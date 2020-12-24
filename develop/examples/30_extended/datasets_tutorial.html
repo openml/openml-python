@@ -11,11 +11,11 @@
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -113,6 +113,7 @@
 </li>
 <li><a class="reference internal" href="#exercise-2">Exercise 2</a><ul>
 <li><a class="reference internal" href="#edit-a-created-dataset">Edit a created dataset</a></li>
+<li><a class="reference internal" href="#fork-dataset">Fork dataset</a></li>
 </ul>
 </li>
 </ul>
@@ -125,7 +126,8 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-datasets-tutorial-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-datasets-tutorial-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="datasets">
 <span id="sphx-glr-examples-30-extended-datasets-tutorial-py"></span><h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h1>
@@ -162,9 +164,10 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 3212 datasets...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 3253 datasets...
 </pre></div>
 </div>
+<div class="output_subarea output_html rendered_html output_result">
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -395,6 +398,7 @@
   </tbody>
 </table>
 </div>
+</div>
 <br />
 <br /></div>
 <div class="section" id="exercise-1">
@@ -411,6 +415,7 @@
 <span class="n">datalist</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;NumberOfClasses &gt; 50&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="output_subarea output_html rendered_html output_result">
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -494,6 +499,14 @@
       <td>144.0</td>
     </tr>
     <tr>
+      <th>41983</th>
+      <td>41983</td>
+      <td>CIFAR-100</td>
+      <td>60000.0</td>
+      <td>3073.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
       <th>42078</th>
       <td>42078</td>
       <td>beer_reviews</td>
@@ -551,6 +564,7 @@
     </tr>
   </tbody>
 </table>
+</div>
 </div>
 <br />
 <br /><div class="section" id="download-datasets">
@@ -712,31 +726,39 @@ original_data_url, paper_url</p>
 only for the dataset owner. Further, critical fields cannot be edited if the dataset has any
 tasks associated with it. To edit critical fields of a dataset (without tasks) owned by you,
 configure the API key:
-openml.config.apikey = ‘FILL_IN_OPENML_API_KEY’</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_id</span> <span class="o">=</span> <span class="n">edit_dataset</span><span class="p">(</span><span class="mi">564</span><span class="p">,</span> <span class="n">default_target_attribute</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Edited dataset ID: </span><span class="si">{</span><span class="n">data_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+openml.config.apikey = ‘FILL_IN_OPENML_API_KEY’
+This example here only shows a failure when trying to work on a dataset not owned by you:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">data_id</span> <span class="o">=</span> <span class="n">edit_dataset</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">default_target_attribute</span><span class="o">=</span><span class="s2">&quot;shape&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">openml</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">OpenMLServerException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Edited dataset ID: 564
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>https://test.openml.org/api/v1/xml/data/edit returned code 1065: Critical features default_target_attribute, row_id_attribute and ignore_attribute can be edited only by the owner. Fork the dataset if changes are required. - None
 </pre></div>
 </div>
-<p>Fork dataset
-Used to create a copy of the dataset with you as the owner.
+</div>
+<div class="section" id="fork-dataset">
+<h3>Fork dataset<a class="headerlink" href="#fork-dataset" title="Permalink to this headline">¶</a></h3>
+<p>Used to create a copy of the dataset with you as the owner.
 Use this API only if you are unable to edit the critical fields (default_target_attribute,
 ignore_attribute, row_id_attribute) of a dataset through the edit_dataset API.
 After the dataset is forked, you can edit the new version of the dataset using edit_dataset.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_id</span> <span class="o">=</span> <span class="n">fork_dataset</span><span class="p">(</span><span class="mi">564</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_id</span> <span class="o">=</span> <span class="n">fork_dataset</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_id</span><span class="p">)</span>
+<span class="n">data_id</span> <span class="o">=</span> <span class="n">edit_dataset</span><span class="p">(</span><span class="n">data_id</span><span class="p">,</span> <span class="n">default_target_attribute</span><span class="o">=</span><span class="s2">&quot;shape&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Forked dataset ID: </span><span class="si">{</span><span class="n">data_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Forked dataset ID: 141470
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>11292
+Forked dataset ID: 11292
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.851 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.788 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-datasets-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/b95c071188526f5ef5d991e382df9fa5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>
@@ -762,8 +784,8 @@ After the dataset is forked, you can edit the new version of the dataset using e
       
     </p>
     <p>
-        &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
+        &copy; Copyright 2014-2020, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.0.<br/>
     </p>
   </div>
 </footer>

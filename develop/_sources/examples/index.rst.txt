@@ -228,27 +228,6 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="How to list and download datasets.">
-
-.. only:: html
-
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_datasets_tutorial_thumb.png
-     :alt: Datasets
-
-     :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/datasets_tutorial
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to list and download tasks.">
 
 .. only:: html
@@ -267,6 +246,27 @@ Extended examples for the usage of the OpenML python connector.
    :hidden:
 
    /examples/30_extended/tasks_tutorial
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="How to list and download datasets.">
+
+.. only:: html
+
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_datasets_tutorial_thumb.png
+     :alt: Datasets
+
+     :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/30_extended/datasets_tutorial
 
 .. raw:: html
 

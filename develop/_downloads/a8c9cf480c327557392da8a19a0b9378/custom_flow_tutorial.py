@@ -82,10 +82,10 @@ flow_hyperparameters = dict(
 # This allows people to specify auto-sklearn hyperparameters used in this flow.
 # In general, using a subflow is not required.
 #
-# Note: flow 15275 is not actually the right flow on the test server,
+# Note: flow 9313 is not actually the right flow on the test server,
 # but that does not matter for this demonstration.
 
-autosklearn_flow = openml.flows.get_flow(15275)  # auto-sklearn 0.5.1
+autosklearn_flow = openml.flows.get_flow(9313)  # auto-sklearn 0.5.1
 subflow = dict(components=OrderedDict(automl_tool=autosklearn_flow),)
 
 ####################################################################################################
@@ -120,7 +120,7 @@ parameters = [
     OrderedDict([("oml:name", "time"), ("oml:value", 120), ("oml:component", flow_id)]),
 ]
 
-task_id = 1408  # Iris Task
+task_id = 1965  # Iris Task
 task = openml.tasks.get_task(task_id)
 dataset_id = task.get_dataset().dataset_id
 

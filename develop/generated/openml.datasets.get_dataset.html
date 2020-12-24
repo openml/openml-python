@@ -11,11 +11,11 @@
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -116,7 +116,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.get_dataset<a class="headerlink" href="#openml-datasets-get-dataset" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="openml.datasets.get_dataset">
-<code class="sig-prename descclassname">openml.datasets.</code><code class="sig-name descname">get_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset_id</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>int<span class="p">, </span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">download_data</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">version</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">error_if_multiple</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">cache_format</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'pickle'</span></em><span class="sig-paren">)</span> &#x2192; openml.datasets.dataset.OpenMLDataset<a class="headerlink" href="#openml.datasets.get_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openml.datasets.</code><code class="sig-name descname">get_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset_id</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>int<span class="p">, </span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">download_data</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">version</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">error_if_multiple</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">cache_format</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'pickle'</span></em><span class="sig-paren">)</span> &#x2192; openml.datasets.dataset.OpenMLDataset<a class="headerlink" href="#openml.datasets.get_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download the OpenML dataset representation, optionally also download actual data file.</p>
 <p>This function is thread/multiprocessing safe.
 This function uses caching. A check will be performed to determine if the information has
@@ -168,8 +168,8 @@ no.of.rows is very high.</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
+        &copy; Copyright 2014-2020, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.0.<br/>
     </p>
   </div>
 </footer>

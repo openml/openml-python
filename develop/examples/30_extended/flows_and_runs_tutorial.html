@@ -11,11 +11,11 @@
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -123,7 +123,8 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="flows-and-runs">
 <span id="sphx-glr-examples-30-extended-flows-and-runs-tutorial-py"></span><h1>Flows and Runs<a class="headerlink" href="#flows-and-runs" title="Permalink to this headline">¶</a></h1>
@@ -204,11 +205,11 @@ Run ID.......: None
 Task ID......: 403
 Task Type....: None
 Task URL.....: https://test.openml.org/t/403
-Flow ID......: 498563
+Flow ID......: 36112
 Flow Name....: sklearn.tree._classes.ExtraTreeClassifier
-Flow URL.....: https://test.openml.org/f/498563
+Flow URL.....: https://test.openml.org/f/36112
 Setup ID.....: None
-Setup String.: Python_3.8.6. Sklearn_0.23.2. NumPy_1.19.4. SciPy_1.5.3. ExtraTreeClassifier(random_state=39634)
+Setup String.: Python_3.8.6. Sklearn_0.24.0. NumPy_1.19.4. SciPy_1.5.4. ExtraTreeClassifier(random_state=45907)
 Dataset ID...: 68
 Dataset URL..: https://test.openml.org/d/68
 </pre></div>
@@ -223,7 +224,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/196070
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/12994
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -234,8 +235,8 @@ the run is sent to the OpenML server:</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Flow
 ===========
-Flow ID.........: 498563 (version 5)
-Flow URL........: https://test.openml.org/f/498563
+Flow ID.........: 36112 (version 3)
+Flow URL........: https://test.openml.org/f/36112
 Flow Name.......: sklearn.tree._classes.ExtraTreeClassifier
 Flow Description: An extremely randomized tree classifier.
 
@@ -247,8 +248,8 @@ selected features and the best split among those is chosen. When
 decision tree.
 
 Warning: Extra-trees should only be used within ensemble methods.
-Upload Date.....: 2020-10-30 21:26:32
-Dependencies....: sklearn==0.23.2
+Upload Date.....: 2020-12-22 19:56:28
+Dependencies....: sklearn==0.24.0
 numpy&gt;=1.6.1
 scipy&gt;=0.9
 </pre></div>
@@ -317,7 +318,7 @@ scipy&gt;=0.9
   warnings.warn(message)
 /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
   warnings.warn(message)
-Uploaded to http://test.openml.org/r/196074
+Uploaded to http://test.openml.org/r/12996
 </pre></div>
 </div>
 </div>
@@ -352,14 +353,14 @@ OpenML Run
 ==========
 Uploader Name: None
 Metric.......: None
-Run ID.......: 196076
-Run URL......: https://test.openml.org/r/196076
+Run ID.......: 12997
+Run URL......: https://test.openml.org/r/12997
 Task ID......: 6
 Task Type....: None
 Task URL.....: https://test.openml.org/t/6
-Flow ID......: 498567
+Flow ID......: 36117
 Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(Nominal=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder)),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
-Flow URL.....: https://test.openml.org/f/498567
+Flow URL.....: https://test.openml.org/f/36117
 Setup ID.....: None
 Setup String.: None
 Dataset ID...: None
@@ -411,13 +412,13 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/196077
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/13000
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  20.515 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  19.394 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9e0617073c8209f15abf91f273871776/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></p>
@@ -442,8 +443,8 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
       
     </p>
     <p>
-        &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
+        &copy; Copyright 2014-2020, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.0.<br/>
     </p>
   </div>
 </footer>

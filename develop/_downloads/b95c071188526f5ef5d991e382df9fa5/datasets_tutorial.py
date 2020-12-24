@@ -112,7 +112,7 @@ _ = pd.plotting.scatter_matrix(
 
 ############################################################################
 # Edit a created dataset
-# =================================================
+# ======================
 # This example uses the test server, to avoid editing a dataset on the main server.
 openml.config.start_using_configuration_for_example()
 ############################################################################
@@ -143,18 +143,23 @@ print(f"Edited dataset ID: {data_id}")
 # tasks associated with it. To edit critical fields of a dataset (without tasks) owned by you,
 # configure the API key:
 # openml.config.apikey = 'FILL_IN_OPENML_API_KEY'
-data_id = edit_dataset(564, default_target_attribute="y")
-print(f"Edited dataset ID: {data_id}")
-
+# This example here only shows a failure when trying to work on a dataset not owned by you:
+try:
+    data_id = edit_dataset(1, default_target_attribute="shape")
+except openml.exceptions.OpenMLServerException as e:
+    print(e)
 
 ############################################################################
 # Fork dataset
+# ============
 # Used to create a copy of the dataset with you as the owner.
 # Use this API only if you are unable to edit the critical fields (default_target_attribute,
 # ignore_attribute, row_id_attribute) of a dataset through the edit_dataset API.
 # After the dataset is forked, you can edit the new version of the dataset using edit_dataset.
 
-data_id = fork_dataset(564)
+data_id = fork_dataset(1)
+print(data_id)
+data_id = edit_dataset(data_id, default_target_attribute="shape")
 print(f"Forked dataset ID: {data_id}")
 
 openml.config.stop_using_configuration_for_example()

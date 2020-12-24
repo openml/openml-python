@@ -11,11 +11,11 @@
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -116,7 +116,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>.run_flow_on_task<a class="headerlink" href="#openml-runs-run-flow-on-task" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="openml.runs.run_flow_on_task">
-<code class="sig-prename descclassname">openml.runs.</code><code class="sig-name descname">run_flow_on_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">flow</span><span class="p">:</span> <span class="n">openml.flows.flow.OpenMLFlow</span></em>, <em class="sig-param"><span class="n">task</span><span class="p">:</span> <span class="n">openml.tasks.task.OpenMLTask</span></em>, <em class="sig-param"><span class="n">avoid_duplicate_runs</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">flow_tags</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">seed</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">add_local_measures</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">upload_flow</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">dataset_format</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'dataframe'</span></em><span class="sig-paren">)</span> &#x2192; openml.runs.run.OpenMLRun<a class="headerlink" href="#openml.runs.run_flow_on_task" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">openml.runs.</code><code class="sig-name descname">run_flow_on_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">flow</span><span class="p">:</span> <span class="n">openml.flows.flow.OpenMLFlow</span></em>, <em class="sig-param"><span class="n">task</span><span class="p">:</span> <span class="n">openml.tasks.task.OpenMLTask</span></em>, <em class="sig-param"><span class="n">avoid_duplicate_runs</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">flow_tags</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">seed</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">add_local_measures</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">upload_flow</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">dataset_format</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'dataframe'</span></em><span class="sig-paren">)</span> &#x2192; openml.runs.run.OpenMLRun<a class="headerlink" href="#openml.runs.run_flow_on_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the model provided by the flow on the dataset defined by task.</p>
 <p>Takes the flow and repeat information into account.
 The Flow may optionally be published.</p>
@@ -174,8 +174,8 @@ If ‘dataframe’, the dataset is passed to the model as a pandas dataframe.</p
       
     </p>
     <p>
-        &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
+        &copy; Copyright 2014-2020, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.0.<br/>
     </p>
   </div>
 </footer>
