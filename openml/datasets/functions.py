@@ -310,8 +310,7 @@ def _name_to_id(
 
 
 def get_datasets(
-    dataset_ids: List[Union[str, int]], download_data: bool = True,
-    download_qualities: bool = True
+    dataset_ids: List[Union[str, int]], download_data: bool = True, download_qualities: bool = True
 ) -> List[OpenMLDataset]:
     """Download datasets.
 
@@ -346,7 +345,8 @@ def get_dataset(
     version: int = None,
     error_if_multiple: bool = False,
     cache_format: str = "pickle",
-    download_qualities: bool = True) -> OpenMLDataset:
+    download_qualities: bool = True,
+) -> OpenMLDataset:
     """ Download the OpenML dataset representation, optionally also download actual data file.
 
     This function is thread/multiprocessing safe.
@@ -406,7 +406,9 @@ def get_dataset(
         features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
 
         try:
-            qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id,download_qualities)
+            qualities_file = _get_dataset_qualities_file(
+                did_cache_dir, dataset_id, download_qualities
+            )
         except OpenMLServerException as e:
             if e.code == 362 and str(e) == "No qualities found - None":
                 logger.warning("No qualities found for dataset {}".format(dataset_id))
@@ -982,7 +984,7 @@ def _get_dataset_features_file(did_cache_dir: str, dataset_id: int) -> str:
     return features_file
 
 
-def _get_dataset_qualities_file(did_cache_dir, dataset_id,download_qualities):
+def _get_dataset_qualities_file(did_cache_dir, dataset_id, download_qualities=True):
     """API call to load dataset qualities. Loads from cache or downloads them.
 
     Features are metafeatures (number of features, number of classes, ...)
@@ -1002,7 +1004,7 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id,download_qualities):
     str
         Path of the cached qualities file
     """
-    if download_qualities == True:
+    if download_qualities:
         # Dataset qualities are subject to change and must be fetched every time
         qualities_file = os.path.join(did_cache_dir, "qualities.xml")
         try:
@@ -1017,7 +1019,6 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id,download_qualities):
         return qualities_file
     else:
         pass
-    
 
 
 def _create_dataset_from_description(
