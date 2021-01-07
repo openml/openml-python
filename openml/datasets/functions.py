@@ -311,6 +311,7 @@ def _name_to_id(
 
 def get_datasets(
     dataset_ids: List[Union[str, int]], download_data: bool = True,
+    download_qualities: bool = True
 ) -> List[OpenMLDataset]:
     """Download datasets.
 
@@ -334,7 +335,7 @@ def get_datasets(
     """
     datasets = []
     for dataset_id in dataset_ids:
-        datasets.append(get_dataset(dataset_id, download_data))
+        datasets.append(get_dataset(dataset_id, download_data, download_qualities))
     return datasets
 
 
@@ -345,7 +346,7 @@ def get_dataset(
     version: int = None,
     error_if_multiple: bool = False,
     cache_format: str = "pickle",
-) -> OpenMLDataset:
+    download_qualities: bool = True) -> OpenMLDataset:
     """ Download the OpenML dataset representation, optionally also download actual data file.
 
     This function is thread/multiprocessing safe.
@@ -405,7 +406,7 @@ def get_dataset(
         features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
 
         try:
-            qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
+            qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id,download_qualities)
         except OpenMLServerException as e:
             if e.code == 362 and str(e) == "No qualities found - None":
                 logger.warning("No qualities found for dataset {}".format(dataset_id))
@@ -981,7 +982,7 @@ def _get_dataset_features_file(did_cache_dir: str, dataset_id: int) -> str:
     return features_file
 
 
-def _get_dataset_qualities_file(did_cache_dir, dataset_id):
+def _get_dataset_qualities_file(did_cache_dir, dataset_id,download_qualities):
     """API call to load dataset qualities. Loads from cache or downloads them.
 
     Features are metafeatures (number of features, number of classes, ...)
@@ -1001,19 +1002,22 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id):
     str
         Path of the cached qualities file
     """
-    # Dataset qualities are subject to change and must be fetched every time
-    qualities_file = os.path.join(did_cache_dir, "qualities.xml")
-    try:
-        with io.open(qualities_file, encoding="utf8") as fh:
-            qualities_xml = fh.read()
-    except (OSError, IOError):
-        url_extension = "data/qualities/{}".format(dataset_id)
-        qualities_xml = openml._api_calls._perform_api_call(url_extension, "get")
+    if download_qualities == True:
+        # Dataset qualities are subject to change and must be fetched every time
+        qualities_file = os.path.join(did_cache_dir, "qualities.xml")
+        try:
+            with io.open(qualities_file, encoding="utf8") as fh:
+                qualities_xml = fh.read()
+        except (OSError, IOError):
+            url_extension = "data/qualities/{}".format(dataset_id)
+            qualities_xml = openml._api_calls._perform_api_call(url_extension, "get")
 
-        with io.open(qualities_file, "w", encoding="utf8") as fh:
-            fh.write(qualities_xml)
-
-    return qualities_file
+            with io.open(qualities_file, "w", encoding="utf8") as fh:
+                fh.write(qualities_xml)
+        return qualities_file
+    else:
+        pass
+    
 
 
 def _create_dataset_from_description(
