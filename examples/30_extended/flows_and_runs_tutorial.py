@@ -8,6 +8,7 @@ How to train/run a model and how to upload the results.
 # License: BSD 3-Clause
 
 import openml
+import numpy as np
 from sklearn import compose, ensemble, neighbors, preprocessing, pipeline, tree
 
 ############################################################################
