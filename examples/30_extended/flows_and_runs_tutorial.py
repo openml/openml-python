@@ -8,7 +8,7 @@ How to train/run a model and how to upload the results.
 # License: BSD 3-Clause
 
 import openml
-from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
+from sklearn import compose, ensemble, neighbors, preprocessing, pipeline, tree
 
 ############################################################################
 # Train machine learning models
@@ -37,9 +37,13 @@ dataset = openml.datasets.get_dataset(17)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
     dataset_format="array", target=dataset.default_target_attribute
 )
+numerical_indicator = list(~np.array(categorical_indicator))
 print(f"Categorical features: {categorical_indicator}")
 transformer = compose.ColumnTransformer(
-    [("one_hot_encoder", preprocessing.OneHotEncoder(categories="auto"), categorical_indicator)]
+    [
+        ("one_hot_encoder", preprocessing.OneHotEncoder(categories="auto"), categorical_indicator),
+        ("numeric_pass", "passthrough", numerical_indicator),
+    ]
 )
 X = transformer.fit_transform(X)
 clf.fit(X, y)
@@ -89,6 +93,12 @@ nominal_feature_indices = [
     for i in range(len(features))
     if features[i].name != task.target_name and features[i].data_type == "nominal"
 ]
+numeric_feature_indices = [
+    i
+    for i in range(len(features))
+    if features[i].name != task.target_name and features[i].data_type == "numeric"
+]
+
 pipe = pipeline.Pipeline(
     steps=[
         (
@@ -97,19 +107,10 @@ pipe = pipeline.Pipeline(
                 [
                     (
                         "Nominal",
-                        pipeline.Pipeline(
-                            [
-                                ("Imputer", impute.SimpleImputer(strategy="most_frequent")),
-                                (
-                                    "Encoder",
-                                    preprocessing.OneHotEncoder(
-                                        sparse=False, handle_unknown="ignore",
-                                    ),
-                                ),
-                            ]
-                        ),
+                        preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore",),
                         nominal_feature_indices,
                     ),
+                    ("Numeric", "passthrough", numeric_feature_indices,),
                 ]
             ),
         ),

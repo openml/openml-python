@@ -36,10 +36,8 @@ import numpy as np
 import openml
 from sklearn.pipeline import make_pipeline, Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, FunctionTransformer
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.decomposition import TruncatedSVD
 
 
 openml.config.start_using_configuration_for_example()
@@ -66,12 +64,9 @@ def cat(X):
     return X.dtypes == "category"
 
 
-cat_imp = make_pipeline(
-    SimpleImputer(strategy="most_frequent"),
-    OneHotEncoder(handle_unknown="ignore", sparse=False),
-    TruncatedSVD(),
+ct = ColumnTransformer(
+    [("cat", OneHotEncoder(handle_unknown="ignore"), cat), ("cont", "passthrough", cont)]
 )
-ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", "passthrough", cont)])
 model_original = Pipeline(steps=[("transform", ct), ("estimator", RandomForestClassifier()),])
 
 # Let's change some hyperparameters. Of course, in any good application we
