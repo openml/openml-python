@@ -1004,21 +1004,18 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id, download_qualities=Tr
     str
         Path of the cached qualities file
     """
-    if download_qualities:
-        # Dataset qualities are subject to change and must be fetched every time
-        qualities_file = os.path.join(did_cache_dir, "qualities.xml")
-        try:
-            with io.open(qualities_file, encoding="utf8") as fh:
-                qualities_xml = fh.read()
-        except (OSError, IOError):
+    # Dataset qualities are subject to change and must be fetched every time
+    qualities_file = os.path.join(did_cache_dir, "qualities.xml")
+    try:
+        with io.open(qualities_file, encoding="utf8") as fh:
+            qualities_xml = fh.read()
+    except (OSError, IOError):
+        if download_qualities:
             url_extension = "data/qualities/{}".format(dataset_id)
             qualities_xml = openml._api_calls._perform_api_call(url_extension, "get")
-
             with io.open(qualities_file, "w", encoding="utf8") as fh:
                 fh.write(qualities_xml)
-        return qualities_file
-    else:
-        pass
+    return qualities_file
 
 
 def _create_dataset_from_description(
