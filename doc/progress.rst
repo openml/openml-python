@@ -12,6 +12,7 @@ Changelog
 * MAINT #671: Improved the performance of ``check_datasets_active`` by only querying the given list of datasets in contrast to querying all datasets. Modified the corresponding unit test.
 * FIX #964 : AValidate `ignore_attribute`, `default_target_attribute`, `row_id_attribute` are set to attributes that exist on the dataset when calling ``create_dataset``.
 * DOC #973 : Change the task used in the welcome page example so it no longer fails using numerical dataset.
+* ADD #1009 : Give possibility to not download the dataset qualities. The cached version is used even so download attribute is false.
 0.11.0
 ~~~~~~
 * ADD #753: Allows uploading custom flows to OpenML via OpenML-Python.
