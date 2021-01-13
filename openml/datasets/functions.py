@@ -328,7 +328,7 @@ def get_datasets(
         make the operation noticeably slower. Metadata is also still retrieved.
         If False, create the OpenMLDataset and only populate it with the metadata.
         The data may later be retrieved through the `OpenMLDataset.get_data` method.
-    download_qualities : bool, optional
+    download_qualities : bool, optional (default=True)
         If True, also download qualities.xml file. If false use the file if it was cached.
 
     Returns
