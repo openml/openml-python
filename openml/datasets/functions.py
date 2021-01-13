@@ -290,7 +290,7 @@ def _name_to_id(
     error_if_multiple : bool (default=False)
         If `False`, if multiple datasets match, return the least recent active dataset.
         If `True`, if multiple datasets match, raise an error.
-    download_qualities : bool, optional
+    download_qualities : bool, optional (default=True)
         If `True`, also download qualities.xml file. If false use the file if it was cached.
 
     Returns
