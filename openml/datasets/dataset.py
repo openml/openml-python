@@ -276,7 +276,7 @@ class OpenMLDataset(OpenMLBase):
             "upload_date",
             "url",
             "dataset",
-            "arff_file",
+            "data_file",
         }
 
         # check that the keys are identical
@@ -289,7 +289,7 @@ class OpenMLDataset(OpenMLBase):
         return all(self.__dict__[key] == other.__dict__[key] for key in self_keys)
 
     def _download_data(self) -> None:
-        """ Download ARFF data file to standard cache directory. Set `self.arff_file`. """
+        """ Download ARFF data file to standard cache directory. Set `self.data_file`. """
         # import required here to avoid circular import.
         from .functions import _get_dataset_arff
 
@@ -298,7 +298,7 @@ class OpenMLDataset(OpenMLBase):
     def _get_arff(self, format: str) -> Dict:
         """Read ARFF file and return decoded arff.
 
-        Reads the file referenced in self.arff_file.
+        Reads the file referenced in self.data_file.
 
         Parameters
         ----------
