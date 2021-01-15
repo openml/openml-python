@@ -1258,6 +1258,8 @@ class TestOpenMLDataset(TestBase):
 
     def test_get_dataset_cache_format_pickle(self):
         dataset = openml.datasets.get_dataset(1)
+        dataset.get_data()
+
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, "anneal")
         self.assertGreater(len(dataset.features), 1)
