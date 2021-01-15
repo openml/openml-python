@@ -218,16 +218,13 @@ class OpenMLDataset(OpenMLBase):
 
         if data_file is not None:
             rval = self._compressed_cache_file_paths(data_file)
-            self.data_pickle_file = rval[0]  # type: Optional[str]
-            self.data_feather_file = rval[1]  # type: Optional[str]
-            self.feather_attribute_file = rval[2]  # type: Optional[str]
-            self._cache_compressed_file_from_arff(self.data_file)
+            self.data_pickle_file = rval[0] if os.path.exists(rval[0]) else None
+            self.data_feather_file = rval[1] if os.path.exists(rval[1]) else None
+            self.feather_attribute_file = rval[2] if os.path.exists(rval[2]) else None
         else:
-            self.data_pickle_file, self.data_feather_file, self.feather_attribute_file = (
-                None,
-                None,
-                None,
-            )
+            self.data_pickle_file = None
+            self.data_feather_file = None
+            self.feather_attribute_file = None
 
     @property
     def id(self) -> Optional[int]:
