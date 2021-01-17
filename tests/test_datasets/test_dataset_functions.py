@@ -433,6 +433,11 @@ class TestOpenMLDataset(TestBase):
         qualities_xml_path = os.path.join(self.workdir, "qualities.xml")
         self.assertTrue(os.path.exists(qualities_xml_path))
 
+    def test__get_dataset_qualities_skip_download(self):
+        qualities = _get_dataset_qualities_file(self.workdir, 2, False)
+        self.assertIsInstance(qualities, str)
+        self.assertEqual(qualities,'')
+
     def test_deletion_of_cache_dir(self):
         # Simple removal
         did_cache_dir = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, 1,)
