@@ -436,7 +436,7 @@ class TestOpenMLDataset(TestBase):
     def test__get_dataset_qualities_skip_download(self):
         qualities = _get_dataset_qualities_file(self.workdir, 2, False)
         self.assertIsInstance(qualities, str)
-        self.assertEqual(qualities,'')
+        self.assertEqual(qualities, "")
 
     def test_deletion_of_cache_dir(self):
         # Simple removal

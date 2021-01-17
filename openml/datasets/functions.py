@@ -1010,9 +1010,10 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id, download_qualities=Tr
     str
         Path of the cached qualities file
     """
-    # return empty path to avoied used cahched version, this will make the output consistent regardless the cache state.
+    # return empty path to avoied used cahched version, this will make the output consistent
+    # regardless the cache state.
     if not download_qualities:
-        return ''
+        return ""
     # Dataset qualities are subject to change and must be fetched every time
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")
     try:
