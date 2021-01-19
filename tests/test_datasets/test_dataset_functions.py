@@ -36,6 +36,7 @@ from openml.datasets.functions import (
     DATASETS_CACHE_DIR_NAME,
 )
 from openml.datasets import fork_dataset, edit_dataset
+from openml.tasks import TaskType, create_task
 
 
 class TestOpenMLDataset(TestBase):
@@ -414,9 +415,8 @@ class TestOpenMLDataset(TestBase):
         }
         self.assertRaisesRegex(
             OpenMLHashException,
-            "Checksum ad484452702105cbf3d30f8deaba39a9 of downloaded file "
-            "is unequal to the expected checksum abc. "
-            "Raised when downloading dataset 5.",
+            "Checksum of downloaded file is unequal to the expected checksum abc when downloading "
+            "https://www.openml.org/data/download/61. Raised when downloading dataset 5.",
             _get_dataset_arff,
             description,
         )
@@ -498,6 +498,7 @@ class TestOpenMLDataset(TestBase):
         )
         self.assertIsInstance(dataset.dataset_id, int)
 
+    @pytest.mark.flaky()
     def test_data_status(self):
         dataset = OpenMLDataset(
             "%s-UploadTestWithURL" % self._get_sentinel(),
@@ -1257,6 +1258,8 @@ class TestOpenMLDataset(TestBase):
 
     def test_get_dataset_cache_format_pickle(self):
         dataset = openml.datasets.get_dataset(1)
+        dataset.get_data()
+
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, "anneal")
         self.assertGreater(len(dataset.features), 1)
@@ -1271,6 +1274,7 @@ class TestOpenMLDataset(TestBase):
     def test_get_dataset_cache_format_feather(self):
 
         dataset = openml.datasets.get_dataset(128, cache_format="feather")
+        dataset.get_data()
 
         # Check if dataset is written to cache directory using feather
         cache_dir = openml.config.get_cache_directory()
@@ -1350,7 +1354,7 @@ class TestOpenMLDataset(TestBase):
             "original_data_url, default_target_attribute, row_id_attribute, "
             "ignore_attribute or paper_url to edit.",
             edit_dataset,
-            data_id=564,
+            data_id=64,  # blood-transfusion-service-center
         )
         # Check server exception when unknown dataset is provided
         self.assertRaisesRegex(
@@ -1360,15 +1364,32 @@ class TestOpenMLDataset(TestBase):
             data_id=999999,
             description="xor operation dataset",
         )
+
+        # Need to own a dataset to be able to edit meta-data
+        # Will be creating a forked version of an existing dataset to allow the unit test user
+        #  to edit meta-data of a dataset
+        did = fork_dataset(1)
+        self._wait_for_dataset_being_processed(did)
+        TestBase._mark_entity_for_removal("data", did)
+        # Need to upload a task attached to this data to test edit failure
+        task = create_task(
+            task_type=TaskType.SUPERVISED_CLASSIFICATION,
+            dataset_id=did,
+            target_name="class",
+            estimation_procedure_id=1,
+        )
+        task = task.publish()
+        TestBase._mark_entity_for_removal("task", task.task_id)
         # Check server exception when owner/admin edits critical fields of dataset with tasks
         self.assertRaisesRegex(
             OpenMLServerException,
             "Critical features default_target_attribute, row_id_attribute and ignore_attribute "
             "can only be edited for datasets without any tasks.",
             edit_dataset,
-            data_id=223,
+            data_id=did,
             default_target_attribute="y",
         )
+
         # Check server exception when a non-owner or non-admin tries to edit critical fields
         self.assertRaisesRegex(
             OpenMLServerException,

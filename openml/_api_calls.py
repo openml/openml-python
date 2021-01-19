@@ -4,6 +4,7 @@ import time
 import hashlib
 import logging
 import requests
+import xml
 import xmltodict
 from typing import Dict, Optional
 
@@ -105,19 +106,8 @@ def _download_text_file(
 
     logging.info("Starting [%s] request for the URL %s", "get", source)
     start = time.time()
-    response = __read_url(source, request_method="get")
+    response = __read_url(source, request_method="get", md5_checksum=md5_checksum)
     downloaded_file = response.text
-
-    if md5_checksum is not None:
-        md5 = hashlib.md5()
-        md5.update(downloaded_file.encode("utf-8"))
-        md5_checksum_download = md5.hexdigest()
-        if md5_checksum != md5_checksum_download:
-            raise OpenMLHashException(
-                "Checksum {} of downloaded file is unequal to the expected checksum {}.".format(
-                    md5_checksum_download, md5_checksum
-                )
-            )
 
     if output_path is None:
         logging.info(
@@ -163,22 +153,33 @@ def _read_url_files(url, data=None, file_elements=None):
     return response
 
 
-def __read_url(url, request_method, data=None):
+def __read_url(url, request_method, data=None, md5_checksum=None):
     data = {} if data is None else data
     if config.apikey is not None:
         data["api_key"] = config.apikey
+    return _send_request(
+        request_method=request_method, url=url, data=data, md5_checksum=md5_checksum
+    )
 
-    return _send_request(request_method=request_method, url=url, data=data)
+
+def __is_checksum_equal(downloaded_file, md5_checksum=None):
+    if md5_checksum is None:
+        return True
+    md5 = hashlib.md5()
+    md5.update(downloaded_file.encode("utf-8"))
+    md5_checksum_download = md5.hexdigest()
+    if md5_checksum == md5_checksum_download:
+        return True
+    return False
 
 
-def _send_request(
-    request_method, url, data, files=None,
-):
-    n_retries = config.connection_n_retries
+def _send_request(request_method, url, data, files=None, md5_checksum=None):
+    n_retries = max(1, min(config.connection_n_retries, config.max_retries))
+
     response = None
     with requests.Session() as session:
         # Start at one to have a non-zero multiplier for the sleep
-        for i in range(1, n_retries + 1):
+        for retry_counter in range(1, n_retries + 1):
             try:
                 if request_method == "get":
                     response = session.get(url, params=data)
@@ -189,25 +190,36 @@ def _send_request(
                 else:
                     raise NotImplementedError()
                 __check_response(response=response, url=url, file_elements=files)
+                if request_method == "get" and not __is_checksum_equal(response.text, md5_checksum):
+                    raise OpenMLHashException(
+                        "Checksum of downloaded file is unequal to the expected checksum {} "
+                        "when downloading {}.".format(md5_checksum, url)
+                    )
                 break
             except (
                 requests.exceptions.ConnectionError,
                 requests.exceptions.SSLError,
                 OpenMLServerException,
+                xml.parsers.expat.ExpatError,
+                OpenMLHashException,
             ) as e:
                 if isinstance(e, OpenMLServerException):
-                    if e.code != 107:
-                        # 107 is a database connection error - only then do retries
+                    if e.code not in [107, 500]:
+                        # 107: database connection error
+                        # 500: internal server error
                         raise
-                    else:
-                        wait_time = 0.3
+                elif isinstance(e, xml.parsers.expat.ExpatError):
+                    if request_method != "get" or retry_counter >= n_retries:
+                        raise OpenMLServerError(
+                            "Unexpected server error when calling {}. Please contact the "
+                            "developers!\nStatus code: {}\n{}".format(
+                                url, response.status_code, response.text,
+                            )
+                        )
+                if retry_counter >= n_retries:
+                    raise
                 else:
-                    wait_time = 0.1
-                if i == n_retries:
-                    raise e
-                else:
-                    time.sleep(wait_time * i)
-                    continue
+                    time.sleep(retry_counter)
     if response is None:
         raise ValueError("This should never happen!")
     return response
@@ -230,6 +242,8 @@ def __parse_server_exception(
         raise OpenMLServerError("URI too long! ({})".format(url))
     try:
         server_exception = xmltodict.parse(response.text)
+    except xml.parsers.expat.ExpatError:
+        raise
     except Exception:
         # OpenML has a sophisticated error system
         # where information about failures is provided. try to parse this

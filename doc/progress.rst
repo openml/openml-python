@@ -8,6 +8,7 @@ Changelog
 
 0.11.1
 ~~~~~~
+* MAINT #1018 : Refactor data loading and storage. Data is now compressed on the first call to `get_data`.
 * MAINT #891: Changed the way that numerical features are stored. Numerical features that range from 0 to 255 are now stored as uint8, which reduces the storage space required as well as storing and loading times.
 * MAINT #671: Improved the performance of ``check_datasets_active`` by only querying the given list of datasets in contrast to querying all datasets. Modified the corresponding unit test.
 * FIX #964 : Validate ``ignore_attribute``, ``default_target_attribute``, ``row_id_attribute`` are set to attributes that exist on the dataset when calling ``create_dataset``.

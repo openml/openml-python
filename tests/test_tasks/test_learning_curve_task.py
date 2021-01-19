@@ -13,7 +13,7 @@ class OpenMLLearningCurveTaskTest(OpenMLSupervisedTaskTest):
     def setUp(self, n_levels: int = 1):
 
         super(OpenMLLearningCurveTaskTest, self).setUp()
-        self.task_id = 801
+        self.task_id = 801  # diabetes
         self.task_type = TaskType.LEARNING_CURVE
         self.estimation_procedure = 13
 
