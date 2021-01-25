@@ -2235,7 +2235,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             clf = SVC(gamma="scale", random_state=1)
             pipe = make_pipeline(preprocessor, clf)
             # run task
-            run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=True)
+            run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
             run.publish()
             new_run = openml.runs.get_run(run.run_id)
             return new_run
