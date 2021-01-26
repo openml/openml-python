@@ -290,7 +290,7 @@ def _name_to_id(
     error_if_multiple : bool (default=False)
         If `False`, if multiple datasets match, return the least recent active dataset.
         If `True`, if multiple datasets match, raise an error.
-    download_qualities : bool, optional
+    download_qualities : bool, optional (default=True)
         If `True`, also download qualities.xml file. If false use the file if it was cached.
 
     Returns
@@ -328,7 +328,7 @@ def get_datasets(
         make the operation noticeably slower. Metadata is also still retrieved.
         If False, create the OpenMLDataset and only populate it with the metadata.
         The data may later be retrieved through the `OpenMLDataset.get_data` method.
-    download_qualities : bool, optional
+    download_qualities : bool, optional (default=True)
         If True, also download qualities.xml file. If false use the file if it was cached.
 
     Returns
@@ -1005,22 +1005,27 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id, download_qualities=Tr
     dataset_id : int
         Dataset ID
 
+    download_qualities : bool
+        wheather to download/use cahsed version or not.
     Returns
     -------
     str
         Path of the cached qualities file
     """
+    # return empty path to avoied used cahched version, this will make the output consistent
+    # regardless the cache state.
+    if not download_qualities:
+        return ""
     # Dataset qualities are subject to change and must be fetched every time
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")
     try:
         with io.open(qualities_file, encoding="utf8") as fh:
             qualities_xml = fh.read()
     except (OSError, IOError):
-        if download_qualities:
-            url_extension = "data/qualities/{}".format(dataset_id)
-            qualities_xml = openml._api_calls._perform_api_call(url_extension, "get")
-            with io.open(qualities_file, "w", encoding="utf8") as fh:
-                fh.write(qualities_xml)
+        url_extension = "data/qualities/{}".format(dataset_id)
+        qualities_xml = openml._api_calls._perform_api_call(url_extension, "get")
+        with io.open(qualities_file, "w", encoding="utf8") as fh:
+            fh.write(qualities_xml)
     return qualities_file
 
 
