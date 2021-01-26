@@ -338,7 +338,9 @@ def get_datasets(
     """
     datasets = []
     for dataset_id in dataset_ids:
-        datasets.append(get_dataset(dataset_id, download_data, download_qualities))
+        datasets.append(
+            get_dataset(dataset_id, download_data, download_qualities=download_qualities)
+        )
     return datasets
 
 
