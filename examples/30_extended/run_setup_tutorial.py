@@ -34,10 +34,14 @@ In this tutorial we will
 
 import numpy as np
 import openml
+from openml.extensions.sklearn import cat, cont
+
 from sklearn.pipeline import make_pipeline, Pipeline
 from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, FunctionTransformer
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.decomposition import TruncatedSVD
 
 
 openml.config.start_using_configuration_for_example()
@@ -55,18 +59,12 @@ task = openml.tasks.get_task(6)
 # easy as you want it to be
 
 
-# Helper functions to return required columns for ColumnTransformer
-def cont(X):
-    return X.dtypes != "category"
-
-
-def cat(X):
-    return X.dtypes == "category"
-
-
-ct = ColumnTransformer(
-    [("cat", OneHotEncoder(handle_unknown="ignore"), cat), ("cont", "passthrough", cont)]
+cat_imp = make_pipeline(
+    SimpleImputer(strategy="most_frequent"),
+    OneHotEncoder(handle_unknown="ignore", sparse=False),
+    TruncatedSVD(),
 )
+ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", "passthrough", cont)])
 model_original = Pipeline(steps=[("transform", ct), ("estimator", RandomForestClassifier()),])
 
 # Let's change some hyperparameters. Of course, in any good application we

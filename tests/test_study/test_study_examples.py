@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 
-from openml.testing import TestBase, SimpleImputer, CustomImputer, cat, cont
+from openml.testing import TestBase, SimpleImputer, CustomImputer
+from openml.extensions.sklearn import cat, cont
 
 import sklearn
 import unittest

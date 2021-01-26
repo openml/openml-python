@@ -10,6 +10,7 @@ import warnings
 
 import sklearn.metrics
 import xmltodict
+import numpy as np
 import pandas as pd
 
 import openml
@@ -508,7 +509,9 @@ def _run_task_get_arffcontent(
             for i, tst_idx in enumerate(test_indices):
                 if task.class_labels is not None:
                     prediction = (
-                        task.class_labels[pred_y[i]] if isinstance(pred_y[i], int) else pred_y[i]
+                        task.class_labels[pred_y[i]]
+                        if isinstance(pred_y[i], (int, np.integer))
+                        else pred_y[i]
                     )
                     if isinstance(test_y, pd.Series):
                         test_prediction = (
@@ -519,7 +522,7 @@ def _run_task_get_arffcontent(
                     else:
                         test_prediction = (
                             task.class_labels[test_y[i]]
-                            if isinstance(test_y[i], int)
+                            if isinstance(test_y[i], (int, np.integer))
                             else test_y[i]
                         )
                     pred_prob = proba_y.iloc[i] if isinstance(proba_y, pd.DataFrame) else proba_y[i]

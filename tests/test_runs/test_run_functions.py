@@ -20,7 +20,8 @@ import warnings
 import pandas as pd
 
 import openml.extensions.sklearn
-from openml.testing import TestBase, SimpleImputer, CustomImputer, cat, cont
+from openml.testing import TestBase, SimpleImputer, CustomImputer
+from openml.extensions.sklearn import cat, cont
 from openml.runs.functions import _run_task_get_arffcontent, run_exists, format_prediction
 from openml.runs.trace import OpenMLRunTrace
 from openml.tasks import TaskType

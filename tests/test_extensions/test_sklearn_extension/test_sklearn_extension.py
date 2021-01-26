@@ -40,7 +40,8 @@ from openml.exceptions import PyOpenMLError
 from openml.flows import OpenMLFlow
 from openml.flows.functions import assert_flows_equal
 from openml.runs.trace import OpenMLRunTrace
-from openml.testing import TestBase, SimpleImputer, CustomImputer, cat, cont
+from openml.testing import TestBase, SimpleImputer, CustomImputer
+from openml.extensions.sklearn import cat, cont
 
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -2195,16 +2196,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
             # for lower versions
             from sklearn.preprocessing import Imputer as SimpleImputer
 
-        class CustomImputer(SimpleImputer):
-            pass
-
-        def cont(X):
-            return X.dtypes != "category"
-
-        def cat(X):
-            return X.dtypes == "category"
-
-        import sklearn.metrics
         import sklearn.tree
         from sklearn.pipeline import Pipeline, make_pipeline
         from sklearn.compose import ColumnTransformer
@@ -2227,3 +2218,38 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 raise AttributeError(e)
             else:
                 raise Exception(e)
+
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="columntransformer introduction in 0.20.0",
+    )
+    def test_setupid_with_column_transformer(self):
+        """Test to check if inclusion of ColumnTransformer in a pipleline is treated as a new
+        flow each time.
+        """
+        import sklearn.compose
+        from sklearn.svm import SVC
+
+        def column_transformer_pipe(task_id):
+            task = openml.tasks.get_task(task_id)
+            # make columntransformer
+            preprocessor = sklearn.compose.ColumnTransformer(
+                transformers=[
+                    ("num", StandardScaler(), cont),
+                    ("cat", OneHotEncoder(handle_unknown="ignore"), cat),
+                ]
+            )
+            # make pipeline
+            clf = SVC(gamma="scale", random_state=1)
+            pipe = make_pipeline(preprocessor, clf)
+            # run task
+            run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
+            run.publish()
+            new_run = openml.runs.get_run(run.run_id)
+            return new_run
+
+        run1 = column_transformer_pipe(11)  # only categorical
+        TestBase._mark_entity_for_removal("run", run1.run_id)
+        run2 = column_transformer_pipe(23)  # only numeric
+        TestBase._mark_entity_for_removal("run", run2.run_id)
+        self.assertEqual(run1.setup_id, run2.setup_id)

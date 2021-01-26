@@ -9,7 +9,7 @@ How to train/run a model and how to upload the results.
 
 import openml
 import numpy as np
-from sklearn import compose, ensemble, neighbors, preprocessing, pipeline, tree
+from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
 
 ############################################################################
 # Train machine learning models
@@ -38,13 +38,9 @@ dataset = openml.datasets.get_dataset(17)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
     dataset_format="array", target=dataset.default_target_attribute
 )
-numerical_indicator = list(~np.array(categorical_indicator))
 print(f"Categorical features: {categorical_indicator}")
 transformer = compose.ColumnTransformer(
-    [
-        ("one_hot_encoder", preprocessing.OneHotEncoder(categories="auto"), categorical_indicator),
-        ("numeric_pass", "passthrough", numerical_indicator),
-    ]
+    [("one_hot_encoder", preprocessing.OneHotEncoder(categories="auto"), categorical_indicator)]
 )
 X = transformer.fit_transform(X)
 clf.fit(X, y)
@@ -88,17 +84,9 @@ print(flow)
 #
 # When you need to handle 'dirty' data, build pipelines to model then automatically.
 task = openml.tasks.get_task(1)
-features = task.get_dataset().features
-nominal_feature_indices = [
-    i
-    for i in range(len(features))
-    if features[i].name != task.target_name and features[i].data_type == "nominal"
-]
-numeric_feature_indices = [
-    i
-    for i in range(len(features))
-    if features[i].name != task.target_name and features[i].data_type == "numeric"
-]
+
+# OpenML helper functions for sklearn can be plugged in directly for complicated pipelines
+from openml.extensions.sklearn import cat, cont
 
 pipe = pipeline.Pipeline(
     steps=[
@@ -107,11 +95,21 @@ pipe = pipeline.Pipeline(
             compose.ColumnTransformer(
                 [
                     (
-                        "Nominal",
-                        preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore",),
-                        nominal_feature_indices,
+                        "categorical",
+                        pipeline.Pipeline(
+                            [
+                                ("Imputer", impute.SimpleImputer(strategy="most_frequent")),
+                                (
+                                    "Encoder",
+                                    preprocessing.OneHotEncoder(
+                                        sparse=False, handle_unknown="ignore"
+                                    ),
+                                ),
+                            ]
+                        ),
+                        cat,  # returns the categorical feature indices
                     ),
-                    ("Numeric", "passthrough", numeric_feature_indices,),
+                    ("continuous", "passthrough", cont),  # returns the numeric feature indices
                 ]
             ),
         ),
@@ -120,6 +118,56 @@ pipe = pipeline.Pipeline(
 )
 
 run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
+myrun = run.publish()
+print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
+
+
+# The above pipeline works with the helper functions that internally deal with pandas DataFrame.
+# In the case, pandas is not available, or a NumPy based data processing is the requirement, the
+# above pipeline is presented below to work with NumPy.
+
+# Extracting the indices of the categorical columns
+features = task.get_dataset().features
+categorical_feature_indices = []
+numeric_feature_indices = []
+for i in range(len(features)):
+    if features[i].name == task.target_name:
+        continue
+    if features[i].data_type == "nominal":
+        categorical_feature_indices.append(i)
+    else:
+        numeric_feature_indices.append(i)
+
+pipe = pipeline.Pipeline(
+    steps=[
+        (
+            "Preprocessing",
+            compose.ColumnTransformer(
+                [
+                    (
+                        "categorical",
+                        pipeline.Pipeline(
+                            [
+                                ("Imputer", impute.SimpleImputer(strategy="most_frequent")),
+                                (
+                                    "Encoder",
+                                    preprocessing.OneHotEncoder(
+                                        sparse=False, handle_unknown="ignore"
+                                    ),
+                                ),
+                            ]
+                        ),
+                        categorical_feature_indices,
+                    ),
+                    ("continuous", "passthrough", numeric_feature_indices),
+                ]
+            ),
+        ),
+        ("Classifier", ensemble.RandomForestClassifier(n_estimators=10)),
+    ]
+)
+
+run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False, dataset_format="array")
 myrun = run.publish()
 print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 
