@@ -62,10 +62,10 @@ print(test_indices.shape, test_indices.dtype)
 # And then split the data based on this:
 
 X, y, _, _ = task.get_dataset().get_data(task.target_name)
-X_train = X.reindex(index=train_indices)
-y_train = y[train_indices]
-X_test = X.reindex(index=test_indices)
-y_test = y[test_indices]
+X_train = X.iloc[train_indices]
+y_train = y.iloc[train_indices]
+X_test = X.iloc[test_indices]
+y_test = y.iloc[test_indices]
 
 print(
     "X_train.shape: {}, y_train.shape: {}, X_test.shape: {}, y_test.shape: {}".format(
@@ -93,10 +93,10 @@ for repeat_idx in range(n_repeats):
             train_indices, test_indices = task.get_train_test_split_indices(
                 repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
             )
-            X_train = X.reindex(index=train_indices)
-            y_train = y[train_indices]
-            X_test = X.reindex(index=test_indices)
-            y_test = y[test_indices]
+            X_train = X.iloc[train_indices]
+            y_train = y.iloc[train_indices]
+            X_test = X.iloc[test_indices]
+            y_test = y.iloc[test_indices]
 
             print(
                 "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
@@ -131,10 +131,10 @@ for repeat_idx in range(n_repeats):
             train_indices, test_indices = task.get_train_test_split_indices(
                 repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
             )
-            X_train = X.reindex(index=train_indices)
-            y_train = y[train_indices]
-            X_test = X.reindex(index=test_indices)
-            y_test = y[test_indices]
+            X_train = X.iloc[train_indices]
+            y_train = y.iloc[train_indices]
+            X_test = X.iloc[test_indices]
+            y_test = y.iloc[test_indices]
 
             print(
                 "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
@@ -169,10 +169,10 @@ for repeat_idx in range(n_repeats):
             train_indices, test_indices = task.get_train_test_split_indices(
                 repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
             )
-            X_train = X.reindex(index=train_indices)
-            y_train = y[train_indices]
-            X_test = X.reindex(index=test_indices)
-            y_test = y[test_indices]
+            X_train = X.iloc[train_indices]
+            y_train = y.iloc[train_indices]
+            X_test = X.iloc[test_indices]
+            y_test = y.iloc[test_indices]
 
             print(
                 "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
