@@ -305,9 +305,9 @@ def _create_cache_directory_for_id(key, id_):
         Path of the created dataset cache directory.
     """
     cache_dir = os.path.join(_create_cache_directory(key), str(id_))
-    if os.path.exists(cache_dir) and os.path.isdir(cache_dir):
+    if os.path.isdir(cache_dir):
         pass
-    elif os.path.exists(cache_dir) and not os.path.isdir(cache_dir):
+    elif os.path.exists(cache_dir):
         raise ValueError("%s cache dir exists but is not a directory!" % key)
     else:
         os.makedirs(cache_dir)

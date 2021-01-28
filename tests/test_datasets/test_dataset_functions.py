@@ -1258,6 +1258,8 @@ class TestOpenMLDataset(TestBase):
 
     def test_get_dataset_cache_format_pickle(self):
         dataset = openml.datasets.get_dataset(1)
+        dataset.get_data()
+
         self.assertEqual(type(dataset), OpenMLDataset)
         self.assertEqual(dataset.name, "anneal")
         self.assertGreater(len(dataset.features), 1)
@@ -1272,6 +1274,7 @@ class TestOpenMLDataset(TestBase):
     def test_get_dataset_cache_format_feather(self):
 
         dataset = openml.datasets.get_dataset(128, cache_format="feather")
+        dataset.get_data()
 
         # Check if dataset is written to cache directory using feather
         cache_dir = openml.config.get_cache_directory()
