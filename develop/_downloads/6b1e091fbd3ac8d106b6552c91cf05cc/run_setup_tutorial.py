@@ -34,6 +34,8 @@ In this tutorial we will
 
 import numpy as np
 import openml
+from openml.extensions.sklearn import cat, cont
+
 from sklearn.pipeline import make_pipeline, Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -55,15 +57,6 @@ task = openml.tasks.get_task(6)
 # we will create a fairly complex model, with many preprocessing components and
 # many potential hyperparameters. Of course, the model can be as complex and as
 # easy as you want it to be
-
-
-# Helper functions to return required columns for ColumnTransformer
-def cont(X):
-    return X.dtypes != "category"
-
-
-def cat(X):
-    return X.dtypes == "category"
 
 
 cat_imp = make_pipeline(

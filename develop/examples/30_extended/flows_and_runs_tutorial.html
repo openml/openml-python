@@ -132,6 +132,7 @@ to download the full example code</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
 
 <span class="kn">import</span> <span class="nn">openml</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">compose</span><span class="p">,</span> <span class="n">ensemble</span><span class="p">,</span> <span class="n">impute</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">,</span> <span class="n">preprocessing</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">tree</span>
 </pre></div>
 </div>
@@ -205,11 +206,11 @@ Run ID.......: None
 Task ID......: 403
 Task Type....: None
 Task URL.....: https://test.openml.org/t/403
-Flow ID......: 36112
+Flow ID......: 33288
 Flow Name....: sklearn.tree._classes.ExtraTreeClassifier
-Flow URL.....: https://test.openml.org/f/36112
+Flow URL.....: https://test.openml.org/f/33288
 Setup ID.....: None
-Setup String.: Python_3.8.6. Sklearn_0.24.0. NumPy_1.19.4. SciPy_1.5.4. ExtraTreeClassifier(random_state=45907)
+Setup String.: Python_3.8.7. Sklearn_0.24.1. NumPy_1.19.5. SciPy_1.6.0. ExtraTreeClassifier(random_state=35269)
 Dataset ID...: 68
 Dataset URL..: https://test.openml.org/d/68
 </pre></div>
@@ -224,7 +225,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/12994
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to http://test.openml.org/r/15378
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -235,8 +236,8 @@ the run is sent to the OpenML server:</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Flow
 ===========
-Flow ID.........: 36112 (version 3)
-Flow URL........: https://test.openml.org/f/36112
+Flow ID.........: 33288 (version 1)
+Flow URL........: https://test.openml.org/f/33288
 Flow Name.......: sklearn.tree._classes.ExtraTreeClassifier
 Flow Description: An extremely randomized tree classifier.
 
@@ -248,8 +249,8 @@ selected features and the best split among those is chosen. When
 decision tree.
 
 Warning: Extra-trees should only be used within ensemble methods.
-Upload Date.....: 2020-12-22 19:56:28
-Dependencies....: sklearn==0.24.0
+Upload Date.....: 2021-01-26 13:09:07
+Dependencies....: sklearn==0.24.1
 numpy&gt;=1.6.1
 scipy&gt;=0.9
 </pre></div>
@@ -258,12 +259,10 @@ scipy&gt;=0.9
 <h3>It also works with pipelines<a class="headerlink" href="#it-also-works-with-pipelines" title="Permalink to this headline">¶</a></h3>
 <p>When you need to handle ‘dirty’ data, build pipelines to model then automatically.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">features</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">()</span><span class="o">.</span><span class="n">features</span>
-<span class="n">nominal_feature_indices</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">i</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">features</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">task</span><span class="o">.</span><span class="n">target_name</span> <span class="ow">and</span> <span class="n">features</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;nominal&quot;</span>
-<span class="p">]</span>
+
+<span class="c1"># OpenML helper functions for sklearn can be plugged in directly for complicated pipelines</span>
+<span class="kn">from</span> <span class="nn">openml.extensions.sklearn</span> <span class="kn">import</span> <span class="n">cat</span><span class="p">,</span> <span class="n">cont</span>
+
 <span class="n">pipe</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
     <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
         <span class="p">(</span>
@@ -271,20 +270,21 @@ scipy&gt;=0.9
             <span class="n">compose</span><span class="o">.</span><span class="n">ColumnTransformer</span><span class="p">(</span>
                 <span class="p">[</span>
                     <span class="p">(</span>
-                        <span class="s2">&quot;Nominal&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;categorical&quot;</span><span class="p">,</span>
                         <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
                             <span class="p">[</span>
                                 <span class="p">(</span><span class="s2">&quot;Imputer&quot;</span><span class="p">,</span> <span class="n">impute</span><span class="o">.</span><span class="n">SimpleImputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;most_frequent&quot;</span><span class="p">)),</span>
                                 <span class="p">(</span>
                                     <span class="s2">&quot;Encoder&quot;</span><span class="p">,</span>
                                     <span class="n">preprocessing</span><span class="o">.</span><span class="n">OneHotEncoder</span><span class="p">(</span>
-                                        <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">handle_unknown</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+                                        <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">handle_unknown</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span>
                                     <span class="p">),</span>
                                 <span class="p">),</span>
                             <span class="p">]</span>
                         <span class="p">),</span>
-                        <span class="n">nominal_feature_indices</span><span class="p">,</span>
+                        <span class="n">cat</span><span class="p">,</span>  <span class="c1"># returns the categorical feature indices</span>
                     <span class="p">),</span>
+                    <span class="p">(</span><span class="s2">&quot;continuous&quot;</span><span class="p">,</span> <span class="s2">&quot;passthrough&quot;</span><span class="p">,</span> <span class="n">cont</span><span class="p">),</span>  <span class="c1"># returns the numeric feature indices</span>
                 <span class="p">]</span>
             <span class="p">),</span>
         <span class="p">),</span>
@@ -293,6 +293,56 @@ scipy&gt;=0.9
 <span class="p">)</span>
 
 <span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">myrun</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Uploaded to http://test.openml.org/r/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">myrun</span><span class="o">.</span><span class="n">run_id</span><span class="p">))</span>
+
+
+<span class="c1"># The above pipeline works with the helper functions that internally deal with pandas DataFrame.</span>
+<span class="c1"># In the case, pandas is not available, or a NumPy based data processing is the requirement, the</span>
+<span class="c1"># above pipeline is presented below to work with NumPy.</span>
+
+<span class="c1"># Extracting the indices of the categorical columns</span>
+<span class="n">features</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">()</span><span class="o">.</span><span class="n">features</span>
+<span class="n">categorical_feature_indices</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">numeric_feature_indices</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="n">features</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">task</span><span class="o">.</span><span class="n">target_name</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">features</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;nominal&quot;</span><span class="p">:</span>
+        <span class="n">categorical_feature_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">numeric_feature_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+<span class="n">pipe</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span>
+            <span class="s2">&quot;Preprocessing&quot;</span><span class="p">,</span>
+            <span class="n">compose</span><span class="o">.</span><span class="n">ColumnTransformer</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">(</span>
+                        <span class="s2">&quot;categorical&quot;</span><span class="p">,</span>
+                        <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
+                            <span class="p">[</span>
+                                <span class="p">(</span><span class="s2">&quot;Imputer&quot;</span><span class="p">,</span> <span class="n">impute</span><span class="o">.</span><span class="n">SimpleImputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;most_frequent&quot;</span><span class="p">)),</span>
+                                <span class="p">(</span>
+                                    <span class="s2">&quot;Encoder&quot;</span><span class="p">,</span>
+                                    <span class="n">preprocessing</span><span class="o">.</span><span class="n">OneHotEncoder</span><span class="p">(</span>
+                                        <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">handle_unknown</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span>
+                                    <span class="p">),</span>
+                                <span class="p">),</span>
+                            <span class="p">]</span>
+                        <span class="p">),</span>
+                        <span class="n">categorical_feature_indices</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="p">(</span><span class="s2">&quot;continuous&quot;</span><span class="p">,</span> <span class="s2">&quot;passthrough&quot;</span><span class="p">,</span> <span class="n">numeric_feature_indices</span><span class="p">),</span>
+                <span class="p">]</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Classifier&quot;</span><span class="p">,</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">10</span><span class="p">)),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;array&quot;</span><span class="p">)</span>
 <span class="n">myrun</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Uploaded to http://test.openml.org/r/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">myrun</span><span class="o">.</span><span class="n">run_id</span><span class="p">))</span>
 </pre></div>
@@ -318,7 +368,28 @@ scipy&gt;=0.9
   warnings.warn(message)
 /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
   warnings.warn(message)
-Uploaded to http://test.openml.org/r/12996
+Uploaded to http://test.openml.org/r/15381
+/home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+/home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
+  warnings.warn(message)
+Uploaded to http://test.openml.org/r/15385
 </pre></div>
 </div>
 </div>
@@ -353,14 +424,14 @@ OpenML Run
 ==========
 Uploader Name: None
 Metric.......: None
-Run ID.......: 12997
-Run URL......: https://test.openml.org/r/12997
+Run ID.......: 15388
+Run URL......: https://test.openml.org/r/15388
 Task ID......: 6
 Task Type....: None
 Task URL.....: https://test.openml.org/t/6
-Flow ID......: 36117
-Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(Nominal=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder)),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
-Flow URL.....: https://test.openml.org/f/36117
+Flow ID......: 35729
+Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(categorical=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder),continuous=passthrough),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
+Flow URL.....: https://test.openml.org/f/35729
 Setup ID.....: None
 Setup String.: None
 Dataset ID...: None
@@ -412,13 +483,13 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/13000
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: http://test.openml.org/r/15392
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  19.394 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  26.722 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9e0617073c8209f15abf91f273871776/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></p>
@@ -443,8 +514,8 @@ task_id:<a class="reference external" href="http://www.openml.org/t/52950">52950
       
     </p>
     <p>
-        &copy; Copyright 2014-2020, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.0.<br/>
+        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
     </p>
   </div>
 </footer>

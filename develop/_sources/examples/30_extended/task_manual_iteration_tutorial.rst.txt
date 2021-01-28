@@ -166,11 +166,11 @@ And then split the data based on this:
 .. code-block:: default
 
 
-    X, y, _, _ = task.get_dataset().get_data(task.target_name)
-    X_train = X.loc[train_indices]
-    y_train = y[train_indices]
-    X_test = X.loc[test_indices]
-    y_test = y[test_indices]
+    X, y = task.get_X_and_y(dataset_format="dataframe")
+    X_train = X.iloc[train_indices]
+    y_train = y.iloc[train_indices]
+    X_test = X.iloc[test_indices]
+    y_test = y.iloc[test_indices]
 
     print(
         "X_train.shape: {}, y_train.shape: {}, X_test.shape: {}, y_test.shape: {}".format(
@@ -197,13 +197,14 @@ And then split the data based on this:
 
 Obviously, we can also retrieve cross-validation versions of the dataset used in task ``233``:
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-88
+.. GENERATED FROM PYTHON SOURCE LINES 78-89
 
 .. code-block:: default
 
 
     task_id = 3
     task = openml.tasks.get_task(task_id)
+    X, y = task.get_X_and_y(dataset_format="dataframe")
     n_repeats, n_folds, n_samples = task.get_split_dimensions()
     print(
         "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
@@ -226,11 +227,11 @@ Obviously, we can also retrieve cross-validation versions of the dataset used in
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-90
+.. GENERATED FROM PYTHON SOURCE LINES 90-91
 
 And then perform the aforementioned iteration over all splits:
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-114
+.. GENERATED FROM PYTHON SOURCE LINES 91-115
 
 .. code-block:: default
 
@@ -240,10 +241,10 @@ And then perform the aforementioned iteration over all splits:
                 train_indices, test_indices = task.get_train_test_split_indices(
                     repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
                 )
-                X_train = X.loc[train_indices]
-                y_train = y[train_indices]
-                X_test = X.loc[test_indices]
-                y_test = y[test_indices]
+                X_train = X.iloc[train_indices]
+                y_train = y.iloc[train_indices]
+                X_test = X.iloc[test_indices]
+                y_test = y.iloc[test_indices]
 
                 print(
                     "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
@@ -282,17 +283,18 @@ And then perform the aforementioned iteration over all splits:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-116
+.. GENERATED FROM PYTHON SOURCE LINES 116-117
 
 And also versions with multiple repeats:
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-126
+.. GENERATED FROM PYTHON SOURCE LINES 117-128
 
 .. code-block:: default
 
 
     task_id = 1767
     task = openml.tasks.get_task(task_id)
+    X, y = task.get_X_and_y(dataset_format="dataframe")
     n_repeats, n_folds, n_samples = task.get_split_dimensions()
     print(
         "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
@@ -315,11 +317,11 @@ And also versions with multiple repeats:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-128
+.. GENERATED FROM PYTHON SOURCE LINES 129-130
 
 And then again perform the aforementioned iteration over all splits:
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-152
+.. GENERATED FROM PYTHON SOURCE LINES 130-154
 
 .. code-block:: default
 
@@ -329,10 +331,10 @@ And then again perform the aforementioned iteration over all splits:
                 train_indices, test_indices = task.get_train_test_split_indices(
                     repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
                 )
-                X_train = X.loc[train_indices]
-                y_train = y[train_indices]
-                X_test = X.loc[test_indices]
-                y_test = y[test_indices]
+                X_train = X.iloc[train_indices]
+                y_train = y.iloc[train_indices]
+                X_test = X.iloc[test_indices]
+                y_test = y.iloc[test_indices]
 
                 print(
                     "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
@@ -371,17 +373,18 @@ And then again perform the aforementioned iteration over all splits:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-154
+.. GENERATED FROM PYTHON SOURCE LINES 155-156
 
 And finally a task based on learning curves:
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-164
+.. GENERATED FROM PYTHON SOURCE LINES 156-167
 
 .. code-block:: default
 
 
     task_id = 1702
     task = openml.tasks.get_task(task_id)
+    X, y = task.get_X_and_y(dataset_format="dataframe")
     n_repeats, n_folds, n_samples = task.get_split_dimensions()
     print(
         "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
@@ -404,11 +407,11 @@ And finally a task based on learning curves:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-166
+.. GENERATED FROM PYTHON SOURCE LINES 168-169
 
 And then again perform the aforementioned iteration over all splits:
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-189
+.. GENERATED FROM PYTHON SOURCE LINES 169-192
 
 .. code-block:: default
 
@@ -418,10 +421,10 @@ And then again perform the aforementioned iteration over all splits:
                 train_indices, test_indices = task.get_train_test_split_indices(
                     repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
                 )
-                X_train = X.loc[train_indices]
-                y_train = y[train_indices]
-                X_test = X.loc[test_indices]
-                y_test = y[test_indices]
+                X_train = X.iloc[train_indices]
+                y_train = y.iloc[train_indices]
+                X_test = X.iloc[test_indices]
+                y_test = y.iloc[test_indices]
 
                 print(
                     "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
@@ -572,7 +575,7 @@ And then again perform the aforementioned iteration over all splits:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.417 seconds)
+   **Total running time of the script:** ( 0 minutes  5.436 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_task_manual_iteration_tutorial.py:

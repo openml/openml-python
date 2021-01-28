@@ -129,6 +129,7 @@
 <div class="section" id="id1">
 <h2>0.11.1<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
+<li><p>MAINT #1018 : Refactor data loading and storage. Data is now compressed on the first call to <cite>get_data</cite>.</p></li>
 <li><p>MAINT #891: Changed the way that numerical features are stored. Numerical features that range from 0 to 255 are now stored as uint8, which reduces the storage space required as well as storing and loading times.</p></li>
 <li><p>MAINT #671: Improved the performance of <code class="docutils literal notranslate"><span class="pre">check_datasets_active</span></code> by only querying the given list of datasets in contrast to querying all datasets. Modified the corresponding unit test.</p></li>
 <li><p>FIX #964 : AValidate <cite>ignore_attribute</cite>, <cite>default_target_attribute</cite>, <cite>row_id_attribute</cite> are set to attributes that exist on the dataset when calling <code class="docutils literal notranslate"><span class="pre">create_dataset</span></code>.</p></li>
@@ -367,8 +368,8 @@ failing to create a flow from the OpenML description.</p></li>
       
     </p>
     <p>
-        &copy; Copyright 2014-2020, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.0.<br/>
+        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
     </p>
   </div>
 </footer>

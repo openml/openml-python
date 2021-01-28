@@ -48,7 +48,7 @@ In this tutorial we will
    connects to the test server at test.openml.org. This prevents the main
    server from crowding with example datasets, tasks, runs, and so on.
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-47
+.. GENERATED FROM PYTHON SOURCE LINES 32-49
 
 .. code-block:: default
 
@@ -57,6 +57,8 @@ In this tutorial we will
 
     import numpy as np
     import openml
+    from openml.extensions.sklearn import cat, cont
+
     from sklearn.pipeline import make_pipeline, Pipeline
     from sklearn.compose import ColumnTransformer
     from sklearn.impute import SimpleImputer
@@ -74,12 +76,12 @@ In this tutorial we will
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-50
+.. GENERATED FROM PYTHON SOURCE LINES 50-52
 
 1) Create a flow and use it to solve a task
 ##############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-93
+.. GENERATED FROM PYTHON SOURCE LINES 52-86
 
 .. code-block:: default
 
@@ -91,15 +93,6 @@ In this tutorial we will
     # we will create a fairly complex model, with many preprocessing components and
     # many potential hyperparameters. Of course, the model can be as complex and as
     # easy as you want it to be
-
-
-    # Helper functions to return required columns for ColumnTransformer
-    def cont(X):
-        return X.dtypes != "category"
-
-
-    def cat(X):
-        return X.dtypes == "category"
 
 
     cat_imp = make_pipeline(
@@ -142,12 +135,12 @@ In this tutorial we will
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-96
+.. GENERATED FROM PYTHON SOURCE LINES 87-89
 
 2) Download the flow and solve the same task again.
 ##############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-110
+.. GENERATED FROM PYTHON SOURCE LINES 89-103
 
 .. code-block:: default
 
@@ -181,12 +174,12 @@ In this tutorial we will
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-113
+.. GENERATED FROM PYTHON SOURCE LINES 104-106
 
 3) We will verify that the obtained results are exactly the same.
 ##############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-117
+.. GENERATED FROM PYTHON SOURCE LINES 106-110
 
 .. code-block:: default
 
@@ -201,7 +194,7 @@ In this tutorial we will
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-120
+.. GENERATED FROM PYTHON SOURCE LINES 111-113
 
 .. code-block:: default
 
@@ -217,7 +210,7 @@ In this tutorial we will
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.726 seconds)
+   **Total running time of the script:** ( 0 minutes  8.278 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_run_setup_tutorial.py:
