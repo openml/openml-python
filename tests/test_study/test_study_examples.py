@@ -13,8 +13,8 @@ class TestStudyFunctions(TestBase):
     """Test the example code of Bischl et al. (2018)"""
 
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
-        reason="columntransformer introduction in 0.20.0",
+        LooseVersion(sklearn.__version__) < "0.24",
+        reason="columntransformer introduction in 0.24.0",
     )
     def test_Figure1a(self):
         """Test listing in Figure 1a on a single task and the old OpenML100 study.
