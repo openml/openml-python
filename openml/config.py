@@ -8,6 +8,7 @@ import logging
 import logging.handlers
 import os
 from pathlib import Path
+import platform
 from typing import Tuple, cast
 
 from io import StringIO
@@ -85,18 +86,18 @@ def set_file_log_level(file_output_level: int):
 
 # Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
 _defaults = {
-    "apikey": None,
+    "apikey": "",
     "server": "https://www.openml.org/api/v1/xml",
-    "cachedir": Path(
-        os.environ.get("XDG_CACHE_HOME", Path("~") / ".cache" / "openml",)
-    ).expanduser(),
+    "cachedir": (
+        os.environ.get("XDG_CACHE_HOME", os.path.join("~", ".cache", "openml",))
+        if platform.system() == "Linux"
+        else os.path.join("~", ".openml")
+    ),
     "avoid_duplicate_runs": "True",
-    "connection_n_retries": 10,
-    "max_retries": 20,
+    "connection_n_retries": "10",
+    "max_retries": "20",
 }
 
-config_dir = Path(os.environ.get("XDG_CONFIG_HOME", Path("~") / ".config" / "openml")).expanduser()
-config_file = config_dir / "config"
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
@@ -192,11 +193,18 @@ def _setup():
     global connection_n_retries
     global max_retries
 
-    # read config file, create openml directory
-    expanded_openml_dir = os.path.expanduser(os.path.join("~", ".openml"))
-    if not os.path.exists(expanded_openml_dir):
+    if platform.system() == "Linux":
+        config_dir = Path(os.environ.get("XDG_CONFIG_HOME", Path("~") / ".config" / "openml"))
+    else:
+        config_dir = Path("~") / ".openml"
+    # Still use os.path.expanduser to trigger the mock in the unit test
+    config_dir = Path(os.path.expanduser(config_dir))
+    config_file = config_dir / "config"
+
+    # read config file, create directory for config file
+    if not os.path.exists(config_dir):
         try:
-            os.mkdir(expanded_openml_dir)
+            os.mkdir(config_dir)
             cache_exists = True
         except PermissionError:
             cache_exists = False
@@ -208,11 +216,11 @@ def _setup():
     else:
         _create_log_handlers(create_file_handler=False)
         openml_logger.warning(
-            "No permission to create openml directory at %s! This can result in OpenML-Python "
-            "not working properly." % expanded_openml_dir
+            "No permission to create OpenML directory at %s! This can result in OpenML-Python "
+            "not working properly." % config_dir
         )
 
-    config = _parse_config()
+    config = _parse_config(config_file)
     apikey = config.get("FAKE_SECTION", "apikey")
     server = config.get("FAKE_SECTION", "server")
 
@@ -231,7 +239,7 @@ def _setup():
 
     avoid_duplicate_runs = config.getboolean("FAKE_SECTION", "avoid_duplicate_runs")
     connection_n_retries = int(config.get("FAKE_SECTION", "connection_n_retries"))
-    max_retries = config.get("FAKE_SECTION", "max_retries")
+    max_retries = int(config.get("FAKE_SECTION", "max_retries"))
     if connection_n_retries > max_retries:
         raise ValueError(
             "A higher number of retries than {} is not allowed to keep the "
@@ -239,7 +247,7 @@ def _setup():
         )
 
 
-def _parse_config():
+def _parse_config(config_file: str):
     """ Parse the config file, set up defaults. """
     config = configparser.RawConfigParser(defaults=_defaults)
 
@@ -254,7 +262,7 @@ def _parse_config():
     except FileNotFoundError:
         logger.info("No config file found at %s, using default configuration.", config_file)
     except OSError as e:
-        logger.info("Error opening file %s: %s", config_file, e.message)
+        logger.info("Error opening file %s: %s", config_file, e.args[0])
     config_file_.seek(0)
     config.read_file(config_file_)
     return config

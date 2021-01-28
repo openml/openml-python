@@ -155,7 +155,7 @@ def _read_url_files(url, data=None, file_elements=None):
 
 def __read_url(url, request_method, data=None, md5_checksum=None):
     data = {} if data is None else data
-    if config.apikey is not None:
+    if config.apikey:
         data["api_key"] = config.apikey
     return _send_request(
         request_method=request_method, url=url, data=data, md5_checksum=md5_checksum
