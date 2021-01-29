@@ -122,8 +122,8 @@ cache_directory = str(_defaults["cachedir"])  # so mypy knows it is a string
 avoid_duplicate_runs = True if _defaults["avoid_duplicate_runs"] == "True" else False
 
 # Number of retries if the connection breaks
-connection_n_retries = _defaults["connection_n_retries"]
-max_retries = _defaults["max_retries"]
+connection_n_retries = int(_defaults["connection_n_retries"])
+max_retries = int(_defaults["max_retries"])
 
 
 class ConfigurationForExamples:
