@@ -10,6 +10,7 @@ import ast
 import unittest.mock
 
 import numpy as np
+from joblib import parallel_backend
 
 import openml
 import openml.exceptions
@@ -1575,3 +1576,52 @@ class TestRun(TestBase):
         ignored_input = [0] * 5
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
+
+    @unittest.mock.patch("openml.runs.functions._run_task_get_arffcontent_parallel_helper")
+    def test__run_task_get_arffcontent_2(self, mock):
+        # Unit test style test
+        def side_effect(*args, **kwargs):
+            return (
+                np.array([0, 1]),
+                np.array([[0.8, 0.2], [0.2, 0.8]]),
+                np.array([1, 2]),
+                np.array([1, 1]),
+                None,
+                {},
+            )
+
+        mock.side_effect = side_effect
+
+        task = openml.tasks.get_task(7)
+
+        flow = unittest.mock.Mock()
+        flow.name = "dummy"
+        clf = SGDClassifier(loss="log", random_state=1)
+
+        # Unit test doesn't work with loky and multiprocessing backend
+        for n_jobs, backend, call_count in (
+            (1, "sequential", 10),
+            (1, "threading", 20),
+            (-1, "threading", 30),
+            (2, "threading", 40),
+            (None, "threading", 50),
+        ):
+            with parallel_backend(backend, n_jobs=n_jobs):
+                res = openml.runs.functions._run_task_get_arffcontent(
+                    flow=flow,
+                    extension=self.extension,
+                    model=clf,
+                    task=task,
+                    add_local_measures=True,
+                    dataset_format="dataframe",
+                )
+            assert len(res) == 4, len(res)  # General function interface
+            assert len(res[0]) == 20  # 10 folds x 2 predictions returned
+            assert res[1] is None  # No trace
+            assert len(res[2]) == 1
+            assert len(res[2]["predictive_accuracy"]) == 1
+            assert len(res[2]["predictive_accuracy"][0]) == 10
+            assert len(res[3]) == 1
+            assert len(res[3]["predictive_accuracy"]) == 1
+            assert len(res[3]["predictive_accuracy"][0]) == 10
+            assert mock.call_count == call_count, (mock.call_count, call_count)

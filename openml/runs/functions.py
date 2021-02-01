@@ -12,6 +12,7 @@ import sklearn.metrics
 import xmltodict
 import numpy as np
 import pandas as pd
+from joblib.parallel import Parallel, delayed
 
 import openml
 import openml.utils
@@ -447,55 +448,33 @@ def _run_task_get_arffcontent(
     # methods, less maintenance, less confusion)
     num_reps, num_folds, num_samples = task.get_split_dimensions()
 
+    jobs = []
     for n_fit, (rep_no, fold_no, sample_no) in enumerate(
         itertools.product(range(num_reps), range(num_folds), range(num_samples),), start=1
     ):
+        jobs.append((n_fit, rep_no, fold_no, sample_no))
 
-        train_indices, test_indices = task.get_train_test_split_indices(
-            repeat=rep_no, fold=fold_no, sample=sample_no
-        )
-        if isinstance(task, OpenMLSupervisedTask):
-            x, y = task.get_X_and_y(dataset_format=dataset_format)
-            if dataset_format == "dataframe":
-                train_x = x.iloc[train_indices]
-                train_y = y.iloc[train_indices]
-                test_x = x.iloc[test_indices]
-                test_y = y.iloc[test_indices]
-            else:
-                train_x = x[train_indices]
-                train_y = y[train_indices]
-                test_x = x[test_indices]
-                test_y = y[test_indices]
-        elif isinstance(task, OpenMLClusteringTask):
-            x = task.get_X(dataset_format=dataset_format)
-            if dataset_format == "dataframe":
-                train_x = x.iloc[train_indices]
-            else:
-                train_x = x[train_indices]
-            train_y = None
-            test_x = None
-            test_y = None
-        else:
-            raise NotImplementedError(task.task_type)
-
-        config.logger.info(
-            "Going to execute flow '%s' on task %d for repeat %d fold %d sample %d.",
-            flow.name,
-            task.task_id,
-            rep_no,
-            fold_no,
-            sample_no,
-        )
-
-        pred_y, proba_y, user_defined_measures_fold, trace = extension._run_model_on_fold(
-            model=model,
-            task=task,
-            X_train=train_x,
-            y_train=train_y,
-            rep_no=rep_no,
+    # Execute runs in parallel
+    # assuming the same number of tasks as workers (n_jobs), the total compute time for this
+    # statement will be similar to the slowest run
+    job_rvals = Parallel(verbose=0, n_jobs=openml.config.n_jobs)(
+        delayed(_run_task_get_arffcontent_parallel_helper)(
+            extension=extension,
+            flow=flow,
             fold_no=fold_no,
-            X_test=test_x,
+            model=model,
+            rep_no=rep_no,
+            sample_no=sample_no,
+            task=task,
+            dataset_format=dataset_format,
         )
+        for n_fit, rep_no, fold_no, sample_no in jobs
+    )  # job_rvals contain the output of all the runs with one-to-one correspondence with `jobs`
+
+    for n_fit, rep_no, fold_no, sample_no in jobs:
+        pred_y, proba_y, test_indices, test_y, trace, user_defined_measures_fold = job_rvals[
+            n_fit - 1
+        ]
         if trace is not None:
             traces.append(trace)
 
@@ -613,6 +592,70 @@ def _run_task_get_arffcontent(
         user_defined_measures_per_fold,
         user_defined_measures_per_sample,
     )
+
+
+def _run_task_get_arffcontent_parallel_helper(
+    extension: "Extension",
+    flow: OpenMLFlow,
+    fold_no: int,
+    model: Any,
+    rep_no: int,
+    sample_no: int,
+    task: OpenMLTask,
+    dataset_format: str,
+) -> Tuple[
+    np.ndarray,
+    Optional[pd.DataFrame],
+    np.ndarray,
+    Optional[pd.DataFrame],
+    Optional[OpenMLRunTrace],
+    "OrderedDict[str, float]",
+]:
+    train_indices, test_indices = task.get_train_test_split_indices(
+        repeat=rep_no, fold=fold_no, sample=sample_no
+    )
+
+    if isinstance(task, OpenMLSupervisedTask):
+        x, y = task.get_X_and_y(dataset_format=dataset_format)
+        if dataset_format == "dataframe":
+            train_x = x.iloc[train_indices]
+            train_y = y.iloc[train_indices]
+            test_x = x.iloc[test_indices]
+            test_y = y.iloc[test_indices]
+        else:
+            train_x = x[train_indices]
+            train_y = y[train_indices]
+            test_x = x[test_indices]
+            test_y = y[test_indices]
+    elif isinstance(task, OpenMLClusteringTask):
+        x = task.get_X(dataset_format=dataset_format)
+        if dataset_format == "dataframe":
+            train_x = x.iloc[train_indices]
+        else:
+            train_x = x[train_indices]
+        train_y = None
+        test_x = None
+        test_y = None
+    else:
+        raise NotImplementedError(task.task_type)
+    config.logger.info(
+        "Going to execute flow '%s' on task %d for repeat %d fold %d sample %d.",
+        flow.name,
+        task.task_id,
+        rep_no,
+        fold_no,
+        sample_no,
+    )
+    (pred_y, proba_y, user_defined_measures_fold, trace,) = extension._run_model_on_fold(
+        model=model,
+        task=task,
+        X_train=train_x,
+        y_train=train_y,
+        rep_no=rep_no,
+        fold_no=fold_no,
+        X_test=test_x,
+    )
+    return pred_y, proba_y, test_indices, test_y, trace, user_defined_measures_fold
 
 
 def get_runs(run_ids):
