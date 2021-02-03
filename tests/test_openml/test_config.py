@@ -11,6 +11,34 @@ class TestConfig(openml.testing.TestBase):
         self.assertTrue(os.path.exists(openml.config.config_file))
         self.assertTrue(os.path.isdir(os.path.expanduser("~/.openml")))
 
+    def test_get_config_as_dict(self):
+        """ Checks if the current configuration is returned accurately as a dict. """
+        config = openml.config.get_config_as_dict()
+        self.assertIsInstance(config, dict)
+        self.assertEqual(len(config), 7)
+        self.assertEqual(config.get("server"), "https://test.openml.org/api/v1/xml")
+        self.assertEqual(config.get("apikey"), "610344db6388d9ba34f6db45a3cf71de")
+        self.assertEqual(config.get("cachedir"), self.workdir)
+        self.assertEqual(config.get("avoid_duplicate_runs"), False)
+        self.assertEqual(config.get("max_retries"), 20)
+        self.assertEqual(config.get("n_jobs"), 4)
+
+    def test_setup_with_config(self):
+        """ Checks if the OpenML configuration can be updated using _setup(). """
+        _config = dict()
+        _config["apikey"] = "610344db6388d9ba34f6db45a3cf71de"
+        _config["server"] = "https://www.openml.org/api/v1/xml"
+        _config["cachedir"] = self.workdir
+        _config["avoid_duplicate_runs"] = True
+        _config["connection_n_retries"] = 100
+        _config["max_retries"] = 1000
+        _config["n_jobs"] = 64
+        orig_config = openml.config.get_config_as_dict()
+        openml.config._setup(_config)
+        updated_config = openml.config.get_config_as_dict()
+        openml.config._setup(orig_config)  # important to not affect other unit tests
+        self.assertDictEqual(_config, updated_config)
+
 
 class TestConfigurationForExamples(openml.testing.TestBase):
     def test_switch_to_example_configuration(self):

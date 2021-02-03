@@ -179,7 +179,7 @@ class ConfigurationForExamples:
         n_jobs = n
 
 
-def _setup():
+def _setup(config=None):
     """Setup openml package. Called on first import.
 
     Reads the config file and sets up apikey, server, cache appropriately.
@@ -203,13 +203,28 @@ def _setup():
         # For other errors, we want to propagate the error as openml does not work without cache
         pass
 
-    config = _parse_config()
-    apikey = config.get("FAKE_SECTION", "apikey")
-    server = config.get("FAKE_SECTION", "server")
+    if config is None:
+        config = _parse_config()
 
-    short_cache_dir = config.get("FAKE_SECTION", "cachedir")
+        def _get(config, key):
+            return config.get("FAKE_SECTION", key)
+
+        avoid_duplicate_runs = config.getboolean("FAKE_SECTION", "avoid_duplicate_runs")
+    else:
+
+        def _get(config, key):
+            return config.get(key)
+
+        avoid_duplicate_runs = config.get("avoid_duplicate_runs")
+
+    apikey = _get(config, "apikey")
+    server = _get(config, "server")
+    short_cache_dir = _get(config, "cachedir")
+    connection_n_retries = _get(config, "connection_n_retries")
+    max_retries = _get(config, "max_retries")
+    n_jobs = _get(config, "n_jobs")
+
     cache_directory = os.path.expanduser(short_cache_dir)
-
     # create the cache subdirectory
     try:
         os.mkdir(cache_directory)
@@ -217,9 +232,6 @@ def _setup():
         # For other errors, we want to propagate the error as openml does not work without cache
         pass
 
-    avoid_duplicate_runs = config.getboolean("FAKE_SECTION", "avoid_duplicate_runs")
-    connection_n_retries = config.get("FAKE_SECTION", "connection_n_retries")
-    max_retries = config.get("FAKE_SECTION", "max_retries")
     if connection_n_retries > max_retries:
         raise ValueError(
             "A higher number of retries than {} is not allowed to keep the "
@@ -252,6 +264,18 @@ def _parse_config():
         config.read_file(config_file_)
     except OSError as e:
         logger.info("Error opening file %s: %s", config_file, e.message)
+    return config
+
+
+def get_config_as_dict():
+    config = dict()
+    config["apikey"] = apikey
+    config["server"] = server
+    config["cachedir"] = cache_directory
+    config["avoid_duplicate_runs"] = avoid_duplicate_runs
+    config["connection_n_retries"] = connection_n_retries
+    config["max_retries"] = max_retries
+    config["n_jobs"] = n_jobs
     return config
 
 
@@ -306,6 +330,7 @@ __all__ = [
     "start_using_configuration_for_example",
     "stop_using_configuration_for_example",
     "set_n_jobs_for_parallel_runs",
+    "get_config_as_dict",
 ]
 
 _setup()

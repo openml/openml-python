@@ -1577,51 +1577,26 @@ class TestRun(TestBase):
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
 
-    @unittest.mock.patch("openml.runs.functions._run_task_get_arffcontent_parallel_helper")
-    def test__run_task_get_arffcontent_2(self, mock):
-        # Unit test style test
-        def side_effect(*args, **kwargs):
-            return (
-                np.array([0, 1]),
-                np.array([[0.8, 0.2], [0.2, 0.8]]),
-                np.array([1, 2]),
-                np.array([1, 1]),
-                None,
-                {},
-            )
-
-        mock.side_effect = side_effect
-
-        task = openml.tasks.get_task(7)
-
+    def test__run_task_get_arffcontent_2(self):
+        """ Tests if a run executed in parallel is collated correctly. """
+        task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
+        x, y = task.get_X_and_y(dataset_format="dataframe")
+        num_instances = x.shape[0]
+        line_length = 6 + len(task.class_labels)
         flow = unittest.mock.Mock()
         flow.name = "dummy"
         clf = SGDClassifier(loss="log", random_state=1)
-
-        # Unit test doesn't work with loky and multiprocessing backend
-        for n_jobs, backend, call_count in (
-            (1, "sequential", 10),
-            (1, "threading", 20),
-            (-1, "threading", 30),
-            (2, "threading", 40),
-            (None, "threading", 50),
-        ):
-            with parallel_backend(backend, n_jobs=n_jobs):
-                res = openml.runs.functions._run_task_get_arffcontent(
-                    flow=flow,
-                    extension=self.extension,
-                    model=clf,
-                    task=task,
-                    add_local_measures=True,
-                    dataset_format="dataframe",
-                )
-            assert len(res) == 4, len(res)  # General function interface
-            assert len(res[0]) == 20  # 10 folds x 2 predictions returned
-            assert res[1] is None  # No trace
-            assert len(res[2]) == 1
-            assert len(res[2]["predictive_accuracy"]) == 1
-            assert len(res[2]["predictive_accuracy"][0]) == 10
-            assert len(res[3]) == 1
-            assert len(res[3]["predictive_accuracy"]) == 1
-            assert len(res[3]["predictive_accuracy"][0]) == 10
-            assert mock.call_count == call_count, (mock.call_count, call_count)
+        with parallel_backend("loky", n_jobs=2):
+            res = openml.runs.functions._run_task_get_arffcontent(
+                flow=flow,
+                extension=self.extension,
+                model=clf,
+                task=task,
+                add_local_measures=True,
+                dataset_format="array",
+            )
+        self.assertEqual(type(res[0]), list)
+        self.assertEqual(len(res[0]), num_instances)
+        self.assertEqual(len(res[0][0]), line_length)
+        self.assertEqual(len(res[2]), 7)
+        self.assertEqual(len(res[3]), 7)

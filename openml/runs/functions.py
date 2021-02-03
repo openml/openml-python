@@ -454,10 +454,13 @@ def _run_task_get_arffcontent(
     ):
         jobs.append((n_fit, rep_no, fold_no, sample_no))
 
+    # The forked child process may not copy the configuration state of OpenML from the parent.
+    # Current configuration setup needs to be copied and passed to the child processes.
+    _config = config.get_config_as_dict()
     # Execute runs in parallel
     # assuming the same number of tasks as workers (n_jobs), the total compute time for this
     # statement will be similar to the slowest run
-    job_rvals = Parallel(verbose=0, n_jobs=openml.config.n_jobs)(
+    job_rvals = Parallel(verbose=0, n_jobs=config.n_jobs)(
         delayed(_run_task_get_arffcontent_parallel_helper)(
             extension=extension,
             flow=flow,
@@ -467,6 +470,7 @@ def _run_task_get_arffcontent(
             sample_no=sample_no,
             task=task,
             dataset_format=dataset_format,
+            configuration=_config,
         )
         for n_fit, rep_no, fold_no, sample_no in jobs
     )  # job_rvals contain the output of all the runs with one-to-one correspondence with `jobs`
@@ -603,6 +607,7 @@ def _run_task_get_arffcontent_parallel_helper(
     sample_no: int,
     task: OpenMLTask,
     dataset_format: str,
+    configuration: Dict = None,
 ) -> Tuple[
     np.ndarray,
     Optional[pd.DataFrame],
@@ -611,6 +616,10 @@ def _run_task_get_arffcontent_parallel_helper(
     Optional[OpenMLRunTrace],
     "OrderedDict[str, float]",
 ]:
+    # Sets up the OpenML instantiated in the child process to match that of the parent's
+    # if configuration=None, loads the default
+    config._setup(configuration)
+
     train_indices, test_indices = task.get_train_test_split_indices(
         repeat=rep_no, fold=fold_no, sample=sample_no
     )
