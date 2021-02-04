@@ -37,15 +37,6 @@ logger.setLevel(logging.DEBUG)
 file_list = []
 directory = None
 
-# finding the root directory of conftest.py and going up to OpenML main directory
-# exploiting the fact that conftest.py always resides in the root directory for tests
-static_dir = os.path.dirname(os.path.abspath(__file__))
-logger.info("static directory: {}".format(static_dir))
-while True:
-    if "openml" in os.listdir(static_dir):
-        break
-    static_dir = os.path.join(static_dir, "..")
-
 
 def worker_id() -> str:
     """ Returns the name of the worker process owning this function call.
@@ -66,7 +57,8 @@ def read_file_list() -> List[str]:
 
     :return: List[str]
     """
-    directory = os.path.join(static_dir, "tests/files/")
+    this_dir = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+    directory = os.path.join(this_dir, "tests/files/")
     if worker_id() == "master":
         logger.info("Collecting file lists from: {}".format(directory))
     files = os.walk(directory)
