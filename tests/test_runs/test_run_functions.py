@@ -1586,17 +1586,76 @@ class TestRun(TestBase):
         flow = unittest.mock.Mock()
         flow.name = "dummy"
         clf = SGDClassifier(loss="log", random_state=1)
-        with parallel_backend("loky", n_jobs=2):
+        with parallel_backend("loky", n_jobs=self.n_jobs):
             res = openml.runs.functions._run_task_get_arffcontent(
                 flow=flow,
                 extension=self.extension,
                 model=clf,
                 task=task,
                 add_local_measures=True,
-                dataset_format="array",
+                dataset_format="array",  # "dataframe" would require handling of categoricals
+                n_jobs=self.n_jobs,
             )
         self.assertEqual(type(res[0]), list)
         self.assertEqual(len(res[0]), num_instances)
         self.assertEqual(len(res[0][0]), line_length)
         self.assertEqual(len(res[2]), 7)
         self.assertEqual(len(res[3]), 7)
+
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.21",
+        reason="couldn't perform local tests successfully w/o bloating RAM",
+    )
+    def test_joblib_backends(self):
+        """ Tests evaluation of a run using various joblib backends and n_jobs. """
+        task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
+        x, y = task.get_X_and_y(dataset_format="dataframe")
+        num_instances = x.shape[0]
+        line_length = 6 + len(task.class_labels)
+        flow = unittest.mock.Mock()
+        flow.name = "dummy"
+
+        for n_jobs, backend, len_time_stats in [
+            (1, "loky", 7),
+            (2, "loky", 4),
+            (-1, "loky", 1),
+            (1, "threading", 7),
+            (-1, "threading", 1),
+            (1, "sequential", 7),
+        ]:
+            clf = sklearn.model_selection.RandomizedSearchCV(
+                estimator=sklearn.ensemble.RandomForestClassifier(n_estimators=5),
+                param_distributions={
+                    "max_depth": [3, None],
+                    "max_features": [1, 2, 3, 4],
+                    "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    "bootstrap": [True, False],
+                    "criterion": ["gini", "entropy"],
+                },
+                random_state=1,
+                cv=sklearn.model_selection.StratifiedKFold(
+                    n_splits=2, shuffle=True, random_state=1
+                ),
+                n_iter=5,
+                n_jobs=n_jobs,
+            )
+            with parallel_backend(backend, n_jobs=n_jobs):
+                res = openml.runs.functions._run_task_get_arffcontent(
+                    flow=flow,
+                    extension=self.extension,
+                    model=clf,
+                    task=task,
+                    add_local_measures=True,
+                    dataset_format="array",  # "dataframe" would require handling of categoricals
+                    n_jobs=n_jobs,
+                )
+            self.assertEqual(type(res[0]), list)
+            self.assertEqual(len(res[0]), num_instances)
+            self.assertEqual(len(res[0][0]), line_length)
+            # usercpu_time_millis_* not recorded when n_jobs > 1
+            # *_time_millis_* not recorded when n_jobs = -1
+            self.assertEqual(len(res[2]), len_time_stats)
+            self.assertEqual(len(res[3]), len_time_stats)
+            self.assertEqual(len(res[2]["predictive_accuracy"][0]), 10)
+            self.assertEqual(len(res[3]["predictive_accuracy"][0]), 10)

@@ -110,6 +110,8 @@ class TestBase(unittest.TestCase):
         # Increase the number of retries to avoid spurious server failures
         self.connection_n_retries = openml.config.connection_n_retries
         openml.config.connection_n_retries = 10
+        # Number of processes to parallelize any evaluation made by a unit test
+        self.n_jobs = 2
 
     def tearDown(self):
         os.chdir(self.cwd)

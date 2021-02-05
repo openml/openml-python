@@ -89,7 +89,6 @@ _defaults = {
     "avoid_duplicate_runs": "True",
     "connection_n_retries": 10,
     "max_retries": 20,
-    "n_jobs": 4,
 }
 
 config_file = os.path.expanduser(os.path.join("~", ".openml", "config"))
@@ -119,7 +118,6 @@ avoid_duplicate_runs = True if _defaults["avoid_duplicate_runs"] == "True" else 
 # Number of retries if the connection breaks
 connection_n_retries = _defaults["connection_n_retries"]
 max_retries = _defaults["max_retries"]
-n_jobs = _defaults["n_jobs"]
 
 
 class ConfigurationForExamples:
@@ -172,12 +170,6 @@ class ConfigurationForExamples:
         apikey = cls._last_used_key
         cls._start_last_called = False
 
-    @classmethod
-    def set_n_jobs_for_parallel_runs(cls, n=4):
-        """ Set the number of workers to be used while running a flow/model on a task. """
-        global n_jobs
-        n_jobs = n
-
 
 def _setup(config=None):
     """Setup openml package. Called on first import.
@@ -194,7 +186,6 @@ def _setup(config=None):
     global avoid_duplicate_runs
     global connection_n_retries
     global max_retries
-    global n_jobs
 
     # read config file, create cache directory
     try:
@@ -222,7 +213,6 @@ def _setup(config=None):
     short_cache_dir = _get(config, "cachedir")
     connection_n_retries = _get(config, "connection_n_retries")
     max_retries = _get(config, "max_retries")
-    n_jobs = _get(config, "n_jobs")
 
     cache_directory = os.path.expanduser(short_cache_dir)
     # create the cache subdirectory
@@ -275,7 +265,6 @@ def get_config_as_dict():
     config["avoid_duplicate_runs"] = avoid_duplicate_runs
     config["connection_n_retries"] = connection_n_retries
     config["max_retries"] = max_retries
-    config["n_jobs"] = n_jobs
     return config
 
 
@@ -321,7 +310,6 @@ start_using_configuration_for_example = (
     ConfigurationForExamples.start_using_configuration_for_example
 )
 stop_using_configuration_for_example = ConfigurationForExamples.stop_using_configuration_for_example
-set_n_jobs_for_parallel_runs = ConfigurationForExamples.set_n_jobs_for_parallel_runs
 
 
 __all__ = [
@@ -329,7 +317,6 @@ __all__ = [
     "set_cache_directory",
     "start_using_configuration_for_example",
     "stop_using_configuration_for_example",
-    "set_n_jobs_for_parallel_runs",
     "get_config_as_dict",
 ]
 

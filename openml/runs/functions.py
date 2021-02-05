@@ -55,6 +55,7 @@ def run_model_on_task(
     upload_flow: bool = False,
     return_flow: bool = False,
     dataset_format: str = "dataframe",
+    n_jobs: int = None,
 ) -> Union[OpenMLRun, Tuple[OpenMLRun, OpenMLFlow]]:
     """Run the model on the dataset defined by the task.
 
@@ -132,6 +133,7 @@ def run_model_on_task(
         add_local_measures=add_local_measures,
         upload_flow=upload_flow,
         dataset_format=dataset_format,
+        n_jobs=n_jobs,
     )
     if return_flow:
         return run, flow
@@ -147,6 +149,7 @@ def run_flow_on_task(
     add_local_measures: bool = True,
     upload_flow: bool = False,
     dataset_format: str = "dataframe",
+    n_jobs: int = None,
 ) -> OpenMLRun:
 
     """Run the model provided by the flow on the dataset defined by task.
@@ -266,6 +269,7 @@ def run_flow_on_task(
         extension=flow.extension,
         add_local_measures=add_local_measures,
         dataset_format=dataset_format,
+        n_jobs=n_jobs,
     )
 
     data_content, trace, fold_evaluations, sample_evaluations = res
@@ -426,6 +430,7 @@ def _run_task_get_arffcontent(
     extension: "Extension",
     add_local_measures: bool,
     dataset_format: str,
+    n_jobs: int = None,
 ) -> Tuple[
     List[List],
     Optional[OpenMLRunTrace],
@@ -460,7 +465,7 @@ def _run_task_get_arffcontent(
     # Execute runs in parallel
     # assuming the same number of tasks as workers (n_jobs), the total compute time for this
     # statement will be similar to the slowest run
-    job_rvals = Parallel(verbose=0, n_jobs=config.n_jobs)(
+    job_rvals = Parallel(verbose=0, n_jobs=n_jobs)(
         delayed(_run_task_get_arffcontent_parallel_helper)(
             extension=extension,
             flow=flow,
