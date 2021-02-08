@@ -55,7 +55,7 @@ def run_model_on_task(
     upload_flow: bool = False,
     return_flow: bool = False,
     dataset_format: str = "dataframe",
-    n_jobs: int = None,
+    n_jobs: Optional[int] = None,
 ) -> Union[OpenMLRun, Tuple[OpenMLRun, OpenMLFlow]]:
     """Run the model on the dataset defined by the task.
 
@@ -86,6 +86,10 @@ def run_model_on_task(
     dataset_format : str (default='dataframe')
         If 'array', the dataset is passed to the model as a numpy array.
         If 'dataframe', the dataset is passed to the model as a pandas dataframe.
+    n_jobs : int (default=None)
+        The number of processes/threads to distribute the evaluation asynchronously.
+        If `None` or `1`, then the evaluation is treated as synchronous and processed sequentially.
+        If `-1`, then the job uses as many cores available.
 
     Returns
     -------
@@ -149,7 +153,7 @@ def run_flow_on_task(
     add_local_measures: bool = True,
     upload_flow: bool = False,
     dataset_format: str = "dataframe",
-    n_jobs: int = None,
+    n_jobs: Optional[int] = None,
 ) -> OpenMLRun:
 
     """Run the model provided by the flow on the dataset defined by task.
@@ -185,6 +189,10 @@ def run_flow_on_task(
     dataset_format : str (default='dataframe')
         If 'array', the dataset is passed to the model as a numpy array.
         If 'dataframe', the dataset is passed to the model as a pandas dataframe.
+    n_jobs : int (default=None)
+        The number of processes/threads to distribute the evaluation asynchronously.
+        If `None` or `1`, then the evaluation is treated as synchronous and processed sequentially.
+        If `-1`, then the job uses as many cores available.
 
     Returns
     -------
@@ -660,7 +668,7 @@ def _run_task_get_arffcontent_parallel_helper(
         fold_no,
         sample_no,
     )
-    (pred_y, proba_y, user_defined_measures_fold, trace,) = extension._run_model_on_fold(
+    pred_y, proba_y, user_defined_measures_fold, trace, = extension._run_model_on_fold(
         model=model,
         task=task,
         X_train=train_x,

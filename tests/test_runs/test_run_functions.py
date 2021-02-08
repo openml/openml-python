@@ -1577,7 +1577,8 @@ class TestRun(TestBase):
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
 
-    def test__run_task_get_arffcontent_2(self):
+    @unittest.mock.patch("joblib.parallel_backend")
+    def test__run_task_get_arffcontent_2(self, parallel_mock):
         """ Tests if a run executed in parallel is collated correctly. """
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
         x, y = task.get_X_and_y(dataset_format="dataframe")
@@ -1596,11 +1597,26 @@ class TestRun(TestBase):
                 dataset_format="array",  # "dataframe" would require handling of categoricals
                 n_jobs=self.n_jobs,
             )
-        self.assertEqual(type(res[0]), list)
+        self.assertIsInstance(res[0], list)
         self.assertEqual(len(res[0]), num_instances)
         self.assertEqual(len(res[0][0]), line_length)
         self.assertEqual(len(res[2]), 7)
         self.assertEqual(len(res[3]), 7)
+        expected_scores = [
+            0.965625,
+            0.94375,
+            0.946875,
+            0.953125,
+            0.96875,
+            0.965625,
+            0.9435736677115988,
+            0.9467084639498433,
+            0.9749216300940439,
+            0.9655172413793104,
+        ]
+        scores = [v for k, v in res[2]["predictive_accuracy"][0].items()]
+        self.assertSequenceEqual(scores, expected_scores, seq_type=list)
+        self.assertEqual(parallel_mock.call_count, 0)
 
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
