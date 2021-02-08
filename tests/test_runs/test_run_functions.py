@@ -1577,6 +1577,10 @@ class TestRun(TestBase):
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
 
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.21",
+        reason="couldn't perform local tests successfully w/o bloating RAM",
+    )
     @unittest.mock.patch("joblib.parallel_backend")
     def test__run_task_get_arffcontent_2(self, parallel_mock):
         """ Tests if a run executed in parallel is collated correctly. """
