@@ -291,7 +291,7 @@ def _name_to_id(
         If `False`, if multiple datasets match, return the least recent active dataset.
         If `True`, if multiple datasets match, raise an error.
     download_qualities : bool, optional (default=True)
-        If `True`, also download qualities.xml file. If false use the file if it was cached.
+        If `True`, also download qualities.xml file. If False it skip the qualities.xml.
 
     Returns
     -------
@@ -329,7 +329,7 @@ def get_datasets(
         If False, create the OpenMLDataset and only populate it with the metadata.
         The data may later be retrieved through the `OpenMLDataset.get_data` method.
     download_qualities : bool, optional (default=True)
-        If True, also download qualities.xml file. If false use the file if it was cached.
+        If True, also download qualities.xml file. If False it skip the qualities.xml.
 
     Returns
     -------
@@ -412,9 +412,10 @@ def get_dataset(
         features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
 
         try:
-            qualities_file = _get_dataset_qualities_file(
-                did_cache_dir, dataset_id, download_qualities
-            )
+            if download_qualities:
+                qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
+            else:
+                qualities_file = ""
         except OpenMLServerException as e:
             if e.code == 362 and str(e) == "No qualities found - None":
                 logger.warning("No qualities found for dataset {}".format(dataset_id))
@@ -990,7 +991,7 @@ def _get_dataset_features_file(did_cache_dir: str, dataset_id: int) -> str:
     return features_file
 
 
-def _get_dataset_qualities_file(did_cache_dir, dataset_id, download_qualities=True):
+def _get_dataset_qualities_file(did_cache_dir, dataset_id):
     """API call to load dataset qualities. Loads from cache or downloads them.
 
     Features are metafeatures (number of features, number of classes, ...)
@@ -1012,10 +1013,6 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id, download_qualities=Tr
     str
         Path of the cached qualities file
     """
-    # return empty path to avoied used cahched version, this will make the output consistent
-    # regardless the cache state.
-    if not download_qualities:
-        return ""
     # Dataset qualities are subject to change and must be fetched every time
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")
     try:
