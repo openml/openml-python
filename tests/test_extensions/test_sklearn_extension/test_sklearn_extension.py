@@ -189,6 +189,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         if LooseVersion(sklearn.__version__) >= "0.22":
             fixture_parameters.update({"ccp_alpha": "0.0"})
             fixture_parameters.move_to_end("ccp_alpha", last=False)
+        if LooseVersion(sklearn.__version__) >= "0.24":
+            del fixture_parameters["presort"]
 
         structure_fixture = {"sklearn.tree.{}.DecisionTreeClassifier".format(tree_name): []}
 
@@ -1317,10 +1319,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 (sklearn.tree.DecisionTreeClassifier.__init__, 14),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
-        else:
+        elif sklearn_version < "0.24":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 18),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 14),
+                (sklearn.pipeline.Pipeline.__init__, 2),
+            ]
+        else:
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 18),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
 
@@ -1523,7 +1531,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "bootstrap": [True, False],
                 "criterion": ["gini", "entropy"],
             },
-            cv=sklearn.model_selection.StratifiedKFold(n_splits=2, random_state=1),
+            cv=sklearn.model_selection.StratifiedKFold(n_splits=2, random_state=1, shuffle=True),
             n_iter=5,
         )
         flow = self.extension.model_to_flow(model)

@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
-        scikit-learn: [0.21.2, 0.22.2, 0.23.1]
+        scikit-learn: [0.21.2, 0.22.2, 0.23.1, 0.24]
         exclude:  # no scikit-learn 0.21.2 release for Python 3.8
           - python-version: 3.8
             scikit-learn: 0.21.2
