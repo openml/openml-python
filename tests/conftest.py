@@ -35,7 +35,6 @@ logger = logging.getLogger("unit_tests")
 logger.setLevel(logging.DEBUG)
 
 file_list = []
-directory = None
 
 
 def worker_id() -> str:
@@ -58,12 +57,10 @@ def read_file_list() -> List[str]:
     :return: List[str]
     """
     this_dir = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
-    directory = os.path.join(this_dir, "tests/files/")
-    if worker_id() == "master":
-        logger.info("Collecting file lists from: {}".format(directory))
-    files = os.walk(directory)
+    directory = os.path.join(this_dir, "..")
+    logger.info("Collecting file lists from: {}".format(directory))
     file_list = []
-    for root, _, filenames in files:
+    for root, _, filenames in os.walk(directory):
         for filename in filenames:
             file_list.append(os.path.join(root, filename))
     return file_list
