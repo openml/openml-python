@@ -869,6 +869,47 @@ def fork_dataset(data_id: int) -> int:
     return int(data_id)
 
 
+def topic_add_dataset(data_id: int, topic: str):
+    """
+    Adds a topic for a dataset.
+    This API is not available for all OpenML users and is accessible only by admins.
+    Parameters
+    ----------
+    data_id : int
+        id of the dataset for which the topic needs to be added
+    topic : str
+        Topic to be added for the dataset
+   """
+    if not isinstance(data_id, int):
+        raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
+    form_data = {"data_id": data_id, "topic": topic}
+    result_xml = openml._api_calls._perform_api_call("data/topicadd", "post", data=form_data)
+    result = xmltodict.parse(result_xml)
+    data_id = result["oml:data_topic"]["oml:id"]
+    return int(data_id)
+
+
+def topic_delete_dataset(data_id: int, topic: str):
+    """
+    Removes a topic from a dataset.
+    This API is not available for all OpenML users and is accessible only by admins.
+    Parameters
+    ----------
+    data_id : int
+        id of the dataset to be forked
+    topic : str
+        Topic to be deleted
+
+   """
+    if not isinstance(data_id, int):
+        raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
+    form_data = {"data_id": data_id, "topic": topic}
+    result_xml = openml._api_calls._perform_api_call("data/topicdelete", "post", data=form_data)
+    result = xmltodict.parse(result_xml)
+    data_id = result["oml:data_topic"]["oml:id"]
+    return int(data_id)
+
+
 def _get_dataset_description(did_cache_dir, dataset_id):
     """Get the dataset description as xml dictionary.
 
