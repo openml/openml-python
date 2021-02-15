@@ -146,7 +146,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture_short_name = "sklearn.DecisionTreeClassifier"
         # str obtained from self.extension._get_sklearn_description(model)
         fixture_description = "A decision tree classifier."
-        version_fixture = "sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9" % sklearn.__version__
+        version_fixture = self.extension._min_dependency_str(sklearn.__version__)
 
         presort_val = "false" if LooseVersion(sklearn.__version__) < "0.22" else '"deprecated"'
         # min_impurity_decrease has been introduced in 0.20
@@ -189,6 +189,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         if LooseVersion(sklearn.__version__) >= "0.22":
             fixture_parameters.update({"ccp_alpha": "0.0"})
             fixture_parameters.move_to_end("ccp_alpha", last=False)
+        if LooseVersion(sklearn.__version__) >= "0.24":
+            del fixture_parameters["presort"]
 
         structure_fixture = {"sklearn.tree.{}.DecisionTreeClassifier".format(tree_name): []}
 
@@ -225,7 +227,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture_description = "K-Means clustering{}".format(
             "" if LooseVersion(sklearn.__version__) < "0.22" else "."
         )
-        version_fixture = "sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9" % sklearn.__version__
+        version_fixture = self.extension._min_dependency_str(sklearn.__version__)
 
         n_jobs_val = "null" if LooseVersion(sklearn.__version__) < "0.23" else '"deprecated"'
         precomp_val = '"auto"' if LooseVersion(sklearn.__version__) < "0.23" else '"deprecated"'
@@ -1317,10 +1319,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 (sklearn.tree.DecisionTreeClassifier.__init__, 14),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
-        else:
+        elif sklearn_version < "0.24":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 18),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 14),
+                (sklearn.pipeline.Pipeline.__init__, 2),
+            ]
+        else:
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 18),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
 
@@ -1523,7 +1531,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "bootstrap": [True, False],
                 "criterion": ["gini", "entropy"],
             },
-            cv=sklearn.model_selection.StratifiedKFold(n_splits=2, random_state=1),
+            cv=sklearn.model_selection.StratifiedKFold(n_splits=2, random_state=1, shuffle=True),
             n_iter=5,
         )
         flow = self.extension.model_to_flow(model)

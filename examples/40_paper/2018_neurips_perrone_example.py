@@ -177,18 +177,14 @@ print("Y : ", y[:5])
 cat_cols = list_categorical_attributes(flow_type=flow_type)
 num_cols = list(set(X.columns) - set(cat_cols))
 
-# Missing value imputers
-cat_imputer = SimpleImputer(missing_values=np.nan, strategy="constant", fill_value="None")
+# Missing value imputers for numeric columns
 num_imputer = SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=-1)
 
-# Creating the one-hot encoder
+# Creating the one-hot encoder for numerical representation of categorical columns
 enc = OneHotEncoder(handle_unknown="ignore")
 
-# Pipeline to handle categorical column transformations
-cat_transforms = Pipeline(steps=[("impute", cat_imputer), ("encode", enc)])
-
 # Combining column transformers
-ct = ColumnTransformer([("cat", cat_transforms, cat_cols), ("num", num_imputer, num_cols)])
+ct = ColumnTransformer([("cat", enc, cat_cols), ("num", num_imputer, num_cols)])
 
 # Creating the full pipeline with the surrogate model
 clf = RandomForestRegressor(n_estimators=50)

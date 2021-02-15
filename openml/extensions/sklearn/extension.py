@@ -211,6 +211,41 @@ class SklearnExtension(Extension):
 
         return short_name.format(pipeline)
 
+    @classmethod
+    def _min_dependency_str(cls, sklearn_version: str) -> str:
+        """ Returns a string containing the minimum dependencies for the sklearn version passed.
+
+        Parameters
+        ----------
+        sklearn_version : str
+            A version string of the xx.xx.xx
+
+        Returns
+        -------
+        str
+        """
+        if LooseVersion(sklearn_version) >= "0.24":
+            # assumption: 0.24 onwards sklearn should contain a _min_dependencies.py file with
+            # variables declared for extracting minimum dependency for that version
+            from sklearn import _min_dependencies as _mindep
+
+            dependency_list = {
+                "numpy": "{}".format(_mindep.NUMPY_MIN_VERSION),
+                "scipy": "{}".format(_mindep.SCIPY_MIN_VERSION),
+                "joblib": "{}".format(_mindep.JOBLIB_MIN_VERSION),
+                "threadpoolctl": "{}".format(_mindep.THREADPOOLCTL_MIN_VERSION),
+            }
+        else:
+            # this is INCORRECT for sklearn versions >= 0.19 and < 0.24
+            # given that OpenML has existing flows uploaded with such dependency information,
+            # we change no behaviour for older sklearn version, however from 0.24 onwards
+            # the dependency list will be accurately updated for any flow uploaded to OpenML
+            dependency_list = {"numpy": "1.6.1", "scipy": "0.9"}
+
+        sklearn_dep = "sklearn=={}".format(sklearn_version)
+        dep_str = "\n".join(["{}>={}".format(k, v) for k, v in dependency_list.items()])
+        return "\n".join([sklearn_dep, dep_str])
+
     ################################################################################################
     # Methods for flow serialization and de-serialization
 
