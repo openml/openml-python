@@ -58,6 +58,7 @@ def read_file_list() -> List[str]:
     """
     this_dir = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
     directory = os.path.join(this_dir, "..")
+    directory = os.path.join(directory, "tests/files/")
     logger.info("Collecting file lists from: {}".format(directory))
     file_list = []
     for root, _, filenames in os.walk(directory):
