@@ -804,20 +804,13 @@ class SklearnExtension(Extension):
             tags=tags,
             extension=self,
             language="English",
-            # TODO fill in dependencies!
             dependencies=dependencies,
         )
 
         return flow
 
     def _get_dependencies(self) -> str:
-        dependencies = "\n".join(
-            [
-                self._format_external_version("sklearn", sklearn.__version__,),
-                "numpy>=1.6.1",
-                "scipy>=0.9",
-            ]
-        )
+        dependencies = self._min_dependency_str(sklearn.__version__)
         return dependencies
 
     def _get_tags(self) -> List[str]:
