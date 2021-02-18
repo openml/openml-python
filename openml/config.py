@@ -221,7 +221,7 @@ def _setup(config=None):
         )
 
     if config is None:
-        config = _parse_config()
+        config = _parse_config(config_file)
 
         def _get(config, key):
             return config.get("FAKE_SECTION", key)
@@ -237,8 +237,8 @@ def _setup(config=None):
     apikey = _get(config, "apikey")
     server = _get(config, "server")
     short_cache_dir = _get(config, "cachedir")
-    connection_n_retries = _get(config, "connection_n_retries")
-    max_retries = _get(config, "max_retries")
+    connection_n_retries = int(_get(config, "connection_n_retries"))
+    max_retries = int(_get(config, "max_retries"))
 
     cache_directory = os.path.expanduser(short_cache_dir)
     # create the cache subdirectory
