@@ -131,6 +131,7 @@ class OpenMLDataset(OpenMLBase):
         qualities_file: Optional[str] = None,
         dataset=None,
         minio_url: Optional[str] = None,
+        parquet_file: Optional[str] = None,
     ):
         def find_invalid_characters(string, pattern):
             invalid_chars = set()
@@ -205,6 +206,7 @@ class OpenMLDataset(OpenMLBase):
         self.update_comment = update_comment
         self.md5_checksum = md5_checksum
         self.data_file = data_file
+        self.parquet_file = parquet_file
         self._dataset = dataset
         self._minio_url = minio_url
 
