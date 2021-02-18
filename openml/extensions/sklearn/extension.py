@@ -211,6 +211,61 @@ class SklearnExtension(Extension):
 
         return short_name.format(pipeline)
 
+    @classmethod
+    def _min_dependency_str(cls, sklearn_version: str) -> str:
+        """ Returns a string containing the minimum dependencies for the sklearn version passed.
+
+        Parameters
+        ----------
+        sklearn_version : str
+            A version string of the xx.xx.xx
+
+        Returns
+        -------
+        str
+        """
+        openml_major_version = int(LooseVersion(openml.__version__).version[1])
+        # This explicit check is necessary to support existing entities on the OpenML servers
+        # that used the fixed dependency string (in the else block)
+        if openml_major_version > 11:
+            # OpenML v0.11 onwards supports sklearn>=0.24
+            # assumption: 0.24 onwards sklearn should contain a _min_dependencies.py file with
+            # variables declared for extracting minimum dependency for that version
+            if LooseVersion(sklearn_version) >= "0.24":
+                from sklearn import _min_dependencies as _mindep
+
+                dependency_list = {
+                    "numpy": "{}".format(_mindep.NUMPY_MIN_VERSION),
+                    "scipy": "{}".format(_mindep.SCIPY_MIN_VERSION),
+                    "joblib": "{}".format(_mindep.JOBLIB_MIN_VERSION),
+                    "threadpoolctl": "{}".format(_mindep.THREADPOOLCTL_MIN_VERSION),
+                }
+            elif LooseVersion(sklearn_version) >= "0.23":
+                dependency_list = {
+                    "numpy": "1.13.3",
+                    "scipy": "0.19.1",
+                    "joblib": "0.11",
+                    "threadpoolctl": "2.0.0",
+                }
+                if LooseVersion(sklearn_version).version[2] == 0:
+                    dependency_list.pop("threadpoolctl")
+            elif LooseVersion(sklearn_version) >= "0.21":
+                dependency_list = {"numpy": "1.11.0", "scipy": "0.17.0", "joblib": "0.11"}
+            elif LooseVersion(sklearn_version) >= "0.19":
+                dependency_list = {"numpy": "1.8.2", "scipy": "0.13.3"}
+            else:
+                dependency_list = {"numpy": "1.6.1", "scipy": "0.9"}
+        else:
+            # this is INCORRECT for sklearn versions >= 0.19 and < 0.24
+            # given that OpenML has existing flows uploaded with such dependency information,
+            # we change no behaviour for older sklearn version, however from 0.24 onwards
+            # the dependency list will be accurately updated for any flow uploaded to OpenML
+            dependency_list = {"numpy": "1.6.1", "scipy": "0.9"}
+
+        sklearn_dep = "sklearn=={}".format(sklearn_version)
+        dep_str = "\n".join(["{}>={}".format(k, v) for k, v in dependency_list.items()])
+        return "\n".join([sklearn_dep, dep_str])
+
     ################################################################################################
     # Methods for flow serialization and de-serialization
 
@@ -769,20 +824,13 @@ class SklearnExtension(Extension):
             tags=tags,
             extension=self,
             language="English",
-            # TODO fill in dependencies!
             dependencies=dependencies,
         )
 
         return flow
 
     def _get_dependencies(self) -> str:
-        dependencies = "\n".join(
-            [
-                self._format_external_version("sklearn", sklearn.__version__,),
-                "numpy>=1.6.1",
-                "scipy>=0.9",
-            ]
-        )
+        dependencies = self._min_dependency_str(sklearn.__version__)
         return dependencies
 
     def _get_tags(self) -> List[str]:
