@@ -96,6 +96,8 @@ class OpenMLDataset(OpenMLBase):
         which maps a quality name to a quality value.
     dataset: string, optional
         Serialized arff dataset string.
+    minio_url: string, optional
+        URL to the MinIO bucket with dataset files
     """
 
     def __init__(
@@ -128,6 +130,7 @@ class OpenMLDataset(OpenMLBase):
         features_file: Optional[str] = None,
         qualities_file: Optional[str] = None,
         dataset=None,
+        minio_url: Optional[str] = None,
     ):
         def find_invalid_characters(string, pattern):
             invalid_chars = set()
@@ -203,6 +206,7 @@ class OpenMLDataset(OpenMLBase):
         self.md5_checksum = md5_checksum
         self.data_file = data_file
         self._dataset = dataset
+        self._minio_url = minio_url
 
         if features_file is not None:
             self.features = _read_features(

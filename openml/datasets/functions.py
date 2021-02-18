@@ -1081,6 +1081,7 @@ def _create_dataset_from_description(
         cache_format=cache_format,
         features_file=features_file,
         qualities_file=qualities_file,
+        minio_url=description.get("oml:minio_url"),
     )
 
 

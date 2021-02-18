@@ -1413,6 +1413,10 @@ class TestOpenMLDataset(TestBase):
             OpenMLServerException, "Unknown dataset", fork_dataset, data_id=999999,
         )
 
+    def test_get_dataset_parquet(self):
+        dataset = openml.datasets.get_dataset(19)
+        self.assertIsNotNone(dataset._minio_url)
+
 
 @pytest.mark.parametrize(
     "default_target_attribute,row_id_attribute,ignore_attribute",
