@@ -89,11 +89,8 @@ def _download_minio_file(
     destination = pathlib.Path(destination)
     parsed_url = urllib.parse.urlparse(source)
 
-    # expect path format: /minio/BUCKET/path/to/file.ext
-    if not str(parsed_url.path).startswith("/minio/"):
-        raise ValueError(f"Expect start of path of source is '/minio/', found '{parsed_url.path}'")
-
-    bucket, object_name = parsed_url.path[len("/minio/") :].split("/", maxsplit=1)
+    # expect path format: /BUCKET/path/to/file.ext
+    bucket, object_name = parsed_url.path[1:].split("/", maxsplit=1)
     if destination.is_dir():
         destination = pathlib.Path(destination, object_name)
     if destination.is_file() and not exists_ok:
@@ -101,9 +98,16 @@ def _download_minio_file(
 
     client = minio.Minio(endpoint=parsed_url.netloc, secure=False,)
 
-    file_meta = client.fget_object(
-        bucket_name=bucket, object_name=object_name, file_path=str(destination),
-    )
+    try:
+        file_meta = client.fget_object(
+            bucket_name=bucket, object_name=object_name, file_path=str(destination),
+        )
+    except minio.error.S3Error as e:
+        if e.message.startswith("Object does not exist"):
+            raise FileNotFoundError(f"Object at '{source}' does not exist.") from e
+        # e.g. permission error, or a bucket does not exist (which is also interpreted as a
+        # permission error on minio level).
+        raise FileNotFoundError("Bucket does not exist or is private.") from e
     return file_meta
 
 
