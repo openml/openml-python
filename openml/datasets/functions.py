@@ -908,6 +908,51 @@ def _get_dataset_description(did_cache_dir, dataset_id):
     return description
 
 
+def _get_dataset_parquet(
+    description: Union[Dict, OpenMLDataset], cache_directory: str = None
+) -> str:
+    """ Return the path to the local parquet file of the dataset. If is not cached, it is downloaded.
+
+    Checks if the file is in the cache, if yes, return the path to the file.
+    If not, downloads the file and caches it, then returns the file path.
+    The cache directory is generated based on dataset information, but can also be specified.
+
+    This function is NOT thread/multiprocessing safe.
+    Unlike the ARFF equivalent, checksums are not available/used (for now).
+
+    Parameters
+    ----------
+    description : dictionary or OpenMLDataset
+        Either a dataset description as dict or OpenMLDataset.
+
+    cache_directory: str, optional (default=None)
+        Folder to store the parquet file in.
+        If None, use the default cache directory for the dataset.
+
+    Returns
+    -------
+    output_filename : string
+        Location of the Parquet file.
+    """
+    if isinstance(description, dict):
+        url = description.get("oml:minio_url")
+        did = description.get("oml:id")
+    elif isinstance(description, OpenMLDataset):
+        url = description._minio_url
+        did = description.dataset_id
+    else:
+        raise TypeError("`description` should be either OpenMLDataset or Dict.")
+
+    if cache_directory is None:
+        cache_directory = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, did)
+    output_file_path = os.path.join(cache_directory, "dataset.pq")
+
+    if not os.path.isfile(output_file_path):
+        openml._api_calls._download_minio_file(source=url, destination=output_file_path)
+
+    return output_file_path
+
+
 def _get_dataset_arff(description: Union[Dict, OpenMLDataset], cache_directory: str = None) -> str:
     """ Return the path to the local arff file of the dataset. If is not cached, it is downloaded.
 

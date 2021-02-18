@@ -36,7 +36,7 @@ from openml.datasets.functions import (
     _get_online_dataset_arff,
     _get_online_dataset_format,
     DATASETS_CACHE_DIR_NAME,
-    # _get_dataset_parquet,
+    _get_dataset_parquet,
 )
 from openml.datasets import fork_dataset, edit_dataset
 from openml.tasks import TaskType, create_task
@@ -447,6 +447,29 @@ class TestOpenMLDataset(TestBase):
             exists_ok=True,
         )
         self.assertTrue(os.path.isfile(file_destination))
+
+    def test__get_dataset_parquet_not_cached(self):
+        description = {
+            "oml:minio_url": "http://openml1.win.tue.nl/minio/dataset20/dataset_20.pq",
+            "oml:id": "20",
+        }
+        path = _get_dataset_parquet(description, cache_directory=self.workdir)
+        self.assertIsInstance(path, str)
+        self.assertTrue(os.path.isfile(path))
+
+    @mock.patch("openml._api_calls._download_minio_file")
+    def test__get_dataset_parquet_is_cached(self, patch):
+        openml.config.cache_directory = self.static_cache_dir
+        patch.side_effect = RuntimeError(
+            "_download_minio_file should not be called when loading from cache"
+        )
+        description = {
+            "oml:minio_url": "http://openml1.win.tue.nl/minio/dataset30/dataset_30.pq",
+            "oml:id": "30",
+        }
+        path = _get_dataset_parquet(description, cache_directory=None)
+        self.assertIsInstance(path, str)
+        self.assertTrue(os.path.isfile(path))
 
     def test__getarff_md5_issue(self):
         description = {

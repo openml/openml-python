@@ -83,7 +83,7 @@ def _download_minio_file(
         URL to a file in a MinIO bucket.
     destination : str
         Path to store the file to, if a directory is provided the original filename is used.
-    overwrite : bool, optional (default=True)
+    exists_ok : bool, optional (default=True)
         If False, raise FileExists if a file already exists in ``destination``.
     """
     destination = pathlib.Path(destination)
