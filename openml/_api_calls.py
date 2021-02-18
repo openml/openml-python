@@ -3,10 +3,14 @@
 import time
 import hashlib
 import logging
+import pathlib
 import requests
+import urllib.parse
 import xml
 import xmltodict
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
+
+import minio
 
 from . import config
 from .exceptions import (
@@ -66,6 +70,37 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
         "%.7fs taken for [%s] request for the URL %s", time.time() - start, request_method, url,
     )
     return response.text
+
+
+def _download_minio_file(
+    source: str, destination: Union[str, pathlib.Path], exists_ok: bool = True,
+) -> minio.datatypes.Object:
+    """ Download file ``source`` from a MinIO Bucket and store it at ``destination``.
+
+    Parameters
+    ----------
+    source : Union[str, pathlib.Path]
+        URL to a file in a MinIO bucket.
+    destination : str
+        Path to store the file to, if a directory is provided the original filename is used.
+    overwrite : bool, optional (default=True)
+        If False, raise FileExists if a file already exists in ``destination``.
+    """
+    destination = pathlib.Path(destination)
+    parsed_url = urllib.parse.urlparse(source)
+
+    _, _, bucket, object_name = parsed_url.path.split("/")
+    if destination.is_dir():
+        destination = pathlib.Path(destination, object_name)
+    if destination.is_file() and not exists_ok:
+        raise FileExistsError(f"File already exists in {destination}.")
+
+    client = minio.Minio(endpoint=parsed_url.netloc, secure=False,)
+
+    file_meta = client.fget_object(
+        bucket_name=bucket, object_name=object_name, file_path=str(destination),
+    )
+    return file_meta
 
 
 def _download_text_file(

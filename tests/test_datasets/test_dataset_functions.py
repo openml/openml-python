@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 
 import os
+import pathlib
 import random
 from itertools import product
 from unittest import mock
@@ -17,6 +18,7 @@ from oslo_concurrency import lockutils
 
 import openml
 from openml import OpenMLDataset
+from openml._api_calls import _download_minio_file
 from openml.exceptions import (
     OpenMLHashException,
     OpenMLPrivateDatasetError,
@@ -34,6 +36,7 @@ from openml.datasets.functions import (
     _get_online_dataset_arff,
     _get_online_dataset_format,
     DATASETS_CACHE_DIR_NAME,
+    # _get_dataset_parquet,
 )
 from openml.datasets import fork_dataset, edit_dataset
 from openml.tasks import TaskType, create_task
@@ -406,6 +409,35 @@ class TestOpenMLDataset(TestBase):
         arff_path = _get_dataset_arff(description, cache_directory=self.workdir)
         self.assertIsInstance(arff_path, str)
         self.assertTrue(os.path.exists(arff_path))
+
+    def test__download_minio_file_to_directory(self):
+        _ = _download_minio_file(
+            source="http://openml1.win.tue.nl/minio/dataset20/dataset_20.pq",
+            destination=self.workdir,
+            exists_ok=True,
+        )
+        self.assertTrue(os.path.isfile(os.path.join(self.workdir, "dataset_20.pq")))
+
+    def test__download_minio_file_to_path(self):
+        file_destination = os.path.join(self.workdir, "custom.pq")
+        _ = _download_minio_file(
+            source="http://openml1.win.tue.nl/minio/dataset20/dataset_20.pq",
+            destination=file_destination,
+            exists_ok=True,
+        )
+        self.assertTrue(os.path.isfile(file_destination))
+
+    def test__download_minio_file_raises_FileExists_if_destination_in_use(self):
+        file_destination = pathlib.Path(self.workdir, "custom.pq")
+        file_destination.touch()
+
+        self.assertRaises(
+            FileExistsError,
+            _download_minio_file,
+            source="http://openml1.win.tue.nl/minio/dataset20/dataset_20.pq",
+            destination=str(file_destination),
+            exists_ok=False,
+        )
 
     def test__getarff_md5_issue(self):
         description = {
@@ -1414,8 +1446,14 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test_get_dataset_parquet(self):
-        dataset = openml.datasets.get_dataset(19)
+        dataset = openml.datasets.get_dataset(20)
         self.assertIsNotNone(dataset._minio_url)
+        self.assertIsNone(dataset.data_parquet_file, "The file should not yet be cached")
+
+        data, categorical, attribute_names = dataset._load_data()
+        self.assertIsNotNone(
+            dataset.data_parquet_file, "Loading data should have stored the parquet file"
+        )
 
 
 @pytest.mark.parametrize(
