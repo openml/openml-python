@@ -59,12 +59,9 @@ task = openml.tasks.get_task(6)
 # easy as you want it to be
 
 
-cat_imp = make_pipeline(
-    SimpleImputer(strategy="most_frequent"),
-    OneHotEncoder(handle_unknown="ignore", sparse=False),
-    TruncatedSVD(),
-)
-ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", "passthrough", cont)])
+cat_imp = make_pipeline(OneHotEncoder(handle_unknown="ignore", sparse=False), TruncatedSVD(),)
+cont_imp = SimpleImputer(strategy="median")
+ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
 model_original = Pipeline(steps=[("transform", ct), ("estimator", RandomForestClassifier()),])
 
 # Let's change some hyperparameters. Of course, in any good application we

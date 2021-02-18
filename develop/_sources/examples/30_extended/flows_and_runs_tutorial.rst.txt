@@ -23,7 +23,7 @@ Flows and Runs
 
 How to train/run a model and how to upload the results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 7-14
+.. GENERATED FROM PYTHON SOURCE LINES 7-13
 
 .. code-block:: default
 
@@ -31,7 +31,6 @@ How to train/run a model and how to upload the results.
     # License: BSD 3-Clause
 
     import openml
-    import numpy as np
     from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
 
 
@@ -41,7 +40,7 @@ How to train/run a model and how to upload the results.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 15-23
+.. GENERATED FROM PYTHON SOURCE LINES 14-22
 
 Train machine learning models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -52,7 +51,7 @@ Train a scikit-learn model on the data manually.
   connects to the test server at test.openml.org. This prevents the main
   server from crowding with example datasets, tasks, runs, and so on.
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-33
+.. GENERATED FROM PYTHON SOURCE LINES 22-32
 
 .. code-block:: default
 
@@ -81,13 +80,13 @@ Train a scikit-learn model on the data manually.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-37
+.. GENERATED FROM PYTHON SOURCE LINES 33-36
 
 You can also ask for meta-data to automatically preprocess the data.
 
 * e.g. categorical features -> do feature encoding
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-48
+.. GENERATED FROM PYTHON SOURCE LINES 36-47
 
 .. code-block:: default
 
@@ -118,13 +117,13 @@ You can also ask for meta-data to automatically preprocess the data.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-52
+.. GENERATED FROM PYTHON SOURCE LINES 48-51
 
 Runs: Easily explore models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 We can run (many) scikit-learn algorithms on (many) OpenML tasks.
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-64
+.. GENERATED FROM PYTHON SOURCE LINES 51-63
 
 .. code-block:: default
 
@@ -133,7 +132,7 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     task = openml.tasks.get_task(403)
 
     # Build any classifier or pipeline
-    clf = tree.ExtraTreeClassifier()
+    clf = tree.DecisionTreeClassifier()
 
     # Run the flow
     run = openml.runs.run_model_on_task(clf, task)
@@ -158,25 +157,25 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     Task ID......: 403
     Task Type....: None
     Task URL.....: https://test.openml.org/t/403
-    Flow ID......: 33288
-    Flow Name....: sklearn.tree._classes.ExtraTreeClassifier
-    Flow URL.....: https://test.openml.org/f/33288
+    Flow ID......: 2036
+    Flow Name....: sklearn.tree._classes.DecisionTreeClassifier
+    Flow URL.....: https://test.openml.org/f/2036
     Setup ID.....: None
-    Setup String.: Python_3.8.7. Sklearn_0.24.1. NumPy_1.19.5. SciPy_1.6.0. ExtraTreeClassifier(random_state=35269)
+    Setup String.: Python_3.8.7. Sklearn_0.24.1. NumPy_1.20.1. SciPy_1.6.1. DecisionTreeClassifier(random_state=48132)
     Dataset ID...: 68
     Dataset URL..: https://test.openml.org/d/68
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-69
+.. GENERATED FROM PYTHON SOURCE LINES 64-68
 
 Share the run on the OpenML server
 
 So far the run is only available locally. By calling the publish function,
 the run is sent to the OpenML server:
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-75
+.. GENERATED FROM PYTHON SOURCE LINES 68-74
 
 .. code-block:: default
 
@@ -196,16 +195,16 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/15378
+    Uploaded to http://test.openml.org/r/724
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-77
+.. GENERATED FROM PYTHON SOURCE LINES 75-76
 
 We can now also inspect the flow object which was automatically created:
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-81
+.. GENERATED FROM PYTHON SOURCE LINES 76-80
 
 .. code-block:: default
 
@@ -225,20 +224,11 @@ We can now also inspect the flow object which was automatically created:
 
     OpenML Flow
     ===========
-    Flow ID.........: 33288 (version 1)
-    Flow URL........: https://test.openml.org/f/33288
-    Flow Name.......: sklearn.tree._classes.ExtraTreeClassifier
-    Flow Description: An extremely randomized tree classifier.
-
-    Extra-trees differ from classic decision trees in the way they are built.
-    When looking for the best split to separate the samples of a node into two
-    groups, random splits are drawn for each of the `max_features` randomly
-    selected features and the best split among those is chosen. When
-    `max_features` is set 1, this amounts to building a totally random
-    decision tree.
-
-    Warning: Extra-trees should only be used within ensemble methods.
-    Upload Date.....: 2021-01-26 13:09:07
+    Flow ID.........: 2036 (version 4)
+    Flow URL........: https://test.openml.org/f/2036
+    Flow Name.......: sklearn.tree._classes.DecisionTreeClassifier
+    Flow Description: A decision tree classifier.
+    Upload Date.....: 2021-02-18 11:07:27
     Dependencies....: sklearn==0.24.1
     numpy>=1.6.1
     scipy>=0.9
@@ -246,18 +236,21 @@ We can now also inspect the flow object which was automatically created:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-86
+.. GENERATED FROM PYTHON SOURCE LINES 81-88
 
 It also works with pipelines
 ############################
 
 When you need to handle 'dirty' data, build pipelines to model then automatically.
+To demonstrate this using the dataset `credit-a <https://test.openml.org/d/16>`_ via
+`task <https://test.openml.org/t/96>`_ as it contains both numerical and categorical
+variables and missing values in both.
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-174
+.. GENERATED FROM PYTHON SOURCE LINES 88-164
 
 .. code-block:: default
 
-    task = openml.tasks.get_task(1)
+    task = openml.tasks.get_task(96)
 
     # OpenML helper functions for sklearn can be plugged in directly for complicated pipelines
     from openml.extensions.sklearn import cat, cont
@@ -270,20 +263,14 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
                     [
                         (
                             "categorical",
-                            pipeline.Pipeline(
-                                [
-                                    ("Imputer", impute.SimpleImputer(strategy="most_frequent")),
-                                    (
-                                        "Encoder",
-                                        preprocessing.OneHotEncoder(
-                                            sparse=False, handle_unknown="ignore"
-                                        ),
-                                    ),
-                                ]
-                            ),
+                            preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
                             cat,  # returns the categorical feature indices
                         ),
-                        ("continuous", "passthrough", cont),  # returns the numeric feature indices
+                        (
+                            "continuous",
+                            impute.SimpleImputer(strategy="median"),
+                            cont,
+                        ),  # returns the numeric feature indices
                     ]
                 ),
             ),
@@ -320,20 +307,14 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
                     [
                         (
                             "categorical",
-                            pipeline.Pipeline(
-                                [
-                                    ("Imputer", impute.SimpleImputer(strategy="most_frequent")),
-                                    (
-                                        "Encoder",
-                                        preprocessing.OneHotEncoder(
-                                            sparse=False, handle_unknown="ignore"
-                                        ),
-                                    ),
-                                ]
-                            ),
+                            preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
                             categorical_feature_indices,
                         ),
-                        ("continuous", "passthrough", numeric_feature_indices),
+                        (
+                            "continuous",
+                            impute.SimpleImputer(strategy="median"),
+                            numeric_feature_indices,
+                        ),
                     ]
                 ),
             ),
@@ -355,60 +336,20 @@ When you need to handle 'dirty' data, build pipelines to model then automaticall
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    Uploaded to http://test.openml.org/r/15381
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    Uploaded to http://test.openml.org/r/15385
+    Uploaded to http://test.openml.org/r/727
+    Uploaded to http://test.openml.org/r/728
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 175-179
+.. GENERATED FROM PYTHON SOURCE LINES 165-169
 
 Running flows on tasks offline for later upload
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 For those scenarios where there is no access to internet, it is possible to run
 a model on a task without uploading results or flows to the server immediately.
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-197
+.. GENERATED FROM PYTHON SOURCE LINES 169-189
 
 .. code-block:: default
 
@@ -418,7 +359,9 @@ a model on a task without uploading results or flows to the server immediately.
     task = openml.tasks.get_task(6)
 
     # The following lines can then be executed offline:
-    run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False, upload_flow=False)
+    run = openml.runs.run_model_on_task(
+        pipe, task, avoid_duplicate_runs=False, upload_flow=False, dataset_format="array",
+    )
 
     # The run may be stored offline, and the flow will be stored along with it:
     run.to_filesystem(directory="myrun")
@@ -440,21 +383,21 @@ a model on a task without uploading results or flows to the server immediately.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
+    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1829: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
 
     OpenML Run
     ==========
     Uploader Name: None
     Metric.......: None
-    Run ID.......: 15388
-    Run URL......: https://test.openml.org/r/15388
+    Run ID.......: 730
+    Run URL......: https://test.openml.org/r/730
     Task ID......: 6
     Task Type....: None
     Task URL.....: https://test.openml.org/t/6
-    Flow ID......: 35729
-    Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(categorical=sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,Encoder=sklearn.preprocessing._encoders.OneHotEncoder),continuous=passthrough),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
-    Flow URL.....: https://test.openml.org/f/35729
+    Flow ID......: 2064
+    Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(categorical=sklearn.preprocessing._encoders.OneHotEncoder,continuous=sklearn.impute._base.SimpleImputer),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
+    Flow URL.....: https://test.openml.org/f/2064
     Setup ID.....: None
     Setup String.: None
     Dataset ID...: None
@@ -462,11 +405,11 @@ a model on a task without uploading results or flows to the server immediately.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-199
+.. GENERATED FROM PYTHON SOURCE LINES 190-191
 
 Alternatively, one can also directly run flows.
 
-.. GENERATED FROM PYTHON SOURCE LINES 199-213
+.. GENERATED FROM PYTHON SOURCE LINES 191-205
 
 .. code-block:: default
 
@@ -491,7 +434,7 @@ Alternatively, one can also directly run flows.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 214-231
+.. GENERATED FROM PYTHON SOURCE LINES 206-223
 
 Challenge
 ^^^^^^^^^
@@ -511,7 +454,7 @@ them. Some tasks you could try (or browse openml.org):
 * Higgs (Physics): data_id:`23512 <http://www.openml.org/d/23512>`_,
   task_id:`52950 <http://www.openml.org/t/52950>`_, 100k instances, missing values.
 
-.. GENERATED FROM PYTHON SOURCE LINES 231-243
+.. GENERATED FROM PYTHON SOURCE LINES 223-235
 
 .. code-block:: default
 
@@ -537,12 +480,12 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/15392
+    kNN on diabetes: http://test.openml.org/r/738
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 244-245
+.. GENERATED FROM PYTHON SOURCE LINES 236-237
 
 .. code-block:: default
 
@@ -557,7 +500,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  26.722 seconds)
+   **Total running time of the script:** ( 0 minutes  22.960 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:

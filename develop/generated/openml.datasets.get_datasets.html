@@ -116,7 +116,7 @@
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.get_datasets<a class="headerlink" href="#openml-datasets-get-datasets" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="openml.datasets.get_datasets">
-<code class="sig-prename descclassname">openml.datasets.</code><code class="sig-name descname">get_datasets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset_ids</span><span class="p">:</span> <span class="n">List<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">download_data</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>openml.datasets.dataset.OpenMLDataset<span class="p">]</span><a class="headerlink" href="#openml.datasets.get_datasets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">openml.datasets.</span></code><code class="sig-name descname"><span class="pre">get_datasets</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_ids</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_qualities</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">openml.datasets.dataset.OpenMLDataset</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#openml.datasets.get_datasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download datasets.</p>
 <p>This function iterates <a class="reference internal" href="openml.datasets.get_dataset.html#openml.datasets.get_dataset" title="openml.datasets.get_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">openml.datasets.get_dataset()</span></code></a>.</p>
 <dl class="field-list simple">
@@ -129,6 +129,8 @@ If dataset names are specified, the least recent still active dataset version is
 make the operation noticeably slower. Metadata is also still retrieved.
 If False, create the OpenMLDataset and only populate it with the metadata.
 The data may later be retrieved through the <cite>OpenMLDataset.get_data</cite> method.</p>
+</dd>
+<dt><strong>download_qualities</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>If True, also download qualities.xml file. If False it skip the qualities.xml.</p>
 </dd>
 </dl>
 </dd>
@@ -156,7 +158,7 @@ The data may later be retrieved through the <cite>OpenMLDataset.get_data</cite> 
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
     </p>
   </div>
 </footer>

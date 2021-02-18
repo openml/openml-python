@@ -286,17 +286,17 @@ pre-processing all retrieved evaluations.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                     cost degree               gamma      kernel
-4223  0.00814510112419639    NaN  0.0134154223021812         NaN
-3329     35.7727942992846      4                 NaN  polynomial
-2033   0.0590766040436884    NaN                 NaN      linear
-1077     29.1931185658536    NaN                 NaN      linear
-4217     7.18346617270325    NaN                 NaN      linear
-Y :  4223    0.984772
-3329    0.483196
-2033    0.903349
-1077    0.905903
-4217    0.992257
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                   cost degree             gamma      kernel
+3019  0.422304215534162    NaN               NaN      linear
+4155  0.321953937512674    NaN  2.13155685470731         NaN
+2585   368.385989910985    NaN               NaN      linear
+3851   2.01225660930141    NaN               NaN  polynomial
+2705   55.3533641500191    NaN  153.544697976645         NaN
+Y :  3019    0.659114
+4155    0.635940
+2585    0.635923
+3851    0.510553
+2705    0.583179
 Name: value, dtype: float64
 </pre></div>
 </div>
@@ -310,18 +310,14 @@ using One-hot encoding prior to modelling.</p>
 <span class="n">cat_cols</span> <span class="o">=</span> <span class="n">list_categorical_attributes</span><span class="p">(</span><span class="n">flow_type</span><span class="o">=</span><span class="n">flow_type</span><span class="p">)</span>
 <span class="n">num_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">cat_cols</span><span class="p">))</span>
 
-<span class="c1"># Missing value imputers</span>
-<span class="n">cat_imputer</span> <span class="o">=</span> <span class="n">SimpleImputer</span><span class="p">(</span><span class="n">missing_values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">)</span>
+<span class="c1"># Missing value imputers for numeric columns</span>
 <span class="n">num_imputer</span> <span class="o">=</span> <span class="n">SimpleImputer</span><span class="p">(</span><span class="n">missing_values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="c1"># Creating the one-hot encoder</span>
+<span class="c1"># Creating the one-hot encoder for numerical representation of categorical columns</span>
 <span class="n">enc</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">handle_unknown</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 
-<span class="c1"># Pipeline to handle categorical column transformations</span>
-<span class="n">cat_transforms</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;impute&quot;</span><span class="p">,</span> <span class="n">cat_imputer</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;encode&quot;</span><span class="p">,</span> <span class="n">enc</span><span class="p">)])</span>
-
 <span class="c1"># Combining column transformers</span>
-<span class="n">ct</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">([(</span><span class="s2">&quot;cat&quot;</span><span class="p">,</span> <span class="n">cat_transforms</span><span class="p">,</span> <span class="n">cat_cols</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;num&quot;</span><span class="p">,</span> <span class="n">num_imputer</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">)])</span>
+<span class="n">ct</span> <span class="o">=</span> <span class="n">ColumnTransformer</span><span class="p">([(</span><span class="s2">&quot;cat&quot;</span><span class="p">,</span> <span class="n">enc</span><span class="p">,</span> <span class="n">cat_cols</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;num&quot;</span><span class="p">,</span> <span class="n">num_imputer</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">)])</span>
 
 <span class="c1"># Creating the full pipeline with the surrogate model</span>
 <span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
@@ -347,7 +343,7 @@ time simple and quick.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 1.6681e-05
+Training RMSE : 2.2729e-05
 </pre></div>
 </div>
 </div>
@@ -382,17 +378,17 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
-0    600.469289  3.298749  858.678425      radial
-1    427.271748  2.204308  900.727710      radial
-2    516.223259  3.521425   45.455657      radial
-3    421.315126  4.072565  415.050685      linear
-4    855.738723  4.334870  527.196400      radial
+0    781.183015  4.793874  261.175298      linear
+1    562.374102  3.091023  521.519489  polynomial
+2    926.578280  4.194926  659.484819  polynomial
+3    741.121161  3.079777  118.607495      linear
+4    745.198413  2.247728  785.148769     sigmoid
 ..          ...       ...         ...         ...
-995   84.927472  2.735714   16.571631      linear
-996  392.582080  2.183359  243.935752  polynomial
-997  639.830666  2.324547   45.621634      radial
-998  907.200974  2.762784  679.756647      linear
-999  870.263378  4.890025  867.532055      linear
+995   17.558763  4.689107  273.260121      radial
+996   76.596578  2.674103  570.780520     sigmoid
+997  391.264925  4.623297  260.938507      linear
+998  432.633888  2.149920  322.798206  polynomial
+999  226.902498  3.615594  908.124528     sigmoid
 
 [1000 rows x 4 columns]
 </pre></div>
@@ -413,10 +409,10 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 <img alt="AUC regret for Random Search on surrogate" class="sphx-glr-single-img" src="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(33.972222222222214, 0.5, &#39;Regret&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(42.722222222222214, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  30.042 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  24.680 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
@@ -443,7 +439,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
     </p>
   </div>
 </footer>

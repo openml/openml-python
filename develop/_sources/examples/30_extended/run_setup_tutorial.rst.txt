@@ -81,7 +81,7 @@ In this tutorial we will
 1) Create a flow and use it to solve a task
 ##############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-86
+.. GENERATED FROM PYTHON SOURCE LINES 52-83
 
 .. code-block:: default
 
@@ -95,12 +95,9 @@ In this tutorial we will
     # easy as you want it to be
 
 
-    cat_imp = make_pipeline(
-        SimpleImputer(strategy="most_frequent"),
-        OneHotEncoder(handle_unknown="ignore", sparse=False),
-        TruncatedSVD(),
-    )
-    ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", "passthrough", cont)])
+    cat_imp = make_pipeline(OneHotEncoder(handle_unknown="ignore", sparse=False), TruncatedSVD(),)
+    cont_imp = SimpleImputer(strategy="median")
+    ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
     model_original = Pipeline(steps=[("transform", ct), ("estimator", RandomForestClassifier()),])
 
     # Let's change some hyperparameters. Of course, in any good application we
@@ -129,18 +126,18 @@ In this tutorial we will
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
+    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1829: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-89
+.. GENERATED FROM PYTHON SOURCE LINES 84-86
 
 2) Download the flow and solve the same task again.
 ##############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-103
+.. GENERATED FROM PYTHON SOURCE LINES 86-100
 
 .. code-block:: default
 
@@ -168,18 +165,18 @@ In this tutorial we will
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1781: UserWarning: Estimator only predicted for 5/6 classes!
+    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1829: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-106
+.. GENERATED FROM PYTHON SOURCE LINES 101-103
 
 3) We will verify that the obtained results are exactly the same.
 ##############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-110
+.. GENERATED FROM PYTHON SOURCE LINES 103-107
 
 .. code-block:: default
 
@@ -194,7 +191,7 @@ In this tutorial we will
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-113
+.. GENERATED FROM PYTHON SOURCE LINES 108-110
 
 .. code-block:: default
 
@@ -210,7 +207,7 @@ In this tutorial we will
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  8.278 seconds)
+   **Total running time of the script:** ( 0 minutes  6.493 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_run_setup_tutorial.py:
