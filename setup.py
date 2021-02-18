@@ -53,6 +53,7 @@ setuptools.setup(
         "pandas>=1.0.0",
         "scipy>=0.13.3",
         "numpy>=1.6.2",
+        "minio",
     ],
     extras_require={
         "test": [
