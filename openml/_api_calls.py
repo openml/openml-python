@@ -89,7 +89,11 @@ def _download_minio_file(
     destination = pathlib.Path(destination)
     parsed_url = urllib.parse.urlparse(source)
 
-    _, _, bucket, object_name = parsed_url.path.split("/")
+    # expect path format: /minio/BUCKET/path/to/file.ext
+    if not str(parsed_url.path).startswith("/minio/"):
+        raise ValueError(f"Expect start of path of source is '/minio/', found '{parsed_url.path}'")
+
+    bucket, object_name = parsed_url.path[len("/minio/") :].split("/", maxsplit=1)
     if destination.is_dir():
         destination = pathlib.Path(destination, object_name)
     if destination.is_file() and not exists_ok:

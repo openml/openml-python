@@ -439,6 +439,15 @@ class TestOpenMLDataset(TestBase):
             exists_ok=False,
         )
 
+    def test__download_minio_file_works_with_bucket_subdirectory(self):
+        file_destination = pathlib.Path(self.workdir, "custom.csv")
+        _ = _download_minio_file(
+            source="http://openml1.win.tue.nl/minio/bucket1/temp/dataset_.csv",
+            destination=file_destination,
+            exists_ok=True,
+        )
+        self.assertTrue(os.path.isfile(file_destination))
+
     def test__getarff_md5_issue(self):
         description = {
             "oml:id": 5,
