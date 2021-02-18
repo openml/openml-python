@@ -8,7 +8,6 @@ How to train/run a model and how to upload the results.
 # License: BSD 3-Clause
 
 import openml
-import numpy as np
 from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
 
 ############################################################################
@@ -54,7 +53,7 @@ clf.fit(X, y)
 task = openml.tasks.get_task(403)
 
 # Build any classifier or pipeline
-clf = tree.ExtraTreeClassifier()
+clf = tree.DecisionTreeClassifier()
 
 # Run the flow
 run = openml.runs.run_model_on_task(clf, task)
@@ -83,7 +82,10 @@ print(flow)
 # ############################
 #
 # When you need to handle 'dirty' data, build pipelines to model then automatically.
-task = openml.tasks.get_task(1)
+# To demonstrate this using the dataset `credit-a <https://test.openml.org/d/16>`_ via
+# `task <https://test.openml.org/t/96>`_ as it contains both numerical and categorical
+# variables and missing values in both.
+task = openml.tasks.get_task(96)
 
 # OpenML helper functions for sklearn can be plugged in directly for complicated pipelines
 from openml.extensions.sklearn import cat, cont
@@ -96,20 +98,14 @@ pipe = pipeline.Pipeline(
                 [
                     (
                         "categorical",
-                        pipeline.Pipeline(
-                            [
-                                ("Imputer", impute.SimpleImputer(strategy="most_frequent")),
-                                (
-                                    "Encoder",
-                                    preprocessing.OneHotEncoder(
-                                        sparse=False, handle_unknown="ignore"
-                                    ),
-                                ),
-                            ]
-                        ),
+                        preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
                         cat,  # returns the categorical feature indices
                     ),
-                    ("continuous", "passthrough", cont),  # returns the numeric feature indices
+                    (
+                        "continuous",
+                        impute.SimpleImputer(strategy="median"),
+                        cont,
+                    ),  # returns the numeric feature indices
                 ]
             ),
         ),
@@ -146,20 +142,14 @@ pipe = pipeline.Pipeline(
                 [
                     (
                         "categorical",
-                        pipeline.Pipeline(
-                            [
-                                ("Imputer", impute.SimpleImputer(strategy="most_frequent")),
-                                (
-                                    "Encoder",
-                                    preprocessing.OneHotEncoder(
-                                        sparse=False, handle_unknown="ignore"
-                                    ),
-                                ),
-                            ]
-                        ),
+                        preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
                         categorical_feature_indices,
                     ),
-                    ("continuous", "passthrough", numeric_feature_indices),
+                    (
+                        "continuous",
+                        impute.SimpleImputer(strategy="median"),
+                        numeric_feature_indices,
+                    ),
                 ]
             ),
         ),
@@ -182,7 +172,9 @@ print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 task = openml.tasks.get_task(6)
 
 # The following lines can then be executed offline:
-run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False, upload_flow=False)
+run = openml.runs.run_model_on_task(
+    pipe, task, avoid_duplicate_runs=False, upload_flow=False, dataset_format="array",
+)
 
 # The run may be stored offline, and the flow will be stored along with it:
 run.to_filesystem(directory="myrun")

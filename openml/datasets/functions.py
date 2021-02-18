@@ -290,6 +290,8 @@ def _name_to_id(
     error_if_multiple : bool (default=False)
         If `False`, if multiple datasets match, return the least recent active dataset.
         If `True`, if multiple datasets match, raise an error.
+    download_qualities : bool, optional (default=True)
+        If `True`, also download qualities.xml file. If False it skip the qualities.xml.
 
     Returns
     -------
@@ -310,7 +312,7 @@ def _name_to_id(
 
 
 def get_datasets(
-    dataset_ids: List[Union[str, int]], download_data: bool = True,
+    dataset_ids: List[Union[str, int]], download_data: bool = True, download_qualities: bool = True
 ) -> List[OpenMLDataset]:
     """Download datasets.
 
@@ -326,6 +328,8 @@ def get_datasets(
         make the operation noticeably slower. Metadata is also still retrieved.
         If False, create the OpenMLDataset and only populate it with the metadata.
         The data may later be retrieved through the `OpenMLDataset.get_data` method.
+    download_qualities : bool, optional (default=True)
+        If True, also download qualities.xml file. If False it skip the qualities.xml.
 
     Returns
     -------
@@ -334,7 +338,9 @@ def get_datasets(
     """
     datasets = []
     for dataset_id in dataset_ids:
-        datasets.append(get_dataset(dataset_id, download_data))
+        datasets.append(
+            get_dataset(dataset_id, download_data, download_qualities=download_qualities)
+        )
     return datasets
 
 
@@ -345,6 +351,7 @@ def get_dataset(
     version: int = None,
     error_if_multiple: bool = False,
     cache_format: str = "pickle",
+    download_qualities: bool = True,
 ) -> OpenMLDataset:
     """ Download the OpenML dataset representation, optionally also download actual data file.
 
@@ -405,7 +412,10 @@ def get_dataset(
         features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
 
         try:
-            qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
+            if download_qualities:
+                qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
+            else:
+                qualities_file = ""
         except OpenMLServerException as e:
             if e.code == 362 and str(e) == "No qualities found - None":
                 logger.warning("No qualities found for dataset {}".format(dataset_id))
@@ -996,6 +1006,8 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id):
     dataset_id : int
         Dataset ID
 
+    download_qualities : bool
+        wheather to download/use cahsed version or not.
     Returns
     -------
     str
@@ -1009,10 +1021,8 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id):
     except (OSError, IOError):
         url_extension = "data/qualities/{}".format(dataset_id)
         qualities_xml = openml._api_calls._perform_api_call(url_extension, "get")
-
         with io.open(qualities_file, "w", encoding="utf8") as fh:
             fh.write(qualities_xml)
-
     return qualities_file
 
 
