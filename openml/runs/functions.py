@@ -12,6 +12,7 @@ import sklearn.metrics
 import xmltodict
 import numpy as np
 import pandas as pd
+from joblib.parallel import Parallel, delayed
 
 import openml
 import openml.utils
@@ -54,6 +55,7 @@ def run_model_on_task(
     upload_flow: bool = False,
     return_flow: bool = False,
     dataset_format: str = "dataframe",
+    n_jobs: Optional[int] = None,
 ) -> Union[OpenMLRun, Tuple[OpenMLRun, OpenMLFlow]]:
     """Run the model on the dataset defined by the task.
 
@@ -84,6 +86,10 @@ def run_model_on_task(
     dataset_format : str (default='dataframe')
         If 'array', the dataset is passed to the model as a numpy array.
         If 'dataframe', the dataset is passed to the model as a pandas dataframe.
+    n_jobs : int (default=None)
+        The number of processes/threads to distribute the evaluation asynchronously.
+        If `None` or `1`, then the evaluation is treated as synchronous and processed sequentially.
+        If `-1`, then the job uses as many cores available.
 
     Returns
     -------
@@ -131,6 +137,7 @@ def run_model_on_task(
         add_local_measures=add_local_measures,
         upload_flow=upload_flow,
         dataset_format=dataset_format,
+        n_jobs=n_jobs,
     )
     if return_flow:
         return run, flow
@@ -146,6 +153,7 @@ def run_flow_on_task(
     add_local_measures: bool = True,
     upload_flow: bool = False,
     dataset_format: str = "dataframe",
+    n_jobs: Optional[int] = None,
 ) -> OpenMLRun:
 
     """Run the model provided by the flow on the dataset defined by task.
@@ -181,6 +189,10 @@ def run_flow_on_task(
     dataset_format : str (default='dataframe')
         If 'array', the dataset is passed to the model as a numpy array.
         If 'dataframe', the dataset is passed to the model as a pandas dataframe.
+    n_jobs : int (default=None)
+        The number of processes/threads to distribute the evaluation asynchronously.
+        If `None` or `1`, then the evaluation is treated as synchronous and processed sequentially.
+        If `-1`, then the job uses as many cores available.
 
     Returns
     -------
@@ -265,6 +277,7 @@ def run_flow_on_task(
         extension=flow.extension,
         add_local_measures=add_local_measures,
         dataset_format=dataset_format,
+        n_jobs=n_jobs,
     )
 
     data_content, trace, fold_evaluations, sample_evaluations = res
@@ -425,6 +438,7 @@ def _run_task_get_arffcontent(
     extension: "Extension",
     add_local_measures: bool,
     dataset_format: str,
+    n_jobs: int = None,
 ) -> Tuple[
     List[List],
     Optional[OpenMLRunTrace],
@@ -447,55 +461,37 @@ def _run_task_get_arffcontent(
     # methods, less maintenance, less confusion)
     num_reps, num_folds, num_samples = task.get_split_dimensions()
 
+    jobs = []
     for n_fit, (rep_no, fold_no, sample_no) in enumerate(
         itertools.product(range(num_reps), range(num_folds), range(num_samples),), start=1
     ):
+        jobs.append((n_fit, rep_no, fold_no, sample_no))
 
-        train_indices, test_indices = task.get_train_test_split_indices(
-            repeat=rep_no, fold=fold_no, sample=sample_no
-        )
-        if isinstance(task, OpenMLSupervisedTask):
-            x, y = task.get_X_and_y(dataset_format=dataset_format)
-            if dataset_format == "dataframe":
-                train_x = x.iloc[train_indices]
-                train_y = y.iloc[train_indices]
-                test_x = x.iloc[test_indices]
-                test_y = y.iloc[test_indices]
-            else:
-                train_x = x[train_indices]
-                train_y = y[train_indices]
-                test_x = x[test_indices]
-                test_y = y[test_indices]
-        elif isinstance(task, OpenMLClusteringTask):
-            x = task.get_X(dataset_format=dataset_format)
-            if dataset_format == "dataframe":
-                train_x = x.iloc[train_indices]
-            else:
-                train_x = x[train_indices]
-            train_y = None
-            test_x = None
-            test_y = None
-        else:
-            raise NotImplementedError(task.task_type)
-
-        config.logger.info(
-            "Going to execute flow '%s' on task %d for repeat %d fold %d sample %d.",
-            flow.name,
-            task.task_id,
-            rep_no,
-            fold_no,
-            sample_no,
-        )
-
-        pred_y, proba_y, user_defined_measures_fold, trace = extension._run_model_on_fold(
-            model=model,
-            task=task,
-            X_train=train_x,
-            y_train=train_y,
-            rep_no=rep_no,
+    # The forked child process may not copy the configuration state of OpenML from the parent.
+    # Current configuration setup needs to be copied and passed to the child processes.
+    _config = config.get_config_as_dict()
+    # Execute runs in parallel
+    # assuming the same number of tasks as workers (n_jobs), the total compute time for this
+    # statement will be similar to the slowest run
+    job_rvals = Parallel(verbose=0, n_jobs=n_jobs)(
+        delayed(_run_task_get_arffcontent_parallel_helper)(
+            extension=extension,
+            flow=flow,
             fold_no=fold_no,
-            X_test=test_x,
+            model=model,
+            rep_no=rep_no,
+            sample_no=sample_no,
+            task=task,
+            dataset_format=dataset_format,
+            configuration=_config,
         )
+        for n_fit, rep_no, fold_no, sample_no in jobs
+    )  # job_rvals contain the output of all the runs with one-to-one correspondence with `jobs`
+
+    for n_fit, rep_no, fold_no, sample_no in jobs:
+        pred_y, proba_y, test_indices, test_y, trace, user_defined_measures_fold = job_rvals[
+            n_fit - 1
+        ]
         if trace is not None:
             traces.append(trace)
 
@@ -613,6 +609,75 @@ def _run_task_get_arffcontent(
         user_defined_measures_per_fold,
         user_defined_measures_per_sample,
     )
+
+
+def _run_task_get_arffcontent_parallel_helper(
+    extension: "Extension",
+    flow: OpenMLFlow,
+    fold_no: int,
+    model: Any,
+    rep_no: int,
+    sample_no: int,
+    task: OpenMLTask,
+    dataset_format: str,
+    configuration: Dict = None,
+) -> Tuple[
+    np.ndarray,
+    Optional[pd.DataFrame],
+    np.ndarray,
+    Optional[pd.DataFrame],
+    Optional[OpenMLRunTrace],
+    "OrderedDict[str, float]",
+]:
+    # Sets up the OpenML instantiated in the child process to match that of the parent's
+    # if configuration=None, loads the default
+    config._setup(configuration)
+
+    train_indices, test_indices = task.get_train_test_split_indices(
+        repeat=rep_no, fold=fold_no, sample=sample_no
+    )
+
+    if isinstance(task, OpenMLSupervisedTask):
+        x, y = task.get_X_and_y(dataset_format=dataset_format)
+        if dataset_format == "dataframe":
+            train_x = x.iloc[train_indices]
+            train_y = y.iloc[train_indices]
+            test_x = x.iloc[test_indices]
+            test_y = y.iloc[test_indices]
+        else:
+            train_x = x[train_indices]
+            train_y = y[train_indices]
+            test_x = x[test_indices]
+            test_y = y[test_indices]
+    elif isinstance(task, OpenMLClusteringTask):
+        x = task.get_X(dataset_format=dataset_format)
+        if dataset_format == "dataframe":
+            train_x = x.iloc[train_indices]
+        else:
+            train_x = x[train_indices]
+        train_y = None
+        test_x = None
+        test_y = None
+    else:
+        raise NotImplementedError(task.task_type)
+    config.logger.info(
+        "Going to execute flow '%s' on task %d for repeat %d fold %d sample %d.",
+        flow.name,
+        task.task_id,
+        rep_no,
+        fold_no,
+        sample_no,
+    )
+    pred_y, proba_y, user_defined_measures_fold, trace, = extension._run_model_on_fold(
+        model=model,
+        task=task,
+        X_train=train_x,
+        y_train=train_y,
+        rep_no=rep_no,
+        fold_no=fold_no,
+        X_test=test_x,
+    )
+    return pred_y, proba_y, test_indices, test_y, trace, user_defined_measures_fold
 
 
 def get_runs(run_ids):
