@@ -1498,12 +1498,8 @@ class TestOpenMLDataset(TestBase):
     def test_get_dataset_parquet(self):
         dataset = openml.datasets.get_dataset(20)
         self.assertIsNotNone(dataset._minio_url)
-        self.assertIsNone(dataset.data_parquet_file, "The file should not yet be cached")
-
-        data, categorical, attribute_names = dataset._load_data()
-        self.assertIsNotNone(
-            dataset.data_parquet_file, "Loading data should have stored the parquet file"
-        )
+        self.assertIsNotNone(dataset.parquet_file)
+        self.assertTrue(os.path.isfile(dataset.parquet_file))
 
 
 @pytest.mark.parametrize(
