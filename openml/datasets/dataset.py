@@ -297,9 +297,11 @@ class OpenMLDataset(OpenMLBase):
     def _download_data(self) -> None:
         """ Download ARFF data file to standard cache directory. Set `self.data_file`. """
         # import required here to avoid circular import.
-        from .functions import _get_dataset_arff
+        from .functions import _get_dataset_arff, _get_dataset_parquet
 
         self.data_file = _get_dataset_arff(self)
+        if self._minio_url is not None:
+            self.parquet_file = _get_dataset_parquet(self)
 
     def _get_arff(self, format: str) -> Dict:
         """Read ARFF file and return decoded arff.
