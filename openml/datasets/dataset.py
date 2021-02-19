@@ -467,17 +467,24 @@ class OpenMLDataset(OpenMLBase):
         feather_attribute_file = data_file.replace(".arff", ".feather.attributes.pkl.py3")
         return data_pickle_file, data_feather_file, feather_attribute_file
 
-    def _cache_compressed_file_from_arff(
-        self, arff_file: str
+    def _cache_compressed_file_from_file(
+        self, data_file: str
     ) -> Tuple[Union[pd.DataFrame, scipy.sparse.csr_matrix], List[bool], List[str]]:
         """ Store data from the arff file in compressed format. Sets cache_format to 'pickle' if data is sparse. """  # noqa: 501
         (
             data_pickle_file,
             data_feather_file,
             feather_attribute_file,
-        ) = self._compressed_cache_file_paths(arff_file)
+        ) = self._compressed_cache_file_paths(data_file)
 
-        data, categorical, attribute_names = self._parse_data_from_arff(arff_file)
+        if data_file.endswith(".arff"):
+            data, categorical, attribute_names = self._parse_data_from_arff(data_file)
+        elif data_file.endswith(".pq"):
+            data = pd.read_parquet(data_file)
+            categorical = [data[c].dtype.name == "category" for c in data.columns]
+            attribute_names = list(data.columns)
+        else:
+            raise ValueError(f"Unknown file type for file '{data_file}'.")
 
         # Feather format does not work for sparse datasets, so we use pickle for sparse datasets
         if scipy.sparse.issparse(data):
@@ -506,8 +513,9 @@ class OpenMLDataset(OpenMLBase):
                 self._download_data()
                 res = self._compressed_cache_file_paths(self.data_file)
                 self.data_pickle_file, self.data_feather_file, self.feather_attribute_file = res
+            file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
             # Since our recently stored data is exists in memory, there is no need to load from disk
-            return self._cache_compressed_file_from_arff(self.data_file)
+            return self._cache_compressed_file_from_file(file_to_load)
 
         # helper variable to help identify where errors occur
         fpath = self.data_feather_file if self.cache_format == "feather" else self.data_pickle_file
@@ -541,7 +549,7 @@ class OpenMLDataset(OpenMLBase):
                 f"{readable_error} when loading dataset {self.id} from '{fpath}'. "
                 f"{hint}"
                 f"Error message was: {error_message}. "
-                "We will continue loading data from the arff-file, "
+                f"We will continue loading data from the arff-file, "
                 "but this will be much slower for big datasets. "
                 "Please manually delete the cache file if you want OpenML-Python "
                 "to attempt to reconstruct it."
@@ -551,7 +559,8 @@ class OpenMLDataset(OpenMLBase):
         data_up_to_date = isinstance(data, pd.DataFrame) or scipy.sparse.issparse(data)
         if self.cache_format == "pickle" and not data_up_to_date:
             logger.info("Updating outdated pickle file.")
-            return self._cache_compressed_file_from_arff(self.data_file)
+            file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
+            return self._cache_compressed_file_from_file(file_to_load)
         return data, categorical, attribute_names
 
     @staticmethod
