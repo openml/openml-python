@@ -98,6 +98,8 @@ class OpenMLDataset(OpenMLBase):
         Serialized arff dataset string.
     minio_url: string, optional
         URL to the MinIO bucket with dataset files
+    parquet_file: string, optional
+        Path to the local parquet file.
     """
 
     def __init__(
@@ -470,7 +472,11 @@ class OpenMLDataset(OpenMLBase):
     def _cache_compressed_file_from_file(
         self, data_file: str
     ) -> Tuple[Union[pd.DataFrame, scipy.sparse.csr_matrix], List[bool], List[str]]:
-        """ Store data from the arff file in compressed format. Sets cache_format to 'pickle' if data is sparse. """  # noqa: 501
+        """ Store data from the local file in compressed format.
+
+        If a local parquet file is present it will be used instead of the arff file.
+        Sets cache_format to 'pickle' if data is sparse.
+        """
         (
             data_pickle_file,
             data_feather_file,
@@ -549,7 +555,7 @@ class OpenMLDataset(OpenMLBase):
                 f"{readable_error} when loading dataset {self.id} from '{fpath}'. "
                 f"{hint}"
                 f"Error message was: {error_message}. "
-                f"We will continue loading data from the arff-file, "
+                "We will continue loading data from the arff-file, "
                 "but this will be much slower for big datasets. "
                 "Please manually delete the cache file if you want OpenML-Python "
                 "to attempt to reconstruct it."
