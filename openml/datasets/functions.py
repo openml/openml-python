@@ -3,7 +3,7 @@
 import io
 import logging
 import os
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, cast
 
 import numpy as np
 import arff
@@ -953,7 +953,9 @@ def _get_dataset_parquet(
 
     if not os.path.isfile(output_file_path):
         try:
-            openml._api_calls._download_minio_file(source=url, destination=output_file_path)
+            openml._api_calls._download_minio_file(
+                source=cast(str, url), destination=output_file_path
+            )
         except FileNotFoundError:
             return None
     return output_file_path
