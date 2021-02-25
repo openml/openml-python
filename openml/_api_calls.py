@@ -74,7 +74,7 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
 
 def _download_minio_file(
     source: str, destination: Union[str, pathlib.Path], exists_ok: bool = True,
-) -> minio.datatypes.Object:
+) -> None:
     """ Download file ``source`` from a MinIO Bucket and store it at ``destination``.
 
     Parameters
@@ -85,6 +85,7 @@ def _download_minio_file(
         Path to store the file to, if a directory is provided the original filename is used.
     exists_ok : bool, optional (default=True)
         If False, raise FileExists if a file already exists in ``destination``.
+
     """
     destination = pathlib.Path(destination)
     parsed_url = urllib.parse.urlparse(source)
@@ -96,10 +97,10 @@ def _download_minio_file(
     if destination.is_file() and not exists_ok:
         raise FileExistsError(f"File already exists in {destination}.")
 
-    client = minio.Minio(endpoint=parsed_url.netloc, secure=False,)
+    client = minio.Minio(endpoint=parsed_url.netloc, secure=False)
 
     try:
-        file_meta = client.fget_object(
+        client.fget_object(
             bucket_name=bucket, object_name=object_name, file_path=str(destination),
         )
     except minio.error.S3Error as e:
@@ -108,7 +109,6 @@ def _download_minio_file(
         # e.g. permission error, or a bucket does not exist (which is also interpreted as a
         # permission error on minio level).
         raise FileNotFoundError("Bucket does not exist or is private.") from e
-    return file_meta
 
 
 def _download_text_file(
