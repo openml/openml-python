@@ -464,9 +464,10 @@ class OpenMLDataset(OpenMLBase):
         return X, categorical, attribute_names
 
     def _compressed_cache_file_paths(self, data_file: str) -> Tuple[str, str, str]:
-        data_pickle_file = data_file.replace(".arff", ".pkl.py3")
-        data_feather_file = data_file.replace(".arff", ".feather")
-        feather_attribute_file = data_file.replace(".arff", ".feather.attributes.pkl.py3")
+        ext = f".{data_file.split('.')[-1]}"
+        data_pickle_file = data_file.replace(ext, ".pkl.py3")
+        data_feather_file = data_file.replace(ext, ".feather")
+        feather_attribute_file = data_file.replace(ext, ".feather.attributes.pkl.py3")
         return data_pickle_file, data_feather_file, feather_attribute_file
 
     def _cache_compressed_file_from_file(
@@ -486,7 +487,11 @@ class OpenMLDataset(OpenMLBase):
         if data_file.endswith(".arff"):
             data, categorical, attribute_names = self._parse_data_from_arff(data_file)
         elif data_file.endswith(".pq"):
-            data = pd.read_parquet(data_file)
+            try:
+                data = pd.read_parquet(data_file)
+            except Exception as e:
+                raise Exception(f"File: {data_file}") from e
+
             categorical = [data[c].dtype.name == "category" for c in data.columns]
             attribute_names = list(data.columns)
         else:
@@ -501,12 +506,16 @@ class OpenMLDataset(OpenMLBase):
             data.to_feather(data_feather_file)
             with open(feather_attribute_file, "wb") as fh:
                 pickle.dump((categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
+            self.data_feather_file = data_feather_file
+            self.feather_attribute_file = feather_attribute_file
         else:
             with open(data_pickle_file, "wb") as fh:
                 pickle.dump((data, categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
+            self.data_pickle_file = data_pickle_file
 
         data_file = data_pickle_file if self.cache_format == "pickle" else data_feather_file
         logger.debug(f"Saved dataset {int(self.dataset_id or -1)}: {self.name} to file {data_file}")
+
         return data, categorical, attribute_names
 
     def _load_data(self):
@@ -517,10 +526,8 @@ class OpenMLDataset(OpenMLBase):
         if need_to_create_pickle or need_to_create_feather:
             if self.data_file is None:
                 self._download_data()
-                res = self._compressed_cache_file_paths(self.data_file)
-                self.data_pickle_file, self.data_feather_file, self.feather_attribute_file = res
+
             file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
-            # Since our recently stored data is exists in memory, there is no need to load from disk
             return self._cache_compressed_file_from_file(file_to_load)
 
         # helper variable to help identify where errors occur
