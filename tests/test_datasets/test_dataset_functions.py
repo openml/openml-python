@@ -421,21 +421,27 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test__download_minio_file_to_directory(self):
-        _ = _download_minio_file(
+        _download_minio_file(
             source="http://openml1.win.tue.nl/dataset20/dataset_20.pq",
             destination=self.workdir,
             exists_ok=True,
         )
-        self.assertTrue(os.path.isfile(os.path.join(self.workdir, "dataset_20.pq")))
+        self.assertTrue(
+            os.path.isfile(os.path.join(self.workdir, "dataset_20.pq")),
+            "_download_minio_file can save to a folder by copying the object name",
+        )
 
     def test__download_minio_file_to_path(self):
         file_destination = os.path.join(self.workdir, "custom.pq")
-        _ = _download_minio_file(
+        _download_minio_file(
             source="http://openml1.win.tue.nl/dataset20/dataset_20.pq",
             destination=file_destination,
             exists_ok=True,
         )
-        self.assertTrue(os.path.isfile(file_destination))
+        self.assertTrue(
+            os.path.isfile(file_destination),
+            "_download_minio_file can save to a folder by copying the object name",
+        )
 
     def test__download_minio_file_raises_FileExists_if_destination_in_use(self):
         file_destination = pathlib.Path(self.workdir, "custom.pq")
@@ -451,12 +457,15 @@ class TestOpenMLDataset(TestBase):
 
     def test__download_minio_file_works_with_bucket_subdirectory(self):
         file_destination = pathlib.Path(self.workdir, "custom.csv")
-        _ = _download_minio_file(
-            source="http://openml1.win.tue.nl/bucket1/temp/dataset_.csv",
+        _download_minio_file(
+            source="http://openml1.win.tue.nl/test/subdirectory/test.csv",
             destination=file_destination,
             exists_ok=True,
         )
-        self.assertTrue(os.path.isfile(file_destination))
+        self.assertTrue(
+            os.path.isfile(file_destination),
+            "_download_minio_file can download from subdirectories",
+        )
 
     def test__get_dataset_parquet_not_cached(self):
         description = {
@@ -464,8 +473,8 @@ class TestOpenMLDataset(TestBase):
             "oml:id": "20",
         }
         path = _get_dataset_parquet(description, cache_directory=self.workdir)
-        self.assertIsInstance(path, str)
-        self.assertTrue(os.path.isfile(path))
+        self.assertIsInstance(path, str, "_get_dataset_parquet returns a path")
+        self.assertTrue(os.path.isfile(path), "_get_dataset_parquet returns path to real file")
 
     @mock.patch("openml._api_calls._download_minio_file")
     def test__get_dataset_parquet_is_cached(self, patch):
@@ -478,8 +487,8 @@ class TestOpenMLDataset(TestBase):
             "oml:id": "30",
         }
         path = _get_dataset_parquet(description, cache_directory=None)
-        self.assertIsInstance(path, str)
-        self.assertTrue(os.path.isfile(path))
+        self.assertIsInstance(path, str, "_get_dataset_parquet returns a path")
+        self.assertTrue(os.path.isfile(path), "_get_dataset_parquet returns path to real file")
 
     def test__get_dataset_parquet_file_does_not_exist(self):
         description = {
@@ -487,7 +496,7 @@ class TestOpenMLDataset(TestBase):
             "oml:id": "20",
         }
         path = _get_dataset_parquet(description, cache_directory=self.workdir)
-        self.assertIsNone(path)
+        self.assertIsNone(path, "_get_dataset_parquet returns None if no file is found")
 
     def test__getarff_md5_issue(self):
         description = {
