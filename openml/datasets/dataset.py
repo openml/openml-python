@@ -490,7 +490,9 @@ class OpenMLDataset(OpenMLBase):
             try:
                 data = pd.read_parquet(data_file)
             except Exception as e:
-                raise Exception(f"File: {data_file}") from e
+                print(data_file)
+                raise e
+                # raise Exception(f"File: {data_file}") from e
 
             categorical = [data[c].dtype.name == "category" for c in data.columns]
             attribute_names = list(data.columns)
