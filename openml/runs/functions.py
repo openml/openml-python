@@ -662,7 +662,7 @@ def _run_task_get_arffcontent_parallel_helper(
         raise NotImplementedError(task.task_type)
     config.logger.info(
         "Going to execute flow '%s' on task %d for repeat %d fold %d sample %d.",
-        flow.name,
+        str(model),
         task.task_id,
         rep_no,
         fold_no,
