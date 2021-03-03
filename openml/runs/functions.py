@@ -1205,3 +1205,18 @@ def format_prediction(
         return [repeat, fold, index, truth, prediction]
     else:
         raise NotImplementedError(f"Formatting for {type(task)} is not supported.")
+
+def delete_run(run_id: int) -> bool:
+    """Deletes a run from the OpenML server.
+
+    Parameters
+    ----------
+    run_id : int
+        OpenML id of the run
+
+    Returns
+    -------
+    bool
+        True if the deletion was successful. False otherwise
+    """
+    return openml.utils._delete_entity("run", run_id)
