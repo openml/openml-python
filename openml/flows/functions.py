@@ -549,7 +549,7 @@ def _create_flow_from_xml(flow_xml: str) -> OpenMLFlow:
     return OpenMLFlow._from_dict(xmltodict.parse(flow_xml))
 
 def delete_flow(flow_id: int) -> bool:
-    """Deletes a dataset from the OpenML server.
+    """Deletes a flow from the OpenML server.
 
     Parameters
     ----------

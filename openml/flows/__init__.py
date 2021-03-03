@@ -2,7 +2,14 @@
 
 from .flow import OpenMLFlow
 
-from .functions import get_flow, list_flows, flow_exists, get_flow_id, assert_flows_equal
+from .functions import (
+    get_flow, 
+    list_flows, 
+    flow_exists, 
+    get_flow_id, 
+    assert_flows_equal, 
+    delete_flow,
+)
 
 __all__ = [
     "OpenMLFlow",
@@ -11,4 +18,5 @@ __all__ = [
     "get_flow_id",
     "flow_exists",
     "assert_flows_equal",
+    "delete_flow",
 ]
