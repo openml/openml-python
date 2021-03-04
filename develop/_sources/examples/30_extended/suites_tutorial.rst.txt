@@ -286,11 +286,11 @@ because we upload some random data.
 
     OpenML Benchmark Suite
     ======================
-    ID..............: 90
+    ID..............: 1074
     Name............: Test-Suite
     Status..........: None
     Main Entity Type: task
-    Study URL.......: https://test.openml.org/s/90
+    Study URL.......: https://test.openml.org/s/1074
     # of Tasks......: 20
 
 
@@ -311,7 +311,7 @@ because we upload some random data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  38.340 seconds)
+   **Total running time of the script:** ( 0 minutes  39.743 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_suites_tutorial.py:

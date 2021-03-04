@@ -75,7 +75,7 @@ analysis.
 
  .. code-block:: none
 
-    2036
+    178
 
 
 
@@ -110,7 +110,7 @@ To simplify the usage we have created a helper function which automates all thes
 
  .. code-block:: none
 
-    2036
+    178
 
 
 
@@ -172,7 +172,7 @@ model. We can then use them to retrieve the flow id as follows:
 
  .. code-block:: none
 
-    2036
+    178
 
 
 
@@ -198,7 +198,7 @@ We can also retrieve all flows for a given name:
 
  .. code-block:: none
 
-    [19, 138, 193, 2036]
+    [178, 10004, 10245, 12428]
 
 
 
@@ -226,7 +226,7 @@ This also works with the actual model (generalizing the first part of this examp
 
  .. code-block:: none
 
-    [19, 138, 193, 2036]
+    [178, 10004, 10245, 12428]
 
 
 
@@ -234,7 +234,7 @@ This also works with the actual model (generalizing the first part of this examp
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.234 seconds)
+   **Total running time of the script:** ( 0 minutes  3.853 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flow_id_tutorial.py:
