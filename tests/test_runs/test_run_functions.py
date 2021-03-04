@@ -7,6 +7,7 @@ import random
 import time
 import sys
 import ast
+import pytest
 import unittest.mock
 
 import numpy as np
@@ -1188,13 +1189,10 @@ class TestRun(TestBase):
         num_folds = 10
         num_repeats = 1
 
-        flow = unittest.mock.Mock()
-        flow.name = "dummy"
         clf = make_pipeline(
             OneHotEncoder(handle_unknown="ignore"), SGDClassifier(loss="log", random_state=1)
         )
         res = openml.runs.functions._run_task_get_arffcontent(
-            flow=flow,
             extension=self.extension,
             model=clf,
             task=task,
@@ -1405,8 +1403,6 @@ class TestRun(TestBase):
         # Check that _run_task_get_arffcontent works when one of the class
         # labels only declared in the arff file, but is not present in the
         # actual data
-        flow = unittest.mock.Mock()
-        flow.name = "dummy"
         task = openml.tasks.get_task(2)  # anneal; crossvalidation
 
         from sklearn.compose import ColumnTransformer
@@ -1421,7 +1417,6 @@ class TestRun(TestBase):
         )  # build a sklearn classifier
 
         data_content, _, _, _ = _run_task_get_arffcontent(
-            flow=flow,
             model=model,
             task=task,
             extension=self.extension,
@@ -1443,8 +1438,6 @@ class TestRun(TestBase):
         # Check that _run_task_get_arffcontent works when one of the class
         # labels only declared in the arff file, but is not present in the
         # actual data
-        flow = unittest.mock.Mock()
-        flow.name = "dummy"
         task = openml.tasks.get_task(2)  # anneal; crossvalidation
         # task_id=2 on test server has 38 columns with 6 numeric columns
         cont_idx = [3, 4, 8, 32, 33, 34]
@@ -1466,7 +1459,6 @@ class TestRun(TestBase):
         )  # build a sklearn classifier
 
         data_content, _, _, _ = _run_task_get_arffcontent(
-            flow=flow,
             model=model,
             task=task,
             extension=self.extension,
@@ -1594,7 +1586,6 @@ class TestRun(TestBase):
         backend = "loky" if LooseVersion(joblib.__version__) > "0.11" else "multiprocessing"
         with parallel_backend(backend, n_jobs=n_jobs):
             res = openml.runs.functions._run_task_get_arffcontent(
-                flow=None,
                 extension=self.extension,
                 model=clf,
                 task=task,
@@ -1630,6 +1621,7 @@ class TestRun(TestBase):
         scores = [v for k, v in res[2]["predictive_accuracy"][0].items()]
         self.assertSequenceEqual(scores, expected_scores, seq_type=list)
 
+    @pytest.mark.flaky()  # appears to fail stochastically on test server
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="couldn't perform local tests successfully w/o bloating RAM",
@@ -1670,7 +1662,6 @@ class TestRun(TestBase):
             )
             with parallel_backend(backend, n_jobs=n_jobs):
                 res = openml.runs.functions._run_task_get_arffcontent(
-                    flow=None,
                     extension=self.extension,
                     model=clf,
                     task=task,

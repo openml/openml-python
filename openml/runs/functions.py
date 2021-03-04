@@ -271,7 +271,6 @@ def run_flow_on_task(
 
     # execute the run
     res = _run_task_get_arffcontent(
-        flow=flow,
         model=flow.model,
         task=task,
         extension=flow.extension,
@@ -432,7 +431,6 @@ def run_exists(task_id: int, setup_id: int) -> Set[int]:
 
 
 def _run_task_get_arffcontent(
-    flow: OpenMLFlow,
     model: Any,
     task: OpenMLTask,
     extension: "Extension",
@@ -476,7 +474,6 @@ def _run_task_get_arffcontent(
     job_rvals = Parallel(verbose=0, n_jobs=n_jobs)(
         delayed(_run_task_get_arffcontent_parallel_helper)(
             extension=extension,
-            flow=flow,
             fold_no=fold_no,
             model=model,
             rep_no=rep_no,
@@ -613,7 +610,6 @@ def _run_task_get_arffcontent(
 
 def _run_task_get_arffcontent_parallel_helper(
     extension: "Extension",
-    flow: OpenMLFlow,
     fold_no: int,
     model: Any,
     rep_no: int,
@@ -661,12 +657,13 @@ def _run_task_get_arffcontent_parallel_helper(
     else:
         raise NotImplementedError(task.task_type)
     config.logger.info(
-        "Going to execute flow '%s' on task %d for repeat %d fold %d sample %d.",
-        str(model),
-        task.task_id,
-        rep_no,
-        fold_no,
-        sample_no,
+        "Going to run model {} on dataset {} for repeat {} fold {} sample {}".format(
+            str(model),
+            openml.datasets.get_dataset(task.dataset_id).name,
+            rep_no,
+            fold_no,
+            sample_no,
+        )
     )
     pred_y, proba_y, user_defined_measures_fold, trace, = extension._run_model_on_fold(
         model=model,
