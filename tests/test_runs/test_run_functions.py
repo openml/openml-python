@@ -1572,7 +1572,7 @@ class TestRun(TestBase):
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
 
-    @pytest.mark.flaky()  # appears to fail stochastically on test server
+    @pytest.mark.flaky(reruns=3, reruns_delay=2)  # appears to fail stochastically on test server
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="couldn't perform local tests successfully w/o bloating RAM",
@@ -1626,7 +1626,7 @@ class TestRun(TestBase):
         self.assertSequenceEqual(scores, expected_scores, seq_type=list)
         set_loky_pickler()
 
-    @pytest.mark.flaky()  # appears to fail stochastically on test server
+    @pytest.mark.flaky(reruns=2, reruns_delay=2)  # appears to fail stochastically on test server
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="couldn't perform local tests successfully w/o bloating RAM",
