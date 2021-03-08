@@ -343,7 +343,8 @@ class TestFlowFunctions(TestBase):
             flow = openml.flows.get_flow(flow_id=flow, reinstantiate=True, strict_version=False)
             # ensure that a new flow was created
             assert flow.flow_id is None
-            assert "0.19.1" not in flow.dependencies
+            assert "sklearn==0.19.1" not in flow.dependencies
+            assert "sklearn>=0.19.1" not in flow.dependencies
 
     def test_get_flow_id(self):
         if self.long_version:

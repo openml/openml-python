@@ -3,7 +3,7 @@
 import io
 import logging
 import os
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, cast
 
 import numpy as np
 import arff
@@ -424,6 +424,10 @@ def get_dataset(
                 raise
 
         arff_file = _get_dataset_arff(description) if download_data else None
+        if "oml:minio_url" in description and download_data:
+            parquet_file = _get_dataset_parquet(description)
+        else:
+            parquet_file = None
         remove_dataset_cache = False
     except OpenMLServerException as e:
         # if there was an exception,
@@ -437,7 +441,7 @@ def get_dataset(
             _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, did_cache_dir)
 
     dataset = _create_dataset_from_description(
-        description, features_file, qualities_file, arff_file, cache_format
+        description, features_file, qualities_file, arff_file, parquet_file, cache_format
     )
     return dataset
 
@@ -949,6 +953,55 @@ def _get_dataset_description(did_cache_dir, dataset_id):
     return description
 
 
+def _get_dataset_parquet(
+    description: Union[Dict, OpenMLDataset], cache_directory: str = None
+) -> Optional[str]:
+    """ Return the path to the local parquet file of the dataset. If is not cached, it is downloaded.
+
+    Checks if the file is in the cache, if yes, return the path to the file.
+    If not, downloads the file and caches it, then returns the file path.
+    The cache directory is generated based on dataset information, but can also be specified.
+
+    This function is NOT thread/multiprocessing safe.
+    Unlike the ARFF equivalent, checksums are not available/used (for now).
+
+    Parameters
+    ----------
+    description : dictionary or OpenMLDataset
+        Either a dataset description as dict or OpenMLDataset.
+
+    cache_directory: str, optional (default=None)
+        Folder to store the parquet file in.
+        If None, use the default cache directory for the dataset.
+
+    Returns
+    -------
+    output_filename : string, optional
+        Location of the Parquet file if successfully downloaded, None otherwise.
+    """
+    if isinstance(description, dict):
+        url = description.get("oml:minio_url")
+        did = description.get("oml:id")
+    elif isinstance(description, OpenMLDataset):
+        url = description._minio_url
+        did = description.dataset_id
+    else:
+        raise TypeError("`description` should be either OpenMLDataset or Dict.")
+
+    if cache_directory is None:
+        cache_directory = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, did)
+    output_file_path = os.path.join(cache_directory, "dataset.pq")
+
+    if not os.path.isfile(output_file_path):
+        try:
+            openml._api_calls._download_minio_file(
+                source=cast(str, url), destination=output_file_path
+            )
+        except FileNotFoundError:
+            return None
+    return output_file_path
+
+
 def _get_dataset_arff(description: Union[Dict, OpenMLDataset], cache_directory: str = None) -> str:
     """ Return the path to the local arff file of the dataset. If is not cached, it is downloaded.
 
@@ -1072,6 +1125,7 @@ def _create_dataset_from_description(
     features_file: str,
     qualities_file: str,
     arff_file: str = None,
+    parquet_file: str = None,
     cache_format: str = "pickle",
 ) -> OpenMLDataset:
     """Create a dataset object from a description dict.
@@ -1086,6 +1140,8 @@ def _create_dataset_from_description(
         Path of the dataset qualities as xml file.
     arff_file : string, optional
         Path of dataset ARFF file.
+    parquet_file : string, optional
+        Path of dataset Parquet file.
     cache_format: string, optional
         Caching option for datasets (feather/pickle)
 
@@ -1122,6 +1178,8 @@ def _create_dataset_from_description(
         cache_format=cache_format,
         features_file=features_file,
         qualities_file=qualities_file,
+        minio_url=description.get("oml:minio_url"),
+        parquet_file=parquet_file,
     )
 
 
