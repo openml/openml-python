@@ -1572,6 +1572,7 @@ class TestRun(TestBase):
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
 
+    @pytest.mark.flaky()  # appears to fail stochastically on test server
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="couldn't perform local tests successfully w/o bloating RAM",
@@ -1579,6 +1580,7 @@ class TestRun(TestBase):
     @unittest.mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
     def test__run_task_get_arffcontent_2(self, parallel_mock):
         """ Tests if a run executed in parallel is collated correctly. """
+        set_loky_pickler("pickle")
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
         x, y = task.get_X_and_y(dataset_format="dataframe")
         num_instances = x.shape[0]
@@ -1587,7 +1589,7 @@ class TestRun(TestBase):
         n_jobs = 2
         backend = "loky" if LooseVersion(joblib.__version__) > "0.11" else "multiprocessing"
         with parallel_backend(backend, n_jobs=n_jobs):
-            res = openml.runs.functions._run_task_get_arffcontent(
+            res = _proxy_for_run_task_get_arffcontent(
                 extension=self.extension,
                 model=clf,
                 task=task,
@@ -1622,6 +1624,7 @@ class TestRun(TestBase):
         ]
         scores = [v for k, v in res[2]["predictive_accuracy"][0].items()]
         self.assertSequenceEqual(scores, expected_scores, seq_type=list)
+        set_loky_pickler()
 
     @pytest.mark.flaky()  # appears to fail stochastically on test server
     @unittest.skipIf(
