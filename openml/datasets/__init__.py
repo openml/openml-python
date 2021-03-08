@@ -11,8 +11,6 @@ from .functions import (
     list_qualities,
     edit_dataset,
     fork_dataset,
-    topic_add_dataset,
-    topic_delete_dataset,
 )
 from .dataset import OpenMLDataset
 from .data_feature import OpenMLDataFeature
@@ -30,6 +28,4 @@ __all__ = [
     "list_qualities",
     "edit_dataset",
     "fork_dataset",
-    "topic_add_dataset",
-    "topic_delete_dataset",
 ]

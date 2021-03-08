@@ -873,7 +873,7 @@ def fork_dataset(data_id: int) -> int:
     return int(data_id)
 
 
-def topic_add_dataset(data_id: int, topic: str):
+def _topic_add_dataset(data_id: int, topic: str):
     """
     Adds a topic for a dataset.
     This API is not available for all OpenML users and is accessible only by admins.
@@ -893,7 +893,7 @@ def topic_add_dataset(data_id: int, topic: str):
     return int(data_id)
 
 
-def topic_delete_dataset(data_id: int, topic: str):
+def _topic_delete_dataset(data_id: int, topic: str):
     """
     Removes a topic from a dataset.
     This API is not available for all OpenML users and is accessible only by admins.

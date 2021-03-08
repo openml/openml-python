@@ -37,8 +37,10 @@ from openml.datasets.functions import (
     _get_online_dataset_format,
     DATASETS_CACHE_DIR_NAME,
     _get_dataset_parquet,
+    _topic_add_dataset,
+    _topic_delete_dataset,
 )
-from openml.datasets import fork_dataset, edit_dataset, topic_add_dataset, topic_delete_dataset
+from openml.datasets import fork_dataset, edit_dataset
 from openml.tasks import TaskType, create_task
 
 
@@ -916,7 +918,7 @@ class TestOpenMLDataset(TestBase):
         self.assertRaisesRegex(
             OpenMLServerException,
             "Topic can only be added/removed by admin.",
-            topic_add_dataset,
+            _topic_add_dataset,
             data_id=31,
             topic="business",
         )
@@ -924,7 +926,7 @@ class TestOpenMLDataset(TestBase):
         self.assertRaisesRegex(
             OpenMLServerException,
             "Topic can only be added/removed by admin.",
-            topic_delete_dataset,
+            _topic_delete_dataset,
             data_id=31,
             topic="business",
         )
