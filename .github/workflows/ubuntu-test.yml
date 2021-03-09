@@ -69,6 +69,5 @@ jobs:
       if: matrix.code-cov && always()
       uses: codecov/codecov-action@v1
       with:
-        files: ./coverage1.xml
         fail_ci_if_error: true
         verbose: true
