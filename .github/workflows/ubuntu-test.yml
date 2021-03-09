@@ -67,5 +67,6 @@ jobs:
       if: matrix.code-cov && always()
       uses: codecov/codecov-action@v1
       with:
+        fetch-depth: 2
         fail_ci_if_error: true
         verbose: true
