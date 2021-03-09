@@ -29,6 +29,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -67,6 +69,6 @@ jobs:
       if: matrix.code-cov && always()
       uses: codecov/codecov-action@v1
       with:
-        fetch-depth: 2
+        files: ./coverage1.xml
         fail_ci_if_error: true
         verbose: true
