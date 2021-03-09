@@ -68,7 +68,8 @@ setuptools.setup(
             "pyarrow",
             "pre-commit",
             "pytest-cov",
-            "pytest-rerunfailures" "mypy",
+            "pytest-rerunfailures",
+            "mypy",
         ],
         "examples": [
             "matplotlib",
