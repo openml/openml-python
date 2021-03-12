@@ -13,8 +13,9 @@ import unittest.mock
 import numpy as np
 import joblib
 from joblib import parallel_backend
-from joblib.externals.loky import set_loky_pickler
-from joblib import wrap_non_picklable_objects
+
+# from joblib.externals.loky import set_loky_pickler
+# from joblib import wrap_non_picklable_objects
 
 import openml
 import openml.exceptions
@@ -1580,7 +1581,6 @@ class TestRun(TestBase):
     @unittest.mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
     def test__run_task_get_arffcontent_2(self, parallel_mock):
         """ Tests if a run executed in parallel is collated correctly. """
-        set_loky_pickler("pickle")
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
         x, y = task.get_X_and_y(dataset_format="dataframe")
         num_instances = x.shape[0]
@@ -1624,7 +1624,6 @@ class TestRun(TestBase):
         ]
         scores = [v for k, v in res[2]["predictive_accuracy"][0].items()]
         self.assertSequenceEqual(scores, expected_scores, seq_type=list)
-        set_loky_pickler()
 
     @pytest.mark.flaky()  # appears to fail stochastically on test server
     @unittest.skipIf(
@@ -1634,7 +1633,7 @@ class TestRun(TestBase):
     @unittest.mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
     def test_joblib_backends(self, parallel_mock):
         """ Tests evaluation of a run using various joblib backends and n_jobs. """
-        set_loky_pickler("pickle")
+        # set_loky_pickler("pickle")
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
         x, y = task.get_X_and_y(dataset_format="dataframe")
         num_instances = x.shape[0]
@@ -1685,10 +1684,10 @@ class TestRun(TestBase):
             self.assertEqual(len(res[2]["predictive_accuracy"][0]), 10)
             self.assertEqual(len(res[3]["predictive_accuracy"][0]), 10)
             self.assertEqual(parallel_mock.call_count, call_count)
-            set_loky_pickler()
+            # set_loky_pickler()
 
 
-@wrap_non_picklable_objects
+# @wrap_non_picklable_objects
 def _proxy_for_run_task_get_arffcontent(
     extension, model, task, add_local_measures, dataset_format, n_jobs
 ):
