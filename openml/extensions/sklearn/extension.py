@@ -1744,6 +1744,8 @@ class SklearnExtension(Extension):
                 user_defined_measures["usercpu_time_millis_training"] = modelfit_dur_cputime
 
             modelfit_dur_walltime = (time.time() - modelfit_start_walltime) * 1000
+            if hasattr(model_copy, "refit_time_"):
+                modelfit_dur_walltime += model_copy.refit_time_
             if can_measure_wallclocktime:
                 user_defined_measures["wall_clock_time_millis_training"] = modelfit_dur_walltime
 

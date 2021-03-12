@@ -69,6 +69,7 @@ setuptools.setup(
             "flaky",
             "pre-commit",
             "pytest-cov",
+            "pytest-rerunfailures",
             "mypy",
         ],
         "examples": [

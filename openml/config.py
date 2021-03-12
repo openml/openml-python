@@ -211,15 +211,6 @@ def _setup(config=None):
     else:
         cache_exists = True
 
-    if cache_exists:
-        _create_log_handlers()
-    else:
-        _create_log_handlers(create_file_handler=False)
-        openml_logger.warning(
-            "No permission to create OpenML directory at %s! This can result in OpenML-Python "
-            "not working properly." % config_dir
-        )
-
     if config is None:
         config = _parse_config(config_file)
 
@@ -239,6 +230,15 @@ def _setup(config=None):
     short_cache_dir = _get(config, "cachedir")
     connection_n_retries = int(_get(config, "connection_n_retries"))
     max_retries = int(_get(config, "max_retries"))
+
+    if cache_exists:
+        _create_log_handlers()
+    else:
+        _create_log_handlers(create_file_handler=False)
+        openml_logger.warning(
+            "No permission to create OpenML directory at %s! This can result in OpenML-Python "
+            "not working properly." % config_dir
+        )
 
     cache_directory = os.path.expanduser(short_cache_dir)
     # create the cache subdirectory

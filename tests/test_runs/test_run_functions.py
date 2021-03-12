@@ -10,6 +10,7 @@ import ast
 import unittest.mock
 
 import numpy as np
+import joblib
 from joblib import parallel_backend
 
 import openml
@@ -1187,13 +1188,10 @@ class TestRun(TestBase):
         num_folds = 10
         num_repeats = 1
 
-        flow = unittest.mock.Mock()
-        flow.name = "dummy"
         clf = make_pipeline(
             OneHotEncoder(handle_unknown="ignore"), SGDClassifier(loss="log", random_state=1)
         )
         res = openml.runs.functions._run_task_get_arffcontent(
-            flow=flow,
             extension=self.extension,
             model=clf,
             task=task,
@@ -1404,8 +1402,6 @@ class TestRun(TestBase):
         # Check that _run_task_get_arffcontent works when one of the class
         # labels only declared in the arff file, but is not present in the
         # actual data
-        flow = unittest.mock.Mock()
-        flow.name = "dummy"
         task = openml.tasks.get_task(2)  # anneal; crossvalidation
 
         from sklearn.compose import ColumnTransformer
@@ -1420,7 +1416,6 @@ class TestRun(TestBase):
         )  # build a sklearn classifier
 
         data_content, _, _, _ = _run_task_get_arffcontent(
-            flow=flow,
             model=model,
             task=task,
             extension=self.extension,
@@ -1442,8 +1437,6 @@ class TestRun(TestBase):
         # Check that _run_task_get_arffcontent works when one of the class
         # labels only declared in the arff file, but is not present in the
         # actual data
-        flow = unittest.mock.Mock()
-        flow.name = "dummy"
         task = openml.tasks.get_task(2)  # anneal; crossvalidation
         # task_id=2 on test server has 38 columns with 6 numeric columns
         cont_idx = [3, 4, 8, 32, 33, 34]
@@ -1465,7 +1458,6 @@ class TestRun(TestBase):
         )  # build a sklearn classifier
 
         data_content, _, _, _ = _run_task_get_arffcontent(
-            flow=flow,
             model=model,
             task=task,
             extension=self.extension,
@@ -1581,20 +1573,18 @@ class TestRun(TestBase):
         LooseVersion(sklearn.__version__) < "0.21",
         reason="couldn't perform local tests successfully w/o bloating RAM",
     )
-    @unittest.mock.patch("openml.extensions.sklearn.SklearnExtension._run_model_on_fold")
+    @unittest.mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
     def test__run_task_get_arffcontent_2(self, parallel_mock):
         """ Tests if a run executed in parallel is collated correctly. """
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
         x, y = task.get_X_and_y(dataset_format="dataframe")
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
-        flow = unittest.mock.Mock()
-        flow.name = "dummy"
         clf = SGDClassifier(loss="log", random_state=1)
         n_jobs = 2
-        with parallel_backend("loky", n_jobs=n_jobs):
+        backend = "loky" if LooseVersion(joblib.__version__) > "0.11" else "multiprocessing"
+        with parallel_backend(backend, n_jobs=n_jobs):
             res = openml.runs.functions._run_task_get_arffcontent(
-                flow=flow,
                 extension=self.extension,
                 model=clf,
                 task=task,
@@ -1606,6 +1596,9 @@ class TestRun(TestBase):
         # function _run_model_on_fold is being mocked out. However, for a new spawned worker, it
         # is not and the mock call_count should remain 0 while the subsequent check of actual
         # results should also hold, only on successful distribution of tasks to workers.
+        # The _prevent_optimize_n_jobs() is a function executed within the _run_model_on_fold()
+        # block and mocking this function doesn't affect rest of the pipeline, but is adequately
+        # indicative if _run_model_on_fold() is being called or not.
         self.assertEqual(parallel_mock.call_count, 0)
         self.assertIsInstance(res[0], list)
         self.assertEqual(len(res[0]), num_instances)
@@ -1638,13 +1631,12 @@ class TestRun(TestBase):
         x, y = task.get_X_and_y(dataset_format="dataframe")
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
-        flow = unittest.mock.Mock()
-        flow.name = "dummy"
 
+        backend_choice = "loky" if LooseVersion(joblib.__version__) > "0.11" else "multiprocessing"
         for n_jobs, backend, len_time_stats, call_count in [
-            (1, "loky", 7, 10),
-            (2, "loky", 4, 10),
-            (-1, "loky", 1, 10),
+            (1, backend_choice, 7, 10),
+            (2, backend_choice, 4, 10),
+            (-1, backend_choice, 1, 10),
             (1, "threading", 7, 20),
             (-1, "threading", 1, 30),
             (1, "sequential", 7, 40),
@@ -1668,7 +1660,6 @@ class TestRun(TestBase):
             )
             with parallel_backend(backend, n_jobs=n_jobs):
                 res = openml.runs.functions._run_task_get_arffcontent(
-                    flow=flow,
                     extension=self.extension,
                     model=clf,
                     task=task,
