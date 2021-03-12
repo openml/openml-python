@@ -7,7 +7,6 @@ import random
 import time
 import sys
 import ast
-import pytest
 import unittest.mock
 
 import numpy as np
@@ -1573,7 +1572,6 @@ class TestRun(TestBase):
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
 
-    @pytest.mark.flaky()  # appears to fail stochastically on test server
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="couldn't perform local tests successfully w/o bloating RAM",
@@ -1625,7 +1623,6 @@ class TestRun(TestBase):
         scores = [v for k, v in res[2]["predictive_accuracy"][0].items()]
         self.assertSequenceEqual(scores, expected_scores, seq_type=list)
 
-    @pytest.mark.flaky()  # appears to fail stochastically on test server
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="couldn't perform local tests successfully w/o bloating RAM",
