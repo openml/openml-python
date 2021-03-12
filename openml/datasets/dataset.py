@@ -639,6 +639,11 @@ class OpenMLDataset(OpenMLBase):
 
     @staticmethod
     def _unpack_categories(series, categories):
+        # nan-likes can not be explicitly specified as a category
+        def valid_category(cat):
+            return isinstance(cat, str) or (cat is not None and not np.isnan(cat))
+
+        filtered_categories = [c for c in categories if valid_category(c)]
         col = []
         for x in series:
             try:
@@ -647,7 +652,7 @@ class OpenMLDataset(OpenMLBase):
                 col.append(np.nan)
         # We require two lines to create a series of categories as detailed here:
         # https://pandas.pydata.org/pandas-docs/version/0.24/user_guide/categorical.html#series-creation  # noqa E501
-        raw_cat = pd.Categorical(col, ordered=True, categories=categories)
+        raw_cat = pd.Categorical(col, ordered=True, categories=filtered_categories)
         return pd.Series(raw_cat, index=series.index, name=series.name)
 
     def get_data(

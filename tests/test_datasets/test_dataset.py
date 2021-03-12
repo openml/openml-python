@@ -50,6 +50,11 @@ class OpenMLDatasetTest(TestBase):
                 name="somename", description="a description", citation="Something by Müller"
             )
 
+    def test__unpack_categories_with_nan_likes(self):
+        categories = ["a", "b", None, float("nan"), np.nan]
+        series = pd.Series(["a", "b", None, float("nan"), np.nan, "b", "a"])
+        OpenMLDataset._unpack_categories(series, categories)
+
     def test_get_data_array(self):
         # Basic usage
         rval, _, categorical, attribute_names = self.dataset.get_data(dataset_format="array")
