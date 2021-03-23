@@ -1633,13 +1633,13 @@ class TestRun(TestBase):
         line_length = 6 + len(task.class_labels)
 
         backend_choice = "loky" if LooseVersion(joblib.__version__) > "0.11" else "multiprocessing"
-        for n_jobs, backend, len_time_stats, call_count in [
-            (1, backend_choice, 7, 10),
-            (2, backend_choice, 7, 10),
-            (-1, backend_choice, 7, 10),
-            (1, "threading", 7, 20),
-            (-1, "threading", 7, 30),
-            (1, "sequential", 7, 40),
+        for n_jobs, backend, call_count in [
+            (1, backend_choice, 10),
+            (2, backend_choice, 10),
+            (-1, backend_choice, 10),
+            (1, "threading", 20),
+            (-1, "threading", 30),
+            (1, "sequential", 40),
         ]:
             clf = sklearn.model_selection.RandomizedSearchCV(
                 estimator=sklearn.ensemble.RandomForestClassifier(n_estimators=5),
@@ -1672,8 +1672,6 @@ class TestRun(TestBase):
             self.assertEqual(len(res[0][0]), line_length)
             # usercpu_time_millis_* not recorded when n_jobs > 1
             # *_time_millis_* not recorded when n_jobs = -1
-            self.assertEqual(len(res[2]), len_time_stats)
-            self.assertEqual(len(res[3]), len_time_stats)
             self.assertEqual(len(res[2]["predictive_accuracy"][0]), 10)
             self.assertEqual(len(res[3]["predictive_accuracy"][0]), 10)
             self.assertEqual(parallel_mock.call_count, call_count)
