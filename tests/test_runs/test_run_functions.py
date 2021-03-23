@@ -1635,10 +1635,10 @@ class TestRun(TestBase):
         backend_choice = "loky" if LooseVersion(joblib.__version__) > "0.11" else "multiprocessing"
         for n_jobs, backend, len_time_stats, call_count in [
             (1, backend_choice, 7, 10),
-            (2, backend_choice, 4, 10),
-            (-1, backend_choice, 1, 10),
+            (2, backend_choice, 7, 10),
+            (-1, backend_choice, 7, 10),
             (1, "threading", 7, 20),
-            (-1, "threading", 1, 30),
+            (-1, "threading", 7, 30),
             (1, "sequential", 7, 40),
         ]:
             clf = sklearn.model_selection.RandomizedSearchCV(
