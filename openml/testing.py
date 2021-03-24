@@ -8,14 +8,7 @@ import sys
 import time
 from typing import Dict, Union, cast
 import unittest
-import warnings
 import pandas as pd
-
-# Currently, importing oslo raises a lot of warning that it will stop working
-# under python3.8; remove this once they disappear
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    from oslo_concurrency import lockutils
 
 import openml
 from openml.tasks import TaskType
@@ -99,13 +92,6 @@ class TestBase(unittest.TestCase):
         openml.config.server = TestBase.test_server
         openml.config.avoid_duplicate_runs = False
         openml.config.cache_directory = self.workdir
-
-        # If we're on travis, we save the api key in the config file to allow
-        # the notebook tests to read them.
-        if os.environ.get("TRAVIS") or os.environ.get("APPVEYOR"):
-            with lockutils.external_lock("config", lock_path=self.workdir):
-                with open(openml.config.config_file, "w") as fh:
-                    fh.write("apikey = %s" % openml.config.apikey)
 
         # Increase the number of retries to avoid spurious server failures
         self.connection_n_retries = openml.config.connection_n_retries
@@ -318,12 +304,4 @@ class CustomImputer(SimpleImputer):
     pass
 
 
-def cont(X):
-    return X.dtypes != "category"
-
-
-def cat(X):
-    return X.dtypes == "category"
-
-
-__all__ = ["TestBase", "SimpleImputer", "CustomImputer", "cat", "cont", "check_task_existence"]
+__all__ = ["TestBase", "SimpleImputer", "CustomImputer", "check_task_existence"]

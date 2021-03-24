@@ -135,8 +135,8 @@ class TestStudyFunctions(TestBase):
             run_ids=list(run_list.keys()),
         )
         study.publish()
-        # not tracking upload for delete since _delete_entity called end of function
-        # asserting return status from openml.study.delete_study()
+        TestBase._mark_entity_for_removal("study", study.id)
+        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], study.id))
         self.assertGreater(study.id, 0)
         study_downloaded = openml.study.get_study(study.id)
         self.assertEqual(study_downloaded.alias, fixt_alias)

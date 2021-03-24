@@ -12,8 +12,8 @@ Changelog
 * ADD #979: Dataset features and qualities are now also cached in pickle format.
 * ADD #982: Add helper functions for column transformers.
 * ADD #989: ``run_model_on_task`` will now warn the user the the model passed has already been fitted.
+* ADD #1009 : Give possibility to not download the dataset qualities. The cached version is used even so download attribute is false.
 * ADD #1016: Add scikit-learn 0.24 support.
-* ADD #1017: Add ``download_qualities`` to ``get_dataset``, which allows you to skip downloading qualities.
 * ADD #1020: Add option to parallelize evaluation of tasks with joblib.
 * ADD #1022: Allow minimum version of dependencies to be listed for a flow, use more accurate minimum versions for scikit-learn dependencies.
 * ADD #1023: Add admin-only calls for adding topics to datasets.
@@ -34,7 +34,6 @@ Changelog
 * FIX #1013: Fixes a bug where ``OpenMLRun.setup_string`` was not uploaded to the server, prepares for ``run_details`` being sent from the server.
 * FIX #1021: Fixes an issue that could occur when running unit tests and openml-python was not in PATH.
 * FIX #1037: Fixes a bug where a dataset could not be loaded if a categorical value had listed nan-like as a possible category.
-
 
 0.11.0
 ~~~~~~

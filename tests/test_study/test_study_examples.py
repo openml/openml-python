@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 
-from openml.testing import TestBase, SimpleImputer, CustomImputer, cat, cont
+from openml.testing import TestBase
+from openml.extensions.sklearn import cat, cont
 
 import sklearn
 import unittest
@@ -12,8 +13,8 @@ class TestStudyFunctions(TestBase):
     """Test the example code of Bischl et al. (2018)"""
 
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
-        reason="columntransformer introduction in 0.20.0",
+        LooseVersion(sklearn.__version__) < "0.24",
+        reason="columntransformer introduction in 0.24.0",
     )
     def test_Figure1a(self):
         """Test listing in Figure 1a on a single task and the old OpenML100 study.
@@ -38,15 +39,14 @@ class TestStudyFunctions(TestBase):
         import openml
         import sklearn.metrics
         import sklearn.tree
+        from sklearn.impute import SimpleImputer
         from sklearn.pipeline import Pipeline, make_pipeline
         from sklearn.compose import ColumnTransformer
         from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
         benchmark_suite = openml.study.get_study("OpenML100", "tasks")  # obtain the benchmark suite
-        cat_imp = make_pipeline(
-            SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore")
-        )
-        cont_imp = make_pipeline(CustomImputer(), StandardScaler())
+        cat_imp = OneHotEncoder(handle_unknown="ignore")
+        cont_imp = make_pipeline(SimpleImputer(strategy="median"), StandardScaler())
         ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
         clf = Pipeline(
             steps=[("preprocess", ct), ("estimator", sklearn.tree.DecisionTreeClassifier())]
