@@ -8,12 +8,33 @@ Changelog
 
 0.11.1
 ~~~~~~
-* MAINT #1018 : Refactor data loading and storage. Data is now compressed on the first call to `get_data`.
-* MAINT #891: Changed the way that numerical features are stored. Numerical features that range from 0 to 255 are now stored as uint8, which reduces the storage space required as well as storing and loading times.
-* MAINT #671: Improved the performance of ``check_datasets_active`` by only querying the given list of datasets in contrast to querying all datasets. Modified the corresponding unit test.
-* FIX #964 : AValidate `ignore_attribute`, `default_target_attribute`, `row_id_attribute` are set to attributes that exist on the dataset when calling ``create_dataset``.
-* DOC #973 : Change the task used in the welcome page example so it no longer fails using numerical dataset.
+* ADD #964: Validate ``ignore_attribute``, ``default_target_attribute``, ``row_id_attribute`` are set to attributes that exist on the dataset when calling ``create_dataset``.
+* ADD #979: Dataset features and qualities are now also cached in pickle format.
+* ADD #982: Add helper functions for column transformers.
+* ADD #989: ``run_model_on_task`` will now warn the user the the model passed has already been fitted.
 * ADD #1009 : Give possibility to not download the dataset qualities. The cached version is used even so download attribute is false.
+* ADD #1016: Add scikit-learn 0.24 support.
+* ADD #1020: Add option to parallelize evaluation of tasks with joblib.
+* ADD #1022: Allow minimum version of dependencies to be listed for a flow, use more accurate minimum versions for scikit-learn dependencies.
+* ADD #1023: Add admin-only calls for adding topics to datasets.
+* ADD #1029: Add support for fetching dataset from a minio server in parquet format.
+* ADD #1031: Generally improve runtime measurements, add them for some previously unsupported flows (e.g. BaseSearchCV derived flows).
+* DOC #973 : Change the task used in the welcome page example so it no longer fails using numerical dataset.
+* MAINT #671: Improved the performance of ``check_datasets_active`` by only querying the given list of datasets in contrast to querying all datasets. Modified the corresponding unit test.
+* MAINT #891: Changed the way that numerical features are stored. Numerical features that range from 0 to 255 are now stored as uint8, which reduces the storage space required as well as storing and loading times.
+* MAINT #975, #988: Add CI through Github Actions.
+* MAINT #977: Allow ``short`` and ``long`` scenarios for unit tests. Reduce the workload for some unit tests.
+* MAINT #985, #1000: Improve unit test stability and output readability, and adds load balancing.
+* MAINT #1018: Refactor data loading and storage. Data is now compressed on the first call to `get_data`.
+* MAINT #1024: Remove flaky decorator for study unit test.
+* FIX #883 #884 #906 #972: Various improvements to the caching system.
+* FIX #980: Speed up ``check_datasets_active``.
+* FIX #984: Add a retry mechanism when the server encounters a database issue.
+* FIX #1004: Fixed an issue that prevented installation on some systems (e.g. Ubuntu).
+* FIX #1013: Fixes a bug where ``OpenMLRun.setup_string`` was not uploaded to the server, prepares for ``run_details`` being sent from the server.
+* FIX #1021: Fixes an issue that could occur when running unit tests and openml-python was not in PATH.
+* FIX #1037: Fixes a bug where a dataset could not be loaded if a categorical value had listed nan-like as a possible category.
+
 0.11.0
 ~~~~~~
 * ADD #753: Allows uploading custom flows to OpenML via OpenML-Python.

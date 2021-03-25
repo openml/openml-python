@@ -805,6 +805,9 @@ def _create_run_from_xml(xml, from_server=True):
     flow_name = obtain_field(run, "oml:flow_name", from_server)
     setup_id = obtain_field(run, "oml:setup_id", from_server, cast=int)
     setup_string = obtain_field(run, "oml:setup_string", from_server)
+    # run_details is currently not sent by the server, so we need to retrieve it safely.
+    # whenever that's resolved, we can enforce it being present (OpenML#1087)
+    run_details = obtain_field(run, "oml:run_details", from_server=False)
 
     if "oml:input_data" in run:
         dataset_id = int(run["oml:input_data"]["oml:dataset"]["oml:did"])
@@ -827,6 +830,7 @@ def _create_run_from_xml(xml, from_server=True):
     if "oml:output_data" not in run:
         if from_server:
             raise ValueError("Run does not contain output_data " "(OpenML server error?)")
+        predictions_url = None
     else:
         output_data = run["oml:output_data"]
         predictions_url = None
@@ -911,6 +915,7 @@ def _create_run_from_xml(xml, from_server=True):
         sample_evaluations=sample_evaluations,
         tags=tags,
         predictions_url=predictions_url,
+        run_details=run_details,
     )
 
 

@@ -52,7 +52,10 @@ DEPENDENCIES_PATTERN = re.compile(
 
 
 SIMPLE_NUMPY_TYPES = [
-    nptype for type_cat, nptypes in np.sctypes.items() for nptype in nptypes if type_cat != "others"
+    nptype
+    for type_cat, nptypes in np.sctypes.items()
+    for nptype in nptypes  # type: ignore
+    if type_cat != "others"
 ]
 SIMPLE_TYPES = tuple([bool, int, float, str] + SIMPLE_NUMPY_TYPES)
 
@@ -546,7 +549,7 @@ class SklearnExtension(Extension):
         major, minor, micro, _, _ = sys.version_info
         python_version = "Python_{}.".format(".".join([str(major), str(minor), str(micro)]))
         sklearn_version = "Sklearn_{}.".format(sklearn.__version__)
-        numpy_version = "NumPy_{}.".format(numpy.__version__)
+        numpy_version = "NumPy_{}.".format(numpy.__version__)  # type: ignore
         scipy_version = "SciPy_{}.".format(scipy.__version__)
 
         return [python_version, sklearn_version, numpy_version, scipy_version]
@@ -563,8 +566,7 @@ class SklearnExtension(Extension):
         str
         """
         run_environment = " ".join(self.get_version_information())
-        # fixme str(model) might contain (...)
-        return run_environment + " " + str(model)
+        return run_environment
 
     def _is_cross_validator(self, o: Any) -> bool:
         return isinstance(o, sklearn.model_selection.BaseCrossValidator)
@@ -1237,11 +1239,11 @@ class SklearnExtension(Extension):
     def _serialize_type(self, o: Any) -> "OrderedDict[str, str]":
         mapping = {
             float: "float",
-            np.float: "np.float",
+            np.float: "np.float",  # type: ignore
             np.float32: "np.float32",
             np.float64: "np.float64",
             int: "int",
-            np.int: "np.int",
+            np.int: "np.int",  # type: ignore
             np.int32: "np.int32",
             np.int64: "np.int64",
         }
@@ -1253,11 +1255,11 @@ class SklearnExtension(Extension):
     def _deserialize_type(self, o: str) -> Any:
         mapping = {
             "float": float,
-            "np.float": np.float,
+            "np.float": np.float,  # type: ignore
             "np.float32": np.float32,
             "np.float64": np.float64,
             "int": int,
-            "np.int": np.int,
+            "np.int": np.int,  # type: ignore
             "np.int32": np.int32,
             "np.int64": np.int64,
         }
@@ -1675,7 +1677,7 @@ class SklearnExtension(Extension):
         """
 
         def _prediction_to_probabilities(
-            y: np.ndarray, model_classes: List[Any], class_labels: Optional[List[str]]
+            y: Union[np.ndarray, List], model_classes: List[Any], class_labels: Optional[List[str]]
         ) -> pd.DataFrame:
             """Transforms predicted probabilities to match with OpenML class indices.
 
