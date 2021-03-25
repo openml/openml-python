@@ -96,6 +96,10 @@ class OpenMLDataset(OpenMLBase):
         which maps a quality name to a quality value.
     dataset: string, optional
         Serialized arff dataset string.
+    minio_url: string, optional
+        URL to the MinIO bucket with dataset files
+    parquet_file: string, optional
+        Path to the local parquet file.
     """
 
     def __init__(
@@ -128,6 +132,8 @@ class OpenMLDataset(OpenMLBase):
         features_file: Optional[str] = None,
         qualities_file: Optional[str] = None,
         dataset=None,
+        minio_url: Optional[str] = None,
+        parquet_file: Optional[str] = None,
     ):
         def find_invalid_characters(string, pattern):
             invalid_chars = set()
@@ -202,7 +208,9 @@ class OpenMLDataset(OpenMLBase):
         self.update_comment = update_comment
         self.md5_checksum = md5_checksum
         self.data_file = data_file
+        self.parquet_file = parquet_file
         self._dataset = dataset
+        self._minio_url = minio_url
 
         if features_file is not None:
             self.features = _read_features(
@@ -291,9 +299,11 @@ class OpenMLDataset(OpenMLBase):
     def _download_data(self) -> None:
         """ Download ARFF data file to standard cache directory. Set `self.data_file`. """
         # import required here to avoid circular import.
-        from .functions import _get_dataset_arff
+        from .functions import _get_dataset_arff, _get_dataset_parquet
 
         self.data_file = _get_dataset_arff(self)
+        if self._minio_url is not None:
+            self.parquet_file = _get_dataset_parquet(self)
 
     def _get_arff(self, format: str) -> Dict:
         """Read ARFF file and return decoded arff.
@@ -454,22 +464,38 @@ class OpenMLDataset(OpenMLBase):
         return X, categorical, attribute_names
 
     def _compressed_cache_file_paths(self, data_file: str) -> Tuple[str, str, str]:
-        data_pickle_file = data_file.replace(".arff", ".pkl.py3")
-        data_feather_file = data_file.replace(".arff", ".feather")
-        feather_attribute_file = data_file.replace(".arff", ".feather.attributes.pkl.py3")
+        ext = f".{data_file.split('.')[-1]}"
+        data_pickle_file = data_file.replace(ext, ".pkl.py3")
+        data_feather_file = data_file.replace(ext, ".feather")
+        feather_attribute_file = data_file.replace(ext, ".feather.attributes.pkl.py3")
         return data_pickle_file, data_feather_file, feather_attribute_file
 
-    def _cache_compressed_file_from_arff(
-        self, arff_file: str
+    def _cache_compressed_file_from_file(
+        self, data_file: str
     ) -> Tuple[Union[pd.DataFrame, scipy.sparse.csr_matrix], List[bool], List[str]]:
-        """ Store data from the arff file in compressed format. Sets cache_format to 'pickle' if data is sparse. """  # noqa: 501
+        """ Store data from the local file in compressed format.
+
+        If a local parquet file is present it will be used instead of the arff file.
+        Sets cache_format to 'pickle' if data is sparse.
+        """
         (
             data_pickle_file,
             data_feather_file,
             feather_attribute_file,
-        ) = self._compressed_cache_file_paths(arff_file)
+        ) = self._compressed_cache_file_paths(data_file)
 
-        data, categorical, attribute_names = self._parse_data_from_arff(arff_file)
+        if data_file.endswith(".arff"):
+            data, categorical, attribute_names = self._parse_data_from_arff(data_file)
+        elif data_file.endswith(".pq"):
+            try:
+                data = pd.read_parquet(data_file)
+            except Exception as e:
+                raise Exception(f"File: {data_file}") from e
+
+            categorical = [data[c].dtype.name == "category" for c in data.columns]
+            attribute_names = list(data.columns)
+        else:
+            raise ValueError(f"Unknown file type for file '{data_file}'.")
 
         # Feather format does not work for sparse datasets, so we use pickle for sparse datasets
         if scipy.sparse.issparse(data):
@@ -480,12 +506,16 @@ class OpenMLDataset(OpenMLBase):
             data.to_feather(data_feather_file)
             with open(feather_attribute_file, "wb") as fh:
                 pickle.dump((categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
+            self.data_feather_file = data_feather_file
+            self.feather_attribute_file = feather_attribute_file
         else:
             with open(data_pickle_file, "wb") as fh:
                 pickle.dump((data, categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
+            self.data_pickle_file = data_pickle_file
 
         data_file = data_pickle_file if self.cache_format == "pickle" else data_feather_file
         logger.debug(f"Saved dataset {int(self.dataset_id or -1)}: {self.name} to file {data_file}")
+
         return data, categorical, attribute_names
 
     def _load_data(self):
@@ -496,10 +526,9 @@ class OpenMLDataset(OpenMLBase):
         if need_to_create_pickle or need_to_create_feather:
             if self.data_file is None:
                 self._download_data()
-                res = self._compressed_cache_file_paths(self.data_file)
-                self.data_pickle_file, self.data_feather_file, self.feather_attribute_file = res
-            # Since our recently stored data is exists in memory, there is no need to load from disk
-            return self._cache_compressed_file_from_arff(self.data_file)
+
+            file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
+            return self._cache_compressed_file_from_file(file_to_load)
 
         # helper variable to help identify where errors occur
         fpath = self.data_feather_file if self.cache_format == "feather" else self.data_pickle_file
@@ -543,7 +572,8 @@ class OpenMLDataset(OpenMLBase):
         data_up_to_date = isinstance(data, pd.DataFrame) or scipy.sparse.issparse(data)
         if self.cache_format == "pickle" and not data_up_to_date:
             logger.info("Updating outdated pickle file.")
-            return self._cache_compressed_file_from_arff(self.data_file)
+            file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
+            return self._cache_compressed_file_from_file(file_to_load)
         return data, categorical, attribute_names
 
     @staticmethod
@@ -609,6 +639,11 @@ class OpenMLDataset(OpenMLBase):
 
     @staticmethod
     def _unpack_categories(series, categories):
+        # nan-likes can not be explicitly specified as a category
+        def valid_category(cat):
+            return isinstance(cat, str) or (cat is not None and not np.isnan(cat))
+
+        filtered_categories = [c for c in categories if valid_category(c)]
         col = []
         for x in series:
             try:
@@ -617,7 +652,7 @@ class OpenMLDataset(OpenMLBase):
                 col.append(np.nan)
         # We require two lines to create a series of categories as detailed here:
         # https://pandas.pydata.org/pandas-docs/version/0.24/user_guide/categorical.html#series-creation  # noqa E501
-        raw_cat = pd.Categorical(col, ordered=True, categories=categories)
+        raw_cat = pd.Categorical(col, ordered=True, categories=filtered_categories)
         return pd.Series(raw_cat, index=series.index, name=series.name)
 
     def get_data(

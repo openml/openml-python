@@ -50,6 +50,17 @@ class OpenMLDatasetTest(TestBase):
                 name="somename", description="a description", citation="Something by Müller"
             )
 
+    def test__unpack_categories_with_nan_likes(self):
+        # unpack_categories decodes numeric categorical values according to the header
+        # Containing a 'non' category in the header shouldn't lead to failure.
+        categories = ["a", "b", None, float("nan"), np.nan]
+        series = pd.Series([0, 1, None, float("nan"), np.nan, 1, 0])
+        clean_series = OpenMLDataset._unpack_categories(series, categories)
+
+        expected_values = ["a", "b", np.nan, np.nan, np.nan, "b", "a"]
+        self.assertListEqual(list(clean_series.values), expected_values)
+        self.assertListEqual(list(clean_series.cat.categories.values), list("ab"))
+
     def test_get_data_array(self):
         # Basic usage
         rval, _, categorical, attribute_names = self.dataset.get_data(dataset_format="array")

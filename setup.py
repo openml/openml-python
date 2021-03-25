@@ -53,6 +53,8 @@ setuptools.setup(
         "pandas>=1.0.0",
         "scipy>=0.13.3",
         "numpy>=1.6.2",
+        "minio",
+        "pyarrow",
     ],
     extras_require={
         "test": [
@@ -65,9 +67,9 @@ setuptools.setup(
             "nbformat",
             "oslo.concurrency",
             "flaky",
-            "pyarrow",
             "pre-commit",
             "pytest-cov",
+            "pytest-rerunfailures",
             "mypy",
         ],
         "examples": [

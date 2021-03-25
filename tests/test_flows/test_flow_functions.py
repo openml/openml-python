@@ -325,8 +325,16 @@ class TestFlowFunctions(TestBase):
         # Note that CI does not test against 0.19.1.
         openml.config.server = self.production_server
         _, sklearn_major, _ = LooseVersion(sklearn.__version__).version[:3]
-        flow = 8175
-        expected = "Trying to deserialize a model with dependency" " sklearn==0.19.1 not satisfied."
+        if sklearn_major > 23:
+            flow = 18587  # 18687, 18725 --- flows building random forest on >= 0.23
+            flow_sklearn_version = "0.23.1"
+        else:
+            flow = 8175
+            flow_sklearn_version = "0.19.1"
+        expected = (
+            "Trying to deserialize a model with dependency "
+            "sklearn=={} not satisfied.".format(flow_sklearn_version)
+        )
         self.assertRaisesRegex(
             ValueError, expected, openml.flows.get_flow, flow_id=flow, reinstantiate=True
         )
@@ -335,7 +343,8 @@ class TestFlowFunctions(TestBase):
             flow = openml.flows.get_flow(flow_id=flow, reinstantiate=True, strict_version=False)
             # ensure that a new flow was created
             assert flow.flow_id is None
-            assert "0.19.1" not in flow.dependencies
+            assert "sklearn==0.19.1" not in flow.dependencies
+            assert "sklearn>=0.19.1" not in flow.dependencies
 
     def test_get_flow_id(self):
         if self.long_version:

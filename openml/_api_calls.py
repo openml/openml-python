@@ -3,10 +3,14 @@
 import time
 import hashlib
 import logging
+import pathlib
 import requests
+import urllib.parse
 import xml
 import xmltodict
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
+
+import minio
 
 from . import config
 from .exceptions import (
@@ -66,6 +70,45 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
         "%.7fs taken for [%s] request for the URL %s", time.time() - start, request_method, url,
     )
     return response.text
+
+
+def _download_minio_file(
+    source: str, destination: Union[str, pathlib.Path], exists_ok: bool = True,
+) -> None:
+    """ Download file ``source`` from a MinIO Bucket and store it at ``destination``.
+
+    Parameters
+    ----------
+    source : Union[str, pathlib.Path]
+        URL to a file in a MinIO bucket.
+    destination : str
+        Path to store the file to, if a directory is provided the original filename is used.
+    exists_ok : bool, optional (default=True)
+        If False, raise FileExists if a file already exists in ``destination``.
+
+    """
+    destination = pathlib.Path(destination)
+    parsed_url = urllib.parse.urlparse(source)
+
+    # expect path format: /BUCKET/path/to/file.ext
+    bucket, object_name = parsed_url.path[1:].split("/", maxsplit=1)
+    if destination.is_dir():
+        destination = pathlib.Path(destination, object_name)
+    if destination.is_file() and not exists_ok:
+        raise FileExistsError(f"File already exists in {destination}.")
+
+    client = minio.Minio(endpoint=parsed_url.netloc, secure=False)
+
+    try:
+        client.fget_object(
+            bucket_name=bucket, object_name=object_name, file_path=str(destination),
+        )
+    except minio.error.S3Error as e:
+        if e.message.startswith("Object does not exist"):
+            raise FileNotFoundError(f"Object at '{source}' does not exist.") from e
+        # e.g. permission error, or a bucket does not exist (which is also interpreted as a
+        # permission error on minio level).
+        raise FileNotFoundError("Bucket does not exist or is private.") from e
 
 
 def _download_text_file(
@@ -155,7 +198,7 @@ def _read_url_files(url, data=None, file_elements=None):
 
 def __read_url(url, request_method, data=None, md5_checksum=None):
     data = {} if data is None else data
-    if config.apikey is not None:
+    if config.apikey:
         data["api_key"] = config.apikey
     return _send_request(
         request_method=request_method, url=url, data=data, md5_checksum=md5_checksum

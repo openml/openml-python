@@ -3,7 +3,7 @@
 import io
 import logging
 import os
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, cast
 
 import numpy as np
 import arff
@@ -290,6 +290,8 @@ def _name_to_id(
     error_if_multiple : bool (default=False)
         If `False`, if multiple datasets match, return the least recent active dataset.
         If `True`, if multiple datasets match, raise an error.
+    download_qualities : bool, optional (default=True)
+        If `True`, also download qualities.xml file. If False it skip the qualities.xml.
 
     Returns
     -------
@@ -310,7 +312,7 @@ def _name_to_id(
 
 
 def get_datasets(
-    dataset_ids: List[Union[str, int]], download_data: bool = True,
+    dataset_ids: List[Union[str, int]], download_data: bool = True, download_qualities: bool = True
 ) -> List[OpenMLDataset]:
     """Download datasets.
 
@@ -326,6 +328,8 @@ def get_datasets(
         make the operation noticeably slower. Metadata is also still retrieved.
         If False, create the OpenMLDataset and only populate it with the metadata.
         The data may later be retrieved through the `OpenMLDataset.get_data` method.
+    download_qualities : bool, optional (default=True)
+        If True, also download qualities.xml file. If False it skip the qualities.xml.
 
     Returns
     -------
@@ -334,7 +338,9 @@ def get_datasets(
     """
     datasets = []
     for dataset_id in dataset_ids:
-        datasets.append(get_dataset(dataset_id, download_data))
+        datasets.append(
+            get_dataset(dataset_id, download_data, download_qualities=download_qualities)
+        )
     return datasets
 
 
@@ -345,6 +351,7 @@ def get_dataset(
     version: int = None,
     error_if_multiple: bool = False,
     cache_format: str = "pickle",
+    download_qualities: bool = True,
 ) -> OpenMLDataset:
     """ Download the OpenML dataset representation, optionally also download actual data file.
 
@@ -405,7 +412,10 @@ def get_dataset(
         features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
 
         try:
-            qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
+            if download_qualities:
+                qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
+            else:
+                qualities_file = ""
         except OpenMLServerException as e:
             if e.code == 362 and str(e) == "No qualities found - None":
                 logger.warning("No qualities found for dataset {}".format(dataset_id))
@@ -414,6 +424,10 @@ def get_dataset(
                 raise
 
         arff_file = _get_dataset_arff(description) if download_data else None
+        if "oml:minio_url" in description and download_data:
+            parquet_file = _get_dataset_parquet(description)
+        else:
+            parquet_file = None
         remove_dataset_cache = False
     except OpenMLServerException as e:
         # if there was an exception,
@@ -427,7 +441,7 @@ def get_dataset(
             _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, did_cache_dir)
 
     dataset = _create_dataset_from_description(
-        description, features_file, qualities_file, arff_file, cache_format
+        description, features_file, qualities_file, arff_file, parquet_file, cache_format
     )
     return dataset
 
@@ -859,6 +873,47 @@ def fork_dataset(data_id: int) -> int:
     return int(data_id)
 
 
+def _topic_add_dataset(data_id: int, topic: str):
+    """
+    Adds a topic for a dataset.
+    This API is not available for all OpenML users and is accessible only by admins.
+    Parameters
+    ----------
+    data_id : int
+        id of the dataset for which the topic needs to be added
+    topic : str
+        Topic to be added for the dataset
+   """
+    if not isinstance(data_id, int):
+        raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
+    form_data = {"data_id": data_id, "topic": topic}
+    result_xml = openml._api_calls._perform_api_call("data/topicadd", "post", data=form_data)
+    result = xmltodict.parse(result_xml)
+    data_id = result["oml:data_topic"]["oml:id"]
+    return int(data_id)
+
+
+def _topic_delete_dataset(data_id: int, topic: str):
+    """
+    Removes a topic from a dataset.
+    This API is not available for all OpenML users and is accessible only by admins.
+    Parameters
+    ----------
+    data_id : int
+        id of the dataset to be forked
+    topic : str
+        Topic to be deleted
+
+   """
+    if not isinstance(data_id, int):
+        raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
+    form_data = {"data_id": data_id, "topic": topic}
+    result_xml = openml._api_calls._perform_api_call("data/topicdelete", "post", data=form_data)
+    result = xmltodict.parse(result_xml)
+    data_id = result["oml:data_topic"]["oml:id"]
+    return int(data_id)
+
+
 def _get_dataset_description(did_cache_dir, dataset_id):
     """Get the dataset description as xml dictionary.
 
@@ -896,6 +951,55 @@ def _get_dataset_description(did_cache_dir, dataset_id):
     description = xmltodict.parse(dataset_xml)["oml:data_set_description"]
 
     return description
+
+
+def _get_dataset_parquet(
+    description: Union[Dict, OpenMLDataset], cache_directory: str = None
+) -> Optional[str]:
+    """ Return the path to the local parquet file of the dataset. If is not cached, it is downloaded.
+
+    Checks if the file is in the cache, if yes, return the path to the file.
+    If not, downloads the file and caches it, then returns the file path.
+    The cache directory is generated based on dataset information, but can also be specified.
+
+    This function is NOT thread/multiprocessing safe.
+    Unlike the ARFF equivalent, checksums are not available/used (for now).
+
+    Parameters
+    ----------
+    description : dictionary or OpenMLDataset
+        Either a dataset description as dict or OpenMLDataset.
+
+    cache_directory: str, optional (default=None)
+        Folder to store the parquet file in.
+        If None, use the default cache directory for the dataset.
+
+    Returns
+    -------
+    output_filename : string, optional
+        Location of the Parquet file if successfully downloaded, None otherwise.
+    """
+    if isinstance(description, dict):
+        url = description.get("oml:minio_url")
+        did = description.get("oml:id")
+    elif isinstance(description, OpenMLDataset):
+        url = description._minio_url
+        did = description.dataset_id
+    else:
+        raise TypeError("`description` should be either OpenMLDataset or Dict.")
+
+    if cache_directory is None:
+        cache_directory = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, did)
+    output_file_path = os.path.join(cache_directory, "dataset.pq")
+
+    if not os.path.isfile(output_file_path):
+        try:
+            openml._api_calls._download_minio_file(
+                source=cast(str, url), destination=output_file_path
+            )
+        except FileNotFoundError:
+            return None
+    return output_file_path
 
 
 def _get_dataset_arff(description: Union[Dict, OpenMLDataset], cache_directory: str = None) -> str:
@@ -996,6 +1100,8 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id):
     dataset_id : int
         Dataset ID
 
+    download_qualities : bool
+        wheather to download/use cahsed version or not.
     Returns
     -------
     str
@@ -1009,10 +1115,8 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id):
     except (OSError, IOError):
         url_extension = "data/qualities/{}".format(dataset_id)
         qualities_xml = openml._api_calls._perform_api_call(url_extension, "get")
-
         with io.open(qualities_file, "w", encoding="utf8") as fh:
             fh.write(qualities_xml)
-
     return qualities_file
 
 
@@ -1021,6 +1125,7 @@ def _create_dataset_from_description(
     features_file: str,
     qualities_file: str,
     arff_file: str = None,
+    parquet_file: str = None,
     cache_format: str = "pickle",
 ) -> OpenMLDataset:
     """Create a dataset object from a description dict.
@@ -1035,6 +1140,8 @@ def _create_dataset_from_description(
         Path of the dataset qualities as xml file.
     arff_file : string, optional
         Path of dataset ARFF file.
+    parquet_file : string, optional
+        Path of dataset Parquet file.
     cache_format: string, optional
         Caching option for datasets (feather/pickle)
 
@@ -1071,6 +1178,8 @@ def _create_dataset_from_description(
         cache_format=cache_format,
         features_file=features_file,
         qualities_file=qualities_file,
+        minio_url=description.get("oml:minio_url"),
+        parquet_file=parquet_file,
     )
 
 
