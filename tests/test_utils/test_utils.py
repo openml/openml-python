@@ -87,6 +87,7 @@ class OpenMLTaskTest(TestBase):
         self.assertEqual(len(evaluations), required_size)
 
     @unittest.mock.patch("openml.config.get_cache_directory")
+    @unittest.skipIf(os.name == "nt", "https://github.com/openml/openml-python/issues/1033")
     def test__create_cache_directory(self, config_mock):
         with tempfile.TemporaryDirectory(dir=self.workdir) as td:
             config_mock.return_value = td
