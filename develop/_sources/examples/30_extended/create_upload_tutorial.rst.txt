@@ -213,7 +213,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/15503
+    URL for dataset: https://test.openml.org/d/20365
 
 
 
@@ -317,7 +317,7 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/15504
+    URL for dataset: https://test.openml.org/d/20367
 
 
 
@@ -428,7 +428,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/15506
+    URL for dataset: https://test.openml.org/d/20371
 
 
 
@@ -496,7 +496,7 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/15507
+    URL for dataset: https://test.openml.org/d/20374
 
 
 
@@ -579,7 +579,7 @@ Dataset is a pandas dataframe with sparse columns
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/15508
+    URL for dataset: https://test.openml.org/d/20376
 
 
 
@@ -599,7 +599,7 @@ Dataset is a pandas dataframe with sparse columns
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.563 seconds)
+   **Total running time of the script:** ( 0 minutes  6.958 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:

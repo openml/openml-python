@@ -129,12 +129,32 @@
 <div class="section" id="id1">
 <h2>0.11.1<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>MAINT #1018 : Refactor data loading and storage. Data is now compressed on the first call to <cite>get_data</cite>.</p></li>
-<li><p>MAINT #891: Changed the way that numerical features are stored. Numerical features that range from 0 to 255 are now stored as uint8, which reduces the storage space required as well as storing and loading times.</p></li>
-<li><p>MAINT #671: Improved the performance of <code class="docutils literal notranslate"><span class="pre">check_datasets_active</span></code> by only querying the given list of datasets in contrast to querying all datasets. Modified the corresponding unit test.</p></li>
-<li><p>FIX #964 : AValidate <cite>ignore_attribute</cite>, <cite>default_target_attribute</cite>, <cite>row_id_attribute</cite> are set to attributes that exist on the dataset when calling <code class="docutils literal notranslate"><span class="pre">create_dataset</span></code>.</p></li>
-<li><p>DOC #973 : Change the task used in the welcome page example so it no longer fails using numerical dataset.</p></li>
+<li><p>ADD #964: Validate <code class="docutils literal notranslate"><span class="pre">ignore_attribute</span></code>, <code class="docutils literal notranslate"><span class="pre">default_target_attribute</span></code>, <code class="docutils literal notranslate"><span class="pre">row_id_attribute</span></code> are set to attributes that exist on the dataset when calling <code class="docutils literal notranslate"><span class="pre">create_dataset</span></code>.</p></li>
+<li><p>ADD #979: Dataset features and qualities are now also cached in pickle format.</p></li>
+<li><p>ADD #982: Add helper functions for column transformers.</p></li>
+<li><p>ADD #989: <code class="docutils literal notranslate"><span class="pre">run_model_on_task</span></code> will now warn the user the the model passed has already been fitted.</p></li>
 <li><p>ADD #1009 : Give possibility to not download the dataset qualities. The cached version is used even so download attribute is false.</p></li>
+<li><p>ADD #1016: Add scikit-learn 0.24 support.</p></li>
+<li><p>ADD #1020: Add option to parallelize evaluation of tasks with joblib.</p></li>
+<li><p>ADD #1022: Allow minimum version of dependencies to be listed for a flow, use more accurate minimum versions for scikit-learn dependencies.</p></li>
+<li><p>ADD #1023: Add admin-only calls for adding topics to datasets.</p></li>
+<li><p>ADD #1029: Add support for fetching dataset from a minio server in parquet format.</p></li>
+<li><p>ADD #1031: Generally improve runtime measurements, add them for some previously unsupported flows (e.g. BaseSearchCV derived flows).</p></li>
+<li><p>DOC #973 : Change the task used in the welcome page example so it no longer fails using numerical dataset.</p></li>
+<li><p>MAINT #671: Improved the performance of <code class="docutils literal notranslate"><span class="pre">check_datasets_active</span></code> by only querying the given list of datasets in contrast to querying all datasets. Modified the corresponding unit test.</p></li>
+<li><p>MAINT #891: Changed the way that numerical features are stored. Numerical features that range from 0 to 255 are now stored as uint8, which reduces the storage space required as well as storing and loading times.</p></li>
+<li><p>MAINT #975, #988: Add CI through Github Actions.</p></li>
+<li><p>MAINT #977: Allow <code class="docutils literal notranslate"><span class="pre">short</span></code> and <code class="docutils literal notranslate"><span class="pre">long</span></code> scenarios for unit tests. Reduce the workload for some unit tests.</p></li>
+<li><p>MAINT #985, #1000: Improve unit test stability and output readability, and adds load balancing.</p></li>
+<li><p>MAINT #1018: Refactor data loading and storage. Data is now compressed on the first call to <cite>get_data</cite>.</p></li>
+<li><p>MAINT #1024: Remove flaky decorator for study unit test.</p></li>
+<li><p>FIX #883 #884 #906 #972: Various improvements to the caching system.</p></li>
+<li><p>FIX #980: Speed up <code class="docutils literal notranslate"><span class="pre">check_datasets_active</span></code>.</p></li>
+<li><p>FIX #984: Add a retry mechanism when the server encounters a database issue.</p></li>
+<li><p>FIX #1004: Fixed an issue that prevented installation on some systems (e.g. Ubuntu).</p></li>
+<li><p>FIX #1013: Fixes a bug where <code class="docutils literal notranslate"><span class="pre">OpenMLRun.setup_string</span></code> was not uploaded to the server, prepares for <code class="docutils literal notranslate"><span class="pre">run_details</span></code> being sent from the server.</p></li>
+<li><p>FIX #1021: Fixes an issue that could occur when running unit tests and openml-python was not in PATH.</p></li>
+<li><p>FIX #1037: Fixes a bug where a dataset could not be loaded if a categorical value had listed nan-like as a possible category.</p></li>
 </ul>
 </div>
 <div class="section" id="id2">
@@ -370,7 +390,7 @@ failing to create a flow from the OpenML description.</p></li>
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
     </p>
   </div>
 </footer>

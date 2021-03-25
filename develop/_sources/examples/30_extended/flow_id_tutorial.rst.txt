@@ -198,7 +198,7 @@ We can also retrieve all flows for a given name:
 
  .. code-block:: none
 
-    [178, 10004, 10245, 12428, 24747, 35647]
+    [178, 10004, 10245, 12428, 66208, 66220, 67190]
 
 
 
@@ -226,7 +226,7 @@ This also works with the actual model (generalizing the first part of this examp
 
  .. code-block:: none
 
-    [178, 10004, 10245, 12428, 24747, 35647]
+    [178, 10004, 10245, 12428, 66208, 66220, 67190]
 
 
 
@@ -234,7 +234,7 @@ This also works with the actual model (generalizing the first part of this examp
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.565 seconds)
+   **Total running time of the script:** ( 0 minutes  6.684 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flow_id_tutorial.py:

@@ -161,7 +161,7 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     Flow Name....: sklearn.tree._classes.DecisionTreeClassifier
     Flow URL.....: https://test.openml.org/f/178
     Setup ID.....: None
-    Setup String.: Python_3.8.8. Sklearn_0.24.1. NumPy_1.20.1. SciPy_1.6.1. DecisionTreeClassifier(random_state=23888)
+    Setup String.: Python_3.8.8. Sklearn_0.24.1. NumPy_1.20.1. SciPy_1.6.2.
     Dataset ID...: 68
     Dataset URL..: https://test.openml.org/d/68
 
@@ -195,7 +195,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/19244
+    Uploaded to http://test.openml.org/r/25574
 
 
 
@@ -336,8 +336,8 @@ variables and missing values in both.
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/19250
-    Uploaded to http://test.openml.org/r/19251
+    Uploaded to http://test.openml.org/r/25578
+    Uploaded to http://test.openml.org/r/25580
 
 
 
@@ -383,15 +383,15 @@ a model on a task without uploading results or flows to the server immediately.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1829: UserWarning: Estimator only predicted for 5/6 classes!
+    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1833: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
 
     OpenML Run
     ==========
     Uploader Name: None
     Metric.......: None
-    Run ID.......: 19253
-    Run URL......: https://test.openml.org/r/19253
+    Run ID.......: 25581
+    Run URL......: https://test.openml.org/r/25581
     Task ID......: 6
     Task Type....: None
     Task URL.....: https://test.openml.org/t/6
@@ -399,7 +399,7 @@ a model on a task without uploading results or flows to the server immediately.
     Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(categorical=sklearn.preprocessing._encoders.OneHotEncoder,continuous=sklearn.impute._base.SimpleImputer),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
     Flow URL.....: https://test.openml.org/f/385
     Setup ID.....: None
-    Setup String.: None
+    Setup String.: Python_3.8.8. Sklearn_0.24.1. NumPy_1.20.1. SciPy_1.6.2.
     Dataset ID...: None
     Dataset URL..: https://test.openml.org/d/None
 
@@ -480,7 +480,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/19259
+    kNN on diabetes: http://test.openml.org/r/25588
 
 
 
@@ -500,7 +500,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  29.447 seconds)
+   **Total running time of the script:** ( 0 minutes  51.919 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:

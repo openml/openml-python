@@ -80,7 +80,7 @@ Exercise 0
 
  .. code-block:: none
 
-    First 10 of 3271 datasets...
+    First 10 of 3275 datasets...
 
 
 .. raw:: html
@@ -827,8 +827,8 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
  .. code-block:: none
 
-    15490
-    Forked dataset ID: 15490
+    20311
+    Forked dataset ID: 20311
 
 
 
@@ -836,7 +836,7 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.708 seconds)
+   **Total running time of the script:** ( 0 minutes  15.718 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:
