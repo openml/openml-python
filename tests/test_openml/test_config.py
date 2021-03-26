@@ -12,6 +12,7 @@ class TestConfig(openml.testing.TestBase):
     @unittest.mock.patch("os.path.expanduser")
     @unittest.mock.patch("openml.config.openml_logger.warning")
     @unittest.mock.patch("openml.config._create_log_handlers")
+    @unittest.skipIf(os.name == "nt", "https://github.com/openml/openml-python/issues/1033")
     def test_non_writable_home(self, log_handler_mock, warnings_mock, expanduser_mock):
         with tempfile.TemporaryDirectory(dir=self.workdir) as td:
             expanduser_mock.side_effect = (
