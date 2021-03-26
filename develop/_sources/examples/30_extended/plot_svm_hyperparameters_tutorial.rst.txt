@@ -215,6 +215,9 @@ Option 1 - plotting via the pandas helper functions
 
  .. code-block:: none
 
+    /opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/pandas/plotting/_matplotlib/tools.py:400: MatplotlibDeprecationWarning: 
+    The is_first_col function was deprecated in Matplotlib 3.4 and will be removed two minor releases later. Use ax.get_subplotspec().is_first_col() instead.
+      if ax.is_first_col():
 
     <AxesSubplot:title={'center':'SVM performance landscape'}, xlabel='sklearn.svm.classes.SVC(16)_C', ylabel='sklearn.svm.classes.SVC(16)_gamma'>
 
@@ -274,7 +277,7 @@ Option 2 - plotting via matplotlib
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.966 seconds)
+   **Total running time of the script:** ( 0 minutes  8.987 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_plot_svm_hyperparameters_tutorial.py:
