@@ -1618,7 +1618,9 @@ class TestRun(TestBase):
             0.9655172413793104,
         ]
         scores = [v for k, v in res[2]["predictive_accuracy"][0].items()]
-        self.assertSequenceEqual(scores, expected_scores, seq_type=list)
+        np.testing.assert_array_almost_equal(
+            scores, expected_scores, decimal=2 if os.name == "nt" else 7
+        )
 
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
