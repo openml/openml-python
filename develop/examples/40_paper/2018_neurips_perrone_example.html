@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Perrone et al. (2018) &#8212; OpenML 0.11.1dev documentation</title>
+    <title>Perrone et al. (2018) &#8212; OpenML 0.12.0 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11.1dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -286,17 +286,17 @@ pre-processing all retrieved evaluations.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                     cost degree                gamma kernel
-1846     0.23447743303624    NaN  0.00547685555409444    NaN
-4662    0.174145893856048    NaN     531.345804471915    NaN
-4489     13.0175284626731    NaN     208.982141221097    NaN
-1777  0.00785961020614641    NaN     145.404590986526    NaN
-3257     430.206100624785    NaN  0.00337959092215592    NaN
-Y :  1846    0.898222
-4662    0.493294
-4489    0.493572
-1777    0.603902
-3257    0.735369
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                    cost degree gamma      kernel
+3606    488.732389472689    NaN   NaN      linear
+3791  0.0368908542197833    NaN   NaN      linear
+3827    2.72769850749814      5   NaN  polynomial
+5168    49.4346979374148    NaN   NaN      linear
+4763   0.806464860799039      5   NaN  polynomial
+Y :  3606    0.682984
+3791    0.618197
+3827    0.501407
+5168    0.987421
+4763    0.983841
 Name: value, dtype: float64
 </pre></div>
 </div>
@@ -343,7 +343,7 @@ time simple and quick.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 1.2683e-05
+Training RMSE : 1.501e-05
 </pre></div>
 </div>
 </div>
@@ -378,17 +378,17 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
-0    162.801222  4.782354  801.071640      radial
-1    402.552125  3.227447  207.121608      radial
-2    618.752727  3.131083  394.297121     sigmoid
-3    892.320010  4.531660   88.632594     sigmoid
-4     12.059934  3.682972  662.766416      linear
+0    721.301589  4.672821  437.751670     sigmoid
+1    741.545069  3.775724  407.807002     sigmoid
+2    392.712248  2.195589  389.239054      radial
+3    697.588524  4.130959  856.592503  polynomial
+4    701.410225  2.608202  787.279680  polynomial
 ..          ...       ...         ...         ...
-995  519.024690  4.571168  523.367234      linear
-996  607.720340  4.239934  540.047481      radial
-997  869.708968  3.193876  362.915310  polynomial
-998  518.810916  3.903814  397.461169      linear
-999   80.957921  4.384123   10.511811      linear
+995  274.999018  4.788165  359.302808  polynomial
+996  422.420972  2.403984  786.717709  polynomial
+997  296.936188  3.409318  483.171836      radial
+998  489.977961  2.584961  621.969081     sigmoid
+999  315.168367  2.173084  599.801085  polynomial
 
 [1000 rows x 4 columns]
 </pre></div>
@@ -412,7 +412,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(42.722222222222214, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  24.484 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  36.565 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
