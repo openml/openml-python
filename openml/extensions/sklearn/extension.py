@@ -1689,11 +1689,12 @@ class SklearnExtension(Extension):
                 model_copy.fit(X_train)
 
             modelfit_dur_cputime = (time.process_time() - modelfit_start_cputime) * 1000
-            user_defined_measures["usercpu_time_millis_training"] = modelfit_dur_cputime
-
             modelfit_dur_walltime = (time.time() - modelfit_start_walltime) * 1000
+
+            user_defined_measures["usercpu_time_millis_training"] = modelfit_dur_cputime
             if hasattr(model_copy, "refit_time_"):
-                modelfit_dur_walltime += model_copy.refit_time_
+                user_defined_measures["refit_time"] = model_copy.refit_time_ * 1000
+                modelfit_dur_walltime += user_defined_measures["refit_time"]
             user_defined_measures["wall_clock_time_millis_training"] = modelfit_dur_walltime
 
         except AttributeError as e:

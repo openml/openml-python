@@ -2254,15 +2254,3 @@ class TestSklearnExtensionRunFunctions(TestBase):
         run2 = column_transformer_pipe(23)  # only numeric
         TestBase._mark_entity_for_removal("run", run2.run_id)
         self.assertEqual(run1.setup_id, run2.setup_id)
-
-    def test_for_refit_time_in_basesearchCV(self):
-        X, y = sklearn.datasets.load_iris(return_X_y=True)
-        rs = sklearn.model_selection.GridSearchCV(
-            estimator=sklearn.ensemble.RandomForestClassifier(),
-            param_grid={"n_estimators": [2, 3, 4, 5]},
-        )
-        rs.fit(X, y)
-        if LooseVersion(sklearn.__version__) < "0.20":
-            self.assertFalse(hasattr(rs, "refit_time_"))
-        else:
-            self.assertTrue(hasattr(rs, "refit_time_"))
