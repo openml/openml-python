@@ -286,17 +286,17 @@ pre-processing all retrieved evaluations.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                    cost degree gamma      kernel
-3606    488.732389472689    NaN   NaN      linear
-3791  0.0368908542197833    NaN   NaN      linear
-3827    2.72769850749814      5   NaN  polynomial
-5168    49.4346979374148    NaN   NaN      linear
-4763   0.806464860799039      5   NaN  polynomial
-Y :  3606    0.682984
-3791    0.618197
-3827    0.501407
-5168    0.987421
-4763    0.983841
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                     cost degree                gamma      kernel
+4621     12.5727603510039    NaN                  NaN      linear
+773   0.00207358725607194    NaN     4.22766941972781         NaN
+3204  0.00538350045542514    NaN                  NaN      linear
+314      370.122636783506      2                  NaN  polynomial
+4385   0.0124159086237037    NaN  0.00250754808808573         NaN
+Y :  4621    0.991504
+773     0.502313
+3204    0.614624
+314     0.911114
+4385    0.986021
 Name: value, dtype: float64
 </pre></div>
 </div>
@@ -343,7 +343,7 @@ time simple and quick.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 1.501e-05
+Training RMSE : 1.8418e-05
 </pre></div>
 </div>
 </div>
@@ -378,17 +378,17 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
-0    721.301589  4.672821  437.751670     sigmoid
-1    741.545069  3.775724  407.807002     sigmoid
-2    392.712248  2.195589  389.239054      radial
-3    697.588524  4.130959  856.592503  polynomial
-4    701.410225  2.608202  787.279680  polynomial
+0    342.569444  3.796228  741.248843     sigmoid
+1    997.831213  4.134586   25.227876     sigmoid
+2    818.278817  2.405279  259.517856  polynomial
+3    958.289860  4.949005  657.563981  polynomial
+4    985.725844  3.640530  179.792675     sigmoid
 ..          ...       ...         ...         ...
-995  274.999018  4.788165  359.302808  polynomial
-996  422.420972  2.403984  786.717709  polynomial
-997  296.936188  3.409318  483.171836      radial
-998  489.977961  2.584961  621.969081     sigmoid
-999  315.168367  2.173084  599.801085  polynomial
+995  740.628213  4.100335  756.497506      linear
+996  962.010741  4.708241  789.777438     sigmoid
+997  172.053682  4.276632  550.183811      radial
+998  679.570138  4.270759  111.067559      linear
+999  726.627066  3.346682  870.584969     sigmoid
 
 [1000 rows x 4 columns]
 </pre></div>
@@ -412,7 +412,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(42.722222222222214, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  36.565 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  24.795 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
