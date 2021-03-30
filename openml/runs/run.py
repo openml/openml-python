@@ -57,7 +57,9 @@ class OpenMLRun(OpenMLBase):
     run_id: int
     description_text: str, optional
         Description text to add to the predictions file.
-        If left None,
+        If left None, is set to the time the arff file is generated.
+    run_details: str, optional (default=None)
+        Description of the run stored in the run meta-data.
     """
 
     def __init__(
@@ -86,6 +88,7 @@ class OpenMLRun(OpenMLBase):
         flow=None,
         run_id=None,
         description_text=None,
+        run_details=None,
     ):
         self.uploader = uploader
         self.uploader_name = uploader_name
@@ -112,6 +115,7 @@ class OpenMLRun(OpenMLBase):
         self.tags = tags
         self.predictions_url = predictions_url
         self.description_text = description_text
+        self.run_details = run_details
 
     @property
     def id(self) -> Optional[int]:
@@ -543,11 +547,15 @@ class OpenMLRun(OpenMLBase):
         description["oml:run"]["@xmlns:oml"] = "http://openml.org/openml"
         description["oml:run"]["oml:task_id"] = self.task_id
         description["oml:run"]["oml:flow_id"] = self.flow_id
+        if self.setup_string is not None:
+            description["oml:run"]["oml:setup_string"] = self.setup_string
         if self.error_message is not None:
             description["oml:run"]["oml:error_message"] = self.error_message
+        if self.run_details is not None:
+            description["oml:run"]["oml:run_details"] = self.run_details
         description["oml:run"]["oml:parameter_setting"] = self.parameter_settings
         if self.tags is not None:
-            description["oml:run"]["oml:tag"] = self.tags  # Tags describing the run
+            description["oml:run"]["oml:tag"] = self.tags
         if (self.fold_evaluations is not None and len(self.fold_evaluations) > 0) or (
             self.sample_evaluations is not None and len(self.sample_evaluations) > 0
         ):
