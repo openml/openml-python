@@ -32,6 +32,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
 
+openml.config.apikey = "7ff6d43e00cc810a00c01bd770996dfc"
+
 ############################################################################
 # Preparing tasks and scikit-learn models
 # ***************************************
@@ -90,7 +92,7 @@ for repeat, val1 in measures["predictive_accuracy"].items():
 # related as:
 # usercpu_time_millis = usercpu_time_millis_training + usercpu_time_millis_testing
 # wall_clock_time_millis = wall_clock_time_millis_training + wall_clock_time_millis_testing
-#
+
 # The timing measures recorded as `*_millis_training` contain the per
 # repeat-fold timing incurred for the executing of the `.fit()` procedure
 # of the model. For `usercpu_time_*` the time recorded using `time.process_time()`
@@ -135,11 +137,14 @@ print_compare_runtimes(measures)
 # includes this in the `wall_clock_time_millis_training` measure recorded.
 
 clf = RandomForestClassifier(n_estimators=10, n_jobs=2)
+
 # GridSearchCV model
+n_iter = 5
 grid_pipe = GridSearchCV(
     estimator=clf,
-    param_grid={"n_estimators": np.linspace(start=1, stop=50, num=6).astype(int).tolist()},
+    param_grid={"n_estimators": np.linspace(start=1, stop=50, num=n_iter).astype(int).tolist()},
     cv=2,
+    n_jobs=2,
 )
 
 run4 = openml.runs.run_model_on_task(model=grid_pipe, task=task, n_jobs=2)
@@ -147,21 +152,43 @@ measures = run4.fold_evaluations
 print_compare_runtimes(measures)
 print()
 
-# Scikit-learn HPO estimators often have a `refit=True` parameter set by default,
-# and thus records the time to refit the model with the best found parameters.
-# This can be extracted in the following manner:
-for repeat, val1 in measures["refit_time"].items():
-    for fold, val2 in val1.items():
-        print("Repeat #{}-Fold #{}: {:.4f}".format(repeat, fold, val2))
-    print()
-
 # Like any optimisation problem, scikit-learn's HPO estimators also generate
 # a sequence of configurations which are evaluated as the best found
-# configuration is tracked throughout the trace. Along with the GridSearchCV
-# already used above, we demonstrate how such optimisation traces can be
-# retrieved by showing an application of these traces - comparing the
-# speed of finding the best configuration using RandomizedSearchCV and
-# GridSearchCV available with scikit-learn.
+# configuration is tracked throughout the trace.
+# The OpenML run object stores these traces as OpenMLRunTrace objects accessible
+# using keys of the pattern (repeat, fold, iterations). Since `iterations` is part
+# of the scikit-learn model here, the runtime recorded per repeat-per fold is for
+# this entire `fit()` procedure.
+
+# We earlier extracted the number of repeats and folds for this task:
+print("# repeats: {}\n# fold: {}".format(n_repeats, n_folds))
+
+# To extract the training runtime of the first repeat, first fold:
+print(run4.fold_evaluations["wall_clock_time_millis_training"][0][0])
+
+# To extract the training runtime of the 1-st repeat, 4-th fold and also
+# to fetch the parameters and performance of the evaluations made during
+# the 1-st repeat, 4-th fold evaluation by the Grid Search model
+_repeat = 0
+_fold = 3
+print(
+    "Total runtime for repeat {}'s fold {}: {:4f} ms".format(
+        _repeat, _fold, run4.fold_evaluations["wall_clock_time_millis_training"][_repeat][_fold]
+    )
+)
+for i in range(n_iter):
+    key = (_repeat, _fold, i)
+    r = run4.trace.trace_iterations[key]
+    print(
+        "n_estimators: {:>2} - score: {:.3f}".format(
+            r.parameters["parameter_n_estimators"], r.evaluation
+        )
+    )
+
+# Along with the GridSearchCV already used above, we demonstrate how such
+# optimisation traces can be retrieved by showing an application of these
+# traces - comparing the speed of finding the best configuration using
+# RandomizedSearchCV and GridSearchCV available with scikit-learn.
 
 # RandomizedSearchCV model
 rs_pipe = RandomizedSearchCV(
@@ -170,29 +197,62 @@ rs_pipe = RandomizedSearchCV(
         "n_estimators": np.linspace(start=1, stop=50, num=15).astype(int).tolist()
     },
     cv=2,
-    n_iter=6,
+    n_iter=n_iter,
+    n_jobs=2,
 )
-run5 = openml.runs.run_model_on_task(model=rs_pipe, task=task, n_jobs=2)
+run5 = openml.runs.run_model_on_task(model=rs_pipe, task=task)
 
-# This function tracks the best so-far seen accuracy as the regret from 100% accuracy
+
+# Since for the call to `openml.runs.run_model_on_task` the parameter
+# `n_jobs` is set to its default None, the evaluations across the OpenML folds
+# are not parallelized. Hence, the time recorded is agnostic to the `n_jobs`
+# being set at both the HPO estimator `GridSearchCV` as well as the base
+# estimator `RandomForestClassifier` in this case. OpenML only records the
+# time taken for the completion of the complete `fit()` call, per-repeat per-fold.
+
+# This notion can be used to extract and plot the best found performance per
+# fold by the HPO model and the corresponding time taken for search across
+# that fold. Moreover, since `n_jobs=None` for `openml.runs.run_model_on_task`
+# the runtimes per fold can be cumulatively added to plot the trace against time.
+
+
+def extract_trace_data(run, n_repeats, n_folds, n_iter, key=None):
+    key = "wall_clock_time_millis_training" if key is None else key
+    data = {"score": [], "runtime": []}
+    for i_r in range(n_repeats):
+        for i_f in range(n_folds):
+            data["runtime"].append(run.fold_evaluations[key][i_r][i_f])
+            for i_i in range(n_iter):
+                r = run.trace.trace_iterations[(i_r, i_f, i_i)]
+                if r.selected:
+                    data["score"].append(r.evaluation)
+                    break
+    return data
+
+
 def get_incumbent_trace(trace):
-    # `trace` is an OpenMLRunTrace object
     best_score = 1
     inc_trace = []
-    for i, r in enumerate(trace.trace_iterations.values()):
-        # `r` is an OpenMLTraceIteration object
-        if i == 0 or (r.selected and (1 - r.evaluation) < best_score):
-            best_score = 1 - r.evaluation
+    for i, r in enumerate(trace):
+        if i == 0 or (1 - r) < best_score:
+            best_score = 1 - r
         inc_trace.append(best_score)
     return inc_trace
 
 
+grid_data = extract_trace_data(run4, n_repeats, n_folds, n_iter)
+rs_data = extract_trace_data(run5, n_repeats, n_folds, n_iter)
+
 plt.clf()
-plt.plot(get_incumbent_trace(run4.trace), label="Grid Search")
-plt.plot(get_incumbent_trace(run5.trace), label="Random Search")
-plt.yscale("log")
+plt.plot(
+    np.cumsum(grid_data["runtime"]), get_incumbent_trace(grid_data["score"]), label="Grid Search"
+)
+plt.plot(
+    np.cumsum(rs_data["runtime"]), get_incumbent_trace(rs_data["score"]), label="Random Search"
+)
 plt.xscale("log")
-plt.xlabel("Number of evaluations")
+plt.yscale("log")
+plt.xlabel("Wallclock time (in milliseconds)")
 plt.ylabel("1 - Accuracy")
 plt.title("Optimisation Trace Comparison")
 plt.legend()
