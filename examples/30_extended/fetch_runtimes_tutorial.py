@@ -74,7 +74,9 @@ def print_compare_runtimes(measures):
 # see the evaluations recorded per fold for the dataset and the information
 # available for this run.
 
-run1 = openml.runs.run_model_on_task(model=clf, task=task, dataset_format="array")
+run1 = openml.runs.run_model_on_task(
+    model=clf, task=task, upload_flow=False, avoid_duplicate_runs=False,
+)
 measures = run1.fold_evaluations
 
 # The timing and performance metrics available are
@@ -109,7 +111,9 @@ print_compare_runtimes(measures)
 # Redefining the model to allow parallelism with `n_jobs=2`
 clf = RandomForestClassifier(n_estimators=10, n_jobs=2)
 
-run2 = openml.runs.run_model_on_task(model=clf, task=task, dataset_format="array")
+run2 = openml.runs.run_model_on_task(
+    model=clf, task=task, n_jobs=4, upload_flow=False, avoid_duplicate_runs=False,
+)
 measures = run2.fold_evaluations
 # The wall-clock time recorded per fold should be lesser than Case 1 above
 print_compare_runtimes(measures)
