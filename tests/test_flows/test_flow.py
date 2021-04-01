@@ -556,25 +556,3 @@ class TestFlow(TestBase):
         self.assertEqual(len(subflow_2.components), 0)
         self.assertIsNone(subflow_2.model)
 
-    def test_delete_flow(self):
-        flow = openml.OpenMLFlow(
-            name="sklearn.dummy.DummyClassifier",
-            class_name="sklearn.dummy.DummyClassifier",
-            description="test description",
-            model=sklearn.dummy.DummyClassifier(),
-            components=collections.OrderedDict(),
-            parameters=collections.OrderedDict(),
-            parameters_meta_info=collections.OrderedDict(),
-            external_version=self.extension._format_external_version(
-                "sklearn", sklearn.__version__,
-            ),
-            tags=[],
-            language="English",
-            dependencies=None,
-        )
-
-        flow, _ = self._add_sentinel_to_flow_name(flow, None)
-
-        flow.publish()
-        _run_id = flow.run_id
-        self.assertTrue(openml.flows.delete_flow(_flow_id))

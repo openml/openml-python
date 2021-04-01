@@ -403,3 +403,24 @@ class TestFlowFunctions(TestBase):
             )
             self.assertEqual(flow_ids_exact_version_True, flow_ids_exact_version_False)
             self.assertIn(flow.flow_id, flow_ids_exact_version_True)
+
+    def test_delete_flow(self):
+        flow = openml.OpenMLFlow(
+            name="sklearn.dummy.DummyClassifier",
+            class_name="sklearn.dummy.DummyClassifier",
+            description="test description",
+            model=sklearn.dummy.DummyClassifier(),
+            components=OrderedDict(),
+            parameters=OrderedDict(),
+            parameters_meta_info=OrderedDict(),
+            external_version="1",
+            tags=[],
+            language="English",
+            dependencies=None,
+        )
+
+        flow, _ = self._add_sentinel_to_flow_name(flow, None)
+
+        flow.publish()
+        _flow_id = flow.flow_id
+        self.assertTrue(openml.flows.delete_flow(_flow_id))
