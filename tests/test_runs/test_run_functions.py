@@ -1763,6 +1763,5 @@ class TestRun(TestBase):
         TestBase._mark_entity_for_removal("run", run.run_id)
         TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
         
-
         _run_id = run.run_id
         self.assertTrue(delete_run(_run_id))
