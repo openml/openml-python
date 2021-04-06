@@ -4,7 +4,7 @@ Fetching Runtimes
 =================
 
 The runtime of machine learning models on specific datasets can be a deciding
-factor on the choice of algorithms. Especially for benchmarking and comparison
+factor on the choice of algorithms, especially for benchmarking and comparison
 purposes. OpenML provides runtime data from runs of model fit and prediction
 on tasks or datasets, for both the CPU-clock as well as the actual wallclock-
 time incurred. The objective of this example is to illustrate how to retrieve
@@ -36,13 +36,12 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 # Preparing tasks and scikit-learn models
 # ***************************************
 
-task_id = 168908
+task_id = 167119
 
 task = openml.tasks.get_task(task_id)
 print(task)
 
 # Viewing associated data
-X, y = task.get_X_and_y(dataset_format="array")
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
     "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
@@ -78,6 +77,7 @@ measures = run1.fold_evaluations
 # The timing and performance metrics available are
 for key in measures.keys():
     print(key)
+print()
 
 # The performance metric is recorded under `predictive_accuracy` per fold
 # and can be retrieved as:
@@ -102,14 +102,14 @@ for repeat, val1 in measures["predictive_accuracy"].items():
 # Comparing the CPU and wall-clock training times of the Random Forest model
 print_compare_runtimes(measures)
 
-################################################################################
-# Case 2: Running a Random Forest model on an OpenML task in parallel (2 cores)
-# *****************************************************************************
-# Redefining the model to allow parallelism with `n_jobs=2`
+######################################################################
+# Case 2: Running a Random Forest model on an OpenML task in parallel
+# ********************************************************************
+# Redefining the model to allow parallelism with `n_jobs=2` (2 cores)
 clf = RandomForestClassifier(n_estimators=10, n_jobs=2)
 
 run2 = openml.runs.run_model_on_task(
-    model=clf, task=task, n_jobs=4, upload_flow=False, avoid_duplicate_runs=False,
+    model=clf, task=task, upload_flow=False, avoid_duplicate_runs=False
 )
 measures = run2.fold_evaluations
 # The wall-clock time recorded per fold should be lesser than Case 1 above
@@ -121,14 +121,23 @@ print_compare_runtimes(measures)
 # Redefining the model to use all available cores with `n_jobs=-1`
 clf = RandomForestClassifier(n_estimators=10, n_jobs=-1)
 
-run3 = openml.runs.run_model_on_task(model=clf, task=task, dataset_format="array")
+run3 = openml.runs.run_model_on_task(
+    model=clf, task=task, upload_flow=False, avoid_duplicate_runs=False
+)
 measures = run3.fold_evaluations
 # The wall-clock time recorded per fold should be lesser than the case above,
-# if more than 2 CPU cores are available
+# if more than 2 CPU cores are available. The speed-up is more pronounced for
+# larger datasets.
 print_compare_runtimes(measures)
 
 #############################################################################
-# It should be noted that there are multiple levels at which parallelism can
+# The CPU time interpretation becomes ambiguous when jobs are distributed over a
+# unknown number of cores. It is difficult to capture both the
+# availability of the number of cores/threads and their eventual utilisation from
+# OpenML, for various cases that can arise as mentioned below. Therefore, the final
+# interpretation of the runtimes are left to the `user`.
+#
+# It should also be noted that there are multiple levels at which parallelism can
 # occur here.
 #
 # * At the outermost level, OpenML tasks contain fixed data splits, on which the
@@ -136,18 +145,18 @@ print_compare_runtimes(measures)
 #   in parallel using the `n_jobs` parameter to `run_model_on_task` or `run_flow_on_task`.
 #
 # * The model/flow specified can also include scikit-learn models that perform their own
-#   parallelisation. For instance, by specifying `n_jobs` in the Random Forest model definition.
+#   parallelization. For instance, by specifying `n_jobs` in the Random Forest model definition.
 #
-# * The sklearn model can further be an HPO estimator and contain it's own parallelisation.
-#   If the base estimator used supports `parallelisation`, then there's a 2-level nested definition
-#   for parallelisation possible. Such an example is explored next.
+# * The sklearn model can further be an HPO estimator and contain it's own parallelization.
+#   If the base estimator used supports `parallelization`, then there's a 2-level nested definition
+#   for parallelization possible. Such an example is explored next.
 
 #####################################################################
 # Case 3: Running and benchmarking HPO algorithms with their runtimes
 # *******************************************************************
 # We shall now optimize a similar RandomForest model for the same task using
-# scikit-learn HPO support by using GridSearchCV to optimize our earlier
-# RandomForest model's parameter `n_estimators`. scikit-learn also provides a
+# scikit-learn's HPO support by using GridSearchCV to optimize our earlier
+# RandomForest model's hyperparameter `n_estimators`. scikit-learn also provides a
 # `refit_time_` for such HPO models, i.e., the time incurred by training
 # and evaluating the model on the best found parameter setting. OpenML
 # includes this in the `wall_clock_time_millis_training` measure recorded.
@@ -163,10 +172,11 @@ grid_pipe = GridSearchCV(
     n_jobs=2,
 )
 
-run4 = openml.runs.run_model_on_task(model=grid_pipe, task=task, n_jobs=2)
+run4 = openml.runs.run_model_on_task(
+    model=grid_pipe, task=task, upload_flow=False, avoid_duplicate_runs=False, n_jobs=2
+)
 measures = run4.fold_evaluations
 print_compare_runtimes(measures)
-print()
 
 ##################################################################################
 # Like any optimisation problem, scikit-learn's HPO estimators also generate
@@ -174,13 +184,15 @@ print()
 # configuration is tracked throughout the trace.
 # The OpenML run object stores these traces as OpenMLRunTrace objects accessible
 # using keys of the pattern (repeat, fold, iterations). Here `fold` implies the
-# outer-cross validation fold as obtained from the task data splits available in OpenML.
-# Since we are running `GridSearchCV` here which itself performs a `2-fold` cross validation,
-# the runtime recorded per repeat-per fold in the run object is for the entire `fit()`
-# procedure of GridSearchCV thus subsuming the runtimes of the 2-fold CV search performed.
+# outer-cross validation fold as obtained from the task data splits in OpenML.
+# GridSearchCV here performs grid search over the inner-cross validation folds as
+# parameterized by the `cv` parameter. Since `GridSearchCV` in this example performs a
+# `2-fold` cross validation, the runtime recorded per repeat-per fold in the run object
+# is for the entire `fit()` procedure of GridSearchCV thus subsuming the runtimes of
+# the 2-fold (inner) CV search performed.
 
 # We earlier extracted the number of repeats and folds for this task:
-print("# repeats: {}\n# fold: {}".format(n_repeats, n_folds))
+print("# repeats: {}\n# folds: {}".format(n_repeats, n_folds))
 
 # To extract the training runtime of the first repeat, first fold:
 print(run4.fold_evaluations["wall_clock_time_millis_training"][0][0])
@@ -206,6 +218,38 @@ for i in range(n_iter):
         )
     )
 
+##################################################################################
+# Scikit-learn's HPO estimators also come with a hyperparameter `refit=True` as a default.
+# In our previous model definition it was set to True by default, which meant that the best
+# found hyperparameter configuration was used to refit or retrain the model without any inner
+# cross validation. This extra refit time measure is provided by the scikit-learn model as the
+# attribute `refit_time_`.
+# This time is included in the `wall_clock_time_millis_training` measure.
+#
+# For non-HPO estimators, `wall_clock_time_millis = wall_clock_time_millis_training + wall_clock_time_millis_testing`.
+#
+# For HPO estimators, `wall_clock_time_millis = wall_clock_time_millis_training + wall_clock_time_millis_testing + refit_time`.
+#
+# This refit time can therefore be explicitly extracted in this manner:
+
+
+def extract_refit_time(run, repeat, fold):
+    refit_time = (
+        run.fold_evaluations["wall_clock_time_millis"][repeat][fold]
+        - run.fold_evaluations["wall_clock_time_millis_training"][repeat][fold]
+        - run.fold_evaluations["wall_clock_time_millis_testing"][repeat][fold]
+    )
+    return refit_time
+
+
+for repeat in range(n_repeats):
+    for fold in range(n_folds):
+        print(
+            "Repeat #{}-Fold #{}: {:.4f}".format(
+                repeat, fold, extract_refit_time(run4, repeat, fold)
+            )
+        )
+
 ############################################################################
 # Along with the GridSearchCV already used above, we demonstrate how such
 # optimisation traces can be retrieved by showing an application of these
@@ -222,7 +266,9 @@ rs_pipe = RandomizedSearchCV(
     n_iter=n_iter,
     n_jobs=2,
 )
-run5 = openml.runs.run_model_on_task(model=rs_pipe, task=task)
+run5 = openml.runs.run_model_on_task(
+    model=rs_pipe, task=task, upload_flow=False, avoid_duplicate_runs=False, n_jobs=2
+)
 
 ################################################################################
 # Since for the call to `openml.runs.run_model_on_task` the parameter
@@ -231,7 +277,7 @@ run5 = openml.runs.run_model_on_task(model=rs_pipe, task=task)
 # being set at both the HPO estimator `GridSearchCV` as well as the base
 # estimator `RandomForestClassifier` in this case. OpenML only records the
 # time taken for the completion of the complete `fit()` call, per-repeat per-fold.
-
+#
 # This notion can be used to extract and plot the best found performance per
 # fold by the HPO model and the corresponding time taken for search across
 # that fold. Moreover, since `n_jobs=None` for `openml.runs.run_model_on_task`

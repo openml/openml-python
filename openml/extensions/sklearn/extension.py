@@ -1694,8 +1694,7 @@ class SklearnExtension(Extension):
             modelfit_dur_walltime = (time.time() - modelfit_start_walltime) * 1000
 
             user_defined_measures["usercpu_time_millis_training"] = modelfit_dur_cputime
-            if hasattr(model_copy, "refit_time_"):
-                modelfit_dur_walltime += model_copy.refit_time_ * 1000
+            refit_time = model_copy.refit_time_ * 1000 if hasattr(model_copy, "refit_time_") else 0
             user_defined_measures["wall_clock_time_millis_training"] = modelfit_dur_walltime
 
         except AttributeError as e:
@@ -1747,7 +1746,7 @@ class SklearnExtension(Extension):
         modelpredict_duration_walltime = (time.time() - modelpredict_start_walltime) * 1000
         user_defined_measures["wall_clock_time_millis_testing"] = modelpredict_duration_walltime
         user_defined_measures["wall_clock_time_millis"] = (
-            modelfit_dur_walltime + modelpredict_duration_walltime
+            modelfit_dur_walltime + modelpredict_duration_walltime + refit_time
         )
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
