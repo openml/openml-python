@@ -7,6 +7,8 @@ APIs
 
 Top-level Classes
 -----------------
+.. automodule:: openml
+
 .. currentmodule:: openml
 
 .. autosummary::
@@ -60,6 +62,8 @@ Modules
 
 :mod:`openml.datasets`: Dataset Functions
 -----------------------------------------
+.. automodule:: openml.datasets
+
 .. currentmodule:: openml.datasets
 
 .. autosummary::
@@ -79,6 +83,8 @@ Modules
 
 :mod:`openml.evaluations`: Evaluation Functions
 -----------------------------------------------
+.. automodule:: openml.evaluations
+
 .. currentmodule:: openml.evaluations
 
 .. autosummary::
@@ -91,6 +97,8 @@ Modules
 
 :mod:`openml.flows`: Flow Functions
 -----------------------------------
+.. automodule:: openml.flows
+
 .. currentmodule:: openml.flows
 
 .. autosummary::
@@ -104,6 +112,8 @@ Modules
 
 :mod:`openml.runs`: Run Functions
 ----------------------------------
+.. automodule:: openml.runs
+
 .. currentmodule:: openml.runs
 
 .. autosummary::
@@ -122,6 +132,8 @@ Modules
 
 :mod:`openml.setups`: Setup Functions
 -------------------------------------
+.. automodule:: openml.setups
+
 .. currentmodule:: openml.setups
 
 .. autosummary::
@@ -135,6 +147,8 @@ Modules
 
 :mod:`openml.study`: Study Functions
 ------------------------------------
+.. automodule:: openml.study
+
 .. currentmodule:: openml.study
 
 .. autosummary::
@@ -158,6 +172,16 @@ Modules
 
 :mod:`openml.tasks`: Task Functions
 -----------------------------------
+.. automodule:: openml.tasks
+
+.. currentmodule:: openml.tasks
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   TaskType
+
 .. currentmodule:: openml.tasks
 
 .. autosummary::

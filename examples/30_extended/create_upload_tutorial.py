@@ -200,8 +200,8 @@ print(f"URL for dataset: {weather_dataset.openml_url}")
 # storing the type of data for each column as well as the attribute names.
 # Therefore, when providing a Pandas DataFrame, OpenML can infer this
 # information without needing to explicitly provide it when calling the
-# function :func:`create_dataset`. In this regard, you only need to pass
-# ``'auto'`` to the ``attributes`` parameter.
+# function :func:`openml.datasets.create_dataset`. In this regard, you only
+# need to pass ``'auto'`` to the ``attributes`` parameter.
 
 df = pd.DataFrame(data, columns=[col_name for col_name, _ in attribute_names])
 # enforce the categorical column to have a categorical dtype
@@ -214,8 +214,8 @@ print(df.info())
 # We enforce the column 'outlook' and 'play' to be a categorical
 # dtype while the column 'windy' is kept as a boolean column. 'temperature'
 # and 'humidity' are kept as numeric columns. Then, we can
-# call :func:`create_dataset` by passing the dataframe and fixing the parameter
-# ``attributes`` to ``'auto'``.
+# call :func:`openml.datasets.create_dataset` by passing the dataframe and
+# fixing the parameter ``attributes`` to ``'auto'``.
 
 weather_dataset = create_dataset(
     name="Weather",
