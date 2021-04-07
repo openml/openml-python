@@ -2,8 +2,8 @@
 
 .. _api:
 
-APIs
-****
+API
+***
 
 Top-level Classes
 -----------------

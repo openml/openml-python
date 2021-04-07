@@ -40,7 +40,7 @@ Example
     run.publish()
     print(f'View the run online: {run.openml_url}')
 
-You can find more examples in our `examples gallery <examples/index.html>`_.
+You can find more examples in our :ref:`sphx_glr_examples`.
 
 ----------------------------
 How to get OpenML for python
@@ -60,7 +60,7 @@ Content
 
 * :ref:`usage`
 * :ref:`api`
-* `Examples <examples/index.html>`_
+* :ref:`sphx_glr_examples`
 * :ref:`contributing`
 * :ref:`progress`
 

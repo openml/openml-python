@@ -1,6 +1,6 @@
 """
-Setup
-=====
+Introduction tutorial & Setup
+=============================
 
 An example how to set up OpenML-Python followed up by a simple example.
 """

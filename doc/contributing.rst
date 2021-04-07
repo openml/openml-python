@@ -41,7 +41,7 @@ not have the capacity to develop and maintain such interfaces on its own. For th
 have built an extension interface to allows others to contribute back. Building a suitable
 extension for therefore requires an understanding of the current OpenML-Python support.
 
-`This example <examples/20_basic/simple_flows_and_runs_tutorial.html>`_
+The :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py` tutorial
 shows how scikit-learn currently works with OpenML-Python as an extension. The *sklearn*
 extension packaged with the `openml-python <https://github.com/openml/openml-python>`_
 repository can be used as a template/benchmark to build the new extension.
@@ -50,7 +50,7 @@ repository can be used as a template/benchmark to build the new extension.
 API
 +++
 * The extension scripts must import the `openml` package and be able to interface with
-  any function from the OpenML-Python `API <api.html>`_.
+  any function from the OpenML-Python :ref:`api`.
 * The extension has to be defined as a Python class and must inherit from
   :class:`openml.extensions.Extension`.
 * This class needs to have all the functions from `class Extension` overloaded as required.
