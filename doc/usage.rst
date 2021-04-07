@@ -16,9 +16,11 @@ This document will guide you through the most important use cases, functions
 and classes in the OpenML Python API. Throughout this document, we will use
 `pandas <http://pandas.pydata.org/>`_ to format and filter tables.
 
-~~~~~~~~~~~~~~~~~~~~~~
+.. _installation:
+
+~~~~~~~~~~~~~~~~~~~~~
 Installation & Set up
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 The OpenML Python package is a connector to `OpenML <https://www.openml.org/>`_.
 It allows you to use and share datasets and tasks, run

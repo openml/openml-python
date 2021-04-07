@@ -344,3 +344,4 @@ sphinx_gallery_conf = {
 
 def setup(app):
     app.add_css_file("codehighlightstyle.css")
+    app.warningiserror = True

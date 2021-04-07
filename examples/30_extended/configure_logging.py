@@ -6,8 +6,6 @@ Logging
 Explains openml-python logging, and shows how to configure it.
 """
 ##################################################################################
-# Logging
-# ^^^^^^^
 # Openml-python uses the `Python logging module <https://docs.python.org/3/library/logging.html>`_
 # to provide users with log messages. Each log message is assigned a level of importance, see
 # the table in Python's logging tutorial
