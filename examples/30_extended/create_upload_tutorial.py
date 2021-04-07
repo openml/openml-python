@@ -126,7 +126,7 @@ print(f"URL for dataset: {diabetes_dataset.openml_url}")
 # OrderedDicts in the case of sparse data.
 #
 # Weather dataset:
-# http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
+# https://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
 data = [
     ["sunny", 85, 85, "FALSE", "no"],

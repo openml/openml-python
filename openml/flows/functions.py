@@ -245,7 +245,7 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
 
     Notes
     -----
-    see http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
+    see https://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
     """
     if not (isinstance(name, str) and len(name) > 0):
         raise ValueError("Argument 'name' should be a non-empty string")

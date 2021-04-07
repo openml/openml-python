@@ -14,7 +14,7 @@ User Guide
 
 This document will guide you through the most important use cases, functions
 and classes in the OpenML Python API. Throughout this document, we will use
-`pandas <http://pandas.pydata.org/>`_ to format and filter tables.
+`pandas <https://pandas.pydata.org/>`_ to format and filter tables.
 
 .. _installation:
 
@@ -29,7 +29,7 @@ machine learning algorithms on them and then share the results online.
 The following tutorial gives a short introduction on how to install and set up
 the OpenML Python connector, followed up by a simple example.
 
-* `Introduction <examples/introduction_tutorial.html>`_
+* `Introduction <examples/20_basic/introduction_tutorial.html>`_
 
 ~~~~~~~~~~~~~
 Configuration
@@ -95,7 +95,7 @@ for which a flow should be optimized.
 Below you can find our tutorial regarding tasks and if you want to know more
 you can read the `OpenML guide <https://docs.openml.org/#tasks>`_:
 
-* `Tasks <examples/tasks_tutorial.html>`_
+* `Tasks <examples/30_extended/tasks_tutorial.html>`_
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Running machine learning algorithms and uploading results
@@ -118,14 +118,14 @@ automatically calculates several metrics which can be used to compare the
 performance of different flows to each other.
 
 So far, the OpenML Python connector works only with estimator objects following
-the `scikit-learn estimator API <http://scikit-learn.org/dev/developers/contributing.html#apis-of-scikit-learn-objects>`_.
+the `scikit-learn estimator API <https://scikit-learn.org/stable/developers/contributing.html#apis-of-scikit-learn-objects>`_.
 Those can be directly run on a task, and a flow will automatically be created or
 downloaded from the server if it already exists.
 
 The next tutorial covers how to train different machine learning models,
 how to run machine learning models on OpenML data and how to share the results:
 
-* `Flows and Runs <examples/flows_and_runs_tutorial.html>`_
+* `Flows and Runs <examples/20_basic/simple_flows_and_runs_tutorial.html>`_
 
 ~~~~~~~~
 Datasets

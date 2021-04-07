@@ -26,7 +26,7 @@ An example how to set up OpenML-Python followed up by a simple example.
 #     pip install openml
 #
 # For further information, please check out the installation guide at
-# https://openml.github.io/openml-python/master/contributing.html#installation
+# :ref:`installation`.
 #
 
 ############################################################################
