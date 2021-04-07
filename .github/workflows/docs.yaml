@@ -18,6 +18,7 @@ jobs:
         cd doc
     - name: Check links
       run: |
+        cd doc
         pwd
         make linkcheck
     - name: Pull latest gh-pages
