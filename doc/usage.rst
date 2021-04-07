@@ -118,7 +118,7 @@ automatically calculates several metrics which can be used to compare the
 performance of different flows to each other.
 
 So far, the OpenML Python connector works only with estimator objects following
-the `scikit-learn estimator API <https://scikit-learn.org/stable/developers/contributing.html#apis-of-scikit-learn-objects>`_.
+the `scikit-learn estimator API <https://scikit-learn.org/stable/developers/develop.html#apis-of-scikit-learn-objects>`_.
 Those can be directly run on a task, and a flow will automatically be created or
 downloaded from the server if it already exists.
 

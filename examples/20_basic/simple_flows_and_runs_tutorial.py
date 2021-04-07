@@ -42,8 +42,8 @@ print(run)
 # ==================
 
 myrun = run.publish()
-print("Run was uploaded to http://test.openml.org/r/" + str(myrun.run_id))
-print("The flow can be found at http://test.openml.org/f/" + str(myrun.flow_id))
+print("Run was uploaded to https://test.openml.org/r/" + str(myrun.run_id))
+print("The flow can be found at https://test.openml.org/f/" + str(myrun.flow_id))
 
 ############################################################################
 openml.config.stop_using_configuration_for_example()
