@@ -2,18 +2,22 @@
 
 from collections import OrderedDict
 import copy
+import functools
 import unittest
+from unittest.mock import patch
 
 from distutils.version import LooseVersion
 import sklearn
 from sklearn import ensemble
 import pandas as pd
+import pytest
 
 import openml
 from openml.testing import TestBase
 import openml.extensions.sklearn
 
 
+@pytest.mark.usefixtures("long_version")
 class TestFlowFunctions(TestBase):
     _multiprocess_can_split_ = True
 
@@ -321,8 +325,16 @@ class TestFlowFunctions(TestBase):
         # Note that CI does not test against 0.19.1.
         openml.config.server = self.production_server
         _, sklearn_major, _ = LooseVersion(sklearn.__version__).version[:3]
-        flow = 8175
-        expected = "Trying to deserialize a model with dependency" " sklearn==0.19.1 not satisfied."
+        if sklearn_major > 23:
+            flow = 18587  # 18687, 18725 --- flows building random forest on >= 0.23
+            flow_sklearn_version = "0.23.1"
+        else:
+            flow = 8175
+            flow_sklearn_version = "0.19.1"
+        expected = (
+            "Trying to deserialize a model with dependency "
+            "sklearn=={} not satisfied.".format(flow_sklearn_version)
+        )
         self.assertRaisesRegex(
             ValueError, expected, openml.flows.get_flow, flow_id=flow, reinstantiate=True
         )
@@ -331,23 +343,34 @@ class TestFlowFunctions(TestBase):
             flow = openml.flows.get_flow(flow_id=flow, reinstantiate=True, strict_version=False)
             # ensure that a new flow was created
             assert flow.flow_id is None
-            assert "0.19.1" not in flow.dependencies
+            assert "sklearn==0.19.1" not in flow.dependencies
+            assert "sklearn>=0.19.1" not in flow.dependencies
 
     def test_get_flow_id(self):
-        clf = sklearn.tree.DecisionTreeClassifier()
-        flow = openml.extensions.get_extension_by_model(clf).model_to_flow(clf).publish()
+        if self.long_version:
+            list_all = openml.utils._list_all
+        else:
+            list_all = functools.lru_cache()(openml.utils._list_all)
+        with patch("openml.utils._list_all", list_all):
+            clf = sklearn.tree.DecisionTreeClassifier()
+            flow = openml.extensions.get_extension_by_model(clf).model_to_flow(clf).publish()
+            TestBase._mark_entity_for_removal("flow", (flow.flow_id, flow.name))
+            TestBase.logger.info(
+                "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id)
+            )
 
-        self.assertEqual(openml.flows.get_flow_id(model=clf, exact_version=True), flow.flow_id)
-        flow_ids = openml.flows.get_flow_id(model=clf, exact_version=False)
-        self.assertIn(flow.flow_id, flow_ids)
-        self.assertGreater(len(flow_ids), 2)
+            self.assertEqual(openml.flows.get_flow_id(model=clf, exact_version=True), flow.flow_id)
+            flow_ids = openml.flows.get_flow_id(model=clf, exact_version=False)
+            self.assertIn(flow.flow_id, flow_ids)
+            self.assertGreater(len(flow_ids), 0)
 
-        # Check that the output of get_flow_id is identical if only the name is given, no matter
-        # whether exact_version is set to True or False.
-        flow_ids_exact_version_True = openml.flows.get_flow_id(name=flow.name, exact_version=True)
-        flow_ids_exact_version_False = openml.flows.get_flow_id(
-            name=flow.name, exact_version=False,
-        )
-        self.assertEqual(flow_ids_exact_version_True, flow_ids_exact_version_False)
-        self.assertIn(flow.flow_id, flow_ids_exact_version_True)
-        self.assertGreater(len(flow_ids_exact_version_True), 2)
+            # Check that the output of get_flow_id is identical if only the name is given, no matter
+            # whether exact_version is set to True or False.
+            flow_ids_exact_version_True = openml.flows.get_flow_id(
+                name=flow.name, exact_version=True
+            )
+            flow_ids_exact_version_False = openml.flows.get_flow_id(
+                name=flow.name, exact_version=False,
+            )
+            self.assertEqual(flow_ids_exact_version_True, flow_ids_exact_version_False)
+            self.assertIn(flow.flow_id, flow_ids_exact_version_True)

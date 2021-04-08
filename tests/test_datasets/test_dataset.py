@@ -1,7 +1,8 @@
 # License: BSD 3-Clause
 
+import os
 from time import time
-from warnings import filterwarnings, catch_warnings
+import unittest.mock
 
 import numpy as np
 import pandas as pd
@@ -49,6 +50,17 @@ class OpenMLDatasetTest(TestBase):
                 name="somename", description="a description", citation="Something by Müller"
             )
 
+    def test__unpack_categories_with_nan_likes(self):
+        # unpack_categories decodes numeric categorical values according to the header
+        # Containing a 'non' category in the header shouldn't lead to failure.
+        categories = ["a", "b", None, float("nan"), np.nan]
+        series = pd.Series([0, 1, None, float("nan"), np.nan, 1, 0])
+        clean_series = OpenMLDataset._unpack_categories(series, categories)
+
+        expected_values = ["a", "b", np.nan, np.nan, np.nan, "b", "a"]
+        self.assertListEqual(list(clean_series.values), expected_values)
+        self.assertListEqual(list(clean_series.cat.categories.values), list("ab"))
+
     def test_get_data_array(self):
         # Basic usage
         rval, _, categorical, attribute_names = self.dataset.get_data(dataset_format="array")
@@ -72,13 +84,13 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual(data.shape[1], len(self.titanic.features))
         self.assertEqual(data.shape[0], 1309)
         col_dtype = {
-            "pclass": "float64",
+            "pclass": "uint8",
             "survived": "category",
             "name": "object",
             "sex": "category",
             "age": "float64",
-            "sibsp": "float64",
-            "parch": "float64",
+            "sibsp": "uint8",
+            "parch": "uint8",
             "ticket": "object",
             "fare": "float64",
             "cabin": "object",
@@ -118,21 +130,29 @@ class OpenMLDatasetTest(TestBase):
         with pytest.raises(PyOpenMLError, match=err_msg):
             self.titanic.get_data(dataset_format="array")
 
+    def _check_expected_type(self, dtype, is_cat, col):
+        if is_cat:
+            expected_type = "category"
+        elif not col.isna().any() and (col.astype("uint8") == col).all():
+            expected_type = "uint8"
+        else:
+            expected_type = "float64"
+
+        self.assertEqual(dtype.name, expected_type)
+
     def test_get_data_with_rowid(self):
         self.dataset.row_id_attribute = "condition"
         rval, _, categorical, _ = self.dataset.get_data(include_row_id=True)
         self.assertIsInstance(rval, pd.DataFrame)
-        for (dtype, is_cat) in zip(rval.dtypes, categorical):
-            expected_type = "category" if is_cat else "float64"
-            self.assertEqual(dtype.name, expected_type)
+        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+            self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
 
         rval, _, categorical, _ = self.dataset.get_data()
         self.assertIsInstance(rval, pd.DataFrame)
-        for (dtype, is_cat) in zip(rval.dtypes, categorical):
-            expected_type = "category" if is_cat else "float64"
-            self.assertEqual(dtype.name, expected_type)
+        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+            self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
 
@@ -149,9 +169,8 @@ class OpenMLDatasetTest(TestBase):
     def test_get_data_with_target_pandas(self):
         X, y, categorical, attribute_names = self.dataset.get_data(target="class")
         self.assertIsInstance(X, pd.DataFrame)
-        for (dtype, is_cat) in zip(X.dtypes, categorical):
-            expected_type = "category" if is_cat else "float64"
-            self.assertEqual(dtype.name, expected_type)
+        for (dtype, is_cat, col) in zip(X.dtypes, categorical, X):
+            self._check_expected_type(dtype, is_cat, X[col])
         self.assertIsInstance(y, pd.Series)
         self.assertEqual(y.dtype.name, "category")
 
@@ -174,26 +193,16 @@ class OpenMLDatasetTest(TestBase):
     def test_get_data_with_ignore_attributes(self):
         self.dataset.ignore_attribute = ["condition"]
         rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=True)
-        for (dtype, is_cat) in zip(rval.dtypes, categorical):
-            expected_type = "category" if is_cat else "float64"
-            self.assertEqual(dtype.name, expected_type)
+        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+            self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
 
         rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=False)
-        for (dtype, is_cat) in zip(rval.dtypes, categorical):
-            expected_type = "category" if is_cat else "float64"
-            self.assertEqual(dtype.name, expected_type)
+        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+            self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
-
-    def test_dataset_format_constructor(self):
-
-        with catch_warnings():
-            filterwarnings("error")
-            self.assertRaises(
-                DeprecationWarning, openml.OpenMLDataset, "Test", "Test", format="arff"
-            )
 
     def test_get_data_with_nonexisting_class(self):
         # This class is using the anneal dataset with labels [1, 2, 3, 4, 5, 'U']. However,
@@ -350,7 +359,48 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertEqual(len(feature.nominal_values), 25)
 
 
-class OpenMLDatasetQualityTest(TestBase):
+class OpenMLDatasetFunctionTest(TestBase):
+    @unittest.mock.patch("openml.datasets.dataset.pickle")
+    @unittest.mock.patch("openml.datasets.dataset._get_features_pickle_file")
+    def test__read_features(self, filename_mock, pickle_mock):
+        """Test we read the features from the xml if no cache pickle is available.
+
+        This test also does some simple checks to verify that the features are read correctly"""
+        filename_mock.return_value = os.path.join(self.workdir, "features.xml.pkl")
+        pickle_mock.load.side_effect = FileNotFoundError
+        features = openml.datasets.dataset._read_features(
+            os.path.join(
+                self.static_cache_dir, "org", "openml", "test", "datasets", "2", "features.xml"
+            )
+        )
+        self.assertIsInstance(features, dict)
+        self.assertEqual(len(features), 39)
+        self.assertIsInstance(features[0], OpenMLDataFeature)
+        self.assertEqual(features[0].name, "family")
+        self.assertEqual(len(features[0].nominal_values), 9)
+        # pickle.load is never called because the features pickle file didn't exist
+        self.assertEqual(pickle_mock.load.call_count, 0)
+        self.assertEqual(pickle_mock.dump.call_count, 1)
+
+    @unittest.mock.patch("openml.datasets.dataset.pickle")
+    @unittest.mock.patch("openml.datasets.dataset._get_qualities_pickle_file")
+    def test__read_qualities(self, filename_mock, pickle_mock):
+        """Test we read the qualities from the xml if no cache pickle is available.
+
+        This test also does some minor checks to ensure that the qualities are read correctly."""
+        filename_mock.return_value = os.path.join(self.workdir, "qualities.xml.pkl")
+        pickle_mock.load.side_effect = FileNotFoundError
+        qualities = openml.datasets.dataset._read_qualities(
+            os.path.join(
+                self.static_cache_dir, "org", "openml", "test", "datasets", "2", "qualities.xml"
+            )
+        )
+        self.assertIsInstance(qualities, dict)
+        self.assertEqual(len(qualities), 106)
+        # pickle.load is never called because the qualities pickle file didn't exist
+        self.assertEqual(pickle_mock.load.call_count, 0)
+        self.assertEqual(pickle_mock.dump.call_count, 1)
+
     def test__check_qualities(self):
         qualities = [{"oml:name": "a", "oml:value": "0.5"}]
         qualities = openml.datasets.dataset._check_qualities(qualities)

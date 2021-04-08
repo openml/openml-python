@@ -25,6 +25,7 @@ Possible Future: class TestBase from openml/testing.py can be included
 import os
 import logging
 from typing import List
+import pytest
 
 import openml
 from openml.testing import TestBase
@@ -34,16 +35,6 @@ logger = logging.getLogger("unit_tests")
 logger.setLevel(logging.DEBUG)
 
 file_list = []
-directory = None
-
-# finding the root directory of conftest.py and going up to OpenML main directory
-# exploiting the fact that conftest.py always resides in the root directory for tests
-static_dir = os.path.dirname(os.path.abspath(__file__))
-logger.info("static directory: {}".format(static_dir))
-while True:
-    if "openml" in os.listdir(static_dir):
-        break
-    static_dir = os.path.join(static_dir, "..")
 
 
 def worker_id() -> str:
@@ -65,12 +56,11 @@ def read_file_list() -> List[str]:
 
     :return: List[str]
     """
-    directory = os.path.join(static_dir, "tests/files/")
-    if worker_id() == "master":
-        logger.info("Collecting file lists from: {}".format(directory))
-    files = os.walk(directory)
+    this_dir = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+    directory = os.path.join(this_dir, "..")
+    logger.info("Collecting file lists from: {}".format(directory))
     file_list = []
-    for root, _, filenames in files:
+    for root, _, filenames in os.walk(directory):
         for filename in filenames:
             file_list.append(os.path.join(root, filename))
     return file_list
@@ -125,7 +115,7 @@ def delete_remote_files(tracker) -> None:
                 openml.utils._delete_entity(entity_type, entity)
                 logger.info("Deleted ({}, {})".format(entity_type, entity))
             except Exception as e:
-                logger.warn("Cannot delete ({},{}): {}".format(entity_type, entity, e))
+                logger.warning("Cannot delete ({},{}): {}".format(entity_type, entity, e))
 
 
 def pytest_sessionstart() -> None:
@@ -182,3 +172,17 @@ def pytest_sessionfinish() -> None:
         logger.info("Local files deleted")
 
     logger.info("{} is killed".format(worker))
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--long",
+        action="store_true",
+        default=False,
+        help="Run the long version of tests which support both short and long scenarios.",
+    )
+
+
+@pytest.fixture(scope="class")
+def long_version(request):
+    request.cls.long_version = request.config.getoption("--long")

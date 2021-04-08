@@ -52,7 +52,10 @@ DEPENDENCIES_PATTERN = re.compile(
 
 
 SIMPLE_NUMPY_TYPES = [
-    nptype for type_cat, nptypes in np.sctypes.items() for nptype in nptypes if type_cat != "others"
+    nptype
+    for type_cat, nptypes in np.sctypes.items()
+    for nptype in nptypes  # type: ignore
+    if type_cat != "others"
 ]
 SIMPLE_TYPES = tuple([bool, int, float, str] + SIMPLE_NUMPY_TYPES)
 
@@ -210,6 +213,61 @@ class SklearnExtension(Extension):
             pipeline = pipeline.replace("[", "(").replace("]", ")")
 
         return short_name.format(pipeline)
+
+    @classmethod
+    def _min_dependency_str(cls, sklearn_version: str) -> str:
+        """ Returns a string containing the minimum dependencies for the sklearn version passed.
+
+        Parameters
+        ----------
+        sklearn_version : str
+            A version string of the xx.xx.xx
+
+        Returns
+        -------
+        str
+        """
+        openml_major_version = int(LooseVersion(openml.__version__).version[1])
+        # This explicit check is necessary to support existing entities on the OpenML servers
+        # that used the fixed dependency string (in the else block)
+        if openml_major_version > 11:
+            # OpenML v0.11 onwards supports sklearn>=0.24
+            # assumption: 0.24 onwards sklearn should contain a _min_dependencies.py file with
+            # variables declared for extracting minimum dependency for that version
+            if LooseVersion(sklearn_version) >= "0.24":
+                from sklearn import _min_dependencies as _mindep
+
+                dependency_list = {
+                    "numpy": "{}".format(_mindep.NUMPY_MIN_VERSION),
+                    "scipy": "{}".format(_mindep.SCIPY_MIN_VERSION),
+                    "joblib": "{}".format(_mindep.JOBLIB_MIN_VERSION),
+                    "threadpoolctl": "{}".format(_mindep.THREADPOOLCTL_MIN_VERSION),
+                }
+            elif LooseVersion(sklearn_version) >= "0.23":
+                dependency_list = {
+                    "numpy": "1.13.3",
+                    "scipy": "0.19.1",
+                    "joblib": "0.11",
+                    "threadpoolctl": "2.0.0",
+                }
+                if LooseVersion(sklearn_version).version[2] == 0:
+                    dependency_list.pop("threadpoolctl")
+            elif LooseVersion(sklearn_version) >= "0.21":
+                dependency_list = {"numpy": "1.11.0", "scipy": "0.17.0", "joblib": "0.11"}
+            elif LooseVersion(sklearn_version) >= "0.19":
+                dependency_list = {"numpy": "1.8.2", "scipy": "0.13.3"}
+            else:
+                dependency_list = {"numpy": "1.6.1", "scipy": "0.9"}
+        else:
+            # this is INCORRECT for sklearn versions >= 0.19 and < 0.24
+            # given that OpenML has existing flows uploaded with such dependency information,
+            # we change no behaviour for older sklearn version, however from 0.24 onwards
+            # the dependency list will be accurately updated for any flow uploaded to OpenML
+            dependency_list = {"numpy": "1.6.1", "scipy": "0.9"}
+
+        sklearn_dep = "sklearn=={}".format(sklearn_version)
+        dep_str = "\n".join(["{}>={}".format(k, v) for k, v in dependency_list.items()])
+        return "\n".join([sklearn_dep, dep_str])
 
     ################################################################################################
     # Methods for flow serialization and de-serialization
@@ -491,7 +549,7 @@ class SklearnExtension(Extension):
         major, minor, micro, _, _ = sys.version_info
         python_version = "Python_{}.".format(".".join([str(major), str(minor), str(micro)]))
         sklearn_version = "Sklearn_{}.".format(sklearn.__version__)
-        numpy_version = "NumPy_{}.".format(numpy.__version__)
+        numpy_version = "NumPy_{}.".format(numpy.__version__)  # type: ignore
         scipy_version = "SciPy_{}.".format(scipy.__version__)
 
         return [python_version, sklearn_version, numpy_version, scipy_version]
@@ -508,8 +566,7 @@ class SklearnExtension(Extension):
         str
         """
         run_environment = " ".join(self.get_version_information())
-        # fixme str(model) might contain (...)
-        return run_environment + " " + str(model)
+        return run_environment
 
     def _is_cross_validator(self, o: Any) -> bool:
         return isinstance(o, sklearn.model_selection.BaseCrossValidator)
@@ -769,20 +826,13 @@ class SklearnExtension(Extension):
             tags=tags,
             extension=self,
             language="English",
-            # TODO fill in dependencies!
             dependencies=dependencies,
         )
 
         return flow
 
     def _get_dependencies(self) -> str:
-        dependencies = "\n".join(
-            [
-                self._format_external_version("sklearn", sklearn.__version__,),
-                "numpy>=1.6.1",
-                "scipy>=0.9",
-            ]
-        )
+        dependencies = self._min_dependency_str(sklearn.__version__)
         return dependencies
 
     def _get_tags(self) -> List[str]:
@@ -1189,11 +1239,11 @@ class SklearnExtension(Extension):
     def _serialize_type(self, o: Any) -> "OrderedDict[str, str]":
         mapping = {
             float: "float",
-            np.float: "np.float",
+            np.float: "np.float",  # type: ignore
             np.float32: "np.float32",
             np.float64: "np.float64",
             int: "int",
-            np.int: "np.int",
+            np.int: "np.int",  # type: ignore
             np.int32: "np.int32",
             np.int64: "np.int64",
         }
@@ -1205,11 +1255,11 @@ class SklearnExtension(Extension):
     def _deserialize_type(self, o: str) -> Any:
         mapping = {
             "float": float,
-            "np.float": np.float,
+            "np.float": np.float,  # type: ignore
             "np.float32": np.float32,
             "np.float64": np.float64,
             "int": int,
-            "np.int": np.int,
+            "np.int": np.int,  # type: ignore
             "np.int32": np.int32,
             "np.int64": np.int64,
         }
@@ -1537,6 +1587,37 @@ class SklearnExtension(Extension):
         model.set_params(**random_states)
         return model
 
+    def check_if_model_fitted(self, model: Any) -> bool:
+        """Returns True/False denoting if the model has already been fitted/trained
+
+        Parameters
+        ----------
+        model : Any
+
+        Returns
+        -------
+        bool
+        """
+        try:
+            # check if model is fitted
+            from sklearn.exceptions import NotFittedError
+
+            # Creating random dummy data of arbitrary size
+            dummy_data = np.random.uniform(size=(10, 3))
+            # Using 'predict' instead of 'sklearn.utils.validation.check_is_fitted' for a more
+            # robust check that works across sklearn versions and models. Internally, 'predict'
+            # should call 'check_is_fitted' for every concerned attribute, thus offering a more
+            # assured check than explicit calls to 'check_is_fitted'
+            model.predict(dummy_data)
+            # Will reach here if the model was fit on a dataset with 3 features
+            return True
+        except NotFittedError:  # needs to be the first exception to be caught
+            # Model is not fitted, as is required
+            return False
+        except ValueError:
+            # Will reach here if the model was fit on a dataset with more or less than 3 features
+            return True
+
     def _run_model_on_fold(
         self,
         model: Any,
@@ -1546,7 +1627,9 @@ class SklearnExtension(Extension):
         fold_no: int,
         y_train: Optional[np.ndarray] = None,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
-    ) -> Tuple[np.ndarray, pd.DataFrame, "OrderedDict[str, float]", Optional[OpenMLRunTrace]]:
+    ) -> Tuple[
+        np.ndarray, Optional[pd.DataFrame], "OrderedDict[str, float]", Optional[OpenMLRunTrace]
+    ]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction
         information.
 
@@ -1581,19 +1664,21 @@ class SklearnExtension(Extension):
         -------
         pred_y : np.ndarray
             Predictions on the training/test set, depending on the task type.
-            For supervised tasks, predicitons are on the test set.
-            For unsupervised tasks, predicitons are on the training set.
-        proba_y : pd.DataFrame
+            For supervised tasks, predictions are on the test set.
+            For unsupervised tasks, predictions are on the training set.
+        proba_y : pd.DataFrame, optional
             Predicted probabilities for the test set.
             None, if task is not Classification or Learning Curve prediction.
         user_defined_measures : OrderedDict[str, float]
             User defined measures that were generated on this fold
-        trace : Optional[OpenMLRunTrace]]
+        trace : OpenMLRunTrace, optional
             arff trace object from a fitted model and the trace content obtained by
             repeatedly calling ``run_model_on_task``
         """
 
-        def _prediction_to_probabilities(y: np.ndarray, model_classes: List[Any]) -> pd.DataFrame:
+        def _prediction_to_probabilities(
+            y: Union[np.ndarray, List], model_classes: List[Any], class_labels: Optional[List[str]]
+        ) -> pd.DataFrame:
             """Transforms predicted probabilities to match with OpenML class indices.
 
             Parameters
@@ -1603,28 +1688,26 @@ class SklearnExtension(Extension):
                 training data).
             model_classes : list
                 List of classes known_predicted by the model, ordered by their index.
+            class_labels : list
+                List of classes as stored in the task object fetched from server.
 
             Returns
             -------
             pd.DataFrame
             """
+            if class_labels is None:
+                raise ValueError("The task has no class labels")
 
-            if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
-                if task.class_labels is not None:
-                    if isinstance(y_train, np.ndarray) and isinstance(task.class_labels[0], str):
-                        # mapping (decoding) the predictions to the categories
-                        # creating a separate copy to not change the expected pred_y type
-                        y = [task.class_labels[pred] for pred in y]
-                else:
-                    raise ValueError("The task has no class labels")
-            else:
-                return None
+            if isinstance(y_train, np.ndarray) and isinstance(class_labels[0], str):
+                # mapping (decoding) the predictions to the categories
+                # creating a separate copy to not change the expected pred_y type
+                y = [class_labels[pred] for pred in y]  # list or numpy array of predictions
 
-            # y: list or numpy array of predictions
             # model_classes: sklearn classifier mapping from original array id to
             # prediction index id
             if not isinstance(model_classes, list):
                 raise ValueError("please convert model classes to list prior to calling this fn")
+
             # DataFrame allows more accurate mapping of classes as column names
             result = pd.DataFrame(
                 0, index=np.arange(len(y)), columns=model_classes, dtype=np.float32
@@ -1638,10 +1721,6 @@ class SklearnExtension(Extension):
                 raise TypeError("argument y_train must not be of type None")
             if X_test is None:
                 raise TypeError("argument X_test must not be of type None")
-
-        # TODO: if possible, give a warning if model is already fitted (acceptable
-        # in case of custom experimentation,
-        # but not desirable if we want to upload to OpenML).
 
         model_copy = sklearn.base.clone(model, safe=True)
         # sanity check: prohibit users from optimizing n_jobs
@@ -1667,6 +1746,8 @@ class SklearnExtension(Extension):
                 user_defined_measures["usercpu_time_millis_training"] = modelfit_dur_cputime
 
             modelfit_dur_walltime = (time.time() - modelfit_start_walltime) * 1000
+            if hasattr(model_copy, "refit_time_"):
+                modelfit_dur_walltime += model_copy.refit_time_
             if can_measure_wallclocktime:
                 user_defined_measures["wall_clock_time_millis_training"] = modelfit_dur_walltime
 
@@ -1732,10 +1813,7 @@ class SklearnExtension(Extension):
                 proba_y = model_copy.predict_proba(X_test)
                 proba_y = pd.DataFrame(proba_y, columns=model_classes)  # handles X_test as numpy
             except AttributeError:  # predict_proba is not available when probability=False
-                if task.class_labels is not None:
-                    proba_y = _prediction_to_probabilities(pred_y, model_classes)
-                else:
-                    raise ValueError("The task has no class labels")
+                proba_y = _prediction_to_probabilities(pred_y, model_classes, task.class_labels)
 
             if task.class_labels is not None:
                 if proba_y.shape[1] != len(task.class_labels):
@@ -1753,12 +1831,13 @@ class SklearnExtension(Extension):
                         proba_y.shape[1], len(task.class_labels),
                     )
                     warnings.warn(message)
-                    openml.config.logger.warn(message)
+                    openml.config.logger.warning(message)
 
                     for i, col in enumerate(task.class_labels):
                         # adding missing columns with 0 probability
                         if col not in model_classes:
                             proba_y[col] = 0
+                    # We re-order the columns to move possibly added missing columns into place.
                     proba_y = proba_y[task.class_labels]
             else:
                 raise ValueError("The task has no class labels")

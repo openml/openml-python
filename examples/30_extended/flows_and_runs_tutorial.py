@@ -53,7 +53,7 @@ clf.fit(X, y)
 task = openml.tasks.get_task(403)
 
 # Build any classifier or pipeline
-clf = tree.ExtraTreeClassifier()
+clf = tree.DecisionTreeClassifier()
 
 # Run the flow
 run = openml.runs.run_model_on_task(clf, task)
@@ -82,13 +82,14 @@ print(flow)
 # ############################
 #
 # When you need to handle 'dirty' data, build pipelines to model then automatically.
-task = openml.tasks.get_task(1)
-features = task.get_dataset().features
-nominal_feature_indices = [
-    i
-    for i in range(len(features))
-    if features[i].name != task.target_name and features[i].data_type == "nominal"
-]
+# To demonstrate this using the dataset `credit-a <https://test.openml.org/d/16>`_ via
+# `task <https://test.openml.org/t/96>`_ as it contains both numerical and categorical
+# variables and missing values in both.
+task = openml.tasks.get_task(96)
+
+# OpenML helper functions for sklearn can be plugged in directly for complicated pipelines
+from openml.extensions.sklearn import cat, cont
+
 pipe = pipeline.Pipeline(
     steps=[
         (
@@ -96,20 +97,15 @@ pipe = pipeline.Pipeline(
             compose.ColumnTransformer(
                 [
                     (
-                        "Nominal",
-                        pipeline.Pipeline(
-                            [
-                                ("Imputer", impute.SimpleImputer(strategy="most_frequent")),
-                                (
-                                    "Encoder",
-                                    preprocessing.OneHotEncoder(
-                                        sparse=False, handle_unknown="ignore",
-                                    ),
-                                ),
-                            ]
-                        ),
-                        nominal_feature_indices,
+                        "categorical",
+                        preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
+                        cat,  # returns the categorical feature indices
                     ),
+                    (
+                        "continuous",
+                        impute.SimpleImputer(strategy="median"),
+                        cont,
+                    ),  # returns the numeric feature indices
                 ]
             ),
         ),
@@ -118,6 +114,50 @@ pipe = pipeline.Pipeline(
 )
 
 run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
+myrun = run.publish()
+print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
+
+
+# The above pipeline works with the helper functions that internally deal with pandas DataFrame.
+# In the case, pandas is not available, or a NumPy based data processing is the requirement, the
+# above pipeline is presented below to work with NumPy.
+
+# Extracting the indices of the categorical columns
+features = task.get_dataset().features
+categorical_feature_indices = []
+numeric_feature_indices = []
+for i in range(len(features)):
+    if features[i].name == task.target_name:
+        continue
+    if features[i].data_type == "nominal":
+        categorical_feature_indices.append(i)
+    else:
+        numeric_feature_indices.append(i)
+
+pipe = pipeline.Pipeline(
+    steps=[
+        (
+            "Preprocessing",
+            compose.ColumnTransformer(
+                [
+                    (
+                        "categorical",
+                        preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
+                        categorical_feature_indices,
+                    ),
+                    (
+                        "continuous",
+                        impute.SimpleImputer(strategy="median"),
+                        numeric_feature_indices,
+                    ),
+                ]
+            ),
+        ),
+        ("Classifier", ensemble.RandomForestClassifier(n_estimators=10)),
+    ]
+)
+
+run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False, dataset_format="array")
 myrun = run.publish()
 print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 
@@ -132,7 +172,9 @@ print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
 task = openml.tasks.get_task(6)
 
 # The following lines can then be executed offline:
-run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False, upload_flow=False)
+run = openml.runs.run_model_on_task(
+    pipe, task, avoid_duplicate_runs=False, upload_flow=False, dataset_format="array",
+)
 
 # The run may be stored offline, and the flow will be stored along with it:
 run.to_filesystem(directory="myrun")

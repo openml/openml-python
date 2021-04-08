@@ -3,9 +3,14 @@
 import time
 import hashlib
 import logging
+import pathlib
 import requests
+import urllib.parse
+import xml
 import xmltodict
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
+
+import minio
 
 from . import config
 from .exceptions import (
@@ -55,7 +60,7 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
     if file_elements is not None:
         if request_method != "post":
             raise ValueError("request method must be post when file elements are present")
-        response = __read_url_files(url, data=data, file_elements=file_elements)
+        response = _read_url_files(url, data=data, file_elements=file_elements)
     else:
         response = __read_url(url, request_method, data)
 
@@ -65,6 +70,45 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
         "%.7fs taken for [%s] request for the URL %s", time.time() - start, request_method, url,
     )
     return response.text
+
+
+def _download_minio_file(
+    source: str, destination: Union[str, pathlib.Path], exists_ok: bool = True,
+) -> None:
+    """ Download file ``source`` from a MinIO Bucket and store it at ``destination``.
+
+    Parameters
+    ----------
+    source : Union[str, pathlib.Path]
+        URL to a file in a MinIO bucket.
+    destination : str
+        Path to store the file to, if a directory is provided the original filename is used.
+    exists_ok : bool, optional (default=True)
+        If False, raise FileExists if a file already exists in ``destination``.
+
+    """
+    destination = pathlib.Path(destination)
+    parsed_url = urllib.parse.urlparse(source)
+
+    # expect path format: /BUCKET/path/to/file.ext
+    bucket, object_name = parsed_url.path[1:].split("/", maxsplit=1)
+    if destination.is_dir():
+        destination = pathlib.Path(destination, object_name)
+    if destination.is_file() and not exists_ok:
+        raise FileExistsError(f"File already exists in {destination}.")
+
+    client = minio.Minio(endpoint=parsed_url.netloc, secure=False)
+
+    try:
+        client.fget_object(
+            bucket_name=bucket, object_name=object_name, file_path=str(destination),
+        )
+    except minio.error.S3Error as e:
+        if e.message.startswith("Object does not exist"):
+            raise FileNotFoundError(f"Object at '{source}' does not exist.") from e
+        # e.g. permission error, or a bucket does not exist (which is also interpreted as a
+        # permission error on minio level).
+        raise FileNotFoundError("Bucket does not exist or is private.") from e
 
 
 def _download_text_file(
@@ -105,20 +149,8 @@ def _download_text_file(
 
     logging.info("Starting [%s] request for the URL %s", "get", source)
     start = time.time()
-    response = __read_url(source, request_method="get")
-    __check_response(response, source, None)
+    response = __read_url(source, request_method="get", md5_checksum=md5_checksum)
     downloaded_file = response.text
-
-    if md5_checksum is not None:
-        md5 = hashlib.md5()
-        md5.update(downloaded_file.encode("utf-8"))
-        md5_checksum_download = md5.hexdigest()
-        if md5_checksum != md5_checksum_download:
-            raise OpenMLHashException(
-                "Checksum {} of downloaded file is unequal to the expected checksum {}.".format(
-                    md5_checksum_download, md5_checksum
-                )
-            )
 
     if output_path is None:
         logging.info(
@@ -138,15 +170,6 @@ def _download_text_file(
         return None
 
 
-def __check_response(response, url, file_elements):
-    if response.status_code != 200:
-        raise __parse_server_exception(response, url, file_elements=file_elements)
-    elif (
-        "Content-Encoding" not in response.headers or response.headers["Content-Encoding"] != "gzip"
-    ):
-        logging.warning("Received uncompressed content from OpenML for {}.".format(url))
-
-
 def _file_id_to_url(file_id, filename=None):
     """
      Presents the URL how to download a given file id
@@ -159,7 +182,7 @@ def _file_id_to_url(file_id, filename=None):
     return url
 
 
-def __read_url_files(url, data=None, file_elements=None):
+def _read_url_files(url, data=None, file_elements=None):
     """do a post request to url with data
     and sending file_elements as files"""
 
@@ -169,26 +192,37 @@ def __read_url_files(url, data=None, file_elements=None):
         file_elements = {}
     # Using requests.post sets header 'Accept-encoding' automatically to
     # 'gzip,deflate'
-    response = __send_request(request_method="post", url=url, data=data, files=file_elements,)
+    response = _send_request(request_method="post", url=url, data=data, files=file_elements,)
     return response
 
 
-def __read_url(url, request_method, data=None):
+def __read_url(url, request_method, data=None, md5_checksum=None):
     data = {} if data is None else data
-    if config.apikey is not None:
+    if config.apikey:
         data["api_key"] = config.apikey
+    return _send_request(
+        request_method=request_method, url=url, data=data, md5_checksum=md5_checksum
+    )
 
-    return __send_request(request_method=request_method, url=url, data=data)
+
+def __is_checksum_equal(downloaded_file, md5_checksum=None):
+    if md5_checksum is None:
+        return True
+    md5 = hashlib.md5()
+    md5.update(downloaded_file.encode("utf-8"))
+    md5_checksum_download = md5.hexdigest()
+    if md5_checksum == md5_checksum_download:
+        return True
+    return False
 
 
-def __send_request(
-    request_method, url, data, files=None,
-):
-    n_retries = config.connection_n_retries
+def _send_request(request_method, url, data, files=None, md5_checksum=None):
+    n_retries = max(1, min(config.connection_n_retries, config.max_retries))
+
     response = None
     with requests.Session() as session:
         # Start at one to have a non-zero multiplier for the sleep
-        for i in range(1, n_retries + 1):
+        for retry_counter in range(1, n_retries + 1):
             try:
                 if request_method == "get":
                     response = session.get(url, params=data)
@@ -198,15 +232,49 @@ def __send_request(
                     response = session.post(url, data=data, files=files)
                 else:
                     raise NotImplementedError()
+                __check_response(response=response, url=url, file_elements=files)
+                if request_method == "get" and not __is_checksum_equal(response.text, md5_checksum):
+                    raise OpenMLHashException(
+                        "Checksum of downloaded file is unequal to the expected checksum {} "
+                        "when downloading {}.".format(md5_checksum, url)
+                    )
                 break
-            except (requests.exceptions.ConnectionError, requests.exceptions.SSLError,) as e:
-                if i == n_retries:
-                    raise e
+            except (
+                requests.exceptions.ConnectionError,
+                requests.exceptions.SSLError,
+                OpenMLServerException,
+                xml.parsers.expat.ExpatError,
+                OpenMLHashException,
+            ) as e:
+                if isinstance(e, OpenMLServerException):
+                    if e.code not in [107, 500]:
+                        # 107: database connection error
+                        # 500: internal server error
+                        raise
+                elif isinstance(e, xml.parsers.expat.ExpatError):
+                    if request_method != "get" or retry_counter >= n_retries:
+                        raise OpenMLServerError(
+                            "Unexpected server error when calling {}. Please contact the "
+                            "developers!\nStatus code: {}\n{}".format(
+                                url, response.status_code, response.text,
+                            )
+                        )
+                if retry_counter >= n_retries:
+                    raise
                 else:
-                    time.sleep(0.1 * i)
+                    time.sleep(retry_counter)
     if response is None:
         raise ValueError("This should never happen!")
     return response
+
+
+def __check_response(response, url, file_elements):
+    if response.status_code != 200:
+        raise __parse_server_exception(response, url, file_elements=file_elements)
+    elif (
+        "Content-Encoding" not in response.headers or response.headers["Content-Encoding"] != "gzip"
+    ):
+        logging.warning("Received uncompressed content from OpenML for {}.".format(url))
 
 
 def __parse_server_exception(
@@ -217,6 +285,8 @@ def __parse_server_exception(
         raise OpenMLServerError("URI too long! ({})".format(url))
     try:
         server_exception = xmltodict.parse(response.text)
+    except xml.parsers.expat.ExpatError:
+        raise
     except Exception:
         # OpenML has a sophisticated error system
         # where information about failures is provided. try to parse this

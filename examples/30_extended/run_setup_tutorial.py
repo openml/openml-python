@@ -34,14 +34,14 @@ In this tutorial we will
 
 import numpy as np
 import openml
-import sklearn.ensemble
-import sklearn.impute
-import sklearn.preprocessing
+from openml.extensions.sklearn import cat, cont
+
 from sklearn.pipeline import make_pipeline, Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, FunctionTransformer
-from sklearn.experimental import enable_hist_gradient_boosting
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.decomposition import TruncatedSVD
 
 
 openml.config.start_using_configuration_for_example()
@@ -58,37 +58,20 @@ task = openml.tasks.get_task(6)
 # many potential hyperparameters. Of course, the model can be as complex and as
 # easy as you want it to be
 
-from sklearn.ensemble import HistGradientBoostingClassifier
-from sklearn.decomposition import TruncatedSVD
 
-
-# Helper functions to return required columns for ColumnTransformer
-def cont(X):
-    return X.dtypes != "category"
-
-
-def cat(X):
-    return X.dtypes == "category"
-
-
-cat_imp = make_pipeline(
-    SimpleImputer(strategy="most_frequent"),
-    OneHotEncoder(handle_unknown="ignore", sparse=False),
-    TruncatedSVD(),
-)
-ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", "passthrough", cont)])
-model_original = sklearn.pipeline.Pipeline(
-    steps=[("transform", ct), ("estimator", HistGradientBoostingClassifier()),]
-)
+cat_imp = make_pipeline(OneHotEncoder(handle_unknown="ignore", sparse=False), TruncatedSVD(),)
+cont_imp = SimpleImputer(strategy="median")
+ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
+model_original = Pipeline(steps=[("transform", ct), ("estimator", RandomForestClassifier()),])
 
 # Let's change some hyperparameters. Of course, in any good application we
 # would tune them using, e.g., Random Search or Bayesian Optimization, but for
 # the purpose of this tutorial we set them to some specific values that might
 # or might not be optimal
 hyperparameters_original = {
-    "estimator__loss": "auto",
-    "estimator__learning_rate": 0.15,
-    "estimator__max_iter": 50,
+    "estimator__criterion": "gini",
+    "estimator__n_estimators": 50,
+    "estimator__max_depth": 10,
     "estimator__min_samples_leaf": 1,
 }
 model_original.set_params(**hyperparameters_original)

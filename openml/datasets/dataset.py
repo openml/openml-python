@@ -3,7 +3,6 @@
 from collections import OrderedDict
 import re
 import gzip
-import io
 import logging
 import os
 import pickle
@@ -13,7 +12,7 @@ import arff
 import numpy as np
 import pandas as pd
 import scipy.sparse
-from warnings import warn
+import xmltodict
 
 from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
@@ -34,7 +33,7 @@ class OpenMLDataset(OpenMLBase):
         Name of the dataset.
     description : str
         Description of the dataset.
-    format : str
+    data_format : str
         Format of the dataset which can be either 'arff' or 'sparse_arff'.
     cache_format : str
         Format for caching the dataset which can be either 'feather' or 'pickle'.
@@ -97,13 +96,16 @@ class OpenMLDataset(OpenMLBase):
         which maps a quality name to a quality value.
     dataset: string, optional
         Serialized arff dataset string.
+    minio_url: string, optional
+        URL to the MinIO bucket with dataset files
+    parquet_file: string, optional
+        Path to the local parquet file.
     """
 
     def __init__(
         self,
         name,
         description,
-        format=None,
         data_format="arff",
         cache_format="pickle",
         dataset_id=None,
@@ -127,9 +129,11 @@ class OpenMLDataset(OpenMLBase):
         update_comment=None,
         md5_checksum=None,
         data_file=None,
-        features=None,
-        qualities=None,
+        features_file: Optional[str] = None,
+        qualities_file: Optional[str] = None,
         dataset=None,
+        minio_url: Optional[str] = None,
+        parquet_file: Optional[str] = None,
     ):
         def find_invalid_characters(string, pattern):
             invalid_chars = set()
@@ -178,16 +182,8 @@ class OpenMLDataset(OpenMLBase):
             )
 
         self.cache_format = cache_format
-        if format is None:
-            self.format = data_format
-        else:
-            warn(
-                "The format parameter in the init will be deprecated "
-                "in the future."
-                "Please use data_format instead",
-                DeprecationWarning,
-            )
-            self.format = format
+        # Has to be called format, otherwise there will be an XML upload error
+        self.format = data_format
         self.creator = creator
         self.contributor = contributor
         self.collection_date = collection_date
@@ -198,7 +194,7 @@ class OpenMLDataset(OpenMLBase):
         self.default_target_attribute = default_target_attribute
         self.row_id_attribute = row_id_attribute
         if isinstance(ignore_attribute, str):
-            self.ignore_attribute = [ignore_attribute]
+            self.ignore_attribute = [ignore_attribute]  # type: Optional[List[str]]
         elif isinstance(ignore_attribute, list) or ignore_attribute is None:
             self.ignore_attribute = ignore_attribute
         else:
@@ -212,39 +208,31 @@ class OpenMLDataset(OpenMLBase):
         self.update_comment = update_comment
         self.md5_checksum = md5_checksum
         self.data_file = data_file
-        self.features = None
-        self.qualities = None
+        self.parquet_file = parquet_file
         self._dataset = dataset
+        self._minio_url = minio_url
 
-        if features is not None:
-            self.features = {}
-            for idx, xmlfeature in enumerate(features["oml:feature"]):
-                nr_missing = xmlfeature.get("oml:number_of_missing_values", 0)
-                feature = OpenMLDataFeature(
-                    int(xmlfeature["oml:index"]),
-                    xmlfeature["oml:name"],
-                    xmlfeature["oml:data_type"],
-                    xmlfeature.get("oml:nominal_value"),
-                    int(nr_missing),
-                )
-                if idx != feature.index:
-                    raise ValueError("Data features not provided " "in right order")
-                self.features[feature.index] = feature
+        if features_file is not None:
+            self.features = _read_features(
+                features_file
+            )  # type: Optional[Dict[int, OpenMLDataFeature]]
+        else:
+            self.features = None
 
-        self.qualities = _check_qualities(qualities)
+        if qualities_file:
+            self.qualities = _read_qualities(qualities_file)  # type: Optional[Dict[str, float]]
+        else:
+            self.qualities = None
 
         if data_file is not None:
-            (
-                self.data_pickle_file,
-                self.data_feather_file,
-                self.feather_attribute_file,
-            ) = self._create_pickle_in_cache(data_file)
+            rval = self._compressed_cache_file_paths(data_file)
+            self.data_pickle_file = rval[0] if os.path.exists(rval[0]) else None
+            self.data_feather_file = rval[1] if os.path.exists(rval[1]) else None
+            self.feather_attribute_file = rval[2] if os.path.exists(rval[2]) else None
         else:
-            self.data_pickle_file, self.data_feather_file, self.feather_attribute_file = (
-                None,
-                None,
-                None,
-            )
+            self.data_pickle_file = None
+            self.data_feather_file = None
+            self.feather_attribute_file = None
 
     @property
     def id(self) -> Optional[int]:
@@ -311,9 +299,11 @@ class OpenMLDataset(OpenMLBase):
     def _download_data(self) -> None:
         """ Download ARFF data file to standard cache directory. Set `self.data_file`. """
         # import required here to avoid circular import.
-        from .functions import _get_dataset_arff
+        from .functions import _get_dataset_arff, _get_dataset_parquet
 
         self.data_file = _get_dataset_arff(self)
+        if self._minio_url is not None:
+            self.parquet_file = _get_dataset_parquet(self)
 
     def _get_arff(self, format: str) -> Dict:
         """Read ARFF file and return decoded arff.
@@ -367,7 +357,7 @@ class OpenMLDataset(OpenMLBase):
             with gzip.open(filename) as fh:
                 return decode_arff(fh)
         else:
-            with io.open(filename, encoding="utf8") as fh:
+            with open(filename, encoding="utf8") as fh:
                 return decode_arff(fh)
 
     def _parse_data_from_arff(
@@ -407,7 +397,7 @@ class OpenMLDataset(OpenMLBase):
         categories_names = {}
         categorical = []
         for i, (name, type_) in enumerate(data["attributes"]):
-            # if the feature is nominal and the a sparse matrix is
+            # if the feature is nominal and a sparse matrix is
             # requested, the categories need to be numeric
             if isinstance(type_, list) and self.format.lower() == "sparse_arff":
                 try:
@@ -415,12 +405,10 @@ class OpenMLDataset(OpenMLBase):
                     # can be encoded into integers
                     pd.factorize(type_)[0]
                 except ValueError:
-                    raise ValueError(
-                        "Categorical data needs to be numeric when " "using sparse ARFF."
-                    )
+                    raise ValueError("Categorical data needs to be numeric when using sparse ARFF.")
             # string can only be supported with pandas DataFrame
             elif type_ == "STRING" and self.format.lower() == "sparse_arff":
-                raise ValueError("Dataset containing strings is not supported " "with sparse ARFF.")
+                raise ValueError("Dataset containing strings is not supported with sparse ARFF.")
 
             # infer the dtype from the ARFF header
             if isinstance(type_, list):
@@ -456,6 +444,17 @@ class OpenMLDataset(OpenMLBase):
                     col.append(
                         self._unpack_categories(X[column_name], categories_names[column_name])
                     )
+                elif attribute_dtype[column_name] in ("floating", "integer"):
+                    X_col = X[column_name]
+                    if X_col.min() >= 0 and X_col.max() <= 255:
+                        try:
+                            X_col_uint = X_col.astype("uint8")
+                            if (X_col == X_col_uint).all():
+                                col.append(X_col_uint)
+                                continue
+                        except ValueError:
+                            pass
+                    col.append(X[column_name])
                 else:
                     col.append(X[column_name])
             X = pd.concat(col, axis=1)
@@ -464,152 +463,117 @@ class OpenMLDataset(OpenMLBase):
 
         return X, categorical, attribute_names
 
-    def _create_pickle_in_cache(self, data_file: str) -> Tuple[str, str, str]:
-        """ Parse the arff and pickle the result. Update any old pickle objects. """
-        data_pickle_file = data_file.replace(".arff", ".pkl.py3")
-        data_feather_file = data_file.replace(".arff", ".feather")
-        feather_attribute_file = data_file.replace(".arff", ".feather.attributes.pkl.py3")
-        if os.path.exists(data_pickle_file) and self.cache_format == "pickle":
-            # Load the data to check if the pickle file is outdated (i.e. contains numpy array)
-            with open(data_pickle_file, "rb") as fh:
-                try:
-                    data, categorical, attribute_names = pickle.load(fh)
-                except EOFError:
-                    # The file is likely corrupt, see #780.
-                    # We deal with this when loading the data in `_load_data`.
-                    return data_pickle_file, data_feather_file, feather_attribute_file
-                except ModuleNotFoundError:
-                    # There was some issue loading the file, see #918
-                    # We deal with this when loading the data in `_load_data`.
-                    return data_pickle_file, data_feather_file, feather_attribute_file
-                except ValueError as e:
-                    if "unsupported pickle protocol" in e.args[0]:
-                        # There was some issue loading the file, see #898
-                        # We deal with this when loading the data in `_load_data`.
-                        return data_pickle_file, data_feather_file, feather_attribute_file
-                    else:
-                        raise
-
-            # Between v0.8 and v0.9 the format of pickled data changed from
-            # np.ndarray to pd.DataFrame. This breaks some backwards compatibility,
-            # e.g. for `run_model_on_task`. If a local file still exists with
-            # np.ndarray data, we reprocess the data file to store a pickled
-            # pd.DataFrame blob. See also #646.
-            if isinstance(data, pd.DataFrame) or scipy.sparse.issparse(data):
-                logger.debug("Data pickle file already exists and is up to date.")
-                return data_pickle_file, data_feather_file, feather_attribute_file
-        elif os.path.exists(data_feather_file) and self.cache_format == "feather":
-            # Load the data to check if the pickle file is outdated (i.e. contains numpy array)
-            try:
-                data = pd.read_feather(data_feather_file)
-            except EOFError:
-                # The file is likely corrupt, see #780.
-                # We deal with this when loading the data in `_load_data`.
-                return data_pickle_file, data_feather_file, feather_attribute_file
-            except ModuleNotFoundError:
-                # There was some issue loading the file, see #918
-                # We deal with this when loading the data in `_load_data`.
-                return data_pickle_file, data_feather_file, feather_attribute_file
-            except ValueError as e:
-                if "unsupported pickle protocol" in e.args[0]:
-                    # There was some issue loading the file, see #898
-                    # We deal with this when loading the data in `_load_data`.
-                    return data_pickle_file, data_feather_file, feather_attribute_file
-                else:
-                    raise
-
-            logger.debug("Data feather file already exists and is up to date.")
-            return data_pickle_file, data_feather_file, feather_attribute_file
-
-        # At this point either the pickle file does not exist, or it had outdated formatting.
-        # We parse the data from arff again and populate the cache with a recent pickle file.
-        X, categorical, attribute_names = self._parse_data_from_arff(data_file)
-
-        # Feather format does not work for sparse datasets, so we use pickle for sparse datasets
-
-        if self.cache_format == "feather" and not scipy.sparse.issparse(X):
-            logger.info("feather write {}".format(self.name))
-            X.to_feather(data_feather_file)
-            with open(feather_attribute_file, "wb") as fh:
-                pickle.dump((categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
-        else:
-            logger.info("pickle write {}".format(self.name))
-            self.cache_format = "pickle"
-            with open(data_pickle_file, "wb") as fh:
-                pickle.dump((X, categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
-            logger.debug(
-                "Saved dataset {did}: {name} to file {path}".format(
-                    did=int(self.dataset_id or -1), name=self.name, path=data_pickle_file
-                )
-            )
+    def _compressed_cache_file_paths(self, data_file: str) -> Tuple[str, str, str]:
+        ext = f".{data_file.split('.')[-1]}"
+        data_pickle_file = data_file.replace(ext, ".pkl.py3")
+        data_feather_file = data_file.replace(ext, ".feather")
+        feather_attribute_file = data_file.replace(ext, ".feather.attributes.pkl.py3")
         return data_pickle_file, data_feather_file, feather_attribute_file
 
+    def _cache_compressed_file_from_file(
+        self, data_file: str
+    ) -> Tuple[Union[pd.DataFrame, scipy.sparse.csr_matrix], List[bool], List[str]]:
+        """ Store data from the local file in compressed format.
+
+        If a local parquet file is present it will be used instead of the arff file.
+        Sets cache_format to 'pickle' if data is sparse.
+        """
+        (
+            data_pickle_file,
+            data_feather_file,
+            feather_attribute_file,
+        ) = self._compressed_cache_file_paths(data_file)
+
+        if data_file.endswith(".arff"):
+            data, categorical, attribute_names = self._parse_data_from_arff(data_file)
+        elif data_file.endswith(".pq"):
+            try:
+                data = pd.read_parquet(data_file)
+            except Exception as e:
+                raise Exception(f"File: {data_file}") from e
+
+            categorical = [data[c].dtype.name == "category" for c in data.columns]
+            attribute_names = list(data.columns)
+        else:
+            raise ValueError(f"Unknown file type for file '{data_file}'.")
+
+        # Feather format does not work for sparse datasets, so we use pickle for sparse datasets
+        if scipy.sparse.issparse(data):
+            self.cache_format = "pickle"
+
+        logger.info(f"{self.cache_format} write {self.name}")
+        if self.cache_format == "feather":
+            data.to_feather(data_feather_file)
+            with open(feather_attribute_file, "wb") as fh:
+                pickle.dump((categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
+            self.data_feather_file = data_feather_file
+            self.feather_attribute_file = feather_attribute_file
+        else:
+            with open(data_pickle_file, "wb") as fh:
+                pickle.dump((data, categorical, attribute_names), fh, pickle.HIGHEST_PROTOCOL)
+            self.data_pickle_file = data_pickle_file
+
+        data_file = data_pickle_file if self.cache_format == "pickle" else data_feather_file
+        logger.debug(f"Saved dataset {int(self.dataset_id or -1)}: {self.name} to file {data_file}")
+
+        return data, categorical, attribute_names
+
     def _load_data(self):
-        """ Load data from pickle or arff. Download data first if not present on disk. """
-        if (self.cache_format == "pickle" and self.data_pickle_file is None) or (
-            self.cache_format == "feather" and self.data_feather_file is None
-        ):
+        """ Load data from compressed format or arff. Download data if not present on disk. """
+        need_to_create_pickle = self.cache_format == "pickle" and self.data_pickle_file is None
+        need_to_create_feather = self.cache_format == "feather" and self.data_feather_file is None
+
+        if need_to_create_pickle or need_to_create_feather:
             if self.data_file is None:
                 self._download_data()
-            (
-                self.data_pickle_file,
-                self.data_feather_file,
-                self.feather_attribute_file,
-            ) = self._create_pickle_in_cache(self.data_file)
 
+            file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
+            return self._cache_compressed_file_from_file(file_to_load)
+
+        # helper variable to help identify where errors occur
+        fpath = self.data_feather_file if self.cache_format == "feather" else self.data_pickle_file
+        logger.info(f"{self.cache_format} load data {self.name}")
         try:
             if self.cache_format == "feather":
-                logger.info("feather load data {}".format(self.name))
                 data = pd.read_feather(self.data_feather_file)
-
+                fpath = self.feather_attribute_file
                 with open(self.feather_attribute_file, "rb") as fh:
                     categorical, attribute_names = pickle.load(fh)
             else:
-                logger.info("pickle load data {}".format(self.name))
                 with open(self.data_pickle_file, "rb") as fh:
                     data, categorical, attribute_names = pickle.load(fh)
-        except EOFError:
-            logger.warning(
-                "Detected a corrupt cache file loading dataset %d: '%s'. "
-                "We will continue loading data from the arff-file, "
-                "but this will be much slower for big datasets. "
-                "Please manually delete the cache file if you want OpenML-Python "
-                "to attempt to reconstruct it."
-                "" % (self.dataset_id, self.data_pickle_file)
-            )
-            data, categorical, attribute_names = self._parse_data_from_arff(self.data_file)
         except FileNotFoundError:
-            raise ValueError(
-                "Cannot find a pickle file for dataset {} at "
-                "location {} ".format(self.name, self.data_pickle_file)
-            )
-        except ModuleNotFoundError as e:
+            raise ValueError(f"Cannot find file for dataset {self.name} at location '{fpath}'.")
+        except (EOFError, ModuleNotFoundError, ValueError) as e:
+            error_message = e.message if hasattr(e, "message") else e.args[0]
+            hint = ""
+
+            if isinstance(e, EOFError):
+                readable_error = "Detected a corrupt cache file"
+            elif isinstance(e, ModuleNotFoundError):
+                readable_error = "Detected likely dependency issues"
+                hint = "This is most likely due to https://github.com/openml/openml-python/issues/918. "  # noqa: 501
+            elif isinstance(e, ValueError) and "unsupported pickle protocol" in e.args[0]:
+                readable_error = "Encountered unsupported pickle protocol"
+            else:
+                raise  # an unknown ValueError is raised, should crash and file bug report
+
             logger.warning(
-                "Encountered error message when loading cached dataset %d: '%s'. "
-                "Error message was: %s. "
-                "This is most likely due to  https://github.com/openml/openml-python/issues/918. "
+                f"{readable_error} when loading dataset {self.id} from '{fpath}'. "
+                f"{hint}"
+                f"Error message was: {error_message}. "
                 "We will continue loading data from the arff-file, "
                 "but this will be much slower for big datasets. "
                 "Please manually delete the cache file if you want OpenML-Python "
                 "to attempt to reconstruct it."
-                "" % (self.dataset_id, self.data_pickle_file, e.args[0]),
             )
             data, categorical, attribute_names = self._parse_data_from_arff(self.data_file)
-        except ValueError as e:
-            if "unsupported pickle protocol" in e.args[0]:
-                logger.warning(
-                    "Encountered unsupported pickle protocol when loading cached dataset %d: '%s'. "
-                    "Error message was: %s. "
-                    "We will continue loading data from the arff-file, "
-                    "but this will be much slower for big datasets. "
-                    "Please manually delete the cache file if you want OpenML-Python "
-                    "to attempt to reconstruct it."
-                    "" % (self.dataset_id, self.data_pickle_file, e.args[0]),
-                )
-                data, categorical, attribute_names = self._parse_data_from_arff(self.data_file)
-            else:
-                raise
 
+        data_up_to_date = isinstance(data, pd.DataFrame) or scipy.sparse.issparse(data)
+        if self.cache_format == "pickle" and not data_up_to_date:
+            logger.info("Updating outdated pickle file.")
+            file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
+            return self._cache_compressed_file_from_file(file_to_load)
         return data, categorical, attribute_names
 
     @staticmethod
@@ -675,6 +639,11 @@ class OpenMLDataset(OpenMLBase):
 
     @staticmethod
     def _unpack_categories(series, categories):
+        # nan-likes can not be explicitly specified as a category
+        def valid_category(cat):
+            return isinstance(cat, str) or (cat is not None and not np.isnan(cat))
+
+        filtered_categories = [c for c in categories if valid_category(c)]
         col = []
         for x in series:
             try:
@@ -683,7 +652,7 @@ class OpenMLDataset(OpenMLBase):
                 col.append(np.nan)
         # We require two lines to create a series of categories as detailed here:
         # https://pandas.pydata.org/pandas-docs/version/0.24/user_guide/categorical.html#series-creation  # noqa E501
-        raw_cat = pd.Categorical(col, ordered=True, categories=categories)
+        raw_cat = pd.Categorical(col, ordered=True, categories=filtered_categories)
         return pd.Series(raw_cat, index=series.index, name=series.name)
 
     def get_data(
@@ -742,7 +711,7 @@ class OpenMLDataset(OpenMLBase):
                 to_exclude.extend(self.ignore_attribute)
 
         if len(to_exclude) > 0:
-            logger.info("Going to remove the following attributes:" " %s" % to_exclude)
+            logger.info("Going to remove the following attributes: %s" % to_exclude)
             keep = np.array(
                 [True if column not in to_exclude else False for column in attribute_names]
             )
@@ -809,6 +778,10 @@ class OpenMLDataset(OpenMLBase):
         -------
         list
         """
+        if self.features is None:
+            raise ValueError(
+                "retrieve_class_labels can only be called if feature information is available."
+            )
         for feature in self.features.values():
             if (feature.name == target_name) and (feature.data_type == "nominal"):
                 return feature.nominal_values
@@ -937,18 +910,73 @@ class OpenMLDataset(OpenMLBase):
         return data_container
 
 
-def _check_qualities(qualities):
-    if qualities is not None:
-        qualities_ = {}
-        for xmlquality in qualities:
-            name = xmlquality["oml:name"]
-            if xmlquality.get("oml:value", None) is None:
-                value = float("NaN")
-            elif xmlquality["oml:value"] == "null":
-                value = float("NaN")
-            else:
-                value = float(xmlquality["oml:value"])
-            qualities_[name] = value
-        return qualities_
-    else:
-        return None
+def _read_features(features_file: str) -> Dict[int, OpenMLDataFeature]:
+    features_pickle_file = _get_features_pickle_file(features_file)
+    try:
+        with open(features_pickle_file, "rb") as fh_binary:
+            features = pickle.load(fh_binary)
+    except:  # noqa E722
+        with open(features_file, encoding="utf8") as fh:
+            features_xml_string = fh.read()
+        xml_dict = xmltodict.parse(
+            features_xml_string, force_list=("oml:feature", "oml:nominal_value")
+        )
+        features_xml = xml_dict["oml:data_features"]
+
+        features = {}
+        for idx, xmlfeature in enumerate(features_xml["oml:feature"]):
+            nr_missing = xmlfeature.get("oml:number_of_missing_values", 0)
+            feature = OpenMLDataFeature(
+                int(xmlfeature["oml:index"]),
+                xmlfeature["oml:name"],
+                xmlfeature["oml:data_type"],
+                xmlfeature.get("oml:nominal_value"),
+                int(nr_missing),
+            )
+            if idx != feature.index:
+                raise ValueError("Data features not provided in right order")
+            features[feature.index] = feature
+
+        with open(features_pickle_file, "wb") as fh_binary:
+            pickle.dump(features, fh_binary)
+    return features
+
+
+def _get_features_pickle_file(features_file: str) -> str:
+    """This function only exists so it can be mocked during unit testing"""
+    return features_file + ".pkl"
+
+
+def _read_qualities(qualities_file: str) -> Dict[str, float]:
+    qualities_pickle_file = _get_qualities_pickle_file(qualities_file)
+    try:
+        with open(qualities_pickle_file, "rb") as fh_binary:
+            qualities = pickle.load(fh_binary)
+    except:  # noqa E722
+        with open(qualities_file, encoding="utf8") as fh:
+            qualities_xml = fh.read()
+        xml_as_dict = xmltodict.parse(qualities_xml, force_list=("oml:quality",))
+        qualities = xml_as_dict["oml:data_qualities"]["oml:quality"]
+        qualities = _check_qualities(qualities)
+        with open(qualities_pickle_file, "wb") as fh_binary:
+            pickle.dump(qualities, fh_binary)
+    return qualities
+
+
+def _get_qualities_pickle_file(qualities_file: str) -> str:
+    """This function only exists so it can be mocked during unit testing"""
+    return qualities_file + ".pkl"
+
+
+def _check_qualities(qualities: List[Dict[str, str]]) -> Dict[str, float]:
+    qualities_ = {}
+    for xmlquality in qualities:
+        name = xmlquality["oml:name"]
+        if xmlquality.get("oml:value", None) is None:
+            value = float("NaN")
+        elif xmlquality["oml:value"] == "null":
+            value = float("NaN")
+        else:
+            value = float(xmlquality["oml:value"])
+        qualities_[name] = value
+    return qualities_

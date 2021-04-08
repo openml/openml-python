@@ -5,11 +5,13 @@ import random
 import os
 from time import time
 
+import xmltodict
 from sklearn.dummy import DummyClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 
+from openml import OpenMLRun
 from openml.testing import TestBase, SimpleImputer
 import openml
 import openml.extensions.sklearn
@@ -102,7 +104,7 @@ class TestRun(TestBase):
                 ("classifier", DecisionTreeClassifier(max_depth=1)),
             ]
         )
-        task = openml.tasks.get_task(119)
+        task = openml.tasks.get_task(119)  # diabetes; crossvalidation
         run = openml.runs.run_model_on_task(
             model=model,
             task=task,
@@ -142,7 +144,7 @@ class TestRun(TestBase):
             },
         )
 
-        task = openml.tasks.get_task(119)
+        task = openml.tasks.get_task(119)  # diabetes; crossvalidation
         run = openml.runs.run_model_on_task(
             model=model, task=task, add_local_measures=False, avoid_duplicate_runs=False,
         )
@@ -163,7 +165,7 @@ class TestRun(TestBase):
         model = Pipeline(
             [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())]
         )
-        task = openml.tasks.get_task(119)
+        task = openml.tasks.get_task(119)  # diabetes; crossvalidation
         run = openml.runs.run_model_on_task(model=model, task=task, add_local_measures=False)
 
         cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
@@ -184,7 +186,7 @@ class TestRun(TestBase):
         model = Pipeline(
             [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())]
         )
-        task = openml.tasks.get_task(119)
+        task = openml.tasks.get_task(119)  # diabetes; crossvalidation
 
         # Make sure the flow does not exist on the server yet.
         flow = extension.model_to_flow(model)
@@ -215,3 +217,19 @@ class TestRun(TestBase):
         # make sure the flow is published as part of publishing the run.
         self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))
         openml.runs.get_run(loaded_run.run_id)
+
+    def test_run_setup_string_included_in_xml(self):
+        SETUP_STRING = "setup-string"
+        run = OpenMLRun(
+            task_id=0,
+            flow_id=None,  # if not none, flow parameters are required.
+            dataset_id=0,
+            setup_string=SETUP_STRING,
+        )
+        xml = run._to_xml()
+        run_dict = xmltodict.parse(xml)["oml:run"]
+        assert "oml:setup_string" in run_dict
+        assert run_dict["oml:setup_string"] == SETUP_STRING
+
+        recreated_run = openml.runs.functions._create_run_from_xml(xml, from_server=False)
+        assert recreated_run.setup_string == SETUP_STRING

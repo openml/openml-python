@@ -67,7 +67,7 @@ class TestSetupFunctions(TestBase):
         self.assertFalse(setup_id)
 
         # now run the flow on an easy task:
-        task = openml.tasks.get_task(115)  # diabetes
+        task = openml.tasks.get_task(115)  # diabetes; crossvalidation
         run = openml.runs.run_flow_on_task(flow, task)
         # spoof flow id, otherwise the sentinel is ignored
         run.flow_id = flow.flow_id

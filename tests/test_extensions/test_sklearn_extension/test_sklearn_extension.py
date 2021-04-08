@@ -40,7 +40,8 @@ from openml.exceptions import PyOpenMLError
 from openml.flows import OpenMLFlow
 from openml.flows.functions import assert_flows_equal
 from openml.runs.trace import OpenMLRunTrace
-from openml.testing import TestBase, SimpleImputer, CustomImputer, cat, cont
+from openml.testing import TestBase, SimpleImputer, CustomImputer
+from openml.extensions.sklearn import cat, cont
 
 
 this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -145,7 +146,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture_short_name = "sklearn.DecisionTreeClassifier"
         # str obtained from self.extension._get_sklearn_description(model)
         fixture_description = "A decision tree classifier."
-        version_fixture = "sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9" % sklearn.__version__
+        version_fixture = self.extension._min_dependency_str(sklearn.__version__)
 
         presort_val = "false" if LooseVersion(sklearn.__version__) < "0.22" else '"deprecated"'
         # min_impurity_decrease has been introduced in 0.20
@@ -188,6 +189,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         if LooseVersion(sklearn.__version__) >= "0.22":
             fixture_parameters.update({"ccp_alpha": "0.0"})
             fixture_parameters.move_to_end("ccp_alpha", last=False)
+        if LooseVersion(sklearn.__version__) >= "0.24":
+            del fixture_parameters["presort"]
 
         structure_fixture = {"sklearn.tree.{}.DecisionTreeClassifier".format(tree_name): []}
 
@@ -224,7 +227,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture_description = "K-Means clustering{}".format(
             "" if LooseVersion(sklearn.__version__) < "0.22" else "."
         )
-        version_fixture = "sklearn==%s\nnumpy>=1.6.1\nscipy>=0.9" % sklearn.__version__
+        version_fixture = self.extension._min_dependency_str(sklearn.__version__)
 
         n_jobs_val = "null" if LooseVersion(sklearn.__version__) < "0.23" else '"deprecated"'
         precomp_val = '"auto"' if LooseVersion(sklearn.__version__) < "0.23" else '"deprecated"'
@@ -1251,7 +1254,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # using this param distribution should raise an exception
         illegal_param_dist = {"base__n_jobs": [-1, 0, 1]}
         # using this param distribution should not raise an exception
-        legal_param_dist = {"base__max_depth": [2, 3, 4]}
+        legal_param_dist = {"n_estimators": [2, 3, 4]}
 
         legal_models = [
             sklearn.ensemble.RandomForestClassifier(),
@@ -1279,12 +1282,19 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         can_measure_cputime_answers = [True, False, False, True, False, False, True, False, False]
         can_measure_walltime_answers = [True, True, False, True, True, False, True, True, False]
+        if LooseVersion(sklearn.__version__) < "0.20":
+            has_refit_time = [False, False, False, False, False, False, False, False, False]
+        else:
+            has_refit_time = [False, False, False, False, False, False, True, True, False]
 
-        for model, allowed_cputime, allowed_walltime in zip(
-            legal_models, can_measure_cputime_answers, can_measure_walltime_answers
+        X, y = sklearn.datasets.load_iris(return_X_y=True)
+        for model, allowed_cputime, allowed_walltime, refit_time in zip(
+            legal_models, can_measure_cputime_answers, can_measure_walltime_answers, has_refit_time
         ):
             self.assertEqual(self.extension._can_measure_cputime(model), allowed_cputime)
             self.assertEqual(self.extension._can_measure_wallclocktime(model), allowed_walltime)
+            model.fit(X, y)
+            self.assertEqual(refit_time, hasattr(model, "refit_time_"))
 
         for model in illegal_models:
             with self.assertRaises(PyOpenMLError):
@@ -1316,10 +1326,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 (sklearn.tree.DecisionTreeClassifier.__init__, 14),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
-        else:
+        elif sklearn_version < "0.24":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 18),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 14),
+                (sklearn.pipeline.Pipeline.__init__, 2),
+            ]
+        else:
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 18),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
 
@@ -1464,7 +1480,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         model = sklearn.pipeline.Pipeline(steps=[("scaler", scaler), ("boosting", boosting)])
         flow = self.extension.model_to_flow(model)
-        task = openml.tasks.get_task(115)
+        task = openml.tasks.get_task(115)  # diabetes; crossvalidation
         run = openml.runs.run_flow_on_task(flow, task)
         run = run.publish()
         TestBase._mark_entity_for_removal("run", run.run_id)
@@ -1522,7 +1538,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "bootstrap": [True, False],
                 "criterion": ["gini", "entropy"],
             },
-            cv=sklearn.model_selection.StratifiedKFold(n_splits=2, random_state=1),
+            cv=sklearn.model_selection.StratifiedKFold(n_splits=2, random_state=1, shuffle=True),
             n_iter=5,
         )
         flow = self.extension.model_to_flow(model)
@@ -1560,7 +1576,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
     # Test methods for performing runs with this extension module
 
     def test_run_model_on_task(self):
-        task = openml.tasks.get_task(1)
+        task = openml.tasks.get_task(1)  # anneal; crossvalidation
         # using most_frequent imputer since dataset has mixed types and to keep things simple
         pipe = sklearn.pipeline.Pipeline(
             [
@@ -1625,7 +1641,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 self.extension.seed_model(model=clf, seed=42)
 
     def test_run_model_on_fold_classification_1_array(self):
-        task = openml.tasks.get_task(1)
+        task = openml.tasks.get_task(1)  # anneal; crossvalidation
 
         X, y = task.get_X_and_y()
         train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0)
@@ -1688,7 +1704,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
     def test_run_model_on_fold_classification_1_dataframe(self):
         from sklearn.compose import ColumnTransformer
 
-        task = openml.tasks.get_task(1)
+        task = openml.tasks.get_task(1)  # anneal; crossvalidation
 
         # diff test_run_model_on_fold_classification_1_array()
         X, y = task.get_X_and_y(dataset_format="dataframe")
@@ -1752,7 +1768,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         )
 
     def test_run_model_on_fold_classification_2(self):
-        task = openml.tasks.get_task(7)
+        task = openml.tasks.get_task(7)  # kr-vs-kp; crossvalidation
 
         X, y = task.get_X_and_y()
         train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0)
@@ -1814,7 +1830,11 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 raise AttributeError("predict_proba is not available when " "probability=False")
 
         # task 1 (test server) is important: it is a task with an unused class
-        tasks = [1, 3, 115]
+        tasks = [
+            1,  # anneal; crossvalidation
+            3,  # anneal; crossvalidation
+            115,  # diabetes; crossvalidation
+        ]
         flow = unittest.mock.Mock()
         flow.name = "dummy"
 
@@ -1968,7 +1988,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             "max_iter": [10, 20, 40, 80],
         }
         num_iters = 10
-        task = openml.tasks.get_task(20)
+        task = openml.tasks.get_task(20)  # balance-scale; crossvalidation
         clf = sklearn.model_selection.RandomizedSearchCV(
             sklearn.neural_network.MLPClassifier(), param_grid, num_iters,
         )
@@ -2079,8 +2099,8 @@ class TestSklearnExtensionRunFunctions(TestBase):
         from sklearn.compose import ColumnTransformer
 
         # testing 'drop', 'passthrough', None as non-actionable sklearn estimators
-        dataset = openml.datasets.get_dataset(128)
-        task = openml.tasks.get_task(59)
+        dataset = openml.datasets.get_dataset(128)  # iris
+        task = openml.tasks.get_task(59)  # mfeat-pixel; crossvalidation
 
         X, y, categorical_ind, feature_names = dataset.get_data(
             target=dataset.default_target_attribute, dataset_format="array"
@@ -2183,16 +2203,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
             # for lower versions
             from sklearn.preprocessing import Imputer as SimpleImputer
 
-        class CustomImputer(SimpleImputer):
-            pass
-
-        def cont(X):
-            return X.dtypes != "category"
-
-        def cat(X):
-            return X.dtypes == "category"
-
-        import sklearn.metrics
         import sklearn.tree
         from sklearn.pipeline import Pipeline, make_pipeline
         from sklearn.compose import ColumnTransformer
@@ -2207,7 +2217,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             steps=[("preprocess", ct), ("estimator", sklearn.tree.DecisionTreeClassifier())]
         )  # build a sklearn classifier
 
-        task = openml.tasks.get_task(253)  # data with mixed types from test server
+        task = openml.tasks.get_task(253)  # profb; crossvalidation
         try:
             _ = openml.runs.run_model_on_task(clf, task)
         except AttributeError as e:
@@ -2215,3 +2225,38 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 raise AttributeError(e)
             else:
                 raise Exception(e)
+
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="columntransformer introduction in 0.20.0",
+    )
+    def test_setupid_with_column_transformer(self):
+        """Test to check if inclusion of ColumnTransformer in a pipleline is treated as a new
+        flow each time.
+        """
+        import sklearn.compose
+        from sklearn.svm import SVC
+
+        def column_transformer_pipe(task_id):
+            task = openml.tasks.get_task(task_id)
+            # make columntransformer
+            preprocessor = sklearn.compose.ColumnTransformer(
+                transformers=[
+                    ("num", StandardScaler(), cont),
+                    ("cat", OneHotEncoder(handle_unknown="ignore"), cat),
+                ]
+            )
+            # make pipeline
+            clf = SVC(gamma="scale", random_state=1)
+            pipe = make_pipeline(preprocessor, clf)
+            # run task
+            run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
+            run.publish()
+            new_run = openml.runs.get_run(run.run_id)
+            return new_run
+
+        run1 = column_transformer_pipe(11)  # only categorical
+        TestBase._mark_entity_for_removal("run", run1.run_id)
+        run2 = column_transformer_pipe(23)  # only numeric
+        TestBase._mark_entity_for_removal("run", run2.run_id)
+        self.assertEqual(run1.setup_id, run2.setup_id)

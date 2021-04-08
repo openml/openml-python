@@ -7,6 +7,8 @@ Store module level information like the API key, cache directory and the server
 import logging
 import logging.handlers
 import os
+from pathlib import Path
+import platform
 from typing import Tuple, cast
 
 from io import StringIO
@@ -19,7 +21,7 @@ console_handler = None
 file_handler = None
 
 
-def _create_log_handlers():
+def _create_log_handlers(create_file_handler=True):
     """ Creates but does not attach the log handlers. """
     global console_handler, file_handler
     if console_handler is not None or file_handler is not None:
@@ -32,12 +34,13 @@ def _create_log_handlers():
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(output_formatter)
 
-    one_mb = 2 ** 20
-    log_path = os.path.join(cache_directory, "openml_python.log")
-    file_handler = logging.handlers.RotatingFileHandler(
-        log_path, maxBytes=one_mb, backupCount=1, delay=True
-    )
-    file_handler.setFormatter(output_formatter)
+    if create_file_handler:
+        one_mb = 2 ** 20
+        log_path = os.path.join(cache_directory, "openml_python.log")
+        file_handler = logging.handlers.RotatingFileHandler(
+            log_path, maxBytes=one_mb, backupCount=1, delay=True
+        )
+        file_handler.setFormatter(output_formatter)
 
 
 def _convert_log_levels(log_level: int) -> Tuple[int, int]:
@@ -83,14 +86,18 @@ def set_file_log_level(file_output_level: int):
 
 # Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
 _defaults = {
-    "apikey": None,
+    "apikey": "",
     "server": "https://www.openml.org/api/v1/xml",
-    "cachedir": os.path.expanduser(os.path.join("~", ".openml", "cache")),
+    "cachedir": (
+        os.environ.get("XDG_CACHE_HOME", os.path.join("~", ".cache", "openml",))
+        if platform.system() == "Linux"
+        else os.path.join("~", ".openml")
+    ),
     "avoid_duplicate_runs": "True",
-    "connection_n_retries": 2,
+    "connection_n_retries": "10",
+    "max_retries": "20",
 }
 
-config_file = os.path.expanduser(os.path.join("~", ".openml", "config"))
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
@@ -115,7 +122,8 @@ cache_directory = str(_defaults["cachedir"])  # so mypy knows it is a string
 avoid_duplicate_runs = True if _defaults["avoid_duplicate_runs"] == "True" else False
 
 # Number of retries if the connection breaks
-connection_n_retries = _defaults["connection_n_retries"]
+connection_n_retries = int(_defaults["connection_n_retries"])
+max_retries = int(_defaults["max_retries"])
 
 
 class ConfigurationForExamples:
@@ -169,7 +177,7 @@ class ConfigurationForExamples:
         cls._start_last_called = False
 
 
-def _setup():
+def _setup(config=None):
     """Setup openml package. Called on first import.
 
     Reads the config file and sets up apikey, server, cache appropriately.
@@ -183,62 +191,102 @@ def _setup():
     global cache_directory
     global avoid_duplicate_runs
     global connection_n_retries
+    global max_retries
 
-    # read config file, create cache directory
-    try:
-        os.mkdir(os.path.expanduser(os.path.join("~", ".openml")))
-    except FileExistsError:
-        # For other errors, we want to propagate the error as openml does not work without cache
-        pass
+    if platform.system() == "Linux":
+        config_dir = Path(os.environ.get("XDG_CONFIG_HOME", Path("~") / ".config" / "openml"))
+    else:
+        config_dir = Path("~") / ".openml"
+    # Still use os.path.expanduser to trigger the mock in the unit test
+    config_dir = Path(os.path.expanduser(config_dir))
+    config_file = config_dir / "config"
 
-    config = _parse_config()
-    apikey = config.get("FAKE_SECTION", "apikey")
-    server = config.get("FAKE_SECTION", "server")
+    # read config file, create directory for config file
+    if not os.path.exists(config_dir):
+        try:
+            os.mkdir(config_dir)
+            cache_exists = True
+        except PermissionError:
+            cache_exists = False
+    else:
+        cache_exists = True
 
-    short_cache_dir = config.get("FAKE_SECTION", "cachedir")
+    if config is None:
+        config = _parse_config(config_file)
+
+        def _get(config, key):
+            return config.get("FAKE_SECTION", key)
+
+        avoid_duplicate_runs = config.getboolean("FAKE_SECTION", "avoid_duplicate_runs")
+    else:
+
+        def _get(config, key):
+            return config.get(key)
+
+        avoid_duplicate_runs = config.get("avoid_duplicate_runs")
+
+    apikey = _get(config, "apikey")
+    server = _get(config, "server")
+    short_cache_dir = _get(config, "cachedir")
+    connection_n_retries = int(_get(config, "connection_n_retries"))
+    max_retries = int(_get(config, "max_retries"))
+
     cache_directory = os.path.expanduser(short_cache_dir)
-
     # create the cache subdirectory
-    try:
-        os.mkdir(cache_directory)
-    except FileExistsError:
-        # For other errors, we want to propagate the error as openml does not work without cache
-        pass
+    if not os.path.exists(cache_directory):
+        try:
+            os.mkdir(cache_directory)
+        except PermissionError:
+            openml_logger.warning(
+                "No permission to create openml cache directory at %s! This can result in "
+                "OpenML-Python not working properly." % cache_directory
+            )
 
-    avoid_duplicate_runs = config.getboolean("FAKE_SECTION", "avoid_duplicate_runs")
-    connection_n_retries = config.get("FAKE_SECTION", "connection_n_retries")
-    if connection_n_retries > 20:
+    if cache_exists:
+        _create_log_handlers()
+    else:
+        _create_log_handlers(create_file_handler=False)
+        openml_logger.warning(
+            "No permission to create OpenML directory at %s! This can result in OpenML-Python "
+            "not working properly." % config_dir
+        )
+
+    if connection_n_retries > max_retries:
         raise ValueError(
-            "A higher number of retries than 20 is not allowed to keep the "
-            "server load reasonable"
+            "A higher number of retries than {} is not allowed to keep the "
+            "server load reasonable".format(max_retries)
         )
 
 
-def _parse_config():
+def _parse_config(config_file: str):
     """ Parse the config file, set up defaults. """
     config = configparser.RawConfigParser(defaults=_defaults)
 
-    if not os.path.exists(config_file):
-        # Create an empty config file if there was none so far
-        fh = open(config_file, "w")
-        fh.close()
-        logger.info(
-            "Could not find a configuration file at %s. Going to "
-            "create an empty file there." % config_file
-        )
-
+    # The ConfigParser requires a [SECTION_HEADER], which we do not expect in our config file.
+    # Cheat the ConfigParser module by adding a fake section header
+    config_file_ = StringIO()
+    config_file_.write("[FAKE_SECTION]\n")
     try:
-        # The ConfigParser requires a [SECTION_HEADER], which we do not expect in our config file.
-        # Cheat the ConfigParser module by adding a fake section header
-        config_file_ = StringIO()
-        config_file_.write("[FAKE_SECTION]\n")
         with open(config_file) as fh:
             for line in fh:
                 config_file_.write(line)
-        config_file_.seek(0)
-        config.read_file(config_file_)
+    except FileNotFoundError:
+        logger.info("No config file found at %s, using default configuration.", config_file)
     except OSError as e:
-        logger.info("Error opening file %s: %s", config_file, e.message)
+        logger.info("Error opening file %s: %s", config_file, e.args[0])
+    config_file_.seek(0)
+    config.read_file(config_file_)
+    return config
+
+
+def get_config_as_dict():
+    config = dict()
+    config["apikey"] = apikey
+    config["server"] = server
+    config["cachedir"] = cache_directory
+    config["avoid_duplicate_runs"] = avoid_duplicate_runs
+    config["connection_n_retries"] = connection_n_retries
+    config["max_retries"] = max_retries
     return config
 
 
@@ -253,11 +301,7 @@ def get_cache_directory():
     """
     url_suffix = urlparse(server).netloc
     reversed_url_suffix = os.sep.join(url_suffix.split(".")[::-1])
-    if not cache_directory:
-        _cachedir = _defaults(cache_directory)
-    else:
-        _cachedir = cache_directory
-    _cachedir = os.path.join(_cachedir, reversed_url_suffix)
+    _cachedir = os.path.join(cache_directory, reversed_url_suffix)
     return _cachedir
 
 
@@ -285,12 +329,13 @@ start_using_configuration_for_example = (
 )
 stop_using_configuration_for_example = ConfigurationForExamples.stop_using_configuration_for_example
 
+
 __all__ = [
     "get_cache_directory",
     "set_cache_directory",
     "start_using_configuration_for_example",
     "stop_using_configuration_for_example",
+    "get_config_as_dict",
 ]
 
 _setup()
-_create_log_handlers()

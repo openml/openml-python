@@ -9,6 +9,7 @@ import pandas as pd
 from functools import wraps
 import collections
 
+import openml
 import openml._api_calls
 import openml.exceptions
 from . import config
@@ -243,7 +244,7 @@ def _list_all(listing_call, output_format="dict", *args, **filters):
                 limit=batch_size,
                 offset=current_offset,
                 output_format=output_format,
-                **active_filters
+                **active_filters,
             )
         except openml.exceptions.OpenMLServerNoResult:
             # we want to return an empty dict in this case
@@ -276,9 +277,11 @@ def _create_cache_directory(key):
     cache = config.get_cache_directory()
     cache_dir = os.path.join(cache, key)
     try:
-        os.makedirs(cache_dir)
-    except OSError:
-        pass
+        os.makedirs(cache_dir, exist_ok=True)
+    except Exception as e:
+        raise openml.exceptions.OpenMLCacheException(
+            f"Cannot create cache directory {cache_dir}."
+        ) from e
     return cache_dir
 
 
@@ -304,9 +307,9 @@ def _create_cache_directory_for_id(key, id_):
         Path of the created dataset cache directory.
     """
     cache_dir = os.path.join(_create_cache_directory(key), str(id_))
-    if os.path.exists(cache_dir) and os.path.isdir(cache_dir):
+    if os.path.isdir(cache_dir):
         pass
-    elif os.path.exists(cache_dir) and not os.path.isdir(cache_dir):
+    elif os.path.exists(cache_dir):
         raise ValueError("%s cache dir exists but is not a directory!" % key)
     else:
         os.makedirs(cache_dir)

@@ -15,7 +15,7 @@ class OpenMLTaskMethodsTest(TestBase):
         super(OpenMLTaskMethodsTest, self).tearDown()
 
     def test_tagging(self):
-        task = openml.tasks.get_task(1)
+        task = openml.tasks.get_task(1)  # anneal; crossvalidation
         tag = "testing_tag_{}_{}".format(self.id(), time())
         task_list = openml.tasks.list_tasks(tag=tag)
         self.assertEqual(len(task_list), 0)
@@ -40,9 +40,9 @@ class OpenMLTaskMethodsTest(TestBase):
         self.assertEqual(681, train_indices[-1])
         self.assertEqual(583, test_indices[0])
         self.assertEqual(24, test_indices[-1])
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             ValueError, "Fold 10 not known", task.get_train_test_split_indices, 10, 0
         )
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             ValueError, "Repeat 10 not known", task.get_train_test_split_indices, 0, 10
         )
