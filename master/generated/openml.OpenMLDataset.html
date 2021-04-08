@@ -3,19 +3,20 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>openml.OpenMLDataset &#8212; OpenML 0.11.0 documentation</title>
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>openml.OpenMLDataset &#8212; OpenML 0.12.0 documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -112,11 +113,11 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="openml-openmldataset">
+  <section id="openml-openmldataset">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLDataset<a class="headerlink" href="#openml-openmldataset" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="openml.OpenMLDataset">
-<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">data_format</span><span class="o">=</span><span class="default_value">'arff'</span></em>, <em class="sig-param"><span class="n">cache_format</span><span class="o">=</span><span class="default_value">'pickle'</span></em>, <em class="sig-param"><span class="n">dataset_id</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">version</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">creator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">contributor</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">collection_date</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">upload_date</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">language</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">licence</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_target_attribute</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">row_id_attribute</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ignore_attribute</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">version_label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">citation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tag</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">visibility</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">original_data_url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">paper_url</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">update_comment</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">md5_checksum</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">data_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">features</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">qualities</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dataset</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">openml.</span></code><code class="sig-name descname"><span class="pre">OpenMLDataset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'arff'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pickle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">creator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contributor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collection_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upload_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">licence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_target_attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_id_attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">citation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visibility</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_data_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paper_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_comment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">md5_checksum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualities_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minio_url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parquet_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dataset object.</p>
 <p>Allows fetching and uploading datasets to OpenML.</p>
 <dl class="field-list simple">
@@ -126,7 +127,7 @@
 </dd>
 <dt><strong>description</strong><span class="classifier">str</span></dt><dd><p>Description of the dataset.</p>
 </dd>
-<dt><strong>format</strong><span class="classifier">str</span></dt><dd><p>Format of the dataset which can be either ‘arff’ or ‘sparse_arff’.</p>
+<dt><strong>data_format</strong><span class="classifier">str</span></dt><dd><p>Format of the dataset which can be either ‘arff’ or ‘sparse_arff’.</p>
 </dd>
 <dt><strong>cache_format</strong><span class="classifier">str</span></dt><dd><p>Format for caching the dataset which can be either ‘feather’ or ‘pickle’.</p>
 </dd>
@@ -189,12 +190,16 @@ which maps a quality name to a quality value.</p>
 </dd>
 <dt><strong>dataset: string, optional</strong></dt><dd><p>Serialized arff dataset string.</p>
 </dd>
+<dt><strong>minio_url: string, optional</strong></dt><dd><p>URL to the MinIO bucket with dataset files</p>
+</dd>
+<dt><strong>parquet_file: string, optional</strong></dt><dd><p>Path to the local parquet file.</p>
+</dd>
 </dl>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
+</section>
 
 
     </div>
@@ -208,8 +213,8 @@ which maps a quality name to a quality value.</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
     </p>
   </div>
 </footer>

@@ -3,19 +3,20 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>openml.OpenMLBenchmarkSuite &#8212; OpenML 0.11.0 documentation</title>
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>openml.OpenMLBenchmarkSuite &#8212; OpenML 0.12.0 documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -112,11 +113,11 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="openml-openmlbenchmarksuite">
+  <section id="openml-openmlbenchmarksuite">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLBenchmarkSuite<a class="headerlink" href="#openml-openmlbenchmarksuite" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="openml.OpenMLBenchmarkSuite">
-<em class="property">class </em><code class="sig-prename descclassname">openml.</code><code class="sig-name descname">OpenMLBenchmarkSuite</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">suite_id</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">alias</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">description</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">status</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">creation_date</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">creator</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">tags</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>Dict<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>int<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">tasks</span><span class="p">:</span> <span class="n">List<span class="p">[</span>int<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLBenchmarkSuite" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">openml.</span></code><code class="sig-name descname"><span class="pre">OpenMLBenchmarkSuite</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suite_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alias</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">creation_date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">creator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tasks</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLBenchmarkSuite" title="Permalink to this definition">¶</a></dt>
 <dd><p>An OpenMLBenchmarkSuite represents the OpenML concept of a suite (a collection of tasks).</p>
 <p>It contains the following information: name, id, description, creation date,
 creator id and the task ids.</p>
@@ -155,7 +156,7 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 </dl>
 </dd></dl>
 
-</div>
+</section>
 
 
     </div>
@@ -169,8 +170,8 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
     </p>
   </div>
 </footer>

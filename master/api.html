@@ -3,19 +3,20 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>APIs &#8212; OpenML 0.11.0 documentation</title>
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>APIs &#8212; OpenML 0.12.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
 <meta charset='utf-8'>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -126,9 +127,9 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="apis">
+  <section id="apis">
 <span id="api"></span><h1>APIs<a class="headerlink" href="#apis" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="top-level-classes">
+<section id="top-level-classes">
 <h2>Top-level Classes<a class="headerlink" href="#top-level-classes" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -148,7 +149,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.OpenMLDataFeature.html#openml.OpenMLDataFeature" title="openml.OpenMLDataFeature"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLDataFeature</span></code></a>(index, name, data_type, …)</p></td>
 <td><p>Data Feature (a.k.a.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset" title="openml.OpenMLDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLDataset</span></code></a>(name, description[, format, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.OpenMLDataset.html#openml.OpenMLDataset" title="openml.OpenMLDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLDataset</span></code></a>(name, description[, …])</p></td>
 <td><p>Dataset object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.OpenMLEvaluation.html#openml.OpenMLEvaluation" title="openml.OpenMLEvaluation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLEvaluation</span></code></a>(run_id, task_id, setup_id, …)</p></td>
@@ -186,8 +187,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="extensions">
+</section>
+<section id="extensions">
 <span id="api-extensions"></span><h2>Extensions<a class="headerlink" href="#extensions" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -220,11 +221,11 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="modules">
+</section>
+<section id="modules">
 <h2>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="openml-datasets-dataset-functions">
+</section>
+<section id="openml-datasets-dataset-functions">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>: Dataset Functions<a class="headerlink" href="#openml-datasets-dataset-functions" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -235,7 +236,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.datasets.attributes_arff_from_df.html#openml.datasets.attributes_arff_from_df" title="openml.datasets.attributes_arff_from_df"><code class="xref py py-obj docutils literal notranslate"><span class="pre">attributes_arff_from_df</span></code></a>(df)</p></td>
 <td><p>Describe attributes of the dataframe according to ARFF specification.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.datasets.check_datasets_active.html#openml.datasets.check_datasets_active" title="openml.datasets.check_datasets_active"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_datasets_active</span></code></a>(dataset_ids)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/openml.datasets.check_datasets_active.html#openml.datasets.check_datasets_active" title="openml.datasets.check_datasets_active"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_datasets_active</span></code></a>(dataset_ids[, …])</p></td>
 <td><p>Check if the dataset ids provided are active.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.datasets.create_dataset.html#openml.datasets.create_dataset" title="openml.datasets.create_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_dataset</span></code></a>(name, description, creator, …)</p></td>
@@ -244,7 +245,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.datasets.get_dataset.html#openml.datasets.get_dataset" title="openml.datasets.get_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dataset</span></code></a>(dataset_id[, download_data, …])</p></td>
 <td><p>Download the OpenML dataset representation, optionally also download actual data file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.datasets.get_datasets.html#openml.datasets.get_datasets" title="openml.datasets.get_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_datasets</span></code></a>(dataset_ids[, download_data])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.datasets.get_datasets.html#openml.datasets.get_datasets" title="openml.datasets.get_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_datasets</span></code></a>(dataset_ids[, download_data, …])</p></td>
 <td><p>Download datasets.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/openml.datasets.list_datasets.html#openml.datasets.list_datasets" title="openml.datasets.list_datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_datasets</span></code></a>([data_id, offset, size, …])</p></td>
@@ -264,8 +265,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="openml-evaluations-evaluation-functions">
+</section>
+<section id="openml-evaluations-evaluation-functions">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.evaluations</span></code>: Evaluation Functions<a class="headerlink" href="#openml-evaluations-evaluation-functions" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -284,8 +285,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="openml-flows-flow-functions">
+</section>
+<section id="openml-flows-flow-functions">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code>: Flow Functions<a class="headerlink" href="#openml-flows-flow-functions" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -307,8 +308,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="openml-runs-run-functions">
+</section>
+<section id="openml-runs-run-functions">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code>: Run Functions<a class="headerlink" href="#openml-runs-run-functions" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -345,8 +346,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="openml-setups-setup-functions">
+</section>
+<section id="openml-setups-setup-functions">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.setups</span></code>: Setup Functions<a class="headerlink" href="#openml-setups-setup-functions" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -368,8 +369,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="openml-study-study-functions">
+</section>
+<section id="openml-study-study-functions">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.study</span></code>: Study Functions<a class="headerlink" href="#openml-study-study-functions" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -421,8 +422,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="openml-tasks-task-functions">
+</section>
+<section id="openml-tasks-task-functions">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>: Task Functions<a class="headerlink" href="#openml-tasks-task-functions" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -444,8 +445,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -459,8 +460,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
     </p>
   </div>
 </footer>

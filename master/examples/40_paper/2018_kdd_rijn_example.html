@@ -3,19 +3,20 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>van Rijn and Hutter (2018) &#8212; OpenML 0.11.0 documentation</title>
-    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>van Rijn and Hutter (2018) &#8212; OpenML 0.12.0 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -117,14 +118,15 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-40-paper-2018-kdd-rijn-example-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-40-paper-2018-kdd-rijn-example-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="van-rijn-and-hutter-2018">
+<section class="sphx-glr-example-title" id="van-rijn-and-hutter-2018">
 <span id="sphx-glr-examples-40-paper-2018-kdd-rijn-example-py"></span><h1>van Rijn and Hutter (2018)<a class="headerlink" href="#van-rijn-and-hutter-2018" title="Permalink to this headline">¶</a></h1>
 <p>A tutorial on how to reproduce the paper <em>Hyperparameter Importance Across Datasets</em>.</p>
 <p>This is a Unix-only tutorial, as the requirements can not be satisfied on a Windows machine (Untested on other
 systems).</p>
-<div class="section" id="publication">
+<section id="publication">
 <h2>Publication<a class="headerlink" href="#publication" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line">Hyperparameter importance across datasets</div>
@@ -149,6 +151,33 @@ systems).</p>
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 
 <span class="kn">import</span> <span class="nn">openml</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap &#39;rocket&#39; which already exists.
+  mpl_cm.register_cmap(_name, _cmap)
+/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap &#39;rocket_r&#39; which already exists.
+  mpl_cm.register_cmap(_name + &quot;_r&quot;, _cmap_r)
+/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap &#39;mako&#39; which already exists.
+  mpl_cm.register_cmap(_name, _cmap)
+/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap &#39;mako_r&#39; which already exists.
+  mpl_cm.register_cmap(_name + &quot;_r&quot;, _cmap_r)
+/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap &#39;icefire&#39; which already exists.
+  mpl_cm.register_cmap(_name, _cmap)
+/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap &#39;icefire_r&#39; which already exists.
+  mpl_cm.register_cmap(_name + &quot;_r&quot;, _cmap_r)
+/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap &#39;vlag&#39; which already exists.
+  mpl_cm.register_cmap(_name, _cmap)
+/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap &#39;vlag_r&#39; which already exists.
+  mpl_cm.register_cmap(_name + &quot;_r&quot;, _cmap_r)
+/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap &#39;flare&#39; which already exists.
+  mpl_cm.register_cmap(_name, _cmap)
+/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap &#39;flare_r&#39; which already exists.
+  mpl_cm.register_cmap(_name + &quot;_r&quot;, _cmap_r)
+/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap &#39;crest&#39; which already exists.
+  mpl_cm.register_cmap(_name, _cmap)
+/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap &#39;crest_r&#39; which already exists.
+  mpl_cm.register_cmap(_name + &quot;_r&quot;, _cmap_r)
 </pre></div>
 </div>
 <p>With the advent of automated machine learning, automated hyperparameter
@@ -304,7 +333,7 @@ the reader is referred to the more elaborate script (referred to earlier)</p>
 </pre></div>
 </div>
 <img alt="2018 kdd rijn example" class="sphx-glr-single-img" src="../../_images/sphx_glr_2018_kdd_rijn_example_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  7.502 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  24.935 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-kdd-rijn-example-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/fb4c80b20c8429a4165b670554f3d313/2018_kdd_rijn_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_kdd_rijn_example.py</span></code></a></p>
@@ -314,8 +343,8 @@ the reader is referred to the more elaborate script (referred to earlier)</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -329,8 +358,8 @@ the reader is referred to the more elaborate script (referred to earlier)</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
     </p>
   </div>
 </footer>

@@ -3,19 +3,20 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Obtaining Flow IDs &#8212; OpenML 0.11.0 documentation</title>
-    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>Obtaining Flow IDs &#8212; OpenML 0.12.0 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -118,9 +119,10 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-flow-id-tutorial-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-flow-id-tutorial-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="obtaining-flow-ids">
+<section class="sphx-glr-example-title" id="obtaining-flow-ids">
 <span id="sphx-glr-examples-30-extended-flow-id-tutorial-py"></span><h1>Obtaining Flow IDs<a class="headerlink" href="#obtaining-flow-ids" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial discusses different ways to obtain the ID of a flow in order to perform further
 analysis.</p>
@@ -138,7 +140,7 @@ analysis.</p>
 <span class="n">clf</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="section" id="obtaining-a-flow-given-a-classifier">
+<section id="obtaining-a-flow-given-a-classifier">
 <h2>1. Obtaining a flow given a classifier<a class="headerlink" href="#obtaining-a-flow-given-a-classifier" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">flow</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">get_extension_by_model</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span><span class="o">.</span><span class="n">model_to_flow</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
 <span class="n">flow_id</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">flow_id</span>
@@ -146,7 +148,7 @@ analysis.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>406901
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>81090
 </pre></div>
 </div>
 <p>This piece of code is rather involved. First, it retrieves a
@@ -162,11 +164,11 @@ by the server (which is obviously also done when uploading/publishing a flow).</
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>406901
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>81090
 </pre></div>
 </div>
-</div>
-<div class="section" id="obtaining-a-flow-given-its-name">
+</section>
+<section id="obtaining-a-flow-given-its-name">
 <h2>2. Obtaining a flow given its name<a class="headerlink" href="#obtaining-a-flow-given-its-name" title="Permalink to this headline">¶</a></h2>
 <p>The schema of a flow is given in XSD (<a class="reference external" href="https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.implementation.upload.xsd">here</a>).  # noqa E501
 Only two fields are required, a unique name, and an external version. While it should be pretty
@@ -178,7 +180,7 @@ algorithm or implementation introduces, renames or drop hyperparameters over tim
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sklearn.tree._classes.DecisionTreeClassifier openml==0.11.0,sklearn==0.23.1
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sklearn.tree._classes.DecisionTreeClassifier openml==0.12.0,sklearn==0.24.1
 </pre></div>
 </div>
 <p>The name and external version are automatically added to a flow when constructing it from a
@@ -188,7 +190,7 @@ model. We can then use them to retrieve the flow id as follows:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>406901
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>81090
 </pre></div>
 </div>
 <p>We can also retrieve all flows for a given name:</p>
@@ -197,7 +199,7 @@ model. We can then use them to retrieve the flow id as follows:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[41010, 73428, 89523, 153938, 166338, 187487, 231321, 232488, 249196, 332802, 335887, 358739, 406901, 407072, 415481, 420453, 420672, 424290]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[178, 10004, 10245, 12428, 66208, 66220, 67190, 81090, 81154, 81171, 81199, 87626]
 </pre></div>
 </div>
 <p>This also works with the actual model (generalizing the first part of this example):</p>
@@ -209,10 +211,10 @@ model. We can then use them to retrieve the flow id as follows:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[41010, 73428, 89523, 153938, 166338, 187487, 231321, 232488, 249196, 332802, 335887, 358739, 406901, 407072, 415481, 420453, 420672, 424290]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[178, 10004, 10245, 12428, 66208, 66220, 67190, 81090, 81154, 81171, 81199, 87626]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  11.132 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  25.010 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flow-id-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7c31477f4d78d8be9026466b8e0bbbaf/flow_id_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flow_id_tutorial.py</span></code></a></p>
@@ -222,8 +224,8 @@ model. We can then use them to retrieve the flow id as follows:</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -237,8 +239,8 @@ model. We can then use them to retrieve the flow id as follows:</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
     </p>
   </div>
 </footer>

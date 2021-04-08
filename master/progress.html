@@ -3,19 +3,20 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Changelog &#8212; OpenML 0.11.0 documentation</title>
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>Changelog &#8212; OpenML 0.12.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
 <meta charset='utf-8'>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -106,14 +107,15 @@
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
-<li><a class="reference internal" href="#id1">0.11.0</a></li>
-<li><a class="reference internal" href="#id2">0.10.2</a></li>
-<li><a class="reference internal" href="#id3">0.10.1</a></li>
-<li><a class="reference internal" href="#id4">0.10.0</a></li>
-<li><a class="reference internal" href="#id5">0.9.0</a></li>
-<li><a class="reference internal" href="#id6">0.8.0</a></li>
-<li><a class="reference internal" href="#id8">0.4.-0.7</a></li>
-<li><a class="reference internal" href="#id9">0.3.0</a></li>
+<li><a class="reference internal" href="#id1">0.11.1</a></li>
+<li><a class="reference internal" href="#id2">0.11.0</a></li>
+<li><a class="reference internal" href="#id3">0.10.2</a></li>
+<li><a class="reference internal" href="#id4">0.10.1</a></li>
+<li><a class="reference internal" href="#id5">0.10.0</a></li>
+<li><a class="reference internal" href="#id6">0.9.0</a></li>
+<li><a class="reference internal" href="#id7">0.8.0</a></li>
+<li><a class="reference internal" href="#id9">0.4.-0.7</a></li>
+<li><a class="reference internal" href="#id10">0.3.0</a></li>
 <li><a class="reference internal" href="#prior">Prior</a></li>
 </ul>
 </li>
@@ -123,10 +125,41 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="changelog">
+  <section id="changelog">
 <span id="progress"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2>0.11.0<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<section id="id1">
+<h2>0.11.1<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>ADD #964: Validate <code class="docutils literal notranslate"><span class="pre">ignore_attribute</span></code>, <code class="docutils literal notranslate"><span class="pre">default_target_attribute</span></code>, <code class="docutils literal notranslate"><span class="pre">row_id_attribute</span></code> are set to attributes that exist on the dataset when calling <code class="docutils literal notranslate"><span class="pre">create_dataset</span></code>.</p></li>
+<li><p>ADD #979: Dataset features and qualities are now also cached in pickle format.</p></li>
+<li><p>ADD #982: Add helper functions for column transformers.</p></li>
+<li><p>ADD #989: <code class="docutils literal notranslate"><span class="pre">run_model_on_task</span></code> will now warn the user the the model passed has already been fitted.</p></li>
+<li><p>ADD #1009 : Give possibility to not download the dataset qualities. The cached version is used even so download attribute is false.</p></li>
+<li><p>ADD #1016: Add scikit-learn 0.24 support.</p></li>
+<li><p>ADD #1020: Add option to parallelize evaluation of tasks with joblib.</p></li>
+<li><p>ADD #1022: Allow minimum version of dependencies to be listed for a flow, use more accurate minimum versions for scikit-learn dependencies.</p></li>
+<li><p>ADD #1023: Add admin-only calls for adding topics to datasets.</p></li>
+<li><p>ADD #1029: Add support for fetching dataset from a minio server in parquet format.</p></li>
+<li><p>ADD #1031: Generally improve runtime measurements, add them for some previously unsupported flows (e.g. BaseSearchCV derived flows).</p></li>
+<li><p>DOC #973 : Change the task used in the welcome page example so it no longer fails using numerical dataset.</p></li>
+<li><p>MAINT #671: Improved the performance of <code class="docutils literal notranslate"><span class="pre">check_datasets_active</span></code> by only querying the given list of datasets in contrast to querying all datasets. Modified the corresponding unit test.</p></li>
+<li><p>MAINT #891: Changed the way that numerical features are stored. Numerical features that range from 0 to 255 are now stored as uint8, which reduces the storage space required as well as storing and loading times.</p></li>
+<li><p>MAINT #975, #988: Add CI through Github Actions.</p></li>
+<li><p>MAINT #977: Allow <code class="docutils literal notranslate"><span class="pre">short</span></code> and <code class="docutils literal notranslate"><span class="pre">long</span></code> scenarios for unit tests. Reduce the workload for some unit tests.</p></li>
+<li><p>MAINT #985, #1000: Improve unit test stability and output readability, and adds load balancing.</p></li>
+<li><p>MAINT #1018: Refactor data loading and storage. Data is now compressed on the first call to <cite>get_data</cite>.</p></li>
+<li><p>MAINT #1024: Remove flaky decorator for study unit test.</p></li>
+<li><p>FIX #883 #884 #906 #972: Various improvements to the caching system.</p></li>
+<li><p>FIX #980: Speed up <code class="docutils literal notranslate"><span class="pre">check_datasets_active</span></code>.</p></li>
+<li><p>FIX #984: Add a retry mechanism when the server encounters a database issue.</p></li>
+<li><p>FIX #1004: Fixed an issue that prevented installation on some systems (e.g. Ubuntu).</p></li>
+<li><p>FIX #1013: Fixes a bug where <code class="docutils literal notranslate"><span class="pre">OpenMLRun.setup_string</span></code> was not uploaded to the server, prepares for <code class="docutils literal notranslate"><span class="pre">run_details</span></code> being sent from the server.</p></li>
+<li><p>FIX #1021: Fixes an issue that could occur when running unit tests and openml-python was not in PATH.</p></li>
+<li><p>FIX #1037: Fixes a bug where a dataset could not be loaded if a categorical value had listed nan-like as a possible category.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h2>0.11.0<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #753: Allows uploading custom flows to OpenML via OpenML-Python.</p></li>
 <li><p>ADD #777: Allows running a flow on pandas dataframes (in addition to numpy arrays).</p></li>
@@ -165,16 +198,16 @@ logging to console and file.</p></li>
 <li><p>MAINT #945: Make OpenML-Python PEP562 compliant.</p></li>
 <li><p>MAINT #951: Converts TaskType class to a TaskType enum.</p></li>
 </ul>
-</div>
-<div class="section" id="id2">
-<h2>0.10.2<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="id3">
+<h2>0.10.2<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #857: Adds task type ID to list_runs</p></li>
 <li><p>DOC #862: Added license BSD 3-Clause to each of the source files.</p></li>
 </ul>
-</div>
-<div class="section" id="id3">
-<h2>0.10.1<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="id4">
+<h2>0.10.1<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #175: Automatically adds the docstring of scikit-learn objects to flow and its parameters.</p></li>
 <li><p>ADD #737: New evaluation listing call that includes the hyperparameter settings.</p></li>
@@ -222,9 +255,9 @@ when there are no qualities available on the server.</p></li>
 <li><p>MAINT #849: Move logic of most different <code class="docutils literal notranslate"><span class="pre">publish</span></code> functions into the base class.</p></li>
 <li><p>MAINt #850: Remove outdated test code.</p></li>
 </ul>
-</div>
-<div class="section" id="id4">
-<h2>0.10.0<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="id5">
+<h2>0.10.0<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #737: Add list_evaluations_setups to return hyperparameters along with list of evaluations.</p></li>
 <li><p>FIX #261: Test server is cleared of all files uploaded during unit testing.</p></li>
@@ -245,9 +278,9 @@ when there are no qualities available on the server.</p></li>
 <li><p>MAINT #752: Update OpenML-Python to be compatible with sklearn 0.21</p></li>
 <li><p>ADD #790: Add user ID and name to list_evaluations</p></li>
 </ul>
-</div>
-<div class="section" id="id5">
-<h2>0.9.0<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="id6">
+<h2>0.9.0<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #560: OpenML-Python can now handle regression tasks as well.</p></li>
 <li><p>ADD #620, #628, #632, #649, #682: Full support for studies and distinguishes suites from studies.</p></li>
@@ -284,9 +317,9 @@ when there are no qualities available on the server.</p></li>
 <li><p>MAINT #686: Adds ignore directives for several <cite>mypy</cite> folders.</p></li>
 <li><p>MAINT #629, #630: Code now adheres to single PEP8 standard.</p></li>
 </ul>
-</div>
-<div class="section" id="id6">
-<h2>0.8.0<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="id7">
+<h2>0.8.0<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #440: Improved dataset upload.</p></li>
 <li><p>ADD #545, #583: Allow uploading a dataset from a pandas DataFrame.</p></li>
@@ -326,24 +359,24 @@ the OpenML connector fails earlier and with a better error message when
 failing to create a flow from the OpenML description.</p></li>
 <li><p>MAINT #561: Improve documentation on running specific unit tests.</p></li>
 </ul>
-</div>
-<div class="section" id="id8">
-<h2>0.4.-0.7<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="id9">
+<h2>0.4.-0.7<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>There is no changelog for these versions.</p>
-</div>
-<div class="section" id="id9">
-<h2>0.3.0<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="id10">
+<h2>0.3.0<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Add this changelog</p></li>
 <li><p>2nd example notebook PyOpenML.ipynb</p></li>
 <li><p>Pagination support for list datasets and list tasks</p></li>
 </ul>
-</div>
-<div class="section" id="prior">
+</section>
+<section id="prior">
 <h2>Prior<a class="headerlink" href="#prior" title="Permalink to this headline">¶</a></h2>
 <p>There is no changelog for prior versions.</p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -357,8 +390,8 @@ failing to create a flow from the OpenML description.</p></li>
       
     </p>
     <p>
-        &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
     </p>
   </div>
 </footer>

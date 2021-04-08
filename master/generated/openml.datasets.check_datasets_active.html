@@ -3,19 +3,20 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>openml.datasets.check_datasets_active &#8212; OpenML 0.11.0 documentation</title>
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>openml.datasets.check_datasets_active &#8212; OpenML 0.12.0 documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -112,16 +113,21 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="openml-datasets-check-datasets-active">
+  <section id="openml-datasets-check-datasets-active">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.check_datasets_active<a class="headerlink" href="#openml-datasets-check-datasets-active" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="openml.datasets.check_datasets_active">
-<code class="sig-prename descclassname">openml.datasets.</code><code class="sig-name descname">check_datasets_active</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset_ids</span><span class="p">:</span> <span class="n">List<span class="p">[</span>int<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span>int<span class="p">, </span>bool<span class="p">]</span><a class="headerlink" href="#openml.datasets.check_datasets_active" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">openml.datasets.</span></code><code class="sig-name descname"><span class="pre">check_datasets_active</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_ids</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_error_if_not_exist</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#openml.datasets.check_datasets_active" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the dataset ids provided are active.</p>
+<p>Raises an error if a dataset_id in the given list
+of dataset_ids does not exist on the server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>dataset_ids</strong><span class="classifier">List[int]</span></dt><dd><p>A list of integers representing dataset ids.</p>
+</dd>
+<dt><strong>raise_error_if_not_exist</strong><span class="classifier">bool (default=True)</span></dt><dd><p>Flag that if activated can raise an error, if one or more of the
+given dataset ids do not exist on the server.</p>
 </dd>
 </dl>
 </dd>
@@ -134,7 +140,7 @@
 </dl>
 </dd></dl>
 
-<div class="clearer"></div></div>
+<div class="clearer"></div></section>
 
 
     </div>
@@ -148,8 +154,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2014-2020, the OpenML-Python team..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
     </p>
   </div>
 </footer>
