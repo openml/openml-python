@@ -27,7 +27,7 @@ It should be noted that there are multiple levels at which parallelism can occur
   If the base estimator used also supports `parallelization`, then there's at least a 2-level nested
   definition for parallelization possible (covered under Case 3 below).
 
-We shall cover these 3 representative scenarios for:
+We shall cover these 4 representative scenarios for:
 
 * (Case 1) Retrieving runtimes for Random Forest training and prediction on each of the
   cross-validation folds
@@ -133,7 +133,7 @@ print_compare_runtimes(measures)
 
 ######################################################################
 # Case 2: Running Scikit-learn models on an OpenML task in parallel
-# ********************************************************************
+# *****************************************************************
 # Redefining the model to allow parallelism with `n_jobs=2` (2 cores)
 
 clf = RandomForestClassifier(n_estimators=10, n_jobs=2)
@@ -375,9 +375,16 @@ run6 = openml.runs.run_model_on_task(
 measures = run6.fold_evaluations
 print_compare_runtimes(measures)
 
+run6 = openml.runs.run_model_on_task(
+    model=dt, task=task, upload_flow=False, avoid_duplicate_runs=False, n_jobs=-1
+)
+measures = run6.fold_evaluations
+print_compare_runtimes(measures)
+
 ################################################################################
 # Running a Neural Network from scikit-learn that uses scikit-learn independent
-# parallelism using libraries such as MKL, OpenBLAS or BLIS.
+# parallelism using libraries such as `MKL, OpenBLAS or BLIS
+# <https://scikit-learn.org/stable/computing/parallelism.html#parallel-numpy-routines-from-numerical-libraries>`_.
 
 mlp = MLPClassifier(max_iter=10)
 run7 = openml.runs.run_model_on_task(
@@ -389,9 +396,10 @@ print_compare_runtimes(measures)
 ################################################################################
 # Summmary
 # *********
-# OpenML records model runtimes for the CPU-clock and the wall-clock times. The above
-# examples illustrated how these recorded runtimes can be extracted, especially when
-# using a scikit-learn model and under parallel setups too. To summarize, OpenML measures the:
+# OpenML records model runtimes for the CPU-clock and the wall-clock times for
+# the scikit-learn extension. The above examples illustrated how these recorded runtimes
+# can be extracted, especially when using a scikit-learn model and under parallel setups
+# too. To summarize, OpenML measures the:
 #
 # * `CPU-time` & `wallclock-time` for the whole run
 #
@@ -423,7 +431,7 @@ print_compare_runtimes(measures)
 # * `CPU-time` & `wallclock-time` for models that scikit-learn doesn't parallelize
 #
 #   * Models like Decision Trees don't parallelize and thus both the wallclock and CPU times are
-#     accurate runtime representations as long as `n_job=1` or `n_jobs=None` at the OpenML call
+#     similar in runtime for the OpenML call
 #   * Scikit-learn Neural Networks can undergo parallelization implicitly owing to thread-level
-#     parallelism involved in the linear algebraic operations and thus only the wallclock-time
-#     reported reflects the actual training time for the model
+#     parallelism involved in the linear algebraic operations and thus the wallclock-time and
+#     CPU-time can differ
