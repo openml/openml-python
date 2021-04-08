@@ -9,7 +9,7 @@ import logging.handlers
 import os
 from pathlib import Path
 import platform
-from typing import Tuple, cast
+from typing import Tuple, cast, Any
 
 from io import StringIO
 import configparser
@@ -177,6 +177,16 @@ class ConfigurationForExamples:
         cls._start_last_called = False
 
 
+def determine_config_file_path() -> Path:
+    if platform.system() == "Linux":
+        config_dir = Path(os.environ.get("XDG_CONFIG_HOME", Path("~") / ".config" / "openml"))
+    else:
+        config_dir = Path("~") / ".openml"
+    # Still use os.path.expanduser to trigger the mock in the unit test
+    config_dir = Path(os.path.expanduser(config_dir))
+    return config_dir / "config"
+
+
 def _setup(config=None):
     """Setup openml package. Called on first import.
 
@@ -193,13 +203,8 @@ def _setup(config=None):
     global connection_n_retries
     global max_retries
 
-    if platform.system() == "Linux":
-        config_dir = Path(os.environ.get("XDG_CONFIG_HOME", Path("~") / ".config" / "openml"))
-    else:
-        config_dir = Path("~") / ".openml"
-    # Still use os.path.expanduser to trigger the mock in the unit test
-    config_dir = Path(os.path.expanduser(config_dir))
-    config_file = config_dir / "config"
+    config_file = determine_config_file_path()
+    config_dir = config_file.parent
 
     # read config file, create directory for config file
     if not os.path.exists(config_dir):
@@ -256,6 +261,32 @@ def _setup(config=None):
             "A higher number of retries than {} is not allowed to keep the "
             "server load reasonable".format(max_retries)
         )
+
+
+def set_field_in_config_file(field: str, value: Any):
+    """ Overwrites the `field` in the configuration file with the new `value`. """
+    fields = [
+        "apikey",
+        "server",
+        "cache_directory",
+        "avoid_duplicate_runs",
+        "connection_n_retries",
+        "max_retries",
+    ]
+    if field not in fields:
+        return ValueError(f"Field '{field}' is not valid and must be one of '{fields}'.")
+
+    globals()[field] = value
+    config_file = determine_config_file_path()
+    config = _parse_config(str(config_file))
+    with open(config_file, "w") as fh:
+        for f in fields:
+            # We can't blindly set all values based on globals() because the user when the user
+            # sets it through config.FIELD it should not be stored to file.
+            value = config.get("FAKE_SECTION", f)
+            if f == field:
+                value = globals()[f]
+            fh.write(f"{f} = {value}\n")
 
 
 def _parse_config(config_file: str):
