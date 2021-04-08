@@ -3,6 +3,7 @@
 import argparse
 import string
 from typing import Union, Callable
+from urllib.parse import urlparse
 
 
 from openml import config
@@ -14,6 +15,14 @@ def is_hex(string_: str) -> bool:
 
 def looks_like_api_key(apikey: str) -> bool:
     return len(apikey) == 32 and is_hex(apikey)
+
+
+def looks_like_url(url: str) -> bool:
+    # There's no thorough url parser, but we only seem to use netloc.
+    try:
+        return bool(urlparse(url).netloc)
+    except Exception:
+        return False
 
 
 def wait_until_valid_input(
@@ -83,13 +92,43 @@ def configure_apikey() -> None:
     print("Key set.")
 
 
+def configure_server():
+    print("\nSpecify which server you wish to connect to.")
+
+    def is_valid_server(server: str) -> bool:
+        is_shorthand = server in ["test", "production"]
+        return is_shorthand or looks_like_url(server)
+
+    response = wait_until_valid_input(
+        prompt="Specify a url or use 'test' or 'production' as a shorthand:",
+        check=is_valid_server,
+        error_message="Must be 'test', 'production' or a url.",
+    )
+
+    if response == "test":
+        response = "https://test.openml.org/api/v1/xml"
+    elif response == "production":
+        response = "https://www.openml.org/api/v1/xml"
+
+    config.set_field_in_config_file("server", response)
+
+
 def configure(args: argparse.Namespace):
-    """ Configures the openml configuration file. """
+    """ Calls the right submenu(s) to edit `args.field` in the configuration file. """
     print_configuration()
     set_functions = {
         "apikey": configure_apikey,
+        "server": configure_server,
     }
-    set_functions.get(args.field, quit)()
+
+    def not_supported_yet():
+        print(f"Setting '{args.field}' is not supported yet.")
+
+    if args.field not in ["all", "none"]:
+        set_functions.get(args.field, not_supported_yet)()
+    elif args.field == "all":
+        for set_field_function in set_functions.values():
+            set_field_function()
 
 
 def main() -> None:
@@ -99,7 +138,9 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="subroutine")
 
     parser_configure = subparsers.add_parser(
-        "configure", description="Set or read variables in your configuration file.",
+        "configure",
+        description="Set or read variables in your configuration file. For more help also see "
+        "'https://openml.github.io/openml-python/master/usage.html#configuration'.",
     )
 
     parser_configure.add_argument(

@@ -273,8 +273,11 @@ def set_field_in_config_file(field: str, value: Any):
     config = _parse_config(str(config_file))
     with open(config_file, "w") as fh:
         for f in _defaults.keys():
-            # We can't blindly set all values based on globals() because the user when the user
+            # We can't blindly set all values based on globals() because when the user
             # sets it through config.FIELD it should not be stored to file.
+            # There doesn't seem to be a way to avoid writing defaults to file with configparser,
+            # because it is impossible to distinguish from an explicitly set value that matches
+            # the default value, to one that was set to its default because it was omitted.
             value = config.get("FAKE_SECTION", f)
             if f == field:
                 value = globals()[f]
