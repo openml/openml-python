@@ -105,20 +105,10 @@ def main() -> None:
     parser_configure.add_argument(
         "field",
         type=str,
-        choices=[
-            "apikey",
-            "server",
-            "cachedir",
-            "avoid_duplicate_runs",
-            "connection_n_retries",
-            "verbosity",
-            "all",
-            "none",
-        ],
+        choices=[*config._defaults.keys(), "all", "none"],
         default="all",
         nargs="?",
-        help="The field you wish to edit, auto-completes the field name, "
-        "e.g. `openml configure cache` is equivalent to `openml configure cachedir`."
+        help="The field you wish to edit."
         "Choosing 'all' lets you configure all fields one by one."
         "Choosing 'none' will print out the current configuration.",
     )

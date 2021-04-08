@@ -265,22 +265,14 @@ def _setup(config=None):
 
 def set_field_in_config_file(field: str, value: Any):
     """ Overwrites the `field` in the configuration file with the new `value`. """
-    fields = [
-        "apikey",
-        "server",
-        "cache_directory",
-        "avoid_duplicate_runs",
-        "connection_n_retries",
-        "max_retries",
-    ]
-    if field not in fields:
-        return ValueError(f"Field '{field}' is not valid and must be one of '{fields}'.")
+    if field not in _defaults:
+        return ValueError(f"Field '{field}' is not valid and must be one of '{_defaults.keys()}'.")
 
     globals()[field] = value
     config_file = determine_config_file_path()
     config = _parse_config(str(config_file))
     with open(config_file, "w") as fh:
-        for f in fields:
+        for f in _defaults.keys():
             # We can't blindly set all values based on globals() because the user when the user
             # sets it through config.FIELD it should not be stored to file.
             value = config.get("FAKE_SECTION", f)
