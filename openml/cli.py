@@ -1,11 +1,10 @@
 """" Command Line Interface for `openml` to configure its settings. """
 
 import argparse
-
-# import os
-# import pathlib
+import os
+import pathlib
 import string
-from typing import Callable  # Union, Callable
+from typing import Union, Callable
 from urllib.parse import urlparse
 
 
@@ -74,22 +73,23 @@ def configure_apikey(value: str) -> None:
             return "Some characters are not hexadecimal."
         return ""
 
-    if value is not None:
-        apikey_malformed = check_apikey(value)
-        if apikey_malformed:
-            print(apikey_malformed)
-            quit(-1)
-    else:
-        print(f"\nYour current API key is set to: '{config.apikey}'")
-        print("You can get an API key at https://new.openml.org")
-        print("You must create an account if you don't have one yet.")
-        print("  1. Log in with the account.")
-        print("  2. Navigate to the profile page (top right circle > Your Profile). ")
-        print("  3. Click the API Key button to reach the page with your API key.")
-        print("If you have any difficulty following these instructions, let us know on Github.")
+    instructions = (
+        f"Your current API key is set to: '{config.apikey}'"
+        "You can get an API key at https://new.openml.org"
+        "You must create an account if you don't have one yet."
+        "  1. Log in with the account."
+        "  2. Navigate to the profile page (top right circle > Your Profile). "
+        "  3. Click the API Key button to reach the page with your API key."
+        "If you have any difficulty following these instructions, let us know on Github."
+    )
 
-        value = wait_until_valid_input(prompt="Please enter your API key:", check=check_apikey,)
-    verbose_set("apikey", value)
+    configure_field(
+        field="apikey",
+        value=value,
+        check_with_message=check_apikey,
+        intro_message=instructions,
+        input_message="Please enter your API key:",
+    )
 
 
 def configure_server(value: str) -> None:
@@ -99,57 +99,81 @@ def configure_server(value: str) -> None:
             return ""
         return "Must be 'test', 'production' or a url."
 
+    configure_field(
+        field="server",
+        value=value,
+        check_with_message=check_server,
+        intro_message="Specify which server you wish to connect to.",
+        input_message="Specify a url or use 'test' or 'production' as a shorthand:",
+    )
+
+
+def configure_cachedir(value: str) -> None:
+    def check_cache_dir(path: str) -> str:
+        p = pathlib.Path(path)
+        if p.is_file():
+            return f"'{path}' is a file, not a directory."
+        expanded = p.expanduser()
+        if not expanded.is_absolute():
+            return f"'{path}' is not absolute (even after expanding '~')."
+        if not expanded.exists():
+            try:
+                os.mkdir(expanded)
+            except PermissionError:
+                return f"'{path}' does not exist and there are not enough permissions to create it."
+        return ""
+
+    configure_field(
+        field="cachedir",
+        value=value,
+        check_with_message=check_cache_dir,
+        intro_message="Configuring the cache directory. It can not be a relative path.",
+        input_message="Specify the directory to use (or create) as cache directory:",
+    )
+    print("NOTE: Data from your old cache directory is not moved over.")
+
+
+def configure_field(
+    field: str,
+    value: Union[None, str],
+    check_with_message: Callable[[str], str],
+    intro_message: str,
+    input_message: str,
+) -> None:
+    """ Configure `field` with `value`. If `value` is None ask the user for input.
+
+    `value` and user input are validated with `check_with_message` function, and
+    in the case of user input the user gets to input a new value.
+    The change is saved in the openml configuration file.
+    In case an invalid `value` is supplied, no changes are made.
+
+    Parameters
+    ----------
+    field: str
+        Field to set.
+    value: str, None
+        Value to field to. If `None` will ask user for input.
+    check_with_message: Callable[[str], str]
+        Function which validates `value` or user input, and returns either an error message if it
+        is invalid, or a False-like value if `value` is valid.
+    intro_message: str
+        Message that is printed once if user input is requested (e.g. instructions).
+    input_message: str
+        Message that comes with the input prompt.
+
+    Returns
+    -------
+
+    """
     if value is not None:
-        server_malformed = check_server(value)
-        if server_malformed:
-            print(server_malformed)
-            quit(-1)
+        malformed_input = check_with_message(value)
+        if malformed_input:
+            print(malformed_input)
+            quit()
     else:
-        print("\nSpecify which server you wish to connect to.")
-        value = wait_until_valid_input(
-            prompt="Specify a url or use 'test' or 'production' as a shorthand:",
-            check=check_server,
-        )
-
-    if value == "test":
-        value = "https://test.openml.org/api/v1/xml"
-    elif value == "production":
-        value = "https://www.openml.org/api/v1/xml"
-
-    verbose_set("server", value)
-
-
-# def configure_cachedir(value: str) -> None:
-#     def is_valid_cachedir(path: str) -> bool:
-#         return True
-#
-#     def cache_dir_error(path: str) -> str:
-#         p = pathlib.Path(path)
-#         if p.is_file():
-#             return f"'{path}' is a file, not a directory."
-#         expanded = p.expanduser()
-#         if not expanded.is_absolute():
-#             return f"'{path}' is not absolute (even after expanding '~')."
-#         if expanded.exists():
-#             try:
-#                 os.mkdir(expanded)
-#             except PermissionError:
-#               return f"'{path}' does not exist and there are not enough permissions to create it."
-#         return "is not valid"
-#
-#     if value is not None:
-#         if not is_valid_cachedir(value):
-#             print(cache_dir_error(value))
-#             quit(-1)
-#     else:
-#         print("\nConfiguring the cache directory. It can not be a relative path.")
-#         value = wait_until_valid_input(
-#             prompt="Specify the directory to use (or create) as cache directory:",
-#             check=is_valid_cachedir,
-#         )
-#
-#     print("NOTE: Data from your old cache directory is not moved over.")
-#     verbose_set("cachedir", value)
+        print(intro_message)
+        value = wait_until_valid_input(prompt=input_message, check=check_with_message,)
+    verbose_set(field, value)
 
 
 def configure(args: argparse.Namespace):
@@ -157,6 +181,7 @@ def configure(args: argparse.Namespace):
     set_functions = {
         "apikey": configure_apikey,
         "server": configure_server,
+        "cachedir": configure_cachedir,
     }
 
     def not_supported_yet(_):
