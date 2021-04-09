@@ -74,12 +74,12 @@ def configure_apikey(value: str) -> None:
         return ""
 
     instructions = (
-        f"Your current API key is set to: '{config.apikey}'"
-        "You can get an API key at https://new.openml.org"
-        "You must create an account if you don't have one yet."
-        "  1. Log in with the account."
-        "  2. Navigate to the profile page (top right circle > Your Profile). "
-        "  3. Click the API Key button to reach the page with your API key."
+        f"Your current API key is set to: '{config.apikey}'. "
+        "You can get an API key at https://new.openml.org. "
+        "You must create an account if you don't have one yet:\n"
+        "  1. Log in with the account.\n"
+        "  2. Navigate to the profile page (top right circle > Your Profile). \n"
+        "  3. Click the API Key button to reach the page with your API key.\n"
         "If you have any difficulty following these instructions, let us know on Github."
     )
 
@@ -104,7 +104,7 @@ def configure_server(value: str) -> None:
         value=value,
         check_with_message=check_server,
         intro_message="Specify which server you wish to connect to.",
-        input_message="Specify a url or use 'test' or 'production' as a shorthand:",
+        input_message="Specify a url or use 'test' or 'production' as a shorthand: ",
     )
 
 
@@ -128,9 +128,72 @@ def configure_cachedir(value: str) -> None:
         value=value,
         check_with_message=check_cache_dir,
         intro_message="Configuring the cache directory. It can not be a relative path.",
-        input_message="Specify the directory to use (or create) as cache directory:",
+        input_message="Specify the directory to use (or create) as cache directory: ",
     )
     print("NOTE: Data from your old cache directory is not moved over.")
+
+
+def configure_connection_n_retries(value: str) -> None:
+    def valid_connection_retries(value: str) -> str:
+        if not value.isdigit():
+            return f"Must be an integer number (smaller than {config.max_retries})."
+        if int(value) > config.max_retries:
+            return f"connection_n_retries may not exceed {config.max_retries}."
+        if int(value) == 0:
+            return "connection_n_retries must be non-zero."
+        return ""
+
+    configure_field(
+        field="connection_n_retries",
+        value=value,
+        check_with_message=valid_connection_retries,
+        intro_message="Configuring the number of times to attempt to connect to the OpenML Server",
+        input_message=f"Enter an integer between 0 and {config.max_retries}: ",
+    )
+
+
+def configure_avoid_duplicate_runs(value: str) -> None:
+    def is_python_bool(value: str) -> str:
+        if value in ["True", "False"]:
+            return ""
+        return "Must be 'True' or 'False' (mind the capital)."
+
+    intro_message = (
+        "If set to True, when `run_flow_on_task` or similar methods are called a lookup is "
+        "performed to see if there already exists such a run on the server. "
+        "If so, download those results instead. "
+        "If set to False, runs will always be executed."
+    )
+
+    configure_field(
+        field="avoid_duplicate_runs",
+        value=value,
+        check_with_message=is_python_bool,
+        intro_message=intro_message,
+        input_message="Enter 'True' or 'False': ",
+    )
+
+
+def configure_verbosity(value: str) -> None:
+    def is_zero_through_two(value: str) -> str:
+        if value in ["0", "1", "2"]:
+            return ""
+        return "Must be '0', '1' or '2'."
+
+    intro_message = (
+        "Set the verbosity of log messages which should be shown by openml-python."
+        " 0: normal output (warnings and errors)"
+        " 1: info output (some high-level progress output)"
+        " 2: debug output (detailed information (for developers))"
+    )
+
+    configure_field(
+        field="verbosity",
+        value=value,
+        check_with_message=is_zero_through_two,
+        intro_message=intro_message,
+        input_message="Enter '0', '1' or '2': ",
+    )
 
 
 def configure_field(
@@ -160,10 +223,6 @@ def configure_field(
         Message that is printed once if user input is requested (e.g. instructions).
     input_message: str
         Message that comes with the input prompt.
-
-    Returns
-    -------
-
     """
     if value is not None:
         malformed_input = check_with_message(value)
@@ -182,6 +241,9 @@ def configure(args: argparse.Namespace):
         "apikey": configure_apikey,
         "server": configure_server,
         "cachedir": configure_cachedir,
+        "connection_n_retries": configure_connection_n_retries,
+        "avoid_duplicate_runs": configure_avoid_duplicate_runs,
+        "verbosity": configure_verbosity,
     }
 
     def not_supported_yet(_):
@@ -197,6 +259,7 @@ def configure(args: argparse.Namespace):
 
     if args.field == "all":
         for set_field_function in set_functions.values():
+            print()  # Visually separating the output by field.
             set_field_function(args.value)
 
 
@@ -212,14 +275,16 @@ def main() -> None:
         "'https://openml.github.io/openml-python/master/usage.html#configuration'.",
     )
 
+    configurable_fields = [f for f in config._defaults if f not in ["max_retries"]]
+
     parser_configure.add_argument(
         "field",
         type=str,
-        choices=[*config._defaults.keys(), "all", "none"],
+        choices=[*configurable_fields, "all", "none"],
         default="all",
         nargs="?",
-        help="The field you wish to edit."
-        "Choosing 'all' lets you configure all fields one by one."
+        help="The field you wish to edit. "
+        "Choosing 'all' lets you configure all fields one by one. "
         "Choosing 'none' will print out the current configuration.",
     )
 
