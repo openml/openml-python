@@ -295,7 +295,7 @@ def get_flow_id(
     Returns
     -------
     int or bool, List
-        flow id iff exists, ``False`` otherwise, List if exact_version is ``False``
+        flow id iff exists, ``False`` otherwise, List if ``exact_version is False``
     """
     if model is None and name is None:
         raise ValueError(
