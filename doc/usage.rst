@@ -59,6 +59,10 @@ which are separated by newlines. The following keys are defined:
     * 1: info output
     * 2: debug output
 
+This file is easily configurable by the ``openml`` command line interface.
+To see where the file is stored, and what its values are, use `openml configure none`.
+Set any field with ``openml configure FIELD`` or even all fields with just ``openml configure``.
+
 ~~~~~~~~~~~~
 Key concepts
 ~~~~~~~~~~~~
