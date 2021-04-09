@@ -68,15 +68,12 @@ def print_configuration():
         print(f"{field.ljust(max_key_length)}: {value}")
 
 
-def configure_apikey() -> None:
-    print(f"\nYour current API key is set to: '{config.apikey}'")
-    print("You can get an API key at https://new.openml.org")
-    print("You must create an account if you don't have one yet.")
-    print("  1. Log in with the account.")
-    print("  2. Navigate to the profile page (top right circle > Your Profile). ")
-    print("  3. Click the API Key button to reach the page with your API key.")
-    print("If you have any difficulty following these instructions, please let us know on Github.")
+def verbose_set(field, value):
+    config.set_field_in_config_file(field, value)
+    print(f"{field} set to '{value}'.")
 
+
+def configure_apikey(value: str) -> None:
     def apikey_error(apikey: str) -> str:
         if len(apikey) != 32:
             return f"The key should contain 32 characters but contains {len(apikey)}."
@@ -84,51 +81,75 @@ def configure_apikey() -> None:
             return "Some characters are not hexadecimal."
         return "This does not look like an API key."
 
-    response = wait_until_valid_input(
-        prompt="Please enter your API key:", check=looks_like_api_key, error_message=apikey_error,
-    )
+    if value is not None:
+        if not looks_like_api_key(value):
+            print(apikey_error(value))
+            quit(-1)
+    else:
+        print(f"\nYour current API key is set to: '{config.apikey}'")
+        print("You can get an API key at https://new.openml.org")
+        print("You must create an account if you don't have one yet.")
+        print("  1. Log in with the account.")
+        print("  2. Navigate to the profile page (top right circle > Your Profile). ")
+        print("  3. Click the API Key button to reach the page with your API key.")
+        print("If you have any difficulty following these instructions, let us know on Github.")
 
-    config.set_field_in_config_file("apikey", response)
-    print("Key set.")
+        value = wait_until_valid_input(
+            prompt="Please enter your API key:",
+            check=looks_like_api_key,
+            error_message=apikey_error,
+        )
+    verbose_set("apikey", value)
 
 
-def configure_server():
-    print("\nSpecify which server you wish to connect to.")
-
+def configure_server(value: str):
     def is_valid_server(server: str) -> bool:
         is_shorthand = server in ["test", "production"]
         return is_shorthand or looks_like_url(server)
 
-    response = wait_until_valid_input(
-        prompt="Specify a url or use 'test' or 'production' as a shorthand:",
-        check=is_valid_server,
-        error_message="Must be 'test', 'production' or a url.",
-    )
+    error_message = "Must be 'test', 'production' or a url."
 
-    if response == "test":
-        response = "https://test.openml.org/api/v1/xml"
-    elif response == "production":
-        response = "https://www.openml.org/api/v1/xml"
+    if value is not None:
+        if not is_valid_server(value):
+            print(error_message)
+            quit(-1)
+    else:
+        print("\nSpecify which server you wish to connect to.")
+        value = wait_until_valid_input(
+            prompt="Specify a url or use 'test' or 'production' as a shorthand:",
+            check=is_valid_server,
+            error_message=error_message,
+        )
 
-    config.set_field_in_config_file("server", response)
+    if value == "test":
+        value = "https://test.openml.org/api/v1/xml"
+    elif value == "production":
+        value = "https://www.openml.org/api/v1/xml"
+
+    verbose_set("server", value)
 
 
 def configure(args: argparse.Namespace):
     """ Calls the right submenu(s) to edit `args.field` in the configuration file. """
-    print_configuration()
     set_functions = {
         "apikey": configure_apikey,
         "server": configure_server,
     }
 
-    def not_supported_yet():
+    def not_supported_yet(_):
         print(f"Setting '{args.field}' is not supported yet.")
 
     if args.field not in ["all", "none"]:
-        set_functions.get(args.field, not_supported_yet)()
-    elif args.field == "all":
+        set_functions.get(args.field, not_supported_yet)(args.value)
+    else:
+        if args.value is not None:
+            print(f"Can not set value ('{args.value}') when field is specified as '{args.field}'.")
+            quit()
+        print_configuration()
+
+    if args.field == "all":
         for set_field_function in set_functions.values():
-            set_field_function()
+            set_field_function(args.value)
 
 
 def main() -> None:
@@ -152,6 +173,10 @@ def main() -> None:
         help="The field you wish to edit."
         "Choosing 'all' lets you configure all fields one by one."
         "Choosing 'none' will print out the current configuration.",
+    )
+
+    parser_configure.add_argument(
+        "value", type=str, default=None, nargs="?", help="The value to set the FIELD to.",
     )
 
     args = parser.parse_args()
