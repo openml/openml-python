@@ -42,13 +42,17 @@ An example how to set up OpenML-Python followed up by a simple example.
 # * After logging in, open your account page (avatar on the top right)
 # * Open 'Account Settings', then 'API authentication' to find your API key.
 #
-# There are two ways to authenticate:
+# There are two ways to permanently authenticate:
 #
+# * Use the ``openml`` CLI tool with ``openml configure apikey MYKEY``,
+#   replacing **MYKEY** with your API key.
 # * Create a plain text file **~/.openml/config** with the line
 #   **'apikey=MYKEY'**, replacing **MYKEY** with your API key. The config
 #   file must be in the directory ~/.openml/config and exist prior to
 #   importing the openml module.
-# * Run the code below, replacing 'YOURKEY' with your API key.
+#
+# Alternatively, by running the code below and replacing 'YOURKEY' with your API key,
+# you authenticate for the duration of the python process.
 #
 # .. warning:: This example uploads data. For that reason, this example
 #   connects to the test server instead. This prevents the live server from
