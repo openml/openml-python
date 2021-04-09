@@ -23,7 +23,9 @@ def looks_like_url(url: str) -> bool:
         return False
 
 
-def wait_until_valid_input(prompt: str, check: Callable[[str], str],) -> str:
+def wait_until_valid_input(
+    prompt: str, check: Callable[[str], str], sanitize: Union[Callable[[str], str], None]
+) -> str:
     """  Asks `prompt` until an input is received which returns True for `check`.
 
     Parameters
@@ -33,18 +35,23 @@ def wait_until_valid_input(prompt: str, check: Callable[[str], str],) -> str:
     check: Callable[[str], str]
         function to call with the given input, that provides an error message if the input is not
         valid otherwise, and False-like otherwise.
+    sanitize: Callable[[str], str], optional
+        A function which attempts to sanitize the user input (e.g. auto-complete).
 
     Returns
     -------
     valid input
 
     """
-
     response = input(prompt)
+    if sanitize:
+        response = sanitize(response)
     error_message = check(response)
     while error_message:
         print(error_message, end="\n\n")
         response = input(prompt)
+        if sanitize:
+            response = sanitize(response)
         error_message = check(response)
 
     return response
@@ -99,12 +106,20 @@ def configure_server(value: str) -> None:
             return ""
         return "Must be 'test', 'production' or a url."
 
+    def replace_shorthand(server: str) -> str:
+        if server == "test":
+            return "https://test.openml.org/api/v1/xml"
+        if server == "production":
+            return "https://www.openml.org/api/v1/xml"
+        return server
+
     configure_field(
         field="server",
         value=value,
         check_with_message=check_server,
         intro_message="Specify which server you wish to connect to.",
         input_message="Specify a url or use 'test' or 'production' as a shorthand: ",
+        sanitize=replace_shorthand,
     )
 
 
@@ -134,12 +149,12 @@ def configure_cachedir(value: str) -> None:
 
 
 def configure_connection_n_retries(value: str) -> None:
-    def valid_connection_retries(value: str) -> str:
-        if not value.isdigit():
+    def valid_connection_retries(n: str) -> str:
+        if not n.isdigit():
             return f"Must be an integer number (smaller than {config.max_retries})."
-        if int(value) > config.max_retries:
+        if int(n) > config.max_retries:
             return f"connection_n_retries may not exceed {config.max_retries}."
-        if int(value) == 0:
+        if int(n) == 0:
             return "connection_n_retries must be non-zero."
         return ""
 
@@ -153,10 +168,17 @@ def configure_connection_n_retries(value: str) -> None:
 
 
 def configure_avoid_duplicate_runs(value: str) -> None:
-    def is_python_bool(value: str) -> str:
-        if value in ["True", "False"]:
+    def is_python_bool(bool_: str) -> str:
+        if bool_ in ["True", "False"]:
             return ""
         return "Must be 'True' or 'False' (mind the capital)."
+
+    def autocomplete_bool(bool_: str) -> str:
+        if bool_.lower() in ["n", "no", "f", "false", "0"]:
+            return "False"
+        if bool_.lower() in ["y", "yes", "t", "true", "1"]:
+            return "True"
+        return bool_
 
     intro_message = (
         "If set to True, when `run_flow_on_task` or similar methods are called a lookup is "
@@ -171,12 +193,13 @@ def configure_avoid_duplicate_runs(value: str) -> None:
         check_with_message=is_python_bool,
         intro_message=intro_message,
         input_message="Enter 'True' or 'False': ",
+        sanitize=autocomplete_bool,
     )
 
 
 def configure_verbosity(value: str) -> None:
-    def is_zero_through_two(value: str) -> str:
-        if value in ["0", "1", "2"]:
+    def is_zero_through_two(verbosity: str) -> str:
+        if verbosity in ["0", "1", "2"]:
             return ""
         return "Must be '0', '1' or '2'."
 
@@ -202,13 +225,15 @@ def configure_field(
     check_with_message: Callable[[str], str],
     intro_message: str,
     input_message: str,
+    sanitize: Union[Callable[[str], str], None] = None,
 ) -> None:
     """ Configure `field` with `value`. If `value` is None ask the user for input.
 
-    `value` and user input are validated with `check_with_message` function, and
-    in the case of user input the user gets to input a new value.
-    The change is saved in the openml configuration file.
-    In case an invalid `value` is supplied, no changes are made.
+    `value` and user input are first corrected/auto-completed with `convert_value` if provided,
+    then validated with `check_with_message` function.
+    If the user input a wrong value in interactive mode, the user gets to input a new value.
+    The new valid value is saved in the openml configuration file.
+    In case an invalid `value` is supplied directly (non-interactive), no changes are made.
 
     Parameters
     ----------
@@ -223,15 +248,23 @@ def configure_field(
         Message that is printed once if user input is requested (e.g. instructions).
     input_message: str
         Message that comes with the input prompt.
+    sanitize: Union[Callable[[str], str], None]
+        A function to convert user input to 'more acceptable' input, e.g. for auto-complete.
+        If no correction of user input is possible, return the original value.
+        If no function is provided, don't attempt to correct/auto-complete input.
     """
     if value is not None:
+        if sanitize:
+            value = sanitize(value)
         malformed_input = check_with_message(value)
         if malformed_input:
             print(malformed_input)
             quit()
     else:
         print(intro_message)
-        value = wait_until_valid_input(prompt=input_message, check=check_with_message,)
+        value = wait_until_valid_input(
+            prompt=input_message, check=check_with_message, sanitize=sanitize,
+        )
     verbose_set(field, value)
 
 
