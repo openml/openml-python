@@ -10,6 +10,7 @@ Changelog
 ~~~~~~
 
 * FIX #1035: Render class attributes and methods again.
+* ADD #1049: Add a command line tool for configuration openml-python.
 
 0.12.0
 ~~~~~~
