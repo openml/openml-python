@@ -3,8 +3,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Perrone et al. (2018) &#8212; OpenML 0.12.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>Perrone et al. (2018) &#8212; OpenML 0.12.1dev documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.1dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -126,11 +127,11 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="perrone-et-al-2018">
+<section class="sphx-glr-example-title" id="perrone-et-al-2018">
 <span id="sphx-glr-examples-40-paper-2018-neurips-perrone-example-py"></span><h1>Perrone et al. (2018)<a class="headerlink" href="#perrone-et-al-2018" title="Permalink to this headline">¶</a></h1>
 <p>A tutorial on how to build a surrogate model based on OpenML data as done for <em>Scalable
 Hyperparameter Transfer Learning</em> by Perrone et al..</p>
-<div class="section" id="publication">
+<section id="publication">
 <h2>Publication<a class="headerlink" href="#publication" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line">Scalable Hyperparameter Transfer Learning</div>
@@ -274,7 +275,7 @@ a tabular format that can be used to build models.</p>
     <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;booster&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
-<div class="section" id="fetching-the-data-from-openml">
+<section id="fetching-the-data-from-openml">
 <h3>Fetching the data from OpenML<a class="headerlink" href="#fetching-the-data-from-openml" title="Permalink to this headline">¶</a></h3>
 <p>Now, we read all the tasks and evaluations for them and collate into a table.
 Here, we are reading all the tasks and evaluations for the SVM flow and
@@ -287,21 +288,21 @@ pre-processing all retrieved evaluations.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                     cost degree                gamma      kernel
-4621     12.5727603510039    NaN                  NaN      linear
-773   0.00207358725607194    NaN     4.22766941972781         NaN
-3204  0.00538350045542514    NaN                  NaN      linear
-314      370.122636783506      2                  NaN  polynomial
-4385   0.0124159086237037    NaN  0.00250754808808573         NaN
-Y :  4621    0.991504
-773     0.502313
-3204    0.614624
-314     0.911114
-4385    0.986021
+2184   0.0296746018673269    NaN     7.26969374444728         NaN
+3498     117.467358560201    NaN     25.3163497004532         NaN
+2390  0.00433631268583405    NaN                  NaN  polynomial
+1683  0.00982949619467096    NaN                  NaN      linear
+3286    0.599168909877586    NaN  0.00139179940152179         NaN
+Y :  2184    0.696964
+3498    0.905262
+2390    0.463952
+1683    0.903202
+3286    0.612989
 Name: value, dtype: float64
 </pre></div>
 </div>
-</div>
-<div class="section" id="creating-pre-processing-and-modelling-pipelines">
+</section>
+<section id="creating-pre-processing-and-modelling-pipelines">
 <h3>Creating pre-processing and modelling pipelines<a class="headerlink" href="#creating-pre-processing-and-modelling-pipelines" title="Permalink to this headline">¶</a></h3>
 <p>The two primary tasks are to impute the missing values, that is, account for the hyperparameters
 that are not available with the runs from OpenML. And secondly, to handle categorical variables
@@ -324,8 +325,8 @@ using One-hot encoding prior to modelling.</p>
 <span class="n">model</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;preprocess&quot;</span><span class="p">,</span> <span class="n">ct</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;surrogate&quot;</span><span class="p">,</span> <span class="n">clf</span><span class="p">)])</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="building-a-surrogate-model-on-a-task-s-evaluation">
+</section>
+<section id="building-a-surrogate-model-on-a-task-s-evaluation">
 <h3>Building a surrogate model on a task’s evaluation<a class="headerlink" href="#building-a-surrogate-model-on-a-task-s-evaluation" title="Permalink to this headline">¶</a></h3>
 <p>The same set of functions can be used for a single task to retrieve a singular table which can
 be used for the surrogate model construction. We shall use the SVM flow here to keep execution
@@ -343,11 +344,11 @@ time simple and quick.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 1.8418e-05
+Training RMSE : 1.6709e-05
 </pre></div>
 </div>
-</div>
-<div class="section" id="evaluating-the-surrogate-model">
+</section>
+<section id="evaluating-the-surrogate-model">
 <h3>Evaluating the surrogate model<a class="headerlink" href="#evaluating-the-surrogate-model" title="Permalink to this headline">¶</a></h3>
 <p>The surrogate model built from a task’s evaluations fetched from OpenML will be put into
 trivial action here, where we shall randomly sample configurations and observe the trajectory
@@ -378,17 +379,17 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
-0    342.569444  3.796228  741.248843     sigmoid
-1    997.831213  4.134586   25.227876     sigmoid
-2    818.278817  2.405279  259.517856  polynomial
-3    958.289860  4.949005  657.563981  polynomial
-4    985.725844  3.640530  179.792675     sigmoid
+0    108.536753  3.147397  176.710582      linear
+1    502.874404  4.720676  164.762814     sigmoid
+2    427.606183  4.170799  194.520065  polynomial
+3    128.457839  2.076254  621.304709      linear
+4    947.528251  3.913975  179.524571      linear
 ..          ...       ...         ...         ...
-995  740.628213  4.100335  756.497506      linear
-996  962.010741  4.708241  789.777438     sigmoid
-997  172.053682  4.276632  550.183811      radial
-998  679.570138  4.270759  111.067559      linear
-999  726.627066  3.346682  870.584969     sigmoid
+995  112.970422  4.070988  115.122023  polynomial
+996  421.789255  3.099804  791.497340      radial
+997  642.612398  2.277700  223.079604     sigmoid
+998  357.146261  2.595788  767.882996      radial
+999  260.318769  2.650197  698.720056     sigmoid
 
 [1000 rows x 4 columns]
 </pre></div>
@@ -409,10 +410,10 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 <img alt="AUC regret for Random Search on surrogate" class="sphx-glr-single-img" src="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(42.722222222222214, 0.5, &#39;Regret&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(33.972222222222214, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  24.795 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  48.390 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
@@ -422,9 +423,9 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
     </div>

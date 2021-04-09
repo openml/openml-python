@@ -3,8 +3,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>openml.OpenMLStudy &#8212; OpenML 0.12.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>openml.OpenMLStudy &#8212; OpenML 0.12.1dev documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.1dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -112,7 +113,7 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="openml-openmlstudy">
+  <section id="openml-openmlstudy">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLStudy<a class="headerlink" href="#openml-openmlstudy" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="openml.OpenMLStudy">
@@ -159,9 +160,61 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 </dl>
 </dd>
 </dl>
+<dl class="py method">
+<dt id="openml.OpenMLStudy.id">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">id</span></code><a class="headerlink" href="#openml.OpenMLStudy.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The id of the entity, it is unique for its entity type.</p>
 </dd></dl>
 
-</div>
+<dl class="py method">
+<dt id="openml.OpenMLStudy.open_in_browser">
+<code class="sig-name descname"><span class="pre">open_in_browser</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLStudy.open_in_browser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the OpenML web page corresponding to this object in your default browser.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="openml.OpenMLStudy.openml_url">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">openml_url</span></code><a class="headerlink" href="#openml.OpenMLStudy.openml_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>The URL of the object on the server, if it was uploaded, else None.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="openml.OpenMLStudy.push_tag">
+<code class="sig-name descname"><span class="pre">push_tag</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLStudy.push_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotates this entity with a tag on the server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="openml.OpenMLStudy.remove_tag">
+<code class="sig-name descname"><span class="pre">remove_tag</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLStudy.remove_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a tag from this entity on the server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="openml.OpenMLStudy.url_for_id">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">url_for_id</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#openml.OpenMLStudy.url_for_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the OpenML URL for the object of the class entity with the given id.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 
 
     </div>

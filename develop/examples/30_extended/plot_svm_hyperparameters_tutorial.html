@@ -3,8 +3,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Plotting hyperparameter surfaces &#8212; OpenML 0.12.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>Plotting hyperparameter surfaces &#8212; OpenML 0.12.1dev documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.1dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -122,7 +123,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-plot-svm-hyperparameters-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="plotting-hyperparameter-surfaces">
+<section class="sphx-glr-example-title" id="plotting-hyperparameter-surfaces">
 <span id="sphx-glr-examples-30-extended-plot-svm-hyperparameters-tutorial-py"></span><h1>Plotting hyperparameter surfaces<a class="headerlink" href="#plotting-hyperparameter-surfaces" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
 
@@ -130,7 +131,7 @@ to download the full example code</p>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 </pre></div>
 </div>
-<div class="section" id="first-step-obtaining-the-data">
+<section id="first-step-obtaining-the-data">
 <h2>First step - obtaining the data<a class="headerlink" href="#first-step-obtaining-the-data" title="Permalink to this headline">¶</a></h2>
 <p>First, we need to choose an SVM flow, for example 8353, and a task. Finding the IDs of them are
 not part of this tutorial, this could for example be done via the website.</p>
@@ -225,8 +226,8 @@ can nicely plot them.</p>
 <span class="n">df</span><span class="p">[</span><span class="n">hyperparameters</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">hyperparameters</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="option-1-plotting-via-the-pandas-helper-functions">
+</section>
+<section id="option-1-plotting-via-the-pandas-helper-functions">
 <h2>Option 1 - plotting via the pandas helper functions<a class="headerlink" href="#option-1-plotting-via-the-pandas-helper-functions" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">hexbin</span><span class="p">(</span>
     <span class="n">x</span><span class="o">=</span><span class="s2">&quot;sklearn.svm.classes.SVC(16)_C&quot;</span><span class="p">,</span>
@@ -247,8 +248,8 @@ The is_first_col function was deprecated in Matplotlib 3.4 and will be removed t
 &lt;AxesSubplot:title={&#39;center&#39;:&#39;SVM performance landscape&#39;}, xlabel=&#39;sklearn.svm.classes.SVC(16)_C&#39;, ylabel=&#39;sklearn.svm.classes.SVC(16)_gamma&#39;&gt;
 </pre></div>
 </div>
-</div>
-<div class="section" id="option-2-plotting-via-matplotlib">
+</section>
+<section id="option-2-plotting-via-matplotlib">
 <h2>Option 2 - plotting via matplotlib<a class="headerlink" href="#option-2-plotting-via-matplotlib" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
@@ -279,7 +280,7 @@ The is_first_col function was deprecated in Matplotlib 3.4 and will be removed t
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;SVM performance landscape&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.793 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.974 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-plot-svm-hyperparameters-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/cf8cbb59c00374b9cf27f6d0287267bd/plot_svm_hyperparameters_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_svm_hyperparameters_tutorial.py</span></code></a></p>
@@ -289,8 +290,8 @@ The is_first_col function was deprecated in Matplotlib 3.4 and will be removed t
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>

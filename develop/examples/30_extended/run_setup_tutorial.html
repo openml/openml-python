@@ -3,8 +3,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Run Setup &#8212; OpenML 0.12.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>Run Setup &#8212; OpenML 0.12.1dev documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.1dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -122,7 +123,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-run-setup-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="run-setup">
+<section class="sphx-glr-example-title" id="run-setup">
 <span id="sphx-glr-examples-30-extended-run-setup-tutorial-py"></span><h1>Run Setup<a class="headerlink" href="#run-setup" title="Permalink to this headline">¶</a></h1>
 <p>By: Jan N. van Rijn</p>
 <p>One of the key features of the openml-python library is that is allows to
@@ -169,7 +170,7 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
 <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="section" id="create-a-flow-and-use-it-to-solve-a-task">
+<section id="create-a-flow-and-use-it-to-solve-a-task">
 <h2>1) Create a flow and use it to solve a task<a class="headerlink" href="#create-a-flow-and-use-it-to-solve-a-task" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># first, let&#39;s download the task that we are interested in</span>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
@@ -207,8 +208,8 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
   warnings.warn(message)
 </pre></div>
 </div>
-</div>
-<div class="section" id="download-the-flow-and-solve-the-same-task-again">
+</section>
+<section id="download-the-flow-and-solve-the-same-task-again">
 <h2>2) Download the flow and solve the same task again.<a class="headerlink" href="#download-the-flow-and-solve-the-same-task-again" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># obtain setup id (note that the setup id is assigned by the OpenML server -</span>
 <span class="c1"># therefore it was not yet available in our local copy of the run)</span>
@@ -228,8 +229,8 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
   warnings.warn(message)
 </pre></div>
 </div>
-</div>
-<div class="section" id="we-will-verify-that-the-obtained-results-are-exactly-the-same">
+</section>
+<section id="we-will-verify-that-the-obtained-results-are-exactly-the-same">
 <h2>3) We will verify that the obtained results are exactly the same.<a class="headerlink" href="#we-will-verify-that-the-obtained-results-are-exactly-the-same" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># the run has stored all predictions in the field data content</span>
 <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">run_original</span><span class="o">.</span><span class="n">data_content</span><span class="p">,</span> <span class="n">run_duplicate</span><span class="o">.</span><span class="n">data_content</span><span class="p">)</span>
@@ -238,7 +239,7 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.010 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.777 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-run-setup-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/6b1e091fbd3ac8d106b6552c91cf05cc/run_setup_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">run_setup_tutorial.py</span></code></a></p>
@@ -248,8 +249,8 @@ server from crowding with example datasets, tasks, runs, and so on.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
