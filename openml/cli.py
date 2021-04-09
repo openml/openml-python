@@ -43,18 +43,16 @@ def wait_until_valid_input(
     valid input
 
     """
-    response = input(prompt)
-    if sanitize:
-        response = sanitize(response)
-    error_message = check(response)
-    while error_message:
-        print(error_message, end="\n\n")
+
+    while True:
         response = input(prompt)
         if sanitize:
             response = sanitize(response)
         error_message = check(response)
-
-    return response
+        if error_message:
+            print(error_message, end="\n\n")
+        else:
+            return response
 
 
 def print_configuration():
