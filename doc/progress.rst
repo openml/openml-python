@@ -6,7 +6,12 @@
 Changelog
 =========
 
-0.11.1
+0.12.1
+~~~~~~
+
+* FIX #1035: Render class attributes and methods again.
+
+0.12.0
 ~~~~~~
 * ADD #964: Validate ``ignore_attribute``, ``default_target_attribute``, ``row_id_attribute`` are set to attributes that exist on the dataset when calling ``create_dataset``.
 * ADD #979: Dataset features and qualities are now also cached in pickle format.
