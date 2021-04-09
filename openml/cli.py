@@ -1,8 +1,11 @@
 """" Command Line Interface for `openml` to configure its settings. """
 
 import argparse
+
+# import os
+# import pathlib
 import string
-from typing import Union, Callable
+from typing import Callable  # Union, Callable
 from urllib.parse import urlparse
 
 
@@ -13,10 +16,6 @@ def is_hex(string_: str) -> bool:
     return all(c in string.hexdigits for c in string_)
 
 
-def looks_like_api_key(apikey: str) -> bool:
-    return len(apikey) == 32 and is_hex(apikey)
-
-
 def looks_like_url(url: str) -> bool:
     # There's no thorough url parser, but we only seem to use netloc.
     try:
@@ -25,35 +24,29 @@ def looks_like_url(url: str) -> bool:
         return False
 
 
-def wait_until_valid_input(
-    prompt: str,
-    check: Callable[[str], bool],
-    error_message: Union[str, Callable[[str], str]] = "That is not a valid response.",
-) -> str:
+def wait_until_valid_input(prompt: str, check: Callable[[str], str],) -> str:
     """  Asks `prompt` until an input is received which returns True for `check`.
 
     Parameters
     ----------
     prompt: str
         message to display
-    check: Callable[[str], bool]
-        function to call with the given input, should return true only if the input is valid.
-    error_message: Union[str, Callable[[str], str]
-        a message to display on invalid input, or a `str`->`str` function that can give feedback
-        specific to the error.
+    check: Callable[[str], str]
+        function to call with the given input, that provides an error message if the input is not
+        valid otherwise, and False-like otherwise.
 
     Returns
     -------
+    valid input
 
     """
 
     response = input(prompt)
-    while not check(response):
-        if isinstance(error_message, str):
-            print(error_message)
-        else:
-            print(error_message(response), end="\n\n")
+    error_message = check(response)
+    while error_message:
+        print(error_message, end="\n\n")
         response = input(prompt)
+        error_message = check(response)
 
     return response
 
@@ -74,16 +67,17 @@ def verbose_set(field, value):
 
 
 def configure_apikey(value: str) -> None:
-    def apikey_error(apikey: str) -> str:
+    def check_apikey(apikey: str) -> str:
         if len(apikey) != 32:
             return f"The key should contain 32 characters but contains {len(apikey)}."
         if not is_hex(apikey):
             return "Some characters are not hexadecimal."
-        return "This does not look like an API key."
+        return ""
 
     if value is not None:
-        if not looks_like_api_key(value):
-            print(apikey_error(value))
+        apikey_malformed = check_apikey(value)
+        if apikey_malformed:
+            print(apikey_malformed)
             quit(-1)
     else:
         print(f"\nYour current API key is set to: '{config.apikey}'")
@@ -94,31 +88,27 @@ def configure_apikey(value: str) -> None:
         print("  3. Click the API Key button to reach the page with your API key.")
         print("If you have any difficulty following these instructions, let us know on Github.")
 
-        value = wait_until_valid_input(
-            prompt="Please enter your API key:",
-            check=looks_like_api_key,
-            error_message=apikey_error,
-        )
+        value = wait_until_valid_input(prompt="Please enter your API key:", check=check_apikey,)
     verbose_set("apikey", value)
 
 
-def configure_server(value: str):
-    def is_valid_server(server: str) -> bool:
+def configure_server(value: str) -> None:
+    def check_server(server: str) -> str:
         is_shorthand = server in ["test", "production"]
-        return is_shorthand or looks_like_url(server)
-
-    error_message = "Must be 'test', 'production' or a url."
+        if is_shorthand or looks_like_url(server):
+            return ""
+        return "Must be 'test', 'production' or a url."
 
     if value is not None:
-        if not is_valid_server(value):
-            print(error_message)
+        server_malformed = check_server(value)
+        if server_malformed:
+            print(server_malformed)
             quit(-1)
     else:
         print("\nSpecify which server you wish to connect to.")
         value = wait_until_valid_input(
             prompt="Specify a url or use 'test' or 'production' as a shorthand:",
-            check=is_valid_server,
-            error_message=error_message,
+            check=check_server,
         )
 
     if value == "test":
@@ -127,6 +117,39 @@ def configure_server(value: str):
         value = "https://www.openml.org/api/v1/xml"
 
     verbose_set("server", value)
+
+
+# def configure_cachedir(value: str) -> None:
+#     def is_valid_cachedir(path: str) -> bool:
+#         return True
+#
+#     def cache_dir_error(path: str) -> str:
+#         p = pathlib.Path(path)
+#         if p.is_file():
+#             return f"'{path}' is a file, not a directory."
+#         expanded = p.expanduser()
+#         if not expanded.is_absolute():
+#             return f"'{path}' is not absolute (even after expanding '~')."
+#         if expanded.exists():
+#             try:
+#                 os.mkdir(expanded)
+#             except PermissionError:
+#               return f"'{path}' does not exist and there are not enough permissions to create it."
+#         return "is not valid"
+#
+#     if value is not None:
+#         if not is_valid_cachedir(value):
+#             print(cache_dir_error(value))
+#             quit(-1)
+#     else:
+#         print("\nConfiguring the cache directory. It can not be a relative path.")
+#         value = wait_until_valid_input(
+#             prompt="Specify the directory to use (or create) as cache directory:",
+#             check=is_valid_cachedir,
+#         )
+#
+#     print("NOTE: Data from your old cache directory is not moved over.")
+#     verbose_set("cachedir", value)
 
 
 def configure(args: argparse.Namespace):
