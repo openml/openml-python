@@ -152,3 +152,9 @@ Extending OpenML-Python
 OpenML-Python provides an extension interface to connect other machine learning libraries than
 scikit-learn to OpenML. Please check the :ref:`api_extensions` and use the
 scikit-learn extension in :class:`openml.extensions.sklearn.SklearnExtension` as a starting point.
+Here is a list of currently maintained OpenML extensions:
+
+* `openml-keras <https://github.com/openml/openml-keras>`_
+* `openml-pytorch <https://github.com/openml/openml-pytorch>`_
+* `openml-tensorflow(for tensorflow 2+) <https://github.com/openml/openml-tensorflow>`_
+
