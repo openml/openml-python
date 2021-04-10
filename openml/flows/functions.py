@@ -288,7 +288,7 @@ def get_flow_id(
     name : str
         Name of the flow. Must provide either ``model`` or ``name``.
     exact_version : bool
-        Whether to return the ``flow_id`` of the exact version or all ``flow_id``s where the name
+        Whether to return the flow id of the exact version or all flow ids where the name
         of the flow matches. This is only taken into account for a model where a version number
         is available.
 

@@ -1,3 +1,5 @@
+:orphan:
+
 :mod:`{{module}}`.{{objname}}
 {{ underline }}==============
 
