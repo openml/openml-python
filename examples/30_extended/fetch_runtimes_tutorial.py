@@ -58,7 +58,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
-openml.config.stop_using_configuration_for_example()
+
 ############################################################################
 # Preparing tasks and scikit-learn models
 # ***************************************
