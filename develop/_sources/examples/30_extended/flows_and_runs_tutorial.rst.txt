@@ -195,7 +195,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/54255
+    Uploaded to http://test.openml.org/r/59586
 
 
 
@@ -338,8 +338,8 @@ variables and missing values in both.
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/54257
-    Uploaded to http://test.openml.org/r/54259
+    Uploaded to http://test.openml.org/r/59591
+    Uploaded to http://test.openml.org/r/59592
 
 
 
@@ -385,15 +385,15 @@ a model on a task without uploading results or flows to the server immediately.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1833: UserWarning: Estimator only predicted for 5/6 classes!
+    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1775: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
 
     OpenML Run
     ==========
     Uploader Name: None
     Metric.......: None
-    Run ID.......: 54261
-    Run URL......: https://test.openml.org/r/54261
+    Run ID.......: 59594
+    Run URL......: https://test.openml.org/r/59594
     Task ID......: 6
     Task Type....: None
     Task URL.....: https://test.openml.org/t/6
@@ -482,7 +482,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/54268
+    kNN on diabetes: http://test.openml.org/r/59598
 
 
 
@@ -502,7 +502,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  43.657 seconds)
+   **Total running time of the script:** ( 0 minutes  36.756 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:
