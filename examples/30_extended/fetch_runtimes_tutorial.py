@@ -85,7 +85,6 @@ def print_compare_runtimes(measures):
                     repeat, fold, val2, measures["wall_clock_time_millis_training"][repeat][fold]
                 )
             )
-        print()
 
 
 ############################################################################
@@ -164,6 +163,13 @@ measures = run3.fold_evaluations
 print_compare_runtimes(measures)
 
 ####################################################################################
+# We can now observe that the ratio of CPU time to wallclock time is lower
+# than in case 1. This happens because joblib by default spawns subprocesses
+# for the workloads for which CPU time cannot be tracked. Therefore, interpreting
+# the reported CPU and wallclock time requires knowledge of the parallelization
+# applied at runtime.
+
+####################################################################################
 # Running the same task with a different parallel backend. Joblib provides multiple
 # backends: {`loky` (default), `multiprocessing`, `dask`, `threading`, `sequential`}.
 # The backend can be explicitly set using a joblib context manager. The behaviour of
@@ -176,12 +182,14 @@ with parallel_backend(backend="multiprocessing", n_jobs=-1):
 measures = run3_.fold_evaluations
 print_compare_runtimes(measures)
 
-#############################################################################
+####################################################################################
 # The CPU time interpretation becomes ambiguous when jobs are distributed over an
-# unknown number of cores. It is difficult to capture both the
-# availability of the number of cores/threads and their eventual utilisation from the
-# OpenML extension, for various cases that can arise as mentioned below. Therefore,
-# the final interpretation of the runtimes are left to the `user`.
+# unknown number of cores or when subprocesses are spawned for which the CPU time
+# cannot be tracked, as in the examples above. It is impossible for OpenML-Python
+# to capture the availability of the number of cores/threads, their eventual
+# utilisation and whether workloads are executed in subprocesses, for various
+# cases that can arise as demonstrated in the rest of the example. Therefore,
+# the final interpretation of the runtimes is left to the `user`.
 
 #####################################################################
 # Case 3: Running and benchmarking HPO algorithms with their runtimes
@@ -254,7 +262,7 @@ for i in range(n_iter):
     )
 
 ##################################################################################
-# Scikit-learn's HPO estimators also come with a hyperparameter `refit=True` as a default.
+# Scikit-learn's HPO estimators also come with an argument `refit=True` as a default.
 # In our previous model definition it was set to True by default, which meant that the best
 # found hyperparameter configuration was used to refit or retrain the model without any inner
 # cross validation. This extra refit time measure is provided by the scikit-learn model as the
@@ -306,16 +314,16 @@ run5 = openml.runs.run_model_on_task(
 )
 
 ################################################################################
-# Since for the call to `openml.runs.run_model_on_task` the parameter
-# `n_jobs` is set to its default `None`, the evaluations across the OpenML folds
-# are not parallelized. Hence, the time recorded is agnostic to the `n_jobs`
-# being set at both the HPO estimator `GridSearchCV` as well as the base
-# estimator `RandomForestClassifier` in this case. The OpenML extension only records the
-# time taken for the completion of the complete `fit()` call, per-repeat per-fold.
+# Since for the call to ``openml.runs.run_model_on_task`` the parameter
+# ``n_jobs`` is set to its default ``None``, the evaluations across the OpenML folds
+# are not parallelized. Hence, the time recorded is agnostic to the ``n_jobs``
+# being set at both the HPO estimator ``GridSearchCV`` as well as the base
+# estimator ``RandomForestClassifier`` in this case. The OpenML extension only records the
+# time taken for the completion of the complete ``fit()`` call, per-repeat per-fold.
 #
 # This notion can be used to extract and plot the best found performance per
 # fold by the HPO model and the corresponding time taken for search across
-# that fold. Moreover, since `n_jobs=None` for `openml.runs.run_model_on_task`
+# that fold. Moreover, since ``n_jobs=None`` for ``openml.runs.run_model_on_task``
 # the runtimes per fold can be cumulatively added to plot the trace against time.
 
 
@@ -379,10 +387,16 @@ run6 = openml.runs.run_model_on_task(
 measures = run6.fold_evaluations
 print_compare_runtimes(measures)
 
-run6 = openml.runs.run_model_on_task(
-    model=dt, task=task, upload_flow=False, avoid_duplicate_runs=False, n_jobs=-1
-)
-measures = run6.fold_evaluations
+################################################################################
+# Although the decision tree does not run in parallel, it can release the
+# `Python GIL <https://docs.python.org/dev/glossary.html#term-global-interpreter-lock>`_.
+# This can result in surprising runtime measures as demonstrated below:
+
+with parallel_backend("threading", n_jobs=-1):
+    run7 = openml.runs.run_model_on_task(
+        model=dt, task=task, upload_flow=False, avoid_duplicate_runs=False
+    )
+measures = run7.fold_evaluations
 print_compare_runtimes(measures)
 
 ################################################################################
@@ -392,36 +406,37 @@ print_compare_runtimes(measures)
 
 mlp = MLPClassifier(max_iter=10)
 
-run7 = openml.runs.run_model_on_task(
+run8 = openml.runs.run_model_on_task(
     model=mlp, task=task, upload_flow=False, avoid_duplicate_runs=False
 )
-measures = run7.fold_evaluations
+measures = run8.fold_evaluations
 print_compare_runtimes(measures)
 
 ################################################################################
 # Case 5: Running Scikit-learn models that don't release GIL
 # **********************************************************
-# Certain Scikit-learn models may not release the `Python GIL
-# <https://docs.python.org/dev/glossary.html#term-global-interpreter-lock>`_. Such conditions allow
-# for thread-safe operations. For such scenarios, the CPU runtimes recorded by the extension can
-# be for multiple threads and therefore be greater than the wallclock-times recorded.
+# Certain Scikit-learn models do not release the `Python GIL
+# <https://docs.python.org/dev/glossary.html#term-global-interpreter-lock>`_ and
+# are also not executed in parallel via a BLAS library. In such cases, the
+# CPU times and wallclock times are most likely trustworthy. Note however
+# that only very few models such as naive Bayes models are of this kind.
 
 clf = GaussianNB()
 
-with parallel_backend("threading", n_jobs=-1):
-    run8 = openml.runs.run_model_on_task(
+with parallel_backend("multiprocessing", n_jobs=-1):
+    run9 = openml.runs.run_model_on_task(
         model=clf, task=task, upload_flow=False, avoid_duplicate_runs=False
     )
-measures = run8.fold_evaluations
+measures = run9.fold_evaluations
 print_compare_runtimes(measures)
 
 ################################################################################
 # Summmary
 # *********
-# OpenML records model runtimes for the CPU-clock and the wall-clock times for
-# the scikit-learn extension. The above examples illustrated how these recorded runtimes
-# can be extracted, especially when using a scikit-learn model and under parallel setups
-# too. To summarize, OpenML measures the:
+# The scikit-learn extension for OpenML-Python records model runtimes for the
+# CPU-clock and the wall-clock times. The above examples illustrated how these
+# recorded runtimes an be extracted when using a scikit-learn model and under
+# parallel setups too. To summarize, the scikit-learn extension measures the:
 #
 # * `CPU-time` & `wallclock-time` for the whole run
 #
@@ -452,8 +467,13 @@ print_compare_runtimes(measures)
 #
 # * `CPU-time` & `wallclock-time` for models that scikit-learn doesn't parallelize
 #
-#   * Models like Decision Trees don't parallelize and thus both the wallclock and CPU times are
-#     similar in runtime for the OpenML call
+#   * Models like Decision Trees or naive Bayes don't parallelize and thus both the wallclock and
+#     CPU times are similar in runtime for the OpenML call
+#   * However, models implemented in Cython, such as the Decision Trees can release the GIL and
+#     still run in parallel if a `threading` backend is used by joblib.
 #   * Scikit-learn Neural Networks can undergo parallelization implicitly owing to thread-level
 #     parallelism involved in the linear algebraic operations and thus the wallclock-time and
-#     CPU-time can differ
+#     CPU-time can differ.
+#
+# Because of all the cases mentioned above it is crucial to understand which case is triggered
+# when reporting runtimes for scikit-learn models measured with OpenML-Python!
