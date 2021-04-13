@@ -435,7 +435,7 @@ print_compare_runtimes(measures)
 # *********
 # The scikit-learn extension for OpenML-Python records model runtimes for the
 # CPU-clock and the wall-clock times. The above examples illustrated how these
-# recorded runtimes an be extracted when using a scikit-learn model and under
+# recorded runtimes can be extracted when using a scikit-learn model and under
 # parallel setups too. To summarize, the scikit-learn extension measures the:
 #
 # * `CPU-time` & `wallclock-time` for the whole run
