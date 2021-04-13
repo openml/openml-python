@@ -1280,19 +1280,13 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             sklearn.model_selection.GridSearchCV(multicore_bagging, illegal_param_dist),
         ]
 
-        can_measure_cputime_answers = [True, False, False, True, False, False, True, False, False]
-        can_measure_walltime_answers = [True, True, False, True, True, False, True, True, False]
         if LooseVersion(sklearn.__version__) < "0.20":
             has_refit_time = [False, False, False, False, False, False, False, False, False]
         else:
             has_refit_time = [False, False, False, False, False, False, True, True, False]
 
         X, y = sklearn.datasets.load_iris(return_X_y=True)
-        for model, allowed_cputime, allowed_walltime, refit_time in zip(
-            legal_models, can_measure_cputime_answers, can_measure_walltime_answers, has_refit_time
-        ):
-            self.assertEqual(self.extension._can_measure_cputime(model), allowed_cputime)
-            self.assertEqual(self.extension._can_measure_wallclocktime(model), allowed_walltime)
+        for model, refit_time in zip(legal_models, has_refit_time):
             model.fit(X, y)
             self.assertEqual(refit_time, hasattr(model, "refit_time_"))
 
