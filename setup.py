@@ -84,7 +84,7 @@ setuptools.setup(
             "seaborn",
         ],
         "examples_unix": ["fanova"],
-        "docs": ["sphinx", "sphinx-gallery", "sphinx_bootstrap_theme", "numpydoc"],
+        "docs": ["sphinx>=3", "sphinx-gallery", "sphinx_bootstrap_theme", "numpydoc",],
     },
     test_suite="pytest",
     classifiers=[

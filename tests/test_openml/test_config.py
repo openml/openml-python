@@ -26,6 +26,16 @@ class TestConfig(openml.testing.TestBase):
         self.assertEqual(log_handler_mock.call_count, 1)
         self.assertFalse(log_handler_mock.call_args_list[0][1]["create_file_handler"])
 
+    @unittest.mock.patch("os.path.expanduser")
+    def test_XDG_directories_do_not_exist(self, expanduser_mock):
+        with tempfile.TemporaryDirectory(dir=self.workdir) as td:
+
+            def side_effect(path_):
+                return os.path.join(td, str(path_).replace("~/", ""))
+
+            expanduser_mock.side_effect = side_effect
+            openml.config._setup()
+
     def test_get_config_as_dict(self):
         """ Checks if the current configuration is returned accurately as a dict. """
         config = openml.config.get_config_as_dict()
