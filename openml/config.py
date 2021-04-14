@@ -204,7 +204,7 @@ def _setup(config=None):
     # read config file, create directory for config file
     if not os.path.exists(config_dir):
         try:
-            os.mkdir(config_dir)
+            os.makedirs(config_dir, exist_ok=True)
             cache_exists = True
         except PermissionError:
             cache_exists = False
@@ -235,7 +235,7 @@ def _setup(config=None):
     # create the cache subdirectory
     if not os.path.exists(cache_directory):
         try:
-            os.mkdir(cache_directory)
+            os.makedirs(cache_directory, exist_ok=True)
         except PermissionError:
             openml_logger.warning(
                 "No permission to create openml cache directory at %s! This can result in "
