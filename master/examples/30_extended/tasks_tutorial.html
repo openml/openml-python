@@ -3,9 +3,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>Tasks &#8212; OpenML 0.12.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tasks &#8212; OpenML 0.12.1 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -129,7 +128,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-tasks-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="tasks">
+<div class="sphx-glr-example-title section" id="tasks">
 <span id="sphx-glr-examples-30-extended-tasks-tutorial-py"></span><h1>Tasks<a class="headerlink" href="#tasks" title="Permalink to this headline">¶</a></h1>
 <p>A tutorial on how to list and download tasks.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
@@ -151,7 +150,7 @@ special tag or only tasks for a specific target such as
 metric, the splits and an iterator which can be used to access the
 splits in a useful manner.</p></li>
 </ol>
-<section id="listing-tasks">
+<div class="section" id="listing-tasks">
 <h2>Listing tasks<a class="headerlink" href="#listing-tasks" title="Permalink to this headline">¶</a></h2>
 <p>We will start by simply listing only <em>supervised classification</em> tasks:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">)</span>
@@ -312,7 +311,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>46341
 </pre></div>
 </div>
-<section id="exercise">
+<div class="section" id="exercise">
 <h3>Exercise<a class="headerlink" href="#exercise" title="Permalink to this headline">¶</a></h3>
 <p>Search for the tasks on the ‘eeg-eye-state’ dataset.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;name==&quot;eeg-eye-state&quot;&#39;</span><span class="p">)</span>
@@ -1117,9 +1116,9 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </div>
 </div>
 <br />
-<br /></section>
-</section>
-<section id="downloading-tasks">
+<br /></div>
+</div>
+<div class="section" id="downloading-tasks">
 <h2>Downloading tasks<a class="headerlink" href="#downloading-tasks" title="Permalink to this headline">¶</a></h2>
 <p>We provide two functions to download tasks, one which downloads only a
 single task by its ID, and one which takes a list of IDs and downloads
@@ -1163,8 +1162,8 @@ Target Feature.......: class
 Cost Matrix..........: Available
 </pre></div>
 </div>
-</section>
-<section id="creating-tasks">
+</div>
+<div class="section" id="creating-tasks">
 <h2>Creating tasks<a class="headerlink" href="#creating-tasks" title="Permalink to this headline">¶</a></h2>
 <p>You can also create new tasks. Take the following into account:</p>
 <ul class="simple">
@@ -1189,7 +1188,7 @@ specific measure. OpenML will always compute all appropriate measures and you ca
 or sort results on your favourite measure afterwards. Only add an evaluation measure if
 necessary (e.g. when other measure make no sense), since it will create a new task, which
 scatters results across tasks.</p>
-<section id="example">
+<div class="section" id="example">
 <h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
 <p>Let’s create a classification task on a dataset. In this example we will do this on the
 Iris dataset (ID=128 (on test server)). We’ll use 10-fold cross-validation (ID=1),
@@ -1235,7 +1234,7 @@ will be returned.</p>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&amp;type=measure">Complete list of model estimation procedures</a>.</p></li>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=measure_type%3Aevaluation_measure&amp;type=measure">Complete list of evaluation measures</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  17.582 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  19.379 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-tasks-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e6648ddbb54e75b09dd01d69be33f340/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></p>
@@ -1245,9 +1244,9 @@ will be returned.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
     </div>
@@ -1262,7 +1261,7 @@ will be returned.</p>
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

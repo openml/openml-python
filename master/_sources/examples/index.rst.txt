@@ -393,6 +393,27 @@ Extended examples for the usage of the OpenML python connector.
    :hidden:
 
    /examples/30_extended/create_upload_tutorial
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The runtime of machine learning models on specific datasets can be a deciding factor on the cho...">
+
+.. only:: html
+
+ .. figure:: /examples/30_extended/images/thumb/sphx_glr_fetch_runtimes_tutorial_thumb.png
+     :alt: Measuring runtimes for Scikit-learn models
+
+     :ref:`sphx_glr_examples_30_extended_fetch_runtimes_tutorial.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/30_extended/fetch_runtimes_tutorial
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

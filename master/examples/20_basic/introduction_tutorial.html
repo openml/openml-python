@@ -3,9 +3,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>Setup &#8212; OpenML 0.12.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Setup &#8212; OpenML 0.12.1 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -124,7 +123,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-examples-20-basic-introduction-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="setup">
+<div class="sphx-glr-example-title section" id="setup">
 <span id="sphx-glr-examples-20-basic-introduction-tutorial-py"></span><h1>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h1>
 <p>An example how to set up OpenML-Python followed up by a simple example.</p>
 <p>OpenML is an online collaboration platform for machine learning which allows
@@ -137,7 +136,7 @@ you to:</p>
 <li><p>Works seamlessly with scikit-learn and other libraries</p></li>
 <li><p>Large scale benchmarking, compare to state of the art</p></li>
 </ul>
-<section id="installation">
+<div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>Installation is done via <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install openml
@@ -145,8 +144,8 @@ you to:</p>
 </div>
 <p>For further information, please check out the installation guide at
 <a class="reference external" href="https://openml.github.io/openml-python/master/contributing.html#installation">https://openml.github.io/openml-python/master/contributing.html#installation</a></p>
-</section>
-<section id="authentication">
+</div>
+<div class="section" id="authentication">
 <h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
 <p>The OpenML server can only be accessed by users who have signed up on the
 OpenML platform. If you don’t have an account yet, sign up now.
@@ -185,8 +184,8 @@ Never share your apikey with others.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># openml.config.apikey = &#39;YOURKEY&#39;</span>
 </pre></div>
 </div>
-</section>
-<section id="caching">
+</div>
+<div class="section" id="caching">
 <h2>Caching<a class="headerlink" href="#caching" title="Permalink to this headline">¶</a></h2>
 <p>When downloading datasets, tasks, runs and flows, they will be cached to
 retrieve them without calling the server later. As with the API key,
@@ -203,8 +202,8 @@ will use <strong>~/.openml/cache</strong> as the cache directory.</p></li>
 <span class="c1"># openml.config.cache_directory = os.path.expanduser(&#39;YOURDIR&#39;)</span>
 </pre></div>
 </div>
-</section>
-<section id="simple-example">
+</div>
+<div class="section" id="simple-example">
 <h2>Simple Example<a class="headerlink" href="#simple-example" title="Permalink to this headline">¶</a></h2>
 <p>Download the OpenML task for the eeg-eye-state.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
@@ -219,13 +218,13 @@ will use <strong>~/.openml/cache</strong> as the cache directory.</p></li>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: http://test.openml.org/r/44180
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: http://test.openml.org/r/62891
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  24.197 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  25.572 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-20-basic-introduction-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/a5a49610d34e7fd2cd1c2f5121cc5f5f/introduction_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">introduction_tutorial.py</span></code></a></p>
@@ -235,8 +234,8 @@ will use <strong>~/.openml/cache</strong> as the cache directory.</p></li>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
     </div>
@@ -251,7 +250,7 @@ will use <strong>~/.openml/cache</strong> as the cache directory.</p></li>
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

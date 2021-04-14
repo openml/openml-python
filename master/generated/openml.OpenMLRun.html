@@ -3,9 +3,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>openml.OpenMLRun &#8212; OpenML 0.12.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>openml.OpenMLRun &#8212; OpenML 0.12.1 documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -113,7 +112,7 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <section id="openml-openmlrun">
+  <div class="section" id="openml-openmlrun">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml</span></code>.OpenMLRun<a class="headerlink" href="#openml-openmlrun" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="openml.OpenMLRun">
@@ -156,9 +155,132 @@ If left None, is set to the time the arff file is generated.</p>
 </dl>
 </dd>
 </dl>
+<dl class="py method">
+<dt id="openml.OpenMLRun.from_filesystem">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_filesystem</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expect_model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">openml.runs.run.OpenMLRun</span><a class="headerlink" href="#openml.OpenMLRun.from_filesystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>The inverse of the to_filesystem method. Instantiates an OpenMLRun
+object based on files stored on the file system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>directory</strong><span class="classifier">str</span></dt><dd><p>a path leading to the folder where the results
+are stored</p>
+</dd>
+<dt><strong>expect_model</strong><span class="classifier">bool</span></dt><dd><p>if True, it requires the model pickle to be present, and an error
+will be thrown if not. Otherwise, the model might or might not
+be present.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>run</strong><span class="classifier">OpenMLRun</span></dt><dd><p>the re-instantiated run object</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-</section>
+<dl class="py method">
+<dt id="openml.OpenMLRun.get_metric_fn">
+<code class="sig-name descname"><span class="pre">get_metric_fn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sklearn_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.get_metric_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates metric scores based on predicted values. Assumes the
+run has been executed locally (and contains run_data). Furthermore,
+it assumes that the ‘correct’ or ‘truth’ attribute is specified in
+the arff (which is an optional field, but always the case for
+openml-python runs)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sklearn_fn</strong><span class="classifier">function</span></dt><dd><p>a function pointer to a sklearn function that
+accepts <code class="docutils literal notranslate"><span class="pre">y_true</span></code>, <code class="docutils literal notranslate"><span class="pre">y_pred</span></code> and <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>scores</strong><span class="classifier">list</span></dt><dd><p>a list of floats, of length num_folds * num_repeats</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="openml.OpenMLRun.id">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">id</span></code><a class="headerlink" href="#openml.OpenMLRun.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The id of the entity, it is unique for its entity type.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="openml.OpenMLRun.open_in_browser">
+<code class="sig-name descname"><span class="pre">open_in_browser</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.open_in_browser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the OpenML web page corresponding to this object in your default browser.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="openml.OpenMLRun.openml_url">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">openml_url</span></code><a class="headerlink" href="#openml.OpenMLRun.openml_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>The URL of the object on the server, if it was uploaded, else None.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="openml.OpenMLRun.push_tag">
+<code class="sig-name descname"><span class="pre">push_tag</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.push_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotates this entity with a tag on the server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="openml.OpenMLRun.remove_tag">
+<code class="sig-name descname"><span class="pre">remove_tag</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.OpenMLRun.remove_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a tag from this entity on the server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="openml.OpenMLRun.to_filesystem">
+<code class="sig-name descname"><span class="pre">to_filesystem</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#openml.OpenMLRun.to_filesystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>The inverse of the from_filesystem method. Serializes a run
+on the filesystem, to be uploaded later.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>directory</strong><span class="classifier">str</span></dt><dd><p>a path leading to the folder where the results
+will be stored. Should be empty</p>
+</dd>
+<dt><strong>store_model</strong><span class="classifier">bool, optional (default=True)</span></dt><dd><p>if True, a model will be pickled as well. As this is the most
+storage expensive part, it is often desirable to not store the
+model.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="openml.OpenMLRun.url_for_id">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">url_for_id</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#openml.OpenMLRun.url_for_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the OpenML URL for the object of the class entity with the given id.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 
 
     </div>
@@ -173,7 +295,7 @@ If left None, is set to the time the arff file is generated.</p>
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

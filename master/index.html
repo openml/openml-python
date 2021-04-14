@@ -3,9 +3,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
-    <title>OpenML &#8212; OpenML 0.12.0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenML &#8212; OpenML 0.12.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="#">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -121,14 +120,14 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <section id="openml">
+  <div class="section" id="openml">
 <h1>OpenML<a class="headerlink" href="#openml" title="Permalink to this headline">¶</a></h1>
 <p><strong>Collaborative Machine Learning in Python</strong></p>
 <p>Welcome to the documentation of the OpenML Python API, a connector to the
 collaborative machine learning platform <a class="reference external" href="https://www.openml.org">OpenML.org</a>.
 The OpenML Python package allows to use datasets and tasks from OpenML together
 with scikit-learn and share the results online.</p>
-<section id="example">
+<div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">impute</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">pipeline</span>
@@ -148,12 +147,12 @@ with scikit-learn and share the results online.</p>
 <span class="c1"># Publish the experiment on OpenML (optional, requires an API key.</span>
 <span class="c1"># You can get your own API key by signing up to OpenML.org)</span>
 <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;View the run online: </span><span class="si">{</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">server</span><span class="si">}</span><span class="s1">/run/</span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">run_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;View the run online: </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You can find more examples in our <a class="reference external" href="examples/index.html">examples gallery</a>.</p>
-</section>
-<section id="how-to-get-openml-for-python">
+</div>
+<div class="section" id="how-to-get-openml-for-python">
 <h2>How to get OpenML for python<a class="headerlink" href="#how-to-get-openml-for-python" title="Permalink to this headline">¶</a></h2>
 <p>You can install the OpenML package via <cite>pip</cite>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install openml
@@ -161,8 +160,8 @@ with scikit-learn and share the results online.</p>
 </div>
 <p>For more advanced installation information, please see the
 <span class="xref std std-ref">installation</span> section.</p>
-</section>
-<section id="content">
+</div>
+<div class="section" id="content">
 <h2>Content<a class="headerlink" href="#content" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="usage.html#usage"><span class="std std-ref">User Guide</span></a></p></li>
@@ -171,8 +170,8 @@ with scikit-learn and share the results online.</p>
 <li><p><a class="reference internal" href="contributing.html#contributing"><span class="std std-ref">Contributing</span></a></p></li>
 <li><p><a class="reference internal" href="progress.html#progress"><span class="std std-ref">Changelog</span></a></p></li>
 </ul>
-</section>
-<section id="further-information">
+</div>
+<div class="section" id="further-information">
 <h2>Further information<a class="headerlink" href="#further-information" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://docs.openml.org/">OpenML documentation</a></p></li>
@@ -183,15 +182,15 @@ with scikit-learn and share the results online.</p>
 <li><p><a class="reference external" href="https://medium.com/open-machine-learning">OpenML blog</a></p></li>
 <li><p><a class="reference external" href="https://twitter.com/open_ml">OpenML twitter account</a></p></li>
 </ul>
-</section>
-<section id="contributing">
+</div>
+<div class="section" id="contributing">
 <h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
 <p>Contribution to the OpenML package is highly appreciated. The OpenML package
 currently has a 1/4 position for the development and all help possible is
 needed to extend and maintain the package, create new examples and improve
 the usability. Please see the <a class="reference internal" href="contributing.html#contributing"><span class="std std-ref">Contributing</span></a> page for more information.</p>
-</section>
-<section id="citing-openml-python">
+</div>
+<div class="section" id="citing-openml-python">
 <h2>Citing OpenML-Python<a class="headerlink" href="#citing-openml-python" title="Permalink to this headline">¶</a></h2>
 <p>If you use OpenML-Python in a scientific publication, we would appreciate a
 reference to the following paper:</p>
@@ -208,8 +207,8 @@ Feurer <em>et al.</em>, arXiv:1911.02490.</p>
 </pre></div>
 </div>
 </div></blockquote>
-</section>
-</section>
+</div>
+</div>
 
 
     </div>
@@ -224,7 +223,7 @@ Feurer <em>et al.</em>, arXiv:1911.02490.</p>
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>
