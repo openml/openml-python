@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Changelog &#8212; OpenML 0.12.1dev documentation</title>
+    <title>Changelog &#8212; OpenML 0.12.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.1dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -130,7 +130,15 @@
 <div class="section" id="id1">
 <h2>0.12.1<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
+<li><p>ADD #895/#1038: Measure runtimes of scikit-learn runs also for models which are parallelized
+via the joblib.</p></li>
+<li><p>DOC #1050: Refer to the webpage instead of the XML file in the main example.</p></li>
+<li><p>DOC #1051: Document existing extensions to OpenML-Python besides the shipped scikit-learn
+extension.</p></li>
 <li><p>FIX #1035: Render class attributes and methods again.</p></li>
+<li><p>FIX #1042: Fixes a rare concurrency issue with OpenML-Python and joblib which caused the joblib
+worker pool to fail.</p></li>
+<li><p>FIX #1053: Fixes a bug which could prevent importing the package in a docker container.</p></li>
 </ul>
 </div>
 <div class="section" id="id2">
