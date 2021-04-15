@@ -629,6 +629,8 @@ class OpenMLDataset(OpenMLBase):
         elif array_format == "dataframe":
             if scipy.sparse.issparse(data):
                 return pd.DataFrame.sparse.from_spmatrix(data, columns=attribute_names)
+            elif isinstance(data, np.ndarray):
+                return pd.Series(data)
         else:
             data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
             logger.warning(
