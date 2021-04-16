@@ -157,7 +157,8 @@ scikit-learn extension in :class:`openml.extensions.sklearn.SklearnExtension` as
 
 Runtime measurement is incorporated in the OpenML sklearn-extension. Example usage and potential
 usage for Hyperparameter Optimisation can be found in the example tutorial:
-`HPO using OpenML <examples/30_extended/fetch_runtimes.html>`_
+
+* :ref:`sphx_glr_examples_30_extended_fetch_runtimes_tutorial.py`
 
 
 Here is a list of currently maintained OpenML extensions:
