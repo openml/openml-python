@@ -9,8 +9,16 @@ Changelog
 0.12.1
 ~~~~~~
 
+* ADD #895/#1038: Measure runtimes of scikit-learn runs also for models which are parallelized
+  via the joblib.
+* DOC #1050: Refer to the webpage instead of the XML file in the main example.
+* DOC #1051: Document existing extensions to OpenML-Python besides the shipped scikit-learn
+  extension.
 * FIX #1035: Render class attributes and methods again.
 * ADD #1049: Add a command line tool for configuration openml-python.
+* FIX #1042: Fixes a rare concurrency issue with OpenML-Python and joblib which caused the joblib
+  worker pool to fail.
+* FIX #1053: Fixes a bug which could prevent importing the package in a docker container.
 
 0.12.0
 ~~~~~~
