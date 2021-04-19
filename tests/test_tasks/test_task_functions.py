@@ -234,3 +234,9 @@ class TestTask(TestBase):
         self.assertTrue(os.path.exists(tid_cache_dir))
         openml.utils._remove_cache_dir_for_id("tasks", tid_cache_dir)
         self.assertFalse(os.path.exists(tid_cache_dir))
+
+    def test_supervised_task_target_format(self):
+        openml.config.server = self.production_server
+        task = openml.tasks.get_task(12731)
+        _, y = task.get_X_and_y(dataset_format="dataframe")
+        self.assertIsInstance(y, pd.Series)

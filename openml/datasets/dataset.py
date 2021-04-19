@@ -628,9 +628,9 @@ class OpenMLDataset(OpenMLBase):
                 )
         elif array_format == "dataframe":
             if scipy.sparse.issparse(data):
-                return pd.DataFrame.sparse.from_spmatrix(data, columns=attribute_names)
-            elif isinstance(data, np.ndarray):
-                return pd.Series(data)
+                data = pd.DataFrame.sparse.from_spmatrix(data, columns=attribute_names)
+            if isinstance(data, pd.DataFrame) and data.shape[1] == 1:
+                data = data.squeeze()  # converting single column to Pandas Series
         else:
             data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
             logger.warning(
@@ -734,6 +734,7 @@ class OpenMLDataset(OpenMLBase):
                 else:
                     target = [target]
             targets = np.array([True if column in target else False for column in attribute_names])
+            target_names = np.array([column for column in attribute_names if column in target])
             if np.sum(targets) > 1:
                 raise NotImplementedError(
                     "Number of requested targets %d is not implemented." % np.sum(targets)
@@ -754,10 +755,9 @@ class OpenMLDataset(OpenMLBase):
             attribute_names = [att for att, k in zip(attribute_names, targets) if not k]
 
             x = self._convert_array_format(x, dataset_format, attribute_names)
-            if scipy.sparse.issparse(y):
-                y = np.asarray(y.todense()).astype(target_dtype).flatten()
-            y = y.squeeze()
-            y = self._convert_array_format(y, dataset_format, attribute_names)
+            if not scipy.sparse.issparse(y):
+                y = y.squeeze()
+            y = self._convert_array_format(y, dataset_format, target_names)
             y = y.astype(target_dtype) if dataset_format == "array" else y
             data, targets = x, y
 
