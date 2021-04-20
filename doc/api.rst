@@ -38,6 +38,7 @@ Dataset Functions
     attributes_arff_from_df
     check_datasets_active
     create_dataset
+    delete_dataset
     get_dataset
     get_datasets
     list_datasets
@@ -103,6 +104,7 @@ Flow Functions
    :template: function.rst
 
     assert_flows_equal
+    delete_flow
     flow_exists
     get_flow
     list_flows
@@ -133,6 +135,7 @@ Run Functions
    :toctree: generated/
    :template: function.rst
 
+    delete_run
     get_run
     get_runs
     get_run_trace
@@ -251,6 +254,7 @@ Task Functions
    :template: function.rst
 
     create_task
+    delete_task
     get_task
     get_tasks
     list_tasks
