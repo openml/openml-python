@@ -69,7 +69,7 @@ print(run)
 myrun = run.publish()
 # For this tutorial, our configuration publishes to the test server
 # as to not pollute the main server.
-print("Uploaded to https://test.openml.org/r/" + str(myrun.run_id))
+print(f"Uploaded to {myrun.openml_url}")
 
 ############################################################################
 # We can now also inspect the flow object which was automatically created:
@@ -115,7 +115,7 @@ pipe = pipeline.Pipeline(
 
 run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
 myrun = run.publish()
-print("Uploaded to https://test.openml.org/r/" + str(myrun.run_id))
+print(f"Uploaded to {myrun.openml_url}")
 
 
 # The above pipeline works with the helper functions that internally deal with pandas DataFrame.
@@ -159,7 +159,7 @@ pipe = pipeline.Pipeline(
 
 run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False, dataset_format="array")
 myrun = run.publish()
-print("Uploaded to https://test.openml.org/r/" + str(myrun.run_id))
+print(f"Uploaded to {myrun.openml_url}")
 
 ###############################################################################
 # Running flows on tasks offline for later upload
@@ -229,7 +229,7 @@ for task_id in [115]:  # Add further tasks. Disclaimer: they might take some tim
 
     run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
     myrun = run.publish()
-    print(f"kNN on {data.name}: https://test.openml.org/r/{myrun.run_id}")
+    print(f"kNN on {data.name}: {myrun.openml_url}")
 
 
 ############################################################################

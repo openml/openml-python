@@ -99,7 +99,7 @@ run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
 # For this tutorial, our configuration publishes to the test server
 # as to not crowd the main server with runs created by examples.
 myrun = run.publish()
-print(f"kNN on {data.name}: https://test.openml.org/r/{myrun.run_id}")
+print(f"kNN on {data.name}: {myrun.openml_url}")
 
 ############################################################################
 openml.config.stop_using_configuration_for_example()
