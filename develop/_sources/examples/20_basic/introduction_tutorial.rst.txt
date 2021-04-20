@@ -50,7 +50,7 @@ For further information, please check out the installation guide at
 https://openml.github.io/openml-python/master/contributing.html#installation
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-56
+.. GENERATED FROM PYTHON SOURCE LINES 33-60
 
 Authentication
 ^^^^^^^^^^^^^^
@@ -64,19 +64,23 @@ and allow you to download and upload datasets, tasks, runs and flows.
 * After logging in, open your account page (avatar on the top right)
 * Open 'Account Settings', then 'API authentication' to find your API key.
 
-There are two ways to authenticate:
+There are two ways to permanently authenticate:
 
+* Use the ``openml`` CLI tool with ``openml configure apikey MYKEY``,
+  replacing **MYKEY** with your API key.
 * Create a plain text file **~/.openml/config** with the line
   **'apikey=MYKEY'**, replacing **MYKEY** with your API key. The config
   file must be in the directory ~/.openml/config and exist prior to
   importing the openml module.
-* Run the code below, replacing 'YOURKEY' with your API key.
+
+Alternatively, by running the code below and replacing 'YOURKEY' with your API key,
+you authenticate for the duration of the python process.
 
 .. warning:: This example uploads data. For that reason, this example
   connects to the test server instead. This prevents the live server from
   crowding with example datasets, tasks, studies, and so on.
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-66
+.. GENERATED FROM PYTHON SOURCE LINES 62-70
 
 .. code-block:: default
 
@@ -95,13 +99,13 @@ There are two ways to authenticate:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-70
+.. GENERATED FROM PYTHON SOURCE LINES 71-74
 
 When using the main server instead, make sure your apikey is configured.
 This can be done with the following line of code (uncomment it!).
 Never share your apikey with others.
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-73
+.. GENERATED FROM PYTHON SOURCE LINES 74-77
 
 .. code-block:: default
 
@@ -115,7 +119,7 @@ Never share your apikey with others.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-85
+.. GENERATED FROM PYTHON SOURCE LINES 78-89
 
 Caching
 ^^^^^^^
@@ -129,7 +133,7 @@ through the API:
   will use **~/.openml/cache** as the cache directory.
 * Run the code below, replacing 'YOURDIR' with the path to the cache directory.
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-90
+.. GENERATED FROM PYTHON SOURCE LINES 89-94
 
 .. code-block:: default
 
@@ -145,13 +149,13 @@ through the API:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-94
+.. GENERATED FROM PYTHON SOURCE LINES 95-98
 
 Simple Example
 ^^^^^^^^^^^^^^
 Download the OpenML task for the eeg-eye-state.
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-104
+.. GENERATED FROM PYTHON SOURCE LINES 98-108
 
 .. code-block:: default
 
@@ -175,12 +179,12 @@ Download the OpenML task for the eeg-eye-state.
 
  .. code-block:: none
 
-    kNN on eeg-eye-state: http://test.openml.org/r/60817
+    kNN on eeg-eye-state: http://test.openml.org/r/65742
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-106
+.. GENERATED FROM PYTHON SOURCE LINES 109-110
 
 .. code-block:: default
 
@@ -195,7 +199,7 @@ Download the OpenML task for the eeg-eye-state.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  25.795 seconds)
+   **Total running time of the script:** ( 0 minutes  20.620 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_introduction_tutorial.py:

@@ -15,6 +15,7 @@ Changelog
 * DOC #1051: Document existing extensions to OpenML-Python besides the shipped scikit-learn
   extension.
 * FIX #1035: Render class attributes and methods again.
+* ADD #1049: Add a command line tool for configuration openml-python.
 * FIX #1042: Fixes a rare concurrency issue with OpenML-Python and joblib which caused the joblib
   worker pool to fail.
 * FIX #1053: Fixes a bug which could prevent importing the package in a docker container.
