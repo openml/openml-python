@@ -1272,6 +1272,7 @@ def _get_online_dataset_format(dataset_id):
     # build a dict from the xml and get the format from the dataset description
     return xmltodict.parse(dataset_xml)["oml:data_set_description"]["oml:format"].lower()
 
+
 def delete_dataset(dataset_id: int) -> bool:
     """Deletes a dataset from the OpenML server.
 

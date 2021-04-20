@@ -24,7 +24,12 @@ import pandas as pd
 import openml.extensions.sklearn
 from openml.testing import TestBase, SimpleImputer, CustomImputer
 from openml.extensions.sklearn import cat, cont
-from openml.runs.functions import _run_task_get_arffcontent, run_exists, format_prediction, delete_run
+from openml.runs.functions import (
+    _run_task_get_arffcontent,
+    run_exists,
+    format_prediction,
+    delete_run,
+)
 from openml.runs.trace import OpenMLRunTrace
 from openml.tasks import TaskType
 from openml.testing import check_task_existence
@@ -1749,19 +1754,14 @@ class TestRun(TestBase):
     def test_delete_run(self):
         rs = 1
         clf = sklearn.pipeline.Pipeline(
-                steps=[
-                        ('imputer', SimpleImputer()),
-                        ('estimator', DecisionTreeClassifier()),
-                ]
-            )
+            steps=[("imputer", SimpleImputer()), ("estimator", DecisionTreeClassifier())]
+        )
         task = openml.tasks.get_task(32)  # diabetes; crossvalidation
 
-        run = openml.runs.run_model_on_task(
-            model=clf, task=task, seed=rs
-        )
+        run = openml.runs.run_model_on_task(model=clf, task=task, seed=rs)
         run.publish()
         TestBase._mark_entity_for_removal("run", run.run_id)
         TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
-        
+
         _run_id = run.run_id
         self.assertTrue(delete_run(_run_id))

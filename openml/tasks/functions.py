@@ -546,6 +546,7 @@ def create_task(
             **kwargs,
         )
 
+
 def delete_task(task_id: int) -> bool:
     """Deletes a task from the OpenML server.
 
@@ -560,4 +561,3 @@ def delete_task(task_id: int) -> bool:
         True if the deletion was successful. False otherwise
     """
     return openml.utils._delete_entity("task", task_id)
-    

@@ -555,4 +555,3 @@ class TestFlow(TestBase):
         self.assertIsNone(subflow_2.parameters["batch-size"])
         self.assertEqual(len(subflow_2.components), 0)
         self.assertIsNone(subflow_2.model)
-

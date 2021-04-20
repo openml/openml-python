@@ -3,11 +3,11 @@
 from .flow import OpenMLFlow
 
 from .functions import (
-    get_flow, 
-    list_flows, 
-    flow_exists, 
-    get_flow_id, 
-    assert_flows_equal, 
+    get_flow,
+    list_flows,
+    flow_exists,
+    get_flow_id,
+    assert_flows_equal,
     delete_flow,
 )
 
