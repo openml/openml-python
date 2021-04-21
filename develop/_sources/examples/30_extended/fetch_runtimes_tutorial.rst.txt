@@ -198,16 +198,16 @@ available for this run.
     predictive_accuracy
 
     The performance metric is recorded under `predictive_accuracy` per fold and can be retrieved as: 
-    Repeat #0-Fold #0: 0.7782
-    Repeat #0-Fold #1: 0.7724
-    Repeat #0-Fold #2: 0.7784
-    Repeat #0-Fold #3: 0.7831
-    Repeat #0-Fold #4: 0.7847
-    Repeat #0-Fold #5: 0.7849
-    Repeat #0-Fold #6: 0.7793
-    Repeat #0-Fold #7: 0.7796
-    Repeat #0-Fold #8: 0.7805
-    Repeat #0-Fold #9: 0.7826
+    Repeat #0-Fold #0: 0.7740
+    Repeat #0-Fold #1: 0.7682
+    Repeat #0-Fold #2: 0.7778
+    Repeat #0-Fold #3: 0.7900
+    Repeat #0-Fold #4: 0.7820
+    Repeat #0-Fold #5: 0.7805
+    Repeat #0-Fold #6: 0.7715
+    Repeat #0-Fold #7: 0.7729
+    Repeat #0-Fold #8: 0.7838
+    Repeat #0-Fold #9: 0.7751
 
 
 
@@ -247,16 +247,16 @@ follows the same procedure but for time taken for the `.predict()` procedure.
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-300.200 vs Wall-300.239
-    Repeat #0-Fold #1: CPU-296.152 vs Wall-296.187
-    Repeat #0-Fold #2: CPU-288.823 vs Wall-288.859
-    Repeat #0-Fold #3: CPU-297.619 vs Wall-297.649
-    Repeat #0-Fold #4: CPU-320.522 vs Wall-320.545
-    Repeat #0-Fold #5: CPU-295.592 vs Wall-295.630
-    Repeat #0-Fold #6: CPU-291.323 vs Wall-291.348
-    Repeat #0-Fold #7: CPU-295.562 vs Wall-295.588
-    Repeat #0-Fold #8: CPU-292.850 vs Wall-292.881
-    Repeat #0-Fold #9: CPU-291.122 vs Wall-291.131
+    Repeat #0-Fold #0: CPU-333.892 vs Wall-333.904
+    Repeat #0-Fold #1: CPU-322.638 vs Wall-322.694
+    Repeat #0-Fold #2: CPU-330.835 vs Wall-330.846
+    Repeat #0-Fold #3: CPU-321.282 vs Wall-321.311
+    Repeat #0-Fold #4: CPU-328.609 vs Wall-328.631
+    Repeat #0-Fold #5: CPU-329.053 vs Wall-329.137
+    Repeat #0-Fold #6: CPU-346.093 vs Wall-346.112
+    Repeat #0-Fold #7: CPU-325.714 vs Wall-325.750
+    Repeat #0-Fold #8: CPU-325.442 vs Wall-325.460
+    Repeat #0-Fold #9: CPU-316.377 vs Wall-316.378
 
 
 
@@ -291,16 +291,16 @@ Redefining the model to allow parallelism with `n_jobs=2` (2 cores)
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-193.687 vs Wall-1169.048
-    Repeat #0-Fold #1: CPU-85.778 vs Wall-224.302
-    Repeat #0-Fold #2: CPU-86.294 vs Wall-216.598
-    Repeat #0-Fold #3: CPU-89.412 vs Wall-220.984
-    Repeat #0-Fold #4: CPU-86.719 vs Wall-236.995
-    Repeat #0-Fold #5: CPU-85.278 vs Wall-216.461
-    Repeat #0-Fold #6: CPU-85.027 vs Wall-224.690
-    Repeat #0-Fold #7: CPU-83.968 vs Wall-218.179
-    Repeat #0-Fold #8: CPU-85.374 vs Wall-245.669
-    Repeat #0-Fold #9: CPU-81.872 vs Wall-218.233
+    Repeat #0-Fold #0: CPU-177.560 vs Wall-1154.997
+    Repeat #0-Fold #1: CPU-92.482 vs Wall-248.804
+    Repeat #0-Fold #2: CPU-93.199 vs Wall-232.573
+    Repeat #0-Fold #3: CPU-93.734 vs Wall-234.302
+    Repeat #0-Fold #4: CPU-95.833 vs Wall-258.294
+    Repeat #0-Fold #5: CPU-93.456 vs Wall-237.769
+    Repeat #0-Fold #6: CPU-88.742 vs Wall-228.750
+    Repeat #0-Fold #7: CPU-93.028 vs Wall-232.290
+    Repeat #0-Fold #8: CPU-86.366 vs Wall-244.270
+    Repeat #0-Fold #9: CPU-87.969 vs Wall-238.712
 
 
 
@@ -336,16 +336,16 @@ Running a Random Forest model on an OpenML task in parallel (all cores available
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-83.528 vs Wall-239.216
-    Repeat #0-Fold #1: CPU-81.494 vs Wall-209.688
-    Repeat #0-Fold #2: CPU-86.137 vs Wall-218.102
-    Repeat #0-Fold #3: CPU-84.528 vs Wall-212.475
-    Repeat #0-Fold #4: CPU-84.543 vs Wall-243.393
-    Repeat #0-Fold #5: CPU-87.715 vs Wall-226.390
-    Repeat #0-Fold #6: CPU-85.269 vs Wall-220.562
-    Repeat #0-Fold #7: CPU-79.941 vs Wall-211.928
-    Repeat #0-Fold #8: CPU-86.550 vs Wall-244.939
-    Repeat #0-Fold #9: CPU-80.083 vs Wall-213.732
+    Repeat #0-Fold #0: CPU-86.406 vs Wall-243.497
+    Repeat #0-Fold #1: CPU-86.339 vs Wall-223.693
+    Repeat #0-Fold #2: CPU-92.202 vs Wall-237.601
+    Repeat #0-Fold #3: CPU-84.143 vs Wall-221.302
+    Repeat #0-Fold #4: CPU-86.739 vs Wall-251.280
+    Repeat #0-Fold #5: CPU-84.705 vs Wall-251.398
+    Repeat #0-Fold #6: CPU-88.546 vs Wall-223.591
+    Repeat #0-Fold #7: CPU-92.037 vs Wall-224.715
+    Repeat #0-Fold #8: CPU-84.621 vs Wall-236.920
+    Repeat #0-Fold #9: CPU-83.915 vs Wall-219.324
 
 
 
@@ -387,16 +387,16 @@ the job distribution can change and therefore the scale of runtimes recorded too
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-339.751 vs Wall-345.161
-    Repeat #0-Fold #1: CPU-337.864 vs Wall-338.751
-    Repeat #0-Fold #2: CPU-330.483 vs Wall-336.842
-    Repeat #0-Fold #3: CPU-327.383 vs Wall-324.824
-    Repeat #0-Fold #4: CPU-329.382 vs Wall-365.891
-    Repeat #0-Fold #5: CPU-330.704 vs Wall-347.017
-    Repeat #0-Fold #6: CPU-323.589 vs Wall-315.534
-    Repeat #0-Fold #7: CPU-316.696 vs Wall-325.652
-    Repeat #0-Fold #8: CPU-311.237 vs Wall-323.245
-    Repeat #0-Fold #9: CPU-317.404 vs Wall-309.782
+    Repeat #0-Fold #0: CPU-329.328 vs Wall-329.509
+    Repeat #0-Fold #1: CPU-324.681 vs Wall-324.959
+    Repeat #0-Fold #2: CPU-320.579 vs Wall-327.436
+    Repeat #0-Fold #3: CPU-324.322 vs Wall-328.947
+    Repeat #0-Fold #4: CPU-318.501 vs Wall-330.445
+    Repeat #0-Fold #5: CPU-322.651 vs Wall-323.570
+    Repeat #0-Fold #6: CPU-313.879 vs Wall-319.940
+    Repeat #0-Fold #7: CPU-324.785 vs Wall-319.932
+    Repeat #0-Fold #8: CPU-317.360 vs Wall-291.903
+    Repeat #0-Fold #9: CPU-320.331 vs Wall-333.821
 
 
 
@@ -457,16 +457,16 @@ included in the `wall_clock_time_millis_training` measure recorded.
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-6441.326 vs Wall-6497.387
-    Repeat #0-Fold #1: CPU-6401.660 vs Wall-6393.079
-    Repeat #0-Fold #2: CPU-6205.143 vs Wall-6229.653
-    Repeat #0-Fold #3: CPU-6538.572 vs Wall-6499.003
-    Repeat #0-Fold #4: CPU-6493.851 vs Wall-6612.126
-    Repeat #0-Fold #5: CPU-6194.294 vs Wall-6192.379
-    Repeat #0-Fold #6: CPU-6484.857 vs Wall-6511.057
-    Repeat #0-Fold #7: CPU-6469.525 vs Wall-6486.180
-    Repeat #0-Fold #8: CPU-6571.355 vs Wall-6523.090
-    Repeat #0-Fold #9: CPU-6565.957 vs Wall-6621.558
+    Repeat #0-Fold #0: CPU-6828.171 vs Wall-6780.140
+    Repeat #0-Fold #1: CPU-6466.836 vs Wall-6459.250
+    Repeat #0-Fold #2: CPU-6712.384 vs Wall-6795.126
+    Repeat #0-Fold #3: CPU-6449.029 vs Wall-6439.981
+    Repeat #0-Fold #4: CPU-6452.516 vs Wall-6459.378
+    Repeat #0-Fold #5: CPU-6134.879 vs Wall-6154.705
+    Repeat #0-Fold #6: CPU-6428.769 vs Wall-6246.214
+    Repeat #0-Fold #7: CPU-6399.451 vs Wall-6570.040
+    Repeat #0-Fold #8: CPU-6419.232 vs Wall-6335.068
+    Repeat #0-Fold #9: CPU-6402.381 vs Wall-6285.776
 
 
 
@@ -508,7 +508,7 @@ the 2-fold (inner) CV search performed.
 
     # repeats: 1
     # folds: 10
-    6497.386932373047
+    6780.139923095703
 
 
 
@@ -550,12 +550,12 @@ the 1-st repeat, 4-th fold evaluation by the Grid Search model.
 
  .. code-block:: none
 
-    Total runtime for repeat 0's fold 3: 6499.002695 ms
-    n_estimators:  1 - score: 0.767
-    n_estimators: 13 - score: 0.800
-    n_estimators: 25 - score: 0.802
-    n_estimators: 37 - score: 0.802
-    n_estimators: 50 - score: 0.803
+    Total runtime for repeat 0's fold 3: 6439.980745 ms
+    n_estimators:  1 - score: 0.757
+    n_estimators: 13 - score: 0.802
+    n_estimators: 25 - score: 0.803
+    n_estimators: 37 - score: 0.805
+    n_estimators: 50 - score: 0.807
 
 
 
@@ -608,16 +608,16 @@ This refit time can therefore be explicitly extracted in this manner:
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: 1460.5842
-    Repeat #0-Fold #1: 1388.7942
-    Repeat #0-Fold #2: 1085.2749
-    Repeat #0-Fold #3: 1376.7757
-    Repeat #0-Fold #4: 1402.5798
-    Repeat #0-Fold #5: 1092.3574
-    Repeat #0-Fold #6: 1418.2467
-    Repeat #0-Fold #7: 1426.9683
-    Repeat #0-Fold #8: 1384.8667
-    Repeat #0-Fold #9: 1498.4877
+    Repeat #0-Fold #0: 1470.4754
+    Repeat #0-Fold #1: 1353.3213
+    Repeat #0-Fold #2: 1484.4208
+    Repeat #0-Fold #3: 1416.8255
+    Repeat #0-Fold #4: 1346.1883
+    Repeat #0-Fold #5: 1050.3907
+    Repeat #0-Fold #6: 1325.8665
+    Repeat #0-Fold #7: 1352.0525
+    Repeat #0-Fold #8: 1327.5216
+    Repeat #0-Fold #9: 1210.9478
 
 
 
@@ -762,16 +762,16 @@ using OpenML to parallelize evaluations for the outer-cross validation folds.
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-117.879 vs Wall-136.706
-    Repeat #0-Fold #1: CPU-113.374 vs Wall-113.387
-    Repeat #0-Fold #2: CPU-111.032 vs Wall-114.630
-    Repeat #0-Fold #3: CPU-114.172 vs Wall-114.784
-    Repeat #0-Fold #4: CPU-109.664 vs Wall-115.049
-    Repeat #0-Fold #5: CPU-105.005 vs Wall-105.046
-    Repeat #0-Fold #6: CPU-112.490 vs Wall-112.683
-    Repeat #0-Fold #7: CPU-107.148 vs Wall-107.535
-    Repeat #0-Fold #8: CPU-104.664 vs Wall-107.328
-    Repeat #0-Fold #9: CPU-105.077 vs Wall-106.745
+    Repeat #0-Fold #0: CPU-116.897 vs Wall-116.924
+    Repeat #0-Fold #1: CPU-116.663 vs Wall-116.820
+    Repeat #0-Fold #2: CPU-117.579 vs Wall-117.599
+    Repeat #0-Fold #3: CPU-116.462 vs Wall-116.635
+    Repeat #0-Fold #4: CPU-116.588 vs Wall-116.709
+    Repeat #0-Fold #5: CPU-117.033 vs Wall-117.311
+    Repeat #0-Fold #6: CPU-118.168 vs Wall-118.187
+    Repeat #0-Fold #7: CPU-117.959 vs Wall-118.022
+    Repeat #0-Fold #8: CPU-116.841 vs Wall-117.057
+    Repeat #0-Fold #9: CPU-117.213 vs Wall-117.241
 
 
 
@@ -804,16 +804,16 @@ This can result in surprising runtime measures as demonstrated below:
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-218.957 vs Wall-157.449
-    Repeat #0-Fold #1: CPU-222.029 vs Wall-156.935
-    Repeat #0-Fold #2: CPU-236.023 vs Wall-167.275
-    Repeat #0-Fold #3: CPU-217.047 vs Wall-154.824
-    Repeat #0-Fold #4: CPU-212.510 vs Wall-148.260
-    Repeat #0-Fold #5: CPU-193.209 vs Wall-115.194
-    Repeat #0-Fold #6: CPU-225.678 vs Wall-161.132
-    Repeat #0-Fold #7: CPU-174.240 vs Wall-109.215
-    Repeat #0-Fold #8: CPU-215.774 vs Wall-151.099
-    Repeat #0-Fold #9: CPU-177.024 vs Wall-109.140
+    Repeat #0-Fold #0: CPU-243.407 vs Wall-183.205
+    Repeat #0-Fold #1: CPU-269.590 vs Wall-195.997
+    Repeat #0-Fold #2: CPU-240.429 vs Wall-172.260
+    Repeat #0-Fold #3: CPU-200.562 vs Wall-121.857
+    Repeat #0-Fold #4: CPU-244.851 vs Wall-172.805
+    Repeat #0-Fold #5: CPU-201.972 vs Wall-121.294
+    Repeat #0-Fold #6: CPU-256.379 vs Wall-178.900
+    Repeat #0-Fold #7: CPU-207.322 vs Wall-127.287
+    Repeat #0-Fold #8: CPU-239.674 vs Wall-170.572
+    Repeat #0-Fold #9: CPU-191.058 vs Wall-120.263
 
 
 
@@ -867,16 +867,16 @@ parallelism using libraries such as `MKL, OpenBLAS or BLIS
       warnings.warn(
     /opt/hostedtoolcache/Python/3.8.9/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    Repeat #0-Fold #0: CPU-2202.944 vs Wall-2203.168
-    Repeat #0-Fold #1: CPU-2330.656 vs Wall-2224.663
-    Repeat #0-Fold #2: CPU-2356.728 vs Wall-2250.865
-    Repeat #0-Fold #3: CPU-2301.493 vs Wall-2194.330
-    Repeat #0-Fold #4: CPU-2326.339 vs Wall-2219.810
-    Repeat #0-Fold #5: CPU-2318.990 vs Wall-2212.366
-    Repeat #0-Fold #6: CPU-2363.759 vs Wall-2256.569
-    Repeat #0-Fold #7: CPU-2345.720 vs Wall-2239.232
-    Repeat #0-Fold #8: CPU-2316.413 vs Wall-2210.108
-    Repeat #0-Fold #9: CPU-2343.087 vs Wall-2236.770
+    Repeat #0-Fold #0: CPU-1555.874 vs Wall-1556.019
+    Repeat #0-Fold #1: CPU-1667.800 vs Wall-1548.929
+    Repeat #0-Fold #2: CPU-1673.090 vs Wall-1553.771
+    Repeat #0-Fold #3: CPU-1667.958 vs Wall-1549.077
+    Repeat #0-Fold #4: CPU-1671.403 vs Wall-1552.005
+    Repeat #0-Fold #5: CPU-1670.263 vs Wall-1551.169
+    Repeat #0-Fold #6: CPU-1672.014 vs Wall-1552.464
+    Repeat #0-Fold #7: CPU-1669.042 vs Wall-1571.538
+    Repeat #0-Fold #8: CPU-1678.454 vs Wall-1559.655
+    Repeat #0-Fold #9: CPU-1675.216 vs Wall-1555.886
 
 
 
@@ -915,16 +915,16 @@ that only very few models such as naive Bayes models are of this kind.
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-59.506 vs Wall-59.984
-    Repeat #0-Fold #1: CPU-57.583 vs Wall-57.789
-    Repeat #0-Fold #2: CPU-58.226 vs Wall-58.900
-    Repeat #0-Fold #3: CPU-57.913 vs Wall-57.946
-    Repeat #0-Fold #4: CPU-58.546 vs Wall-58.588
-    Repeat #0-Fold #5: CPU-57.877 vs Wall-57.903
-    Repeat #0-Fold #6: CPU-56.445 vs Wall-56.696
-    Repeat #0-Fold #7: CPU-57.693 vs Wall-57.700
-    Repeat #0-Fold #8: CPU-58.930 vs Wall-58.983
-    Repeat #0-Fold #9: CPU-57.113 vs Wall-57.499
+    Repeat #0-Fold #0: CPU-63.778 vs Wall-63.824
+    Repeat #0-Fold #1: CPU-65.200 vs Wall-65.387
+    Repeat #0-Fold #2: CPU-62.564 vs Wall-62.602
+    Repeat #0-Fold #3: CPU-68.718 vs Wall-68.916
+    Repeat #0-Fold #4: CPU-62.457 vs Wall-66.511
+    Repeat #0-Fold #5: CPU-62.437 vs Wall-62.493
+    Repeat #0-Fold #6: CPU-66.172 vs Wall-66.222
+    Repeat #0-Fold #7: CPU-69.309 vs Wall-69.528
+    Repeat #0-Fold #8: CPU-62.348 vs Wall-65.346
+    Repeat #0-Fold #9: CPU-63.648 vs Wall-63.770
 
 
 
@@ -981,7 +981,7 @@ when reporting runtimes for scikit-learn models measured with OpenML-Python!
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  7.796 seconds)
+   **Total running time of the script:** ( 2 minutes  49.165 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_fetch_runtimes_tutorial.py:
