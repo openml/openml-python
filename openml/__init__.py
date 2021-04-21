@@ -12,7 +12,7 @@ learning. OpenML can be used to
 In particular, this module implements a python interface for the
 `OpenML REST API <https://www.openml.org/guide#!rest_services>`_
 (`REST on wikipedia
-<http://en.wikipedia.org/wiki/Representational_state_transfer>`_).
+<https://en.wikipedia.org/wiki/Representational_state_transfer>`_).
 """
 
 # License: BSD 3-Clause

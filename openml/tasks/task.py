@@ -199,8 +199,6 @@ class OpenMLTask(OpenMLBase):
 class OpenMLSupervisedTask(OpenMLTask, ABC):
     """OpenML Supervised Classification object.
 
-       Inherited from :class:`openml.OpenMLTask`
-
        Parameters
        ----------
        target_name : str
@@ -293,8 +291,6 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 class OpenMLClassificationTask(OpenMLSupervisedTask):
     """OpenML Classification object.
 
-       Inherited from :class:`openml.OpenMLSupervisedTask`
-
        Parameters
        ----------
        class_labels : List of str (optional)
@@ -338,8 +334,6 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
 
 class OpenMLRegressionTask(OpenMLSupervisedTask):
     """OpenML Regression object.
-
-       Inherited from :class:`openml.OpenMLSupervisedTask`
     """
 
     def __init__(
@@ -371,8 +365,6 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
 
 class OpenMLClusteringTask(OpenMLTask):
     """OpenML Clustering object.
-
-       Inherited from :class:`openml.OpenMLTask`
 
        Parameters
        ----------
@@ -451,8 +443,6 @@ class OpenMLClusteringTask(OpenMLTask):
 
 class OpenMLLearningCurveTask(OpenMLClassificationTask):
     """OpenML Learning Curve object.
-
-       Inherited from :class:`openml.OpenMLClassificationTask`
     """
 
     def __init__(

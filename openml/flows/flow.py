@@ -19,8 +19,9 @@ class OpenMLFlow(OpenMLBase):
     :meth:`openml.flows.create_flow_from_model`. Using this helper function
     ensures that all relevant fields are filled in.
 
-    Implements https://github.com/openml/website/blob/master/openml_OS/ \
-        views/pages/api_new/v1/xsd/openml.implementation.upload.xsd.
+    Implements `openml.implementation.upload.xsd
+    <https://github.com/openml/openml/blob/master/openml_OS/views/pages/api_new/v1/xsd/
+    openml.implementation.upload.xsd>`_.
 
     Parameters
     ----------

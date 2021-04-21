@@ -6,6 +6,14 @@
 Changelog
 =========
 
+0.12.2
+~~~~~~
+
+* DOC: Fixes a few broken links in the documentation.
+* MAINT/DOC: Automatically check for broken external links when building the documentation.
+* MAINT/DOC: Fail documentation building on warnings. This will make the documentation building
+  fail if a reference cannot be found (i.e. an internal link is broken).
+
 0.12.1
 ~~~~~~
 
@@ -15,6 +23,7 @@ Changelog
 * DOC #1051: Document existing extensions to OpenML-Python besides the shipped scikit-learn
   extension.
 * FIX #1035: Render class attributes and methods again.
+* ADD #1049: Add a command line tool for configuration openml-python.
 * FIX #1042: Fixes a rare concurrency issue with OpenML-Python and joblib which caused the joblib
   worker pool to fail.
 * FIX #1053: Fixes a bug which could prevent importing the package in a docker container.

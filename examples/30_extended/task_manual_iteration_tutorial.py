@@ -6,7 +6,7 @@ Tasks define a target and a train/test split. Normally, they are the input to th
 ``openml.runs.run_model_on_task`` which automatically runs the model on all splits of the task.
 However, sometimes it is necessary to manually split a dataset to perform experiments outside of
 the functions provided by OpenML. One such example is in the benchmark library
-`HPOlib2 <https://github.com/automl/hpolib2>`_ which extensively uses data from OpenML,
+`HPOBench <https://github.com/automl/HPOBench>`_ which extensively uses data from OpenML,
 but not OpenML's functionality to conduct runs.
 """
 

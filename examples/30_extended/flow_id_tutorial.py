@@ -35,7 +35,7 @@ print(flow_id)
 # This piece of code is rather involved. First, it retrieves a
 # :class:`~openml.extensions.Extension` which is registered and can handle the given model,
 # in our case it is :class:`openml.extensions.sklearn.SklearnExtension`. Second, the extension
-# converts the classifier into an instance of :class:`openml.flow.OpenMLFlow`. Third and finally,
+# converts the classifier into an instance of :class:`openml.OpenMLFlow`. Third and finally,
 # the publish method checks whether the current flow is already present on OpenML. If not,
 # it uploads the flow, otherwise, it updates the current instance with all information computed
 # by the server (which is obviously also done when uploading/publishing a flow).

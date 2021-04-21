@@ -24,13 +24,43 @@ class OpenMLDatasetTest(TestBase):
 
         # Load dataset id 2 - dataset 2 is interesting because it contains
         # missing values, categorical features etc.
-        self.dataset = openml.datasets.get_dataset(2, download_data=False)
+        self._dataset = None
         # titanic as missing values, categories, and string
-        self.titanic = openml.datasets.get_dataset(40945, download_data=False)
+        self._titanic = None
         # these datasets have some boolean features
-        self.pc4 = openml.datasets.get_dataset(1049, download_data=False)
-        self.jm1 = openml.datasets.get_dataset(1053, download_data=False)
-        self.iris = openml.datasets.get_dataset(61, download_data=False)
+        self._pc4 = None
+        self._jm1 = None
+        self._iris = None
+
+    @property
+    def dataset(self):
+        if self._dataset is None:
+            self._dataset = openml.datasets.get_dataset(2, download_data=False)
+        return self._dataset
+
+    @property
+    def titanic(self):
+        if self._titanic is None:
+            self._titanic = openml.datasets.get_dataset(40945, download_data=False)
+        return self._titanic
+
+    @property
+    def pc4(self):
+        if self._pc4 is None:
+            self._pc4 = openml.datasets.get_dataset(1049, download_data=False)
+        return self._pc4
+
+    @property
+    def jm1(self):
+        if self._jm1 is None:
+            self._jm1 = openml.datasets.get_dataset(1053, download_data=False)
+        return self._jm1
+
+    @property
+    def iris(self):
+        if self._iris is None:
+            self._iris = openml.datasets.get_dataset(61, download_data=False)
+        return self._iris
 
     def test_repr(self):
         # create a bare-bones dataset as would be returned by

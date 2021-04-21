@@ -245,7 +245,7 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
 
     Notes
     -----
-    see http://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
+    see https://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
     """
     if not (isinstance(name, str) and len(name) > 0):
         raise ValueError("Argument 'name' should be a non-empty string")
@@ -288,14 +288,14 @@ def get_flow_id(
     name : str
         Name of the flow. Must provide either ``model`` or ``name``.
     exact_version : bool
-        Whether to return the ``flow_id`` of the exact version or all ``flow_id``s where the name
+        Whether to return the flow id of the exact version or all flow ids where the name
         of the flow matches. This is only taken into account for a model where a version number
         is available.
 
     Returns
     -------
     int or bool, List
-        flow id iff exists, ``False`` otherwise, List if exact_version is ``False``
+        flow id iff exists, ``False`` otherwise, List if ``exact_version is False``
     """
     if model is None and name is None:
         raise ValueError(
