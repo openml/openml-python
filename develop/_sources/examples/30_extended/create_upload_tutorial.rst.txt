@@ -128,7 +128,7 @@ that data).
         "Robert Tibshirani (2004) (Least Angle Regression) "
         "Annals of Statistics (with discussion), 407-499"
     )
-    paper_url = "http://web.stanford.edu/~hastie/Papers/LARS/LeastAngle_2002.pdf"
+    paper_url = "https://web.stanford.edu/~hastie/Papers/LARS/LeastAngle_2002.pdf"
 
 
 
@@ -184,7 +184,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
         data=data,
         # A version label which is provided by the user.
         version_label="test",
-        original_data_url="http://www4.stat.ncsu.edu/~boos/var.select/diabetes.html",
+        original_data_url="https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html",
         paper_url=paper_url,
     )
 
@@ -213,7 +213,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/53998
+    URL for dataset: https://test.openml.org/d/54051
 
 
 
@@ -226,7 +226,7 @@ A list can contain lists in the case of dense data or it can contain
 OrderedDicts in the case of sparse data.
 
 Weather dataset:
-http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
+https://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
 .. GENERATED FROM PYTHON SOURCE LINES 130-190
 
@@ -317,7 +317,7 @@ http://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/53999
+    URL for dataset: https://test.openml.org/d/54052
 
 
 
@@ -331,8 +331,8 @@ be stored as a Pandas DataFrame. DataFrames offer the advantage of
 storing the type of data for each column as well as the attribute names.
 Therefore, when providing a Pandas DataFrame, OpenML can infer this
 information without needing to explicitly provide it when calling the
-function :func:`create_dataset`. In this regard, you only need to pass
-``'auto'`` to the ``attributes`` parameter.
+function :func:`openml.datasets.create_dataset`. In this regard, you only
+need to pass ``'auto'`` to the ``attributes`` parameter.
 
 .. GENERATED FROM PYTHON SOURCE LINES 205-213
 
@@ -378,8 +378,8 @@ function :func:`create_dataset`. In this regard, you only need to pass
 We enforce the column 'outlook' and 'play' to be a categorical
 dtype while the column 'windy' is kept as a boolean column. 'temperature'
 and 'humidity' are kept as numeric columns. Then, we can
-call :func:`create_dataset` by passing the dataframe and fixing the parameter
-``attributes`` to ``'auto'``.
+call :func:`openml.datasets.create_dataset` by passing the dataframe and
+fixing the parameter ``attributes`` to ``'auto'``.
 
 .. GENERATED FROM PYTHON SOURCE LINES 219-237
 
@@ -428,7 +428,7 @@ call :func:`create_dataset` by passing the dataframe and fixing the parameter
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/54000
+    URL for dataset: https://test.openml.org/d/54053
 
 
 
@@ -496,7 +496,7 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/54001
+    URL for dataset: https://test.openml.org/d/54054
 
 
 
@@ -579,7 +579,7 @@ Dataset is a pandas dataframe with sparse columns
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/54002
+    URL for dataset: https://test.openml.org/d/54055
 
 
 
@@ -599,7 +599,7 @@ Dataset is a pandas dataframe with sparse columns
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  8.237 seconds)
+   **Total running time of the script:** ( 0 minutes  10.609 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:

@@ -348,30 +348,26 @@ will be seeded with a random number from the RandomState.</p>
 <dl class="py method">
 <dt id="openml.extensions.sklearn.SklearnExtension.trim_flow_name">
 <em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">trim_flow_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">long_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_trim_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_outer</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.trim_flow_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Shorten generated sklearn flow name to at most <cite>max_length</cite> characters.</p>
+<dd><p>Shorten generated sklearn flow name to at most <code class="docutils literal notranslate"><span class="pre">max_length</span></code> characters.</p>
 <p>Flows are assumed to have the following naming structure:
-(model_selection)? (pipeline)? (steps)+
+<code class="docutils literal notranslate"><span class="pre">(model_selection)?</span> <span class="pre">(pipeline)?</span> <span class="pre">(steps)+</span></code>
 and will be shortened to:
-sklearn.(selection.)?(pipeline.)?(steps)+
-e.g. (white spaces and newlines added for readability)
-sklearn.pipeline.Pipeline(</p>
-<blockquote>
-<div><dl class="simple">
-<dt>columntransformer=sklearn.compose._column_transformer.ColumnTransformer(</dt><dd><dl class="simple">
-<dt>numeric=sklearn.pipeline.Pipeline(</dt><dd><p>imputer=sklearn.preprocessing.imputation.Imputer,
-standardscaler=sklearn.preprocessing.data.StandardScaler),</p>
-</dd>
-<dt>nominal=sklearn.pipeline.Pipeline(</dt><dd><p>simpleimputer=sklearn.impute.SimpleImputer,
-onehotencoder=sklearn.preprocessing._encoders.OneHotEncoder)),</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p>variancethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,
-svc=sklearn.svm.classes.SVC)</p>
-</div></blockquote>
+<code class="docutils literal notranslate"><span class="pre">sklearn.(selection.)?(pipeline.)?(steps)+</span></code>
+e.g. (white spaces and newlines added for readability)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sklearn</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">columntransformer</span><span class="o">=</span><span class="n">sklearn</span><span class="o">.</span><span class="n">compose</span><span class="o">.</span><span class="n">_column_transformer</span><span class="o">.</span><span class="n">ColumnTransformer</span><span class="p">(</span>
+        <span class="n">numeric</span><span class="o">=</span><span class="n">sklearn</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
+            <span class="n">imputer</span><span class="o">=</span><span class="n">sklearn</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">imputation</span><span class="o">.</span><span class="n">Imputer</span><span class="p">,</span>
+            <span class="n">standardscaler</span><span class="o">=</span><span class="n">sklearn</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">StandardScaler</span><span class="p">),</span>
+        <span class="n">nominal</span><span class="o">=</span><span class="n">sklearn</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
+            <span class="n">simpleimputer</span><span class="o">=</span><span class="n">sklearn</span><span class="o">.</span><span class="n">impute</span><span class="o">.</span><span class="n">SimpleImputer</span><span class="p">,</span>
+            <span class="n">onehotencoder</span><span class="o">=</span><span class="n">sklearn</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">_encoders</span><span class="o">.</span><span class="n">OneHotEncoder</span><span class="p">)),</span>
+    <span class="n">variancethreshold</span><span class="o">=</span><span class="n">sklearn</span><span class="o">.</span><span class="n">feature_selection</span><span class="o">.</span><span class="n">variance_threshold</span><span class="o">.</span><span class="n">VarianceThreshold</span><span class="p">,</span>
+    <span class="n">svc</span><span class="o">=</span><span class="n">sklearn</span><span class="o">.</span><span class="n">svm</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">SVC</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>-&gt;
-sklearn.Pipeline(ColumnTransformer,VarianceThreshold,SVC)</p>
+<code class="docutils literal notranslate"><span class="pre">sklearn.Pipeline(ColumnTransformer,VarianceThreshold,SVC)</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">

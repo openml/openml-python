@@ -153,7 +153,7 @@ analysis.</p>
 <p>This piece of code is rather involved. First, it retrieves a
 <a class="reference internal" href="../../generated/openml.extensions.Extension.html#openml.extensions.Extension" title="openml.extensions.Extension"><code class="xref py py-class docutils literal notranslate"><span class="pre">Extension</span></code></a> which is registered and can handle the given model,
 in our case it is <a class="reference internal" href="../../generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension" title="openml.extensions.sklearn.SklearnExtension"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.extensions.sklearn.SklearnExtension</span></code></a>. Second, the extension
-converts the classifier into an instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">openml.flow.OpenMLFlow</span></code>. Third and finally,
+converts the classifier into an instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">openml.OpenMLFlow</span></code>. Third and finally,
 the publish method checks whether the current flow is already present on OpenML. If not,
 it uploads the flow, otherwise, it updates the current instance with all information computed
 by the server (which is obviously also done when uploading/publishing a flow).</p>
@@ -213,7 +213,7 @@ model. We can then use them to retrieve the flow id as follows:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[178, 10004, 10245, 12428, 66208, 66220, 67190, 81090, 81154, 81171, 81199, 87626, 131887, 131891, 131975, 131991, 179250, 179298, 179299, 179422]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  39.961 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  52.325 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flow-id-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7c31477f4d78d8be9026466b8e0bbbaf/flow_id_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flow_id_tutorial.py</span></code></a></p>

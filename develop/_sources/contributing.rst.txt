@@ -19,7 +19,7 @@ In particular, a few ways to contribute to openml-python are:
    For more information, see the :ref:`extensions` below.
 
  * Bug reports. If something doesn't work for you or is cumbersome, please open a new issue to let
-   us know about the problem. See `this section <https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md#reporting-bugs>`_.
+   us know about the problem. See `this section <https://github.com/openml/openml-python/blob/master/CONTRIBUTING.md#user-content-reporting-bugs>`_.
 
  * `Cite OpenML <https://www.openml.org/cite>`_ if you use it in a scientific publication.
 
@@ -38,10 +38,10 @@ Content of the Library
 To leverage support from the community and to tap in the potential of OpenML, interfacing
 with popular machine learning libraries is essential. However, the OpenML-Python team does
 not have the capacity to develop and maintain such interfaces on its own. For this, we
-have built an extension interface to allows others to contribute back. Building a suitable 
+have built an extension interface to allows others to contribute back. Building a suitable
 extension for therefore requires an understanding of the current OpenML-Python support.
 
-`This example <examples/20_basic/simple_flows_and_runs_tutorial.html>`_
+The :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py` tutorial
 shows how scikit-learn currently works with OpenML-Python as an extension. The *sklearn*
 extension packaged with the `openml-python <https://github.com/openml/openml-python>`_
 repository can be used as a template/benchmark to build the new extension.
@@ -50,7 +50,7 @@ repository can be used as a template/benchmark to build the new extension.
 API
 +++
 * The extension scripts must import the `openml` package and be able to interface with
-  any function from the OpenML-Python `API <api.html>`_.
+  any function from the OpenML-Python :ref:`api`.
 * The extension has to be defined as a Python class and must inherit from
   :class:`openml.extensions.Extension`.
 * This class needs to have all the functions from `class Extension` overloaded as required.
@@ -61,7 +61,7 @@ API
 
 Interfacing with OpenML-Python
 ++++++++++++++++++++++++++++++
-Once the new extension class has been defined, the openml-python module to 
+Once the new extension class has been defined, the openml-python module to
 :meth:`openml.extensions.register_extension` must be called to allow OpenML-Python to
 interface the new extension.
 
@@ -73,8 +73,8 @@ Each extension created should be a stand-alone repository, compatible with the
 `OpenML-Python repository <https://github.com/openml/openml-python>`_.
 The extension repository should work off-the-shelf with *OpenML-Python* installed.
 
-Create a `public Github repo <https://help.github.com/en/articles/create-a-repo>`_ with
-the following directory structure:
+Create a `public Github repo <https://docs.github.com/en/github/getting-started-with-github/create-a-repo>`_
+with the following directory structure:
 
 ::
 

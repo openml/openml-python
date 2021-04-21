@@ -134,8 +134,8 @@ Publishing the run
 
 
     myrun = run.publish()
-    print("Run was uploaded to http://test.openml.org/r/" + str(myrun.run_id))
-    print("The flow can be found at http://test.openml.org/f/" + str(myrun.flow_id))
+    print(f"Run was uploaded to {myrun.openml_url}")
+    print(f"The flow can be found at {myrun.flow.openml_url}")
 
 
 
@@ -147,8 +147,8 @@ Publishing the run
 
  .. code-block:: none
 
-    Run was uploaded to http://test.openml.org/r/67873
-    The flow can be found at http://test.openml.org/f/179227
+    Run was uploaded to https://test.openml.org/r/67922
+    The flow can be found at https://test.openml.org/f/179227
 
 
 
@@ -168,7 +168,7 @@ Publishing the run
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.758 seconds)
+   **Total running time of the script:** ( 0 minutes  11.223 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_flows_and_runs_tutorial.py:

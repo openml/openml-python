@@ -182,12 +182,13 @@ Task and parameter values in the example are fictional.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-152
+.. GENERATED FROM PYTHON SOURCE LINES 129-153
 
 The last bit of information for the run we need are the predicted values.
 The exact format of the predictions will depend on the task.
 
 The predictions should always be a list of lists, each list should contain:
+
 - the repeat number: for repeated evaluation strategies. (e.g. repeated cross-validation)
 - the fold number: for cross-validation. (what should this be for holdout?)
 - 0: this field is for backward compatibility.
@@ -208,7 +209,7 @@ You can ignore this code, or use it to better understand the formatting of the p
 
 Find the repeats/folds for this task:
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-187
+.. GENERATED FROM PYTHON SOURCE LINES 153-188
 
 .. code-block:: default
 
@@ -248,12 +249,12 @@ Find the repeats/folds for this task:
         predictions.append(prediction)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-190
+.. GENERATED FROM PYTHON SOURCE LINES 189-191
 
 Finally we can create the OpenMLRun object and upload.
 We use the argument setup_string because the used flow was a script.
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-206
+.. GENERATED FROM PYTHON SOURCE LINES 191-207
 
 .. code-block:: default
 

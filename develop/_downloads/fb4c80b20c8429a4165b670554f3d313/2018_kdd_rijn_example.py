@@ -13,7 +13,7 @@ Publication
 | Hyperparameter importance across datasets
 | Jan N. van Rijn and Frank Hutter
 | In *Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining*, 2018
-| Available at https://dl.acm.org/citation.cfm?id=3220058
+| Available at https://dl.acm.org/doi/10.1145/3219819.3220058
 """
 
 # License: BSD 3-Clause

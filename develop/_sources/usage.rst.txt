@@ -14,11 +14,13 @@ User Guide
 
 This document will guide you through the most important use cases, functions
 and classes in the OpenML Python API. Throughout this document, we will use
-`pandas <http://pandas.pydata.org/>`_ to format and filter tables.
+`pandas <https://pandas.pydata.org/>`_ to format and filter tables.
 
-~~~~~~~~~~~~~~~~~~~~~~
+.. _installation:
+
+~~~~~~~~~~~~~~~~~~~~~
 Installation & Set up
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 The OpenML Python package is a connector to `OpenML <https://www.openml.org/>`_.
 It allows you to use and share datasets and tasks, run
@@ -27,7 +29,7 @@ machine learning algorithms on them and then share the results online.
 The following tutorial gives a short introduction on how to install and set up
 the OpenML Python connector, followed up by a simple example.
 
-* `Introduction <examples/introduction_tutorial.html>`_
+* `:ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`
 
 ~~~~~~~~~~~~~
 Configuration
@@ -97,7 +99,7 @@ for which a flow should be optimized.
 Below you can find our tutorial regarding tasks and if you want to know more
 you can read the `OpenML guide <https://docs.openml.org/#tasks>`_:
 
-* `Tasks <examples/tasks_tutorial.html>`_
+* :ref:`sphx_glr_examples_30_extended_tasks_tutorial.py`
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Running machine learning algorithms and uploading results
@@ -120,14 +122,14 @@ automatically calculates several metrics which can be used to compare the
 performance of different flows to each other.
 
 So far, the OpenML Python connector works only with estimator objects following
-the `scikit-learn estimator API <http://scikit-learn.org/dev/developers/contributing.html#apis-of-scikit-learn-objects>`_.
+the `scikit-learn estimator API <https://scikit-learn.org/stable/developers/develop.html#apis-of-scikit-learn-objects>`_.
 Those can be directly run on a task, and a flow will automatically be created or
 downloaded from the server if it already exists.
 
 The next tutorial covers how to train different machine learning models,
 how to run machine learning models on OpenML data and how to share the results:
 
-* `Flows and Runs <examples/flows_and_runs_tutorial.html>`_
+* :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py`
 
 ~~~~~~~~
 Datasets
@@ -142,12 +144,12 @@ available metadata. The tutorial which follows explains how to get a list of
 datasets, how to filter the list to find the dataset that suits your
 requirements and how to download a dataset:
 
-* `Filter and explore datasets <examples/30_extended/datasets_tutorial.html>`_
+* :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py`
 
 OpenML is about sharing machine learning results and the datasets they were
 obtained on. Learn how to share your datasets in the following tutorial:
 
-* `Upload a dataset <examples/30_extended/create_upload_tutorial.html>`_
+* :ref:`sphx_glr_examples_30_extended_create_upload_tutorial.py`
 
 ***********************
 Extending OpenML-Python
@@ -159,7 +161,8 @@ scikit-learn extension in :class:`openml.extensions.sklearn.SklearnExtension` as
 
 Runtime measurement is incorporated in the OpenML sklearn-extension. Example usage and potential
 usage for Hyperparameter Optimisation can be found in the example tutorial:
-`HPO using OpenML <examples/30_extended/fetch_runtimes.html>`_
+
+* :ref:`sphx_glr_examples_30_extended_fetch_runtimes_tutorial.py`
 
 
 Here is a list of currently maintained OpenML extensions:

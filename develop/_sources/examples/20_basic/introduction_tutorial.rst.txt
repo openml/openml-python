@@ -18,8 +18,8 @@
 .. _sphx_glr_examples_20_basic_introduction_tutorial.py:
 
 
-Setup
-=====
+Introduction tutorial & Setup
+=============================
 
 An example how to set up OpenML-Python followed up by a simple example.
 
@@ -47,7 +47,7 @@ Installation is done via ``pip``:
     pip install openml
 
 For further information, please check out the installation guide at
-https://openml.github.io/openml-python/master/contributing.html#installation
+:ref:`installation`.
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 33-60
@@ -60,7 +60,7 @@ OpenML platform. If you don’t have an account yet, sign up now.
 You will receive an API key, which will authenticate you to the server
 and allow you to download and upload datasets, tasks, runs and flows.
 
-* Create an OpenML account (free) on http://www.openml.org.
+* Create an OpenML account (free) on https://www.openml.org.
 * After logging in, open your account page (avatar on the top right)
 * Open 'Account Settings', then 'API authentication' to find your API key.
 
@@ -167,7 +167,7 @@ Download the OpenML task for the eeg-eye-state.
     # For this tutorial, our configuration publishes to the test server
     # as to not crowd the main server with runs created by examples.
     myrun = run.publish()
-    print(f"kNN on {data.name}: http://test.openml.org/r/{myrun.run_id}")
+    print(f"kNN on {data.name}: {myrun.openml_url}")
 
 
 
@@ -179,7 +179,7 @@ Download the OpenML task for the eeg-eye-state.
 
  .. code-block:: none
 
-    kNN on eeg-eye-state: http://test.openml.org/r/67874
+    kNN on eeg-eye-state: https://test.openml.org/r/67939
 
 
 
@@ -199,7 +199,7 @@ Download the OpenML task for the eeg-eye-state.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  20.458 seconds)
+   **Total running time of the script:** ( 0 minutes  26.325 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_introduction_tutorial.py:

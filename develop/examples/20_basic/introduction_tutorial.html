@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Setup &#8212; OpenML 0.12.1 documentation</title>
+    <title>Introduction tutorial &amp; Setup &#8212; OpenML 0.12.1 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
@@ -105,7 +105,7 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#">Setup</a><ul>
+<li><a class="reference internal" href="#">Introduction tutorial &amp; Setup</a><ul>
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#authentication">Authentication</a></li>
 <li><a class="reference internal" href="#caching">Caching</a></li>
@@ -123,8 +123,8 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-examples-20-basic-introduction-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="setup">
-<span id="sphx-glr-examples-20-basic-introduction-tutorial-py"></span><h1>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h1>
+<div class="sphx-glr-example-title section" id="introduction-tutorial-setup">
+<span id="sphx-glr-examples-20-basic-introduction-tutorial-py"></span><h1>Introduction tutorial &amp; Setup<a class="headerlink" href="#introduction-tutorial-setup" title="Permalink to this headline">¶</a></h1>
 <p>An example how to set up OpenML-Python followed up by a simple example.</p>
 <p>OpenML is an online collaboration platform for machine learning which allows
 you to:</p>
@@ -143,7 +143,7 @@ you to:</p>
 </pre></div>
 </div>
 <p>For further information, please check out the installation guide at
-<a class="reference external" href="https://openml.github.io/openml-python/master/contributing.html#installation">https://openml.github.io/openml-python/master/contributing.html#installation</a></p>
+<a class="reference internal" href="../../usage.html#installation"><span class="std std-ref">Installation &amp; Set up</span></a>.</p>
 </div>
 <div class="section" id="authentication">
 <h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
@@ -152,7 +152,7 @@ OpenML platform. If you don’t have an account yet, sign up now.
 You will receive an API key, which will authenticate you to the server
 and allow you to download and upload datasets, tasks, runs and flows.</p>
 <ul class="simple">
-<li><p>Create an OpenML account (free) on <a class="reference external" href="http://www.openml.org">http://www.openml.org</a>.</p></li>
+<li><p>Create an OpenML account (free) on <a class="reference external" href="https://www.openml.org">https://www.openml.org</a>.</p></li>
 <li><p>After logging in, open your account page (avatar on the top right)</p></li>
 <li><p>Open ‘Account Settings’, then ‘API authentication’ to find your API key.</p></li>
 </ul>
@@ -217,17 +217,17 @@ will use <strong>~/.openml/cache</strong> as the cache directory.</p></li>
 <span class="c1"># For this tutorial, our configuration publishes to the test server</span>
 <span class="c1"># as to not crowd the main server with runs created by examples.</span>
 <span class="n">myrun</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;kNN on </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: http://test.openml.org/r/</span><span class="si">{</span><span class="n">myrun</span><span class="o">.</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;kNN on </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">myrun</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: http://test.openml.org/r/67874
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: https://test.openml.org/r/67939
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  20.458 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  26.325 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-20-basic-introduction-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/a5a49610d34e7fd2cd1c2f5121cc5f5f/introduction_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">introduction_tutorial.py</span></code></a></p>

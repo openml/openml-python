@@ -4,9 +4,9 @@
 
 .. _sphx_glr_examples:
 
-========
-Examples
-========
+================
+Examples Gallery
+================
 
 
 .. raw:: html
@@ -73,7 +73,7 @@ Introductory examples to the usage of the OpenML python connector.
 .. only:: html
 
  .. figure:: /examples/20_basic/images/thumb/sphx_glr_introduction_tutorial_thumb.png
-     :alt: Setup
+     :alt: Introduction tutorial & Setup
 
      :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`
 

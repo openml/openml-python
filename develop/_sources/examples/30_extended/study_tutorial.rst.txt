@@ -49,15 +49,16 @@ tasks, all required information about a study can be retrieved.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-29
+.. GENERATED FROM PYTHON SOURCE LINES 24-30
 
 .. warning:: This example uploads data. For that reason, this example
    connects to the test server at test.openml.org before doing so.
    This prevents the crowding of the main server with example datasets,
    tasks, runs, and so on.
+
 ###########################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-38
+.. GENERATED FROM PYTHON SOURCE LINES 33-39
 
 Listing studies
 ***************
@@ -66,7 +67,7 @@ Listing studies
 * Default gives ``dict``, but we'll use ``dataframe`` to obtain an
   easier-to-work-with data structure
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-43
+.. GENERATED FROM PYTHON SOURCE LINES 39-44
 
 .. code-block:: default
 
@@ -102,16 +103,16 @@ Listing studies
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-46
+.. GENERATED FROM PYTHON SOURCE LINES 45-47
 
 Downloading studies
 ===================
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-49
+.. GENERATED FROM PYTHON SOURCE LINES 49-50
 
 This is done based on the study ID.
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-52
+.. GENERATED FROM PYTHON SOURCE LINES 50-53
 
 .. code-block:: default
 
@@ -145,11 +146,11 @@ This is done based on the study ID.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-54
+.. GENERATED FROM PYTHON SOURCE LINES 54-55
 
 Studies also features a description:
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-56
+.. GENERATED FROM PYTHON SOURCE LINES 55-57
 
 .. code-block:: default
 
@@ -172,11 +173,11 @@ Studies also features a description:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-58
+.. GENERATED FROM PYTHON SOURCE LINES 58-59
 
 Studies are a container for runs:
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-60
+.. GENERATED FROM PYTHON SOURCE LINES 59-61
 
 .. code-block:: default
 
@@ -197,12 +198,12 @@ Studies are a container for runs:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-63
+.. GENERATED FROM PYTHON SOURCE LINES 62-64
 
 And we can use the evaluation listing functionality to learn more about
 the evaluations available for the conducted runs:
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-68
+.. GENERATED FROM PYTHON SOURCE LINES 64-69
 
 .. code-block:: default
 
@@ -233,7 +234,7 @@ the evaluations available for the conducted runs:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-75
+.. GENERATED FROM PYTHON SOURCE LINES 70-76
 
 Uploading studies
 =================
@@ -242,7 +243,7 @@ Creating a study is as simple as creating any kind of other OpenML entity.
 In this examples we'll create a few runs for the OpenML-100 benchmark
 suite which is available on the OpenML test server.
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-109
+.. GENERATED FROM PYTHON SOURCE LINES 76-110
 
 .. code-block:: default
 
@@ -293,17 +294,17 @@ suite which is available on the OpenML test server.
     True
     OpenML Study
     ============
-    ID..............: 9057
+    ID..............: 9071
     Name............: Test-Study
     Status..........: None
     Main Entity Type: run
-    Study URL.......: https://test.openml.org/s/9057
+    Study URL.......: https://test.openml.org/s/9071
     # of Runs.......: 3
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-111
+.. GENERATED FROM PYTHON SOURCE LINES 111-112
 
 .. code-block:: default
 
@@ -318,7 +319,7 @@ suite which is available on the OpenML test server.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  38.235 seconds)
+   **Total running time of the script:** ( 0 minutes  51.304 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_study_tutorial.py:

@@ -138,7 +138,7 @@ with a machine learning package (such as scikit-learn or keras). These extension
 are hosted in separate repositories and may have their own guidelines.
 For more information, see the <a class="reference internal" href="#extensions"><span class="std std-ref">Connecting new machine learning libraries</span></a> below.</p></li>
 <li><p>Bug reports. If something doesn’t work for you or is cumbersome, please open a new issue to let
-us know about the problem. See <a class="reference external" href="https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md#reporting-bugs">this section</a>.</p></li>
+us know about the problem. See <a class="reference external" href="https://github.com/openml/openml-python/blob/master/CONTRIBUTING.md#user-content-reporting-bugs">this section</a>.</p></li>
 <li><p><a class="reference external" href="https://www.openml.org/cite">Cite OpenML</a> if you use it in a scientific publication.</p></li>
 <li><p>Visit one of our <a class="reference external" href="https://meet.openml.org/">hackathons</a>.</p></li>
 <li><p>Contribute to another OpenML project, such as <a class="reference external" href="https://github.com/openml/OpenML/blob/master/CONTRIBUTING.md">the main OpenML project</a>.</p></li>
@@ -153,7 +153,7 @@ with popular machine learning libraries is essential. However, the OpenML-Python
 not have the capacity to develop and maintain such interfaces on its own. For this, we
 have built an extension interface to allows others to contribute back. Building a suitable
 extension for therefore requires an understanding of the current OpenML-Python support.</p>
-<p><a class="reference external" href="examples/20_basic/simple_flows_and_runs_tutorial.html">This example</a>
+<p>The <a class="reference internal" href="examples/20_basic/simple_flows_and_runs_tutorial.html#sphx-glr-examples-20-basic-simple-flows-and-runs-tutorial-py"><span class="std std-ref">Flows and Runs</span></a> tutorial
 shows how scikit-learn currently works with OpenML-Python as an extension. The <em>sklearn</em>
 extension packaged with the <a class="reference external" href="https://github.com/openml/openml-python">openml-python</a>
 repository can be used as a template/benchmark to build the new extension.</p>
@@ -161,7 +161,7 @@ repository can be used as a template/benchmark to build the new extension.</p>
 <h4>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>The extension scripts must import the <cite>openml</cite> package and be able to interface with
-any function from the OpenML-Python <a class="reference external" href="api.html">API</a>.</p></li>
+any function from the OpenML-Python <a class="reference internal" href="api.html#api"><span class="std std-ref">API</span></a>.</p></li>
 <li><p>The extension has to be defined as a Python class and must inherit from
 <a class="reference internal" href="generated/openml.extensions.Extension.html#openml.extensions.Extension" title="openml.extensions.Extension"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.extensions.Extension</span></code></a>.</p></li>
 <li><p>This class needs to have all the functions from <cite>class Extension</cite> overloaded as required.</p></li>
@@ -182,8 +182,8 @@ interface the new extension.</p>
 <p>Each extension created should be a stand-alone repository, compatible with the
 <a class="reference external" href="https://github.com/openml/openml-python">OpenML-Python repository</a>.
 The extension repository should work off-the-shelf with <em>OpenML-Python</em> installed.</p>
-<p>Create a <a class="reference external" href="https://help.github.com/en/articles/create-a-repo">public Github repo</a> with
-the following directory structure:</p>
+<p>Create a <a class="reference external" href="https://docs.github.com/en/github/getting-started-with-github/create-a-repo">public Github repo</a>
+with the following directory structure:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="p">[</span><span class="n">repo</span> <span class="n">name</span><span class="p">]</span>
 <span class="o">|</span>    <span class="o">|--</span> <span class="p">[</span><span class="n">extension</span> <span class="n">name</span><span class="p">]</span>
 <span class="o">|</span>    <span class="o">|</span>    <span class="o">|--</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span>

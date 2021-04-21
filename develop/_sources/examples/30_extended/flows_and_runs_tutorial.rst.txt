@@ -183,7 +183,7 @@ the run is sent to the OpenML server:
     myrun = run.publish()
     # For this tutorial, our configuration publishes to the test server
     # as to not pollute the main server.
-    print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
+    print(f"Uploaded to {myrun.openml_url}")
 
 
 
@@ -195,7 +195,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/67959
+    Uploaded to https://test.openml.org/r/68066
 
 
 
@@ -282,7 +282,7 @@ variables and missing values in both.
 
     run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
     myrun = run.publish()
-    print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
+    print(f"Uploaded to {myrun.openml_url}")
 
 
     # The above pipeline works with the helper functions that internally deal with pandas DataFrame.
@@ -326,7 +326,7 @@ variables and missing values in both.
 
     run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False, dataset_format="array")
     myrun = run.publish()
-    print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
+    print(f"Uploaded to {myrun.openml_url}")
 
 
 
@@ -338,8 +338,8 @@ variables and missing values in both.
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/67961
-    Uploaded to http://test.openml.org/r/67964
+    Uploaded to https://test.openml.org/r/68069
+    Uploaded to https://test.openml.org/r/68071
 
 
 
@@ -385,15 +385,15 @@ a model on a task without uploading results or flows to the server immediately.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1775: UserWarning: Estimator only predicted for 5/6 classes!
+    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1779: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
 
     OpenML Run
     ==========
     Uploader Name: None
     Metric.......: None
-    Run ID.......: 67966
-    Run URL......: https://test.openml.org/r/67966
+    Run ID.......: 68073
+    Run URL......: https://test.openml.org/r/68073
     Task ID......: 6
     Task Type....: None
     Task URL.....: https://test.openml.org/t/6
@@ -445,16 +445,16 @@ Try to build the best possible models on several OpenML tasks,
 compare your results with the rest of the class and learn from
 them. Some tasks you could try (or browse openml.org):
 
-* EEG eye state: data_id:`1471 <http://www.openml.org/d/1471>`_,
-  task_id:`14951 <http://www.openml.org/t/14951>`_
-* Volcanoes on Venus: data_id:`1527 <http://www.openml.org/d/1527>`_,
-  task_id:`10103 <http://www.openml.org/t/10103>`_
-* Walking activity: data_id:`1509 <http://www.openml.org/d/1509>`_,
-  task_id:`9945 <http://www.openml.org/t/9945>`_, 150k instances.
-* Covertype (Satellite): data_id:`150 <http://www.openml.org/d/150>`_,
-  task_id:`218 <http://www.openml.org/t/218>`_, 500k instances.
-* Higgs (Physics): data_id:`23512 <http://www.openml.org/d/23512>`_,
-  task_id:`52950 <http://www.openml.org/t/52950>`_, 100k instances, missing values.
+* EEG eye state: data_id:`1471 <https://www.openml.org/d/1471>`_,
+  task_id:`14951 <https://www.openml.org/t/14951>`_
+* Volcanoes on Venus: data_id:`1527 <https://www.openml.org/d/1527>`_,
+  task_id:`10103 <https://www.openml.org/t/10103>`_
+* Walking activity: data_id:`1509 <https://www.openml.org/d/1509>`_,
+  task_id:`9945 <https://www.openml.org/t/9945>`_, 150k instances.
+* Covertype (Satellite): data_id:`150 <https://www.openml.org/d/150>`_,
+  task_id:`218 <https://www.openml.org/t/218>`_, 500k instances.
+* Higgs (Physics): data_id:`23512 <https://www.openml.org/d/23512>`_,
+  task_id:`52950 <https://www.openml.org/t/52950>`_, 100k instances, missing values.
 
 .. GENERATED FROM PYTHON SOURCE LINES 223-235
 
@@ -469,7 +469,7 @@ them. Some tasks you could try (or browse openml.org):
 
         run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
         myrun = run.publish()
-        print(f"kNN on {data.name}: http://test.openml.org/r/{myrun.run_id}")
+        print(f"kNN on {data.name}: {myrun.openml_url}")
 
 
 
@@ -482,7 +482,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/67972
+    kNN on diabetes: https://test.openml.org/r/68076
 
 
 
@@ -502,7 +502,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  38.205 seconds)
+   **Total running time of the script:** ( 0 minutes  52.217 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:

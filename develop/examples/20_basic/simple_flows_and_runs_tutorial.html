@@ -184,19 +184,19 @@ Dataset URL..: https://test.openml.org/d/20
 <div class="section" id="publishing-the-run">
 <h1>Publishing the run<a class="headerlink" href="#publishing-the-run" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">myrun</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Run was uploaded to http://test.openml.org/r/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">myrun</span><span class="o">.</span><span class="n">run_id</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The flow can be found at http://test.openml.org/f/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">myrun</span><span class="o">.</span><span class="n">flow_id</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Run was uploaded to </span><span class="si">{</span><span class="n">myrun</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The flow can be found at </span><span class="si">{</span><span class="n">myrun</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Run was uploaded to http://test.openml.org/r/67873
-The flow can be found at http://test.openml.org/f/179227
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Run was uploaded to https://test.openml.org/r/67922
+The flow can be found at https://test.openml.org/f/179227
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.758 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  11.223 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-20-basic-simple-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/cb73f5fc41065b327cef9d079472032b/simple_flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">simple_flows_and_runs_tutorial.py</span></code></a></p>

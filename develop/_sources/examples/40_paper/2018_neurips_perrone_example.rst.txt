@@ -30,7 +30,7 @@ Publication
 | Scalable Hyperparameter Transfer Learning
 | Valerio Perrone and Rodolphe Jenatton and Matthias Seeger and Cedric Archambeau
 | In *Advances in Neural Information Processing Systems 31*, 2018
-| Available at http://papers.nips.cc/paper/7917-scalable-hyperparameter-transfer-learning.pdf
+| Available at https://papers.nips.cc/paper/7917-scalable-hyperparameter-transfer-learning.pdf
 
 This example demonstrates how OpenML runs can be used to construct a surrogate model.
 
@@ -224,16 +224,16 @@ pre-processing all retrieved evaluations.
  .. code-block:: none
 
                          cost degree              gamma      kernel
-    1624     127.187853721203    NaN   155.895885642962         NaN
-    3325     236.807644727628      4                NaN  polynomial
-    3899  0.00689601557633773    NaN                NaN  polynomial
-    1819   0.0341676263726564      4                NaN  polynomial
-    5329  0.00297208304876947    NaN  0.422149210114246         NaN
-    Y :  1624    0.603803
-    3325    0.480309
-    3899    0.523752
-    1819    0.616136
-    5329    0.963757
+    5112    0.724149581953443      5                NaN  polynomial
+    4837     303.578390342718    NaN  0.195690767616621         NaN
+    1268    0.258801815409304      5                NaN  polynomial
+    4249  0.00480307176541716      5                NaN  polynomial
+    531   0.00236600091192954    NaN                NaN  polynomial
+    Y :  5112    0.983319
+    4837    0.981040
+    1268    0.606761
+    4249    0.968217
+    531     0.879744
     Name: value, dtype: float64
 
 
@@ -312,7 +312,7 @@ time simple and quick.
  .. code-block:: none
 
     Task ID :  145878
-    Training RMSE : 1.6737e-05
+    Training RMSE : 1.3728e-05
 
 
 
@@ -366,17 +366,17 @@ NOTE: This section is written exclusively for the SVM flow
  .. code-block:: none
 
                cost    degree       gamma      kernel
-    0    302.118179  4.444120  256.906544      linear
-    1    495.488730  3.543262  272.640283      linear
-    2    682.637961  4.428412  280.786618      radial
-    3    842.665556  4.195962  558.700761      linear
-    4    620.413516  2.469514  510.487856  polynomial
+    0    808.309778  4.929271  592.182069     sigmoid
+    1    728.178151  2.102850   54.432264  polynomial
+    2    948.098631  4.108024  598.161298      radial
+    3    709.734216  2.557067  784.329001     sigmoid
+    4    460.778413  4.409440  556.006591      linear
     ..          ...       ...         ...         ...
-    995  609.712773  3.902101  211.468831      linear
-    996  306.222459  2.314756  383.014217      linear
-    997   59.041117  2.113591  518.604771      linear
-    998  138.335495  2.663499  367.051000      radial
-    999  452.978963  4.267634  674.814246      linear
+    995   90.102012  4.521168  371.281575     sigmoid
+    996  931.203783  2.635278  227.978050      linear
+    997  646.104947  4.933042   80.971953      linear
+    998  766.072585  2.682375   27.996746  polynomial
+    999  449.975333  2.260090  580.127615     sigmoid
 
     [1000 rows x 4 columns]
 
@@ -421,7 +421,7 @@ NOTE: This section is written exclusively for the SVM flow
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  25.420 seconds)
+   **Total running time of the script:** ( 0 minutes  33.764 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_neurips_perrone_example.py:
