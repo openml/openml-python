@@ -114,6 +114,11 @@ pygments_style = "sphinx"
 # If true, keep warnings as "system message" paragraphs in the built documents.
 # keep_warnings = False
 
+# Complain about all broken internal links - broken external links can be
+# found with `make linkcheck`
+#
+# currently disabled because without intersphinx we cannot link to numpy.ndarray
+# nitpicky = True
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -344,3 +349,4 @@ sphinx_gallery_conf = {
 
 def setup(app):
     app.add_css_file("codehighlightstyle.css")
+    app.warningiserror = True

@@ -1,6 +1,6 @@
 """
-Setup
-=====
+Introduction tutorial & Setup
+=============================
 
 An example how to set up OpenML-Python followed up by a simple example.
 """
@@ -26,7 +26,7 @@ An example how to set up OpenML-Python followed up by a simple example.
 #     pip install openml
 #
 # For further information, please check out the installation guide at
-# https://openml.github.io/openml-python/master/contributing.html#installation
+# :ref:`installation`.
 #
 
 ############################################################################
@@ -38,7 +38,7 @@ An example how to set up OpenML-Python followed up by a simple example.
 # You will receive an API key, which will authenticate you to the server
 # and allow you to download and upload datasets, tasks, runs and flows.
 #
-# * Create an OpenML account (free) on http://www.openml.org.
+# * Create an OpenML account (free) on https://www.openml.org.
 # * After logging in, open your account page (avatar on the top right)
 # * Open 'Account Settings', then 'API authentication' to find your API key.
 #
@@ -103,7 +103,7 @@ run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
 # For this tutorial, our configuration publishes to the test server
 # as to not crowd the main server with runs created by examples.
 myrun = run.publish()
-print(f"kNN on {data.name}: http://test.openml.org/r/{myrun.run_id}")
+print(f"kNN on {data.name}: {myrun.openml_url}")
 
 ############################################################################
 openml.config.stop_using_configuration_for_example()

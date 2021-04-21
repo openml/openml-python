@@ -130,6 +130,7 @@ dataset_id = task.get_dataset().dataset_id
 # The exact format of the predictions will depend on the task.
 #
 # The predictions should always be a list of lists, each list should contain:
+#
 # - the repeat number: for repeated evaluation strategies. (e.g. repeated cross-validation)
 # - the fold number: for cross-validation. (what should this be for holdout?)
 # - 0: this field is for backward compatibility.

@@ -6,7 +6,7 @@ Benchmark suites
 How to list, download and upload benchmark suites.
 
 If you want to learn more about benchmark suites, check out our
-`brief introductory tutorial <../20_basic/simple_suites_tutorial.html>`_ or the
+brief introductory tutorial :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py` or the
 `OpenML benchmark docs <https://docs.openml.org/benchmark/#benchmarking-suites>`_.
 """
 ############################################################################
@@ -24,6 +24,7 @@ import openml
 #   connects to the test server at test.openml.org before doing so.
 #   This prevents the main server from crowding with example datasets,
 #   tasks, runs, and so on.
+#
 ############################################################################
 
 

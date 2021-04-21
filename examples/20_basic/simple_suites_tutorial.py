@@ -62,7 +62,6 @@ for task_id in tasks[:3]:
 # Further examples
 # ================
 #
-# * `Advanced benchmarking suites tutorial <../30_extended/suites_tutorial.html>`_
-# * `Benchmarking studies tutorial <../30_extended/study_tutorial.html>`_
-# * `Using studies to compare linear and non-linear classifiers
-#   <../40_paper/2018_ida_strang_example.html>`_
+# * :ref:`sphx_glr_examples_30_extended_suites_tutorial.py`
+# * :ref:`sphx_glr_examples_30_extended_study_tutorial.py`
+# * :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py`

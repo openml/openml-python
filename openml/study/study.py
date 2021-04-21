@@ -186,8 +186,6 @@ class OpenMLStudy(BaseStudy):
     According to this list of run ids, the study object receives a list of
     OpenML object ids (datasets, flows, tasks and setups).
 
-    Inherits from :class:`openml.BaseStudy`
-
     Parameters
     ----------
     study_id : int
@@ -267,8 +265,6 @@ class OpenMLBenchmarkSuite(BaseStudy):
 
     According to this list of task ids, the suite object receives a list of
     OpenML object ids (datasets).
-
-    Inherits from :class:`openml.BaseStudy`
 
     Parameters
     ----------

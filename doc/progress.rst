@@ -6,6 +6,14 @@
 Changelog
 =========
 
+0.12.2
+~~~~~~
+
+* DOC: Fixes a few broken links in the documentation.
+* MAINT/DOC: Automatically check for broken external links when building the documentation.
+* MAINT/DOC: Fail documentation building on warnings. This will make the documentation building
+  fail if a reference cannot be found (i.e. an internal link is broken).
+
 0.12.1
 ~~~~~~
 
