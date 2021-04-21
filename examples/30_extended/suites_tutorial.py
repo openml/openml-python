@@ -73,6 +73,12 @@ print(tasks.describe().transpose())
 # Uploading suites is as simple as uploading any kind of other OpenML
 # entity - the only reason why we need so much code in this example is
 # because we upload some random data.
+#
+# .. warning:: This example uploads data. For that reason, this example
+#   connects to the test server at test.openml.org. This prevents the main
+#   server from crowding with example datasets, tasks, runs, and so on. The
+#   use of this test server can affect behaviour and performance of the
+#   OpenML-Python API.
 
 openml.config.start_using_configuration_for_example()
 

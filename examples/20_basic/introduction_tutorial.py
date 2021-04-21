@@ -53,10 +53,7 @@ An example how to set up OpenML-Python followed up by a simple example.
 #
 # Alternatively, by running the code below and replacing 'YOURKEY' with your API key,
 # you authenticate for the duration of the python process.
-#
-# .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server instead. This prevents the live server from
-#   crowding with example datasets, tasks, studies, and so on.
+
 
 ############################################################################
 
@@ -65,6 +62,12 @@ An example how to set up OpenML-Python followed up by a simple example.
 import openml
 from sklearn import neighbors
 
+############################################################################
+# .. warning:: This example uploads data. For that reason, this example
+#   connects to the test server at test.openml.org. This prevents the main
+#   server from crowding with example datasets, tasks, runs, and so on. The
+#   use of this test server can affect behaviour and performance of the
+#   OpenML-Python API.
 openml.config.start_using_configuration_for_example()
 
 ############################################################################

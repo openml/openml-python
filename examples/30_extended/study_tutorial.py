@@ -73,6 +73,13 @@ print(evaluations.head())
 # Creating a study is as simple as creating any kind of other OpenML entity.
 # In this examples we'll create a few runs for the OpenML-100 benchmark
 # suite which is available on the OpenML test server.
+#
+# .. warning:: This example uploads data. For that reason, this example
+#   connects to the test server at test.openml.org. This prevents the main
+#   server from crowding with example datasets, tasks, runs, and so on. The
+#   use of this test server can affect behaviour and performance of the
+#   OpenML-Python API.
+
 openml.config.start_using_configuration_for_example()
 
 # Model to be used

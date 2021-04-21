@@ -114,6 +114,12 @@ _ = pd.plotting.scatter_matrix(
 # Edit a created dataset
 # ======================
 # This example uses the test server, to avoid editing a dataset on the main server.
+#
+# .. warning:: This example uploads data. For that reason, this example
+#   connects to the test server at test.openml.org. This prevents the main
+#   server from crowding with example datasets, tasks, runs, and so on. The
+#   use of this test server can affect behaviour and performance of the
+#   OpenML-Python API.
 openml.config.start_using_configuration_for_example()
 ############################################################################
 # Edit non-critical fields, allowed for all authorized users:

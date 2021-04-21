@@ -13,12 +13,8 @@ As an example we will use the flows generated for the `AutoML Benchmark <https:/
 and also show how to link runs to the custom flow.
 """
 
-####################################################################################################
-
 # License: BSD 3-Clause
-# .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server at test.openml.org. This prevents the main
-#   server from crowding with example datasets, tasks, runs, and so on.
+
 from collections import OrderedDict
 import numpy as np
 
@@ -26,6 +22,12 @@ import openml
 from openml import OpenMLClassificationTask
 from openml.runs.functions import format_prediction
 
+####################################################################################################
+# .. warning:: This example uploads data. For that reason, this example
+#   connects to the test server at test.openml.org. This prevents the main
+#   server from crowding with example datasets, tasks, runs, and so on. The
+#   use of this test server can affect behaviour and performance of the
+#   OpenML-Python API.
 openml.config.start_using_configuration_for_example()
 
 ####################################################################################################

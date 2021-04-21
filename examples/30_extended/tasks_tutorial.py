@@ -183,7 +183,12 @@ print(tasks[0])
 # If a task with these parameters exists, we will get an appropriate exception.
 # If such a task doesn't exist, a task will be created and the corresponding task_id
 # will be returned.
-
+#
+# .. warning:: This example uploads data. For that reason, this example
+#   connects to the test server at test.openml.org. This prevents the main
+#   server from crowding with example datasets, tasks, runs, and so on. The
+#   use of this test server can affect behaviour and performance of the
+#   OpenML-Python API.
 
 # using test server for example uploads
 openml.config.start_using_configuration_for_example()
