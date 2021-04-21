@@ -755,6 +755,9 @@ class OpenMLDataset(OpenMLBase):
             attribute_names = [att for att, k in zip(attribute_names, targets) if not k]
 
             x = self._convert_array_format(x, dataset_format, attribute_names)
+            if dataset_format == "array" and scipy.sparse.issparse(y):
+                # scikit-learn requires dense representation of targets
+                y = np.asarray(y.todense()).astype(target_dtype)
             if not scipy.sparse.issparse(y):
                 y = y.squeeze()
             y = self._convert_array_format(y, dataset_format, target_names)
