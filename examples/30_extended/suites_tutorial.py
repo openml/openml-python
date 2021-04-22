@@ -19,14 +19,6 @@ import numpy as np
 
 import openml
 
-############################################################################
-# .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server at test.openml.org before doing so.
-#   This prevents the main server from crowding with example datasets,
-#   tasks, runs, and so on.
-#
-############################################################################
-
 
 ############################################################################
 # Listing suites
