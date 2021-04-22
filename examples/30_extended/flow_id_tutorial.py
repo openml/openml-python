@@ -27,6 +27,8 @@ import openml
 openml.config.start_using_configuration_for_example()
 
 
+############################################################################
+# Defining a classifier
 clf = sklearn.tree.DecisionTreeClassifier()
 
 ####################################################################################################

@@ -172,6 +172,14 @@ print(tasks[0])
 # necessary (e.g. when other measure make no sense), since it will create a new task, which
 # scatters results across tasks.
 
+############################################################################
+# We'll use the test server for the rest of this tutorial.
+# .. warning:: This example uploads data. For that reason, this example
+#   connects to the test server at test.openml.org. This prevents the main
+#   server from crowding with example datasets, tasks, runs, and so on. The
+#   use of this test server can affect behaviour and performance of the
+#   OpenML-Python API.
+openml.config.start_using_configuration_for_example()
 
 ############################################################################
 # Example
@@ -183,15 +191,7 @@ print(tasks[0])
 # If a task with these parameters exists, we will get an appropriate exception.
 # If such a task doesn't exist, a task will be created and the corresponding task_id
 # will be returned.
-#
-# .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server at test.openml.org. This prevents the main
-#   server from crowding with example datasets, tasks, runs, and so on. The
-#   use of this test server can affect behaviour and performance of the
-#   OpenML-Python API.
 
-# using test server for example uploads
-openml.config.start_using_configuration_for_example()
 
 try:
     my_task = openml.tasks.create_task(

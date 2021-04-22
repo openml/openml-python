@@ -10,19 +10,21 @@ How to train/run a model and how to upload the results.
 import openml
 from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
 
+
 ############################################################################
-# Train machine learning models
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#
-# Train a scikit-learn model on the data manually.
-#
 # .. warning:: This example uploads data. For that reason, this example
 #   connects to the test server at test.openml.org. This prevents the main
 #   server from crowding with example datasets, tasks, runs, and so on. The
 #   use of this test server can affect behaviour and performance of the
 #   OpenML-Python API.
-
 openml.config.start_using_configuration_for_example()
+
+############################################################################
+# Train machine learning models
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# Train a scikit-learn model on the data manually.
+
 # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
 dataset = openml.datasets.get_dataset(68)
 X, y, categorical_indicator, attribute_names = dataset.get_data(

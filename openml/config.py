@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import platform
 from typing import Tuple, cast, Any
+import warnings
 
 from io import StringIO
 import configparser
@@ -157,6 +158,9 @@ class ConfigurationForExamples:
         # Test server key for examples
         server = cls._test_server
         apikey = cls._test_apikey
+        warnings.warn(
+            "Switching to the test server {} may result in inconsistent behaviour!".format(server)
+        )
 
     @classmethod
     def stop_using_configuration_for_example(cls):
