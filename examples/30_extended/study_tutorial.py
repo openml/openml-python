@@ -2,9 +2,7 @@
 =================
 Benchmark studies
 =================
-
 How to list, download and upload benchmark studies.
-
 In contrast to `benchmark suites <https://docs.openml.org/benchmark/#benchmarking-suites>`_ which
 hold a list of tasks, studies hold a list of runs. As runs contain all information on flows and
 tasks, all required information about a study can be retrieved.
@@ -59,11 +57,11 @@ print(evaluations.head())
 
 ############################################################################
 # We'll use the test server for the rest of this tutorial.
+#
 # .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server at test.openml.org. This prevents the main
-#   server from crowding with example datasets, tasks, runs, and so on. The
-#   use of this test server can affect behaviour and performance of the
-#   OpenML-Python API.
+#   connects to the test server at test.openml.org before doing so.
+#   This prevents the crowding of the main server with example datasets,
+#   tasks, runs, and so on.
 openml.config.start_using_configuration_for_example()
 
 ############################################################################
