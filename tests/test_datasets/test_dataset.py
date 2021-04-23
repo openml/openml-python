@@ -330,7 +330,7 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertEqual(len(attribute_names), 20001)
         self.assertTrue(all([isinstance(att, str) for att in attribute_names]))
 
-    def test_get_sparse_dataset_array_dataframe(self):
+    def test_get_sparse_dataset_dataframe(self):
         rval, *_ = self.sparse_dataset.get_data()
         self.assertIsInstance(rval, pd.DataFrame)
         np.testing.assert_array_equal(
