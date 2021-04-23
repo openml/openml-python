@@ -159,7 +159,8 @@ class ConfigurationForExamples:
         server = cls._test_server
         apikey = cls._test_apikey
         warnings.warn(
-            "Switching to the test server {} may result in inconsistent behaviour!".format(server)
+            "Switching to the test server {} to not upload results to the live server.
+            Using the test server may result in reduced performance of the API!".format(server)
         )
 
     @classmethod
