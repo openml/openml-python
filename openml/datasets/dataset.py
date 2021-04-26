@@ -756,13 +756,13 @@ class OpenMLDataset(OpenMLBase):
             if dataset_format == "array" and scipy.sparse.issparse(y):
                 # scikit-learn requires dense representation of targets
                 y = np.asarray(y.todense()).astype(target_dtype)
-                # dense representation of single column sparse arrays become 1 2-d array
+                # dense representation of single column sparse arrays become a 2-d array
                 # need to flatten it to a 1-d array for _convert_array_format()
                 y = y.squeeze()
             y = self._convert_array_format(y, dataset_format, target_names)
             y = y.astype(target_dtype) if dataset_format == "array" else y
             if len(y.shape) > 1 and y.shape[1] == 1:
-                # single column targets should be 1-d
+                # single column targets should be 1-d for both `array` and `dataframe` formats
                 y = y.squeeze()
             data, targets = x, y
 
