@@ -628,7 +628,7 @@ class OpenMLDataset(OpenMLBase):
                 )
         elif array_format == "dataframe":
             if scipy.sparse.issparse(data):
-                return pd.DataFrame.sparse.from_spmatrix(data, columns=attribute_names)
+                data = pd.DataFrame.sparse.from_spmatrix(data, columns=attribute_names)
         else:
             data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
             logger.warning(
@@ -732,6 +732,7 @@ class OpenMLDataset(OpenMLBase):
                 else:
                     target = [target]
             targets = np.array([True if column in target else False for column in attribute_names])
+            target_names = np.array([column for column in attribute_names if column in target])
             if np.sum(targets) > 1:
                 raise NotImplementedError(
                     "Number of requested targets %d is not implemented." % np.sum(targets)
@@ -752,11 +753,17 @@ class OpenMLDataset(OpenMLBase):
             attribute_names = [att for att, k in zip(attribute_names, targets) if not k]
 
             x = self._convert_array_format(x, dataset_format, attribute_names)
-            if scipy.sparse.issparse(y):
-                y = np.asarray(y.todense()).astype(target_dtype).flatten()
-            y = y.squeeze()
-            y = self._convert_array_format(y, dataset_format, attribute_names)
+            if dataset_format == "array" and scipy.sparse.issparse(y):
+                # scikit-learn requires dense representation of targets
+                y = np.asarray(y.todense()).astype(target_dtype)
+                # dense representation of single column sparse arrays become a 2-d array
+                # need to flatten it to a 1-d array for _convert_array_format()
+                y = y.squeeze()
+            y = self._convert_array_format(y, dataset_format, target_names)
             y = y.astype(target_dtype) if dataset_format == "array" else y
+            if len(y.shape) > 1 and y.shape[1] == 1:
+                # single column targets should be 1-d for both `array` and `dataframe` formats
+                y = y.squeeze()
             data, targets = x, y
 
         return data, targets, categorical, attribute_names
