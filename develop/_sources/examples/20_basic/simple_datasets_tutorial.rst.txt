@@ -122,10 +122,10 @@ Download a dataset
     URL: https://www.openml.org/data/v1/download/61/iris.arff
     **Author**: R.A. Fisher  
     **Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/Iris) - 1936 - Donated by Michael Marshall  
-    **Please cite**: [UCI Citation Policy](https://archive.ics.uci.edu/ml/citation_policy.html)  
+    **Please cite**:   
 
     **Iris Plants Database**  
-    This is perhaps the best known database to be found in the pattern recognition literature.  Fisher's paper is a classic in the field and is referenced frequently to this day.  (See Duda & Hart, for example.)  The data set contains 3 classes of 50 in
+    This is perhaps the best known database to be found in the pattern recognition literature.  Fisher's paper is a classic in the field and is referenced frequently to this day.  (See Duda & Hart, for example.)  The data set contains 3 classes of 50 instances each, where each class refers to a type of iris plant.  One class 
 
 
 
@@ -197,7 +197,7 @@ Visualize the dataset
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  12.097 seconds)
+   **Total running time of the script:** ( 0 minutes  11.324 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_datasets_tutorial.py:
