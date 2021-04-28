@@ -58,10 +58,8 @@ print(evaluations.head())
 ############################################################################
 # We'll use the test server for the rest of this tutorial.
 #
-# .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server at test.openml.org before doing so.
-#   This prevents the crowding of the main server with example datasets,
-#   tasks, runs, and so on.
+# .. warning::
+#    .. include:: ../../warning.txt
 openml.config.start_using_configuration_for_example()
 
 ############################################################################

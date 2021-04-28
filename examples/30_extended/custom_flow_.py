@@ -23,11 +23,8 @@ from openml import OpenMLClassificationTask
 from openml.runs.functions import format_prediction
 
 ####################################################################################################
-# .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server at test.openml.org. This prevents the main
-#   server from crowding with example datasets, tasks, runs, and so on. The
-#   use of this test server can affect behaviour and performance of the
-#   OpenML-Python API.
+# .. warning::
+#    .. include:: ../../warning.txt
 openml.config.start_using_configuration_for_example()
 
 ####################################################################################################
