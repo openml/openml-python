@@ -59,7 +59,7 @@ print(evaluations.head())
 # We'll use the test server for the rest of this tutorial.
 #
 # .. warning::
-#    .. include:: ../../warning.txt
+#    .. include:: ../../test_server_usage_warning.txt
 openml.config.start_using_configuration_for_example()
 
 ############################################################################

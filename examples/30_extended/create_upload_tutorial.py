@@ -17,7 +17,7 @@ from openml.datasets.functions import create_dataset
 
 ############################################################################
 # .. warning::
-#    .. include:: ../../warning.txt
+#    .. include:: ../../test_server_usage_warning.txt
 
 openml.config.start_using_configuration_for_example()
 ############################################################################

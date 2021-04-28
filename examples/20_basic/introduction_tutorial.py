@@ -64,7 +64,7 @@ from sklearn import neighbors
 
 ############################################################################
 # .. warning::
-#    .. include:: ../../warning.txt
+#    .. include:: ../../test_server_usage_warning.txt
 openml.config.start_using_configuration_for_example()
 
 ############################################################################
