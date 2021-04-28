@@ -3,7 +3,9 @@
 import time
 import hashlib
 import logging
+import math
 import pathlib
+import random
 import requests
 import urllib.parse
 import xml
@@ -262,7 +264,10 @@ def _send_request(request_method, url, data, files=None, md5_checksum=None):
                 if retry_counter >= n_retries:
                     raise
                 else:
-                    time.sleep(retry_counter)
+                    wait = retry_counter + (1 / (1 + math.exp(-(retry_counter - 6)))) * 20
+                    variation = random.gauss(0, wait / 10)
+                    wait_time = max(1.0, wait + variation)
+                    time.sleep(wait_time)
     if response is None:
         raise ValueError("This should never happen!")
     return response
