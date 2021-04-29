@@ -24,10 +24,6 @@ In this tutorial we will
     2) Download the flow, reinstantiate the model with same hyperparameters,
        and solve the same task again;
     3) We will verify that the obtained results are exactly the same.
-
-.. warning:: This example uploads data. For that reason, this example
-   connects to the test server at test.openml.org. This prevents the main
-   server from crowding with example datasets, tasks, runs, and so on.
 """
 
 # License: BSD 3-Clause
@@ -43,7 +39,9 @@ from sklearn.preprocessing import OneHotEncoder, FunctionTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.decomposition import TruncatedSVD
 
-
+############################################################################
+# .. warning::
+#    .. include:: ../../test_server_usage_warning.txt
 openml.config.start_using_configuration_for_example()
 
 ###############################################################################

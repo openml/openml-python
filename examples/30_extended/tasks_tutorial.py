@@ -172,6 +172,12 @@ print(tasks[0])
 # necessary (e.g. when other measure make no sense), since it will create a new task, which
 # scatters results across tasks.
 
+############################################################################
+# We'll use the test server for the rest of this tutorial.
+#
+# .. warning::
+#    .. include:: ../../test_server_usage_warning.txt
+openml.config.start_using_configuration_for_example()
 
 ############################################################################
 # Example
@@ -184,9 +190,6 @@ print(tasks[0])
 # If such a task doesn't exist, a task will be created and the corresponding task_id
 # will be returned.
 
-
-# using test server for example uploads
-openml.config.start_using_configuration_for_example()
 
 try:
     my_task = openml.tasks.create_task(
