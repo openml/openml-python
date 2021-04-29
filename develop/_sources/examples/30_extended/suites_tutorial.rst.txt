@@ -28,7 +28,7 @@ If you want to learn more about benchmark suites, check out our
 brief introductory tutorial :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py` or the
 `OpenML benchmark docs <https://docs.openml.org/benchmark/#benchmarking-suites>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-22
+.. GENERATED FROM PYTHON SOURCE LINES 13-23
 
 .. code-block:: default
 
@@ -48,16 +48,8 @@ brief introductory tutorial :ref:`sphx_glr_examples_20_basic_simple_suites_tutor
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-29
 
-.. warning:: This example uploads data. For that reason, this example
-   connects to the test server at test.openml.org before doing so.
-   This prevents the main server from crowding with example datasets,
-   tasks, runs, and so on.
-
-###########################################################################
-
-.. GENERATED FROM PYTHON SOURCE LINES 32-38
+.. GENERATED FROM PYTHON SOURCE LINES 24-30
 
 Listing suites
 **************
@@ -66,7 +58,7 @@ Listing suites
 * Default gives ``dict``, but we'll use ``dataframe`` to obtain an
   easier-to-work-with data structure
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-42
+.. GENERATED FROM PYTHON SOURCE LINES 30-34
 
 .. code-block:: default
 
@@ -101,16 +93,16 @@ Listing suites
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-45
+.. GENERATED FROM PYTHON SOURCE LINES 35-37
 
 Downloading suites
 ==================
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-48
+.. GENERATED FROM PYTHON SOURCE LINES 39-40
 
 This is done based on the dataset ID.
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-51
+.. GENERATED FROM PYTHON SOURCE LINES 40-43
 
 .. code-block:: default
 
@@ -142,11 +134,11 @@ This is done based on the dataset ID.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-53
+.. GENERATED FROM PYTHON SOURCE LINES 44-45
 
 Suites also feature a description:
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-55
+.. GENERATED FROM PYTHON SOURCE LINES 45-47
 
 .. code-block:: default
 
@@ -168,11 +160,11 @@ Suites also feature a description:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-57
+.. GENERATED FROM PYTHON SOURCE LINES 48-49
 
 Suites are a container for tasks:
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-59
+.. GENERATED FROM PYTHON SOURCE LINES 49-51
 
 .. code-block:: default
 
@@ -193,11 +185,11 @@ Suites are a container for tasks:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-61
+.. GENERATED FROM PYTHON SOURCE LINES 52-53
 
 And we can use the task listing functionality to learn more about them:
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-69
+.. GENERATED FROM PYTHON SOURCE LINES 53-61
 
 .. code-block:: default
 
@@ -239,7 +231,36 @@ And we can use the task listing functionality to learn more about them:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-76
+.. GENERATED FROM PYTHON SOURCE LINES 62-66
+
+We'll use the test server for the rest of this tutorial.
+
+.. warning::
+   .. include:: ../../test_server_usage_warning.txt
+
+.. GENERATED FROM PYTHON SOURCE LINES 66-68
+
+.. code-block:: default
+
+    openml.config.start_using_configuration_for_example()
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      warnings.warn(
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 69-75
 
 Uploading suites
 ================
@@ -248,12 +269,10 @@ Uploading suites is as simple as uploading any kind of other OpenML
 entity - the only reason why we need so much code in this example is
 because we upload some random data.
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-99
+.. GENERATED FROM PYTHON SOURCE LINES 75-96
 
 .. code-block:: default
 
-
-    openml.config.start_using_configuration_for_example()
 
     # We'll take a random subset of at least ten tasks of all available tasks on
     # the test server:
@@ -287,17 +306,17 @@ because we upload some random data.
 
     OpenML Benchmark Suite
     ======================
-    ID..............: 10186
+    ID..............: 10608
     Name............: Test-Suite
     Status..........: None
     Main Entity Type: task
-    Study URL.......: https://test.openml.org/s/10186
+    Study URL.......: https://test.openml.org/s/10608
     # of Tasks......: 20
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-101
+.. GENERATED FROM PYTHON SOURCE LINES 97-98
 
 .. code-block:: default
 
@@ -312,7 +331,7 @@ because we upload some random data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  41.077 seconds)
+   **Total running time of the script:** ( 0 minutes  42.443 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_suites_tutorial.py:

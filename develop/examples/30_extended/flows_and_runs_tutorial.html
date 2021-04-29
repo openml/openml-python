@@ -135,17 +135,25 @@ to download the full example code</p>
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">compose</span><span class="p">,</span> <span class="n">ensemble</span><span class="p">,</span> <span class="n">impute</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">,</span> <span class="n">preprocessing</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">tree</span>
 </pre></div>
 </div>
+<p>We’ll use the test server for the rest of this tutorial.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This example uploads data. For that reason, this example connects to the test server at test.openml.org.
+This prevents the main server from crowding with example datasets, tasks, runs, and so on.
+The use of this test server can affect behaviour and performance of the OpenML-Python API.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+  warnings.warn(
+</pre></div>
+</div>
 <div class="section" id="train-machine-learning-models">
 <h2>Train machine learning models<a class="headerlink" href="#train-machine-learning-models" title="Permalink to this headline">¶</a></h2>
 <p>Train a scikit-learn model on the data manually.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This example uploads data. For that reason, this example
-connects to the test server at test.openml.org. This prevents the main
-server from crowding with example datasets, tasks, runs, and so on.</p>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
-<span class="c1"># NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">68</span><span class="p">)</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_indicator</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
     <span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
@@ -205,11 +213,11 @@ Run ID.......: None
 Task ID......: 403
 Task Type....: None
 Task URL.....: https://test.openml.org/t/403
-Flow ID......: 179250
+Flow ID......: 226432
 Flow Name....: sklearn.tree._classes.DecisionTreeClassifier
-Flow URL.....: https://test.openml.org/f/179250
+Flow URL.....: https://test.openml.org/f/226432
 Setup ID.....: None
-Setup String.: Python_3.8.9. Sklearn_0.24.1. NumPy_1.20.2. SciPy_1.6.3.
+Setup String.: Python_3.8.9. Sklearn_0.24.2. NumPy_1.20.2. SciPy_1.6.3.
 Dataset ID...: 68
 Dataset URL..: https://test.openml.org/d/68
 </pre></div>
@@ -224,7 +232,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to https://test.openml.org/r/76384
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to https://test.openml.org/r/79467
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -235,12 +243,12 @@ the run is sent to the OpenML server:</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Flow
 ===========
-Flow ID.........: 179250 (version 18)
-Flow URL........: https://test.openml.org/f/179250
+Flow ID.........: 226432 (version 23)
+Flow URL........: https://test.openml.org/f/226432
 Flow Name.......: sklearn.tree._classes.DecisionTreeClassifier
 Flow Description: A decision tree classifier.
-Upload Date.....: 2021-04-14 10:24:51
-Dependencies....: sklearn==0.24.1
+Upload Date.....: 2021-04-28 14:52:25
+Dependencies....: sklearn==0.24.2
 numpy&gt;=1.13.3
 scipy&gt;=0.19.1
 joblib&gt;=0.11
@@ -331,8 +339,8 @@ variables and missing values in both.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to https://test.openml.org/r/76386
-Uploaded to https://test.openml.org/r/76388
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to https://test.openml.org/r/79469
+Uploaded to https://test.openml.org/r/79470
 </pre></div>
 </div>
 </div>
@@ -369,16 +377,16 @@ OpenML Run
 ==========
 Uploader Name: None
 Metric.......: None
-Run ID.......: 76389
-Run URL......: https://test.openml.org/r/76389
+Run ID.......: 79471
+Run URL......: https://test.openml.org/r/79471
 Task ID......: 6
 Task Type....: None
 Task URL.....: https://test.openml.org/t/6
-Flow ID......: 179598
+Flow ID......: 226921
 Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(categorical=sklearn.preprocessing._encoders.OneHotEncoder,continuous=sklearn.impute._base.SimpleImputer),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
-Flow URL.....: https://test.openml.org/f/179598
+Flow URL.....: https://test.openml.org/f/226921
 Setup ID.....: None
-Setup String.: Python_3.8.9. Sklearn_0.24.1. NumPy_1.20.2. SciPy_1.6.3.
+Setup String.: Python_3.8.9. Sklearn_0.24.2. NumPy_1.20.2. SciPy_1.6.3.
 Dataset ID...: None
 Dataset URL..: https://test.openml.org/d/None
 </pre></div>
@@ -428,13 +436,13 @@ task_id:<a class="reference external" href="https://www.openml.org/t/52950">5295
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: https://test.openml.org/r/76390
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: https://test.openml.org/r/79472
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  38.250 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  42.751 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9e0617073c8209f15abf91f273871776/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></p>

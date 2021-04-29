@@ -308,7 +308,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>46343
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>46361
 </pre></div>
 </div>
 <div class="section" id="exercise">
@@ -864,7 +864,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>20742</th>
+      <th>20744</th>
       <td>191646</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -895,7 +895,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>24414</th>
+      <th>24418</th>
       <td>213320</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -926,7 +926,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>27613</th>
+      <th>27619</th>
       <td>234435</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -957,7 +957,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>31927</th>
+      <th>31935</th>
       <td>256739</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -988,7 +988,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>31937</th>
+      <th>31945</th>
       <td>256750</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1019,7 +1019,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>37096</th>
+      <th>37108</th>
       <td>297708</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1050,7 +1050,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>40292</th>
+      <th>40306</th>
       <td>318835</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1081,7 +1081,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>43511</th>
+      <th>43527</th>
       <td>339990</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1188,6 +1188,21 @@ specific measure. OpenML will always compute all appropriate measures and you ca
 or sort results on your favourite measure afterwards. Only add an evaluation measure if
 necessary (e.g. when other measure make no sense), since it will create a new task, which
 scatters results across tasks.</p>
+<p>We’ll use the test server for the rest of this tutorial.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This example uploads data. For that reason, this example connects to the test server at test.openml.org.
+This prevents the main server from crowding with example datasets, tasks, runs, and so on.
+The use of this test server can affect behaviour and performance of the OpenML-Python API.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+  warnings.warn(
+</pre></div>
+</div>
 <div class="section" id="example">
 <h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
 <p>Let’s create a classification task on a dataset. In this example we will do this on the
@@ -1196,10 +1211,7 @@ and <em>predictive accuracy</em> as the predefined measure (this can also be lef
 If a task with these parameters exists, we will get an appropriate exception.
 If such a task doesn’t exist, a task will be created and the corresponding task_id
 will be returned.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># using test server for example uploads</span>
-<span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
-
-<span class="k">try</span><span class="p">:</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
     <span class="n">my_task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
         <span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span>
         <span class="n">dataset_id</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
@@ -1234,7 +1246,7 @@ will be returned.</p>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&amp;type=measure">Complete list of model estimation procedures</a>.</p></li>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=measure_type%3Aevaluation_measure&amp;type=measure">Complete list of evaluation measures</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  8.056 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  13.398 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-tasks-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e6648ddbb54e75b09dd01d69be33f340/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></p>

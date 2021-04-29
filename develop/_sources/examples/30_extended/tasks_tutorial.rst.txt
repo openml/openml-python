@@ -383,7 +383,7 @@ Finally, it is also possible to list all tasks on OpenML with:
 
  .. code-block:: none
 
-    46343
+    46361
 
 
 
@@ -956,7 +956,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>20742</th>
+          <th>20744</th>
           <td>191646</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -987,7 +987,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>24414</th>
+          <th>24418</th>
           <td>213320</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1018,7 +1018,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>27613</th>
+          <th>27619</th>
           <td>234435</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1049,7 +1049,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>31927</th>
+          <th>31935</th>
           <td>256739</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1080,7 +1080,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>31937</th>
+          <th>31945</th>
           <td>256750</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1111,7 +1111,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>37096</th>
+          <th>37108</th>
           <td>297708</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1142,7 +1142,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>40292</th>
+          <th>40306</th>
           <td>318835</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1173,7 +1173,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>43511</th>
+          <th>43527</th>
           <td>339990</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1334,7 +1334,36 @@ or sort results on your favourite measure afterwards. Only add an evaluation mea
 necessary (e.g. when other measure make no sense), since it will create a new task, which
 scatters results across tasks.
 
-.. GENERATED FROM PYTHON SOURCE LINES 177-186
+.. GENERATED FROM PYTHON SOURCE LINES 176-180
+
+We'll use the test server for the rest of this tutorial.
+
+.. warning::
+   .. include:: ../../test_server_usage_warning.txt
+
+.. GENERATED FROM PYTHON SOURCE LINES 180-182
+
+.. code-block:: default
+
+    openml.config.start_using_configuration_for_example()
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      warnings.warn(
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 183-192
 
 Example
 #######
@@ -1346,14 +1375,11 @@ If a task with these parameters exists, we will get an appropriate exception.
 If such a task doesn't exist, a task will be created and the corresponding task_id
 will be returned.
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-217
+.. GENERATED FROM PYTHON SOURCE LINES 192-220
 
 .. code-block:: default
 
 
-
-    # using test server for example uploads
-    openml.config.start_using_configuration_for_example()
 
     try:
         my_task = openml.tasks.create_task(
@@ -1396,7 +1422,7 @@ will be returned.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 218-222
+.. GENERATED FROM PYTHON SOURCE LINES 221-225
 
 * `Complete list of task types <https://www.openml.org/search?type=task_type>`_.
 * `Complete list of model estimation procedures <https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure>`_.
@@ -1406,7 +1432,7 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  8.056 seconds)
+   **Total running time of the script:** ( 1 minutes  13.398 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:

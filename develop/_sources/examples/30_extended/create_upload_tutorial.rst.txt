@@ -45,13 +45,12 @@ A tutorial on how to create and upload a dataset to OpenML.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-22
+.. GENERATED FROM PYTHON SOURCE LINES 19-21
 
-.. warning:: This example uploads data. For that reason, this example
-  connects to the test server at test.openml.org. This prevents the main
-  server from crowding with example datasets, tasks, runs, and so on.
+.. warning::
+   .. include:: ../../test_server_usage_warning.txt
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-24
+.. GENERATED FROM PYTHON SOURCE LINES 21-23
 
 .. code-block:: default
 
@@ -61,10 +60,19 @@ A tutorial on how to create and upload a dataset to OpenML.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      warnings.warn(
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-34
+
+.. GENERATED FROM PYTHON SOURCE LINES 26-33
 
 Below we will cover the following cases of the dataset object:
 
@@ -74,7 +82,7 @@ Below we will cover the following cases of the dataset object:
 * A sparse matrix
 * A pandas sparse dataframe
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-45
+.. GENERATED FROM PYTHON SOURCE LINES 35-44
 
 Dataset is a numpy array
 ========================
@@ -86,7 +94,7 @@ Prepare dataset
 Load an example dataset from scikit-learn which we will upload to OpenML.org
 via the API.
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-53
+.. GENERATED FROM PYTHON SOURCE LINES 44-52
 
 .. code-block:: default
 
@@ -105,7 +113,7 @@ via the API.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-59
+.. GENERATED FROM PYTHON SOURCE LINES 53-58
 
 OpenML does not distinguish between the attributes and targets on the data
 level and stores all data in a single matrix.
@@ -113,7 +121,7 @@ level and stores all data in a single matrix.
 The target feature is indicated as meta-data of the dataset (and tasks on
 that data).
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-72
+.. GENERATED FROM PYTHON SOURCE LINES 58-71
 
 .. code-block:: default
 
@@ -137,7 +145,7 @@ that data).
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-79
+.. GENERATED FROM PYTHON SOURCE LINES 72-78
 
 Create the dataset object
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -146,7 +154,7 @@ expected format:
 
 https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-117
+.. GENERATED FROM PYTHON SOURCE LINES 78-116
 
 .. code-block:: default
 
@@ -195,7 +203,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-122
+.. GENERATED FROM PYTHON SOURCE LINES 117-121
 
 .. code-block:: default
 
@@ -213,12 +221,12 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/60525
+    URL for dataset: https://test.openml.org/d/62937
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-130
+.. GENERATED FROM PYTHON SOURCE LINES 122-129
 
 Dataset is a list
 =================
@@ -228,7 +236,7 @@ OrderedDicts in the case of sparse data.
 Weather dataset:
 https://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-190
+.. GENERATED FROM PYTHON SOURCE LINES 129-189
 
 .. code-block:: default
 
@@ -299,7 +307,7 @@ https://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 191-195
+.. GENERATED FROM PYTHON SOURCE LINES 190-194
 
 .. code-block:: default
 
@@ -317,12 +325,12 @@ https://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/60526
+    URL for dataset: https://test.openml.org/d/62938
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-205
+.. GENERATED FROM PYTHON SOURCE LINES 195-204
 
 Dataset is a pandas DataFrame
 =============================
@@ -334,7 +342,7 @@ information without needing to explicitly provide it when calling the
 function :func:`openml.datasets.create_dataset`. In this regard, you only
 need to pass ``'auto'`` to the ``attributes`` parameter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 205-213
+.. GENERATED FROM PYTHON SOURCE LINES 204-212
 
 .. code-block:: default
 
@@ -373,7 +381,7 @@ need to pass ``'auto'`` to the ``attributes`` parameter.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 214-219
+.. GENERATED FROM PYTHON SOURCE LINES 213-218
 
 We enforce the column 'outlook' and 'play' to be a categorical
 dtype while the column 'windy' is kept as a boolean column. 'temperature'
@@ -381,7 +389,7 @@ and 'humidity' are kept as numeric columns. Then, we can
 call :func:`openml.datasets.create_dataset` by passing the dataframe and
 fixing the parameter ``attributes`` to ``'auto'``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 219-237
+.. GENERATED FROM PYTHON SOURCE LINES 218-236
 
 .. code-block:: default
 
@@ -410,7 +418,7 @@ fixing the parameter ``attributes`` to ``'auto'``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 238-242
+.. GENERATED FROM PYTHON SOURCE LINES 237-241
 
 .. code-block:: default
 
@@ -428,17 +436,17 @@ fixing the parameter ``attributes`` to ``'auto'``.
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/60527
+    URL for dataset: https://test.openml.org/d/62939
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 243-245
+.. GENERATED FROM PYTHON SOURCE LINES 242-244
 
 Dataset is a sparse matrix
 ==========================
 
-.. GENERATED FROM PYTHON SOURCE LINES 245-273
+.. GENERATED FROM PYTHON SOURCE LINES 244-272
 
 .. code-block:: default
 
@@ -477,7 +485,7 @@ Dataset is a sparse matrix
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 274-279
+.. GENERATED FROM PYTHON SOURCE LINES 273-278
 
 .. code-block:: default
 
@@ -496,17 +504,17 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/60528
+    URL for dataset: https://test.openml.org/d/62940
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 280-282
+.. GENERATED FROM PYTHON SOURCE LINES 279-281
 
 Dataset is a pandas dataframe with sparse columns
 =================================================
 
-.. GENERATED FROM PYTHON SOURCE LINES 282-307
+.. GENERATED FROM PYTHON SOURCE LINES 281-306
 
 .. code-block:: default
 
@@ -560,7 +568,7 @@ Dataset is a pandas dataframe with sparse columns
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 308-313
+.. GENERATED FROM PYTHON SOURCE LINES 307-312
 
 .. code-block:: default
 
@@ -579,12 +587,12 @@ Dataset is a pandas dataframe with sparse columns
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/60529
+    URL for dataset: https://test.openml.org/d/62941
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 314-315
+.. GENERATED FROM PYTHON SOURCE LINES 313-314
 
 .. code-block:: default
 
@@ -599,7 +607,7 @@ Dataset is a pandas dataframe with sparse columns
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  8.177 seconds)
+   **Total running time of the script:** ( 0 minutes  8.616 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:

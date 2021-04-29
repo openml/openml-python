@@ -50,7 +50,7 @@ For further information, please check out the installation guide at
 :ref:`installation`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-60
+.. GENERATED FROM PYTHON SOURCE LINES 33-56
 
 Authentication
 ^^^^^^^^^^^^^^
@@ -76,11 +76,7 @@ There are two ways to permanently authenticate:
 Alternatively, by running the code below and replacing 'YOURKEY' with your API key,
 you authenticate for the duration of the python process.
 
-.. warning:: This example uploads data. For that reason, this example
-  connects to the test server instead. This prevents the live server from
-  crowding with example datasets, tasks, studies, and so on.
-
-.. GENERATED FROM PYTHON SOURCE LINES 62-70
+.. GENERATED FROM PYTHON SOURCE LINES 59-65
 
 .. code-block:: default
 
@@ -90,11 +86,36 @@ you authenticate for the duration of the python process.
     import openml
     from sklearn import neighbors
 
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 66-68
+
+.. warning::
+   .. include:: ../../test_server_usage_warning.txt
+
+.. GENERATED FROM PYTHON SOURCE LINES 68-70
+
+.. code-block:: default
+
     openml.config.start_using_configuration_for_example()
 
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      warnings.warn(
 
 
 
@@ -179,7 +200,7 @@ Download the OpenML task for the eeg-eye-state.
 
  .. code-block:: none
 
-    kNN on eeg-eye-state: https://test.openml.org/r/76300
+    kNN on eeg-eye-state: https://test.openml.org/r/79394
 
 
 
@@ -199,7 +220,7 @@ Download the OpenML task for the eeg-eye-state.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  20.687 seconds)
+   **Total running time of the script:** ( 0 minutes  21.760 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_introduction_tutorial.py:

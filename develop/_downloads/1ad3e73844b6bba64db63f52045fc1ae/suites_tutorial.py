@@ -19,14 +19,6 @@ import numpy as np
 
 import openml
 
-############################################################################
-# .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server at test.openml.org before doing so.
-#   This prevents the main server from crowding with example datasets,
-#   tasks, runs, and so on.
-#
-############################################################################
-
 
 ############################################################################
 # Listing suites
@@ -67,14 +59,19 @@ tasks = tasks.query("tid in @suite.tasks")
 print(tasks.describe().transpose())
 
 ############################################################################
+# We'll use the test server for the rest of this tutorial.
+#
+# .. warning::
+#    .. include:: ../../test_server_usage_warning.txt
+openml.config.start_using_configuration_for_example()
+
+############################################################################
 # Uploading suites
 # ================
 #
 # Uploading suites is as simple as uploading any kind of other OpenML
 # entity - the only reason why we need so much code in this example is
 # because we upload some random data.
-
-openml.config.start_using_configuration_for_example()
 
 # We'll take a random subset of at least ten tasks of all available tasks on
 # the test server:

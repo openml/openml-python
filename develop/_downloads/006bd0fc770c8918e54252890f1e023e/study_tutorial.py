@@ -2,9 +2,7 @@
 =================
 Benchmark studies
 =================
-
 How to list, download and upload benchmark studies.
-
 In contrast to `benchmark suites <https://docs.openml.org/benchmark/#benchmarking-suites>`_ which
 hold a list of tasks, studies hold a list of runs. As runs contain all information on flows and
 tasks, all required information about a study can be retrieved.
@@ -18,15 +16,6 @@ import uuid
 from sklearn.ensemble import RandomForestClassifier
 
 import openml
-
-
-############################################################################
-# .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server at test.openml.org before doing so.
-#   This prevents the crowding of the main server with example datasets,
-#   tasks, runs, and so on.
-#
-############################################################################
 
 
 ############################################################################
@@ -67,13 +56,19 @@ evaluations = openml.evaluations.list_evaluations(
 print(evaluations.head())
 
 ############################################################################
+# We'll use the test server for the rest of this tutorial.
+#
+# .. warning::
+#    .. include:: ../../test_server_usage_warning.txt
+openml.config.start_using_configuration_for_example()
+
+############################################################################
 # Uploading studies
 # =================
 #
 # Creating a study is as simple as creating any kind of other OpenML entity.
 # In this examples we'll create a few runs for the OpenML-100 benchmark
 # suite which is available on the OpenML test server.
-openml.config.start_using_configuration_for_example()
 
 # Model to be used
 clf = RandomForestClassifier()

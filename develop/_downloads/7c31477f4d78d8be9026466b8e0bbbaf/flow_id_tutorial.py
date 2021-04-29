@@ -16,10 +16,14 @@ import sklearn.tree
 import openml
 
 
-# Activating test server
+############################################################################
+# .. warning::
+#    .. include:: ../../test_server_usage_warning.txt
 openml.config.start_using_configuration_for_example()
 
 
+############################################################################
+# Defining a classifier
 clf = sklearn.tree.DecisionTreeClassifier()
 
 ####################################################################################################

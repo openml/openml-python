@@ -126,8 +126,8 @@ to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="benchmark-studies">
 <span id="sphx-glr-examples-30-extended-study-tutorial-py"></span><h1>Benchmark studies<a class="headerlink" href="#benchmark-studies" title="Permalink to this headline">¶</a></h1>
-<p>How to list, download and upload benchmark studies.</p>
-<p>In contrast to <a class="reference external" href="https://docs.openml.org/benchmark/#benchmarking-suites">benchmark suites</a> which
+<p>How to list, download and upload benchmark studies.
+In contrast to <a class="reference external" href="https://docs.openml.org/benchmark/#benchmarking-suites">benchmark suites</a> which
 hold a list of tasks, studies hold a list of runs. As runs contain all information on flows and
 tasks, all required information about a study can be retrieved.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
@@ -139,14 +139,6 @@ tasks, all required information about a study can be retrieved.</p>
 <span class="kn">import</span> <span class="nn">openml</span>
 </pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This example uploads data. For that reason, this example
-connects to the test server at test.openml.org before doing so.
-This prevents the crowding of the main server with example datasets,
-tasks, runs, and so on.</p>
-</div>
-<hr class="docutils" />
 <div class="section" id="listing-studies">
 <h2>Listing studies<a class="headerlink" href="#listing-studies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -234,15 +226,28 @@ the evaluations available for the conducted runs:</p>
 [5 rows x 14 columns]
 </pre></div>
 </div>
+<p>We’ll use the test server for the rest of this tutorial.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This example uploads data. For that reason, this example connects to the test server at test.openml.org.
+This prevents the main server from crowding with example datasets, tasks, runs, and so on.
+The use of this test server can affect behaviour and performance of the OpenML-Python API.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+  warnings.warn(
+</pre></div>
+</div>
 </div>
 <div class="section" id="uploading-studies">
 <h3>Uploading studies<a class="headerlink" href="#uploading-studies" title="Permalink to this headline">¶</a></h3>
 <p>Creating a study is as simple as creating any kind of other OpenML entity.
 In this examples we’ll create a few runs for the OpenML-100 benchmark
 suite which is available on the OpenML test server.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
-
-<span class="c1"># Model to be used</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Model to be used</span>
 <span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">()</span>
 
 <span class="c1"># We&#39;ll create a study with one run on 3 datasets present in the suite</span>
@@ -278,18 +283,18 @@ suite which is available on the OpenML test server.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>True
 OpenML Study
 ============
-ID..............: 10187
+ID..............: 10609
 Name............: Test-Study
 Status..........: None
 Main Entity Type: run
-Study URL.......: https://test.openml.org/s/10187
+Study URL.......: https://test.openml.org/s/10609
 # of Runs.......: 3
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  38.105 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  42.821 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-study-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/006bd0fc770c8918e54252890f1e023e/study_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">study_tutorial.py</span></code></a></p>

@@ -23,7 +23,7 @@ Flows and Runs
 
 A simple tutorial on how to train/run a model and how to upload the results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 7-13
+.. GENERATED FROM PYTHON SOURCE LINES 7-14
 
 .. code-block:: default
 
@@ -40,21 +40,43 @@ A simple tutorial on how to train/run a model and how to upload the results.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-20
+
+.. GENERATED FROM PYTHON SOURCE LINES 15-17
+
+.. warning::
+   .. include:: ../../test_server_usage_warning.txt
+
+.. GENERATED FROM PYTHON SOURCE LINES 17-19
+
+.. code-block:: default
+
+    openml.config.start_using_configuration_for_example()
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      warnings.warn(
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 20-22
 
 Train a machine learning model
 ==============================
 
-.. warning:: This example uploads data. For that reason, this example
-  connects to the test server at test.openml.org. This prevents the main
-  server from crowding with example datasets, tasks, runs, and so on.
-
-.. GENERATED FROM PYTHON SOURCE LINES 20-31
+.. GENERATED FROM PYTHON SOURCE LINES 22-31
 
 .. code-block:: default
 
-
-    openml.config.start_using_configuration_for_example()
 
     # NOTE: We are using dataset 20 from the test server: https://test.openml.org/d/20
     dataset = openml.datasets.get_dataset(20)
@@ -112,11 +134,11 @@ Running a model on a task
     Task ID......: 119
     Task Type....: None
     Task URL.....: https://test.openml.org/t/119
-    Flow ID......: 179227
+    Flow ID......: 226430
     Flow Name....: sklearn.ensemble._forest.RandomForestClassifier
-    Flow URL.....: https://test.openml.org/f/179227
+    Flow URL.....: https://test.openml.org/f/226430
     Setup ID.....: None
-    Setup String.: Python_3.8.9. Sklearn_0.24.1. NumPy_1.20.2. SciPy_1.6.3.
+    Setup String.: Python_3.8.9. Sklearn_0.24.2. NumPy_1.20.2. SciPy_1.6.3.
     Dataset ID...: 20
     Dataset URL..: https://test.openml.org/d/20
 
@@ -147,8 +169,8 @@ Publishing the run
 
  .. code-block:: none
 
-    Run was uploaded to https://test.openml.org/r/76297
-    The flow can be found at https://test.openml.org/f/179227
+    Run was uploaded to https://test.openml.org/r/79390
+    The flow can be found at https://test.openml.org/f/226430
 
 
 
@@ -168,7 +190,7 @@ Publishing the run
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.754 seconds)
+   **Total running time of the script:** ( 0 minutes  8.624 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_flows_and_runs_tutorial.py:

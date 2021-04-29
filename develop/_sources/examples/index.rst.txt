@@ -186,7 +186,7 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="How to list, download and upload benchmark studies.">
+    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark studies">
 
 .. only:: html
 

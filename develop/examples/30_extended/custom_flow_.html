@@ -131,17 +131,22 @@ as when the flow uses a framework without an extension or when the flow is descr
 As an example we will use the flows generated for the <a class="reference external" href="https://openml.github.io/automlbenchmark/">AutoML Benchmark</a>,
 and also show how to link runs to the custom flow.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
-<span class="c1"># .. warning:: This example uploads data. For that reason, this example</span>
-<span class="c1">#   connects to the test server at test.openml.org. This prevents the main</span>
-<span class="c1">#   server from crowding with example datasets, tasks, runs, and so on.</span>
+
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">from</span> <span class="nn">openml</span> <span class="kn">import</span> <span class="n">OpenMLClassificationTask</span>
 <span class="kn">from</span> <span class="nn">openml.runs.functions</span> <span class="kn">import</span> <span class="n">format_prediction</span>
-
-<span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This example uploads data. For that reason, this example connects to the test server at test.openml.org.
+This prevents the main server from crowding with example datasets, tasks, runs, and so on.
+The use of this test server can affect behaviour and performance of the OpenML-Python API.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="section" id="defining-the-flow">
