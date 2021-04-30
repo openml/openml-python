@@ -138,6 +138,7 @@ html_theme_options = {
         ("User Guide", "usage"),
         ("API", "api"),
         ("Examples", "examples/index"),
+        ("Extensions", "extensions"),
         ("Contributing", "contributing"),
         ("Changelog", "progress"),
     ],

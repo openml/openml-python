@@ -61,6 +61,7 @@ Content
 * :ref:`usage`
 * :ref:`api`
 * :ref:`sphx_glr_examples`
+* :ref:`extensions`
 * :ref:`contributing`
 * :ref:`progress`
 
