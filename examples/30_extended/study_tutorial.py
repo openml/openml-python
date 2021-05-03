@@ -36,7 +36,8 @@ print(studies.head(n=10))
 
 ############################################################################
 # This is done based on the study ID.
-study = openml.study.get_study(123)
+# https://www.openml.org/api/v1/study/123
+study = openml.study.get_study("Linear vs. Non Linear")
 print(study)
 
 ############################################################################
@@ -77,7 +78,8 @@ clf = RandomForestClassifier()
 tasks = [115, 259, 307]
 
 # To verify
-suite = openml.study.get_suite(1)
+# https://test.openml.org/api/v1/study/1
+suite = openml.study.get_suite("OpenML100")
 print(all([t_id in suite.tasks for t_id in tasks]))
 
 run_ids = []
