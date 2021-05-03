@@ -219,7 +219,7 @@ def __is_checksum_equal(downloaded_file, md5_checksum=None):
 
 
 def _send_request(request_method, url, data, files=None, md5_checksum=None):
-    n_retries = max(1, min(config.connection_n_retries, config.max_retries))
+    n_retries = max(1, config.connection_n_retries)
 
     response = None
     with requests.Session() as session:

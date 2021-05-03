@@ -149,11 +149,9 @@ def configure_cachedir(value: str) -> None:
 def configure_connection_n_retries(value: str) -> None:
     def valid_connection_retries(n: str) -> str:
         if not n.isdigit():
-            return f"Must be an integer number (smaller than {config.max_retries})."
-        if int(n) > config.max_retries:
-            return f"connection_n_retries may not exceed {config.max_retries}."
-        if int(n) == 0:
-            return "connection_n_retries must be non-zero."
+            return f"'{n}' is not a valid positive integer."
+        if int(n) <= 0:
+            return "connection_n_retries must be positive."
         return ""
 
     configure_field(
@@ -161,7 +159,7 @@ def configure_connection_n_retries(value: str) -> None:
         value=value,
         check_with_message=valid_connection_retries,
         intro_message="Configuring the number of times to attempt to connect to the OpenML Server",
-        input_message=f"Enter an integer between 0 and {config.max_retries}: ",
+        input_message="Enter a positive integer: ",
     )
 
 

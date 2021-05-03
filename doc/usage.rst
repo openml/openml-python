@@ -54,7 +54,7 @@ which are separated by newlines. The following keys are defined:
 
 * retry_policy:
     * Defines how to react when the server is unavailable or experiencing high load. It determines both how often to attempt to reconnect and how quickly to do so. Please don't use ``human`` in an automated script that you run more than one instance of, it might increase the time to complete your jobs and that of others.
-    * human: For people running openml in interactive fashion. Try only a few times, but in quick succession.
+    * human (default): For people running openml in interactive fashion. Try only a few times, but in quick succession.
     * robot: For people using openml in an automated fashion. Keep trying to reconnect for a longer time, quickly increasing the time between retries.
 
 * connection_n_retries:
