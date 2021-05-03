@@ -9,6 +9,7 @@ Changelog
 0.12.2
 ~~~~~~
 
+* ADD #1065: Add a ``retry_policy`` configuration option that determines the frequency and number of times to attempt to retry server requests.
 * DOC: Fixes a few broken links in the documentation.
 * MAINT/DOC: Automatically check for broken external links when building the documentation.
 * MAINT/DOC: Fail documentation building on warnings. This will make the documentation building
