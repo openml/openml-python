@@ -36,8 +36,7 @@ print(studies.head(n=10))
 
 ############################################################################
 # This is done based on the study ID.
-# https://www.openml.org/api/v1/study/123
-study = openml.study.get_study("Linear vs. Non Linear")
+study = openml.study.get_study(123)
 print(study)
 
 ############################################################################
