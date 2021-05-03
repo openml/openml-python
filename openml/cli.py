@@ -215,6 +215,35 @@ def configure_verbosity(value: str) -> None:
     )
 
 
+def configure_retry_policy(value: str) -> None:
+    def is_known_policy(policy: str) -> str:
+        if policy in ["human", "robot"]:
+            return ""
+        return "Must be 'human' or 'robot'."
+
+    def autocomplete_policy(policy: str) -> str:
+        for option in ["human", "robot"]:
+            if option.startswith(policy.lower()):
+                return option
+        return policy
+
+    intro_message = (
+        "Set the retry policy which determines how to react if the server is unresponsive."
+        "We recommend 'human' for interactive usage and 'robot' for scripts."
+        "'human': try a few times in quick succession, less reliable but quicker response."
+        "'robot': try many times with increasing intervals, more reliable but slower response."
+    )
+
+    configure_field(
+        field="retry_policy",
+        value=value,
+        check_with_message=is_known_policy,
+        intro_message=intro_message,
+        input_message="Enter 'human' or 'robot': ",
+        sanitize=autocomplete_policy,
+    )
+
+
 def configure_field(
     field: str,
     value: Union[None, str],
@@ -270,6 +299,7 @@ def configure(args: argparse.Namespace):
         "apikey": configure_apikey,
         "server": configure_server,
         "cachedir": configure_cachedir,
+        "retry_policy": configure_retry_policy,
         "connection_n_retries": configure_connection_n_retries,
         "avoid_duplicate_runs": configure_avoid_duplicate_runs,
         "verbosity": configure_verbosity,
