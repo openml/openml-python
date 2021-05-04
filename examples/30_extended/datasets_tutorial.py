@@ -52,7 +52,7 @@ datalist.query("NumberOfClasses > 50")
 # =================
 
 # This is done based on the dataset ID.
-dataset = openml.datasets.get_dataset(1471)
+dataset = openml.datasets.get_dataset(dataset_id="eeg-eye-state", version=1)
 
 # Print a summary
 print(
@@ -92,7 +92,7 @@ print(X.info())
 # data file. The dataset object can be used as normal.
 # Whenever you use any functionality that requires the data,
 # such as `get_data`, the data will be downloaded.
-dataset = openml.datasets.get_dataset(1471, download_data=False)
+dataset = openml.datasets.get_dataset(dataset_id="eeg-eye-state", version=1, download_data=False)
 
 ############################################################################
 # Exercise 2

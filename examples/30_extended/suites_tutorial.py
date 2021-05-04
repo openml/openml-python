@@ -37,7 +37,8 @@ print(suites.head(n=10))
 
 ############################################################################
 # This is done based on the dataset ID.
-suite = openml.study.get_suite(99)
+# https://www.openml.org/api/v1/study/99
+suite = openml.study.get_suite("OpenML-CC18")
 print(suite)
 
 ############################################################################

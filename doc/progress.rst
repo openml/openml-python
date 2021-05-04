@@ -8,7 +8,7 @@ Changelog
 
 0.12.2
 ~~~~~~
-
+* MAINT/DOC: #1066/#1063 Use names instead of integer ids in the examples whenever possible. Update documentation for ``get_dataset``.
 * DOC: Fixes a few broken links in the documentation.
 * MAINT/DOC: Automatically check for broken external links when building the documentation.
 * MAINT/DOC: Fail documentation building on warnings. This will make the documentation building

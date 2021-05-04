@@ -368,7 +368,8 @@ def get_dataset(
     Parameters
     ----------
     dataset_id : int or str
-        Dataset ID of the dataset to download
+        Dataset ID of the dataset to download. It can be an integer or it can be a string
+        of the dataset name.
     download_data : bool, optional (default=True)
         If True, also download the data file. Beware that some datasets are large and it might
         make the operation noticeably slower. Metadata is also still retrieved.
