@@ -169,7 +169,7 @@ Publishing the run
 
  .. code-block:: none
 
-    Run was uploaded to https://test.openml.org/r/84274
+    Run was uploaded to https://test.openml.org/r/84601
     The flow can be found at https://test.openml.org/f/226430
 
 
@@ -190,7 +190,7 @@ Publishing the run
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.816 seconds)
+   **Total running time of the script:** ( 0 minutes  25.685 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_flows_and_runs_tutorial.py:
