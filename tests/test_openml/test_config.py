@@ -44,8 +44,8 @@ class TestConfig(openml.testing.TestBase):
         _config["server"] = "https://test.openml.org/api/v1/xml"
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = False
-        _config["connection_n_retries"] = 10
-        _config["retry_policy"] = "human"
+        _config["connection_n_retries"] = 20
+        _config["retry_policy"] = "robot"
         self.assertIsInstance(config, dict)
         self.assertEqual(len(config), 6)
         self.assertDictEqual(config, _config)
