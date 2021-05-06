@@ -249,9 +249,8 @@ def _send_request(request_method, url, data, files=None, md5_checksum=None):
                 OpenMLHashException,
             ) as e:
                 if isinstance(e, OpenMLServerException):
-                    if e.code not in [107, 500]:
+                    if e.code not in [107]:
                         # 107: database connection error
-                        # 500: internal server error
                         raise
                 elif isinstance(e, xml.parsers.expat.ExpatError):
                     if request_method != "get" or retry_counter >= n_retries:

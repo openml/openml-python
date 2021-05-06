@@ -160,19 +160,7 @@ obtained on. Learn how to share your datasets in the following tutorial:
 Extending OpenML-Python
 ***********************
 
-OpenML-Python provides an extension interface to connect other machine learning libraries than
-scikit-learn to OpenML. Please check the :ref:`api_extensions` and use the
-scikit-learn extension in :class:`openml.extensions.sklearn.SklearnExtension` as a starting point.
-
-Runtime measurement is incorporated in the OpenML sklearn-extension. Example usage and potential
-usage for Hyperparameter Optimisation can be found in the example tutorial:
-
-* :ref:`sphx_glr_examples_30_extended_fetch_runtimes_tutorial.py`
-
-
-Here is a list of currently maintained OpenML extensions:
-
-* `openml-keras <https://github.com/openml/openml-keras>`_
-* `openml-pytorch <https://github.com/openml/openml-pytorch>`_
-* `openml-tensorflow(for tensorflow 2+) <https://github.com/openml/openml-tensorflow>`_
+OpenML-Python provides an extension interface to connect machine learning libraries directly to
+the API and ships a ``scikit-learn`` extension. You can find more information in the Section
+:ref:`extensions`'
 
