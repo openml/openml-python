@@ -25,6 +25,6 @@ jobs:
         with:
           context: docker/
           push: true
-          tags: openml/openml-python:latest,openml/openml-python:${{env.GITHUB_SHA}}
+          tags: "openml/openml-python:latest,openml/openml-python:$GITHUB_SHA"
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
