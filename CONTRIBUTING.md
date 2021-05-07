@@ -179,7 +179,7 @@ following rules before you submit a pull request:
 
 
 note: *We recommend to follow the instructions below to install all requirements locally.
-However it is also possible to use the [openml-python docker image](https://github.com/openml/openml-python/blob/master/docker/readme.md) for testing and building documentation.
+However it is also possible to use the [openml-python docker image](https://github.com/openml/openml-python/blob/main/docker/readme.md) for testing and building documentation.
 This can be useful for one-off contributions or when you are experiencing installation issues.*
 
 First install openml with its test dependencies by running

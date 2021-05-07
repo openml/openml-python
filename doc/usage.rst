@@ -76,7 +76,7 @@ It is also possible to try out the latest development version of ``openml-python
 ```
 
 
-See the `openml-python docker documentation <https://github.com/openml/openml-python/blob/master/docker/readme.md>`_ for more information.
+See the `openml-python docker documentation <https://github.com/openml/openml-python/blob/main/docker/readme.md>`_ for more information.
 
 ~~~~~~~~~~~~
 Key concepts
