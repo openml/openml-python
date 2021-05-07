@@ -9,7 +9,9 @@ First pull the docker image:
     docker pull openml/openml-python
 
 ## Usage
-`docker run -it openml/openml-python [-|DOC|TEST] [BRANCH]`
+
+
+    docker run -it openml/openml-python [DOC,TEST] [BRANCH]
 
 The image is designed to work with two specified directories which may be mounted ([`docker --mount documentation`](https://docs.docker.com/storage/bind-mounts/#start-a-container-with-a-bind-mount)).
 You can mount your openml-python folder to the `/code` directory to run tests or build docs on your local files.
@@ -58,6 +60,8 @@ For example, to run tests on your local repository:
 
     docker run --mount type=bind,source=PATH_TO_REPOSITORY,destination=/code -t openml/openml-python test
     
+Running tests from the state of an online repository is supported similar to building documentation (i.e. specify `BRANCH` instead of mounting `/code`).
+    
 ## Troubleshooting
 
 When you are mounting a directory you can check that it is mounted correctly by running the image in bash mode.
@@ -68,10 +72,14 @@ If e.g. there is no code in your mounted `/code`, you should double-check the pr
 This section contains some notes about the structure of the image, intended for those who want to work on it.
 
 ### Added Directories
-There is a `/omlp` directory which by default contains the openml-python repository in the state with which the image was built.
-The used virtual environment resides in the `/omlp/venv/` folder.
-The startup script is located in `/scripts/startup.sh`.
-Otherwise it is built on a vanilla `python:3` image.
+The `openml/openml-python` image is built on a vanilla `python:3` image.
+Additionally it contains the following files are directories:
+
+ - `/omlp`: contains the openml-python repository in the state with which the image was built by default.
+            If working with a `BRANCH`, this repository will be set to the `HEAD` of `BRANCH`.
+ - `/omlp/venv/`: contains the used virtual environment for `doc` and `test`. It has `openml-python` dependencies pre-installed.
+            When invoked with `doc` or `test`, the dependencies will be updated based on the `setup.py` of the `BRANCH` or mounted `/code`.
+ - `/scripts/startup.sh`: the entrypoint of the image. Takes care of the automated features (e.g. `doc` and `test`).
 
 ## Building the image
 To build the image yourself, execute `docker build -f Dockerfile .` from this directory.
