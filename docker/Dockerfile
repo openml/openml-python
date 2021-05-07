@@ -5,6 +5,7 @@ FROM python:3
 RUN git clone  https://github.com/openml/openml-python.git omlp
 WORKDIR omlp
 RUN python -m venv venv
+RUN venv/bin/pip install wheel setuptools
 RUN venv/bin/pip install -e .[test,examples,docs,examples_unix]
 
 WORKDIR /
