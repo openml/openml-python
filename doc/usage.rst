@@ -70,6 +70,19 @@ This file is easily configurable by the ``openml`` command line interface.
 To see where the file is stored, and what its values are, use `openml configure none`.
 Set any field with ``openml configure FIELD`` or even all fields with just ``openml configure``.
 
+~~~~~~
+Docker
+~~~~~~
+
+It is also possible to try out the latest development version of ``openml-python`` with docker:
+
+```
+    docker run -it openml/openml-python
+```
+
+
+See the `openml-python docker documentation <https://github.com/openml/openml-python/blob/main/docker/readme.md>`_ for more information.
+
 ~~~~~~~~~~~~
 Key concepts
 ~~~~~~~~~~~~
