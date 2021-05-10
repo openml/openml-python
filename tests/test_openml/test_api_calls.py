@@ -29,4 +29,4 @@ class TestConfig(openml.testing.TestBase):
         ):
             openml._api_calls._send_request("get", "/abc", {})
 
-        self.assertEqual(Session_class_mock.return_value.__enter__.return_value.get.call_count, 10)
+        self.assertEqual(Session_class_mock.return_value.__enter__.return_value.get.call_count, 20)

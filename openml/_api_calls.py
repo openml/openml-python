@@ -3,7 +3,9 @@
 import time
 import hashlib
 import logging
+import math
 import pathlib
+import random
 import requests
 import urllib.parse
 import xml
@@ -217,7 +219,7 @@ def __is_checksum_equal(downloaded_file, md5_checksum=None):
 
 
 def _send_request(request_method, url, data, files=None, md5_checksum=None):
-    n_retries = max(1, min(config.connection_n_retries, config.max_retries))
+    n_retries = max(1, config.connection_n_retries)
 
     response = None
     with requests.Session() as session:
@@ -261,7 +263,17 @@ def _send_request(request_method, url, data, files=None, md5_checksum=None):
                 if retry_counter >= n_retries:
                     raise
                 else:
-                    time.sleep(retry_counter)
+
+                    def robot(n: int) -> float:
+                        wait = (1 / (1 + math.exp(-(n * 0.5 - 4)))) * 60
+                        variation = random.gauss(0, wait / 10)
+                        return max(1.0, wait + variation)
+
+                    def human(n: int) -> float:
+                        return max(1.0, n)
+
+                    delay = {"human": human, "robot": robot}[config.retry_policy](retry_counter)
+                    time.sleep(delay)
     if response is None:
         raise ValueError("This should never happen!")
     return response
