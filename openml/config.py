@@ -9,7 +9,7 @@ import logging.handlers
 import os
 from pathlib import Path
 import platform
-from typing import Tuple, cast, Any
+from typing import Tuple, cast, Any, Optional
 import warnings
 
 from io import StringIO
@@ -95,10 +95,9 @@ _defaults = {
         else os.path.join("~", ".openml")
     ),
     "avoid_duplicate_runs": "True",
-    "connection_n_retries": "10",
-    "max_retries": "20",
+    "retry_policy": "human",
+    "connection_n_retries": "5",
 }
-
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
@@ -122,9 +121,26 @@ apikey = _defaults["apikey"]
 cache_directory = str(_defaults["cachedir"])  # so mypy knows it is a string
 avoid_duplicate_runs = True if _defaults["avoid_duplicate_runs"] == "True" else False
 
-# Number of retries if the connection breaks
+retry_policy = _defaults["retry_policy"]
 connection_n_retries = int(_defaults["connection_n_retries"])
-max_retries = int(_defaults["max_retries"])
+
+
+def set_retry_policy(value: str, n_retries: Optional[int] = None) -> None:
+    global retry_policy
+    global connection_n_retries
+    default_retries_by_policy = dict(human=5, robot=50)
+
+    if value not in default_retries_by_policy:
+        raise ValueError(
+            f"Detected retry_policy '{value}' but must be one of {default_retries_by_policy}"
+        )
+    if n_retries is not None and not isinstance(n_retries, int):
+        raise TypeError(f"`n_retries` must be of type `int` or `None` but is `{type(n_retries)}`.")
+    if isinstance(n_retries, int) and n_retries < 1:
+        raise ValueError(f"`n_retries` is '{n_retries}' but must be positive.")
+
+    retry_policy = value
+    connection_n_retries = default_retries_by_policy[value] if n_retries is None else n_retries
 
 
 class ConfigurationForExamples:
@@ -205,8 +221,6 @@ def _setup(config=None):
     global server
     global cache_directory
     global avoid_duplicate_runs
-    global connection_n_retries
-    global max_retries
 
     config_file = determine_config_file_path()
     config_dir = config_file.parent
@@ -238,8 +252,12 @@ def _setup(config=None):
     apikey = _get(config, "apikey")
     server = _get(config, "server")
     short_cache_dir = _get(config, "cachedir")
-    connection_n_retries = int(_get(config, "connection_n_retries"))
-    max_retries = int(_get(config, "max_retries"))
+
+    n_retries = _get(config, "connection_n_retries")
+    if n_retries is not None:
+        n_retries = int(n_retries)
+
+    set_retry_policy(_get(config, "retry_policy"), n_retries)
 
     cache_directory = os.path.expanduser(short_cache_dir)
     # create the cache subdirectory
@@ -259,12 +277,6 @@ def _setup(config=None):
         openml_logger.warning(
             "No permission to create OpenML directory at %s! This can result in OpenML-Python "
             "not working properly." % config_dir
-        )
-
-    if connection_n_retries > max_retries:
-        raise ValueError(
-            "A higher number of retries than {} is not allowed to keep the "
-            "server load reasonable".format(max_retries)
         )
 
 
@@ -317,7 +329,7 @@ def get_config_as_dict():
     config["cachedir"] = cache_directory
     config["avoid_duplicate_runs"] = avoid_duplicate_runs
     config["connection_n_retries"] = connection_n_retries
-    config["max_retries"] = max_retries
+    config["retry_policy"] = retry_policy
     return config
 
 

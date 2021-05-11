@@ -52,9 +52,14 @@ which are separated by newlines. The following keys are defined:
     * if set to ``True``, when ``run_flow_on_task`` or similar methods are called a lookup is performed to see if there already exists such a run on the server. If so, download those results instead.
     * if not given, will default to ``True``.
 
+* retry_policy:
+    * Defines how to react when the server is unavailable or experiencing high load. It determines both how often to attempt to reconnect and how quickly to do so. Please don't use ``human`` in an automated script that you run more than one instance of, it might increase the time to complete your jobs and that of others.
+    * human (default): For people running openml in interactive fashion. Try only a few times, but in quick succession.
+    * robot: For people using openml in an automated fashion. Keep trying to reconnect for a longer time, quickly increasing the time between retries.
+
 * connection_n_retries:
-    * number of connection retries.
-    * default: 2. Maximum number of retries: 20.
+    * number of connection retries
+    * default depends on retry_policy (5 for ``human``, 50 for ``robot``)
 
 * verbosity:
     * 0: normal output
@@ -64,6 +69,19 @@ which are separated by newlines. The following keys are defined:
 This file is easily configurable by the ``openml`` command line interface.
 To see where the file is stored, and what its values are, use `openml configure none`.
 Set any field with ``openml configure FIELD`` or even all fields with just ``openml configure``.
+
+~~~~~~
+Docker
+~~~~~~
+
+It is also possible to try out the latest development version of ``openml-python`` with docker:
+
+```
+    docker run -it openml/openml-python
+```
+
+
+See the `openml-python docker documentation <https://github.com/openml/openml-python/blob/main/docker/readme.md>`_ for more information.
 
 ~~~~~~~~~~~~
 Key concepts
@@ -155,19 +173,7 @@ obtained on. Learn how to share your datasets in the following tutorial:
 Extending OpenML-Python
 ***********************
 
-OpenML-Python provides an extension interface to connect other machine learning libraries than
-scikit-learn to OpenML. Please check the :ref:`api_extensions` and use the
-scikit-learn extension in :class:`openml.extensions.sklearn.SklearnExtension` as a starting point.
-
-Runtime measurement is incorporated in the OpenML sklearn-extension. Example usage and potential
-usage for Hyperparameter Optimisation can be found in the example tutorial:
-
-* :ref:`sphx_glr_examples_30_extended_fetch_runtimes_tutorial.py`
-
-
-Here is a list of currently maintained OpenML extensions:
-
-* `openml-keras <https://github.com/openml/openml-keras>`_
-* `openml-pytorch <https://github.com/openml/openml-pytorch>`_
-* `openml-tensorflow(for tensorflow 2+) <https://github.com/openml/openml-tensorflow>`_
+OpenML-Python provides an extension interface to connect machine learning libraries directly to
+the API and ships a ``scikit-learn`` extension. You can find more information in the Section
+:ref:`extensions`'
 

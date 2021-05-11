@@ -94,8 +94,9 @@ class TestBase(unittest.TestCase):
         openml.config.cache_directory = self.workdir
 
         # Increase the number of retries to avoid spurious server failures
+        self.retry_policy = openml.config.retry_policy
         self.connection_n_retries = openml.config.connection_n_retries
-        openml.config.connection_n_retries = 10
+        openml.config.set_retry_policy("robot", n_retries=20)
 
     def tearDown(self):
         os.chdir(self.cwd)
@@ -109,6 +110,7 @@ class TestBase(unittest.TestCase):
                 raise
         openml.config.server = self.production_server
         openml.config.connection_n_retries = self.connection_n_retries
+        openml.config.retry_policy = self.retry_policy
 
     @classmethod
     def _mark_entity_for_removal(self, entity_type, entity_id):
