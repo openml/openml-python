@@ -66,7 +66,7 @@ COMPOSITION_STEP_CONSTANT = "composition_step_constant"
 
 class SklearnExtension(Extension):
     """Connect scikit-learn to OpenML-Python.
-       The estimators which use this extension must be scikit-learn compatible',
+       The estimators which use this extension must be scikit-learn compatible,
        i.e needs to be a subclass of sklearn.base.BaseEstimator".
     """
 
