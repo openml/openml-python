@@ -64,7 +64,7 @@ interface the new extension.
 
 The following methods should get implemented. Although the documentation in
 the `Extension` interface should always be leading, here we list some additional
-information and best practises. 
+information and best practices. 
 The `Sklearn Extension API :class:`openml.extensions.sklearn.SklearnExtension.html`
 is a good example to follow. Note that most of the methods to be implemented 
 are relatively simple, and can be done in several lines of code. 
@@ -72,30 +72,30 @@ are relatively simple, and can be done in several lines of code.
 * General setup (required)
   * :meth:`can_handle_flow`: Takes as argument an OpenML flow, and checks
     whether this can be handled by the current extension. The OpenML database
-    consists of many flows, from varios workbenches (e.g., scikit-learn, Weka,
+    consists of many flows, from various workbenches (e.g., scikit-learn, Weka,
     mlr). This method is called before a model is being deserialized.
     Typically, the flow-dependency field is used to check whether the specific
     library is present, and no unknown libraries are present there. 
   * :meth:`can_handle_model`: Similar as :meth:`can_handle_flow`, except that
-    in this case a Python object is given. As such, in many cases this method
-    can be implemented by checking whether this adhires to a certain base-class.
+    in this case a Python object is given. As such, in many cases, this method
+    can be implemented by checking whether this adheres to a certain base class.
 * Serialization and De-serialization (required)
   * :meth:`flow_to_model`: deserializes the OpenML Flow into a model (if the
     library can indeed handle the flow). This method has an important interplay
     with :meth:`model_to_flow`. 
-    Running these two methods in succession, should result in exactly the same
+    Running these two methods in succession should result in exactly the same
     model (or flow). This property can be used for unit testing (e.g., build a
     model with hyperparameters, make predictions on a task, serialize it to a flow,
     deserialize it back, make it predict on the same task, and check whether the
     predictions are exactly the same.)
     The example in the scikit-learn interface might seem daunting, but note that
     here some complicated design choices were made, that allow for all sorts of
-    interesting research questions. It is probably good practise to start easy. 
+    interesting research questions. It is probably good practice to start easy. 
   * :meth:`model_to_flow`: The inverse of :meth:`flow_to_model`. Serializes a 
     model into an OpenML Flow. The flow should preserve the class, the library
     version, and the tunable hyperparameters. 
   * :meth:`get_version_information`: Return a tuple with the version information
-    of the important libaries. 
+    of the important libraries. 
   * :meth:`create_setup_string`: No longer uses, and will be deprecated soon. 
 * Performing runs (required)
   * :meth:`is_estimator`: Gets as input a class, and checks whether it has the 
@@ -108,17 +108,20 @@ are relatively simple, and can be done in several lines of code.
     on the train split and return the predictions on the test split. On top of
     the actual predictions, also the class probabilities should be determined. 
     For hard-classifiers, this can just be the hot-encoded predicted label. The
-    predictions will be evaluated on the OpenML server. Also additional
-    information can be returned, for example user defined measures (such as
+    predictions will be evaluated on the OpenML server. Also, additional
+    information can be returned, for example, user-defined measures (such as
     runtime information, as this can not be inferred on the server). Additionally,
     information about a hyperparameter optimization trace can be provided. 
   * :meth:`obtain_parameter_values`: Obtains the hyperparameters of a given
-    model and the current values. 
+    model and the current values. Please note that in the case of a hyperparameter
+    optimization procedure (e.g., random search), you only should return the
+    hyperparameters of this procedure (e.g., the hyperparameter grid, budget,
+    etc) and that the chosen model will be inferred from the optimization trace. 
   * :meth:`check_if_model_fitted`: Check whether the train method of the model
     has been called (and as such, whether the predict method can be used).
 * Hyperparameter optimization (optional)
   * :meth:`instantiate_model_from_hpo_class`: In a given run has recorded the
-    hyperparameter optimization trace, then this function can be used to
+    hyperparameter optimization trace, then this method can be used to
     reinstantiate the model with hyperparameters of a given hyperparameter
     optimization iteration. Has some similarities with :meth:`flow_to_model` (as
     this method also sets the hyperparameters of a model). 
