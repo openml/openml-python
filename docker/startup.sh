@@ -44,6 +44,7 @@ if [ -n "$2" ]; then
     git fetch "$fork_url" "$fork_branch":branch_from_fork
     branch=branch_from_fork
   else
+    git fetch origin "$2"
     branch=$2
   fi
   if ! git checkout "$branch" ; then
