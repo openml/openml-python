@@ -27,9 +27,14 @@ Connecting new machine learning libraries
 Content of the Library
 ~~~~~~~~~~~~~~~~~~~~~~
 
-To leverage support from the community and to tap in the potential of OpenML, interfacing
-with popular machine learning libraries is essential. However, the OpenML-Python team does
-not have the capacity to develop and maintain such interfaces on its own. For this, we
+To leverage support from the community and to tap in the potential of OpenML,
+interfacing with popular machine learning libraries is essential.
+The OpenML-Python package is capable of downloading meta-data and results (data,
+flows, runs), regardless of the library that was used to upload it.
+However, uploading flows and runs from a specific library, requires an
+additional interface.
+The OpenML-Python team does not have the capacity to develop and maintain such
+interfaces on its own. For this, we
 have built an extension interface to allows others to contribute back. Building a suitable
 extension for therefore requires an understanding of the current OpenML-Python support.
 
@@ -56,6 +61,34 @@ Interfacing with OpenML-Python
 Once the new extension class has been defined, the openml-python module to
 :meth:`openml.extensions.register_extension` must be called to allow OpenML-Python to
 interface the new extension.
+
+The following functions should get implemented. Although the documentation in
+the `SklearnExtension` interface should always be leading, here we list some
+additional information and best practises. 
+
+* General setup (required)
+  * :meth:`can_handle_flow`: Takes as argument an OpenML flow, and checks
+    whether this can be handled by the current extension. The OpenML database
+    consists of many flows, from varios workbenches (e.g., scikit-learn, Weka,
+    mlr). This function is called before a model is being deserialized.
+    Typically, the flow-dependency field is used to check whether the specific
+    library is present, and no unknown libraries are present there. 
+  * :meth:`can_handle_model`: Similar as :meth:`can_handle_flow`, except that
+    in this case a Python object is given. As such, in many cases this function
+    can be implemented by checking whether this adhires to a certain base-class.
+* Serialization and De-serialization (required)
+  * :meth:`flow_to_model`
+  * :meth:`model_to_flow`
+  * :meth:`get_version_information`
+  * :meth:`create_setup_string`
+* Performing runs (required)
+  * :meth:`is_estimator`
+  * :meth:`seed_model`
+  * :meth:`_run_model_on_fold`
+  * :meth:`obtain_parameter_values`
+  * :meth:`check_if_model_fitted`
+* Hyperparameter optimization (optional)
+  * :meth:`instantiate_model_from_hpo_class`
 
 
 Hosting the library
