@@ -44,8 +44,8 @@ class TestConfig(openml.testing.TestBase):
         _config["server"] = "https://test.openml.org/api/v1/xml"
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = False
-        _config["connection_n_retries"] = 10
-        _config["max_retries"] = 20
+        _config["connection_n_retries"] = 20
+        _config["retry_policy"] = "robot"
         self.assertIsInstance(config, dict)
         self.assertEqual(len(config), 6)
         self.assertDictEqual(config, _config)
@@ -57,8 +57,8 @@ class TestConfig(openml.testing.TestBase):
         _config["server"] = "https://www.openml.org/api/v1/xml"
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = True
+        _config["retry_policy"] = "human"
         _config["connection_n_retries"] = 100
-        _config["max_retries"] = 1000
         orig_config = openml.config.get_config_as_dict()
         openml.config._setup(_config)
         updated_config = openml.config.get_config_as_dict()

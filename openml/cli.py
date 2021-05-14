@@ -149,11 +149,9 @@ def configure_cachedir(value: str) -> None:
 def configure_connection_n_retries(value: str) -> None:
     def valid_connection_retries(n: str) -> str:
         if not n.isdigit():
-            return f"Must be an integer number (smaller than {config.max_retries})."
-        if int(n) > config.max_retries:
-            return f"connection_n_retries may not exceed {config.max_retries}."
-        if int(n) == 0:
-            return "connection_n_retries must be non-zero."
+            return f"'{n}' is not a valid positive integer."
+        if int(n) <= 0:
+            return "connection_n_retries must be positive."
         return ""
 
     configure_field(
@@ -161,7 +159,7 @@ def configure_connection_n_retries(value: str) -> None:
         value=value,
         check_with_message=valid_connection_retries,
         intro_message="Configuring the number of times to attempt to connect to the OpenML Server",
-        input_message=f"Enter an integer between 0 and {config.max_retries}: ",
+        input_message="Enter a positive integer: ",
     )
 
 
@@ -214,6 +212,35 @@ def configure_verbosity(value: str) -> None:
         check_with_message=is_zero_through_two,
         intro_message=intro_message,
         input_message="Enter '0', '1' or '2': ",
+    )
+
+
+def configure_retry_policy(value: str) -> None:
+    def is_known_policy(policy: str) -> str:
+        if policy in ["human", "robot"]:
+            return ""
+        return "Must be 'human' or 'robot'."
+
+    def autocomplete_policy(policy: str) -> str:
+        for option in ["human", "robot"]:
+            if option.startswith(policy.lower()):
+                return option
+        return policy
+
+    intro_message = (
+        "Set the retry policy which determines how to react if the server is unresponsive."
+        "We recommend 'human' for interactive usage and 'robot' for scripts."
+        "'human': try a few times in quick succession, less reliable but quicker response."
+        "'robot': try many times with increasing intervals, more reliable but slower response."
+    )
+
+    configure_field(
+        field="retry_policy",
+        value=value,
+        check_with_message=is_known_policy,
+        intro_message=intro_message,
+        input_message="Enter 'human' or 'robot': ",
+        sanitize=autocomplete_policy,
     )
 
 
@@ -272,6 +299,7 @@ def configure(args: argparse.Namespace):
         "apikey": configure_apikey,
         "server": configure_server,
         "cachedir": configure_cachedir,
+        "retry_policy": configure_retry_policy,
         "connection_n_retries": configure_connection_n_retries,
         "avoid_duplicate_runs": configure_avoid_duplicate_runs,
         "verbosity": configure_verbosity,
