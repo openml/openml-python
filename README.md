@@ -13,18 +13,6 @@ It can be used to download or upload OpenML data such as datasets and machine le
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-Main branch:
-
-[![Build Status](https://travis-ci.org/openml/openml-python.svg?branch=master)](https://travis-ci.org/openml/openml-python)
-[![Build status](https://ci.appveyor.com/api/projects/status/blna1eip00kdyr25?svg=true)](https://ci.appveyor.com/project/OpenML/openml-python)
-[![Coverage Status](https://coveralls.io/repos/github/openml/openml-python/badge.svg?branch=master)](https://coveralls.io/github/openml/openml-python?branch=master)
-
-Development branch:
-
-[![Build Status](https://travis-ci.org/openml/openml-python.svg?branch=develop)](https://travis-ci.org/openml/openml-python)
-[![Build status](https://ci.appveyor.com/api/projects/status/blna1eip00kdyr25/branch/develop?svg=true)](https://ci.appveyor.com/project/OpenML/openml-python/branch/develop)
-[![Coverage Status](https://coveralls.io/repos/github/openml/openml-python/badge.svg?branch=develop)](https://coveralls.io/github/openml/openml-python?branch=develop)
-
 ## Citing OpenML-Python
 
 If you use OpenML-Python in a scientific publication, we would appreciate a reference to the
