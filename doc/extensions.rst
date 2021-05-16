@@ -120,7 +120,7 @@ are relatively simple, and can be done in several lines of code.
   * :meth:`check_if_model_fitted`: Check whether the train method of the model
     has been called (and as such, whether the predict method can be used).
 * Hyperparameter optimization (optional)
-  * :meth:`instantiate_model_from_hpo_class`: In a given run has recorded the
+  * :meth:`instantiate_model_from_hpo_class`: If a given run has recorded the
     hyperparameter optimization trace, then this method can be used to
     reinstantiate the model with hyperparameters of a given hyperparameter
     optimization iteration. Has some similarities with :meth:`flow_to_model` (as
