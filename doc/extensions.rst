@@ -96,7 +96,7 @@ are relatively simple, and can be done in several lines of code.
     version, and the tunable hyperparameters. 
   * :meth:`get_version_information`: Return a tuple with the version information
     of the important libraries. 
-  * :meth:`create_setup_string`: No longer uses, and will be deprecated soon. 
+  * :meth:`create_setup_string`: No longer used, and will be deprecated soon. 
 * Performing runs (required)
   * :meth:`is_estimator`: Gets as input a class, and checks whether it has the 
     status of estimator in the library (typically, whether it has a train method
