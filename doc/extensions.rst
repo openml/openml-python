@@ -31,8 +31,8 @@ To leverage support from the community and to tap in the potential of OpenML,
 interfacing with popular machine learning libraries is essential.
 The OpenML-Python package is capable of downloading meta-data and results (data,
 flows, runs), regardless of the library that was used to upload it.
-However, uploading flows and runs from a specific library, requires an
-additional interface.
+However, in order to simplify the process of uploading flows and runs from a
+specific library, an additional interface can be build.
 The OpenML-Python team does not have the capacity to develop and maintain such
 interfaces on its own. For this, we
 have built an extension interface to allows others to contribute back. Building a suitable
@@ -105,13 +105,17 @@ are relatively simple, and can be done in several lines of code.
   * :meth:`_run_model_on_fold`: One of the main requirements for a library to
     generate run objects for the OpenML server. Obtains a train split (with
     labels) and a test split (without labels) and the goal is to train a model
-    on the train split and return the predictions on the test split. On top of
-    the actual predictions, also the class probabilities should be determined. 
-    For hard-classifiers, this can just be the hot-encoded predicted label. The
-    predictions will be evaluated on the OpenML server. Also, additional
-    information can be returned, for example, user-defined measures (such as
-    runtime information, as this can not be inferred on the server). Additionally,
-    information about a hyperparameter optimization trace can be provided. 
+    on the train split and return the predictions on the test split.
+    On top of the actual predictions, also the class probabilities should be
+    determined. 
+    For classifiers that do not return class probabilities, this can just be the
+    hot-encoded predicted label.
+    The predictions will be evaluated on the OpenML server.
+    Also, additional information can be returned, for example, user-defined
+    measures (such as runtime information, as this can not be inferred on the
+    server). 
+    Additionally, information about a hyperparameter optimization trace can be
+    provided. 
   * :meth:`obtain_parameter_values`: Obtains the hyperparameters of a given
     model and the current values. Please note that in the case of a hyperparameter
     optimization procedure (e.g., random search), you only should return the
