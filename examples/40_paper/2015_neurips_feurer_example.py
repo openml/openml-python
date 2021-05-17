@@ -4,7 +4,7 @@ Feurer et al. (2015)
 
 A tutorial on how to get the datasets used in the paper introducing *Auto-sklearn* by Feurer et al..
 
-Auto-sklearn website: https://automl.github.io/auto-sklearn/master/
+Auto-sklearn website: https://automl.github.io/auto-sklearn/
 
 Publication
 ~~~~~~~~~~~

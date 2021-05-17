@@ -331,7 +331,7 @@ def main() -> None:
     parser_configure = subparsers.add_parser(
         "configure",
         description="Set or read variables in your configuration file. For more help also see "
-        "'https://openml.github.io/openml-python/master/usage.html#configuration'.",
+        "'https://openml.github.io/openml-python/main/usage.html#configuration'.",
     )
 
     configurable_fields = [f for f in config._defaults if f not in ["max_retries"]]
