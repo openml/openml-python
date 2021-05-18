@@ -132,10 +132,9 @@ is a good example to follow. Note that most methods are relatively simple and ca
     reinstantiate the model with hyperparameters of a given hyperparameter
     optimization iteration. Has some similarities with :meth:`flow_to_model` (as
     this method also sets the hyperparameters of a model).
-    Note that although this method is optional, for the extension to work it
-    needs to exist. If this function is not required, we recommend to have an
-    empty function that raises a `NotImplementedError` with a useful error
-    message.
+    Note that although this method is required, it is not necessary to implement
+    any logic if hyperparameter optimization is not implemented. Simply raise
+    a `NotImplementedError` then.
 
 Hosting the library
 ~~~~~~~~~~~~~~~~~~~
