@@ -40,7 +40,8 @@ directory of the user and is called config. It consists of ``key = value`` pairs
 which are separated by newlines. The following keys are defined:
 
 * apikey:
-    * required to access the server. The `OpenML setup <https://openml.github.io/openml-python/master/examples/20_basic/introduction_tutorial.html#authentication>`_ describes how to obtain an API key.
+    * required to access the server. The :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`
+      describes how to obtain an API key.
 
 * server:
     * default: ``http://www.openml.org``. Alternatively, use ``test.openml.org`` for the test server.

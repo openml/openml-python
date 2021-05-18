@@ -44,6 +44,7 @@ if [ -n "$2" ]; then
     git fetch "$fork_url" "$fork_branch":branch_from_fork
     branch=branch_from_fork
   else
+    git fetch origin "$2"
     branch=$2
   fi
   if ! git checkout "$branch" ; then
@@ -58,7 +59,7 @@ fi
 
 source /omlp/venv/bin/activate
 cd $code_dir
-# The most recent ``master`` is already installed, but we want to update any outdated dependencies
+# The most recent ``main`` is already installed, but we want to update any outdated dependencies
 pip install -e .[test,examples,docs,examples_unix]
 
 if [ "$1" == "test" ]; then
