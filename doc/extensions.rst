@@ -32,7 +32,7 @@ interfacing with popular machine learning libraries is essential.
 The OpenML-Python package is capable of downloading meta-data and results (data,
 flows, runs), regardless of the library that was used to upload it.
 However, in order to simplify the process of uploading flows and runs from a
-specific library, an additional interface can be build.
+specific library, an additional interface can be built.
 The OpenML-Python team does not have the capacity to develop and maintain such
 interfaces on its own. For this, we
 have built an extension interface to allows others to contribute back. Building a suitable
