@@ -25,8 +25,4 @@ In particular, a few ways to contribute to openml-python are:
 
  * Visit one of our `hackathons <https://meet.openml.org/>`_.
 
- * Contribute to another OpenML project, such as `the main OpenML project <https://github.com/openml/OpenML/blob/main/CONTRIBUTING.md>`_.
-
-.. _extensions:
-
-
+ * Contribute to another OpenML project, such as `the main OpenML project <https://github.com/openml/OpenML/blob/master/CONTRIBUTING.md>`_.
