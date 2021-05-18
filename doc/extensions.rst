@@ -66,8 +66,7 @@ The following methods should get implemented. Although the documentation in
 the `Extension` interface should always be leading, here we list some additional
 information and best practices. 
 The `Sklearn Extension API :class:`openml.extensions.sklearn.SklearnExtension.html`
-is a good example to follow. Note that most of the methods to be implemented 
-are relatively simple, and can be done in several lines of code. 
+is a good example to follow. Note that most methods are relatively simple and can be implemented in several lines of code. 
 
 * General setup (required)
   * :meth:`can_handle_flow`: Takes as argument an OpenML flow, and checks
