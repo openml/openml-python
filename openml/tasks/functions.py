@@ -4,7 +4,7 @@ from collections import OrderedDict
 import io
 import re
 import os
-from typing import Union, Dict, Optional
+from typing import Union, Dict, Optional, List
 
 import pandas as pd
 import xmltodict
@@ -297,7 +297,9 @@ def __list_tasks(api_call, output_format="dict"):
     return tasks
 
 
-def get_tasks(task_ids, download_data=True):
+def get_tasks(
+    task_ids: List[Union[str, int]], download_data: bool = True, download_qualities: bool = True
+) -> List[OpenMLTask]:
     """Download tasks.
 
     This function iterates :meth:`openml.tasks.get_task`.
@@ -306,8 +308,10 @@ def get_tasks(task_ids, download_data=True):
     ----------
     task_ids : iterable
         Integers/Strings representing task ids.
-    download_data : bool
+    download_data : bool (default = True)
         Option to trigger download of data along with the meta data.
+    download_qualities : bool (default=True)
+        Option to download 'qualities' meta-data in addition to the minimal dataset description.
 
     Returns
     -------
@@ -315,12 +319,14 @@ def get_tasks(task_ids, download_data=True):
     """
     tasks = []
     for task_id in task_ids:
-        tasks.append(get_task(task_id, download_data))
+        tasks.append(get_task(task_id, download_data, download_qualities))
     return tasks
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_task(task_id: int, download_data: bool = True) -> OpenMLTask:
+def get_task(
+    task_id: int, download_data: bool = True, download_qualities: bool = True
+) -> OpenMLTask:
     """Download OpenML task for a given task ID.
 
     Downloads the task representation, while the data splits can be
@@ -331,8 +337,10 @@ def get_task(task_id: int, download_data: bool = True) -> OpenMLTask:
     ----------
     task_id : int or str
         The OpenML task id.
-    download_data : bool
+    download_data : bool (default=True)
         Option to trigger download of data along with the meta data.
+    download_qualities : bool (default=True)
+        Option to download 'qualities' meta-data in addition to the minimal dataset description.
 
     Returns
     -------
@@ -347,7 +355,7 @@ def get_task(task_id: int, download_data: bool = True) -> OpenMLTask:
 
     try:
         task = _get_task_description(task_id)
-        dataset = get_dataset(task.dataset_id, download_data)
+        dataset = get_dataset(task.dataset_id, download_data, download_qualities=download_qualities)
         # List of class labels availaible in dataset description
         # Including class labels as part of task meta data handles
         #   the case where data download was initially disabled
