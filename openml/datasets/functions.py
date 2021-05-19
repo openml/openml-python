@@ -8,6 +8,7 @@ from typing import List, Dict, Union, Optional, cast
 import numpy as np
 import arff
 import pandas as pd
+import urllib3
 
 import xmltodict
 from scipy.sparse import coo_matrix
@@ -425,7 +426,10 @@ def get_dataset(
 
         arff_file = _get_dataset_arff(description) if download_data else None
         if "oml:minio_url" in description and download_data:
-            parquet_file = _get_dataset_parquet(description)
+            try:
+                parquet_file = _get_dataset_parquet(description)
+            except urllib3.exceptions.MaxRetryError:
+                parquet_file = None
         else:
             parquet_file = None
         remove_dataset_cache = False
