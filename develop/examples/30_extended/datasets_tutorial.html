@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Datasets &#8212; OpenML 0.12.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Datasets &#8212; OpenML 0.12.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -130,7 +131,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-datasets-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="datasets">
+<section class="sphx-glr-example-title" id="datasets">
 <span id="sphx-glr-examples-30-extended-datasets-tutorial-py"></span><h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h1>
 <p>How to list and download datasets.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clauses</span>
@@ -140,7 +141,7 @@ to download the full example code</p>
 <span class="kn">from</span> <span class="nn">openml.datasets</span> <span class="kn">import</span> <span class="n">edit_dataset</span><span class="p">,</span> <span class="n">fork_dataset</span><span class="p">,</span> <span class="n">get_dataset</span>
 </pre></div>
 </div>
-<div class="section" id="exercise-0">
+<section id="exercise-0">
 <h2>Exercise 0<a class="headerlink" href="#exercise-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>List datasets</p>
@@ -165,7 +166,7 @@ to download the full example code</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 3317 datasets...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 3348 datasets...
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -401,8 +402,8 @@ to download the full example code</p>
 </div>
 </div>
 <br />
-<br /></div>
-<div class="section" id="exercise-1">
+<br /></section>
+<section id="exercise-1">
 <h2>Exercise 1<a class="headerlink" href="#exercise-1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Find datasets with more than 10000 examples.</p></li>
@@ -568,7 +569,7 @@ to download the full example code</p>
 </div>
 </div>
 <br />
-<br /><div class="section" id="download-datasets">
+<br /><section id="download-datasets">
 <h3>Download datasets<a class="headerlink" href="#download-datasets" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is done based on the dataset ID.</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">)</span>
@@ -672,9 +673,9 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">,</span> <span class="n">download_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="exercise-2">
+</section>
+</section>
+<section id="exercise-2">
 <h2>Exercise 2<a class="headerlink" href="#exercise-2" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Explore the data visually.</p></li>
@@ -692,7 +693,7 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 </pre></div>
 </div>
 <img alt="datasets tutorial" class="sphx-glr-single-img" src="../../_images/sphx_glr_datasets_tutorial_001.png" />
-<div class="section" id="edit-a-created-dataset">
+<section id="edit-a-created-dataset">
 <h3>Edit a created dataset<a class="headerlink" href="#edit-a-created-dataset" title="Permalink to this headline">¶</a></h3>
 <p>This example uses the test server, to avoid editing a dataset on the main server.</p>
 <div class="admonition warning">
@@ -705,7 +706,7 @@ The use of this test server can affect behaviour and performance of the OpenML-P
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
   warnings.warn(
 </pre></div>
 </div>
@@ -750,8 +751,8 @@ This example here only shows a failure when trying to work on a dataset not owne
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>https://test.openml.org/api/v1/xml/data/edit returned code 1065: Critical features default_target_attribute, row_id_attribute and ignore_attribute can be edited only by the owner. Fork the dataset if changes are required. - None
 </pre></div>
 </div>
-</div>
-<div class="section" id="fork-dataset">
+</section>
+<section id="fork-dataset">
 <h3>Fork dataset<a class="headerlink" href="#fork-dataset" title="Permalink to this headline">¶</a></h3>
 <p>Used to create a copy of the dataset with you as the owner.
 Use this API only if you are unable to edit the critical fields (default_target_attribute,
@@ -766,11 +767,11 @@ After the dataset is forked, you can edit the new version of the dataset using e
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>67021
-Forked dataset ID: 67021
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>92647
+Forked dataset ID: 92647
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  4.066 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  15.091 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-datasets-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/b95c071188526f5ef5d991e382df9fa5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>
@@ -780,9 +781,9 @@ Forked dataset ID: 67021
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
     </div>
@@ -797,7 +798,7 @@ Forked dataset ID: 67021
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>

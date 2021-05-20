@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>User Guide &#8212; OpenML 0.12.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>User Guide &#8212; OpenML 0.12.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -109,6 +110,7 @@
 <li><a class="reference internal" href="#">User Guide</a><ul>
 <li><a class="reference internal" href="#installation-set-up">Installation &amp; Set up</a></li>
 <li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#docker">Docker</a></li>
 <li><a class="reference internal" href="#key-concepts">Key concepts</a></li>
 <li><a class="reference internal" href="#working-with-tasks">Working with tasks</a></li>
 <li><a class="reference internal" href="#running-machine-learning-algorithms-and-uploading-results">Running machine learning algorithms and uploading results</a></li>
@@ -122,12 +124,12 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="user-guide">
+  <section id="user-guide">
 <span id="usage"></span><h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
 <p>This document will guide you through the most important use cases, functions
 and classes in the OpenML Python API. Throughout this document, we will use
 <a class="reference external" href="https://pandas.pydata.org/">pandas</a> to format and filter tables.</p>
-<div class="section" id="installation-set-up">
+<section id="installation-set-up">
 <span id="installation"></span><h2>Installation &amp; Set up<a class="headerlink" href="#installation-set-up" title="Permalink to this headline">¶</a></h2>
 <p>The OpenML Python package is a connector to <a class="reference external" href="https://www.openml.org/">OpenML</a>.
 It allows you to use and share datasets and tasks, run
@@ -137,8 +139,8 @@ the OpenML Python connector, followed up by a simple example.</p>
 <ul class="simple">
 <li><p><cite>:ref:`sphx_glr_examples_20_basic_introduction_tutorial.py</cite></p></li>
 </ul>
-</div>
-<div class="section" id="configuration">
+</section>
+<section id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>The configuration file resides in a directory <code class="docutils literal notranslate"><span class="pre">.openml</span></code> in the home
 directory of the user and is called config. It consists of <code class="docutils literal notranslate"><span class="pre">key</span> <span class="pre">=</span> <span class="pre">value</span></code> pairs
@@ -146,7 +148,8 @@ which are separated by newlines. The following keys are defined:</p>
 <ul class="simple">
 <li><dl class="simple">
 <dt>apikey:</dt><dd><ul>
-<li><p>required to access the server. The <a class="reference external" href="https://openml.github.io/openml-python/master/examples/20_basic/introduction_tutorial.html#authentication">OpenML setup</a> describes how to obtain an API key.</p></li>
+<li><p>required to access the server. The <a class="reference internal" href="examples/20_basic/introduction_tutorial.html#sphx-glr-examples-20-basic-introduction-tutorial-py"><span class="std std-ref">Introduction tutorial &amp; Setup</span></a>
+describes how to obtain an API key.</p></li>
 </ul>
 </dd>
 </dl>
@@ -174,9 +177,18 @@ which are separated by newlines. The following keys are defined:</p>
 </dl>
 </li>
 <li><dl class="simple">
+<dt>retry_policy:</dt><dd><ul>
+<li><p>Defines how to react when the server is unavailable or experiencing high load. It determines both how often to attempt to reconnect and how quickly to do so. Please don’t use <code class="docutils literal notranslate"><span class="pre">human</span></code> in an automated script that you run more than one instance of, it might increase the time to complete your jobs and that of others.</p></li>
+<li><p>human (default): For people running openml in interactive fashion. Try only a few times, but in quick succession.</p></li>
+<li><p>robot: For people using openml in an automated fashion. Keep trying to reconnect for a longer time, quickly increasing the time between retries.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
 <dt>connection_n_retries:</dt><dd><ul>
-<li><p>number of connection retries.</p></li>
-<li><p>default: 2. Maximum number of retries: 20.</p></li>
+<li><p>number of connection retries</p></li>
+<li><p>default depends on retry_policy (5 for <code class="docutils literal notranslate"><span class="pre">human</span></code>, 50 for <code class="docutils literal notranslate"><span class="pre">robot</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -194,8 +206,16 @@ which are separated by newlines. The following keys are defined:</p>
 <p>This file is easily configurable by the <code class="docutils literal notranslate"><span class="pre">openml</span></code> command line interface.
 To see where the file is stored, and what its values are, use <cite>openml configure none</cite>.
 Set any field with <code class="docutils literal notranslate"><span class="pre">openml</span> <span class="pre">configure</span> <span class="pre">FIELD</span></code> or even all fields with just <code class="docutils literal notranslate"><span class="pre">openml</span> <span class="pre">configure</span></code>.</p>
+</section>
+<section id="docker">
+<h2>Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
+<p>It is also possible to try out the latest development version of <code class="docutils literal notranslate"><span class="pre">openml-python</span></code> with docker:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker run -it openml/openml-python
+</pre></div>
 </div>
-<div class="section" id="key-concepts">
+<p>See the <a class="reference external" href="https://github.com/openml/openml-python/blob/main/docker/readme.md">openml-python docker documentation</a> for more information.</p>
+</section>
+<section id="key-concepts">
 <h2>Key concepts<a class="headerlink" href="#key-concepts" title="Permalink to this headline">¶</a></h2>
 <p>OpenML contains several key concepts which it needs to make machine learning
 research shareable. A machine learning experiment consists of one or several
@@ -208,8 +228,8 @@ user guide we will examine how to search through <strong>datasets</strong> in or
 a list of <strong>tasks</strong>.</p>
 <p>A further explanation is given in the
 <a class="reference external" href="https://openml.github.io/OpenML/#concepts">OpenML user guide</a>.</p>
-</div>
-<div class="section" id="working-with-tasks">
+</section>
+<section id="working-with-tasks">
 <h2>Working with tasks<a class="headerlink" href="#working-with-tasks" title="Permalink to this headline">¶</a></h2>
 <p>You can think of a task as an experimentation protocol, describing how to apply
 a machine learning model to a dataset in a way that is comparable with the
@@ -225,8 +245,8 @@ you can read the <a class="reference external" href="https://docs.openml.org/#ta
 <ul class="simple">
 <li><p><a class="reference internal" href="examples/30_extended/tasks_tutorial.html#sphx-glr-examples-30-extended-tasks-tutorial-py"><span class="std std-ref">Tasks</span></a></p></li>
 </ul>
-</div>
-<div class="section" id="running-machine-learning-algorithms-and-uploading-results">
+</section>
+<section id="running-machine-learning-algorithms-and-uploading-results">
 <h2>Running machine learning algorithms and uploading results<a class="headerlink" href="#running-machine-learning-algorithms-and-uploading-results" title="Permalink to this headline">¶</a></h2>
 <p>In order to upload and share results of running a machine learning algorithm
 on a task, we need to create an <code class="xref py py-class docutils literal notranslate"><span class="pre">OpenMLRun</span></code>. A run object can
@@ -250,8 +270,8 @@ how to run machine learning models on OpenML data and how to share the results:<
 <ul class="simple">
 <li><p><a class="reference internal" href="examples/20_basic/simple_flows_and_runs_tutorial.html#sphx-glr-examples-20-basic-simple-flows-and-runs-tutorial-py"><span class="std std-ref">Flows and Runs</span></a></p></li>
 </ul>
-</div>
-<div class="section" id="datasets">
+</section>
+<section id="datasets">
 <h2>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
 <p>OpenML provides a large collection of datasets and the benchmark
 “<a class="reference external" href="https://docs.openml.org/benchmark/">OpenML100</a>” which consists of a curated
@@ -268,14 +288,14 @@ obtained on. Learn how to share your datasets in the following tutorial:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="examples/30_extended/create_upload_tutorial.html#sphx-glr-examples-30-extended-create-upload-tutorial-py"><span class="std std-ref">Dataset upload tutorial</span></a></p></li>
 </ul>
-</div>
-</div>
-<div class="section" id="extending-openml-python">
+</section>
+</section>
+<section id="extending-openml-python">
 <h1>Extending OpenML-Python<a class="headerlink" href="#extending-openml-python" title="Permalink to this headline">¶</a></h1>
 <p>OpenML-Python provides an extension interface to connect machine learning libraries directly to
 the API and ships a <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> extension. You can find more information in the Section
 <a class="reference internal" href="extensions.html#extensions"><span class="std std-ref">Extensions</span></a>’</p>
-</div>
+</section>
 
 
     </div>
@@ -290,7 +310,7 @@ the API and ships a <code class="docutils literal notranslate"><span class="pre"
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>

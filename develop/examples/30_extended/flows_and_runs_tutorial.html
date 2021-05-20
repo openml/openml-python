@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flows and Runs &#8212; OpenML 0.12.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Flows and Runs &#8212; OpenML 0.12.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -127,7 +128,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="flows-and-runs">
+<section class="sphx-glr-example-title" id="flows-and-runs">
 <span id="sphx-glr-examples-30-extended-flows-and-runs-tutorial-py"></span><h1>Flows and Runs<a class="headerlink" href="#flows-and-runs" title="Permalink to this headline">¶</a></h1>
 <p>How to train/run a model and how to upload the results.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
@@ -147,11 +148,11 @@ The use of this test server can affect behaviour and performance of the OpenML-P
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
   warnings.warn(
 </pre></div>
 </div>
-<div class="section" id="train-machine-learning-models">
+<section id="train-machine-learning-models">
 <h2>Train machine learning models<a class="headerlink" href="#train-machine-learning-models" title="Permalink to this headline">¶</a></h2>
 <p>Train a scikit-learn model on the data manually.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68</span>
@@ -189,8 +190,8 @@ The use of this test server can affect behaviour and performance of the OpenML-P
 KNeighborsClassifier(n_neighbors=1)
 </pre></div>
 </div>
-</div>
-<div class="section" id="runs-easily-explore-models">
+</section>
+<section id="runs-easily-explore-models">
 <h2>Runs: Easily explore models<a class="headerlink" href="#runs-easily-explore-models" title="Permalink to this headline">¶</a></h2>
 <p>We can run (many) scikit-learn algorithms on (many) OpenML tasks.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get a task</span>
@@ -214,11 +215,11 @@ Run ID.......: None
 Task ID......: 403
 Task Type....: None
 Task URL.....: https://test.openml.org/t/403
-Flow ID......: 226432
+Flow ID......: 319369
 Flow Name....: sklearn.tree._classes.DecisionTreeClassifier
-Flow URL.....: https://test.openml.org/f/226432
+Flow URL.....: https://test.openml.org/f/319369
 Setup ID.....: None
-Setup String.: Python_3.8.9. Sklearn_0.24.2. NumPy_1.20.2. SciPy_1.6.3.
+Setup String.: Python_3.8.10. Sklearn_0.24.2. NumPy_1.20.3. SciPy_1.6.3.
 Dataset ID...: 68
 Dataset URL..: https://test.openml.org/d/68
 </pre></div>
@@ -233,7 +234,7 @@ the run is sent to the OpenML server:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to https://test.openml.org/r/84691
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to https://test.openml.org/r/116818
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -244,11 +245,11 @@ the run is sent to the OpenML server:</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Flow
 ===========
-Flow ID.........: 226432 (version 23)
-Flow URL........: https://test.openml.org/f/226432
+Flow ID.........: 319369 (version 29)
+Flow URL........: https://test.openml.org/f/319369
 Flow Name.......: sklearn.tree._classes.DecisionTreeClassifier
 Flow Description: A decision tree classifier.
-Upload Date.....: 2021-04-28 14:52:25
+Upload Date.....: 2021-05-17 17:08:47
 Dependencies....: sklearn==0.24.2
 numpy&gt;=1.13.3
 scipy&gt;=0.19.1
@@ -256,7 +257,7 @@ joblib&gt;=0.11
 threadpoolctl&gt;=2.0.0
 </pre></div>
 </div>
-<div class="section" id="it-also-works-with-pipelines">
+<section id="it-also-works-with-pipelines">
 <h3>It also works with pipelines<a class="headerlink" href="#it-also-works-with-pipelines" title="Permalink to this headline">¶</a></h3>
 <p>When you need to handle ‘dirty’ data, build pipelines to model then automatically.
 To demonstrate this using the dataset <a class="reference external" href="https://test.openml.org/d/16">credit-a</a> via
@@ -340,13 +341,13 @@ variables and missing values in both.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to https://test.openml.org/r/84693
-Uploaded to https://test.openml.org/r/84694
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to https://test.openml.org/r/116819
+Uploaded to https://test.openml.org/r/116821
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="running-flows-on-tasks-offline-for-later-upload">
+</section>
+</section>
+<section id="running-flows-on-tasks-offline-for-later-upload">
 <h2>Running flows on tasks offline for later upload<a class="headerlink" href="#running-flows-on-tasks-offline-for-later-upload" title="Permalink to this headline">¶</a></h2>
 <p>For those scenarios where there is no access to internet, it is possible to run
 a model on a task without uploading results or flows to the server immediately.</p>
@@ -371,23 +372,23 @@ a model on a task without uploading results or flows to the server immediately.<
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1779: UserWarning: Estimator only predicted for 5/6 classes!
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1782: UserWarning: Estimator only predicted for 5/6 classes!
   warnings.warn(message)
 
 OpenML Run
 ==========
 Uploader Name: None
 Metric.......: None
-Run ID.......: 84697
-Run URL......: https://test.openml.org/r/84697
+Run ID.......: 116822
+Run URL......: https://test.openml.org/r/116822
 Task ID......: 6
 Task Type....: None
 Task URL.....: https://test.openml.org/t/6
-Flow ID......: 226921
+Flow ID......: 319860
 Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(categorical=sklearn.preprocessing._encoders.OneHotEncoder,continuous=sklearn.impute._base.SimpleImputer),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
-Flow URL.....: https://test.openml.org/f/226921
+Flow URL.....: https://test.openml.org/f/319860
 Setup ID.....: None
-Setup String.: Python_3.8.9. Sklearn_0.24.2. NumPy_1.20.2. SciPy_1.6.3.
+Setup String.: Python_3.8.10. Sklearn_0.24.2. NumPy_1.20.3. SciPy_1.6.3.
 Dataset ID...: None
 Dataset URL..: https://test.openml.org/d/None
 </pre></div>
@@ -407,8 +408,8 @@ Dataset URL..: https://test.openml.org/d/None
 <span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_flow_on_task</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="challenge">
+</section>
+<section id="challenge">
 <h2>Challenge<a class="headerlink" href="#challenge" title="Permalink to this headline">¶</a></h2>
 <p>Try to build the best possible models on several OpenML tasks,
 compare your results with the rest of the class and learn from
@@ -437,13 +438,13 @@ task_id:<a class="reference external" href="https://www.openml.org/t/52950">5295
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: https://test.openml.org/r/84699
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: https://test.openml.org/r/116825
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  41.501 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  45.615 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9e0617073c8209f15abf91f273871776/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></p>
@@ -453,8 +454,8 @@ task_id:<a class="reference external" href="https://www.openml.org/t/52950">5295
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -469,7 +470,7 @@ task_id:<a class="reference external" href="https://www.openml.org/t/52950">5295
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>

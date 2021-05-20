@@ -80,7 +80,7 @@ Exercise 0
 
  .. code-block:: none
 
-    First 10 of 3317 datasets...
+    First 10 of 3348 datasets...
 
 
 .. raw:: html
@@ -727,7 +727,7 @@ This example uses the test server, to avoid editing a dataset on the main server
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
       warnings.warn(
 
 
@@ -839,8 +839,8 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
  .. code-block:: none
 
-    67021
-    Forked dataset ID: 67021
+    92647
+    Forked dataset ID: 92647
 
 
 
@@ -848,7 +848,7 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  4.066 seconds)
+   **Total running time of the script:** ( 0 minutes  15.091 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:

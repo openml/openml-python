@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>openml.extensions.sklearn.SklearnExtension &#8212; OpenML 0.12.1 documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>openml.extensions.sklearn.SklearnExtension &#8212; OpenML 0.12.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -113,15 +114,17 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="openml-extensions-sklearn-sklearnextension">
+  <section id="openml-extensions-sklearn-sklearnextension">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.extensions.sklearn</span></code>.SklearnExtension<a class="headerlink" href="#openml-extensions-sklearn-sklearnextension" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="openml.extensions.sklearn.SklearnExtension">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">openml.extensions.sklearn.</span></code><code class="sig-name descname"><span class="pre">SklearnExtension</span></code><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension" title="Permalink to this definition">¶</a></dt>
-<dd><p>Connect scikit-learn to OpenML-Python.</p>
+<dt class="sig sig-object py" id="openml.extensions.sklearn.SklearnExtension">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">openml.extensions.sklearn.</span></span><span class="sig-name descname"><span class="pre">SklearnExtension</span></span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect scikit-learn to OpenML-Python.
+The estimators which use this extension must be scikit-learn compatible,
+i.e needs to be a subclass of sklearn.base.BaseEstimator”.</p>
 <dl class="py method">
-<dt id="openml.extensions.sklearn.SklearnExtension.can_handle_flow">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">can_handle_flow</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flow</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">openml.flows.flow.OpenMLFlow</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.can_handle_flow" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="openml.extensions.sklearn.SklearnExtension.can_handle_flow">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">can_handle_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flow</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="openml.flows.OpenMLFlow.html#openml.flows.OpenMLFlow" title="openml.flows.flow.OpenMLFlow"><span class="pre">openml.flows.flow.OpenMLFlow</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.can_handle_flow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether a given describes a scikit-learn estimator.</p>
 <p>This is done by parsing the <code class="docutils literal notranslate"><span class="pre">external_version</span></code> field.</p>
 <dl class="field-list simple">
@@ -139,8 +142,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="openml.extensions.sklearn.SklearnExtension.can_handle_model">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">can_handle_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.can_handle_model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="openml.extensions.sklearn.SklearnExtension.can_handle_model">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">can_handle_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.can_handle_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether a model is an instance of <code class="docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -157,8 +160,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="openml.extensions.sklearn.SklearnExtension.check_if_model_fitted">
-<code class="sig-name descname"><span class="pre">check_if_model_fitted</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.check_if_model_fitted" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="openml.extensions.sklearn.SklearnExtension.check_if_model_fitted">
+<span class="sig-name descname"><span class="pre">check_if_model_fitted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.check_if_model_fitted" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True/False denoting if the model has already been fitted/trained</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -175,8 +178,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="openml.extensions.sklearn.SklearnExtension.create_setup_string">
-<code class="sig-name descname"><span class="pre">create_setup_string</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.create_setup_string" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="openml.extensions.sklearn.SklearnExtension.create_setup_string">
+<span class="sig-name descname"><span class="pre">create_setup_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.create_setup_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a string which can be used to reinstantiate the given model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -193,8 +196,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="openml.extensions.sklearn.SklearnExtension.flow_to_model">
-<code class="sig-name descname"><span class="pre">flow_to_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flow</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">openml.flows.flow.OpenMLFlow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialize_with_defaults</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_version</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Any</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.flow_to_model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="openml.extensions.sklearn.SklearnExtension.flow_to_model">
+<span class="sig-name descname"><span class="pre">flow_to_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flow</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="openml.flows.OpenMLFlow.html#openml.flows.OpenMLFlow" title="openml.flows.flow.OpenMLFlow"><span class="pre">openml.flows.flow.OpenMLFlow</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialize_with_defaults</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_version</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Any</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.flow_to_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes a sklearn model based on a flow.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -218,8 +221,8 @@ ignored and a flow with its defaults is returned.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="openml.extensions.sklearn.SklearnExtension.get_version_information">
-<code class="sig-name descname"><span class="pre">get_version_information</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.get_version_information" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="openml.extensions.sklearn.SklearnExtension.get_version_information">
+<span class="sig-name descname"><span class="pre">get_version_information</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.get_version_information" title="Permalink to this definition">¶</a></dt>
 <dd><p>List versions of libraries required by the flow.</p>
 <p>Libraries listed are <code class="docutils literal notranslate"><span class="pre">Python</span></code>, <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code> and <code class="docutils literal notranslate"><span class="pre">scipy</span></code>.</p>
 <dl class="field-list simple">
@@ -232,8 +235,8 @@ ignored and a flow with its defaults is returned.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="openml.extensions.sklearn.SklearnExtension.instantiate_model_from_hpo_class">
-<code class="sig-name descname"><span class="pre">instantiate_model_from_hpo_class</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trace_iteration</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">openml.runs.trace.OpenMLTraceIteration</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Any</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.instantiate_model_from_hpo_class" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="openml.extensions.sklearn.SklearnExtension.instantiate_model_from_hpo_class">
+<span class="sig-name descname"><span class="pre">instantiate_model_from_hpo_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trace_iteration</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">openml.runs.trace.OpenMLTraceIteration</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Any</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.instantiate_model_from_hpo_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiate a <code class="docutils literal notranslate"><span class="pre">base_estimator</span></code> which can be searched over by the hyperparameter
 optimization model.</p>
 <dl class="field-list simple">
@@ -254,8 +257,8 @@ optimization model.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="openml.extensions.sklearn.SklearnExtension.is_estimator">
-<code class="sig-name descname"><span class="pre">is_estimator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.is_estimator" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="openml.extensions.sklearn.SklearnExtension.is_estimator">
+<span class="sig-name descname"><span class="pre">is_estimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.is_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether the given model is a scikit-learn estimator.</p>
 <p>This function is only required for backwards compatibility and will be removed in the
 near future.</p>
@@ -274,8 +277,8 @@ near future.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="openml.extensions.sklearn.SklearnExtension.model_to_flow">
-<code class="sig-name descname"><span class="pre">model_to_flow</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">openml.flows.flow.OpenMLFlow</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.model_to_flow" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="openml.extensions.sklearn.SklearnExtension.model_to_flow">
+<span class="sig-name descname"><span class="pre">model_to_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="openml.flows.OpenMLFlow.html#openml.flows.OpenMLFlow" title="openml.flows.flow.OpenMLFlow"><span class="pre">openml.flows.flow.OpenMLFlow</span></a><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.model_to_flow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transform a scikit-learn model to a flow for uploading it to OpenML.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -292,8 +295,8 @@ near future.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="openml.extensions.sklearn.SklearnExtension.obtain_parameter_values">
-<code class="sig-name descname"><span class="pre">obtain_parameter_values</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flow</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">openml.flows.flow.OpenMLFlow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.obtain_parameter_values" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="openml.extensions.sklearn.SklearnExtension.obtain_parameter_values">
+<span class="sig-name descname"><span class="pre">obtain_parameter_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flow</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="openml.flows.OpenMLFlow.html#openml.flows.OpenMLFlow" title="openml.flows.flow.OpenMLFlow"><span class="pre">openml.flows.flow.OpenMLFlow</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.obtain_parameter_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts all parameter settings required for the flow from the model.</p>
 <p>If no explicit model is provided, the parameters will be extracted from <cite>flow.model</cite>
 instead.</p>
@@ -320,8 +323,8 @@ If None, use the model specified in <code class="docutils literal notranslate"><
 </dd></dl>
 
 <dl class="py method">
-<dt id="openml.extensions.sklearn.SklearnExtension.seed_model">
-<code class="sig-name descname"><span class="pre">seed_model</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Any</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.seed_model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="openml.extensions.sklearn.SklearnExtension.seed_model">
+<span class="sig-name descname"><span class="pre">seed_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Any</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.seed_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the random state of all the unseeded components of a model and return the seeded
 model.</p>
 <p>Required so that all seed information can be uploaded to OpenML for reproducible results.</p>
@@ -347,8 +350,8 @@ will be seeded with a random number from the RandomState.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="openml.extensions.sklearn.SklearnExtension.trim_flow_name">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">trim_flow_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">long_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_trim_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_outer</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.trim_flow_name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="openml.extensions.sklearn.SklearnExtension.trim_flow_name">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">trim_flow_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">long_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_trim_length</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_outer</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#openml.extensions.sklearn.SklearnExtension.trim_flow_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shorten generated sklearn flow name to at most <code class="docutils literal notranslate"><span class="pre">max_length</span></code> characters.</p>
 <p>Flows are assumed to have the following naming structure:
 <code class="docutils literal notranslate"><span class="pre">(model_selection)?</span> <span class="pre">(pipeline)?</span> <span class="pre">(steps)+</span></code>
@@ -392,7 +395,7 @@ There is no guarantee the end result will not exceed <cite>extra_trim_length</ci
 
 </dd></dl>
 
-</div>
+</section>
 
 
     </div>
@@ -407,7 +410,7 @@ There is no guarantee the end result will not exceed <cite>extra_trim_length</ci
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>

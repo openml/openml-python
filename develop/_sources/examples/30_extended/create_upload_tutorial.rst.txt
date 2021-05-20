@@ -66,7 +66,7 @@ A tutorial on how to create and upload a dataset to OpenML.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
       warnings.warn(
 
 
@@ -221,7 +221,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/67022
+    URL for dataset: https://test.openml.org/d/92649
 
 
 
@@ -325,7 +325,7 @@ https://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/67023
+    URL for dataset: https://test.openml.org/d/92650
 
 
 
@@ -436,7 +436,7 @@ fixing the parameter ``attributes`` to ``'auto'``.
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/67024
+    URL for dataset: https://test.openml.org/d/92651
 
 
 
@@ -504,7 +504,7 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/67025
+    URL for dataset: https://test.openml.org/d/92652
 
 
 
@@ -587,7 +587,7 @@ Dataset is a pandas dataframe with sparse columns
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/67026
+    URL for dataset: https://test.openml.org/d/92653
 
 
 
@@ -607,7 +607,7 @@ Dataset is a pandas dataframe with sparse columns
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  8.535 seconds)
+   **Total running time of the script:** ( 0 minutes  10.862 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:

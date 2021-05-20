@@ -246,7 +246,7 @@ We'll use the test server for the rest of this tutorial.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
       warnings.warn(
 
 
@@ -311,11 +311,11 @@ suite which is available on the OpenML test server.
     True
     OpenML Study
     ============
-    ID..............: 11315
+    ID..............: 15693
     Name............: Test-Study
     Status..........: None
     Main Entity Type: run
-    Study URL.......: https://test.openml.org/s/11315
+    Study URL.......: https://test.openml.org/s/15693
     # of Runs.......: 3
 
 
@@ -336,7 +336,7 @@ suite which is available on the OpenML test server.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  27.763 seconds)
+   **Total running time of the script:** ( 0 minutes  45.432 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_study_tutorial.py:

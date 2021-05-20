@@ -64,7 +64,7 @@ We'll use the test server for the rest of this tutorial.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:161: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
       warnings.warn(
 
 
@@ -182,11 +182,11 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     Task ID......: 403
     Task Type....: None
     Task URL.....: https://test.openml.org/t/403
-    Flow ID......: 226432
+    Flow ID......: 319369
     Flow Name....: sklearn.tree._classes.DecisionTreeClassifier
-    Flow URL.....: https://test.openml.org/f/226432
+    Flow URL.....: https://test.openml.org/f/319369
     Setup ID.....: None
-    Setup String.: Python_3.8.9. Sklearn_0.24.2. NumPy_1.20.2. SciPy_1.6.3.
+    Setup String.: Python_3.8.10. Sklearn_0.24.2. NumPy_1.20.3. SciPy_1.6.3.
     Dataset ID...: 68
     Dataset URL..: https://test.openml.org/d/68
 
@@ -220,7 +220,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to https://test.openml.org/r/84691
+    Uploaded to https://test.openml.org/r/116818
 
 
 
@@ -249,11 +249,11 @@ We can now also inspect the flow object which was automatically created:
 
     OpenML Flow
     ===========
-    Flow ID.........: 226432 (version 23)
-    Flow URL........: https://test.openml.org/f/226432
+    Flow ID.........: 319369 (version 29)
+    Flow URL........: https://test.openml.org/f/319369
     Flow Name.......: sklearn.tree._classes.DecisionTreeClassifier
     Flow Description: A decision tree classifier.
-    Upload Date.....: 2021-04-28 14:52:25
+    Upload Date.....: 2021-05-17 17:08:47
     Dependencies....: sklearn==0.24.2
     numpy>=1.13.3
     scipy>=0.19.1
@@ -363,8 +363,8 @@ variables and missing values in both.
 
  .. code-block:: none
 
-    Uploaded to https://test.openml.org/r/84693
-    Uploaded to https://test.openml.org/r/84694
+    Uploaded to https://test.openml.org/r/116819
+    Uploaded to https://test.openml.org/r/116821
 
 
 
@@ -410,23 +410,23 @@ a model on a task without uploading results or flows to the server immediately.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1779: UserWarning: Estimator only predicted for 5/6 classes!
+    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1782: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
 
     OpenML Run
     ==========
     Uploader Name: None
     Metric.......: None
-    Run ID.......: 84697
-    Run URL......: https://test.openml.org/r/84697
+    Run ID.......: 116822
+    Run URL......: https://test.openml.org/r/116822
     Task ID......: 6
     Task Type....: None
     Task URL.....: https://test.openml.org/t/6
-    Flow ID......: 226921
+    Flow ID......: 319860
     Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(categorical=sklearn.preprocessing._encoders.OneHotEncoder,continuous=sklearn.impute._base.SimpleImputer),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
-    Flow URL.....: https://test.openml.org/f/226921
+    Flow URL.....: https://test.openml.org/f/319860
     Setup ID.....: None
-    Setup String.: Python_3.8.9. Sklearn_0.24.2. NumPy_1.20.2. SciPy_1.6.3.
+    Setup String.: Python_3.8.10. Sklearn_0.24.2. NumPy_1.20.3. SciPy_1.6.3.
     Dataset ID...: None
     Dataset URL..: https://test.openml.org/d/None
 
@@ -507,7 +507,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: https://test.openml.org/r/84699
+    kNN on diabetes: https://test.openml.org/r/116825
 
 
 
@@ -527,7 +527,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  41.501 seconds)
+   **Total running time of the script:** ( 0 minutes  45.615 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:

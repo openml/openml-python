@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Changelog &#8212; OpenML 0.12.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Changelog &#8212; OpenML 0.12.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -127,18 +128,26 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="changelog">
+  <section id="changelog">
 <span id="progress"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
+<section id="id1">
 <h2>0.12.2<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
+<li><p>ADD #1065: Add a <code class="docutils literal notranslate"><span class="pre">retry_policy</span></code> configuration option that determines the frequency and number of times to attempt to retry server requests.</p></li>
+<li><p>ADD #1075: A docker image is now automatically built on a push to develop. It can be used to build docs or run tests in an isolated environment.</p></li>
+<li><p>ADD: You can now avoid downloading ‘qualities’ meta-data when downloading a task with the <code class="docutils literal notranslate"><span class="pre">download_qualities</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">openml.tasks.get_task[s]</span></code> functions.</p></li>
 <li><p>DOC: Fixes a few broken links in the documentation.</p></li>
+<li><p>DOC #1061: Improve examples to always show a warning when they switch to the test server.</p></li>
+<li><p>DOC #1067: Improve documentation on the scikit-learn extension interface.</p></li>
+<li><p>DOC #1068: Create dedicated extensions page.</p></li>
+<li><p>FIX #1075: Correctly convert <cite>y</cite> to a pandas series when downloading sparse data.</p></li>
+<li><p>MAINT: Rename <cite>master</cite> brach to ` main` branch.</p></li>
 <li><p>MAINT/DOC: Automatically check for broken external links when building the documentation.</p></li>
 <li><p>MAINT/DOC: Fail documentation building on warnings. This will make the documentation building
 fail if a reference cannot be found (i.e. an internal link is broken).</p></li>
 </ul>
-</div>
-<div class="section" id="id2">
+</section>
+<section id="id2">
 <h2>0.12.1<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #895/#1038: Measure runtimes of scikit-learn runs also for models which are parallelized
@@ -152,8 +161,8 @@ extension.</p></li>
 worker pool to fail.</p></li>
 <li><p>FIX #1053: Fixes a bug which could prevent importing the package in a docker container.</p></li>
 </ul>
-</div>
-<div class="section" id="id3">
+</section>
+<section id="id3">
 <h2>0.12.0<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #964: Validate <code class="docutils literal notranslate"><span class="pre">ignore_attribute</span></code>, <code class="docutils literal notranslate"><span class="pre">default_target_attribute</span></code>, <code class="docutils literal notranslate"><span class="pre">row_id_attribute</span></code> are set to attributes that exist on the dataset when calling <code class="docutils literal notranslate"><span class="pre">create_dataset</span></code>.</p></li>
@@ -183,8 +192,8 @@ worker pool to fail.</p></li>
 <li><p>FIX #1021: Fixes an issue that could occur when running unit tests and openml-python was not in PATH.</p></li>
 <li><p>FIX #1037: Fixes a bug where a dataset could not be loaded if a categorical value had listed nan-like as a possible category.</p></li>
 </ul>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h2>0.11.0<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #753: Allows uploading custom flows to OpenML via OpenML-Python.</p></li>
@@ -224,15 +233,15 @@ logging to console and file.</p></li>
 <li><p>MAINT #945: Make OpenML-Python PEP562 compliant.</p></li>
 <li><p>MAINT #951: Converts TaskType class to a TaskType enum.</p></li>
 </ul>
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h2>0.10.2<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #857: Adds task type ID to list_runs</p></li>
 <li><p>DOC #862: Added license BSD 3-Clause to each of the source files.</p></li>
 </ul>
-</div>
-<div class="section" id="id6">
+</section>
+<section id="id6">
 <h2>0.10.1<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #175: Automatically adds the docstring of scikit-learn objects to flow and its parameters.</p></li>
@@ -281,8 +290,8 @@ when there are no qualities available on the server.</p></li>
 <li><p>MAINT #849: Move logic of most different <code class="docutils literal notranslate"><span class="pre">publish</span></code> functions into the base class.</p></li>
 <li><p>MAINt #850: Remove outdated test code.</p></li>
 </ul>
-</div>
-<div class="section" id="id7">
+</section>
+<section id="id7">
 <h2>0.10.0<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #737: Add list_evaluations_setups to return hyperparameters along with list of evaluations.</p></li>
@@ -304,8 +313,8 @@ when there are no qualities available on the server.</p></li>
 <li><p>MAINT #752: Update OpenML-Python to be compatible with sklearn 0.21</p></li>
 <li><p>ADD #790: Add user ID and name to list_evaluations</p></li>
 </ul>
-</div>
-<div class="section" id="id8">
+</section>
+<section id="id8">
 <h2>0.9.0<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #560: OpenML-Python can now handle regression tasks as well.</p></li>
@@ -343,8 +352,8 @@ when there are no qualities available on the server.</p></li>
 <li><p>MAINT #686: Adds ignore directives for several <cite>mypy</cite> folders.</p></li>
 <li><p>MAINT #629, #630: Code now adheres to single PEP8 standard.</p></li>
 </ul>
-</div>
-<div class="section" id="id9">
+</section>
+<section id="id9">
 <h2>0.8.0<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>ADD #440: Improved dataset upload.</p></li>
@@ -385,24 +394,24 @@ the OpenML connector fails earlier and with a better error message when
 failing to create a flow from the OpenML description.</p></li>
 <li><p>MAINT #561: Improve documentation on running specific unit tests.</p></li>
 </ul>
-</div>
-<div class="section" id="id11">
+</section>
+<section id="id11">
 <h2>0.4.-0.7<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
 <p>There is no changelog for these versions.</p>
-</div>
-<div class="section" id="id12">
+</section>
+<section id="id12">
 <h2>0.3.0<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Add this changelog</p></li>
 <li><p>2nd example notebook PyOpenML.ipynb</p></li>
 <li><p>Pagination support for list datasets and list tasks</p></li>
 </ul>
-</div>
-<div class="section" id="prior">
+</section>
+<section id="prior">
 <h2>Prior<a class="headerlink" href="#prior" title="Permalink to this headline">¶</a></h2>
 <p>There is no changelog for prior versions.</p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -417,7 +426,7 @@ failing to create a flow from the OpenML description.</p></li>
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>
