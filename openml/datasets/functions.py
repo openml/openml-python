@@ -370,7 +370,7 @@ def get_dataset(
     ----------
     dataset_id : int or str
         Dataset ID of the dataset to download
-    download_data : bool, optional (default=True)
+    download_data : bool (default=True)
         If True, also download the data file. Beware that some datasets are large and it might
         make the operation noticeably slower. Metadata is also still retrieved.
         If False, create the OpenMLDataset and only populate it with the metadata.
@@ -378,12 +378,14 @@ def get_dataset(
     version : int, optional (default=None)
         Specifies the version if `dataset_id` is specified by name.
         If no version is specified, retrieve the least recent still active version.
-    error_if_multiple : bool, optional (default=False)
+    error_if_multiple : bool (default=False)
         If ``True`` raise an error if multiple datasets are found with matching criteria.
-    cache_format : str, optional (default='pickle')
+    cache_format : str (default='pickle')
         Format for caching the dataset - may be feather or pickle
         Note that the default 'pickle' option may load slower than feather when
         no.of.rows is very high.
+    download_qualities : bool (default=True)
+        Option to download 'qualities' meta-data in addition to the minimal dataset description.
     Returns
     -------
     dataset : :class:`openml.OpenMLDataset`

@@ -11,6 +11,7 @@ Changelog
 
 * ADD #1065: Add a ``retry_policy`` configuration option that determines the frequency and number of times to attempt to retry server requests.
 * ADD #1075: A docker image is now automatically built on a push to develop. It can be used to build docs or run tests in an isolated environment.
+* ADD: You can now avoid downloading 'qualities' meta-data when downloading a task with the ``download_qualities`` parameter of ``openml.tasks.get_task[s]`` functions.
 * DOC: Fixes a few broken links in the documentation.
 * MAINT: Rename `master` brach to ` main` branch.
 * MAINT/DOC: Automatically check for broken external links when building the documentation.
