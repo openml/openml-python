@@ -1,5 +1,5 @@
 # License: BSD 3-Clause
-
+import warnings
 from collections import OrderedDict
 import io
 import re
@@ -298,7 +298,7 @@ def __list_tasks(api_call, output_format="dict"):
 
 
 def get_tasks(
-    task_ids: List[Union[str, int]], download_data: bool = True, download_qualities: bool = True
+    task_ids: List[int], download_data: bool = True, download_qualities: bool = True
 ) -> List[OpenMLTask]:
     """Download tasks.
 
@@ -306,8 +306,8 @@ def get_tasks(
 
     Parameters
     ----------
-    task_ids : iterable
-        Integers/Strings representing task ids.
+    task_ids : List[int]
+        A list of task ids to download.
     download_data : bool (default = True)
         Option to trigger download of data along with the meta data.
     download_qualities : bool (default=True)
@@ -335,8 +335,8 @@ def get_task(
 
     Parameters
     ----------
-    task_id : int or str
-        The OpenML task id.
+    task_id : int
+        The OpenML task id of the task to download.
     download_data : bool (default=True)
         Option to trigger download of data along with the meta data.
     download_qualities : bool (default=True)
@@ -346,10 +346,13 @@ def get_task(
     -------
     task
     """
+    if not isinstance(task_id, int):
+        warnings.warn("Task id must be specified as `int` from 0.14.0 onwards.", DeprecationWarning)
+
     try:
         task_id = int(task_id)
     except (ValueError, TypeError):
-        raise ValueError("Dataset ID is neither an Integer nor can be " "cast to an Integer.")
+        raise ValueError("Dataset ID is neither an Integer nor can be cast to an Integer.")
 
     tid_cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id,)
 
