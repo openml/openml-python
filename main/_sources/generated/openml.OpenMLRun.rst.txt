@@ -1,6 +1,0 @@
-﻿:mod:`openml`.OpenMLRun
-==============================
-
-.. currentmodule:: openml
-
-.. autoclass:: OpenMLRun

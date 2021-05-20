@@ -21,14 +21,12 @@
 =================
 Benchmark studies
 =================
-
 How to list, download and upload benchmark studies.
-
 In contrast to `benchmark suites <https://docs.openml.org/benchmark/#benchmarking-suites>`_ which
 hold a list of tasks, studies hold a list of runs. As runs contain all information on flows and
 tasks, all required information about a study can be retrieved.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-23
+.. GENERATED FROM PYTHON SOURCE LINES 11-21
 
 .. code-block:: default
 
@@ -49,15 +47,7 @@ tasks, all required information about a study can be retrieved.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-29
-
-.. warning:: This example uploads data. For that reason, this example
-   connects to the test server at test.openml.org before doing so.
-   This prevents the crowding of the main server with example datasets,
-   tasks, runs, and so on.
-###########################################################################
-
-.. GENERATED FROM PYTHON SOURCE LINES 32-38
+.. GENERATED FROM PYTHON SOURCE LINES 22-28
 
 Listing studies
 ***************
@@ -66,7 +56,7 @@ Listing studies
 * Default gives ``dict``, but we'll use ``dataframe`` to obtain an
   easier-to-work-with data structure
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-43
+.. GENERATED FROM PYTHON SOURCE LINES 28-33
 
 .. code-block:: default
 
@@ -102,16 +92,16 @@ Listing studies
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-46
+.. GENERATED FROM PYTHON SOURCE LINES 34-36
 
 Downloading studies
 ===================
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-49
+.. GENERATED FROM PYTHON SOURCE LINES 38-39
 
 This is done based on the study ID.
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-52
+.. GENERATED FROM PYTHON SOURCE LINES 39-42
 
 .. code-block:: default
 
@@ -145,11 +135,11 @@ This is done based on the study ID.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-54
+.. GENERATED FROM PYTHON SOURCE LINES 43-44
 
 Studies also features a description:
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-56
+.. GENERATED FROM PYTHON SOURCE LINES 44-46
 
 .. code-block:: default
 
@@ -172,11 +162,11 @@ Studies also features a description:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-58
+.. GENERATED FROM PYTHON SOURCE LINES 47-48
 
 Studies are a container for runs:
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-60
+.. GENERATED FROM PYTHON SOURCE LINES 48-50
 
 .. code-block:: default
 
@@ -197,12 +187,12 @@ Studies are a container for runs:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-63
+.. GENERATED FROM PYTHON SOURCE LINES 51-53
 
 And we can use the evaluation listing functionality to learn more about
 the evaluations available for the conducted runs:
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-68
+.. GENERATED FROM PYTHON SOURCE LINES 53-58
 
 .. code-block:: default
 
@@ -233,7 +223,36 @@ the evaluations available for the conducted runs:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-75
+.. GENERATED FROM PYTHON SOURCE LINES 59-63
+
+We'll use the test server for the rest of this tutorial.
+
+.. warning::
+   .. include:: ../../test_server_usage_warning.txt
+
+.. GENERATED FROM PYTHON SOURCE LINES 63-65
+
+.. code-block:: default
+
+    openml.config.start_using_configuration_for_example()
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      warnings.warn(
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 66-72
 
 Uploading studies
 =================
@@ -242,11 +261,10 @@ Creating a study is as simple as creating any kind of other OpenML entity.
 In this examples we'll create a few runs for the OpenML-100 benchmark
 suite which is available on the OpenML test server.
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-109
+.. GENERATED FROM PYTHON SOURCE LINES 72-105
 
 .. code-block:: default
 
-    openml.config.start_using_configuration_for_example()
 
     # Model to be used
     clf = RandomForestClassifier()
@@ -293,17 +311,17 @@ suite which is available on the OpenML test server.
     True
     OpenML Study
     ============
-    ID..............: 8392
+    ID..............: 15649
     Name............: Test-Study
     Status..........: None
     Main Entity Type: run
-    Study URL.......: https://test.openml.org/s/8392
+    Study URL.......: https://test.openml.org/s/15649
     # of Runs.......: 3
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-111
+.. GENERATED FROM PYTHON SOURCE LINES 106-107
 
 .. code-block:: default
 
@@ -318,7 +336,7 @@ suite which is available on the OpenML test server.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  51.341 seconds)
+   **Total running time of the script:** ( 0 minutes  43.511 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_study_tutorial.py:

@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tasks &#8212; OpenML 0.12.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Tasks &#8212; OpenML 0.12.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -65,6 +66,7 @@
                 <li><a href="../../usage.html">User Guide</a></li>
                 <li><a href="../../api.html">API</a></li>
                 <li><a href="../index.html">Examples</a></li>
+                <li><a href="../../extensions.html">Extensions</a></li>
                 <li><a href="../../contributing.html">Contributing</a></li>
                 <li><a href="../../progress.html">Changelog</a></li>
             
@@ -128,7 +130,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-tasks-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="tasks">
+<section class="sphx-glr-example-title" id="tasks">
 <span id="sphx-glr-examples-30-extended-tasks-tutorial-py"></span><h1>Tasks<a class="headerlink" href="#tasks" title="Permalink to this headline">¶</a></h1>
 <p>A tutorial on how to list and download tasks.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
@@ -150,7 +152,7 @@ special tag or only tasks for a specific target such as
 metric, the splits and an iterator which can be used to access the
 splits in a useful manner.</p></li>
 </ol>
-<div class="section" id="listing-tasks">
+<section id="listing-tasks">
 <h2>Listing tasks<a class="headerlink" href="#listing-tasks" title="Permalink to this headline">¶</a></h2>
 <p>We will start by simply listing only <em>supervised classification</em> tasks:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">)</span>
@@ -158,7 +160,7 @@ splits in a useful manner.</p></li>
 </div>
 <p><strong>openml.tasks.list_tasks()</strong> returns a dictionary of dictionaries by default, which we convert
 into a
-<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html">pandas dataframe</a>
+<a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html">pandas dataframe</a>
 to have better visualization capabilities and easier access:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
@@ -182,7 +184,7 @@ to have better visualization capabilities and easier access:</p>
        &#39;NumberOfMissingValues&#39;, &#39;NumberOfNumericFeatures&#39;,
        &#39;NumberOfSymbolicFeatures&#39;, &#39;cost_matrix&#39;],
       dtype=&#39;object&#39;)
-First 5 of 3722 tasks:
+First 5 of 3724 tasks:
    tid  ... cost_matrix
 2    2  ...         NaN
 3    3  ...         NaN
@@ -237,7 +239,7 @@ First 5 of 3722 tasks:
 </pre></div>
 </div>
 <p>Resampling strategies can be found on the
-<a class="reference external" href="http://www.openml.org/search?type=measure&amp;q=estimation%20procedure">OpenML Website</a>.</p>
+<a class="reference external" href="https://www.openml.org/search?type=measure&amp;q=estimation%20procedure">OpenML Website</a>.</p>
 <p>Similar to listing tasks by task type, we can list tasks by tags:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s2">&quot;OpenML100&quot;</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First 5 of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span><span class="si">}</span><span class="s2"> tasks:&quot;</span><span class="p">)</span>
@@ -301,17 +303,17 @@ supervised classification tasks with more than 500 instances and less than 50000
 instances per task. To make things easier, the tasks do not contain highly
 unbalanced data and sparse data. However, the tasks include missing values and
 categorical features. You can find out more about the <em>OpenML 100</em> on
-<a class="reference external" href="https://www.openml.org/guide/benchmark">the OpenML benchmarking page</a>.</p>
+<a class="reference external" href="https://docs.openml.org/benchmark/">the OpenML benchmarking page</a>.</p>
 <p>Finally, it is also possible to list all tasks on OpenML with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>46341
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>46364
 </pre></div>
 </div>
-<div class="section" id="exercise">
+<section id="exercise">
 <h3>Exercise<a class="headerlink" href="#exercise" title="Permalink to this headline">¶</a></h3>
 <p>Search for the tasks on the ‘eeg-eye-state’ dataset.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;name==&quot;eeg-eye-state&quot;&#39;</span><span class="p">)</span>
@@ -864,7 +866,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>20742</th>
+      <th>20744</th>
       <td>191646</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -895,7 +897,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>24414</th>
+      <th>24418</th>
       <td>213320</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -926,7 +928,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>27613</th>
+      <th>27619</th>
       <td>234435</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -957,7 +959,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>31927</th>
+      <th>31935</th>
       <td>256739</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -988,7 +990,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>31937</th>
+      <th>31945</th>
       <td>256750</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1019,7 +1021,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>37096</th>
+      <th>37108</th>
       <td>297708</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1050,7 +1052,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>40292</th>
+      <th>40306</th>
       <td>318835</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1081,7 +1083,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>43511</th>
+      <th>43527</th>
       <td>339990</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1116,9 +1118,9 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </div>
 </div>
 <br />
-<br /></div>
-</div>
-<div class="section" id="downloading-tasks">
+<br /></section>
+</section>
+<section id="downloading-tasks">
 <h2>Downloading tasks<a class="headerlink" href="#downloading-tasks" title="Permalink to this headline">¶</a></h2>
 <p>We provide two functions to download tasks, one which downloads only a
 single task by its ID, and one which takes a list of IDs and downloads
@@ -1162,8 +1164,8 @@ Target Feature.......: class
 Cost Matrix..........: Available
 </pre></div>
 </div>
-</div>
-<div class="section" id="creating-tasks">
+</section>
+<section id="creating-tasks">
 <h2>Creating tasks<a class="headerlink" href="#creating-tasks" title="Permalink to this headline">¶</a></h2>
 <p>You can also create new tasks. Take the following into account:</p>
 <ul class="simple">
@@ -1188,7 +1190,22 @@ specific measure. OpenML will always compute all appropriate measures and you ca
 or sort results on your favourite measure afterwards. Only add an evaluation measure if
 necessary (e.g. when other measure make no sense), since it will create a new task, which
 scatters results across tasks.</p>
-<div class="section" id="example">
+<p>We’ll use the test server for the rest of this tutorial.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This example uploads data. For that reason, this example connects to the test server at test.openml.org.
+This prevents the main server from crowding with example datasets, tasks, runs, and so on.
+The use of this test server can affect behaviour and performance of the OpenML-Python API.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+  warnings.warn(
+</pre></div>
+</div>
+<section id="example">
 <h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
 <p>Let’s create a classification task on a dataset. In this example we will do this on the
 Iris dataset (ID=128 (on test server)). We’ll use 10-fold cross-validation (ID=1),
@@ -1196,10 +1213,7 @@ and <em>predictive accuracy</em> as the predefined measure (this can also be lef
 If a task with these parameters exists, we will get an appropriate exception.
 If such a task doesn’t exist, a task will be created and the corresponding task_id
 will be returned.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># using test server for example uploads</span>
-<span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
-
-<span class="k">try</span><span class="p">:</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
     <span class="n">my_task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
         <span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span>
         <span class="n">dataset_id</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
@@ -1234,7 +1248,7 @@ will be returned.</p>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&amp;type=measure">Complete list of model estimation procedures</a>.</p></li>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=measure_type%3Aevaluation_measure&amp;type=measure">Complete list of evaluation measures</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  19.379 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  59.800 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-tasks-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e6648ddbb54e75b09dd01d69be33f340/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></p>
@@ -1244,9 +1258,9 @@ will be returned.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
     </div>
@@ -1261,7 +1275,7 @@ will be returned.</p>
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>

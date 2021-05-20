@@ -1,0 +1,8 @@
+﻿:orphan:
+
+:mod:`openml.study`.OpenMLBenchmarkSuite
+===============================================
+
+.. currentmodule:: openml.study
+
+.. autoclass:: OpenMLBenchmarkSuite

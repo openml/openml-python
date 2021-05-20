@@ -114,6 +114,9 @@ _ = pd.plotting.scatter_matrix(
 # Edit a created dataset
 # ======================
 # This example uses the test server, to avoid editing a dataset on the main server.
+#
+# .. warning::
+#    .. include:: ../../test_server_usage_warning.txt
 openml.config.start_using_configuration_for_example()
 ############################################################################
 # Edit non-critical fields, allowed for all authorized users:

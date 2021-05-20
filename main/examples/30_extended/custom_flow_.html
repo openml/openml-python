@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Creating and Using a Custom Flow &#8212; OpenML 0.12.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Creating and Using a Custom Flow &#8212; OpenML 0.12.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -65,6 +66,7 @@
                 <li><a href="../../usage.html">User Guide</a></li>
                 <li><a href="../../api.html">API</a></li>
                 <li><a href="../index.html">Examples</a></li>
+                <li><a href="../../extensions.html">Extensions</a></li>
                 <li><a href="../../contributing.html">Contributing</a></li>
                 <li><a href="../../progress.html">Changelog</a></li>
             
@@ -121,33 +123,38 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-custom-flow-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="creating-and-using-a-custom-flow">
+<section class="sphx-glr-example-title" id="creating-and-using-a-custom-flow">
 <span id="sphx-glr-examples-30-extended-custom-flow-py"></span><h1>Creating and Using a Custom Flow<a class="headerlink" href="#creating-and-using-a-custom-flow" title="Permalink to this headline">¶</a></h1>
 <p>The most convenient way to create a flow for your machine learning workflow is to generate it
-automatically as described in the <a class="reference external" href="https://openml.github.io/openml-python/master/examples/30_extended/flow_id_tutorial.html#sphx-glr-examples-30-extended-flow-id-tutorial-py">Obtain Flow IDs</a> tutorial.  # noqa E501
+automatically as described in the <a class="reference internal" href="flow_id_tutorial.html#sphx-glr-examples-30-extended-flow-id-tutorial-py"><span class="std std-ref">Obtaining Flow IDs</span></a> tutorial.
 However, there are scenarios where this is not possible, such
 as when the flow uses a framework without an extension or when the flow is described by a script.</p>
 <p>In those cases you can still create a custom flow by following the steps of this tutorial.
 As an example we will use the flows generated for the <a class="reference external" href="https://openml.github.io/automlbenchmark/">AutoML Benchmark</a>,
 and also show how to link runs to the custom flow.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
-<span class="c1"># .. warning:: This example uploads data. For that reason, this example</span>
-<span class="c1">#   connects to the test server at test.openml.org. This prevents the main</span>
-<span class="c1">#   server from crowding with example datasets, tasks, runs, and so on.</span>
+
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">from</span> <span class="nn">openml</span> <span class="kn">import</span> <span class="n">OpenMLClassificationTask</span>
 <span class="kn">from</span> <span class="nn">openml.runs.functions</span> <span class="kn">import</span> <span class="n">format_prediction</span>
-
-<span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="section" id="defining-the-flow">
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This example uploads data. For that reason, this example connects to the test server at test.openml.org.
+This prevents the main server from crowding with example datasets, tasks, runs, and so on.
+The use of this test server can affect behaviour and performance of the OpenML-Python API.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<section id="defining-the-flow">
 <h2>1. Defining the flow<a class="headerlink" href="#defining-the-flow" title="Permalink to this headline">¶</a></h2>
 <p>The first step is to define all the hyperparameters of your flow.
-The API pages feature a descriptions of each variable of the <a class="reference external" href="https://openml.github.io/openml-python/master/generated/openml.OpenMLFlow.html#openml.OpenMLFlow">OpenMLFlow</a>.  # noqa E501
+The API pages feature a descriptions of each variable of the <a class="reference internal" href="../../generated/openml.flows.OpenMLFlow.html#openml.flows.OpenMLFlow" title="openml.flows.OpenMLFlow"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.flows.OpenMLFlow</span></code></a>.
 Note that <cite>external version</cite> and <cite>name</cite> together uniquely identify a flow.</p>
 <p>The AutoML Benchmark runs AutoML systems across a range of tasks.
 OpenML stores Flows for each AutoML system. However, the AutoML benchmark adds
@@ -211,8 +218,8 @@ the model of the flow to <cite>None</cite>.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;autosklearn flow created: </span><span class="si">{</span><span class="n">autosklearn_amlb_flow</span><span class="o">.</span><span class="n">flow_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="using-the-flow">
+</section>
+<section id="using-the-flow">
 <h2>2. Using the flow<a class="headerlink" href="#using-the-flow" title="Permalink to this headline">¶</a></h2>
 <p>This Section will show how to upload run data for your custom flow.
 Take care to change the values of parameters as well as the task id,
@@ -233,17 +240,15 @@ Task and parameter values in the example are fictional.</p>
 </div>
 <p>The last bit of information for the run we need are the predicted values.
 The exact format of the predictions will depend on the task.</p>
-<p>The predictions should always be a list of lists, each list should contain:
-- the repeat number: for repeated evaluation strategies. (e.g. repeated cross-validation)
-- the fold number: for cross-validation. (what should this be for holdout?)
-- 0: this field is for backward compatibility.
-- index: the row (of the original dataset) for which the prediction was made.
-- p_1, …, p_c: for each class the predicted probability of the sample</p>
-<blockquote>
-<div><p>belonging to that class. (no elements for regression tasks)
-Make sure the order of these elements follows the order of <cite>task.class_labels</cite>.</p>
-</div></blockquote>
+<p>The predictions should always be a list of lists, each list should contain:</p>
 <ul class="simple">
+<li><p>the repeat number: for repeated evaluation strategies. (e.g. repeated cross-validation)</p></li>
+<li><p>the fold number: for cross-validation. (what should this be for holdout?)</p></li>
+<li><p>0: this field is for backward compatibility.</p></li>
+<li><p>index: the row (of the original dataset) for which the prediction was made.</p></li>
+<li><p>p_1, …, p_c: for each class the predicted probability of the sample
+belonging to that class. (no elements for regression tasks)
+Make sure the order of these elements follows the order of <cite>task.class_labels</cite>.</p></li>
 <li><p>the predicted class/value for the sample</p></li>
 <li><p>the true class/value for the sample</p></li>
 </ul>
@@ -319,8 +324,8 @@ We use the argument setup_string because the used flow was a script.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -335,7 +340,7 @@ We use the argument setup_string because the used flow was a script.</p>
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>

@@ -6,8 +6,6 @@ Logging
 Explains openml-python logging, and shows how to configure it.
 """
 ##################################################################################
-# Logging
-# ^^^^^^^
 # Openml-python uses the `Python logging module <https://docs.python.org/3/library/logging.html>`_
 # to provide users with log messages. Each log message is assigned a level of importance, see
 # the table in Python's logging tutorial
@@ -16,7 +14,7 @@ Explains openml-python logging, and shows how to configure it.
 # By default, openml-python will print log messages of level `WARNING` and above to console.
 # All log messages (including `DEBUG` and `INFO`) are also saved in a file, which can be
 # found in your cache directory (see also the
-# `introduction tutorial <../20_basic/introduction_tutorial.html>`_).
+# :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`).
 # These file logs are automatically deleted if needed, and use at most 2MB of space.
 #
 # It is possible to configure what log levels to send to console and file.

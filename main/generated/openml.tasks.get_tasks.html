@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>openml.tasks.get_tasks &#8212; OpenML 0.12.1 documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>openml.tasks.get_tasks &#8212; OpenML 0.12.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -65,6 +66,7 @@
                 <li><a href="../usage.html">User Guide</a></li>
                 <li><a href="../api.html">API</a></li>
                 <li><a href="../examples/index.html">Examples</a></li>
+                <li><a href="../extensions.html">Extensions</a></li>
                 <li><a href="../contributing.html">Contributing</a></li>
                 <li><a href="../progress.html">Changelog</a></li>
             
@@ -112,19 +114,21 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="openml-tasks-get-tasks">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>.get_tasks<a class="headerlink" href="#openml-tasks-get-tasks" title="Permalink to this headline">¶</a></h1>
+  <section id="openml-tasks-get-tasks">
+<h1><a class="reference internal" href="../api.html#module-openml.tasks" title="openml.tasks"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code></a>.get_tasks<a class="headerlink" href="#openml-tasks-get-tasks" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="openml.tasks.get_tasks">
-<code class="sig-prename descclassname"><span class="pre">openml.tasks.</span></code><code class="sig-name descname"><span class="pre">get_tasks</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.get_tasks" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="openml.tasks.get_tasks">
+<span class="sig-prename descclassname"><span class="pre">openml.tasks.</span></span><span class="sig-name descname"><span class="pre">get_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_ids</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_qualities</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="openml.tasks.OpenMLTask.html#openml.tasks.OpenMLTask" title="openml.tasks.task.OpenMLTask"><span class="pre">openml.tasks.task.OpenMLTask</span></a><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#openml.tasks.get_tasks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download tasks.</p>
 <p>This function iterates <a class="reference internal" href="openml.tasks.get_task.html#openml.tasks.get_task" title="openml.tasks.get_task"><code class="xref py py-meth docutils literal notranslate"><span class="pre">openml.tasks.get_task()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>task_ids</strong><span class="classifier">iterable</span></dt><dd><p>Integers/Strings representing task ids.</p>
+<dt><strong>task_ids</strong><span class="classifier">List[int]</span></dt><dd><p>A list of task ids to download.</p>
 </dd>
-<dt><strong>download_data</strong><span class="classifier">bool</span></dt><dd><p>Option to trigger download of data along with the meta data.</p>
+<dt><strong>download_data</strong><span class="classifier">bool (default = True)</span></dt><dd><p>Option to trigger download of data along with the meta data.</p>
+</dd>
+<dt><strong>download_qualities</strong><span class="classifier">bool (default=True)</span></dt><dd><p>Option to download ‘qualities’ meta-data in addition to the minimal dataset description.</p>
 </dd>
 </dl>
 </dd>
@@ -136,7 +140,7 @@
 </dl>
 </dd></dl>
 
-<div class="clearer"></div></div>
+<div class="clearer"></div></section>
 
 
     </div>
@@ -151,7 +155,7 @@
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>

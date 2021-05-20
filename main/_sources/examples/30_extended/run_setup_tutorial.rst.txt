@@ -44,11 +44,7 @@ In this tutorial we will
        and solve the same task again;
     3) We will verify that the obtained results are exactly the same.
 
-.. warning:: This example uploads data. For that reason, this example
-   connects to the test server at test.openml.org. This prevents the main
-   server from crowding with example datasets, tasks, runs, and so on.
-
-.. GENERATED FROM PYTHON SOURCE LINES 32-49
+.. GENERATED FROM PYTHON SOURCE LINES 28-42
 
 .. code-block:: default
 
@@ -67,21 +63,45 @@ In this tutorial we will
     from sklearn.decomposition import TruncatedSVD
 
 
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 43-45
+
+.. warning::
+   .. include:: ../../test_server_usage_warning.txt
+
+.. GENERATED FROM PYTHON SOURCE LINES 45-47
+
+.. code-block:: default
+
     openml.config.start_using_configuration_for_example()
 
 
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      warnings.warn(
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-52
+
+.. GENERATED FROM PYTHON SOURCE LINES 48-50
 
 1) Create a flow and use it to solve a task
 ##############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-83
+.. GENERATED FROM PYTHON SOURCE LINES 50-81
 
 .. code-block:: default
 
@@ -126,18 +146,18 @@ In this tutorial we will
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1775: UserWarning: Estimator only predicted for 5/6 classes!
+    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1782: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-86
+.. GENERATED FROM PYTHON SOURCE LINES 82-84
 
 2) Download the flow and solve the same task again.
 ##############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-100
+.. GENERATED FROM PYTHON SOURCE LINES 84-98
 
 .. code-block:: default
 
@@ -165,18 +185,18 @@ In this tutorial we will
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1775: UserWarning: Estimator only predicted for 5/6 classes!
+    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1782: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-103
+.. GENERATED FROM PYTHON SOURCE LINES 99-101
 
 3) We will verify that the obtained results are exactly the same.
 ##############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-107
+.. GENERATED FROM PYTHON SOURCE LINES 101-105
 
 .. code-block:: default
 
@@ -191,7 +211,7 @@ In this tutorial we will
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-110
+.. GENERATED FROM PYTHON SOURCE LINES 106-108
 
 .. code-block:: default
 
@@ -207,7 +227,7 @@ In this tutorial we will
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  12.220 seconds)
+   **Total running time of the script:** ( 0 minutes  10.353 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_run_setup_tutorial.py:

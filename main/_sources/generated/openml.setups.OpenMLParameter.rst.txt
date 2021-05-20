@@ -1,0 +1,8 @@
+﻿:orphan:
+
+:mod:`openml.setups`.OpenMLParameter
+===========================================
+
+.. currentmodule:: openml.setups
+
+.. autoclass:: OpenMLParameter

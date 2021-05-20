@@ -23,7 +23,7 @@ Flows and Runs
 
 How to train/run a model and how to upload the results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 7-13
+.. GENERATED FROM PYTHON SOURCE LINES 7-14
 
 .. code-block:: default
 
@@ -40,23 +40,48 @@ How to train/run a model and how to upload the results.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-22
+
+.. GENERATED FROM PYTHON SOURCE LINES 15-19
+
+We'll use the test server for the rest of this tutorial.
+
+.. warning::
+   .. include:: ../../test_server_usage_warning.txt
+
+.. GENERATED FROM PYTHON SOURCE LINES 19-21
+
+.. code-block:: default
+
+    openml.config.start_using_configuration_for_example()
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      warnings.warn(
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 22-26
 
 Train machine learning models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Train a scikit-learn model on the data manually.
 
-.. warning:: This example uploads data. For that reason, this example
-  connects to the test server at test.openml.org. This prevents the main
-  server from crowding with example datasets, tasks, runs, and so on.
-
-.. GENERATED FROM PYTHON SOURCE LINES 22-32
+.. GENERATED FROM PYTHON SOURCE LINES 26-35
 
 .. code-block:: default
 
 
-    openml.config.start_using_configuration_for_example()
     # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
     dataset = openml.datasets.get_dataset(68)
     X, y, categorical_indicator, attribute_names = dataset.get_data(
@@ -80,13 +105,13 @@ Train a scikit-learn model on the data manually.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-36
+.. GENERATED FROM PYTHON SOURCE LINES 36-39
 
 You can also ask for meta-data to automatically preprocess the data.
 
 * e.g. categorical features -> do feature encoding
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-47
+.. GENERATED FROM PYTHON SOURCE LINES 39-50
 
 .. code-block:: default
 
@@ -117,13 +142,13 @@ You can also ask for meta-data to automatically preprocess the data.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-51
+.. GENERATED FROM PYTHON SOURCE LINES 51-54
 
 Runs: Easily explore models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 We can run (many) scikit-learn algorithms on (many) OpenML tasks.
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-63
+.. GENERATED FROM PYTHON SOURCE LINES 54-66
 
 .. code-block:: default
 
@@ -157,25 +182,25 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     Task ID......: 403
     Task Type....: None
     Task URL.....: https://test.openml.org/t/403
-    Flow ID......: 179250
+    Flow ID......: 319369
     Flow Name....: sklearn.tree._classes.DecisionTreeClassifier
-    Flow URL.....: https://test.openml.org/f/179250
+    Flow URL.....: https://test.openml.org/f/319369
     Setup ID.....: None
-    Setup String.: Python_3.8.8. Sklearn_0.24.1. NumPy_1.20.2. SciPy_1.6.2.
+    Setup String.: Python_3.8.10. Sklearn_0.24.2. NumPy_1.20.3. SciPy_1.6.3.
     Dataset ID...: 68
     Dataset URL..: https://test.openml.org/d/68
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-68
+.. GENERATED FROM PYTHON SOURCE LINES 67-71
 
 Share the run on the OpenML server
 
 So far the run is only available locally. By calling the publish function,
 the run is sent to the OpenML server:
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-74
+.. GENERATED FROM PYTHON SOURCE LINES 71-77
 
 .. code-block:: default
 
@@ -183,7 +208,7 @@ the run is sent to the OpenML server:
     myrun = run.publish()
     # For this tutorial, our configuration publishes to the test server
     # as to not pollute the main server.
-    print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
+    print(f"Uploaded to {myrun.openml_url}")
 
 
 
@@ -195,16 +220,16 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/62970
+    Uploaded to https://test.openml.org/r/116564
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-76
+.. GENERATED FROM PYTHON SOURCE LINES 78-79
 
 We can now also inspect the flow object which was automatically created:
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-80
+.. GENERATED FROM PYTHON SOURCE LINES 79-83
 
 .. code-block:: default
 
@@ -224,12 +249,12 @@ We can now also inspect the flow object which was automatically created:
 
     OpenML Flow
     ===========
-    Flow ID.........: 179250 (version 18)
-    Flow URL........: https://test.openml.org/f/179250
+    Flow ID.........: 319369 (version 29)
+    Flow URL........: https://test.openml.org/f/319369
     Flow Name.......: sklearn.tree._classes.DecisionTreeClassifier
     Flow Description: A decision tree classifier.
-    Upload Date.....: 2021-04-14 10:24:51
-    Dependencies....: sklearn==0.24.1
+    Upload Date.....: 2021-05-17 17:08:47
+    Dependencies....: sklearn==0.24.2
     numpy>=1.13.3
     scipy>=0.19.1
     joblib>=0.11
@@ -238,7 +263,7 @@ We can now also inspect the flow object which was automatically created:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-88
+.. GENERATED FROM PYTHON SOURCE LINES 84-91
 
 It also works with pipelines
 ############################
@@ -248,7 +273,7 @@ To demonstrate this using the dataset `credit-a <https://test.openml.org/d/16>`_
 `task <https://test.openml.org/t/96>`_ as it contains both numerical and categorical
 variables and missing values in both.
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-164
+.. GENERATED FROM PYTHON SOURCE LINES 91-167
 
 .. code-block:: default
 
@@ -282,7 +307,7 @@ variables and missing values in both.
 
     run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
     myrun = run.publish()
-    print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
+    print(f"Uploaded to {myrun.openml_url}")
 
 
     # The above pipeline works with the helper functions that internally deal with pandas DataFrame.
@@ -326,7 +351,7 @@ variables and missing values in both.
 
     run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False, dataset_format="array")
     myrun = run.publish()
-    print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
+    print(f"Uploaded to {myrun.openml_url}")
 
 
 
@@ -338,20 +363,20 @@ variables and missing values in both.
 
  .. code-block:: none
 
-    Uploaded to http://test.openml.org/r/62977
-    Uploaded to http://test.openml.org/r/62979
+    Uploaded to https://test.openml.org/r/116566
+    Uploaded to https://test.openml.org/r/116567
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-169
+.. GENERATED FROM PYTHON SOURCE LINES 168-172
 
 Running flows on tasks offline for later upload
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 For those scenarios where there is no access to internet, it is possible to run
 a model on a task without uploading results or flows to the server immediately.
 
-.. GENERATED FROM PYTHON SOURCE LINES 169-189
+.. GENERATED FROM PYTHON SOURCE LINES 172-192
 
 .. code-block:: default
 
@@ -385,33 +410,33 @@ a model on a task without uploading results or flows to the server immediately.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1775: UserWarning: Estimator only predicted for 5/6 classes!
+    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1782: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
 
     OpenML Run
     ==========
     Uploader Name: None
     Metric.......: None
-    Run ID.......: 62981
-    Run URL......: https://test.openml.org/r/62981
+    Run ID.......: 116570
+    Run URL......: https://test.openml.org/r/116570
     Task ID......: 6
     Task Type....: None
     Task URL.....: https://test.openml.org/t/6
-    Flow ID......: 179598
+    Flow ID......: 319860
     Flow Name....: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(categorical=sklearn.preprocessing._encoders.OneHotEncoder,continuous=sklearn.impute._base.SimpleImputer),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
-    Flow URL.....: https://test.openml.org/f/179598
+    Flow URL.....: https://test.openml.org/f/319860
     Setup ID.....: None
-    Setup String.: Python_3.8.8. Sklearn_0.24.1. NumPy_1.20.2. SciPy_1.6.2.
+    Setup String.: Python_3.8.10. Sklearn_0.24.2. NumPy_1.20.3. SciPy_1.6.3.
     Dataset ID...: None
     Dataset URL..: https://test.openml.org/d/None
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-191
+.. GENERATED FROM PYTHON SOURCE LINES 193-194
 
 Alternatively, one can also directly run flows.
 
-.. GENERATED FROM PYTHON SOURCE LINES 191-205
+.. GENERATED FROM PYTHON SOURCE LINES 194-208
 
 .. code-block:: default
 
@@ -436,7 +461,7 @@ Alternatively, one can also directly run flows.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 206-223
+.. GENERATED FROM PYTHON SOURCE LINES 209-226
 
 Challenge
 ^^^^^^^^^
@@ -445,18 +470,18 @@ Try to build the best possible models on several OpenML tasks,
 compare your results with the rest of the class and learn from
 them. Some tasks you could try (or browse openml.org):
 
-* EEG eye state: data_id:`1471 <http://www.openml.org/d/1471>`_,
-  task_id:`14951 <http://www.openml.org/t/14951>`_
-* Volcanoes on Venus: data_id:`1527 <http://www.openml.org/d/1527>`_,
-  task_id:`10103 <http://www.openml.org/t/10103>`_
-* Walking activity: data_id:`1509 <http://www.openml.org/d/1509>`_,
-  task_id:`9945 <http://www.openml.org/t/9945>`_, 150k instances.
-* Covertype (Satellite): data_id:`150 <http://www.openml.org/d/150>`_,
-  task_id:`218 <http://www.openml.org/t/218>`_, 500k instances.
-* Higgs (Physics): data_id:`23512 <http://www.openml.org/d/23512>`_,
-  task_id:`52950 <http://www.openml.org/t/52950>`_, 100k instances, missing values.
+* EEG eye state: data_id:`1471 <https://www.openml.org/d/1471>`_,
+  task_id:`14951 <https://www.openml.org/t/14951>`_
+* Volcanoes on Venus: data_id:`1527 <https://www.openml.org/d/1527>`_,
+  task_id:`10103 <https://www.openml.org/t/10103>`_
+* Walking activity: data_id:`1509 <https://www.openml.org/d/1509>`_,
+  task_id:`9945 <https://www.openml.org/t/9945>`_, 150k instances.
+* Covertype (Satellite): data_id:`150 <https://www.openml.org/d/150>`_,
+  task_id:`218 <https://www.openml.org/t/218>`_, 500k instances.
+* Higgs (Physics): data_id:`23512 <https://www.openml.org/d/23512>`_,
+  task_id:`52950 <https://www.openml.org/t/52950>`_, 100k instances, missing values.
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-235
+.. GENERATED FROM PYTHON SOURCE LINES 226-238
 
 .. code-block:: default
 
@@ -469,7 +494,7 @@ them. Some tasks you could try (or browse openml.org):
 
         run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
         myrun = run.publish()
-        print(f"kNN on {data.name}: http://test.openml.org/r/{myrun.run_id}")
+        print(f"kNN on {data.name}: {myrun.openml_url}")
 
 
 
@@ -482,12 +507,12 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: http://test.openml.org/r/62986
+    kNN on diabetes: https://test.openml.org/r/116572
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 236-237
+.. GENERATED FROM PYTHON SOURCE LINES 239-240
 
 .. code-block:: default
 
@@ -502,7 +527,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  50.612 seconds)
+   **Total running time of the script:** ( 0 minutes  43.387 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:

@@ -80,7 +80,7 @@ Exercise 0
 
  .. code-block:: none
 
-    First 10 of 3276 datasets...
+    First 10 of 3348 datasets...
 
 
 .. raw:: html
@@ -703,13 +703,16 @@ Exercise 2
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-117
+.. GENERATED FROM PYTHON SOURCE LINES 114-120
 
 Edit a created dataset
 ======================
 This example uses the test server, to avoid editing a dataset on the main server.
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-118
+.. warning::
+   .. include:: ../../test_server_usage_warning.txt
+
+.. GENERATED FROM PYTHON SOURCE LINES 120-121
 
 .. code-block:: default
 
@@ -718,16 +721,25 @@ This example uses the test server, to avoid editing a dataset on the main server
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      warnings.warn(
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-122
+
+.. GENERATED FROM PYTHON SOURCE LINES 122-125
 
 Edit non-critical fields, allowed for all authorized users:
 description, creator, contributor, collection_date, language, citation,
 original_data_url, paper_url
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-140
+.. GENERATED FROM PYTHON SOURCE LINES 125-143
 
 .. code-block:: default
 
@@ -764,7 +776,7 @@ original_data_url, paper_url
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-147
+.. GENERATED FROM PYTHON SOURCE LINES 144-150
 
 Editing critical fields (default_target_attribute, row_id_attribute, ignore_attribute) is allowed
 only for the dataset owner. Further, critical fields cannot be edited if the dataset has any
@@ -773,7 +785,7 @@ configure the API key:
 openml.config.apikey = 'FILL_IN_OPENML_API_KEY'
 This example here only shows a failure when trying to work on a dataset not owned by you:
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-152
+.. GENERATED FROM PYTHON SOURCE LINES 150-155
 
 .. code-block:: default
 
@@ -797,7 +809,7 @@ This example here only shows a failure when trying to work on a dataset not owne
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-159
+.. GENERATED FROM PYTHON SOURCE LINES 156-162
 
 Fork dataset
 ============
@@ -806,7 +818,7 @@ Use this API only if you are unable to edit the critical fields (default_target_
 ignore_attribute, row_id_attribute) of a dataset through the edit_dataset API.
 After the dataset is forked, you can edit the new version of the dataset using edit_dataset.
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-166
+.. GENERATED FROM PYTHON SOURCE LINES 162-169
 
 .. code-block:: default
 
@@ -827,8 +839,8 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
  .. code-block:: none
 
-    50030
-    Forked dataset ID: 50030
+    92458
+    Forked dataset ID: 92458
 
 
 
@@ -836,7 +848,7 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  15.110 seconds)
+   **Total running time of the script:** ( 0 minutes  14.655 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:

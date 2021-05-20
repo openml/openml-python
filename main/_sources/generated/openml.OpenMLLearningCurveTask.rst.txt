@@ -1,6 +1,0 @@
-﻿:mod:`openml`.OpenMLLearningCurveTask
-============================================
-
-.. currentmodule:: openml
-
-.. autoclass:: OpenMLLearningCurveTask

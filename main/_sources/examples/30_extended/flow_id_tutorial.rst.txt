@@ -25,7 +25,7 @@ Obtaining Flow IDs
 This tutorial discusses different ways to obtain the ID of a flow in order to perform further
 analysis.
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-25
+.. GENERATED FROM PYTHON SOURCE LINES 11-19
 
 .. code-block:: default
 
@@ -37,9 +37,48 @@ analysis.
     import openml
 
 
-    # Activating test server
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 20-22
+
+.. warning::
+   .. include:: ../../test_server_usage_warning.txt
+
+.. GENERATED FROM PYTHON SOURCE LINES 22-25
+
+.. code-block:: default
+
     openml.config.start_using_configuration_for_example()
 
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      warnings.warn(
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 26-27
+
+Defining a classifier
+
+.. GENERATED FROM PYTHON SOURCE LINES 27-29
+
+.. code-block:: default
 
     clf = sklearn.tree.DecisionTreeClassifier()
 
@@ -50,13 +89,13 @@ analysis.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-29
+.. GENERATED FROM PYTHON SOURCE LINES 30-33
 
 1. Obtaining a flow given a classifier
 ======================================
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-34
+.. GENERATED FROM PYTHON SOURCE LINES 33-38
 
 .. code-block:: default
 
@@ -75,24 +114,24 @@ analysis.
 
  .. code-block:: none
 
-    179250
+    319369
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-44
+.. GENERATED FROM PYTHON SOURCE LINES 39-48
 
 This piece of code is rather involved. First, it retrieves a
 :class:`~openml.extensions.Extension` which is registered and can handle the given model,
 in our case it is :class:`openml.extensions.sklearn.SklearnExtension`. Second, the extension
-converts the classifier into an instance of :class:`openml.flow.OpenMLFlow`. Third and finally,
+converts the classifier into an instance of :class:`openml.OpenMLFlow`. Third and finally,
 the publish method checks whether the current flow is already present on OpenML. If not,
 it uploads the flow, otherwise, it updates the current instance with all information computed
 by the server (which is obviously also done when uploading/publishing a flow).
 
 To simplify the usage we have created a helper function which automates all these steps:
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-48
+.. GENERATED FROM PYTHON SOURCE LINES 48-52
 
 .. code-block:: default
 
@@ -110,12 +149,12 @@ To simplify the usage we have created a helper function which automates all thes
 
  .. code-block:: none
 
-    179250
+    319369
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-58
+.. GENERATED FROM PYTHON SOURCE LINES 53-62
 
 2. Obtaining a flow given its name
 ==================================
@@ -127,7 +166,7 @@ be immediately clear. However, this information is very important as it allows t
 flows with the same name for different versions of a software. This might be necessary if an
 algorithm or implementation introduces, renames or drop hyperparameters over time.
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-61
+.. GENERATED FROM PYTHON SOURCE LINES 62-65
 
 .. code-block:: default
 
@@ -144,17 +183,17 @@ algorithm or implementation introduces, renames or drop hyperparameters over tim
 
  .. code-block:: none
 
-    sklearn.tree._classes.DecisionTreeClassifier openml==0.12.1,sklearn==0.24.1
+    sklearn.tree._classes.DecisionTreeClassifier openml==0.12.2,sklearn==0.24.2
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-64
+.. GENERATED FROM PYTHON SOURCE LINES 66-68
 
 The name and external version are automatically added to a flow when constructing it from a
 model. We can then use them to retrieve the flow id as follows:
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-68
+.. GENERATED FROM PYTHON SOURCE LINES 68-72
 
 .. code-block:: default
 
@@ -172,16 +211,16 @@ model. We can then use them to retrieve the flow id as follows:
 
  .. code-block:: none
 
-    179250
+    319369
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-70
+.. GENERATED FROM PYTHON SOURCE LINES 73-74
 
 We can also retrieve all flows for a given name:
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-73
+.. GENERATED FROM PYTHON SOURCE LINES 74-77
 
 .. code-block:: default
 
@@ -198,16 +237,16 @@ We can also retrieve all flows for a given name:
 
  .. code-block:: none
 
-    [178, 10004, 10245, 12428, 66208, 66220, 67190, 81090, 81154, 81171, 81199, 87626, 131887, 131891, 131975, 131991, 179250, 179298, 179299, 179422]
+    [178, 10004, 10245, 12428, 66208, 66220, 67190, 81090, 81154, 81171, 81199, 87626, 131887, 131891, 131975, 131991, 179250, 179298, 179299, 179422, 209168, 226432, 235165, 237105, 319318, 319322, 319341, 319369]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-75
+.. GENERATED FROM PYTHON SOURCE LINES 78-79
 
 This also works with the actual model (generalizing the first part of this example):
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-80
+.. GENERATED FROM PYTHON SOURCE LINES 79-84
 
 .. code-block:: default
 
@@ -226,7 +265,7 @@ This also works with the actual model (generalizing the first part of this examp
 
  .. code-block:: none
 
-    [178, 10004, 10245, 12428, 66208, 66220, 67190, 81090, 81154, 81171, 81199, 87626, 131887, 131891, 131975, 131991, 179250, 179298, 179299, 179422]
+    [178, 10004, 10245, 12428, 66208, 66220, 67190, 81090, 81154, 81171, 81199, 87626, 131887, 131891, 131975, 131991, 179250, 179298, 179299, 179422, 209168, 226432, 235165, 237105, 319318, 319322, 319341, 319369]
 
 
 
@@ -234,7 +273,7 @@ This also works with the actual model (generalizing the first part of this examp
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  44.737 seconds)
+   **Total running time of the script:** ( 1 minutes  35.995 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flow_id_tutorial.py:

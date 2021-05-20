@@ -18,8 +18,8 @@
 .. _sphx_glr_examples_20_basic_introduction_tutorial.py:
 
 
-Setup
-=====
+Introduction tutorial & Setup
+=============================
 
 An example how to set up OpenML-Python followed up by a simple example.
 
@@ -47,7 +47,7 @@ Installation is done via ``pip``:
     pip install openml
 
 For further information, please check out the installation guide at
-https://openml.github.io/openml-python/master/contributing.html#installation
+:ref:`installation`.
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 33-56
@@ -60,23 +60,23 @@ OpenML platform. If you don’t have an account yet, sign up now.
 You will receive an API key, which will authenticate you to the server
 and allow you to download and upload datasets, tasks, runs and flows.
 
-* Create an OpenML account (free) on http://www.openml.org.
+* Create an OpenML account (free) on https://www.openml.org.
 * After logging in, open your account page (avatar on the top right)
 * Open 'Account Settings', then 'API authentication' to find your API key.
 
-There are two ways to authenticate:
+There are two ways to permanently authenticate:
 
+* Use the ``openml`` CLI tool with ``openml configure apikey MYKEY``,
+  replacing **MYKEY** with your API key.
 * Create a plain text file **~/.openml/config** with the line
   **'apikey=MYKEY'**, replacing **MYKEY** with your API key. The config
   file must be in the directory ~/.openml/config and exist prior to
   importing the openml module.
-* Run the code below, replacing 'YOURKEY' with your API key.
 
-.. warning:: This example uploads data. For that reason, this example
-  connects to the test server instead. This prevents the live server from
-  crowding with example datasets, tasks, studies, and so on.
+Alternatively, by running the code below and replacing 'YOURKEY' with your API key,
+you authenticate for the duration of the python process.
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-66
+.. GENERATED FROM PYTHON SOURCE LINES 59-65
 
 .. code-block:: default
 
@@ -86,22 +86,47 @@ There are two ways to authenticate:
     import openml
     from sklearn import neighbors
 
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 66-68
+
+.. warning::
+   .. include:: ../../test_server_usage_warning.txt
+
+.. GENERATED FROM PYTHON SOURCE LINES 68-70
+
+.. code-block:: default
+
     openml.config.start_using_configuration_for_example()
 
 
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      warnings.warn(
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-70
+
+.. GENERATED FROM PYTHON SOURCE LINES 71-74
 
 When using the main server instead, make sure your apikey is configured.
 This can be done with the following line of code (uncomment it!).
 Never share your apikey with others.
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-73
+.. GENERATED FROM PYTHON SOURCE LINES 74-77
 
 .. code-block:: default
 
@@ -115,7 +140,7 @@ Never share your apikey with others.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-85
+.. GENERATED FROM PYTHON SOURCE LINES 78-89
 
 Caching
 ^^^^^^^
@@ -129,7 +154,7 @@ through the API:
   will use **~/.openml/cache** as the cache directory.
 * Run the code below, replacing 'YOURDIR' with the path to the cache directory.
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-90
+.. GENERATED FROM PYTHON SOURCE LINES 89-94
 
 .. code-block:: default
 
@@ -145,13 +170,13 @@ through the API:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-94
+.. GENERATED FROM PYTHON SOURCE LINES 95-98
 
 Simple Example
 ^^^^^^^^^^^^^^
 Download the OpenML task for the eeg-eye-state.
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-104
+.. GENERATED FROM PYTHON SOURCE LINES 98-108
 
 .. code-block:: default
 
@@ -163,7 +188,7 @@ Download the OpenML task for the eeg-eye-state.
     # For this tutorial, our configuration publishes to the test server
     # as to not crowd the main server with runs created by examples.
     myrun = run.publish()
-    print(f"kNN on {data.name}: http://test.openml.org/r/{myrun.run_id}")
+    print(f"kNN on {data.name}: {myrun.openml_url}")
 
 
 
@@ -175,12 +200,12 @@ Download the OpenML task for the eeg-eye-state.
 
  .. code-block:: none
 
-    kNN on eeg-eye-state: http://test.openml.org/r/62891
+    kNN on eeg-eye-state: https://test.openml.org/r/116470
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-106
+.. GENERATED FROM PYTHON SOURCE LINES 109-110
 
 .. code-block:: default
 
@@ -195,7 +220,7 @@ Download the OpenML task for the eeg-eye-state.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  25.572 seconds)
+   **Total running time of the script:** ( 0 minutes  21.634 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_introduction_tutorial.py:

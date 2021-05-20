@@ -1,0 +1,8 @@
+﻿:orphan:
+
+:mod:`openml.tasks`.OpenMLTask
+=====================================
+
+.. currentmodule:: openml.tasks
+
+.. autoclass:: OpenMLTask

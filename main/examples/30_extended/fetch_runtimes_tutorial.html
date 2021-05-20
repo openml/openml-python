@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Measuring runtimes for Scikit-learn models &#8212; OpenML 0.12.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Measuring runtimes for Scikit-learn models &#8212; OpenML 0.12.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -65,6 +66,7 @@
                 <li><a href="../../usage.html">User Guide</a></li>
                 <li><a href="../../api.html">API</a></li>
                 <li><a href="../index.html">Examples</a></li>
+                <li><a href="../../extensions.html">Extensions</a></li>
                 <li><a href="../../contributing.html">Contributing</a></li>
                 <li><a href="../../progress.html">Changelog</a></li>
             
@@ -126,7 +128,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-fetch-runtimes-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="measuring-runtimes-for-scikit-learn-models">
+<section class="sphx-glr-example-title" id="measuring-runtimes-for-scikit-learn-models">
 <span id="sphx-glr-examples-30-extended-fetch-runtimes-tutorial-py"></span><h1>Measuring runtimes for Scikit-learn models<a class="headerlink" href="#measuring-runtimes-for-scikit-learn-models" title="Permalink to this headline">¶</a></h1>
 <p>The runtime of machine learning models on specific datasets can be a deciding
 factor on the choice of algorithms, especially for benchmarking and comparison
@@ -173,7 +175,7 @@ parallelize</p></li>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span><span class="p">,</span> <span class="n">RandomizedSearchCV</span>
 </pre></div>
 </div>
-<div class="section" id="preparing-tasks-and-scikit-learn-models">
+<section id="preparing-tasks-and-scikit-learn-models">
 <h2>Preparing tasks and scikit-learn models<a class="headerlink" href="#preparing-tasks-and-scikit-learn-models" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">167119</span>
 
@@ -212,8 +214,8 @@ Cost Matrix..........: Available
 Task 167119: number of repeats: 1, number of folds: 10, number of samples 1.
 </pre></div>
 </div>
-</div>
-<div class="section" id="case-1-running-a-random-forest-model-on-an-openml-task">
+</section>
+<section id="case-1-running-a-random-forest-model-on-an-openml-task">
 <h2>Case 1: Running a Random Forest model on an OpenML task<a class="headerlink" href="#case-1-running-a-random-forest-model-on-an-openml-task" title="Permalink to this headline">¶</a></h2>
 <p>We’ll run a Random Forest model and obtain an OpenML run object. We can
 see the evaluations recorded per fold for the dataset and the information
@@ -251,16 +253,16 @@ wall_clock_time_millis
 predictive_accuracy
 
 The performance metric is recorded under `predictive_accuracy` per fold and can be retrieved as:
-Repeat #0-Fold #0: 0.7847
-Repeat #0-Fold #1: 0.7713
-Repeat #0-Fold #2: 0.7807
-Repeat #0-Fold #3: 0.7905
-Repeat #0-Fold #4: 0.7883
-Repeat #0-Fold #5: 0.7840
-Repeat #0-Fold #6: 0.7800
-Repeat #0-Fold #7: 0.7776
-Repeat #0-Fold #8: 0.7898
-Repeat #0-Fold #9: 0.7797
+Repeat #0-Fold #0: 0.7791
+Repeat #0-Fold #1: 0.7660
+Repeat #0-Fold #2: 0.7762
+Repeat #0-Fold #3: 0.7854
+Repeat #0-Fold #4: 0.7809
+Repeat #0-Fold #5: 0.7805
+Repeat #0-Fold #6: 0.7747
+Repeat #0-Fold #7: 0.7740
+Repeat #0-Fold #8: 0.7840
+Repeat #0-Fold #9: 0.7753
 </pre></div>
 </div>
 <p>The remaining entries recorded in <cite>measures</cite> are the runtime records
@@ -278,20 +280,20 @@ follows the same procedure but for time taken for the <cite>.predict()</cite> pr
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-300.661 vs Wall-300.670
-Repeat #0-Fold #1: CPU-296.717 vs Wall-296.773
-Repeat #0-Fold #2: CPU-297.779 vs Wall-297.788
-Repeat #0-Fold #3: CPU-299.649 vs Wall-299.660
-Repeat #0-Fold #4: CPU-296.061 vs Wall-296.088
-Repeat #0-Fold #5: CPU-295.007 vs Wall-295.024
-Repeat #0-Fold #6: CPU-299.013 vs Wall-299.032
-Repeat #0-Fold #7: CPU-296.810 vs Wall-296.855
-Repeat #0-Fold #8: CPU-298.634 vs Wall-298.655
-Repeat #0-Fold #9: CPU-298.295 vs Wall-304.434
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-301.923 vs Wall-301.920
+Repeat #0-Fold #1: CPU-297.459 vs Wall-297.492
+Repeat #0-Fold #2: CPU-294.051 vs Wall-294.094
+Repeat #0-Fold #3: CPU-300.600 vs Wall-300.598
+Repeat #0-Fold #4: CPU-293.478 vs Wall-293.476
+Repeat #0-Fold #5: CPU-303.575 vs Wall-303.573
+Repeat #0-Fold #6: CPU-296.462 vs Wall-296.521
+Repeat #0-Fold #7: CPU-296.328 vs Wall-296.380
+Repeat #0-Fold #8: CPU-299.504 vs Wall-299.535
+Repeat #0-Fold #9: CPU-297.626 vs Wall-297.658
 </pre></div>
 </div>
-</div>
-<div class="section" id="case-2-running-scikit-learn-model-on-an-openml-task-in-parallel">
+</section>
+<section id="case-2-running-scikit-learn-model-on-an-openml-task-in-parallel">
 <h2>Case 2: Running Scikit-learn model on an OpenML task in parallel<a class="headerlink" href="#case-2-running-scikit-learn-model-on-an-openml-task-in-parallel" title="Permalink to this headline">¶</a></h2>
 <p>Redefining the model to allow parallelism with <cite>n_jobs=2</cite> (2 cores)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -305,16 +307,16 @@ Repeat #0-Fold #9: CPU-298.295 vs Wall-304.434
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-178.031 vs Wall-1087.555
-Repeat #0-Fold #1: CPU-87.312 vs Wall-224.322
-Repeat #0-Fold #2: CPU-89.639 vs Wall-218.711
-Repeat #0-Fold #3: CPU-92.718 vs Wall-226.172
-Repeat #0-Fold #4: CPU-86.345 vs Wall-232.726
-Repeat #0-Fold #5: CPU-88.253 vs Wall-219.224
-Repeat #0-Fold #6: CPU-82.208 vs Wall-214.112
-Repeat #0-Fold #7: CPU-83.385 vs Wall-220.027
-Repeat #0-Fold #8: CPU-92.131 vs Wall-248.883
-Repeat #0-Fold #9: CPU-83.271 vs Wall-214.564
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-149.117 vs Wall-1061.280
+Repeat #0-Fold #1: CPU-88.402 vs Wall-227.789
+Repeat #0-Fold #2: CPU-83.809 vs Wall-234.660
+Repeat #0-Fold #3: CPU-85.211 vs Wall-220.394
+Repeat #0-Fold #4: CPU-87.251 vs Wall-245.329
+Repeat #0-Fold #5: CPU-84.666 vs Wall-219.493
+Repeat #0-Fold #6: CPU-89.522 vs Wall-246.529
+Repeat #0-Fold #7: CPU-88.887 vs Wall-227.854
+Repeat #0-Fold #8: CPU-88.743 vs Wall-246.900
+Repeat #0-Fold #9: CPU-87.877 vs Wall-220.968
 </pre></div>
 </div>
 <p>Running a Random Forest model on an OpenML task in parallel (all cores available):</p>
@@ -332,16 +334,16 @@ Repeat #0-Fold #9: CPU-83.271 vs Wall-214.564
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-83.580 vs Wall-236.078
-Repeat #0-Fold #1: CPU-82.887 vs Wall-213.490
-Repeat #0-Fold #2: CPU-87.497 vs Wall-218.626
-Repeat #0-Fold #3: CPU-84.471 vs Wall-223.689
-Repeat #0-Fold #4: CPU-83.737 vs Wall-238.592
-Repeat #0-Fold #5: CPU-82.782 vs Wall-215.400
-Repeat #0-Fold #6: CPU-83.143 vs Wall-215.741
-Repeat #0-Fold #7: CPU-84.158 vs Wall-218.791
-Repeat #0-Fold #8: CPU-84.007 vs Wall-237.875
-Repeat #0-Fold #9: CPU-85.050 vs Wall-224.726
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-86.863 vs Wall-241.277
+Repeat #0-Fold #1: CPU-91.021 vs Wall-222.280
+Repeat #0-Fold #2: CPU-95.156 vs Wall-256.707
+Repeat #0-Fold #3: CPU-86.064 vs Wall-224.754
+Repeat #0-Fold #4: CPU-95.204 vs Wall-256.729
+Repeat #0-Fold #5: CPU-86.314 vs Wall-227.041
+Repeat #0-Fold #6: CPU-83.314 vs Wall-234.321
+Repeat #0-Fold #7: CPU-84.063 vs Wall-224.015
+Repeat #0-Fold #8: CPU-85.297 vs Wall-237.629
+Repeat #0-Fold #9: CPU-84.558 vs Wall-221.843
 </pre></div>
 </div>
 <p>We can now observe that the ratio of CPU time to wallclock time is lower
@@ -362,16 +364,16 @@ the job distribution can change and therefore the scale of runtimes recorded too
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-322.687 vs Wall-322.953
-Repeat #0-Fold #1: CPU-325.916 vs Wall-328.599
-Repeat #0-Fold #2: CPU-311.101 vs Wall-311.754
-Repeat #0-Fold #3: CPU-311.914 vs Wall-311.054
-Repeat #0-Fold #4: CPU-313.856 vs Wall-329.002
-Repeat #0-Fold #5: CPU-312.888 vs Wall-301.597
-Repeat #0-Fold #6: CPU-304.293 vs Wall-254.496
-Repeat #0-Fold #7: CPU-311.562 vs Wall-326.005
-Repeat #0-Fold #8: CPU-308.358 vs Wall-293.671
-Repeat #0-Fold #9: CPU-304.234 vs Wall-291.579
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-335.755 vs Wall-298.035
+Repeat #0-Fold #1: CPU-334.368 vs Wall-361.992
+Repeat #0-Fold #2: CPU-353.189 vs Wall-361.290
+Repeat #0-Fold #3: CPU-317.575 vs Wall-318.106
+Repeat #0-Fold #4: CPU-334.397 vs Wall-342.165
+Repeat #0-Fold #5: CPU-310.441 vs Wall-305.676
+Repeat #0-Fold #6: CPU-310.159 vs Wall-306.151
+Repeat #0-Fold #7: CPU-319.982 vs Wall-317.108
+Repeat #0-Fold #8: CPU-313.167 vs Wall-282.993
+Repeat #0-Fold #9: CPU-311.024 vs Wall-320.798
 </pre></div>
 </div>
 <p>The CPU time interpretation becomes ambiguous when jobs are distributed over an
@@ -381,8 +383,8 @@ to capture the availability of the number of cores/threads, their eventual
 utilisation and whether workloads are executed in subprocesses, for various
 cases that can arise as demonstrated in the rest of the example. Therefore,
 the final interpretation of the runtimes is left to the <cite>user</cite>.</p>
-</div>
-<div class="section" id="case-3-running-and-benchmarking-hpo-algorithms-with-their-runtimes">
+</section>
+<section id="case-3-running-and-benchmarking-hpo-algorithms-with-their-runtimes">
 <h2>Case 3: Running and benchmarking HPO algorithms with their runtimes<a class="headerlink" href="#case-3-running-and-benchmarking-hpo-algorithms-with-their-runtimes" title="Permalink to this headline">¶</a></h2>
 <p>We shall now optimize a similar RandomForest model for the same task using
 scikit-learn’s HPO support by using GridSearchCV to optimize our earlier
@@ -412,16 +414,16 @@ included in the <cite>wall_clock_time_millis_training</cite> measure recorded.</
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-6297.253 vs Wall-6403.788
-Repeat #0-Fold #1: CPU-6295.920 vs Wall-6280.742
-Repeat #0-Fold #2: CPU-6301.068 vs Wall-6395.642
-Repeat #0-Fold #3: CPU-5638.027 vs Wall-5612.533
-Repeat #0-Fold #4: CPU-5869.229 vs Wall-5868.674
-Repeat #0-Fold #5: CPU-6206.812 vs Wall-6209.890
-Repeat #0-Fold #6: CPU-5850.863 vs Wall-5831.085
-Repeat #0-Fold #7: CPU-5553.181 vs Wall-5586.090
-Repeat #0-Fold #8: CPU-5948.416 vs Wall-5894.819
-Repeat #0-Fold #9: CPU-6257.515 vs Wall-5805.139
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-5865.525 vs Wall-5865.626
+Repeat #0-Fold #1: CPU-6481.158 vs Wall-6261.166
+Repeat #0-Fold #2: CPU-6078.181 vs Wall-5966.063
+Repeat #0-Fold #3: CPU-5907.108 vs Wall-5869.001
+Repeat #0-Fold #4: CPU-6014.545 vs Wall-6056.602
+Repeat #0-Fold #5: CPU-6304.988 vs Wall-6210.725
+Repeat #0-Fold #6: CPU-6315.662 vs Wall-6346.545
+Repeat #0-Fold #7: CPU-6045.214 vs Wall-6021.021
+Repeat #0-Fold #8: CPU-6414.182 vs Wall-6398.849
+Repeat #0-Fold #9: CPU-6309.705 vs Wall-6370.443
 </pre></div>
 </div>
 <p>Like any optimisation problem, scikit-learn’s HPO estimators also generate
@@ -445,7 +447,7 @@ the 2-fold (inner) CV search performed.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span># repeats: 1
 # folds: 10
-6403.787612915039
+5865.625619888306
 </pre></div>
 </div>
 <p>To extract the training runtime of the 1-st repeat, 4-th (outer) fold and also
@@ -469,12 +471,12 @@ the 1-st repeat, 4-th fold evaluation by the Grid Search model.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Total runtime for repeat 0&#39;s fold 3: 5612.532854 ms
-n_estimators:  1 - score: 0.758
-n_estimators: 13 - score: 0.802
-n_estimators: 25 - score: 0.804
-n_estimators: 37 - score: 0.803
-n_estimators: 50 - score: 0.803
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Total runtime for repeat 0&#39;s fold 3: 5869.001150 ms
+n_estimators:  1 - score: 0.768
+n_estimators: 13 - score: 0.803
+n_estimators: 25 - score: 0.803
+n_estimators: 37 - score: 0.804
+n_estimators: 50 - score: 0.804
 </pre></div>
 </div>
 <p>Scikit-learn’s HPO estimators also come with an argument <cite>refit=True</cite> as a default.
@@ -505,16 +507,16 @@ This time is included in the <cite>wall_clock_time_millis_training</cite> measur
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: 1420.7556
-Repeat #0-Fold #1: 1334.8031
-Repeat #0-Fold #2: 1372.6127
-Repeat #0-Fold #3: 725.9767
-Repeat #0-Fold #4: 1017.0851
-Repeat #0-Fold #5: 1319.0393
-Repeat #0-Fold #6: 1004.9539
-Repeat #0-Fold #7: 735.0087
-Repeat #0-Fold #8: 974.7694
-Repeat #0-Fold #9: 835.4979
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: 1006.6056
+Repeat #0-Fold #1: 1155.6685
+Repeat #0-Fold #2: 1062.9563
+Repeat #0-Fold #3: 980.8533
+Repeat #0-Fold #4: 1006.7117
+Repeat #0-Fold #5: 1292.7718
+Repeat #0-Fold #6: 1348.7232
+Repeat #0-Fold #7: 1074.2974
+Repeat #0-Fold #8: 1379.9582
+Repeat #0-Fold #9: 1382.4365
 </pre></div>
 </div>
 <p>Along with the GridSearchCV already used above, we demonstrate how such
@@ -590,8 +592,8 @@ the runtimes per fold can be cumulatively added to plot the trace against time.<
 </pre></div>
 </div>
 <img alt="Optimisation Trace Comparison" class="sphx-glr-single-img" src="../../_images/sphx_glr_fetch_runtimes_tutorial_001.png" />
-</div>
-<div class="section" id="case-4-running-models-that-scikit-learn-doesn-t-parallelize">
+</section>
+<section id="case-4-running-models-that-scikit-learn-doesn-t-parallelize">
 <h2>Case 4: Running models that scikit-learn doesn’t parallelize<a class="headerlink" href="#case-4-running-models-that-scikit-learn-doesn-t-parallelize" title="Permalink to this headline">¶</a></h2>
 <p>Both scikit-learn and OpenML depend on parallelism implemented through <cite>joblib</cite>.
 However, there can be cases where either models cannot be parallelized or don’t
@@ -608,16 +610,16 @@ using OpenML to parallelize evaluations for the outer-cross validation folds.</p
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-115.631 vs Wall-116.068
-Repeat #0-Fold #1: CPU-112.084 vs Wall-112.085
-Repeat #0-Fold #2: CPU-111.704 vs Wall-111.729
-Repeat #0-Fold #3: CPU-111.965 vs Wall-112.014
-Repeat #0-Fold #4: CPU-120.222 vs Wall-120.893
-Repeat #0-Fold #5: CPU-111.126 vs Wall-111.164
-Repeat #0-Fold #6: CPU-112.718 vs Wall-112.721
-Repeat #0-Fold #7: CPU-112.168 vs Wall-112.189
-Repeat #0-Fold #8: CPU-111.795 vs Wall-111.832
-Repeat #0-Fold #9: CPU-111.649 vs Wall-111.695
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-120.616 vs Wall-120.646
+Repeat #0-Fold #1: CPU-112.440 vs Wall-112.550
+Repeat #0-Fold #2: CPU-117.451 vs Wall-117.660
+Repeat #0-Fold #3: CPU-114.280 vs Wall-118.030
+Repeat #0-Fold #4: CPU-117.642 vs Wall-118.054
+Repeat #0-Fold #5: CPU-114.941 vs Wall-115.199
+Repeat #0-Fold #6: CPU-113.124 vs Wall-113.160
+Repeat #0-Fold #7: CPU-118.971 vs Wall-121.073
+Repeat #0-Fold #8: CPU-112.700 vs Wall-112.818
+Repeat #0-Fold #9: CPU-120.755 vs Wall-120.854
 </pre></div>
 </div>
 <p>Although the decision tree does not run in parallel, it can release the
@@ -632,16 +634,16 @@ This can result in surprising runtime measures as demonstrated below:</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-223.820 vs Wall-157.392
-Repeat #0-Fold #1: CPU-186.127 vs Wall-112.919
-Repeat #0-Fold #2: CPU-224.213 vs Wall-159.792
-Repeat #0-Fold #3: CPU-183.877 vs Wall-114.321
-Repeat #0-Fold #4: CPU-232.980 vs Wall-164.727
-Repeat #0-Fold #5: CPU-187.485 vs Wall-121.222
-Repeat #0-Fold #6: CPU-225.020 vs Wall-160.044
-Repeat #0-Fold #7: CPU-188.025 vs Wall-113.319
-Repeat #0-Fold #8: CPU-226.392 vs Wall-160.519
-Repeat #0-Fold #9: CPU-175.757 vs Wall-113.053
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-237.391 vs Wall-168.988
+Repeat #0-Fold #1: CPU-232.751 vs Wall-169.526
+Repeat #0-Fold #2: CPU-220.047 vs Wall-155.731
+Repeat #0-Fold #3: CPU-190.192 vs Wall-118.446
+Repeat #0-Fold #4: CPU-245.100 vs Wall-174.216
+Repeat #0-Fold #5: CPU-204.859 vs Wall-139.175
+Repeat #0-Fold #6: CPU-243.779 vs Wall-174.432
+Repeat #0-Fold #7: CPU-227.131 vs Wall-164.795
+Repeat #0-Fold #8: CPU-268.824 vs Wall-197.109
+Repeat #0-Fold #9: CPU-244.857 vs Wall-181.239
 </pre></div>
 </div>
 <p>Running a Neural Network from scikit-learn that uses scikit-learn independent
@@ -656,40 +658,40 @@ parallelism using libraries such as <a class="reference external" href="https://
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.10/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
   warnings.warn(
-/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+/opt/hostedtoolcache/Python/3.8.10/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
   warnings.warn(
-/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+/opt/hostedtoolcache/Python/3.8.10/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
   warnings.warn(
-/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+/opt/hostedtoolcache/Python/3.8.10/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
   warnings.warn(
-/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+/opt/hostedtoolcache/Python/3.8.10/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
   warnings.warn(
-/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+/opt/hostedtoolcache/Python/3.8.10/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
   warnings.warn(
-/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+/opt/hostedtoolcache/Python/3.8.10/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
   warnings.warn(
-/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+/opt/hostedtoolcache/Python/3.8.10/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
   warnings.warn(
-/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+/opt/hostedtoolcache/Python/3.8.10/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
   warnings.warn(
-/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+/opt/hostedtoolcache/Python/3.8.10/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:614: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
   warnings.warn(
-Repeat #0-Fold #0: CPU-1562.903 vs Wall-1563.046
-Repeat #0-Fold #1: CPU-1691.964 vs Wall-1572.566
-Repeat #0-Fold #2: CPU-1689.225 vs Wall-1571.377
-Repeat #0-Fold #3: CPU-1685.427 vs Wall-1566.356
-Repeat #0-Fold #4: CPU-1681.707 vs Wall-1562.601
-Repeat #0-Fold #5: CPU-1665.208 vs Wall-1546.425
-Repeat #0-Fold #6: CPU-1674.818 vs Wall-1555.358
-Repeat #0-Fold #7: CPU-1674.141 vs Wall-1555.327
-Repeat #0-Fold #8: CPU-1679.703 vs Wall-1560.740
-Repeat #0-Fold #9: CPU-1669.430 vs Wall-1550.154
+Repeat #0-Fold #0: CPU-1606.036 vs Wall-1608.110
+Repeat #0-Fold #1: CPU-1592.033 vs Wall-1592.149
+Repeat #0-Fold #2: CPU-1591.235 vs Wall-1591.318
+Repeat #0-Fold #3: CPU-1568.917 vs Wall-1569.005
+Repeat #0-Fold #4: CPU-1593.813 vs Wall-1594.112
+Repeat #0-Fold #5: CPU-1606.945 vs Wall-1607.114
+Repeat #0-Fold #6: CPU-1599.793 vs Wall-1599.986
+Repeat #0-Fold #7: CPU-1608.805 vs Wall-1608.927
+Repeat #0-Fold #8: CPU-1601.709 vs Wall-1601.825
+Repeat #0-Fold #9: CPU-1561.987 vs Wall-1562.109
 </pre></div>
 </div>
-</div>
-<div class="section" id="case-5-running-scikit-learn-models-that-don-t-release-gil">
+</section>
+<section id="case-5-running-scikit-learn-models-that-don-t-release-gil">
 <h2>Case 5: Running Scikit-learn models that don’t release GIL<a class="headerlink" href="#case-5-running-scikit-learn-models-that-don-t-release-gil" title="Permalink to this headline">¶</a></h2>
 <p>Certain Scikit-learn models do not release the <a class="reference external" href="https://docs.python.org/dev/glossary.html#term-global-interpreter-lock">Python GIL</a> and
 are also not executed in parallel via a BLAS library. In such cases, the
@@ -706,20 +708,20 @@ that only very few models such as naive Bayes models are of this kind.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-64.136 vs Wall-64.178
-Repeat #0-Fold #1: CPU-64.043 vs Wall-64.139
-Repeat #0-Fold #2: CPU-60.568 vs Wall-60.656
-Repeat #0-Fold #3: CPU-60.726 vs Wall-60.738
-Repeat #0-Fold #4: CPU-60.249 vs Wall-60.522
-Repeat #0-Fold #5: CPU-60.324 vs Wall-60.339
-Repeat #0-Fold #6: CPU-60.075 vs Wall-60.090
-Repeat #0-Fold #7: CPU-60.454 vs Wall-61.097
-Repeat #0-Fold #8: CPU-60.166 vs Wall-60.233
-Repeat #0-Fold #9: CPU-60.382 vs Wall-60.649
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-66.859 vs Wall-75.173
+Repeat #0-Fold #1: CPU-63.702 vs Wall-63.943
+Repeat #0-Fold #2: CPU-63.393 vs Wall-63.417
+Repeat #0-Fold #3: CPU-65.407 vs Wall-65.441
+Repeat #0-Fold #4: CPU-63.250 vs Wall-63.313
+Repeat #0-Fold #5: CPU-62.452 vs Wall-62.468
+Repeat #0-Fold #6: CPU-63.041 vs Wall-63.330
+Repeat #0-Fold #7: CPU-60.909 vs Wall-61.997
+Repeat #0-Fold #8: CPU-63.131 vs Wall-63.246
+Repeat #0-Fold #9: CPU-61.225 vs Wall-61.656
 </pre></div>
 </div>
-</div>
-<div class="section" id="summmary">
+</section>
+<section id="summmary">
 <h2>Summmary<a class="headerlink" href="#summmary" title="Permalink to this headline">¶</a></h2>
 <p>The scikit-learn extension for OpenML-Python records model runtimes for the
 CPU-clock and the wall-clock times. The above examples illustrated how these
@@ -771,7 +773,7 @@ CPU-time can differ.</p></li>
 </ul>
 <p>Because of all the cases mentioned above it is crucial to understand which case is triggered
 when reporting runtimes for scikit-learn models measured with OpenML-Python!</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  42.179 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  19.739 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-fetch-runtimes-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/8c382c76eb99f4156c49950f4c9349a0/fetch_runtimes_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_runtimes_tutorial.py</span></code></a></p>
@@ -781,8 +783,8 @@ when reporting runtimes for scikit-learn models measured with OpenML-Python!</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -797,7 +799,7 @@ when reporting runtimes for scikit-learn models measured with OpenML-Python!</p>
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>

@@ -1,6 +1,0 @@
-﻿:mod:`openml`.OpenMLStudy
-================================
-
-.. currentmodule:: openml
-
-.. autoclass:: OpenMLStudy

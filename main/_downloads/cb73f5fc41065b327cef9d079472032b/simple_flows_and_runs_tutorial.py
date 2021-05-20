@@ -10,15 +10,15 @@ A simple tutorial on how to train/run a model and how to upload the results.
 import openml
 from sklearn import ensemble, neighbors
 
+
+############################################################################
+# .. warning::
+#    .. include:: ../../test_server_usage_warning.txt
+openml.config.start_using_configuration_for_example()
+
 ############################################################################
 # Train a machine learning model
 # ==============================
-#
-# .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server at test.openml.org. This prevents the main
-#   server from crowding with example datasets, tasks, runs, and so on.
-
-openml.config.start_using_configuration_for_example()
 
 # NOTE: We are using dataset 20 from the test server: https://test.openml.org/d/20
 dataset = openml.datasets.get_dataset(20)
@@ -42,8 +42,8 @@ print(run)
 # ==================
 
 myrun = run.publish()
-print("Run was uploaded to http://test.openml.org/r/" + str(myrun.run_id))
-print("The flow can be found at http://test.openml.org/f/" + str(myrun.flow_id))
+print(f"Run was uploaded to {myrun.openml_url}")
+print(f"The flow can be found at {myrun.flow.openml_url}")
 
 ############################################################################
 openml.config.stop_using_configuration_for_example()

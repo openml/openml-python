@@ -1,4 +1,6 @@
-﻿:mod:`openml.extensions.sklearn`.SklearnExtension
+﻿:orphan:
+
+:mod:`openml.extensions.sklearn`.SklearnExtension
 ========================================================
 
 .. currentmodule:: openml.extensions.sklearn

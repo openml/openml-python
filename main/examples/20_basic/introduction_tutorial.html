@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Setup &#8212; OpenML 0.12.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Introduction tutorial &amp; Setup &#8212; OpenML 0.12.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -65,6 +66,7 @@
                 <li><a href="../../usage.html">User Guide</a></li>
                 <li><a href="../../api.html">API</a></li>
                 <li><a href="../index.html">Examples</a></li>
+                <li><a href="../../extensions.html">Extensions</a></li>
                 <li><a href="../../contributing.html">Contributing</a></li>
                 <li><a href="../../progress.html">Changelog</a></li>
             
@@ -105,7 +107,7 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#">Setup</a><ul>
+<li><a class="reference internal" href="#">Introduction tutorial &amp; Setup</a><ul>
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#authentication">Authentication</a></li>
 <li><a class="reference internal" href="#caching">Caching</a></li>
@@ -123,8 +125,8 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-examples-20-basic-introduction-tutorial-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="setup">
-<span id="sphx-glr-examples-20-basic-introduction-tutorial-py"></span><h1>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h1>
+<section class="sphx-glr-example-title" id="introduction-tutorial-setup">
+<span id="sphx-glr-examples-20-basic-introduction-tutorial-py"></span><h1>Introduction tutorial &amp; Setup<a class="headerlink" href="#introduction-tutorial-setup" title="Permalink to this headline">¶</a></h1>
 <p>An example how to set up OpenML-Python followed up by a simple example.</p>
 <p>OpenML is an online collaboration platform for machine learning which allows
 you to:</p>
@@ -136,46 +138,55 @@ you to:</p>
 <li><p>Works seamlessly with scikit-learn and other libraries</p></li>
 <li><p>Large scale benchmarking, compare to state of the art</p></li>
 </ul>
-<div class="section" id="installation">
+<section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>Installation is done via <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install openml
 </pre></div>
 </div>
 <p>For further information, please check out the installation guide at
-<a class="reference external" href="https://openml.github.io/openml-python/master/contributing.html#installation">https://openml.github.io/openml-python/master/contributing.html#installation</a></p>
-</div>
-<div class="section" id="authentication">
+<a class="reference internal" href="../../usage.html#installation"><span class="std std-ref">Installation &amp; Set up</span></a>.</p>
+</section>
+<section id="authentication">
 <h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
 <p>The OpenML server can only be accessed by users who have signed up on the
 OpenML platform. If you don’t have an account yet, sign up now.
 You will receive an API key, which will authenticate you to the server
 and allow you to download and upload datasets, tasks, runs and flows.</p>
 <ul class="simple">
-<li><p>Create an OpenML account (free) on <a class="reference external" href="http://www.openml.org">http://www.openml.org</a>.</p></li>
+<li><p>Create an OpenML account (free) on <a class="reference external" href="https://www.openml.org">https://www.openml.org</a>.</p></li>
 <li><p>After logging in, open your account page (avatar on the top right)</p></li>
 <li><p>Open ‘Account Settings’, then ‘API authentication’ to find your API key.</p></li>
 </ul>
-<p>There are two ways to authenticate:</p>
+<p>There are two ways to permanently authenticate:</p>
 <ul class="simple">
+<li><p>Use the <code class="docutils literal notranslate"><span class="pre">openml</span></code> CLI tool with <code class="docutils literal notranslate"><span class="pre">openml</span> <span class="pre">configure</span> <span class="pre">apikey</span> <span class="pre">MYKEY</span></code>,
+replacing <strong>MYKEY</strong> with your API key.</p></li>
 <li><p>Create a plain text file <strong>~/.openml/config</strong> with the line
 <strong>‘apikey=MYKEY’</strong>, replacing <strong>MYKEY</strong> with your API key. The config
 file must be in the directory ~/.openml/config and exist prior to
 importing the openml module.</p></li>
-<li><p>Run the code below, replacing ‘YOURKEY’ with your API key.</p></li>
 </ul>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This example uploads data. For that reason, this example
-connects to the test server instead. This prevents the live server from
-crowding with example datasets, tasks, studies, and so on.</p>
-</div>
+<p>Alternatively, by running the code below and replacing ‘YOURKEY’ with your API key,
+you authenticate for the duration of the python process.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
 
 <span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">neighbors</span>
-
-<span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This example uploads data. For that reason, this example connects to the test server at test.openml.org.
+This prevents the main server from crowding with example datasets, tasks, runs, and so on.
+The use of this test server can affect behaviour and performance of the OpenML-Python API.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+  warnings.warn(
 </pre></div>
 </div>
 <p>When using the main server instead, make sure your apikey is configured.
@@ -184,8 +195,8 @@ Never share your apikey with others.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># openml.config.apikey = &#39;YOURKEY&#39;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="caching">
+</section>
+<section id="caching">
 <h2>Caching<a class="headerlink" href="#caching" title="Permalink to this headline">¶</a></h2>
 <p>When downloading datasets, tasks, runs and flows, they will be cached to
 retrieve them without calling the server later. As with the API key,
@@ -202,8 +213,8 @@ will use <strong>~/.openml/cache</strong> as the cache directory.</p></li>
 <span class="c1"># openml.config.cache_directory = os.path.expanduser(&#39;YOURDIR&#39;)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="simple-example">
+</section>
+<section id="simple-example">
 <h2>Simple Example<a class="headerlink" href="#simple-example" title="Permalink to this headline">¶</a></h2>
 <p>Download the OpenML task for the eeg-eye-state.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
@@ -214,17 +225,17 @@ will use <strong>~/.openml/cache</strong> as the cache directory.</p></li>
 <span class="c1"># For this tutorial, our configuration publishes to the test server</span>
 <span class="c1"># as to not crowd the main server with runs created by examples.</span>
 <span class="n">myrun</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;kNN on </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: http://test.openml.org/r/</span><span class="si">{</span><span class="n">myrun</span><span class="o">.</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;kNN on </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">myrun</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: http://test.openml.org/r/62891
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on eeg-eye-state: https://test.openml.org/r/116470
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  25.572 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  21.634 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-20-basic-introduction-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/a5a49610d34e7fd2cd1c2f5121cc5f5f/introduction_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">introduction_tutorial.py</span></code></a></p>
@@ -234,8 +245,8 @@ will use <strong>~/.openml/cache</strong> as the cache directory.</p></li>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -250,7 +261,7 @@ will use <strong>~/.openml/cache</strong> as the cache directory.</p></li>
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>

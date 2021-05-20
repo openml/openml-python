@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Perrone et al. (2018) &#8212; OpenML 0.12.1 documentation</title>
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Perrone et al. (2018) &#8212; OpenML 0.12.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -55,7 +56,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -65,6 +66,7 @@
                 <li><a href="../../usage.html">User Guide</a></li>
                 <li><a href="../../api.html">API</a></li>
                 <li><a href="../index.html">Examples</a></li>
+                <li><a href="../../extensions.html">Extensions</a></li>
                 <li><a href="../../contributing.html">Contributing</a></li>
                 <li><a href="../../progress.html">Changelog</a></li>
             
@@ -126,17 +128,17 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="perrone-et-al-2018">
+<section class="sphx-glr-example-title" id="perrone-et-al-2018">
 <span id="sphx-glr-examples-40-paper-2018-neurips-perrone-example-py"></span><h1>Perrone et al. (2018)<a class="headerlink" href="#perrone-et-al-2018" title="Permalink to this headline">¶</a></h1>
 <p>A tutorial on how to build a surrogate model based on OpenML data as done for <em>Scalable
 Hyperparameter Transfer Learning</em> by Perrone et al..</p>
-<div class="section" id="publication">
+<section id="publication">
 <h2>Publication<a class="headerlink" href="#publication" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
 <div class="line">Scalable Hyperparameter Transfer Learning</div>
 <div class="line">Valerio Perrone and Rodolphe Jenatton and Matthias Seeger and Cedric Archambeau</div>
 <div class="line">In <em>Advances in Neural Information Processing Systems 31</em>, 2018</div>
-<div class="line">Available at <a class="reference external" href="http://papers.nips.cc/paper/7917-scalable-hyperparameter-transfer-learning.pdf">http://papers.nips.cc/paper/7917-scalable-hyperparameter-transfer-learning.pdf</a></div>
+<div class="line">Available at <a class="reference external" href="https://papers.nips.cc/paper/7917-scalable-hyperparameter-transfer-learning.pdf">https://papers.nips.cc/paper/7917-scalable-hyperparameter-transfer-learning.pdf</a></div>
 </div>
 <p>This example demonstrates how OpenML runs can be used to construct a surrogate model.</p>
 <p>In the following section, we shall do the following:</p>
@@ -274,7 +276,7 @@ a tabular format that can be used to build models.</p>
     <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;booster&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
-<div class="section" id="fetching-the-data-from-openml">
+<section id="fetching-the-data-from-openml">
 <h3>Fetching the data from OpenML<a class="headerlink" href="#fetching-the-data-from-openml" title="Permalink to this headline">¶</a></h3>
 <p>Now, we read all the tasks and evaluations for them and collate into a table.
 Here, we are reading all the tasks and evaluations for the SVM flow and
@@ -286,22 +288,22 @@ pre-processing all retrieved evaluations.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                   cost degree gamma      kernel
-821    5.34958458381009    NaN   NaN      linear
-5104   1.60676837729349    NaN   NaN      linear
-765   0.110158742324337    NaN   NaN      linear
-1669  0.594772653812212      5   NaN  polynomial
-2181   156.554975353123    NaN   NaN  polynomial
-Y :  821     0.958267
-5104    0.993988
-765     0.977809
-1669    0.570565
-2181    0.590850
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                    cost degree               gamma      kernel
+3466    215.147217927605    NaN   0.496266054983871         NaN
+105   0.0115930395336712    NaN                 NaN      linear
+4957   0.421894347252967    NaN   0.547067969928505         NaN
+2290    174.102333613583      5                 NaN  polynomial
+1564     115.49903792873    NaN  0.0434289938492314         NaN
+Y :  3466    0.950058
+105     0.956393
+4957    0.959575
+2290    0.532226
+1564    0.889831
 Name: value, dtype: float64
 </pre></div>
 </div>
-</div>
-<div class="section" id="creating-pre-processing-and-modelling-pipelines">
+</section>
+<section id="creating-pre-processing-and-modelling-pipelines">
 <h3>Creating pre-processing and modelling pipelines<a class="headerlink" href="#creating-pre-processing-and-modelling-pipelines" title="Permalink to this headline">¶</a></h3>
 <p>The two primary tasks are to impute the missing values, that is, account for the hyperparameters
 that are not available with the runs from OpenML. And secondly, to handle categorical variables
@@ -324,8 +326,8 @@ using One-hot encoding prior to modelling.</p>
 <span class="n">model</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;preprocess&quot;</span><span class="p">,</span> <span class="n">ct</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;surrogate&quot;</span><span class="p">,</span> <span class="n">clf</span><span class="p">)])</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="building-a-surrogate-model-on-a-task-s-evaluation">
+</section>
+<section id="building-a-surrogate-model-on-a-task-s-evaluation">
 <h3>Building a surrogate model on a task’s evaluation<a class="headerlink" href="#building-a-surrogate-model-on-a-task-s-evaluation" title="Permalink to this headline">¶</a></h3>
 <p>The same set of functions can be used for a single task to retrieve a singular table which can
 be used for the surrogate model construction. We shall use the SVM flow here to keep execution
@@ -343,11 +345,11 @@ time simple and quick.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 1.8754e-05
+Training RMSE : 8.4667e-06
 </pre></div>
 </div>
-</div>
-<div class="section" id="evaluating-the-surrogate-model">
+</section>
+<section id="evaluating-the-surrogate-model">
 <h3>Evaluating the surrogate model<a class="headerlink" href="#evaluating-the-surrogate-model" title="Permalink to this headline">¶</a></h3>
 <p>The surrogate model built from a task’s evaluations fetched from OpenML will be put into
 trivial action here, where we shall randomly sample configurations and observe the trajectory
@@ -378,17 +380,17 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
-0     77.101543  4.436816  596.741543      radial
-1    222.621435  4.300443  270.406573  polynomial
-2    882.818456  3.525189   50.973326      linear
-3    702.573001  2.806297  421.983615      radial
-4    635.229482  3.716489  601.718117  polynomial
+0     20.742504  2.544544  888.842814  polynomial
+1    309.184019  2.122358  784.705500     sigmoid
+2    958.170089  3.863527  209.146641      linear
+3    909.397848  4.969151  773.171109      linear
+4    143.461920  4.079027  338.603473     sigmoid
 ..          ...       ...         ...         ...
-995  151.651191  3.424720  188.497940      linear
-996  896.771094  2.140833  574.426869      radial
-997  239.168553  2.956702  835.481202  polynomial
-998  289.398516  2.666113  795.984399      linear
-999  806.988577  2.794470  825.531760      radial
+995  515.721882  2.450827  273.337802      radial
+996  542.622916  3.054282  625.685305      linear
+997  266.512815  4.160575  662.763836     sigmoid
+998  796.223157  4.821681  323.034761      linear
+999  163.753598  4.572996  731.662782      linear
 
 [1000 rows x 4 columns]
 </pre></div>
@@ -412,7 +414,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(42.722222222222214, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  34.109 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  28.047 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
@@ -422,9 +424,9 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
     </div>
@@ -439,7 +441,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
     </p>
   </div>
 </footer>
