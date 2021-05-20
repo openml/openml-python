@@ -506,6 +506,9 @@ class TestOpenMLDataset(TestBase):
             "oml:md5_checksum": "abc",
             "oml:url": "https://www.openml.org/data/download/61",
         }
+        n = openml.config.connection_n_retries
+        openml.config.connection_n_retries = 1
+
         self.assertRaisesRegex(
             OpenMLHashException,
             "Checksum of downloaded file is unequal to the expected checksum abc when downloading "
@@ -513,6 +516,8 @@ class TestOpenMLDataset(TestBase):
             _get_dataset_arff,
             description,
         )
+
+        openml.config.connection_n_retries = n
 
     def test__get_dataset_features(self):
         features_file = _get_dataset_features_file(self.workdir, 2)

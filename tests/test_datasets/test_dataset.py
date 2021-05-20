@@ -24,13 +24,43 @@ class OpenMLDatasetTest(TestBase):
 
         # Load dataset id 2 - dataset 2 is interesting because it contains
         # missing values, categorical features etc.
-        self.dataset = openml.datasets.get_dataset(2, download_data=False)
+        self._dataset = None
         # titanic as missing values, categories, and string
-        self.titanic = openml.datasets.get_dataset(40945, download_data=False)
+        self._titanic = None
         # these datasets have some boolean features
-        self.pc4 = openml.datasets.get_dataset(1049, download_data=False)
-        self.jm1 = openml.datasets.get_dataset(1053, download_data=False)
-        self.iris = openml.datasets.get_dataset(61, download_data=False)
+        self._pc4 = None
+        self._jm1 = None
+        self._iris = None
+
+    @property
+    def dataset(self):
+        if self._dataset is None:
+            self._dataset = openml.datasets.get_dataset(2, download_data=False)
+        return self._dataset
+
+    @property
+    def titanic(self):
+        if self._titanic is None:
+            self._titanic = openml.datasets.get_dataset(40945, download_data=False)
+        return self._titanic
+
+    @property
+    def pc4(self):
+        if self._pc4 is None:
+            self._pc4 = openml.datasets.get_dataset(1049, download_data=False)
+        return self._pc4
+
+    @property
+    def jm1(self):
+        if self._jm1 is None:
+            self._jm1 = openml.datasets.get_dataset(1053, download_data=False)
+        return self._jm1
+
+    @property
+    def iris(self):
+        if self._iris is None:
+            self._iris = openml.datasets.get_dataset(61, download_data=False)
+        return self._iris
 
     def test_repr(self):
         # create a bare-bones dataset as would be returned by
@@ -257,7 +287,7 @@ class OpenMLDatasetTestSparse(TestBase):
 
         self.sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
 
-    def test_get_sparse_dataset_with_target(self):
+    def test_get_sparse_dataset_array_with_target(self):
         X, y, _, attribute_names = self.sparse_dataset.get_data(
             dataset_format="array", target="class"
         )
@@ -273,7 +303,22 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertEqual(len(attribute_names), 20000)
         self.assertNotIn("class", attribute_names)
 
-    def test_get_sparse_dataset(self):
+    def test_get_sparse_dataset_dataframe_with_target(self):
+        X, y, _, attribute_names = self.sparse_dataset.get_data(
+            dataset_format="dataframe", target="class"
+        )
+        self.assertIsInstance(X, pd.DataFrame)
+        self.assertIsInstance(X.dtypes[0], pd.SparseDtype)
+        self.assertEqual(X.shape, (600, 20000))
+
+        self.assertIsInstance(y, pd.Series)
+        self.assertIsInstance(y.dtypes, pd.SparseDtype)
+        self.assertEqual(y.shape, (600,))
+
+        self.assertEqual(len(attribute_names), 20000)
+        self.assertNotIn("class", attribute_names)
+
+    def test_get_sparse_dataset_array(self):
         rval, _, categorical, attribute_names = self.sparse_dataset.get_data(dataset_format="array")
         self.assertTrue(sparse.issparse(rval))
         self.assertEqual(rval.dtype, np.float32)
@@ -285,7 +330,7 @@ class OpenMLDatasetTestSparse(TestBase):
         self.assertEqual(len(attribute_names), 20001)
         self.assertTrue(all([isinstance(att, str) for att in attribute_names]))
 
-    def test_get_sparse_dataframe(self):
+    def test_get_sparse_dataset_dataframe(self):
         rval, *_ = self.sparse_dataset.get_data()
         self.assertIsInstance(rval, pd.DataFrame)
         np.testing.assert_array_equal(

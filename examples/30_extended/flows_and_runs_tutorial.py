@@ -10,17 +10,20 @@ How to train/run a model and how to upload the results.
 import openml
 from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
 
+
+############################################################################
+# We'll use the test server for the rest of this tutorial.
+#
+# .. warning::
+#    .. include:: ../../test_server_usage_warning.txt
+openml.config.start_using_configuration_for_example()
+
 ############################################################################
 # Train machine learning models
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # Train a scikit-learn model on the data manually.
-#
-# .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server at test.openml.org. This prevents the main
-#   server from crowding with example datasets, tasks, runs, and so on.
 
-openml.config.start_using_configuration_for_example()
 # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
 dataset = openml.datasets.get_dataset(68)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
@@ -69,7 +72,7 @@ print(run)
 myrun = run.publish()
 # For this tutorial, our configuration publishes to the test server
 # as to not pollute the main server.
-print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
+print(f"Uploaded to {myrun.openml_url}")
 
 ############################################################################
 # We can now also inspect the flow object which was automatically created:
@@ -115,7 +118,7 @@ pipe = pipeline.Pipeline(
 
 run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
 myrun = run.publish()
-print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
+print(f"Uploaded to {myrun.openml_url}")
 
 
 # The above pipeline works with the helper functions that internally deal with pandas DataFrame.
@@ -159,7 +162,7 @@ pipe = pipeline.Pipeline(
 
 run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False, dataset_format="array")
 myrun = run.publish()
-print("Uploaded to http://test.openml.org/r/" + str(myrun.run_id))
+print(f"Uploaded to {myrun.openml_url}")
 
 ###############################################################################
 # Running flows on tasks offline for later upload
@@ -210,16 +213,16 @@ run = openml.runs.run_flow_on_task(flow, task)
 # compare your results with the rest of the class and learn from
 # them. Some tasks you could try (or browse openml.org):
 #
-# * EEG eye state: data_id:`1471 <http://www.openml.org/d/1471>`_,
-#   task_id:`14951 <http://www.openml.org/t/14951>`_
-# * Volcanoes on Venus: data_id:`1527 <http://www.openml.org/d/1527>`_,
-#   task_id:`10103 <http://www.openml.org/t/10103>`_
-# * Walking activity: data_id:`1509 <http://www.openml.org/d/1509>`_,
-#   task_id:`9945 <http://www.openml.org/t/9945>`_, 150k instances.
-# * Covertype (Satellite): data_id:`150 <http://www.openml.org/d/150>`_,
-#   task_id:`218 <http://www.openml.org/t/218>`_, 500k instances.
-# * Higgs (Physics): data_id:`23512 <http://www.openml.org/d/23512>`_,
-#   task_id:`52950 <http://www.openml.org/t/52950>`_, 100k instances, missing values.
+# * EEG eye state: data_id:`1471 <https://www.openml.org/d/1471>`_,
+#   task_id:`14951 <https://www.openml.org/t/14951>`_
+# * Volcanoes on Venus: data_id:`1527 <https://www.openml.org/d/1527>`_,
+#   task_id:`10103 <https://www.openml.org/t/10103>`_
+# * Walking activity: data_id:`1509 <https://www.openml.org/d/1509>`_,
+#   task_id:`9945 <https://www.openml.org/t/9945>`_, 150k instances.
+# * Covertype (Satellite): data_id:`150 <https://www.openml.org/d/150>`_,
+#   task_id:`218 <https://www.openml.org/t/218>`_, 500k instances.
+# * Higgs (Physics): data_id:`23512 <https://www.openml.org/d/23512>`_,
+#   task_id:`52950 <https://www.openml.org/t/52950>`_, 100k instances, missing values.
 
 # Easy benchmarking:
 for task_id in [115]:  # Add further tasks. Disclaimer: they might take some time
@@ -229,7 +232,7 @@ for task_id in [115]:  # Add further tasks. Disclaimer: they might take some tim
 
     run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
     myrun = run.publish()
-    print(f"kNN on {data.name}: http://test.openml.org/r/{myrun.run_id}")
+    print(f"kNN on {data.name}: {myrun.openml_url}")
 
 
 ############################################################################

@@ -63,8 +63,8 @@ def run_model_on_task(
     ----------
     model : sklearn model
         A model which has a function fit(X,Y) and predict(X),
-        all supervised estimators of scikit learn follow this definition of a model [1]
-        [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
+        all supervised estimators of scikit learn follow this definition of a model
+        (https://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
     task : OpenMLTask or int or str
         Task to perform or Task id.
         This may be a model instead if the first argument is an OpenMLTask.
@@ -166,8 +166,8 @@ def run_flow_on_task(
     flow : OpenMLFlow
         A flow wraps a machine learning model together with relevant information.
         The model has a function fit(X,Y) and predict(X),
-        all supervised estimators of scikit learn follow this definition of a model [1]
-        [1](http://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
+        all supervised estimators of scikit learn follow this definition of a model
+        (https://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
     task : OpenMLTask
         Task to perform. This may be an OpenMLFlow instead if the first argument is an OpenMLTask.
     avoid_duplicate_runs : bool, optional (default=True)

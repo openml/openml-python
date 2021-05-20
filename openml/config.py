@@ -9,7 +9,8 @@ import logging.handlers
 import os
 from pathlib import Path
 import platform
-from typing import Tuple, cast
+from typing import Tuple, cast, Any, Optional
+import warnings
 
 from io import StringIO
 import configparser
@@ -94,10 +95,9 @@ _defaults = {
         else os.path.join("~", ".openml")
     ),
     "avoid_duplicate_runs": "True",
-    "connection_n_retries": "10",
-    "max_retries": "20",
+    "retry_policy": "human",
+    "connection_n_retries": "5",
 }
-
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
@@ -121,9 +121,26 @@ apikey = _defaults["apikey"]
 cache_directory = str(_defaults["cachedir"])  # so mypy knows it is a string
 avoid_duplicate_runs = True if _defaults["avoid_duplicate_runs"] == "True" else False
 
-# Number of retries if the connection breaks
+retry_policy = _defaults["retry_policy"]
 connection_n_retries = int(_defaults["connection_n_retries"])
-max_retries = int(_defaults["max_retries"])
+
+
+def set_retry_policy(value: str, n_retries: Optional[int] = None) -> None:
+    global retry_policy
+    global connection_n_retries
+    default_retries_by_policy = dict(human=5, robot=50)
+
+    if value not in default_retries_by_policy:
+        raise ValueError(
+            f"Detected retry_policy '{value}' but must be one of {default_retries_by_policy}"
+        )
+    if n_retries is not None and not isinstance(n_retries, int):
+        raise TypeError(f"`n_retries` must be of type `int` or `None` but is `{type(n_retries)}`.")
+    if isinstance(n_retries, int) and n_retries < 1:
+        raise ValueError(f"`n_retries` is '{n_retries}' but must be positive.")
+
+    retry_policy = value
+    connection_n_retries = default_retries_by_policy[value] if n_retries is None else n_retries
 
 
 class ConfigurationForExamples:
@@ -157,6 +174,10 @@ class ConfigurationForExamples:
         # Test server key for examples
         server = cls._test_server
         apikey = cls._test_apikey
+        warnings.warn(
+            "Switching to the test server {} to not upload results to the live server. "
+            "Using the test server may result in reduced performance of the API!".format(server)
+        )
 
     @classmethod
     def stop_using_configuration_for_example(cls):
@@ -177,6 +198,16 @@ class ConfigurationForExamples:
         cls._start_last_called = False
 
 
+def determine_config_file_path() -> Path:
+    if platform.system() == "Linux":
+        config_dir = Path(os.environ.get("XDG_CONFIG_HOME", Path("~") / ".config" / "openml"))
+    else:
+        config_dir = Path("~") / ".openml"
+    # Still use os.path.expanduser to trigger the mock in the unit test
+    config_dir = Path(os.path.expanduser(config_dir))
+    return config_dir / "config"
+
+
 def _setup(config=None):
     """Setup openml package. Called on first import.
 
@@ -190,16 +221,9 @@ def _setup(config=None):
     global server
     global cache_directory
     global avoid_duplicate_runs
-    global connection_n_retries
-    global max_retries
 
-    if platform.system() == "Linux":
-        config_dir = Path(os.environ.get("XDG_CONFIG_HOME", Path("~") / ".config" / "openml"))
-    else:
-        config_dir = Path("~") / ".openml"
-    # Still use os.path.expanduser to trigger the mock in the unit test
-    config_dir = Path(os.path.expanduser(config_dir))
-    config_file = config_dir / "config"
+    config_file = determine_config_file_path()
+    config_dir = config_file.parent
 
     # read config file, create directory for config file
     if not os.path.exists(config_dir):
@@ -228,8 +252,12 @@ def _setup(config=None):
     apikey = _get(config, "apikey")
     server = _get(config, "server")
     short_cache_dir = _get(config, "cachedir")
-    connection_n_retries = int(_get(config, "connection_n_retries"))
-    max_retries = int(_get(config, "max_retries"))
+
+    n_retries = _get(config, "connection_n_retries")
+    if n_retries is not None:
+        n_retries = int(n_retries)
+
+    set_retry_policy(_get(config, "retry_policy"), n_retries)
 
     cache_directory = os.path.expanduser(short_cache_dir)
     # create the cache subdirectory
@@ -251,11 +279,26 @@ def _setup(config=None):
             "not working properly." % config_dir
         )
 
-    if connection_n_retries > max_retries:
-        raise ValueError(
-            "A higher number of retries than {} is not allowed to keep the "
-            "server load reasonable".format(max_retries)
-        )
+
+def set_field_in_config_file(field: str, value: Any):
+    """ Overwrites the `field` in the configuration file with the new `value`. """
+    if field not in _defaults:
+        return ValueError(f"Field '{field}' is not valid and must be one of '{_defaults.keys()}'.")
+
+    globals()[field] = value
+    config_file = determine_config_file_path()
+    config = _parse_config(str(config_file))
+    with open(config_file, "w") as fh:
+        for f in _defaults.keys():
+            # We can't blindly set all values based on globals() because when the user
+            # sets it through config.FIELD it should not be stored to file.
+            # There doesn't seem to be a way to avoid writing defaults to file with configparser,
+            # because it is impossible to distinguish from an explicitly set value that matches
+            # the default value, to one that was set to its default because it was omitted.
+            value = config.get("FAKE_SECTION", f)
+            if f == field:
+                value = globals()[f]
+            fh.write(f"{f} = {value}\n")
 
 
 def _parse_config(config_file: str):
@@ -286,7 +329,7 @@ def get_config_as_dict():
     config["cachedir"] = cache_directory
     config["avoid_duplicate_runs"] = avoid_duplicate_runs
     config["connection_n_retries"] = connection_n_retries
-    config["max_retries"] = max_retries
+    config["retry_policy"] = retry_policy
     return config
 
 

@@ -65,7 +65,10 @@ COMPOSITION_STEP_CONSTANT = "composition_step_constant"
 
 
 class SklearnExtension(Extension):
-    """Connect scikit-learn to OpenML-Python."""
+    """Connect scikit-learn to OpenML-Python.
+       The estimators which use this extension must be scikit-learn compatible,
+       i.e needs to be a subclass of sklearn.base.BaseEstimator".
+    """
 
     ################################################################################################
     # General setup
@@ -104,25 +107,29 @@ class SklearnExtension(Extension):
     def trim_flow_name(
         cls, long_name: str, extra_trim_length: int = 100, _outer: bool = True
     ) -> str:
-        """ Shorten generated sklearn flow name to at most `max_length` characters.
+        """ Shorten generated sklearn flow name to at most ``max_length`` characters.
 
         Flows are assumed to have the following naming structure:
-        (model_selection)? (pipeline)? (steps)+
+        ``(model_selection)? (pipeline)? (steps)+``
         and will be shortened to:
-        sklearn.(selection.)?(pipeline.)?(steps)+
+        ``sklearn.(selection.)?(pipeline.)?(steps)+``
         e.g. (white spaces and newlines added for readability)
-        sklearn.pipeline.Pipeline(
-            columntransformer=sklearn.compose._column_transformer.ColumnTransformer(
-                numeric=sklearn.pipeline.Pipeline(
-                    imputer=sklearn.preprocessing.imputation.Imputer,
-                    standardscaler=sklearn.preprocessing.data.StandardScaler),
-                nominal=sklearn.pipeline.Pipeline(
-                    simpleimputer=sklearn.impute.SimpleImputer,
-                    onehotencoder=sklearn.preprocessing._encoders.OneHotEncoder)),
-            variancethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,
-            svc=sklearn.svm.classes.SVC)
+
+        .. code ::
+
+            sklearn.pipeline.Pipeline(
+                columntransformer=sklearn.compose._column_transformer.ColumnTransformer(
+                    numeric=sklearn.pipeline.Pipeline(
+                        imputer=sklearn.preprocessing.imputation.Imputer,
+                        standardscaler=sklearn.preprocessing.data.StandardScaler),
+                    nominal=sklearn.pipeline.Pipeline(
+                        simpleimputer=sklearn.impute.SimpleImputer,
+                        onehotencoder=sklearn.preprocessing._encoders.OneHotEncoder)),
+                variancethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,
+                svc=sklearn.svm.classes.SVC)
+
         ->
-        sklearn.Pipeline(ColumnTransformer,VarianceThreshold,SVC)
+        ``sklearn.Pipeline(ColumnTransformer,VarianceThreshold,SVC)``
 
         Parameters
         ----------

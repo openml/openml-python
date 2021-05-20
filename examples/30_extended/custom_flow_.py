@@ -4,7 +4,7 @@ Creating and Using a Custom Flow
 ================================
 
 The most convenient way to create a flow for your machine learning workflow is to generate it
-automatically as described in the `Obtain Flow IDs <https://openml.github.io/openml-python/master/examples/30_extended/flow_id_tutorial.html#sphx-glr-examples-30-extended-flow-id-tutorial-py>`_ tutorial.  # noqa E501
+automatically as described in the :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py` tutorial.
 However, there are scenarios where this is not possible, such
 as when the flow uses a framework without an extension or when the flow is described by a script.
 
@@ -13,12 +13,8 @@ As an example we will use the flows generated for the `AutoML Benchmark <https:/
 and also show how to link runs to the custom flow.
 """
 
-####################################################################################################
-
 # License: BSD 3-Clause
-# .. warning:: This example uploads data. For that reason, this example
-#   connects to the test server at test.openml.org. This prevents the main
-#   server from crowding with example datasets, tasks, runs, and so on.
+
 from collections import OrderedDict
 import numpy as np
 
@@ -26,13 +22,16 @@ import openml
 from openml import OpenMLClassificationTask
 from openml.runs.functions import format_prediction
 
+####################################################################################################
+# .. warning::
+#    .. include:: ../../test_server_usage_warning.txt
 openml.config.start_using_configuration_for_example()
 
 ####################################################################################################
 # 1. Defining the flow
 # ====================
 # The first step is to define all the hyperparameters of your flow.
-# The API pages feature a descriptions of each variable of the `OpenMLFlow <https://openml.github.io/openml-python/master/generated/openml.OpenMLFlow.html#openml.OpenMLFlow>`_.  # noqa E501
+# The API pages feature a descriptions of each variable of the :class:`openml.flows.OpenMLFlow`.
 # Note that `external version` and `name` together uniquely identify a flow.
 #
 # The AutoML Benchmark runs AutoML systems across a range of tasks.
@@ -130,6 +129,7 @@ dataset_id = task.get_dataset().dataset_id
 # The exact format of the predictions will depend on the task.
 #
 # The predictions should always be a list of lists, each list should contain:
+#
 # - the repeat number: for repeated evaluation strategies. (e.g. repeated cross-validation)
 # - the fold number: for cross-validation. (what should this be for holdout?)
 # - 0: this field is for backward compatibility.

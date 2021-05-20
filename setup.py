@@ -31,7 +31,7 @@ setuptools.setup(
     long_description=README,
     long_description_content_type="text/markdown",
     license="BSD 3-clause",
-    url="http://openml.org/",
+    url="https://openml.org/",
     project_urls={
         "Documentation": "https://openml.github.io/openml-python/",
         "Source Code": "https://github.com/openml/openml-python",
@@ -102,4 +102,5 @@ setuptools.setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
+    entry_points={"console_scripts": ["openml=openml.cli:main"]},
 )

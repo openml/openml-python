@@ -1,6 +1,6 @@
 This document describes the workflow on how to contribute to the openml-python package.
 If you are interested in connecting a machine learning package with OpenML (i.e.
-write an openml-python extension) or want to find other ways to contribute, see [this page](https://openml.github.io/openml-python/master/contributing.html#contributing).
+write an openml-python extension) or want to find other ways to contribute, see [this page](https://openml.github.io/openml-python/main/contributing.html#contributing).
 
 Scope of the package
 --------------------
@@ -20,7 +20,7 @@ keep the number of potential installation dependencies as low as possible.
 Therefore, the connection to other machine learning libraries such as
 *pytorch*, *keras* or *tensorflow* should not be done directly inside this
 package, but in a separate package using the OpenML Python connector.
-More information on OpenML Python connectors can be found [here](https://openml.github.io/openml-python/master/contributing.html#contributing).
+More information on OpenML Python connectors can be found [here](https://openml.github.io/openml-python/main/contributing.html#contributing).
 
 Reporting bugs
 --------------
@@ -100,7 +100,7 @@ local disk:
    $ git checkout -b feature/my-feature
    ```
 
-   Always use a ``feature`` branch. It's good practice to never work on the ``master`` or ``develop`` branch! 
+   Always use a ``feature`` branch. It's good practice to never work on the ``main`` or ``develop`` branch! 
    To make the nature of your pull request easily visible, please prepend the name of the branch with the type of changes you want to merge, such as ``feature`` if it contains a new feature, ``fix`` for a bugfix, ``doc`` for documentation and ``maint`` for other maintenance on the package.
 
 4. Develop the feature on your feature branch. Add changed files using ``git add`` and then ``git commit`` files:
@@ -177,6 +177,10 @@ following rules before you submit a pull request:
 
  - If any source file is being added to the repository, please add the BSD 3-Clause license to it.
 
+
+*Note*: We recommend to follow the instructions below to install all requirements locally.
+However it is also possible to use the [openml-python docker image](https://github.com/openml/openml-python/blob/main/docker/readme.md) for testing and building documentation.
+This can be useful for one-off contributions or when you are experiencing installation issues.
 
 First install openml with its test dependencies by running
   ```bash

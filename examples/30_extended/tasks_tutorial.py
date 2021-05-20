@@ -36,7 +36,7 @@ tasks = openml.tasks.list_tasks(task_type=TaskType.SUPERVISED_CLASSIFICATION)
 ############################################################################
 # **openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, which we convert
 # into a
-# `pandas dataframe <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
+# `pandas dataframe <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
 # to have better visualization capabilities and easier access:
 
 tasks = pd.DataFrame.from_dict(tasks, orient="index")
@@ -76,7 +76,7 @@ print(len(filtered_tasks))
 
 ############################################################################
 # Resampling strategies can be found on the
-# `OpenML Website <http://www.openml.org/search?type=measure&q=estimation%20procedure>`_.
+# `OpenML Website <https://www.openml.org/search?type=measure&q=estimation%20procedure>`_.
 #
 # Similar to listing tasks by task type, we can list tasks by tags:
 
@@ -105,7 +105,7 @@ print(tasks)
 # instances per task. To make things easier, the tasks do not contain highly
 # unbalanced data and sparse data. However, the tasks include missing values and
 # categorical features. You can find out more about the *OpenML 100* on
-# `the OpenML benchmarking page <https://www.openml.org/guide/benchmark>`_.
+# `the OpenML benchmarking page <https://docs.openml.org/benchmark/>`_.
 #
 # Finally, it is also possible to list all tasks on OpenML with:
 
@@ -172,6 +172,12 @@ print(tasks[0])
 # necessary (e.g. when other measure make no sense), since it will create a new task, which
 # scatters results across tasks.
 
+############################################################################
+# We'll use the test server for the rest of this tutorial.
+#
+# .. warning::
+#    .. include:: ../../test_server_usage_warning.txt
+openml.config.start_using_configuration_for_example()
 
 ############################################################################
 # Example
@@ -184,9 +190,6 @@ print(tasks[0])
 # If such a task doesn't exist, a task will be created and the corresponding task_id
 # will be returned.
 
-
-# using test server for example uploads
-openml.config.start_using_configuration_for_example()
 
 try:
     my_task = openml.tasks.create_task(
