@@ -82,6 +82,7 @@ setuptools.setup(
             "ipython",
             "ipykernel",
             "seaborn",
+            "bayesian-optimization",
         ],
         "examples_unix": ["fanova"],
         "docs": ["sphinx>=3", "sphinx-gallery", "sphinx_bootstrap_theme", "numpydoc",],
