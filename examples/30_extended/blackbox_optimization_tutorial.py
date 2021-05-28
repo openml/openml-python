@@ -9,7 +9,7 @@ of machine learning datasets, their data splits, models with their hyperparamete
 associated runs and evaluations. Such a setup allows for reproducibility in not just standard
 machine learning use, but also cases such as black-box optimization. In this example, we treat the
 problem of tuning or optimizing a machine learning model's hyperparameters for a particular dataset
-as a black-box problem. We shall tune 2 hyperparameters of an SVM model, to obtain a configuration
+as a black-box optimization problem. We shall tune 2 hyperparameters of an SVM model, to obtain a configuration
 that performs the best on a held-out validation set.
 
 OpenML tasks have predetermined train-test splits. The best found configuration is then refit on
