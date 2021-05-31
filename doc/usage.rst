@@ -29,15 +29,18 @@ machine learning algorithms on them and then share the results online.
 The following tutorial gives a short introduction on how to install and set up
 the OpenML Python connector, followed up by a simple example.
 
-* `:ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`
+* :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`
 
 ~~~~~~~~~~~~~
 Configuration
 ~~~~~~~~~~~~~
 
-The configuration file resides in a directory ``.openml`` in the home
-directory of the user and is called config. It consists of ``key = value`` pairs
-which are separated by newlines. The following keys are defined:
+The configuration file resides in a directory ``.config/openml`` in the home
+directory of the user and is called config (More specifically, it resides in the
+`configuration directory specified by the XDGB Base Directory Specification
+<https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html>`_).
+It consists of ``key = value`` pairs which are separated by newlines.
+The following keys are defined:
 
 * apikey:
     * required to access the server. The :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`
