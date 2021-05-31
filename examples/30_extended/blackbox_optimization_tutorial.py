@@ -186,7 +186,7 @@ general = dict(
     description=("Running BO on SVM using OpenML"),
     external_version="bayesian-optimization==1.2.0",
     language="English",
-    tags=["bbo", "svc", "sklearn"],
+    tags=["bbo", "svc", "svm", "sklearn", "bayesopt", "hpo", "Bayesian optimization"],
     dependencies="bayesian-optimization==1.2.0",
     components=OrderedDict()
 )
