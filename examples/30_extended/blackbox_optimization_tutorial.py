@@ -1,5 +1,4 @@
 """
-
 ================================
 Blackbox Optimization and OpenML
 ================================
@@ -12,9 +11,15 @@ problem of tuning or optimizing a machine learning model's hyperparameters for a
 as a black-box optimization problem. We shall tune 2 hyperparameters of an SVM model, to obtain a configuration
 that performs the best on a held-out validation set.
 
-OpenML tasks have predetermined train-test splits. The best found configuration is then refit on
-the entire training split and evaluated on the test split, which is then uploaded to the OpenML
-server as an OpenMLRun object, along with the optimization trace from Bayesian Optimization (BO).
+OpenML tasks have predetermined train-test splits. The onus is on the user to create a validation
+set on which optimization performance can be evaluated. In this tutorial, we split the OpenML
+training split further to create a validation split on which the optimization is evaluated. The
+best found configuration is then refit on the OpenML training split (training + validation split)
+and evaluated on the test split, which is then uploaded to the OpenML server as an OpenMLRun
+object, along with the optimization trace from Bayesian Optimization (BO).
+
+Additional requirement for this tutorial:
+* bayesian-optimization >= 1.2.0
 
 """
 
@@ -34,33 +39,7 @@ from sklearn.model_selection import train_test_split
 
 
 ############################################################################
-# Designing hyperparameter space to optimize
-# ******************************************
-# Obtaining the hyperparameter domain for the SVM model to tune. We use the
-# same design as the (SVM tutorial)[<plot_svm_hyperparameters_tutorial.py>].
-
-df = openml.evaluations.list_evaluations_setups(
-    function="predictive_accuracy",
-    flows=[8353],  # https://www.openml.org/f/8353
-    tasks=[6],     # https://www.openml.org/t/6
-    output_format="dataframe",
-    # Using this flag incorporates the hyperparameters into the returned dataframe. Otherwise,
-    # the dataframe would contain a field ``paramaters`` containing an unparsed dictionary.
-    parameters_in_separate_columns=True,
-)
-hyperparameters = ["sklearn.svm.classes.SVC(16)_C", "sklearn.svm.classes.SVC(16)_gamma"]
-df = df[hyperparameters]
-C = df["sklearn.svm.classes.SVC(16)_C"].astype(float)
-C_bound = (C.min(), C.max())
-gamma = df["sklearn.svm.classes.SVC(16)_gamma"].astype(float)
-gamma_bound = (gamma.min(), gamma.max())
-
-# Configuration search space or bounds
-bounds = [C_bound, gamma_bound]
-pbounds = dict(C=C_bound, gamma=gamma_bound)
-
-############################################################################
-# We'll switch to the test server for the rest of this tutorial.
+# We'll switch to the test server for this tutorial.
 #
 # .. warning::
 #    .. include:: ../../test_server_usage_warning.txt
@@ -97,6 +76,20 @@ test_y = y.iloc[test_idx]
 train_X, valid_X, train_y, valid_y = train_test_split(
     train_X, train_y, test_size=0.3, random_state=seed
 )
+
+############################################################################
+# Designing hyperparameter space to optimize
+# ******************************************
+# We shall create a 2-dimensional hyperparameter space here for the C and gamma
+# parameters from `LIBSVM <https://www.csie.ntu.edu.tw/~cjlin/libsvm/>`_.
+
+C_bound = (0.031276662914728116, 31569.291108185385)
+gamma_bound = (3.080213781754402e-05, 7.986384354827698)
+
+# Configuration search space or bounds
+bounds = [C_bound, gamma_bound]
+pbounds = dict(C=C_bound, gamma=gamma_bound)
+
 
 ############################################################################
 # Defining model to optimize using BO
@@ -144,7 +137,15 @@ print("Best accuracy obtained on validation set : {:.5f} %".format(optimizer.max
 ############################################################################
 # Obtaining optimization trace
 # ****************************
-# Obtaining optimization trace and building an OpenMLRunTrace object for the run
+# In general, an OpenMLRunTrace object contains a record of the sequence of
+# evaluations performed at each iteration. Each such record is an object of
+# type OpenMLTraceIteration which maps the fold number, the repetition count,
+# to the model parameters used to obtain the score at that iteration. If the
+# score at that iteration is the best seen score, the OpenMLTraceIteration also
+# records if those model parameters were selected during the sequence of optimization.
+# In the context of this tutorial, the OpenMLRunTrace will contain information
+# about all the function evaluations performed during BO to find the best
+# performing configuration.
 
 # Following these guidelines: https://docs.openml.org/OpenML_definition/#trace
 trace_iterations = dict()
@@ -184,9 +185,9 @@ print("Accuracy on the test set: {:.5f} %".format(accuracy_score(_predictions, t
 general = dict(
     name="sklearn_bbo_example_flow",
     description=("Running BO on SVM using OpenML"),
-    external_version="bayesian-optimization==1.2.0",
+    external_version="bayesian-optimization==1.2.0, sklearn==0.24.1",
     language="English",
-    tags=["bbo", "svc", "svm", "sklearn", "bayesopt", "hpo", "Bayesian optimization"],
+    tags=["bbo", "svc", "svm", "sklearn", "bayesopt", "hpo", "bayesian-optimization"],
     dependencies="bayesian-optimization==1.2.0",
     components=OrderedDict()
 )
@@ -243,6 +244,7 @@ parameters = [
 # Collating predictions for the OpenML arff data to be stored on the server
 predictions = []
 for i in range(len(test_idx)):
+    # openml.runs.functions.format_prediction() is a helper function in OpenML-Python
     prediction = format_prediction(
         task=task,
         repeat=0,
@@ -287,44 +289,23 @@ print("Accuracy on the test set computed by OpenML: {:.5f} %".format(
 )
 
 ############################################################################
-# Fetching model specifications (best configuration) from uploaded run
-# Training the model and comparing predictions with the predictions recorded 
-# under the original run
+# A minor drawback of creating a flow from scratch is that this uploaded run
+# cannot be fetched from the server to instantiate an SVM model with the
+# best found parameters directly. OpenML requires that all models be serialized
+# with the help of `OpenML extensions <http://openml.github.io/openml-python/main/extensions.html>`_
+# for the machine learning library the model is being called from.
+# However, the same can be performed using a custom flow, without an extension,
+# albeit with few extra steps as shown below:
 
-# _clf = openml.runs.initialize_model_from_run(my_run.run_id)
-# _clf.probability = True
-# _clf.random_state = seed
-# _clf.fit(train_X.append(valid_X), train_y.append(valid_y))
-# _predictions = _clf.predict(test_X)
-#
-# assert predictions == _predictions
+run = openml.runs.get_run(my_run.run_id)
 
-# svm_on_test_server = [
-#     101323, 101343, 101383, 103511, 103551, 103591, 103632, 204904, 207060, 219404, 220130
-# ]
-# flow_id = svm_on_test_server[np.random.randint(len(svm_on_test_server))]
-# flow = openml.flows.get_flow(flow_id)
-# print(flow)
+model_params = dict(random_state=seed, probability=True)
+for _, elem in enumerate(run.parameter_settings):
+    model_params[elem['oml:name']] = float(elem['oml:value'])
 
-############################################################################
-# Using OpenML-Python API to create runs and obtain predictions
+# Initializing model with the parameters obtained from the run object
+clf = SVC(**model_params)
+print(clf)
 
-# clf = SVC(**model_params)
-# # Updating flow parameters with best found configuration from DE
-# flow.parameters.update(model_params)
-# run = openml.runs.run_flow_on_task(
-#     flow=flow, task=task, upload_flow=False, seed=seed, avoid_duplicate_runs=False
-# )
-# run.publish()
-#
-# # Fetching model specifications (best configuration) from uploaded run
-# _clf = openml.runs.initialize_model_from_run(run.run_id)
-# _clf.probability = True
-# _clf.random_state = seed
-# _clf.fit(train_X.append(valid_X), train_y.append(valid_y))
-# predictions_2 = _clf.predict(test_X)
-#
-# # Check if the predictions obtained locally and from the uploaded run are the same
-# assert np.all(predictions_1 == predictions_2)
 
 openml.config.stop_using_configuration_for_example()
