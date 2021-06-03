@@ -8,8 +8,8 @@ of machine learning datasets, their data splits, models with their hyperparamete
 associated runs and evaluations. Such a setup allows for reproducibility in not just standard
 machine learning use, but also cases such as black-box optimization. In this example, we treat the
 problem of tuning or optimizing a machine learning model's hyperparameters for a particular dataset
-as a black-box optimization problem. We shall tune 2 hyperparameters of an SVM model, to obtain a configuration
-that performs the best on a held-out validation set.
+as a black-box optimization problem. We shall tune 2 hyperparameters of an SVM model, to obtain a
+configuration that performs the best on a held-out validation set.
 
 OpenML tasks have predetermined train-test splits. The onus is on the user to create a validation
 set on which optimization performance can be evaluated. In this tutorial, we split the OpenML
@@ -19,6 +19,7 @@ and evaluated on the test split, which is then uploaded to the OpenML server as 
 object, along with the optimization trace from Bayesian Optimization (BO).
 
 Additional requirement for this tutorial:
+
 * bayesian-optimization >= 1.2.0
 
 """
@@ -62,8 +63,9 @@ print(task)
 
 # Retrieving training and test splits
 training_idx, test_idx = task.get_train_test_split_indices(fold=0, repeat=0)
+
 # Fixed train-test data splits for each OpenML tasks
-print("# training instances: {}".format(len(training_idx)))
+print("\n# training instances: {}".format(len(training_idx)))
 print("# test instances: {}".format(len(test_idx)))
 
 # Fetching and creating Training-Validation-Test data splits

@@ -77,7 +77,7 @@ Docker
 It is also possible to try out the latest development version of ``openml-python`` with docker:
 
 ```
-    docker run -it openml/openml-python
+docker run -it openml/openml-python
 ```
 
 
