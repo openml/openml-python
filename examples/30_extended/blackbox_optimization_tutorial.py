@@ -83,10 +83,10 @@ train_X, valid_X, train_y, valid_y = train_test_split(
 # Designing hyperparameter space to optimize
 # ******************************************
 # We shall create a 2-dimensional hyperparameter space here for the C and gamma
-# parameters from `LIBSVM <https://www.csie.ntu.edu.tw/~cjlin/libsvm/>`_.
+# parameters from this `SVM guide <https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf>`_.
 
-C_bound = (0.031276662914728116, 31569.291108185385)
-gamma_bound = (3.080213781754402e-05, 7.986384354827698)
+C_bound = (2 ** -5, 2 ** 15)
+gamma_bound = (2 ** -15, 2 ** 3)
 
 # Configuration search space or bounds
 bounds = [C_bound, gamma_bound]
