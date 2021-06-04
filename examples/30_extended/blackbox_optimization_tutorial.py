@@ -33,7 +33,9 @@ from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration
 import time
 import numpy as np
 from collections import OrderedDict
+from pip._vendor import pkg_resources
 from bayes_opt import BayesianOptimization
+import sklearn
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
@@ -45,6 +47,17 @@ from sklearn.model_selection import train_test_split
 # .. warning::
 #    .. include:: ../../test_server_usage_warning.txt
 openml.config.start_using_configuration_for_example()
+
+############################################################################
+# Retrieving bayes_opt and sklearn version being used
+
+pkg_name = "bayesian-optimization"
+bo_version = [p.version for p in pkg_resources.working_set if p.project_name.lower() == pkg_name][0]
+bo_version = "{}=={}".format(pkg_name, bo_version)
+print(bo_version)
+
+sklearn_version = "scikit-learn=={}".format(sklearn.__version__)
+print(sklearn_version)
 
 ############################################################################
 # Preparing data splits
@@ -91,7 +104,6 @@ gamma_bound = (2 ** -15, 2 ** 3)
 # Configuration search space or bounds
 bounds = [C_bound, gamma_bound]
 pbounds = dict(C=C_bound, gamma=gamma_bound)
-
 
 ############################################################################
 # Defining model to optimize using BO
@@ -187,10 +199,10 @@ print("Accuracy on the test set: {:.5f} %".format(accuracy_score(_predictions, t
 general = dict(
     name="sklearn_bbo_example_flow",
     description=("Running BO on SVM using OpenML"),
-    external_version="bayesian-optimization==1.2.0, sklearn==0.24.1",
+    external_version="{}, {}".format(bo_version, sklearn_version),
     language="English",
     tags=["bbo", "svc", "svm", "sklearn", "bayesopt", "hpo", "bayesian-optimization"],
-    dependencies="bayesian-optimization==1.2.0",
+    dependencies="{}".format(bo_version),
     components=OrderedDict()
 )
 
