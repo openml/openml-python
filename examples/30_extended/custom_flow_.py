@@ -4,7 +4,7 @@ Creating and Using a Custom Flow
 ================================
 
 The most convenient way to create a flow for your machine learning workflow is to generate it
-automatically as described in the `Obtain Flow IDs <https://openml.github.io/openml-python/master/examples/30_extended/flow_id_tutorial.html#sphx-glr-examples-30-extended-flow-id-tutorial-py>`_ tutorial.  # noqa E501
+automatically as described in the :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py` tutorial.
 However, there are scenarios where this is not possible, such
 as when the flow uses a framework without an extension or when the flow is described by a script.
 
@@ -31,7 +31,7 @@ openml.config.start_using_configuration_for_example()
 # 1. Defining the flow
 # ====================
 # The first step is to define all the hyperparameters of your flow.
-# The API pages feature a descriptions of each variable of the `OpenMLFlow <https://openml.github.io/openml-python/master/generated/openml.OpenMLFlow.html#openml.OpenMLFlow>`_.  # noqa E501
+# The API pages feature a descriptions of each variable of the :class:`openml.flows.OpenMLFlow`.
 # Note that `external version` and `name` together uniquely identify a flow.
 #
 # The AutoML Benchmark runs AutoML systems across a range of tasks.
