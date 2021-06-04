@@ -1,10 +1,10 @@
 # License: BSD 3-Clause
-
+import warnings
 from collections import OrderedDict
 import io
 import re
 import os
-from typing import Union, Dict, Optional
+from typing import Union, Dict, Optional, List
 
 import pandas as pd
 import xmltodict
@@ -297,17 +297,21 @@ def __list_tasks(api_call, output_format="dict"):
     return tasks
 
 
-def get_tasks(task_ids, download_data=True):
+def get_tasks(
+    task_ids: List[int], download_data: bool = True, download_qualities: bool = True
+) -> List[OpenMLTask]:
     """Download tasks.
 
     This function iterates :meth:`openml.tasks.get_task`.
 
     Parameters
     ----------
-    task_ids : iterable
-        Integers/Strings representing task ids.
-    download_data : bool
+    task_ids : List[int]
+        A list of task ids to download.
+    download_data : bool (default = True)
         Option to trigger download of data along with the meta data.
+    download_qualities : bool (default=True)
+        Option to download 'qualities' meta-data in addition to the minimal dataset description.
 
     Returns
     -------
@@ -315,12 +319,14 @@ def get_tasks(task_ids, download_data=True):
     """
     tasks = []
     for task_id in task_ids:
-        tasks.append(get_task(task_id, download_data))
+        tasks.append(get_task(task_id, download_data, download_qualities))
     return tasks
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_task(task_id: int, download_data: bool = True) -> OpenMLTask:
+def get_task(
+    task_id: int, download_data: bool = True, download_qualities: bool = True
+) -> OpenMLTask:
     """Download OpenML task for a given task ID.
 
     Downloads the task representation, while the data splits can be
@@ -329,25 +335,30 @@ def get_task(task_id: int, download_data: bool = True) -> OpenMLTask:
 
     Parameters
     ----------
-    task_id : int or str
-        The OpenML task id.
-    download_data : bool
+    task_id : int
+        The OpenML task id of the task to download.
+    download_data : bool (default=True)
         Option to trigger download of data along with the meta data.
+    download_qualities : bool (default=True)
+        Option to download 'qualities' meta-data in addition to the minimal dataset description.
 
     Returns
     -------
     task
     """
+    if not isinstance(task_id, int):
+        warnings.warn("Task id must be specified as `int` from 0.14.0 onwards.", DeprecationWarning)
+
     try:
         task_id = int(task_id)
     except (ValueError, TypeError):
-        raise ValueError("Dataset ID is neither an Integer nor can be " "cast to an Integer.")
+        raise ValueError("Dataset ID is neither an Integer nor can be cast to an Integer.")
 
     tid_cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id,)
 
     try:
         task = _get_task_description(task_id)
-        dataset = get_dataset(task.dataset_id, download_data)
+        dataset = get_dataset(task.dataset_id, download_data, download_qualities=download_qualities)
         # List of class labels availaible in dataset description
         # Including class labels as part of task meta data handles
         #   the case where data download was initially disabled

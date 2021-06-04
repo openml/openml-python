@@ -59,7 +59,7 @@ fi
 
 source /omlp/venv/bin/activate
 cd $code_dir
-# The most recent ``master`` is already installed, but we want to update any outdated dependencies
+# The most recent ``main`` is already installed, but we want to update any outdated dependencies
 pip install -e .[test,examples,docs,examples_unix]
 
 if [ "$1" == "test" ]; then
