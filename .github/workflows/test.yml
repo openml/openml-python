@@ -3,13 +3,14 @@ name: Tests
 on: [push, pull_request]
 
 jobs:
-  ubuntu:
-
-    runs-on: ubuntu-latest
+  test:
+    name: (${{ matrix.os }}, Py${{ matrix.python-version }}, sk${{ matrix.scikit-learn }})
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
         scikit-learn: [0.21.2, 0.22.2, 0.23.1, 0.24]
+        os: [ubuntu-latest]
         exclude:  # no scikit-learn 0.21.2 release for Python 3.8
           - python-version: 3.8
             scikit-learn: 0.21.2
@@ -24,6 +25,8 @@ jobs:
           - python-version: 3.8
             scikit-learn: 0.23.1
             code-cov: true
+          - os: windows-latest
+            scikit-learn: 0.24.*
       fail-fast:  false
       max-parallel: 4
 
@@ -32,6 +35,7 @@ jobs:
       with:
         fetch-depth: 2
     - name: Setup Python ${{ matrix.python-version }}
+      if: {{ matrix.os != windows-latest }}  # windows-latest only uses preinstalled Python (3.7.9)
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
@@ -50,10 +54,15 @@ jobs:
       id: status-before
       run: |
         echo "::set-output name=BEFORE::$(git status --porcelain -b)"
-    - name: Run tests
+    - name: Run tests on Ubuntu
+      if: ${{ matrix.os == ubuntu-latest }}
       run: |
         if [ ${{ matrix.code-cov }} ]; then codecov='--cov=openml --long  --cov-report=xml'; fi
         pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv $codecov --reruns 5 --reruns-delay 1
+    - name: Run tests on Windows
+      if: ${{ matrix.os == windows-latest }}
+      run: |  # we need a separate step because of the bash-specific if-statement in the previous one.
+        pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv --reruns 5 --reruns-delay 1
     - name: Check for files left behind by test
       if: ${{ always() }}
       run: |
