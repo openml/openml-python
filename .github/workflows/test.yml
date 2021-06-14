@@ -55,12 +55,12 @@ jobs:
       run: |
         echo "::set-output name=BEFORE::$(git status --porcelain -b)"
     - name: Run tests on Ubuntu
-      if: ${{ matrix.os == ubuntu-latest }}
+      if: false #  matrix.os == 'ubuntu-latest' temporarily disable ubuntu tests to free capacity for windows tests during development
       run: |
         if [ ${{ matrix.code-cov }} ]; then codecov='--cov=openml --long  --cov-report=xml'; fi
         pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv $codecov --reruns 5 --reruns-delay 1
     - name: Run tests on Windows
-      if: ${{ matrix.os == windows-latest }}
+      if: matrix.os == 'windows-latest'
       run: |  # we need a separate step because of the bash-specific if-statement in the previous one.
         pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv --reruns 5 --reruns-delay 1
     - name: Check for files left behind by test
