@@ -6,6 +6,12 @@
 Changelog
 =========
 
+0.13.0
+~~~~~~
+
+ * MAIN#1088: Do CI for Windows on Github Actions instead of Appveyor.
+
+
 0.12.2
 ~~~~~~
 
