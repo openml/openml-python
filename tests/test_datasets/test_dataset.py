@@ -147,12 +147,12 @@ class OpenMLDatasetTest(TestBase):
         # test to check that we are converting properly True and False even
         # with some inconsistency when dumping the data on openml
         data, _, _, _ = self.jm1.get_data()
-        self.assertTrue(data["defects"].dtype.name == "category")
-        self.assertTrue(set(data["defects"].cat.categories) == {True, False})
+        self.assertEquals(data["defects"].dtype.name, "category")
+        self.assertEquals(data["defects"].cat.categories.to_list(), ["false", "true"])
 
         data, _, _, _ = self.pc4.get_data()
-        self.assertTrue(data["c"].dtype.name == "category")
-        self.assertTrue(set(data["c"].cat.categories) == {True, False})
+        self.assertEquals(data["c"].dtype.name, "category")
+        self.assertEquals(data["c"].cat.categories.to_list(), ["FALSE", "TRUE"])
 
     def test_get_data_no_str_data_for_nparrays(self):
         # check that an error is raised when the dataset contains string
