@@ -414,17 +414,7 @@ class OpenMLDataset(OpenMLBase):
             if isinstance(type_, list):
                 categorical.append(True)
                 categories_names[name] = type_
-                if len(type_) == 2:
-                    type_norm = [cat.lower().capitalize() for cat in type_]
-                    if set(["True", "False"]) == set(type_norm):
-                        categories_names[name] = [
-                            True if cat == "True" else False for cat in type_norm
-                        ]
-                        attribute_dtype[name] = "boolean"
-                    else:
-                        attribute_dtype[name] = "categorical"
-                else:
-                    attribute_dtype[name] = "categorical"
+                attribute_dtype[name] = "categorical"
             else:
                 categorical.append(False)
                 attribute_dtype[name] = ARFF_DTYPES_TO_PD_DTYPE[type_]
