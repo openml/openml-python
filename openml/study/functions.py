@@ -177,9 +177,9 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
 def create_study(
     name: str,
     description: str,
-    run_ids: List[int],
-    alias: Optional[str],
-    benchmark_suite: Optional[int],
+    run_ids: Optional[List[int]] = None,
+    alias: Optional[str] = None,
+    benchmark_suite: Optional[int] = None,
 ) -> OpenMLStudy:
     """
     Creates an OpenML study (collection of data, tasks, flows, setups and run),
@@ -188,16 +188,19 @@ def create_study(
 
     Parameters
     ----------
-    alias : str (optional)
-        a string ID, unique on server (url-friendly)
     benchmark_suite : int (optional)
         the benchmark suite (another study) upon which this study is ran.
     name : str
         the name of the study (meta-info)
     description : str
         brief description (meta-info)
-    run_ids : list
-        a list of run ids associated with this study
+    run_ids : list, optional
+        a list of run ids associated with this study,
+        these can also be added later with ``attach_to_study``.
+    alias : str (optional)
+        a string ID, unique on server (url-friendly)
+    benchmark_suite: int (optional)
+        the ID of the suite for which this study contains run results
 
     Returns
     -------
@@ -223,7 +226,7 @@ def create_study(
 
 
 def create_benchmark_suite(
-    name: str, description: str, task_ids: List[int], alias: Optional[str],
+    name: str, description: str, task_ids: List[int], alias: Optional[str] = None,
 ) -> OpenMLBenchmarkSuite:
     """
     Creates an OpenML benchmark suite (collection of entity types, where
@@ -231,14 +234,15 @@ def create_benchmark_suite(
 
     Parameters
     ----------
-    alias : str (optional)
-        a string ID, unique on server (url-friendly)
     name : str
         the name of the study (meta-info)
     description : str
         brief description (meta-info)
     task_ids : list
         a list of task ids associated with this study
+        more can be added later with ``attach_to_suite``.
+    alias : str (optional)
+        a string ID, unique on server (url-friendly)
 
     Returns
     -------
