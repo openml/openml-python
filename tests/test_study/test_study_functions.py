@@ -132,7 +132,7 @@ class TestStudyFunctions(TestBase):
         self.assertGreater(study.id, 0)
         study_downloaded = openml.study.get_study(study.id)
         self.assertEqual(study_downloaded.main_entity_type, "run")
-        self.assertListEqual(study_downloaded.runs, [])
+        self.assertIsNone(study_downloaded.runs)
         openml.study.delete_study(study.id)
 
     def test_publish_empty_study_explicit(self):
@@ -241,7 +241,7 @@ class TestStudyFunctions(TestBase):
 
     def test_study_list(self):
         study_list = openml.study.list_studies(status="in_preparation")
-        # might fail if server is recently resetted
+        # might fail if server is recently reset
         self.assertGreaterEqual(len(study_list), 2)
 
     def test_study_list_output_format(self):
