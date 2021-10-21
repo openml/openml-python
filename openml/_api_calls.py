@@ -242,6 +242,7 @@ def _send_request(request_method, url, data, files=None, md5_checksum=None):
                     )
                 break
             except (
+                requests.exceptions.ChunkedEncodingError,
                 requests.exceptions.ConnectionError,
                 requests.exceptions.SSLError,
                 OpenMLServerException,
