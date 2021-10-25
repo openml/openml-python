@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use this software in a publication, please cite the metadata from preferred-citation."
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Feurer"
+    given-names: "Matthias"
+    alias: "mfeurer"
+  - family-names: "van Rijn"
+    given-names: "Jan N."
+    orcid: "https://orcid.org/0000-0003-2898-2168"
+  - family-names: "Kadra"
+    given-names: "Arlind"
+  - family-names: "Gijsbers"
+    given-names: "Pieter"
+    orcid: "https://orcid.org/0000-0001-7346-8075"
+  - family-names: "Mallik"
+    given-names: "Neeratyoy"
+    orcid: "https://orcid.org/0000-0002-0598-1608"
+  - family-names: "Ravi"
+    given-names: "Sahithya"
+  - family-names: "Müller"
+    given-names: "Andreas"
+  - family-names: "Vanschoren"
+    given-names: "Joaquin"
+    orcid: "https://orcid.org/0000-0001-7044-9805"
+  - family-names: "Hutter"
+    given-names: "Frank"
+  journal: "Journal of Machine Learning Research"
+  title: "OpenML-Python: an extensible Python API for OpenML"
+  abstract: "OpenML is an online platform for open science collaboration in machine learning, used to share datasets and results of machine learning experiments. In this paper, we introduce OpenML-Python, a client API for Python, which opens up the OpenML platform for a wide range of Python-based machine learning tools. It provides easy access to all datasets, tasks and experiments on OpenML from within Python. It also provides functionality to conduct machine learning experiments, upload the results to OpenML, and reproduce results which are stored on OpenML. Furthermore, it comes with a scikit-learn extension and an extension mechanism to easily integrate other machine learning libraries written in Python into the OpenML ecosystem. Source code and documentation are available at https://github.com/openml/openml-python/."
+  volume: 22
+  year: 2021
+  url: https://jmlr.org/papers/v22/19-920.html
