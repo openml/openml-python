@@ -31,4 +31,8 @@ preferred-citation:
   abstract: "OpenML is an online platform for open science collaboration in machine learning, used to share datasets and results of machine learning experiments. In this paper, we introduce OpenML-Python, a client API for Python, which opens up the OpenML platform for a wide range of Python-based machine learning tools. It provides easy access to all datasets, tasks and experiments on OpenML from within Python. It also provides functionality to conduct machine learning experiments, upload the results to OpenML, and reproduce results which are stored on OpenML. Furthermore, it comes with a scikit-learn extension and an extension mechanism to easily integrate other machine learning libraries written in Python into the OpenML ecosystem. Source code and documentation are available at https://github.com/openml/openml-python/."
   volume: 22
   year: 2021
+  start: 1
+  end: 5
+  pages: 5
+  number: 100
   url: https://jmlr.org/papers/v22/19-920.html
