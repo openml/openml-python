@@ -428,10 +428,7 @@ def get_dataset(
 
         arff_file = _get_dataset_arff(description) if download_data else None
         if "oml:minio_url" in description and download_data:
-            try:
-                parquet_file = _get_dataset_parquet(description)
-            except urllib3.exceptions.MaxRetryError:
-                parquet_file = None
+            parquet_file = _get_dataset_parquet(description)
         else:
             parquet_file = None
         remove_dataset_cache = False
@@ -1003,7 +1000,8 @@ def _get_dataset_parquet(
             openml._api_calls._download_minio_file(
                 source=cast(str, url), destination=output_file_path
             )
-        except FileNotFoundError:
+        except (FileNotFoundError, urllib3.exceptions.MaxRetryError) as e:
+            logger.warning("Could not download file from %s: %s" % (cast(str, url), e))
             return None
     return output_file_path
 
