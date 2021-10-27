@@ -80,7 +80,7 @@ Exercise 0
 
  .. code-block:: none
 
-    First 10 of 3407 datasets...
+    First 10 of 3449 datasets...
 
 
 .. raw:: html
@@ -695,9 +695,10 @@ Exercise 2
 
 
 
-.. image:: /examples/30_extended/images/sphx_glr_datasets_tutorial_001.png
-    :alt: datasets tutorial
-    :class: sphx-glr-single-img
+.. image-sg:: /examples/30_extended/images/sphx_glr_datasets_tutorial_001.png
+   :alt: datasets tutorial
+   :srcset: /examples/30_extended/images/sphx_glr_datasets_tutorial_001.png
+   :class: sphx-glr-single-img
 
 
 
@@ -839,8 +840,8 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
  .. code-block:: none
 
-    99533
-    Forked dataset ID: 99533
+    197
+    Forked dataset ID: 197
 
 
 
@@ -848,7 +849,7 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  14.419 seconds)
+   **Total running time of the script:** ( 0 minutes  10.365 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:

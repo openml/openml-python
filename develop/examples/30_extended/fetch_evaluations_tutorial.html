@@ -9,10 +9,10 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
@@ -23,9 +23,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -236,11 +236,11 @@ Note that we now filter the evaluations based on another parameter ‘task’.</
 
 Displaying head of sorted dataframe:
         run_id  task_id  setup_id  ...     value values  array_data
-2780  10279797   167140   8166877  ...  0.968613   None        None
-2781  10279798   167140   8166877  ...  0.968613   None        None
-2238  10232158   167140   8157180  ...  0.967671   None        None
-2255  10232987   167140   8157961  ...  0.967671   None        None
-2845  10291679   167140   8157545  ...  0.967043   None        None
+2788  10279797   167140   8166877  ...  0.968613   None        None
+2789  10279798   167140   8166877  ...  0.968613   None        None
+2246  10232158   167140   8157180  ...  0.967671   None        None
+2263  10232987   167140   8157961  ...  0.967671   None        None
+2314  10271558   167140   8154506  ...  0.967043   None        None
 
 [5 rows x 14 columns]
 </pre></div>
@@ -277,8 +277,7 @@ We shall now plot a cumulative distributive function (CDF) for the accuracies ob
 <span class="c1"># with non-zero probability. While the maximum accuracy seen till now is 96.5%.</span>
 </pre></div>
 </div>
-<img alt="CDF" class="sphx-glr-single-img" src="../../_images/sphx_glr_fetch_evaluations_tutorial_001.png" />
-</section>
+<img src="../../_images/sphx_glr_fetch_evaluations_tutorial_001.png" srcset="../../_images/sphx_glr_fetch_evaluations_tutorial_001.png" alt="CDF" class = "sphx-glr-single-img"/></section>
 <section id="comparing-top-10-performing-flows">
 <h2>Comparing top 10 performing flows<a class="headerlink" href="#comparing-top-10-performing-flows" title="Permalink to this headline">¶</a></h2>
 <p>Let us now try to see which flows generally performed the best for this task.
@@ -329,18 +328,17 @@ For this, we shall compare the top performing flows.</p>
     <span class="nb">print</span><span class="p">((</span><span class="n">flow_ids</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">flow_names</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
 </pre></div>
 </div>
-<img alt="Boxplot comparing predictive_accuracy for different flows" class="sphx-glr-single-img" src="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" />
-<p class="sphx-glr-script-out">Out:</p>
+<img src="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" srcset="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" alt="Boxplot comparing predictive_accuracy for different flows" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(12736, &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)&#39;)
-(8353, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
 (8399, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)&#39;)
+(8353, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
 (12127, &#39;sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)&#39;)
 (16347, &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,onehotencoder=sklearn.preprocessing._encoders.OneHotEncoder,svc=sklearn.svm.classes.SVC)(1)&#39;)
-(8317, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
 (17373, &#39;sklearn.model_selection._search_successive_halving.HalvingRandomSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(4)&#39;)
+(8317, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
 (17369, &#39;sklearn.model_selection._search_successive_halving.HalvingRandomSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(3)&#39;)
-(17371, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(3)&#39;)
 (17374, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(4)&#39;)
+(17371, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(3)&#39;)
 </pre></div>
 </div>
 <section id="obtaining-evaluations-with-hyperparameter-settings">
@@ -395,7 +393,7 @@ For this, we shall compare the top performing flows.</p>
 &#39;&#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.123 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  16.899 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-fetch-evaluations-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ae7e73aff29ef9ace1e17781346a204b/fetch_evaluations_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_evaluations_tutorial.py</span></code></a></p>
@@ -422,7 +420,7 @@ For this, we shall compare the top performing flows.</p>
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br/>
     </p>
   </div>
 </footer>

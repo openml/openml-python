@@ -9,10 +9,10 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
@@ -23,9 +23,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -184,7 +184,7 @@ to have better visualization capabilities and easier access:</p>
        &#39;NumberOfMissingValues&#39;, &#39;NumberOfNumericFeatures&#39;,
        &#39;NumberOfSymbolicFeatures&#39;, &#39;cost_matrix&#39;],
       dtype=&#39;object&#39;)
-First 5 of 3725 tasks:
+First 5 of 3741 tasks:
    tid  ... cost_matrix
 2    2  ...         NaN
 3    3  ...         NaN
@@ -210,7 +210,7 @@ First 5 of 3725 tasks:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 232, 241, 245, 259, 267, 271, 279, 283, 1766, 1775, 1779, 1793, 1801, 1805, 1813, 1817, 1882, 1891, 1895, 1909, 1917, 1921, 1929, 1933, 1945, 1952, 1956, 1967, 1973, 1977, 1983, 1987, 2079, 2125, 2944, 3022, 3034, 3047, 3049, 3053, 3054, 3055, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 4189, 4191, 4197, 4198, 4199, 4217, 4223, 4225, 4226, 4234, 4240, 4254, 4265, 4266, 4288, 4328, 4341, 4345, 4365, 4395, 4396, 4397, 4409, 4411, 4423, 4499, 4508, 4515, 4517, 4518, 4519, 4522, 4538, 4557, 4558, 4562, 4565, 4572, 4582, 4584, 4591, 4618, 4676, 4684, 4697, 4704, 7286, 7307, 7543, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 12738, 12739, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146574, 146576, 146577, 146578, 146583, 146587, 146588, 146593, 146596, 146597, 146600, 146818, 146819, 166859, 166875, 166882, 166884, 166893, 166905, 166906, 166907, 166913, 166915, 166919, 166947, 166953, 166956, 166957, 166958, 166959, 166960, 166967, 166976, 166977, 166978, 166980, 166983, 166988, 166989, 166992, 167016, 167020, 167031, 167037, 167062, 167067, 167068, 167095, 167096, 167100, 167104, 167106, 167151, 167154, 167160, 167163, 167167, 167168, 167171, 167173, 167174, 167175, 167180, 167184, 167187, 167194, 167198, 168300, 168783, 168819, 168820, 168821, 168822, 168823, 168824, 168825, 168907, 189786, 189859, 189899, 189900, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233090, 233094, 233109, 233115, 233171, 233206, 359953, 359954, 359955, 360857, 360865, 360868, 360869]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 232, 241, 245, 259, 267, 271, 279, 283, 1766, 1775, 1779, 1793, 1801, 1805, 1813, 1817, 1882, 1891, 1895, 1909, 1917, 1921, 1929, 1933, 1945, 1952, 1956, 1967, 1973, 1977, 1983, 1987, 2079, 2125, 2944, 3022, 3034, 3047, 3049, 3053, 3054, 3055, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 4189, 4191, 4197, 4198, 4199, 4217, 4223, 4225, 4226, 4234, 4240, 4254, 4265, 4266, 4288, 4328, 4341, 4345, 4365, 4395, 4396, 4397, 4409, 4411, 4423, 4499, 4508, 4515, 4517, 4518, 4519, 4522, 4538, 4557, 4558, 4562, 4565, 4572, 4582, 4584, 4591, 4618, 4676, 4684, 4697, 4704, 7286, 7307, 7543, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 12738, 12739, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146574, 146576, 146577, 146578, 146583, 146587, 146588, 146593, 146596, 146597, 146600, 146818, 146819, 166859, 166875, 166882, 166884, 166893, 166905, 166906, 166907, 166913, 166915, 166919, 166947, 166953, 166956, 166957, 166958, 166959, 166960, 166967, 166976, 166977, 166978, 166980, 166983, 166988, 166989, 166992, 167016, 167020, 167031, 167037, 167062, 167067, 167068, 167095, 167096, 167100, 167104, 167106, 167151, 167154, 167160, 167163, 167167, 167168, 167171, 167173, 167174, 167175, 167180, 167184, 167187, 167194, 167198, 168300, 168783, 168819, 168820, 168821, 168822, 168823, 168824, 168825, 168907, 189786, 189859, 189899, 189900, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233090, 233094, 233109, 233115, 233171, 233206, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
@@ -218,7 +218,7 @@ First 5 of 3725 tasks:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>292
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>295
 </pre></div>
 </div>
 <p>Then, we can further restrict the tasks to all have the same resampling strategy:</p>
@@ -227,7 +227,7 @@ First 5 of 3725 tasks:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 2079, 3022, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 7286, 7307, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146818, 146819, 168300, 168907, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233171, 359953, 359954, 359955, 360857, 360865, 360868, 360869]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 2079, 3022, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 7286, 7307, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146818, 146819, 168300, 168907, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233171, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
@@ -235,7 +235,7 @@ First 5 of 3725 tasks:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>121
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>124
 </pre></div>
 </div>
 <p>Resampling strategies can be found on the
@@ -310,7 +310,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>46370
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>46498
 </pre></div>
 </div>
 <section id="exercise">
@@ -773,7 +773,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>11918</th>
+      <th>11920</th>
       <td>146761</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -804,7 +804,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>13203</th>
+      <th>13205</th>
       <td>148117</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -835,7 +835,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>17301</th>
+      <th>17310</th>
       <td>170139</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -866,7 +866,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>20744</th>
+      <th>20761</th>
       <td>191646</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -897,7 +897,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>24418</th>
+      <th>24447</th>
       <td>213320</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -928,7 +928,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>27619</th>
+      <th>27656</th>
       <td>234435</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -959,7 +959,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>31935</th>
+      <th>31980</th>
       <td>256739</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -990,7 +990,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>31945</th>
+      <th>31990</th>
       <td>256750</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1021,7 +1021,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>37108</th>
+      <th>37168</th>
       <td>297708</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1052,7 +1052,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>40306</th>
+      <th>40373</th>
       <td>318835</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1083,7 +1083,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>43527</th>
+      <th>43601</th>
       <td>339990</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1239,16 +1239,12 @@ will be returned.</p>
 <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task already exists. Task ID is 1317
-</pre></div>
-</div>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.openml.org/search?type=task_type">Complete list of task types</a>.</p></li>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&amp;type=measure">Complete list of model estimation procedures</a>.</p></li>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=measure_type%3Aevaluation_measure&amp;type=measure">Complete list of evaluation measures</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  58.686 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  53.295 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-tasks-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e6648ddbb54e75b09dd01d69be33f340/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></p>
@@ -1275,7 +1271,7 @@ will be returned.</p>
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br/>
     </p>
   </div>
 </footer>

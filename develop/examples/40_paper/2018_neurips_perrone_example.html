@@ -9,10 +9,10 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
@@ -23,9 +23,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -288,17 +288,17 @@ pre-processing all retrieved evaluations.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                    cost degree               gamma      kernel
-2732     7.0469227707489    NaN    21.8471653863537         NaN
-881   0.0107540826315643    NaN                 NaN      linear
-3325    236.807644727628      4                 NaN  polynomial
-2621    12.3831933276594    NaN  0.0730779459113245         NaN
-3024    2.42989248743007    NaN  0.0184294858515533         NaN
-Y :  2732    0.625805
-881     0.954889
-3325    0.480309
-2621    0.714398
-3024    0.685255
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                    cost degree              gamma      kernel
+593   0.0259966363220684    NaN  0.118031408772225         NaN
+1302    10.4016514699745    NaN                NaN      linear
+1756   0.599598527996022      2                NaN  polynomial
+903     0.41976153945837    NaN                NaN      linear
+2843  0.0125495464456375    NaN                NaN      linear
+Y :  593     0.600338
+1302    0.906957
+1756    0.822636
+903     0.979428
+2843    0.720140
 Name: value, dtype: float64
 </pre></div>
 </div>
@@ -345,7 +345,7 @@ time simple and quick.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 1.5201e-05
+Training RMSE : 1.7515e-05
 </pre></div>
 </div>
 </section>
@@ -380,17 +380,17 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
-0    479.017850  3.494611  291.678238     sigmoid
-1    414.287730  4.034137  787.602880     sigmoid
-2    837.752889  3.935513  311.445902      linear
-3    813.648845  3.813139  595.081185     sigmoid
-4    548.522780  4.000094  720.162157      linear
+0    625.557705  2.074493  374.259959      radial
+1     93.695458  4.811090  102.719133      radial
+2    501.250314  4.640792  867.860230      linear
+3    515.393318  3.057889  726.312635      linear
+4     77.033680  2.301383  623.296986      linear
 ..          ...       ...         ...         ...
-995  234.104300  2.050860  197.016339  polynomial
-996   85.533828  4.770097  893.800845      radial
-997  564.676691  2.832728   46.747663      linear
-998  302.419041  2.670130  460.877781     sigmoid
-999  129.200798  2.700158  227.679225  polynomial
+995  177.032447  2.295636  620.059300  polynomial
+996  473.538157  2.772552  710.775377      linear
+997  677.488396  4.214868  835.250786      radial
+998  502.649784  4.758664  658.621115      radial
+999  248.923955  4.045365   58.808064  polynomial
 
 [1000 rows x 4 columns]
 </pre></div>
@@ -409,12 +409,11 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Regret&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="AUC regret for Random Search on surrogate" class="sphx-glr-single-img" src="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" />
-<p class="sphx-glr-script-out">Out:</p>
+<img src="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" srcset="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" alt="AUC regret for Random Search on surrogate" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(33.972222222222214, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  23.961 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  24.621 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
@@ -441,7 +440,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
     </p>
     <p>
         &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br/>
     </p>
   </div>
 </footer>

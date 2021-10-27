@@ -204,9 +204,10 @@ Option 1 - plotting via the pandas helper functions
 
 
 
-.. image:: /examples/30_extended/images/sphx_glr_plot_svm_hyperparameters_tutorial_001.png
-    :alt: SVM performance landscape
-    :class: sphx-glr-single-img
+.. image-sg:: /examples/30_extended/images/sphx_glr_plot_svm_hyperparameters_tutorial_001.png
+   :alt: SVM performance landscape
+   :srcset: /examples/30_extended/images/sphx_glr_plot_svm_hyperparameters_tutorial_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -255,9 +256,10 @@ Option 2 - plotting via matplotlib
 
 
 
-.. image:: /examples/30_extended/images/sphx_glr_plot_svm_hyperparameters_tutorial_002.png
-    :alt: SVM performance landscape
-    :class: sphx-glr-single-img
+.. image-sg:: /examples/30_extended/images/sphx_glr_plot_svm_hyperparameters_tutorial_002.png
+   :alt: SVM performance landscape
+   :srcset: /examples/30_extended/images/sphx_glr_plot_svm_hyperparameters_tutorial_002.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -274,7 +276,7 @@ Option 2 - plotting via matplotlib
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  8.511 seconds)
+   **Total running time of the script:** ( 0 minutes  8.295 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_plot_svm_hyperparameters_tutorial.py:

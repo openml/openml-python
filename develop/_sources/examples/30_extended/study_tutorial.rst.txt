@@ -80,12 +80,12 @@ Listing studies
     2    2   Study_2              run  ...  in_preparation  2015-10-20 15:28:44       2
     3    3   Study_3              run  ...  in_preparation  2015-10-20 15:34:39       2
     5    5   Study_5              run  ...  in_preparation  2015-11-19 11:20:33     749
-    6    6   Study_6              run  ...  in_preparation  2015-12-04 08:20:14     735
     7    7   Study_7              run  ...  in_preparation  2016-01-06 17:49:36      64
     8    8   Study_8              run  ...  in_preparation  2016-03-13 13:38:31    1135
-    9    9   Study_9              run  ...  in_preparation  2016-03-14 13:38:15     507
     10  10  Study_10              run  ...  in_preparation  2016-03-16 12:16:08     507
     11  11  Study_11              run  ...  in_preparation  2016-03-22 16:48:06       1
+    12  12  Study_12              run  ...  in_preparation  2016-03-31 15:05:45    1195
+    13  13  Study_13              run  ...  in_preparation  2016-04-05 13:57:41      62
 
     [10 rows x 7 columns]
 
@@ -311,11 +311,11 @@ suite which is available on the OpenML test server.
     True
     OpenML Study
     ============
-    ID..............: 16863
+    ID..............: 3
     Name............: Test-Study
     Status..........: None
     Main Entity Type: run
-    Study URL.......: https://test.openml.org/s/16863
+    Study URL.......: https://test.openml.org/s/3
     # of Runs.......: 3
 
 
@@ -336,7 +336,7 @@ suite which is available on the OpenML test server.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  39.545 seconds)
+   **Total running time of the script:** ( 0 minutes  27.378 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_study_tutorial.py:

@@ -130,9 +130,10 @@ makes the s-plot
 
 
 
-.. image:: /examples/40_paper/images/sphx_glr_2018_ida_strang_example_001.png
-    :alt: SVM
-    :class: sphx-glr-single-img
+.. image-sg:: /examples/40_paper/images/sphx_glr_2018_ida_strang_example_001.png
+   :alt: SVM
+   :srcset: /examples/40_paper/images/sphx_glr_2018_ida_strang_example_001.png
+   :class: sphx-glr-single-img
 
 
 
@@ -178,9 +179,10 @@ needed for the scatter plot
 
 
 
-.. image:: /examples/40_paper/images/sphx_glr_2018_ida_strang_example_002.png
-    :alt: SVM
-    :class: sphx-glr-single-img
+.. image-sg:: /examples/40_paper/images/sphx_glr_2018_ida_strang_example_002.png
+   :alt: SVM
+   :srcset: /examples/40_paper/images/sphx_glr_2018_ida_strang_example_002.png
+   :class: sphx-glr-single-img
 
 
 
@@ -208,9 +210,10 @@ two algorithms on various axis (not in the paper)
 
 
 
-.. image:: /examples/40_paper/images/sphx_glr_2018_ida_strang_example_003.png
-    :alt: 2018 ida strang example
-    :class: sphx-glr-single-img
+.. image-sg:: /examples/40_paper/images/sphx_glr_2018_ida_strang_example_003.png
+   :alt: 2018 ida strang example
+   :srcset: /examples/40_paper/images/sphx_glr_2018_ida_strang_example_003.png
+   :class: sphx-glr-single-img
 
 
 
@@ -219,7 +222,7 @@ two algorithms on various axis (not in the paper)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.935 seconds)
+   **Total running time of the script:** ( 0 minutes  2.156 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_ida_strang_example.py:
