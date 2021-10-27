@@ -133,7 +133,6 @@ class TestStudyFunctions(TestBase):
         study_downloaded = openml.study.get_study(study.id)
         self.assertEqual(study_downloaded.main_entity_type, "run")
         self.assertIsNone(study_downloaded.runs)
-        openml.study.delete_study(study.id)
 
     def test_publish_empty_study_explicit(self):
         self._test_publish_empty_study_is_allowed(explicit=True)
