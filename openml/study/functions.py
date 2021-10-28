@@ -3,7 +3,6 @@
 from typing import cast, Dict, List, Optional, Union
 import warnings
 
-import dateutil.parser
 import xmltodict
 import pandas as pd
 
@@ -94,7 +93,6 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
     description = result_dict["oml:description"]
     status = result_dict["oml:status"]
     creation_date = result_dict["oml:creation_date"]
-    creation_date_as_date = dateutil.parser.parse(creation_date)
     creator = result_dict["oml:creator"]
 
     # tags is legacy. remove once no longer needed.
@@ -106,35 +104,18 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
                 current_tag["window_start"] = tag["oml:window_start"]
             tags.append(current_tag)
 
-    if "oml:data" in result_dict:
-        datasets = [int(x) for x in result_dict["oml:data"]["oml:data_id"]]
-    else:
-        raise ValueError("No datasets attached to study {}!".format(id_))
-    if "oml:tasks" in result_dict:
-        tasks = [int(x) for x in result_dict["oml:tasks"]["oml:task_id"]]
-    else:
-        raise ValueError("No tasks attached to study {}!".format(id_))
+    def get_nested_ids_from_result_dict(key: str, subkey: str) -> Optional[List]:
+        if result_dict.get(key) is not None:
+            return [int(oml_id) for oml_id in result_dict[key][subkey]]
+        return None
+
+    datasets = get_nested_ids_from_result_dict("oml:data", "oml:data_id")
+    tasks = get_nested_ids_from_result_dict("oml:tasks", "oml:task_id")
 
     if main_entity_type in ["runs", "run"]:
-
-        if "oml:flows" in result_dict:
-            flows = [int(x) for x in result_dict["oml:flows"]["oml:flow_id"]]
-        else:
-            raise ValueError("No flows attached to study {}!".format(id_))
-        if "oml:setups" in result_dict:
-            setups = [int(x) for x in result_dict["oml:setups"]["oml:setup_id"]]
-        else:
-            raise ValueError("No setups attached to study {}!".format(id_))
-        if "oml:runs" in result_dict:
-            runs = [
-                int(x) for x in result_dict["oml:runs"]["oml:run_id"]
-            ]  # type: Optional[List[int]]
-        else:
-            if creation_date_as_date < dateutil.parser.parse("2019-01-01"):
-                # Legacy studies did not require runs
-                runs = None
-            else:
-                raise ValueError("No runs attached to study {}!".format(id_))
+        flows = get_nested_ids_from_result_dict("oml:flows", "oml:flow_id")
+        setups = get_nested_ids_from_result_dict("oml:setups", "oml:setup_id")
+        runs = get_nested_ids_from_result_dict("oml:runs", "oml:run_id")
 
         study = OpenMLStudy(
             study_id=study_id,
@@ -177,9 +158,9 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
 def create_study(
     name: str,
     description: str,
-    run_ids: List[int],
-    alias: Optional[str],
-    benchmark_suite: Optional[int],
+    run_ids: Optional[List[int]] = None,
+    alias: Optional[str] = None,
+    benchmark_suite: Optional[int] = None,
 ) -> OpenMLStudy:
     """
     Creates an OpenML study (collection of data, tasks, flows, setups and run),
@@ -188,16 +169,19 @@ def create_study(
 
     Parameters
     ----------
-    alias : str (optional)
-        a string ID, unique on server (url-friendly)
     benchmark_suite : int (optional)
         the benchmark suite (another study) upon which this study is ran.
     name : str
         the name of the study (meta-info)
     description : str
         brief description (meta-info)
-    run_ids : list
-        a list of run ids associated with this study
+    run_ids : list, optional
+        a list of run ids associated with this study,
+        these can also be added later with ``attach_to_study``.
+    alias : str (optional)
+        a string ID, unique on server (url-friendly)
+    benchmark_suite: int (optional)
+        the ID of the suite for which this study contains run results
 
     Returns
     -------
@@ -217,13 +201,13 @@ def create_study(
         data=None,
         tasks=None,
         flows=None,
-        runs=run_ids,
+        runs=run_ids if run_ids != [] else None,
         setups=None,
     )
 
 
 def create_benchmark_suite(
-    name: str, description: str, task_ids: List[int], alias: Optional[str],
+    name: str, description: str, task_ids: List[int], alias: Optional[str] = None,
 ) -> OpenMLBenchmarkSuite:
     """
     Creates an OpenML benchmark suite (collection of entity types, where
@@ -231,14 +215,15 @@ def create_benchmark_suite(
 
     Parameters
     ----------
-    alias : str (optional)
-        a string ID, unique on server (url-friendly)
     name : str
         the name of the study (meta-info)
     description : str
         brief description (meta-info)
     task_ids : list
         a list of task ids associated with this study
+        more can be added later with ``attach_to_suite``.
+    alias : str (optional)
+        a string ID, unique on server (url-friendly)
 
     Returns
     -------

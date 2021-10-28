@@ -1,4 +1,5 @@
 # License: BSD 3-Clause
+from typing import Optional, List
 
 import openml
 import openml.study
@@ -114,6 +115,31 @@ class TestStudyFunctions(TestBase):
         self.assertEqual(study_downloaded.status, "deactivated")
         # can't delete study, now it's not longer in preparation
 
+    def _test_publish_empty_study_is_allowed(self, explicit: bool):
+        runs: Optional[List[int]] = [] if explicit else None
+        kind = "explicit" if explicit else "implicit"
+
+        study = openml.study.create_study(
+            name=f"empty-study-{kind}",
+            description=f"a study with no runs attached {kind}ly",
+            run_ids=runs,
+        )
+
+        study.publish()
+        TestBase._mark_entity_for_removal("study", study.id)
+        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], study.id))
+
+        self.assertGreater(study.id, 0)
+        study_downloaded = openml.study.get_study(study.id)
+        self.assertEqual(study_downloaded.main_entity_type, "run")
+        self.assertIsNone(study_downloaded.runs)
+
+    def test_publish_empty_study_explicit(self):
+        self._test_publish_empty_study_is_allowed(explicit=True)
+
+    def test_publish_empty_study_implicit(self):
+        self._test_publish_empty_study_is_allowed(explicit=False)
+
     @pytest.mark.flaky()
     def test_publish_study(self):
         # get some random runs to attach
@@ -214,7 +240,7 @@ class TestStudyFunctions(TestBase):
 
     def test_study_list(self):
         study_list = openml.study.list_studies(status="in_preparation")
-        # might fail if server is recently resetted
+        # might fail if server is recently reset
         self.assertGreaterEqual(len(study_list), 2)
 
     def test_study_list_output_format(self):
