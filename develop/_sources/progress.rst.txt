@@ -8,7 +8,7 @@ Changelog
 
 0.13.0
 ~~~~~~
-
+ * FIX#1110: Make arguments to ``create_study`` and ``create_suite`` that are defined as optional by the OpenML XSD actually optional.
  * MAIN#1088: Do CI for Windows on Github Actions instead of Appveyor.
 
 
