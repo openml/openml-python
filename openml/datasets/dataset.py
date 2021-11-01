@@ -544,13 +544,13 @@ class OpenMLDataset(OpenMLBase):
                     data, categorical, attribute_names = pickle.load(fh)
         except FileNotFoundError:
             raise ValueError(f"Cannot find file for dataset {self.name} at location '{fpath}'.")
-        except (EOFError, ModuleNotFoundError, ValueError) as e:
+        except (EOFError, ModuleNotFoundError, ValueError, AttributeError) as e:
             error_message = e.message if hasattr(e, "message") else e.args[0]
             hint = ""
 
             if isinstance(e, EOFError):
                 readable_error = "Detected a corrupt cache file"
-            elif isinstance(e, ModuleNotFoundError):
+            elif isinstance(e, (ModuleNotFoundError, AttributeError)):
                 readable_error = "Detected likely dependency issues"
                 hint = "This is most likely due to https://github.com/openml/openml-python/issues/918. "  # noqa: 501
             elif isinstance(e, ValueError) and "unsupported pickle protocol" in e.args[0]:
