@@ -220,7 +220,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to https://test.openml.org/r/2197
+    Uploaded to https://test.openml.org/r/4746
 
 
 
@@ -363,8 +363,8 @@ variables and missing values in both.
 
  .. code-block:: none
 
-    Uploaded to https://test.openml.org/r/2199
-    Uploaded to https://test.openml.org/r/2200
+    Uploaded to https://test.openml.org/r/4750
+    Uploaded to https://test.openml.org/r/4752
 
 
 
@@ -417,8 +417,8 @@ a model on a task without uploading results or flows to the server immediately.
     ==========
     Uploader Name: None
     Metric.......: None
-    Run ID.......: 2201
-    Run URL......: https://test.openml.org/r/2201
+    Run ID.......: 4753
+    Run URL......: https://test.openml.org/r/4753
     Task ID......: 6
     Task Type....: None
     Task URL.....: https://test.openml.org/t/6
@@ -507,7 +507,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: https://test.openml.org/r/2203
+    kNN on diabetes: https://test.openml.org/r/4754
 
 
 
@@ -527,7 +527,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  21.285 seconds)
+   **Total running time of the script:** ( 0 minutes  29.147 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:
