@@ -559,7 +559,7 @@ class OpenMLDataset(OpenMLBase):
                 if isinstance(e, ModuleNotFoundError):
                     hint += "https://github.com/openml/openml-python/issues/918. "
                 elif isinstance(e, AttributeError):
-                    hint = "https://github.com/openml/openml-python/pull/1121. "
+                    hint += "https://github.com/openml/openml-python/pull/1121. "
 
             elif isinstance(e, ValueError) and "unsupported pickle protocol" in e.args[0]:
                 readable_error = "Encountered unsupported pickle protocol"
