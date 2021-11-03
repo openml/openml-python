@@ -552,7 +552,15 @@ class OpenMLDataset(OpenMLBase):
                 readable_error = "Detected a corrupt cache file"
             elif isinstance(e, (ModuleNotFoundError, AttributeError)):
                 readable_error = "Detected likely dependency issues"
-                hint = "This is most likely due to https://github.com/openml/openml-python/issues/918. "  # noqa: 501
+                hint = (
+                    "This can happen if the cache was constructed with a different pandas version "
+                    "than the one that is used to load the data. See also "
+                )
+                if isinstance(e, ModuleNotFoundError):
+                    hint += "https://github.com/openml/openml-python/issues/918. "
+                elif isinstance(e, AttributeError):
+                    hint = "https://github.com/openml/openml-python/pull/1121. "
+
             elif isinstance(e, ValueError) and "unsupported pickle protocol" in e.args[0]:
                 readable_error = "Encountered unsupported pickle protocol"
             else:
