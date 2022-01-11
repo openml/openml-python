@@ -239,7 +239,7 @@ And we can use the task listing functionality to learn more about them:
     tid                                  72.0  41849.305556  ...  42707.50  167141.0
     did                                  72.0  10472.263889  ...  10594.25   41027.0
     MajorityClassSize                    72.0   4820.166667  ...   2796.00   48658.0
-    MaxNominalAttDistinctValues          71.0      8.422535  ...     10.00      71.0
+    MaxNominalAttDistinctValues          71.0      8.718310  ...     10.00      71.0
     MinorityClassSize                    72.0   2199.777778  ...   1326.50   47662.0
     NumberOfClasses                      72.0      5.680556  ...      8.25      46.0
     NumberOfFeatures                     72.0    196.597222  ...     71.50    3073.0
@@ -330,11 +330,11 @@ because we upload some random data.
 
     OpenML Benchmark Suite
     ======================
-    ID..............: 950
+    ID..............: 1042
     Name............: Test-Suite
     Status..........: None
     Main Entity Type: task
-    Study URL.......: https://test.openml.org/s/950
+    Study URL.......: https://test.openml.org/s/1042
     # of Tasks......: 20
 
 
@@ -355,7 +355,7 @@ because we upload some random data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  43.707 seconds)
+   **Total running time of the script:** ( 0 minutes  45.774 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_suites_tutorial.py:

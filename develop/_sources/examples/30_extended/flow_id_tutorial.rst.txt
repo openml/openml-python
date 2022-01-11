@@ -114,7 +114,7 @@ Defining a classifier
 
  .. code-block:: none
 
-    22
+    14836
 
 
 
@@ -149,7 +149,7 @@ To simplify the usage we have created a helper function which automates all thes
 
  .. code-block:: none
 
-    22
+    14836
 
 
 
@@ -183,7 +183,7 @@ algorithm or implementation introduces, renames or drop hyperparameters over tim
 
  .. code-block:: none
 
-    sklearn.tree._classes.DecisionTreeClassifier openml==0.12.2,sklearn==1.0.1
+    sklearn.tree._classes.DecisionTreeClassifier openml==0.12.2,sklearn==1.0.2
 
 
 
@@ -211,7 +211,7 @@ model. We can then use them to retrieve the flow id as follows:
 
  .. code-block:: none
 
-    22
+    14836
 
 
 
@@ -237,7 +237,7 @@ We can also retrieve all flows for a given name:
 
  .. code-block:: none
 
-    [21, 22, 26, 30, 2004]
+    [21, 22, 26, 30, 2004, 14729, 14738, 14836]
 
 
 
@@ -265,7 +265,7 @@ This also works with the actual model (generalizing the first part of this examp
 
  .. code-block:: none
 
-    [21, 22, 26, 30, 2004]
+    [21, 22, 26, 30, 2004, 14729, 14738, 14836]
 
 
 
@@ -273,7 +273,7 @@ This also works with the actual model (generalizing the first part of this examp
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.249 seconds)
+   **Total running time of the script:** ( 0 minutes  10.285 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flow_id_tutorial.py:
