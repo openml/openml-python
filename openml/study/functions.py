@@ -135,7 +135,7 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
         )  # type: BaseStudy
 
     elif main_entity_type in ["tasks", "task"]:
-
+        tasks = cast("List[int]", tasks)
         study = OpenMLBenchmarkSuite(
             suite_id=study_id,
             alias=alias,
