@@ -175,6 +175,7 @@ class TestRun(TestBase):
         predictions_prime = run_prime._generate_arff_dict()
 
         self._compare_predictions(predictions, predictions_prime)
+        pd.testing.assert_frame_equal(run.predictions, run_prime.predictions)
 
     def _perform_run(
         self,
