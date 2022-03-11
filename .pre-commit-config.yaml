@@ -9,20 +9,20 @@ repos:
     hooks:
       - id: mypy
         name: mypy openml
-        files: openml/*
+        files: openml/.*
       - id: mypy
         name: mypy tests
-        files: tests/*
+        files: tests/.*
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.3
     hooks:
       - id: flake8
         name: flake8 openml
-        files: openml/*
+        files: openml/.*
         additional_dependencies:
           - flake8-print==3.1.4
       - id: flake8
         name: flake8 tests
-        files: tests/*
+        files: tests/.*
         additional_dependencies:
           - flake8-print==3.1.4
