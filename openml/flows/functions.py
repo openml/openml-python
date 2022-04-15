@@ -256,7 +256,7 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
         "flow/exists", "post", data={"name": name, "external_version": external_version},
     )
 
-    result_dict = xmltodict.parse(xml_response)
+    result_dict = xmltodict.parse(xml_response, strip_whitespace=False)
     flow_id = int(result_dict["oml:flow_exists"]["oml:id"])
     if flow_id > 0:
         return flow_id
@@ -329,7 +329,7 @@ def get_flow_id(
 def __list_flows(api_call: str, output_format: str = "dict") -> Union[Dict, pd.DataFrame]:
 
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    flows_dict = xmltodict.parse(xml_string, force_list=("oml:flow",))
+    flows_dict = xmltodict.parse(xml_string, strip_whitespace=False, force_list=("oml:flow",))
 
     # Minimalistic check if the XML is useful
     assert type(flows_dict["oml:flows"]["oml:flow"]) == list, type(flows_dict["oml:flows"])
@@ -538,4 +538,4 @@ def _create_flow_from_xml(flow_xml: str) -> OpenMLFlow:
     OpenMLFlow
     """
 
-    return OpenMLFlow._from_dict(xmltodict.parse(flow_xml))
+    return OpenMLFlow._from_dict(xmltodict.parse(flow_xml, strip_whitespace=False))

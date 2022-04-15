@@ -52,7 +52,7 @@ def list_qualities() -> List[str]:
     """
     api_call = "data/qualities/list"
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    qualities = xmltodict.parse(xml_string, force_list=("oml:quality"))
+    qualities = xmltodict.parse(xml_string, strip_whitespace=False, force_list=("oml:quality"))
     # Minimalistic check if the XML is useful
     if "oml:data_qualities_list" not in qualities:
         raise ValueError("Error in return XML, does not contain " '"oml:data_qualities_list"')
@@ -181,7 +181,7 @@ def _list_datasets(data_id: Optional[List] = None, output_format="dict", **kwarg
 def __list_datasets(api_call, output_format="dict"):
 
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    datasets_dict = xmltodict.parse(xml_string, force_list=("oml:dataset",))
+    datasets_dict = xmltodict.parse(xml_string, strip_whitespace=False, force_list=("oml:dataset",))
 
     # Minimalistic check if the XML is useful
     assert type(datasets_dict["oml:data"]["oml:dataset"]) == list, type(datasets_dict["oml:data"])
@@ -724,7 +724,7 @@ def status_update(data_id, status):
         raise ValueError("Illegal status value. " "Legal values: %s" % legal_status)
     data = {"data_id": data_id, "status": status}
     result_xml = openml._api_calls._perform_api_call("data/status/update", "post", data=data)
-    result = xmltodict.parse(result_xml)
+    result = xmltodict.parse(result_xml, strip_whitespace=False)
     server_data_id = result["oml:data_status_update"]["oml:id"]
     server_status = result["oml:data_status_update"]["oml:status"]
     if status != server_status or int(data_id) != int(server_data_id):
@@ -832,7 +832,7 @@ def edit_dataset(
     result_xml = openml._api_calls._perform_api_call(
         "data/edit", "post", data=form_data, file_elements=file_elements
     )
-    result = xmltodict.parse(result_xml)
+    result = xmltodict.parse(result_xml, strip_whitespace=False)
     data_id = result["oml:data_edit"]["oml:id"]
     return int(data_id)
 
@@ -871,7 +871,7 @@ def fork_dataset(data_id: int) -> int:
     # compose data fork parameters
     form_data = {"data_id": data_id}
     result_xml = openml._api_calls._perform_api_call("data/fork", "post", data=form_data)
-    result = xmltodict.parse(result_xml)
+    result = xmltodict.parse(result_xml, strip_whitespace=False)
     data_id = result["oml:data_fork"]["oml:id"]
     return int(data_id)
 
@@ -891,7 +891,7 @@ def _topic_add_dataset(data_id: int, topic: str):
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
     form_data = {"data_id": data_id, "topic": topic}
     result_xml = openml._api_calls._perform_api_call("data/topicadd", "post", data=form_data)
-    result = xmltodict.parse(result_xml)
+    result = xmltodict.parse(result_xml, strip_whitespace=False)
     data_id = result["oml:data_topic"]["oml:id"]
     return int(data_id)
 
@@ -912,7 +912,7 @@ def _topic_delete_dataset(data_id: int, topic: str):
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
     form_data = {"data_id": data_id, "topic": topic}
     result_xml = openml._api_calls._perform_api_call("data/topicdelete", "post", data=form_data)
-    result = xmltodict.parse(result_xml)
+    result = xmltodict.parse(result_xml, strip_whitespace=False)
     data_id = result["oml:data_topic"]["oml:id"]
     return int(data_id)
 
@@ -951,7 +951,7 @@ def _get_dataset_description(did_cache_dir, dataset_id):
         with io.open(description_file, "w", encoding="utf8") as fh:
             fh.write(dataset_xml)
 
-    description = xmltodict.parse(dataset_xml)["oml:data_set_description"]
+    description = xmltodict.parse(dataset_xml, strip_whitespace=False)["oml:data_set_description"]
 
     return description
 
@@ -1205,7 +1205,7 @@ def _get_online_dataset_arff(dataset_id):
     # build a dict from the xml.
     # use the url from the dataset description and return the ARFF string
     return openml._api_calls._download_text_file(
-        xmltodict.parse(dataset_xml)["oml:data_set_description"]["oml:url"],
+        xmltodict.parse(dataset_xml, strip_whitespace=False)["oml:data_set_description"]["oml:url"],
     )
 
 
@@ -1225,4 +1225,4 @@ def _get_online_dataset_format(dataset_id):
     """
     dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id, "get")
     # build a dict from the xml and get the format from the dataset description
-    return xmltodict.parse(dataset_xml)["oml:data_set_description"]["oml:format"].lower()
+    return xmltodict.parse(dataset_xml, strip_whitespace=False)["oml:data_set_description"]["oml:format"].lower()

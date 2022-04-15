@@ -130,7 +130,7 @@ class OpenMLBase(ABC):
         response_text = openml._api_calls._perform_api_call(
             call, "post", file_elements=file_elements
         )
-        xml_response = xmltodict.parse(response_text)
+        xml_response = xmltodict.parse(response_text, strip_whitespace=False)
 
         self._parse_publish_response(xml_response)
         return self

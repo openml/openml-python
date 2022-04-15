@@ -397,7 +397,7 @@ class OpenMLFlow(OpenMLBase):
     def from_filesystem(cls, input_directory) -> "OpenMLFlow":
         with open(os.path.join(input_directory, "flow.xml"), "r") as f:
             xml_string = f.read()
-        return OpenMLFlow._from_dict(xmltodict.parse(xml_string))
+        return OpenMLFlow._from_dict(xmltodict.parse(xml_string, strip_whitespace=False))
 
     def _parse_publish_response(self, xml_response: Dict):
         """ Parse the id from the xml_response and assign it to self. """

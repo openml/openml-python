@@ -768,7 +768,7 @@ def _create_run_from_xml(xml, from_server=True):
         else:
             raise AttributeError("Run XML does not contain required (server) " "field: ", fieldname)
 
-    run = xmltodict.parse(xml, force_list=["oml:file", "oml:evaluation", "oml:parameter_setting"])[
+    run = xmltodict.parse(xml, strip_whitespace=False, force_list=["oml:file", "oml:evaluation", "oml:parameter_setting"])[
         "oml:run"
     ]
     run_id = obtain_field(run, "oml:run_id", from_server, cast=int)
@@ -1096,7 +1096,7 @@ def _list_runs(
 def __list_runs(api_call, output_format="dict"):
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    runs_dict = xmltodict.parse(xml_string, force_list=("oml:run",))
+    runs_dict = xmltodict.parse(xml_string, strip_whitespace=False, force_list=("oml:run",))
     # Minimalistic check if the XML is useful
     if "oml:runs" not in runs_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s' % str(runs_dict))

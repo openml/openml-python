@@ -934,7 +934,7 @@ def _read_features(features_file: str) -> Dict[int, OpenMLDataFeature]:
         with open(features_file, encoding="utf8") as fh:
             features_xml_string = fh.read()
         xml_dict = xmltodict.parse(
-            features_xml_string, force_list=("oml:feature", "oml:nominal_value")
+            features_xml_string, strip_whitespace=False, force_list=("oml:feature", "oml:nominal_value")
         )
         features_xml = xml_dict["oml:data_features"]
 
@@ -970,7 +970,7 @@ def _read_qualities(qualities_file: str) -> Dict[str, float]:
     except:  # noqa E722
         with open(qualities_file, encoding="utf8") as fh:
             qualities_xml = fh.read()
-        xml_as_dict = xmltodict.parse(qualities_xml, force_list=("oml:quality",))
+        xml_as_dict = xmltodict.parse(qualities_xml, strip_whitespace=False, force_list=("oml:quality",))
         qualities = xml_as_dict["oml:data_qualities"]["oml:quality"]
         qualities = _check_qualities(qualities)
         with open(qualities_pickle_file, "wb") as fh_binary:
