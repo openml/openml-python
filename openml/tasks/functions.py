@@ -232,7 +232,9 @@ def _list_tasks(task_type=None, output_format="dict", **kwargs):
 
 def __list_tasks(api_call, output_format="dict"):
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    tasks_dict = xmltodict.parse(xml_string, strip_whitespace=False, force_list=("oml:task", "oml:input"))
+    tasks_dict = xmltodict.parse(
+        xml_string, strip_whitespace=False, force_list=("oml:task", "oml:input")
+    )
     # Minimalistic check if the XML is useful
     if "oml:tasks" not in tasks_dict:
         raise ValueError('Error in return XML, does not contain "oml:runs": %s' % str(tasks_dict))

@@ -76,7 +76,9 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
         "oml:run_id",
         "oml:tag",  # legacy.
     )
-    result_dict = xmltodict.parse(xml_string, strip_whitespace=False, force_list=force_list_tags)["oml:study"]
+    result_dict = xmltodict.parse(xml_string, strip_whitespace=False, force_list=force_list_tags)[
+        "oml:study"
+    ]
     study_id = int(result_dict["oml:id"])
     alias = result_dict["oml:alias"] if "oml:alias" in result_dict else None
     main_entity_type = result_dict["oml:main_entity_type"]

@@ -1,6 +1,5 @@
 # License: BSD 3-Clause
 
-from string import whitespace
 import time
 import hashlib
 import logging

@@ -1225,4 +1225,6 @@ def _get_online_dataset_format(dataset_id):
     """
     dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id, "get")
     # build a dict from the xml and get the format from the dataset description
-    return xmltodict.parse(dataset_xml, strip_whitespace=False)["oml:data_set_description"]["oml:format"].lower()
+    return xmltodict.parse(dataset_xml, strip_whitespace=False)["oml:data_set_description"][
+        "oml:format"
+    ].lower()
