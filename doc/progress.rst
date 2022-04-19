@@ -11,7 +11,7 @@ Changelog
  * FIX#1030: ``pre-commit`` hooks now no longer should issue a warning.
  * FIX#1110: Make arguments to ``create_study`` and ``create_suite`` that are defined as optional by the OpenML XSD actually optional.
  * MAIN#1088: Do CI for Windows on Github Actions instead of Appveyor.
-
+ * ADD#1103: Add a ``predictions`` property to OpenMLRun for easy accessibility of prediction data.
 
 
 0.12.2

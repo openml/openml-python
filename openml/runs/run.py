@@ -8,6 +8,7 @@ import os
 
 import arff
 import numpy as np
+import pandas as pd
 
 import openml
 import openml._api_calls
@@ -116,6 +117,23 @@ class OpenMLRun(OpenMLBase):
         self.predictions_url = predictions_url
         self.description_text = description_text
         self.run_details = run_details
+        self._predictions = None
+
+    @property
+    def predictions(self) -> pd.DataFrame:
+        """ Return a DataFrame with predictions for this run """
+        if self._predictions is None:
+            if self.data_content:
+                arff_dict = self._generate_arff_dict()
+            elif self.predictions_url:
+                arff_text = openml._api_calls._download_text_file(self.predictions_url)
+                arff_dict = arff.loads(arff_text)
+            else:
+                raise RuntimeError("Run has no predictions.")
+            self._predictions = pd.DataFrame(
+                arff_dict["data"], columns=[name for name, _ in arff_dict["attributes"]]
+            )
+        return self._predictions
 
     @property
     def id(self) -> Optional[int]:
