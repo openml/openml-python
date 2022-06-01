@@ -385,7 +385,7 @@ class OpenMLRun(OpenMLBase):
 
         return arff_dict
 
-    def get_metric_fn(self, sklearn_fn, kwargs=None):
+    def get_metric_fn(self, sklearn_fn, kwargs=None, use_probs=False):
         """Calculates metric scores based on predicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
         it assumes that the 'correct' or 'truth' attribute is specified in
@@ -447,6 +447,7 @@ class OpenMLRun(OpenMLBase):
         repeat_idx = attribute_dict["repeat"]
         fold_idx = attribute_dict["fold"]
         predicted_idx = attribute_dict["prediction"]  # Assume supervised task
+        predicted_idxs = [v for k, v in attribute_dict.items() if 'confidence.' in k]
 
         if (
             task.task_type_id == TaskType.SUPERVISED_CLASSIFICATION
@@ -482,6 +483,7 @@ class OpenMLRun(OpenMLBase):
             else:
                 samp = 0  # No learning curve sample, always 0
 
+            probs = None
             if task.task_type_id in [
                 TaskType.SUPERVISED_CLASSIFICATION,
                 TaskType.LEARNING_CURVE,
@@ -489,7 +491,9 @@ class OpenMLRun(OpenMLBase):
                 prediction = predictions_arff["attributes"][predicted_idx][1].index(
                     line[predicted_idx]
                 )
+                probs = [line[x] for x in predicted_idxs]
                 correct = predictions_arff["attributes"][predicted_idx][1].index(line[correct_idx])
+                correct_probs = line[correct_idx]
             elif task.task_type_id == TaskType.SUPERVISED_REGRESSION:
                 prediction = line[predicted_idx]
                 correct = line[correct_idx]
@@ -503,8 +507,12 @@ class OpenMLRun(OpenMLBase):
                 values_predict[rep][fold][samp] = []
                 values_correct[rep][fold][samp] = []
 
-            values_predict[rep][fold][samp].append(prediction)
-            values_correct[rep][fold][samp].append(correct)
+            if use_probs:
+                values_predict[rep][fold][samp].append(probs)
+                values_correct[rep][fold][samp].append(correct_probs)
+            else:
+                values_predict[rep][fold][samp].append(prediction)
+                values_correct[rep][fold][samp].append(correct)
 
         scores = []
         for rep in values_predict.keys():
