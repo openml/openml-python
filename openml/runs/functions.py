@@ -48,7 +48,7 @@ RUNS_CACHE_DIR_NAME = "runs"
 def run_model_on_task(
     model: Any,
     task: Union[int, str, OpenMLTask],
-    avoid_duplicate_runs: bool = True,
+    avoid_duplicate_runs: bool = False,
     flow_tags: List[str] = None,
     seed: int = None,
     add_local_measures: bool = True,
@@ -68,7 +68,7 @@ def run_model_on_task(
     task : OpenMLTask or int or str
         Task to perform or Task id.
         This may be a model instead if the first argument is an OpenMLTask.
-    avoid_duplicate_runs : bool, optional (default=True)
+    avoid_duplicate_runs : bool, optional (default=False)
         If True, the run will throw an error if the setup/task combination is already present on
         the server. This feature requires an internet connection.
     flow_tags : List[str], optional (default=None)

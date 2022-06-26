@@ -8,6 +8,7 @@ Changelog
 
 0.13.0
 ~~~~~~
+ * MAINT#1143: Change default argument for ``avoid_duplicate_runs`` of ``run_model_on_task`` to false to avoid requiring an API key by default.
  * FIX#1030: ``pre-commit`` hooks now no longer should issue a warning.
  * FIX#1110: Make arguments to ``create_study`` and ``create_suite`` that are defined as optional by the OpenML XSD actually optional.
  * MAIN#1088: Do CI for Windows on Github Actions instead of Appveyor.
