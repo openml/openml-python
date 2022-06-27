@@ -8,6 +8,7 @@ Changelog
 
 0.13.0
 ~~~~~~
+ * FIX#1100/#1058: Avoid ``NoneType`` error when printing task without ``class_labels`` attribute.
  * FIX#1030: ``pre-commit`` hooks now no longer should issue a warning.
  * FIX#1110: Make arguments to ``create_study`` and ``create_suite`` that are defined as optional by the OpenML XSD actually optional.
  * MAIN#1088: Do CI for Windows on Github Actions instead of Appveyor.
