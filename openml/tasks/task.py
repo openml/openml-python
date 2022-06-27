@@ -97,7 +97,7 @@ class OpenMLTask(OpenMLBase):
             fields["Estimation Procedure"] = self.estimation_procedure["type"]
         if getattr(self, "target_name", None) is not None:
             fields["Target Feature"] = getattr(self, "target_name")
-            if hasattr(self, "class_labels"):
+            if hasattr(self, "class_labels") and getattr(self, "class_labels") is not None:
                 fields["# of Classes"] = len(getattr(self, "class_labels"))
             if hasattr(self, "cost_matrix"):
                 fields["Cost Matrix"] = "Available"
