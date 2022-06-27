@@ -253,7 +253,7 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
         raise ValueError("Argument 'version' should be a non-empty string")
 
     xml_response = openml._api_calls._perform_api_call(
-        "flow/exists", "post", data={"name": name, "external_version": external_version},
+        "flow/exists", "get", data={"name": name, "external_version": external_version},
     )
 
     result_dict = xmltodict.parse(xml_response)
