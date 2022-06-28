@@ -135,15 +135,7 @@ def list_tasks(
     it is used as task_type in the task description, but it is named
     type when used as a filter in list tasks call.
     task_type : TaskType, optional
-        ID of the task type as detailed `here <https://www.openml.org/search?type=task_type>`_.
-        - Supervised classification: 1
-        - Supervised regression: 2
-        - Learning curve: 3
-        - Supervised data stream classification: 4
-        - Clustering: 5
-        - Machine Learning Challenge: 6
-        - Survival Analysis: 7
-        - Subgroup Discovery: 8
+        Refers to the type of task.
     offset : int, optional
         the number of tasks to skip, starting from the first
     size : int, optional
@@ -196,16 +188,7 @@ def _list_tasks(task_type=None, output_format="dict", **kwargs):
     it is used as task_type in the task description, but it is named
     type when used as a filter in list tasks call.
     task_type : TaskType, optional
-        ID of the task type as detailed
-        `here <https://www.openml.org/search?type=task_type>`_.
-        - Supervised classification: 1
-        - Supervised regression: 2
-        - Learning curve: 3
-        - Supervised data stream classification: 4
-        - Clustering: 5
-        - Machine Learning Challenge: 6
-        - Survival Analysis: 7
-        - Subgroup Discovery: 8
+        Refers to the type of task.
     output_format: str, optional (default='dict')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
