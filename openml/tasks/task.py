@@ -176,7 +176,7 @@ class OpenMLTask(OpenMLBase):
         task_container = OrderedDict()  # type: OrderedDict[str, OrderedDict]
         task_dict = OrderedDict(
             [("@xmlns:oml", "http://openml.org/openml")]
-        )  # type: OrderedDict[str, Union[List, str, TaskType]]
+        )  # type: OrderedDict[str, Union[List, str, int]]
 
         task_container["oml:task_inputs"] = task_dict
         task_dict["oml:task_type_id"] = self.task_type_id.value

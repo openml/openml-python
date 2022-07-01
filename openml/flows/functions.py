@@ -434,6 +434,9 @@ def assert_flows_equal(
         attr1 = getattr(flow1, key, None)
         attr2 = getattr(flow2, key, None)
         if key == "components":
+            if not (isinstance(attr1, Dict) and isinstance(attr2, Dict)):
+                raise TypeError("Cannot compare components because they are not dictionary.")
+
             for name in set(attr1.keys()).union(attr2.keys()):
                 if name not in attr1:
                     raise ValueError(
@@ -495,8 +498,8 @@ def assert_flows_equal(
                 # dictionary with keys specifying the parameter's 'description' and 'data_type'
                 # checking parameter descriptions can be ignored since that might change
                 # data type check can also be ignored if one of them is not defined, i.e., None
-                params1 = set(flow1.parameters_meta_info.keys())
-                params2 = set(flow2.parameters_meta_info.keys())
+                params1 = set(flow1.parameters_meta_info)
+                params2 = set(flow2.parameters_meta_info)
                 if params1 != params2:
                     raise ValueError(
                         "Parameter list in meta info for parameters differ " "in the two flows."

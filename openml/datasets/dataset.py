@@ -354,8 +354,8 @@ class OpenMLDataset(OpenMLBase):
             return decoder.decode(fh, encode_nominal=True, return_type=return_type)
 
         if filename[-3:] == ".gz":
-            with gzip.open(filename) as fh:
-                return decode_arff(fh)
+            with gzip.open(filename) as zipfile:
+                return decode_arff(zipfile)
         else:
             with open(filename, encoding="utf8") as fh:
                 return decode_arff(fh)

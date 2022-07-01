@@ -11,7 +11,7 @@ import re
 from re import IGNORECASE
 import sys
 import time
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union, cast, Sized
 import warnings
 
 import numpy as np
@@ -499,7 +499,7 @@ class SklearnExtension(Extension):
                 rval = tuple(rval)
         elif isinstance(o, SIMPLE_TYPES) or o is None:
             if isinstance(o, tuple(SIMPLE_NUMPY_TYPES)):
-                o = o.item()
+                o = o.item()  # type: ignore
             # base parameter values
             rval = o
         elif isinstance(o, dict):
@@ -1357,7 +1357,7 @@ class SklearnExtension(Extension):
                     # if the parameter is deprecated, don't show it
                     continue
 
-            if not (hasattr(value, "__len__") and len(value) == 0):
+            if not (isinstance(value, Sized) and len(value) == 0):
                 value = json.dumps(value)
                 parameters[key] = value
             else:
