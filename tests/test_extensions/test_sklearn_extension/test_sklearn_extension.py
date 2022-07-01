@@ -2208,7 +2208,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         reason="columntransformer introduction in 0.20.0",
     )
     def test_failed_serialization_of_custom_class(self):
-        """Test to check if any custom class inherited from sklearn expectedly fails serialization"""
+        """Check if any custom class inherited from sklearn expectedly fails serialization"""
         try:
             from sklearn.impute import SimpleImputer
         except ImportError:
