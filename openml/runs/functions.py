@@ -353,7 +353,10 @@ def initialize_model_from_run(run_id: int) -> Any:
 
 
 def initialize_model_from_trace(
-    run_id: int, repeat: int, fold: int, iteration: Optional[int] = None,
+    run_id: int,
+    repeat: int,
+    fold: int,
+    iteration: Optional[int] = None,
 ) -> Any:
     """
     Initialize a model based on the parameters that were set
@@ -461,7 +464,12 @@ def _run_task_get_arffcontent(
 
     jobs = []
     for n_fit, (rep_no, fold_no, sample_no) in enumerate(
-        itertools.product(range(num_reps), range(num_folds), range(num_samples),), start=1
+        itertools.product(
+            range(num_reps),
+            range(num_folds),
+            range(num_samples),
+        ),
+        start=1,
     ):
         jobs.append((n_fit, rep_no, fold_no, sample_no))
 
@@ -537,7 +545,8 @@ def _run_task_get_arffcontent(
 
             if add_local_measures:
                 _calculate_local_measure(
-                    sklearn.metrics.accuracy_score, "predictive_accuracy",
+                    sklearn.metrics.accuracy_score,
+                    "predictive_accuracy",
                 )
 
         elif isinstance(task, OpenMLRegressionTask):
@@ -557,7 +566,8 @@ def _run_task_get_arffcontent(
 
             if add_local_measures:
                 _calculate_local_measure(
-                    sklearn.metrics.mean_absolute_error, "mean_absolute_error",
+                    sklearn.metrics.mean_absolute_error,
+                    "mean_absolute_error",
                 )
 
         elif isinstance(task, OpenMLClusteringTask):
@@ -921,7 +931,10 @@ def _create_run_from_xml(xml, from_server=True):
 
 def _get_cached_run(run_id):
     """Load a run from the cache."""
-    run_cache_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id,)
+    run_cache_dir = openml.utils._create_cache_directory_for_id(
+        RUNS_CACHE_DIR_NAME,
+        run_id,
+    )
     try:
         run_file = os.path.join(run_cache_dir, "description.xml")
         with io.open(run_file, encoding="utf8") as fh:
@@ -1144,7 +1157,7 @@ def format_prediction(
     sample: Optional[int] = None,
     proba: Optional[Dict[str, float]] = None,
 ) -> List[Union[str, int, float]]:
-    """ Format the predictions in the specific order as required for the run results.
+    """Format the predictions in the specific order as required for the run results.
 
     Parameters
     ----------

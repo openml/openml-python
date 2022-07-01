@@ -175,7 +175,7 @@ def _list_setups(setup=None, output_format="object", **kwargs):
     Returns
     -------
     dict or dataframe
-        """
+    """
 
     api_call = "setup/list"
     if setup is not None:

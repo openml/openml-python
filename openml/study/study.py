@@ -99,7 +99,7 @@ class BaseStudy(OpenMLBase):
         return self.study_id
 
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
-        """ Collect all information to display in the __repr__ body. """
+        """Collect all information to display in the __repr__ body."""
         fields = {
             "Name": self.name,
             "Status": self.status,
@@ -138,11 +138,11 @@ class BaseStudy(OpenMLBase):
         return [(key, fields[key]) for key in order if key in fields]
 
     def _parse_publish_response(self, xml_response: Dict):
-        """ Parse the id from the xml_response and assign it to self. """
+        """Parse the id from the xml_response and assign it to self."""
         self.study_id = int(xml_response["oml:study_upload"]["oml:id"])
 
     def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
-        """ Creates a dictionary representation of self. """
+        """Creates a dictionary representation of self."""
         # some can not be uploaded, e.g., id, creator, creation_date
         simple_props = ["alias", "main_entity_type", "name", "description"]
         # maps from attribute name (which is used as outer tag name) to immer

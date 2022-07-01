@@ -30,7 +30,8 @@ def get_suite(suite_id: Union[int, str]) -> OpenMLBenchmarkSuite:
 
 
 def get_study(
-    study_id: Union[int, str], arg_for_backwards_compat: Optional[str] = None,
+    study_id: Union[int, str],
+    arg_for_backwards_compat: Optional[str] = None,
 ) -> OpenMLStudy:  # noqa F401
     """
     Retrieves all relevant information of an OpenML study from the server.
@@ -83,7 +84,8 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
     if entity_type != main_entity_type:
         raise ValueError(
             "Unexpected entity type '{}' reported by the server, expected '{}'".format(
-                main_entity_type, entity_type,
+                main_entity_type,
+                entity_type,
             )
         )
     benchmark_suite = (
@@ -207,7 +209,10 @@ def create_study(
 
 
 def create_benchmark_suite(
-    name: str, description: str, task_ids: List[int], alias: Optional[str] = None,
+    name: str,
+    description: str,
+    task_ids: List[int],
+    alias: Optional[str] = None,
 ) -> OpenMLBenchmarkSuite:
     """
     Creates an OpenML benchmark suite (collection of entity types, where

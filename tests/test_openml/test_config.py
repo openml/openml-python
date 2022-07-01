@@ -37,7 +37,7 @@ class TestConfig(openml.testing.TestBase):
             openml.config._setup()
 
     def test_get_config_as_dict(self):
-        """ Checks if the current configuration is returned accurately as a dict. """
+        """Checks if the current configuration is returned accurately as a dict."""
         config = openml.config.get_config_as_dict()
         _config = dict()
         _config["apikey"] = "610344db6388d9ba34f6db45a3cf71de"
@@ -51,7 +51,7 @@ class TestConfig(openml.testing.TestBase):
         self.assertDictEqual(config, _config)
 
     def test_setup_with_config(self):
-        """ Checks if the OpenML configuration can be updated using _setup(). """
+        """Checks if the OpenML configuration can be updated using _setup()."""
         _config = dict()
         _config["apikey"] = "610344db6388d9ba34f6db45a3cf71de"
         _config["server"] = "https://www.openml.org/api/v1/xml"
@@ -68,7 +68,7 @@ class TestConfig(openml.testing.TestBase):
 
 class TestConfigurationForExamples(openml.testing.TestBase):
     def test_switch_to_example_configuration(self):
-        """ Verifies the test configuration is loaded properly. """
+        """Verifies the test configuration is loaded properly."""
         # Below is the default test key which would be used anyway, but just for clarity:
         openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
         openml.config.server = self.production_server
@@ -79,7 +79,7 @@ class TestConfigurationForExamples(openml.testing.TestBase):
         self.assertEqual(openml.config.server, self.test_server)
 
     def test_switch_from_example_configuration(self):
-        """ Verifies the previous configuration is loaded after stopping. """
+        """Verifies the previous configuration is loaded after stopping."""
         # Below is the default test key which would be used anyway, but just for clarity:
         openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
         openml.config.server = self.production_server
@@ -91,14 +91,14 @@ class TestConfigurationForExamples(openml.testing.TestBase):
         self.assertEqual(openml.config.server, self.production_server)
 
     def test_example_configuration_stop_before_start(self):
-        """ Verifies an error is raised is `stop_...` is called before `start_...`. """
+        """Verifies an error is raised is `stop_...` is called before `start_...`."""
         error_regex = ".*stop_use_example_configuration.*start_use_example_configuration.*first"
         self.assertRaisesRegex(
             RuntimeError, error_regex, openml.config.stop_using_configuration_for_example
         )
 
     def test_example_configuration_start_twice(self):
-        """ Checks that the original config can be returned to if `start..` is called twice. """
+        """Checks that the original config can be returned to if `start..` is called twice."""
         openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
         openml.config.server = self.production_server
 

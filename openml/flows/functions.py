@@ -122,7 +122,8 @@ def _get_flow_description(flow_id: int) -> OpenMLFlow:
     except OpenMLCacheException:
 
         xml_file = os.path.join(
-            openml.utils._create_cache_directory_for_id(FLOWS_CACHE_DIR_NAME, flow_id), "flow.xml",
+            openml.utils._create_cache_directory_for_id(FLOWS_CACHE_DIR_NAME, flow_id),
+            "flow.xml",
         )
 
         flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id, request_method="get")
@@ -253,7 +254,9 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
         raise ValueError("Argument 'version' should be a non-empty string")
 
     xml_response = openml._api_calls._perform_api_call(
-        "flow/exists", "get", data={"name": name, "external_version": external_version},
+        "flow/exists",
+        "get",
+        data={"name": name, "external_version": external_version},
     )
 
     result_dict = xmltodict.parse(xml_response)
@@ -265,7 +268,9 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
 
 
 def get_flow_id(
-    model: Optional[Any] = None, name: Optional[str] = None, exact_version=True,
+    model: Optional[Any] = None,
+    name: Optional[str] = None,
+    exact_version=True,
 ) -> Union[int, bool, List[int]]:
     """Retrieves the flow id for a model or a flow name.
 
@@ -357,7 +362,7 @@ def __list_flows(api_call: str, output_format: str = "dict") -> Union[Dict, pd.D
 
 
 def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
-    """ Raises a ValueError if the flow or any of its subflows has no flow id. """
+    """Raises a ValueError if the flow or any of its subflows has no flow id."""
 
     # Depth-first search to check if all components were uploaded to the
     # server before parsing the parameters

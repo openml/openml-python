@@ -736,10 +736,18 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fu2 = sklearn.pipeline.FeatureUnion(transformer_list=[("scaler", ohe), ("ohe", scaler)])
 
         fu1_serialization, _ = self._serialization_test_helper(
-            fu1, X=None, y=None, subcomponent_parameters=(), dependencies_mock_call_count=(3, 6),
+            fu1,
+            X=None,
+            y=None,
+            subcomponent_parameters=(),
+            dependencies_mock_call_count=(3, 6),
         )
         fu2_serialization, _ = self._serialization_test_helper(
-            fu2, X=None, y=None, subcomponent_parameters=(), dependencies_mock_call_count=(3, 6),
+            fu2,
+            X=None,
+            y=None,
+            subcomponent_parameters=(),
+            dependencies_mock_call_count=(3, 6),
         )
 
         # OneHotEncoder was moved to _encoders module in 0.20
@@ -1104,7 +1112,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         }
 
         clf = sklearn.model_selection.GridSearchCV(
-            sklearn.ensemble.BaggingClassifier(), param_grid=param_grid,
+            sklearn.ensemble.BaggingClassifier(),
+            param_grid=param_grid,
         )
         with self.assertRaisesRegex(
             TypeError, re.compile(r".*OpenML.*Flow.*is not JSON serializable", flags=re.DOTALL)
@@ -1513,7 +1522,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.extension.obtain_parameter_values(flow)
 
         model = sklearn.ensemble.AdaBoostClassifier(
-            base_estimator=sklearn.linear_model.LogisticRegression(solver="lbfgs",)
+            base_estimator=sklearn.linear_model.LogisticRegression(
+                solver="lbfgs",
+            )
         )
         flow = self.extension.model_to_flow(model)
         flow.flow_id = 1
@@ -1546,14 +1557,14 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 self.assertEqual(parameter["oml:component"], 2)
 
     def test_numpy_type_allowed_in_flow(self):
-        """ Simple numpy types should be serializable. """
+        """Simple numpy types should be serializable."""
         dt = sklearn.tree.DecisionTreeClassifier(
             max_depth=np.float64(3.0), min_samples_leaf=np.int32(5)
         )
         self.extension.model_to_flow(dt)
 
     def test_numpy_array_not_allowed_in_flow(self):
-        """ Simple numpy arrays should not be serializable. """
+        """Simple numpy arrays should not be serializable."""
         bin = sklearn.preprocessing.MultiLabelBinarizer(classes=np.asarray([1, 2, 3]))
         with self.assertRaises(TypeError):
             self.extension.model_to_flow(bin)
@@ -1772,7 +1783,8 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y[test_indices]
 
         pipeline = sklearn.model_selection.GridSearchCV(
-            sklearn.tree.DecisionTreeClassifier(), {"max_depth": [1, 2]},
+            sklearn.tree.DecisionTreeClassifier(),
+            {"max_depth": [1, 2]},
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
@@ -1947,7 +1959,11 @@ class TestSklearnExtensionRunFunctions(TestBase):
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
-            model=pipeline, task=task, fold_no=0, rep_no=0, X_train=X,
+            model=pipeline,
+            task=task,
+            fold_no=0,
+            rep_no=0,
+            X_train=X,
         )
 
         y_hat, y_hat_proba, user_defined_measures, trace = res
@@ -1984,7 +2000,9 @@ class TestSklearnExtensionRunFunctions(TestBase):
         num_iters = 10
         task = openml.tasks.get_task(20)  # balance-scale; crossvalidation
         clf = sklearn.model_selection.RandomizedSearchCV(
-            sklearn.neural_network.MLPClassifier(), param_grid, num_iters,
+            sklearn.neural_network.MLPClassifier(),
+            param_grid,
+            num_iters,
         )
         # just run the task on the model (without invoking any fancy extension & openml code)
         train, _ = task.get_train_test_split_indices(0, 0)
@@ -2149,7 +2167,8 @@ class TestSklearnExtensionRunFunctions(TestBase):
         self.assertEqual(flow.components["prep"].class_name, "sklearn.pipeline.Pipeline")
         self.assertIsInstance(flow.components["prep"].components["columntransformer"], OpenMLFlow)
         self.assertIsInstance(
-            flow.components["prep"].components["columntransformer"].components["cat"], OpenMLFlow,
+            flow.components["prep"].components["columntransformer"].components["cat"],
+            OpenMLFlow,
         )
         self.assertEqual(
             flow.components["prep"].components["columntransformer"].components["cat"].name, "drop"
@@ -2189,8 +2208,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         reason="columntransformer introduction in 0.20.0",
     )
     def test_failed_serialization_of_custom_class(self):
-        """Test to check if any custom class inherited from sklearn expectedly fails serialization
-        """
+        """Test to check if any custom class inherited from sklearn expectedly fails serialization"""
         try:
             from sklearn.impute import SimpleImputer
         except ImportError:
