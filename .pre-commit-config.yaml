@@ -10,9 +10,13 @@ repos:
       - id: mypy
         name: mypy openml
         files: openml/.*
+        additional_dependencies:
+          - types-requests
       - id: mypy
         name: mypy tests
         files: tests/.*
+        additional_dependencies:
+          - types-requests
   - repo: https://gitlab.com/pycqa/flake8
     rev: 4.0.1
     hooks:
