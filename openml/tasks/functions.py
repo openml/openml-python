@@ -354,7 +354,10 @@ def get_task(
     except (ValueError, TypeError):
         raise ValueError("Dataset ID is neither an Integer nor can be cast to an Integer.")
 
-    tid_cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id,)
+    tid_cache_dir = openml.utils._create_cache_directory_for_id(
+        TASKS_CACHE_DIR_NAME,
+        task_id,
+    )
 
     try:
         task = _get_task_description(task_id)
@@ -371,7 +374,8 @@ def get_task(
                 task.download_split()
     except Exception as e:
         openml.utils._remove_cache_dir_for_id(
-            TASKS_CACHE_DIR_NAME, tid_cache_dir,
+            TASKS_CACHE_DIR_NAME,
+            tid_cache_dir,
         )
         raise e
 
@@ -384,7 +388,11 @@ def _get_task_description(task_id):
         return _get_cached_task(task_id)
     except OpenMLCacheException:
         xml_file = os.path.join(
-            openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id,), "task.xml",
+            openml.utils._create_cache_directory_for_id(
+                TASKS_CACHE_DIR_NAME,
+                task_id,
+            ),
+            "task.xml",
         )
         task_xml = openml._api_calls._perform_api_call("task/%d" % task_id, "get")
 

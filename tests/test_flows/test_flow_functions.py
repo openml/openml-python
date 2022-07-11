@@ -112,10 +112,14 @@ class TestFlowFunctions(TestBase):
             new_flow = copy.deepcopy(flow)
             setattr(new_flow, attribute, new_value)
             self.assertNotEqual(
-                getattr(flow, attribute), getattr(new_flow, attribute),
+                getattr(flow, attribute),
+                getattr(new_flow, attribute),
             )
             self.assertRaises(
-                ValueError, openml.flows.functions.assert_flows_equal, flow, new_flow,
+                ValueError,
+                openml.flows.functions.assert_flows_equal,
+                flow,
+                new_flow,
             )
 
         # Test that the API ignores several keys when comparing flows
@@ -134,7 +138,8 @@ class TestFlowFunctions(TestBase):
             new_flow = copy.deepcopy(flow)
             setattr(new_flow, attribute, new_value)
             self.assertNotEqual(
-                getattr(flow, attribute), getattr(new_flow, attribute),
+                getattr(flow, attribute),
+                getattr(new_flow, attribute),
             )
             openml.flows.functions.assert_flows_equal(flow, new_flow)
 
@@ -370,7 +375,8 @@ class TestFlowFunctions(TestBase):
                 name=flow.name, exact_version=True
             )
             flow_ids_exact_version_False = openml.flows.get_flow_id(
-                name=flow.name, exact_version=False,
+                name=flow.name,
+                exact_version=False,
             )
             self.assertEqual(flow_ids_exact_version_True, flow_ids_exact_version_False)
             self.assertIn(flow.flow_id, flow_ids_exact_version_True)

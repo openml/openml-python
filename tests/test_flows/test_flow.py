@@ -176,7 +176,8 @@ class TestFlow(TestBase):
             parameters=collections.OrderedDict(),
             parameters_meta_info=collections.OrderedDict(),
             external_version=self.extension._format_external_version(
-                "sklearn", sklearn.__version__,
+                "sklearn",
+                sklearn.__version__,
             ),
             tags=[],
             language="English",
@@ -368,7 +369,10 @@ class TestFlow(TestBase):
         steps = [
             ("imputation", SimpleImputer(strategy="median")),
             ("hotencoding", sklearn.preprocessing.OneHotEncoder(**ohe_params)),
-            ("variencethreshold", sklearn.feature_selection.VarianceThreshold(),),
+            (
+                "variencethreshold",
+                sklearn.feature_selection.VarianceThreshold(),
+            ),
             ("classifier", sklearn.tree.DecisionTreeClassifier()),
         ]
         complicated = sklearn.pipeline.Pipeline(steps=steps)
@@ -387,7 +391,10 @@ class TestFlow(TestBase):
 
             # check if flow exists can find it
             flow = openml.flows.get_flow(flow.flow_id)
-            downloaded_flow_id = openml.flows.flow_exists(flow.name, flow.external_version,)
+            downloaded_flow_id = openml.flows.flow_exists(
+                flow.name,
+                flow.external_version,
+            )
             self.assertEqual(downloaded_flow_id, flow.flow_id)
 
     def test_sklearn_to_upload_to_flow(self):

@@ -36,12 +36,12 @@ logger = logging.getLogger(__name__)
 
 
 def _get_cache_directory(dataset: OpenMLDataset) -> str:
-    """ Return the cache directory of the OpenMLDataset """
+    """Return the cache directory of the OpenMLDataset"""
     return _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset.dataset_id)
 
 
 def list_qualities() -> List[str]:
-    """ Return list of data qualities available.
+    """Return list of data qualities available.
 
     The function performs an API call to retrieve the entire list of
     data qualities that are computed on the datasets uploaded.
@@ -236,7 +236,8 @@ def _validated_data_attributes(
 
 
 def check_datasets_active(
-    dataset_ids: List[int], raise_error_if_not_exist: bool = True,
+    dataset_ids: List[int],
+    raise_error_if_not_exist: bool = True,
 ) -> Dict[int, bool]:
     """
     Check if the dataset ids provided are active.
@@ -274,7 +275,7 @@ def check_datasets_active(
 def _name_to_id(
     dataset_name: str, version: Optional[int] = None, error_if_multiple: bool = False
 ) -> int:
-    """ Attempt to find the dataset id of the dataset with the given name.
+    """Attempt to find the dataset id of the dataset with the given name.
 
     If multiple datasets with the name exist, and ``error_if_multiple`` is ``False``,
     then return the least recent still active dataset.
@@ -354,7 +355,7 @@ def get_dataset(
     cache_format: str = "pickle",
     download_qualities: bool = True,
 ) -> OpenMLDataset:
-    """ Download the OpenML dataset representation, optionally also download actual data file.
+    """Download the OpenML dataset representation, optionally also download actual data file.
 
     This function is thread/multiprocessing safe.
     This function uses caching. A check will be performed to determine if the information has
@@ -407,7 +408,10 @@ def get_dataset(
             "`dataset_id` must be one of `str` or `int`, not {}.".format(type(dataset_id))
         )
 
-    did_cache_dir = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset_id,)
+    did_cache_dir = _create_cache_directory_for_id(
+        DATASETS_CACHE_DIR_NAME,
+        dataset_id,
+    )
 
     remove_dataset_cache = True
     try:
@@ -450,7 +454,7 @@ def get_dataset(
 
 
 def attributes_arff_from_df(df):
-    """ Describe attributes of the dataframe according to ARFF specification.
+    """Describe attributes of the dataframe according to ARFF specification.
 
     Parameters
     ----------
@@ -746,7 +750,7 @@ def edit_dataset(
     original_data_url=None,
     paper_url=None,
 ) -> int:
-    """ Edits an OpenMLDataset.
+    """Edits an OpenMLDataset.
 
     In addition to providing the dataset id of the dataset to edit (through data_id),
     you must specify a value for at least one of the optional function arguments,
@@ -886,7 +890,7 @@ def _topic_add_dataset(data_id: int, topic: str):
         id of the dataset for which the topic needs to be added
     topic : str
         Topic to be added for the dataset
-   """
+    """
     if not isinstance(data_id, int):
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
     form_data = {"data_id": data_id, "topic": topic}
@@ -907,7 +911,7 @@ def _topic_delete_dataset(data_id: int, topic: str):
     topic : str
         Topic to be deleted
 
-   """
+    """
     if not isinstance(data_id, int):
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
     form_data = {"data_id": data_id, "topic": topic}
@@ -959,7 +963,7 @@ def _get_dataset_description(did_cache_dir, dataset_id):
 def _get_dataset_parquet(
     description: Union[Dict, OpenMLDataset], cache_directory: str = None
 ) -> Optional[str]:
-    """ Return the path to the local parquet file of the dataset. If is not cached, it is downloaded.
+    """Return the path to the local parquet file of the dataset. If is not cached, it is downloaded.
 
     Checks if the file is in the cache, if yes, return the path to the file.
     If not, downloads the file and caches it, then returns the file path.
@@ -1007,7 +1011,7 @@ def _get_dataset_parquet(
 
 
 def _get_dataset_arff(description: Union[Dict, OpenMLDataset], cache_directory: str = None) -> str:
-    """ Return the path to the local arff file of the dataset. If is not cached, it is downloaded.
+    """Return the path to the local arff file of the dataset. If is not cached, it is downloaded.
 
     Checks if the file is in the cache, if yes, return the path to the file.
     If not, downloads the file and caches it, then returns the file path.

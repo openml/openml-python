@@ -176,7 +176,11 @@ task = openml.tasks.get_task(6)
 
 # The following lines can then be executed offline:
 run = openml.runs.run_model_on_task(
-    pipe, task, avoid_duplicate_runs=False, upload_flow=False, dataset_format="array",
+    pipe,
+    task,
+    avoid_duplicate_runs=False,
+    upload_flow=False,
+    dataset_format="array",
 )
 
 # The run may be stored offline, and the flow will be stored along with it:

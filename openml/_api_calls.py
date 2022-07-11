@@ -69,15 +69,20 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
     __check_response(response, url, file_elements)
 
     logging.info(
-        "%.7fs taken for [%s] request for the URL %s", time.time() - start, request_method, url,
+        "%.7fs taken for [%s] request for the URL %s",
+        time.time() - start,
+        request_method,
+        url,
     )
     return response.text
 
 
 def _download_minio_file(
-    source: str, destination: Union[str, pathlib.Path], exists_ok: bool = True,
+    source: str,
+    destination: Union[str, pathlib.Path],
+    exists_ok: bool = True,
 ) -> None:
-    """ Download file ``source`` from a MinIO Bucket and store it at ``destination``.
+    """Download file ``source`` from a MinIO Bucket and store it at ``destination``.
 
     Parameters
     ----------
@@ -103,7 +108,9 @@ def _download_minio_file(
 
     try:
         client.fget_object(
-            bucket_name=bucket, object_name=object_name, file_path=str(destination),
+            bucket_name=bucket,
+            object_name=object_name,
+            file_path=str(destination),
         )
     except minio.error.S3Error as e:
         if e.message.startswith("Object does not exist"):
@@ -120,7 +127,7 @@ def _download_text_file(
     exists_ok: bool = True,
     encoding: str = "utf8",
 ) -> Optional[str]:
-    """ Download the text file at `source` and store it in `output_path`.
+    """Download the text file at `source` and store it in `output_path`.
 
     By default, do nothing if a file already exists in `output_path`.
     The downloaded file can be checked against an expected md5 checksum.
@@ -156,7 +163,10 @@ def _download_text_file(
 
     if output_path is None:
         logging.info(
-            "%.7fs taken for [%s] request for the URL %s", time.time() - start, "get", source,
+            "%.7fs taken for [%s] request for the URL %s",
+            time.time() - start,
+            "get",
+            source,
         )
         return downloaded_file
 
@@ -165,7 +175,10 @@ def _download_text_file(
             fh.write(downloaded_file)
 
         logging.info(
-            "%.7fs taken for [%s] request for the URL %s", time.time() - start, "get", source,
+            "%.7fs taken for [%s] request for the URL %s",
+            time.time() - start,
+            "get",
+            source,
         )
 
         del downloaded_file
@@ -174,8 +187,8 @@ def _download_text_file(
 
 def _file_id_to_url(file_id, filename=None):
     """
-     Presents the URL how to download a given file id
-     filename is optional
+    Presents the URL how to download a given file id
+    filename is optional
     """
     openml_url = config.server.split("/api/")
     url = openml_url[0] + "/data/download/%s" % file_id
@@ -194,7 +207,12 @@ def _read_url_files(url, data=None, file_elements=None):
         file_elements = {}
     # Using requests.post sets header 'Accept-encoding' automatically to
     # 'gzip,deflate'
-    response = _send_request(request_method="post", url=url, data=data, files=file_elements,)
+    response = _send_request(
+        request_method="post",
+        url=url,
+        data=data,
+        files=file_elements,
+    )
     return response
 
 
@@ -258,7 +276,9 @@ def _send_request(request_method, url, data, files=None, md5_checksum=None):
                         raise OpenMLServerError(
                             "Unexpected server error when calling {}. Please contact the "
                             "developers!\nStatus code: {}\n{}".format(
-                                url, response.status_code, response.text,
+                                url,
+                                response.status_code,
+                                response.text,
                             )
                         )
                 if retry_counter >= n_retries:
@@ -290,7 +310,9 @@ def __check_response(response, url, file_elements):
 
 
 def __parse_server_exception(
-    response: requests.Response, url: str, file_elements: Dict,
+    response: requests.Response,
+    url: str,
+    file_elements: Dict,
 ) -> OpenMLServerError:
 
     if response.status_code == 414:
@@ -319,12 +341,17 @@ def __parse_server_exception(
 
         # 512 for runs, 372 for datasets, 500 for flows
         # 482 for tasks, 542 for evaluations, 674 for setups
-        return OpenMLServerNoResult(code=code, message=full_message,)
+        return OpenMLServerNoResult(
+            code=code,
+            message=full_message,
+        )
     # 163: failure to validate flow XML (https://www.openml.org/api_docs#!/flow/post_flow)
     if code in [163] and file_elements is not None and "description" in file_elements:
         # file_elements['description'] is the XML file description of the flow
         full_message = "\n{}\n{} - {}".format(
-            file_elements["description"], message, additional_information,
+            file_elements["description"],
+            message,
+            additional_information,
         )
     else:
         full_message = "{} - {}".format(message, additional_information)
