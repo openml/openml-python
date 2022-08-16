@@ -462,9 +462,9 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test__download_minio_file_works_with_bucket_subdirectory(self):
-        file_destination = pathlib.Path(self.workdir, "custom.csv")
+        file_destination = pathlib.Path(self.workdir, "custom.pq")
         _download_minio_file(
-            source="http://openml1.win.tue.nl/test/subdirectory/test.csv",
+            source="http://openml1.win.tue.nl/dataset61/dataset_61.pq",
             destination=file_destination,
             exists_ok=True,
         )
