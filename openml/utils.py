@@ -131,7 +131,7 @@ def _tag_entity(entity_type, entity_id, tag, untag=False):
     post_variables = {"%s_id" % entity_type: entity_id, "tag": tag}
     result_xml = openml._api_calls._perform_api_call(uri, "post", post_variables)
 
-    result = xmltodict.parse(result_xml, force_list={"oml:tag"})[main_tag]
+    result = xmltodict.parse(result_xml, strip_whitespace=False, force_list={"oml:tag"})[main_tag]
 
     if "oml:tag" in result:
         return result["oml:tag"]
@@ -173,7 +173,7 @@ def _delete_entity(entity_type, entity_id):
 
     url_suffix = "%s/%d" % (entity_type, entity_id)
     result_xml = openml._api_calls._perform_api_call(url_suffix, "delete")
-    result = xmltodict.parse(result_xml)
+    result = xmltodict.parse(result_xml, strip_whitespace=False)
     if "oml:%s_delete" % entity_type in result:
         return True
     else:

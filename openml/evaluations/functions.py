@@ -179,7 +179,7 @@ def _list_evaluations(
 def __list_evaluations(api_call, output_format="object"):
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    evals_dict = xmltodict.parse(xml_string, force_list=("oml:evaluation",))
+    evals_dict = xmltodict.parse(xml_string, strip_whitespace=False, force_list=("oml:evaluation",))
     # Minimalistic check if the XML is useful
     if "oml:evaluations" not in evals_dict:
         raise ValueError(
@@ -265,7 +265,7 @@ def list_evaluation_measures() -> List[str]:
     """
     api_call = "evaluationmeasure/list"
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    qualities = xmltodict.parse(xml_string, force_list=("oml:measures"))
+    qualities = xmltodict.parse(xml_string, strip_whitespace=False, force_list=("oml:measures"))
     # Minimalistic check if the XML is useful
     if "oml:evaluation_measures" not in qualities:
         raise ValueError("Error in return XML, does not contain " '"oml:evaluation_measures"')
