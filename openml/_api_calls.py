@@ -87,13 +87,13 @@ def _download_minio_file(
         Path to store the file to, if a directory is provided the original filename is used.
     exists_ok : bool, optional (default=True)
         If False, raise FileExists if a file already exists in ``destination``.
-
     """
     destination = pathlib.Path(destination)
     parsed_url = urllib.parse.urlparse(source)
 
     # expect path format: /BUCKET/path/to/file.ext
     bucket, object_name = parsed_url.path[1:].split("/", maxsplit=1)
+    print(f"{source=}\n{destination=}\n{bucket=}\n{object_name=}")
     if destination.is_dir():
         destination = pathlib.Path(destination, object_name)
     if destination.is_file() and not exists_ok:
@@ -112,6 +112,42 @@ def _download_minio_file(
         # permission error on minio level).
         raise FileNotFoundError("Bucket does not exist or is private.") from e
 
+
+def _download_minio_bucket(
+    source: str, destination: Union[str, pathlib.Path], exists_ok: bool = True,
+) -> None:
+    """ Download file ``source`` from a MinIO Bucket and store it at ``destination``.
+
+    Parameters
+    ----------
+    source : Union[str, pathlib.Path]
+        URL to a MinIO bucket.
+    destination : str
+        Path to a directory to store the bucket content in.
+    exists_ok : bool, optional (default=True)
+        If False, raise FileExists if a file already exists in ``destination``.
+    """
+
+    destination = pathlib.Path(destination)
+    parsed_url = urllib.parse.urlparse(source)
+
+    # expect path format: /BUCKET/path/to/file.ext
+    bucket = parsed_url.path[1:]
+    # if destination.is_dir():
+    #     destination = pathlib.Path(destination, object_name)
+    # if destination.is_file() and not exists_ok:
+    #     raise FileExistsError(f"File already exists in {destination}.")
+
+    client = minio.Minio(endpoint=parsed_url.netloc, secure=False)
+
+    for file_object in client.list_objects(bucket, recursive=True):
+        print(f"{file_object=}")
+        source=source + "/" + file_object.object_name
+        print(f"{source=}")
+        _download_minio_file(
+            source=source + "/" + file_object.object_name,
+            destination=pathlib.Path(destination, file_object.object_name),
+        )
 
 def _download_text_file(
     source: str,
