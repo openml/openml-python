@@ -998,10 +998,16 @@ def _get_dataset_parquet(
         cache_directory = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, did)
     output_file_path = os.path.join(cache_directory, "dataset.pq")
 
+    if url.endswith(".pq"):
+        url, _ = url.rsplit("/", maxsplit=1)
+
     if not os.path.isfile(output_file_path):
         try:
-            openml._api_calls._download_minio_file(
-                source=cast(str, url), destination=output_file_path
+            # openml._api_calls._download_minio_file(
+            #     source=cast(str, url), destination=output_file_path
+            # )
+            openml._api_calls._download_minio_bucket(
+                source=cast(str, url), destination=cache_directory
             )
         except FileNotFoundError:
             return None

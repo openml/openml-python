@@ -93,7 +93,7 @@ def _download_minio_file(
 
     # expect path format: /BUCKET/path/to/file.ext
     bucket, object_name = parsed_url.path[1:].split("/", maxsplit=1)
-    print(f"{source=}\n{destination=}\n{bucket=}\n{object_name=}")
+    #print(f"{source=}\n{destination=}\n{bucket=}\n{object_name=}")
     if destination.is_dir():
         destination = pathlib.Path(destination, object_name)
     if destination.is_file() and not exists_ok:
@@ -141,9 +141,6 @@ def _download_minio_bucket(
     client = minio.Minio(endpoint=parsed_url.netloc, secure=False)
 
     for file_object in client.list_objects(bucket, recursive=True):
-        print(f"{file_object=}")
-        source=source + "/" + file_object.object_name
-        print(f"{source=}")
         _download_minio_file(
             source=source + "/" + file_object.object_name,
             destination=pathlib.Path(destination, file_object.object_name),
