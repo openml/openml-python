@@ -141,10 +141,16 @@ def _download_minio_bucket(
     client = minio.Minio(endpoint=parsed_url.netloc, secure=False)
 
     for file_object in client.list_objects(bucket, recursive=True):
-        _download_minio_file(
-            source=source + "/" + file_object.object_name,
-            destination=pathlib.Path(destination, file_object.object_name),
-        )
+        try:
+            # print(source + "/" + file_object.object_name)
+            _download_minio_file(
+                source=source + "/" + file_object.object_name,
+                destination=pathlib.Path(destination, file_object.object_name),
+                exists_ok=False
+            )
+        except FileExistsError:
+            # print("skip")
+            pass
 
 def _download_text_file(
     source: str,
