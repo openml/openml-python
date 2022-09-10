@@ -819,7 +819,7 @@ def _create_run_from_xml(xml, from_server=True):
     # whenever that's resolved, we can enforce it being present (OpenML#1087)
     run_details = obtain_field(run, "oml:run_details", from_server=False)
 
-    if "oml:input_data" in run:
+    if "oml:input_data" in run and len(run["oml:input_data"].get("oml:dataset")) == 1:
         dataset_id = int(run["oml:input_data"]["oml:dataset"]["oml:did"])
     elif not from_server:
         dataset_id = None
