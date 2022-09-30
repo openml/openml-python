@@ -1335,10 +1335,17 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 (sklearn.tree.DecisionTreeClassifier.__init__, 14),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
-        else:
+        elif sklearn_version < "1.0":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 18),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 13),
+                (sklearn.pipeline.Pipeline.__init__, 2),
+            ]
+        else:
+            # Tested with 1.0 and 1.1
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 17),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 12),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
 
