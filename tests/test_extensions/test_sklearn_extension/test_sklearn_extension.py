@@ -267,7 +267,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("verbose", "0"),
                 )
             )
-        else:
+        elif LooseVersion(sklearn.__version__) < "1.0":
             fixture_parameters = OrderedDict(
                 (
                     ("algorithm", '"auto"'),
@@ -278,6 +278,34 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("n_init", "10"),
                     ("n_jobs", n_jobs_val),
                     ("precompute_distances", precomp_val),
+                    ("random_state", "null"),
+                    ("tol", "0.0001"),
+                    ("verbose", "0"),
+                )
+            )
+        elif LooseVersion(sklearn.__version__) < "1.1":
+            fixture_parameters = OrderedDict(
+                (
+                    ("algorithm", '"auto"'),
+                    ("copy_x", "true"),
+                    ("init", '"k-means++"'),
+                    ("max_iter", "300"),
+                    ("n_clusters", "8"),
+                    ("n_init", "10"),
+                    ("random_state", "null"),
+                    ("tol", "0.0001"),
+                    ("verbose", "0"),
+                )
+            )
+        else:
+            fixture_parameters = OrderedDict(
+                (
+                    ("algorithm", '"lloyd"'),
+                    ("copy_x", "true"),
+                    ("init", '"k-means++"'),
+                    ("max_iter", "300"),
+                    ("n_clusters", "8"),
+                    ("n_init", "10"),
                     ("random_state", "null"),
                     ("tol", "0.0001"),
                     ("verbose", "0"),
