@@ -353,7 +353,24 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         fixture_short_name = "sklearn.Pipeline(StandardScaler,DummyClassifier)"
 
-        if version.parse(sklearn.__version__) >= version.parse("0.21.0"):
+        if version.parse(sklearn.__version__) >= version.parse("1.0"):
+            fixture_description = (
+                "Pipeline of transforms with a final estimator.\n\nSequentially"
+                " apply a list of transforms and a final estimator.\n"
+                "Intermediate steps of the pipeline must be 'transforms', that "
+                "is, they\nmust implement `fit` and `transform` methods.\nThe final "
+                "estimator only needs to implement `fit`.\nThe transformers in "
+                "the pipeline can be cached using ``memory`` argument.\n\nThe "
+                "purpose of the pipeline is to assemble several steps that can "
+                "be\ncross-validated together while setting different parameters"
+                ". For this, it\nenables setting parameters of the various steps"
+                " using their names and the\nparameter name separated by a `'__'`,"
+                " as in the example below. A step's\nestimator may be replaced "
+                "entirely by setting the parameter with its name\nto another "
+                "estimator, or a transformer removed by setting it to\n"
+                "`'passthrough'` or `None`."
+            )
+        elif version.parse(sklearn.__version__) >= version.parse("0.21.0"):
             fixture_description = (
                 "Pipeline of transforms with a final estimator.\n\nSequentially"
                 " apply a list of transforms and a final estimator.\n"
@@ -443,7 +460,24 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         fixture_short_name = "sklearn.Pipeline(StandardScaler,KMeans)"
 
-        if version.parse(sklearn.__version__) >= version.parse("0.21.0"):
+        if version.parse(sklearn.__version__) >= version.parse("1.0"):
+            fixture_description = (
+                "Pipeline of transforms with a final estimator.\n\nSequentially"
+                " apply a list of transforms and a final estimator.\n"
+                "Intermediate steps of the pipeline must be 'transforms', that "
+                "is, they\nmust implement `fit` and `transform` methods.\nThe final "
+                "estimator only needs to implement `fit`.\nThe transformers in "
+                "the pipeline can be cached using ``memory`` argument.\n\nThe "
+                "purpose of the pipeline is to assemble several steps that can "
+                "be\ncross-validated together while setting different parameters"
+                ". For this, it\nenables setting parameters of the various steps"
+                " using their names and the\nparameter name separated by a `'__'`,"
+                " as in the example below. A step's\nestimator may be replaced "
+                "entirely by setting the parameter with its name\nto another "
+                "estimator, or a transformer removed by setting it to\n"
+                "`'passthrough'` or `None`."
+            )
+        elif version.parse(sklearn.__version__) >= version.parse("0.21.0"):
             fixture_description = (
                 "Pipeline of transforms with a final estimator.\n\nSequentially"
                 " apply a list of transforms and a final estimator.\n"
