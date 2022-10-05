@@ -1302,7 +1302,7 @@ class TestRun(TestBase):
         assert "weka" in run.tags
         assert "weka_3.7.12" in run.tags
         assert run.predictions_url == (
-            "https://www.openml.org/data/download/1667125/"
+            "https://api.openml.org/data/download/1667125/"
             "weka_generated_predictions4575715871712251329.arff"
         )
 
