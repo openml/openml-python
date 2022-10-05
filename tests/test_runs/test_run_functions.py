@@ -1112,13 +1112,13 @@ class TestRun(TestBase):
 
             flow = self.extension.model_to_flow(clf)
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
-            self.assertGreater(flow_exists, 0)
+            self.assertGreater(flow_exists, 0, "Server says flow from run does not exist.")
             # Do NOT use get_flow reinitialization, this potentially sets
             # hyperparameter values wrong. Rather use the local model.
             downloaded_flow = openml.flows.get_flow(flow_exists)
             downloaded_flow.model = clf
             setup_exists = openml.setups.setup_exists(downloaded_flow)
-            self.assertGreater(setup_exists, 0)
+            self.assertGreater(setup_exists, 0, "Server says setup of run does not exist.")
             run_ids = run_exists(task.task_id, setup_exists)
             self.assertTrue(run_ids, msg=(run_ids, clf))
 
