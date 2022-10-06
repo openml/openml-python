@@ -8,6 +8,7 @@ Changelog
 
 0.13.0
 ~~~~~~
+ * MAINT#1104: Fix outdated docstring for ``list_task``.
  * FIX#1030: ``pre-commit`` hooks now no longer should issue a warning.
  * FIX#1110: Make arguments to ``create_study`` and ``create_suite`` that are defined as optional by the OpenML XSD actually optional.
  * FIX#1147: ``openml.flow.flow_exists`` no longer requires an API key.
