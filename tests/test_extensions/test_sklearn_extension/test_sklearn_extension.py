@@ -1304,36 +1304,6 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         for case in cases:
             self.assertRaises(PyOpenMLError, self.extension.model_to_flow, case)
 
-    def test_illegal_parameter_names_pipeline(self):
-        # illegal name: steps
-        steps = [
-            ("Imputer", SimpleImputer(strategy="median")),
-            (
-                "OneHotEncoder",
-                sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
-            ),
-            (
-                "steps",
-                sklearn.ensemble.BaggingClassifier(
-                    base_estimator=sklearn.tree.DecisionTreeClassifier
-                ),
-            ),
-        ]
-        self.assertRaises(ValueError, sklearn.pipeline.Pipeline, steps=steps)
-
-    def test_illegal_parameter_names_featureunion(self):
-        # illegal name: transformer_list
-        transformer_list = [
-            ("transformer_list", SimpleImputer(strategy="median")),
-            (
-                "OneHotEncoder",
-                sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
-            ),
-        ]
-        self.assertRaises(
-            ValueError, sklearn.pipeline.FeatureUnion, transformer_list=transformer_list
-        )
-
     def test_paralizable_check(self):
         # using this model should pass the test (if param distribution is
         # legal)
