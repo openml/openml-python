@@ -143,7 +143,9 @@ class TestRun(TestBase):
                 val_2 = predictions_prime["data"][idx][col_idx]
                 if type(val_1) == float or type(val_2) == float:
                     self.assertAlmostEqual(
-                        float(val_1), float(val_2), places=6,
+                        float(val_1),
+                        float(val_2),
+                        places=6,
                     )
                 else:
                     self.assertEqual(val_1, val_2)
@@ -165,11 +167,17 @@ class TestRun(TestBase):
         if create_task_obj:
             task = openml.tasks.get_task(run.task_id)
             run_prime = openml.runs.run_model_on_task(
-                model=model_prime, task=task, avoid_duplicate_runs=False, seed=seed,
+                model=model_prime,
+                task=task,
+                avoid_duplicate_runs=False,
+                seed=seed,
             )
         else:
             run_prime = openml.runs.run_model_on_task(
-                model=model_prime, task=run.task_id, avoid_duplicate_runs=False, seed=seed,
+                model=model_prime,
+                task=run.task_id,
+                avoid_duplicate_runs=False,
+                seed=seed,
             )
 
         predictions_prime = run_prime._generate_arff_dict()
@@ -277,7 +285,9 @@ class TestRun(TestBase):
             # test the initialize setup function
             run_id = run_.run_id
             run_server = openml.runs.get_run(run_id)
-            clf_server = openml.setups.initialize_model(setup_id=run_server.setup_id,)
+            clf_server = openml.setups.initialize_model(
+                setup_id=run_server.setup_id,
+            )
             flow_local = self.extension.model_to_flow(clf)
             flow_server = self.extension.model_to_flow(clf_server)
 
@@ -299,7 +309,9 @@ class TestRun(TestBase):
             openml.flows.assert_flows_equal(flow_local, flow_server)
 
             # and test the initialize setup from run function
-            clf_server2 = openml.runs.initialize_model_from_run(run_id=run_server.run_id,)
+            clf_server2 = openml.runs.initialize_model_from_run(
+                run_id=run_server.run_id,
+            )
             flow_server2 = self.extension.model_to_flow(clf_server2)
             if flow.class_name not in classes_without_random_state:
                 self.assertEqual(flow_server2.parameters["random_state"], flow_expected_rsv)
@@ -382,7 +394,10 @@ class TestRun(TestBase):
             AttributeError, "'LinearRegression' object has no attribute 'classes_'"
         ):
             openml.runs.run_model_on_task(
-                model=clf, task=task, avoid_duplicate_runs=False, dataset_format="array",
+                model=clf,
+                task=task,
+                avoid_duplicate_runs=False,
+                dataset_format="array",
             )
 
     def test_check_erronous_sklearn_flow_fails(self):
@@ -396,7 +411,8 @@ class TestRun(TestBase):
             r"Penalty term must be positive; got \(C=u?'abc'\)",  # u? for 2.7/3.4-6 compability
         ):
             openml.runs.run_model_on_task(
-                task=task, model=clf,
+                task=task,
+                model=clf,
             )
 
     ###########################################################################
@@ -474,7 +490,9 @@ class TestRun(TestBase):
             self._wait_for_processed_run(run.run_id, 600)
             try:
                 model_prime = openml.runs.initialize_model_from_trace(
-                    run_id=run.run_id, repeat=0, fold=0,
+                    run_id=run.run_id,
+                    repeat=0,
+                    fold=0,
                 )
             except openml.exceptions.OpenMLServerException as e:
                 e.message = "%s; run_id %d" % (e.message, run.run_id)
@@ -815,8 +833,8 @@ class TestRun(TestBase):
                     RandomizedSearchCV(
                         DecisionTreeClassifier(),
                         {
-                            "min_samples_split": [2 ** x for x in range(1, 8)],
-                            "min_samples_leaf": [2 ** x for x in range(0, 7)],
+                            "min_samples_split": [2**x for x in range(1, 8)],
+                            "min_samples_leaf": [2**x for x in range(0, 7)],
                         },
                         cv=3,
                         n_iter=10,
@@ -858,7 +876,10 @@ class TestRun(TestBase):
 
         task = openml.tasks.get_task(11)  # kr-vs-kp; holdout
         run = openml.runs.run_model_on_task(
-            model=randomsearch, task=task, avoid_duplicate_runs=False, seed=1,
+            model=randomsearch,
+            task=task,
+            avoid_duplicate_runs=False,
+            seed=1,
         )
         run_ = run.publish()
         TestBase._mark_entity_for_removal("run", run.run_id)
@@ -896,7 +917,10 @@ class TestRun(TestBase):
         else:
             tests.append((sklearn.metrics.jaccard_score, {}))
         for test_idx, test in enumerate(tests):
-            alt_scores = run.get_metric_fn(sklearn_fn=test[0], kwargs=test[1],)
+            alt_scores = run.get_metric_fn(
+                sklearn_fn=test[0],
+                kwargs=test[1],
+            )
             self.assertEqual(len(alt_scores), 10)
             for idx in range(len(alt_scores)):
                 self.assertGreaterEqual(alt_scores[idx], 0)
@@ -909,7 +933,10 @@ class TestRun(TestBase):
 
         # task and clf are purposely in the old order
         run = openml.runs.run_model_on_task(
-            task, clf, avoid_duplicate_runs=False, upload_flow=False,
+            task,
+            clf,
+            avoid_duplicate_runs=False,
+            upload_flow=False,
         )
 
         self._test_local_evaluations(run)
@@ -935,7 +962,10 @@ class TestRun(TestBase):
 
         # invoke OpenML run
         run = openml.runs.run_flow_on_task(
-            task, flow, avoid_duplicate_runs=False, upload_flow=False,
+            task,
+            flow,
+            avoid_duplicate_runs=False,
+            upload_flow=False,
         )
 
         self._test_local_evaluations(run)
@@ -960,7 +990,10 @@ class TestRun(TestBase):
 
         # invoke OpenML run
         run = openml.runs.run_model_on_task(
-            model=clf, task=task, avoid_duplicate_runs=False, upload_flow=False,
+            model=clf,
+            task=task,
+            avoid_duplicate_runs=False,
+            upload_flow=False,
         )
 
         self._test_local_evaluations(run)
@@ -1013,7 +1046,11 @@ class TestRun(TestBase):
             TestBase.logger.info("collected from test_run_functions: {}".format(task_id))
 
         task = openml.tasks.get_task(task_id)
-        run = openml.runs.run_model_on_task(model=clf, task=task, avoid_duplicate_runs=False,)
+        run = openml.runs.run_model_on_task(
+            model=clf,
+            task=task,
+            avoid_duplicate_runs=False,
+        )
         run_ = run.publish()
         TestBase._mark_entity_for_removal("run", run_.run_id)
         TestBase.logger.info("collected from test_run_functions: {}".format(run_.run_id))
@@ -1075,13 +1112,13 @@ class TestRun(TestBase):
 
             flow = self.extension.model_to_flow(clf)
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
-            self.assertGreater(flow_exists, 0)
+            self.assertGreater(flow_exists, 0, "Server says flow from run does not exist.")
             # Do NOT use get_flow reinitialization, this potentially sets
             # hyperparameter values wrong. Rather use the local model.
             downloaded_flow = openml.flows.get_flow(flow_exists)
             downloaded_flow.model = clf
             setup_exists = openml.setups.setup_exists(downloaded_flow)
-            self.assertGreater(setup_exists, 0)
+            self.assertGreater(setup_exists, 0, "Server says setup of run does not exist.")
             run_ids = run_exists(task.task_id, setup_exists)
             self.assertTrue(run_ids, msg=(run_ids, clf))
 
@@ -1098,7 +1135,9 @@ class TestRun(TestBase):
         )
         with self.assertRaisesRegex(openml.exceptions.PyOpenMLError, expected_message_regex):
             openml.runs.run_flow_on_task(
-                task=task, flow=flow, avoid_duplicate_runs=True,
+                task=task,
+                flow=flow,
+                avoid_duplicate_runs=True,
             )
 
     def test_run_with_illegal_flow_id_after_load(self):
@@ -1113,7 +1152,11 @@ class TestRun(TestBase):
             task=task, flow=flow, avoid_duplicate_runs=False, upload_flow=False
         )
 
-        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)),)
+        cache_path = os.path.join(
+            self.workdir,
+            "runs",
+            str(random.getrandbits(128)),
+        )
         run.to_filesystem(cache_path)
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 
@@ -1144,7 +1187,9 @@ class TestRun(TestBase):
         expected_message_regex = "Local flow_id does not match server flow_id: " "'-1' vs '[0-9]+'"
         with self.assertRaisesRegex(openml.exceptions.PyOpenMLError, expected_message_regex):
             openml.runs.run_flow_on_task(
-                task=task, flow=flow_new, avoid_duplicate_runs=True,
+                task=task,
+                flow=flow_new,
+                avoid_duplicate_runs=True,
             )
 
     def test_run_with_illegal_flow_id_1_after_load(self):
@@ -1167,7 +1212,11 @@ class TestRun(TestBase):
             task=task, flow=flow_new, avoid_duplicate_runs=False, upload_flow=False
         )
 
-        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)),)
+        cache_path = os.path.join(
+            self.workdir,
+            "runs",
+            str(random.getrandbits(128)),
+        )
         run.to_filesystem(cache_path)
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 
@@ -1253,7 +1302,7 @@ class TestRun(TestBase):
         assert "weka" in run.tags
         assert "weka_3.7.12" in run.tags
         assert run.predictions_url == (
-            "https://www.openml.org/data/download/1667125/"
+            "https://api.openml.org/data/download/1667125/"
             "weka_generated_predictions4575715871712251329.arff"
         )
 
@@ -1488,7 +1537,10 @@ class TestRun(TestBase):
         downloaded_flow = openml.flows.get_flow(flow.flow_id)
         task = openml.tasks.get_task(self.TEST_SERVER_TASK_SIMPLE["task_id"])
         run = openml.runs.run_flow_on_task(
-            flow=downloaded_flow, task=task, avoid_duplicate_runs=False, upload_flow=False,
+            flow=downloaded_flow,
+            task=task,
+            avoid_duplicate_runs=False,
+            upload_flow=False,
         )
 
         run.publish()
@@ -1573,7 +1625,7 @@ class TestRun(TestBase):
     )
     @unittest.mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
     def test__run_task_get_arffcontent_2(self, parallel_mock):
-        """ Tests if a run executed in parallel is collated correctly. """
+        """Tests if a run executed in parallel is collated correctly."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
         x, y = task.get_X_and_y(dataset_format="dataframe")
         num_instances = x.shape[0]
@@ -1626,7 +1678,7 @@ class TestRun(TestBase):
     )
     @unittest.mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
     def test_joblib_backends(self, parallel_mock):
-        """ Tests evaluation of a run using various joblib backends and n_jobs. """
+        """Tests evaluation of a run using various joblib backends and n_jobs."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
         x, y = task.get_X_and_y(dataset_format="dataframe")
         num_instances = x.shape[0]

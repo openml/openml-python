@@ -40,7 +40,8 @@ setuptools.setup(
     # Make sure to remove stale files such as the egg-info before updating this:
     # https://stackoverflow.com/a/26547314
     packages=setuptools.find_packages(
-        include=["openml.*", "openml"], exclude=["*.tests", "*.tests.*", "tests.*", "tests"],
+        include=["openml.*", "openml"],
+        exclude=["*.tests", "*.tests.*", "tests.*", "tests"],
     ),
     package_data={"": ["*.txt", "*.md", "py.typed"]},
     python_requires=">=3.6",
@@ -84,7 +85,12 @@ setuptools.setup(
             "seaborn",
         ],
         "examples_unix": ["fanova"],
-        "docs": ["sphinx>=3", "sphinx-gallery", "sphinx_bootstrap_theme", "numpydoc",],
+        "docs": [
+            "sphinx>=3",
+            "sphinx-gallery",
+            "sphinx_bootstrap_theme",
+            "numpydoc",
+        ],
     },
     test_suite="pytest",
     classifiers=[

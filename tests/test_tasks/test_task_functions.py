@@ -143,7 +143,15 @@ class TestTask(TestBase):
         self.assertIsInstance(task, OpenMLTask)
         self.assertTrue(
             os.path.exists(
-                os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "task.xml",)
+                os.path.join(
+                    self.workdir,
+                    "org",
+                    "openml",
+                    "test",
+                    "tasks",
+                    "1",
+                    "task.xml",
+                )
             )
         )
         self.assertTrue(
@@ -162,7 +170,15 @@ class TestTask(TestBase):
         self.assertIsInstance(task, OpenMLTask)
         self.assertTrue(
             os.path.exists(
-                os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "task.xml",)
+                os.path.join(
+                    self.workdir,
+                    "org",
+                    "openml",
+                    "test",
+                    "tasks",
+                    "2",
+                    "task.xml",
+                )
             )
         )
         self.assertEqual(task.class_labels, ["1", "2", "3", "4", "5", "U"])
@@ -230,7 +246,10 @@ class TestTask(TestBase):
 
     def test_deletion_of_cache_dir(self):
         # Simple removal
-        tid_cache_dir = openml.utils._create_cache_directory_for_id("tasks", 1,)
+        tid_cache_dir = openml.utils._create_cache_directory_for_id(
+            "tasks",
+            1,
+        )
         self.assertTrue(os.path.exists(tid_cache_dir))
         openml.utils._remove_cache_dir_for_id("tasks", tid_cache_dir)
         self.assertFalse(os.path.exists(tid_cache_dir))

@@ -44,7 +44,10 @@ n_repeats, n_folds, n_samples = task.get_split_dimensions()
 
 print(
     "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-        task_id, n_repeats, n_folds, n_samples,
+        task_id,
+        n_repeats,
+        n_folds,
+        n_samples,
     )
 )
 
@@ -53,7 +56,11 @@ print(
 # samples (indexing is zero-based). Usually, one would loop over all repeats, folds and sample
 # sizes, but we can neglect this here as there is only a single repetition.
 
-train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0,)
+train_indices, test_indices = task.get_train_test_split_indices(
+    repeat=0,
+    fold=0,
+    sample=0,
+)
 
 print(train_indices.shape, train_indices.dtype)
 print(test_indices.shape, test_indices.dtype)
@@ -69,7 +76,10 @@ y_test = y.iloc[test_indices]
 
 print(
     "X_train.shape: {}, y_train.shape: {}, X_test.shape: {}, y_test.shape: {}".format(
-        X_train.shape, y_train.shape, X_test.shape, y_test.shape,
+        X_train.shape,
+        y_train.shape,
+        X_test.shape,
+        y_test.shape,
     )
 )
 
@@ -82,7 +92,10 @@ X, y = task.get_X_and_y(dataset_format="dataframe")
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
     "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-        task_id, n_repeats, n_folds, n_samples,
+        task_id,
+        n_repeats,
+        n_folds,
+        n_samples,
     )
 )
 
@@ -92,7 +105,9 @@ for repeat_idx in range(n_repeats):
     for fold_idx in range(n_folds):
         for sample_idx in range(n_samples):
             train_indices, test_indices = task.get_train_test_split_indices(
-                repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
+                repeat=repeat_idx,
+                fold=fold_idx,
+                sample=sample_idx,
             )
             X_train = X.iloc[train_indices]
             y_train = y.iloc[train_indices]
@@ -121,7 +136,10 @@ X, y = task.get_X_and_y(dataset_format="dataframe")
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
     "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-        task_id, n_repeats, n_folds, n_samples,
+        task_id,
+        n_repeats,
+        n_folds,
+        n_samples,
     )
 )
 
@@ -131,7 +149,9 @@ for repeat_idx in range(n_repeats):
     for fold_idx in range(n_folds):
         for sample_idx in range(n_samples):
             train_indices, test_indices = task.get_train_test_split_indices(
-                repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
+                repeat=repeat_idx,
+                fold=fold_idx,
+                sample=sample_idx,
             )
             X_train = X.iloc[train_indices]
             y_train = y.iloc[train_indices]
@@ -160,7 +180,10 @@ X, y = task.get_X_and_y(dataset_format="dataframe")
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
     "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-        task_id, n_repeats, n_folds, n_samples,
+        task_id,
+        n_repeats,
+        n_folds,
+        n_samples,
     )
 )
 
@@ -170,7 +193,9 @@ for repeat_idx in range(n_repeats):
     for fold_idx in range(n_folds):
         for sample_idx in range(n_samples):
             train_indices, test_indices = task.get_train_test_split_indices(
-                repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
+                repeat=repeat_idx,
+                fold=fold_idx,
+                sample=sample_idx,
             )
             X_train = X.iloc[train_indices]
             y_train = y.iloc[train_indices]

@@ -174,7 +174,7 @@ class OpenMLFlow(OpenMLBase):
             )
 
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
-        """ Collect all information to display in the __repr__ body. """
+        """Collect all information to display in the __repr__ body."""
         fields = {
             "Flow Name": self.name,
             "Flow Description": self.description,
@@ -203,7 +203,7 @@ class OpenMLFlow(OpenMLBase):
         return [(key, fields[key]) for key in order if key in fields]
 
     def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
-        """ Creates a dictionary representation of self. """
+        """Creates a dictionary representation of self."""
         flow_container = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
         flow_dict = OrderedDict(
             [("@xmlns:oml", "http://openml.org/openml")]
@@ -297,7 +297,7 @@ class OpenMLFlow(OpenMLBase):
 
         Calls itself recursively to create :class:`OpenMLFlow` objects of
         subflows (components).
-        
+
         XML definition of a flow is available at
         https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.implementation.upload.xsd
 
@@ -400,11 +400,11 @@ class OpenMLFlow(OpenMLBase):
         return OpenMLFlow._from_dict(xmltodict.parse(xml_string))
 
     def _parse_publish_response(self, xml_response: Dict):
-        """ Parse the id from the xml_response and assign it to self. """
+        """Parse the id from the xml_response and assign it to self."""
         self.flow_id = int(xml_response["oml:upload_flow"]["oml:id"])
 
     def publish(self, raise_error_if_exists: bool = False) -> "OpenMLFlow":
-        """ Publish this flow to OpenML server.
+        """Publish this flow to OpenML server.
 
         Raises a PyOpenMLError if the flow exists on the server, but
         `self.flow_id` does not match the server known flow id.

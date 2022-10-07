@@ -44,7 +44,8 @@ class TestStudyFunctions(TestBase):
         openml.config.server = self.production_server
 
         with self.assertRaisesRegex(
-            ValueError, "Unexpected entity type 'task' reported by the server, expected 'run'",
+            ValueError,
+            "Unexpected entity type 'task' reported by the server, expected 'run'",
         ):
             openml.study.get_study(99)
 
@@ -62,7 +63,8 @@ class TestStudyFunctions(TestBase):
         openml.config.server = self.production_server
 
         with self.assertRaisesRegex(
-            ValueError, "Unexpected entity type 'run' reported by the server, expected 'task'",
+            ValueError,
+            "Unexpected entity type 'run' reported by the server, expected 'task'",
         ):
             openml.study.get_suite(123)
 
