@@ -1541,7 +1541,10 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test_get_dataset_parquet(self):
-        dataset = openml.datasets.get_dataset(20)
+        # Parquet functionality is disabled on the test server
+        # There is no parquet-copy of the test server yet.
+        openml.config.server = self.production_server
+        dataset = openml.datasets.get_dataset(61)
         self.assertIsNotNone(dataset._minio_url)
         self.assertIsNotNone(dataset.parquet_file)
         self.assertTrue(os.path.isfile(dataset.parquet_file))
