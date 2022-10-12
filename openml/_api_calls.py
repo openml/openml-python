@@ -11,6 +11,7 @@ import urllib.parse
 import xml
 import xmltodict
 from typing import Dict, Optional, Union
+import zipfile
 
 import minio
 
@@ -105,6 +106,10 @@ def _download_minio_file(
         client.fget_object(
             bucket_name=bucket, object_name=object_name, file_path=str(destination),
         )
+        if destination.is_file() and destination.suffix == ".zip":
+            with zipfile.ZipFile(destination, 'r') as zip_ref:
+                zip_ref.extractall(destination.parent)
+
     except minio.error.S3Error as e:
         if e.message.startswith("Object does not exist"):
             raise FileNotFoundError(f"Object at '{source}' does not exist.") from e
