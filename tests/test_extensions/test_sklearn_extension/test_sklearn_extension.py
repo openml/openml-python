@@ -5,6 +5,7 @@ import json
 import re
 import os
 import sys
+from typing import Any
 import unittest
 from distutils.version import LooseVersion
 from collections import OrderedDict
@@ -72,6 +73,45 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.y = iris.target
 
         self.extension = SklearnExtension()
+
+    def _get_expected_pipeline_description(self, model: Any) -> str:
+        if version.parse(sklearn.__version__) >= version.parse("1.0"):
+            expected_fixture = (
+                "Pipeline of transforms with a final estimator.\n\nSequentially"
+                " apply a list of transforms and a final estimator.\n"
+                "Intermediate steps of the pipeline must be 'transforms', that "
+                "is, they\nmust implement `fit` and `transform` methods.\nThe final "
+                "estimator only needs to implement `fit`.\nThe transformers in "
+                "the pipeline can be cached using ``memory`` argument.\n\nThe "
+                "purpose of the pipeline is to assemble several steps that can "
+                "be\ncross-validated together while setting different parameters"
+                ". For this, it\nenables setting parameters of the various steps"
+                " using their names and the\nparameter name separated by a `'__'`,"
+                " as in the example below. A step's\nestimator may be replaced "
+                "entirely by setting the parameter with its name\nto another "
+                "estimator, or a transformer removed by setting it to\n"
+                "`'passthrough'` or `None`."
+            )
+        elif version.parse(sklearn.__version__) >= version.parse("0.21.0"):
+            expected_fixture = (
+                "Pipeline of transforms with a final estimator.\n\nSequentially"
+                " apply a list of transforms and a final estimator.\n"
+                "Intermediate steps of the pipeline must be 'transforms', that "
+                "is, they\nmust implement fit and transform methods.\nThe final "
+                "estimator only needs to implement fit.\nThe transformers in "
+                "the pipeline can be cached using ``memory`` argument.\n\nThe "
+                "purpose of the pipeline is to assemble several steps that can "
+                "be\ncross-validated together while setting different parameters"
+                ".\nFor this, it enables setting parameters of the various steps"
+                " using their\nnames and the parameter name separated by a '__',"
+                " as in the example below.\nA step's estimator may be replaced "
+                "entirely by setting the parameter\nwith its name to another "
+                "estimator, or a transformer removed by setting\nit to "
+                "'passthrough' or ``None``."
+            )
+        else:
+            expected_fixture = self.extension._get_sklearn_description(model)
+        return expected_fixture
 
     def _serialization_test_helper(
         self, model, X, y, subcomponent_parameters, dependencies_mock_call_count=(1, 2)
@@ -398,44 +438,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             "dummy=sklearn.dummy.DummyClassifier)".format(scaler_name)
         )
         fixture_short_name = "sklearn.Pipeline(StandardScaler,DummyClassifier)"
-
-        if version.parse(sklearn.__version__) >= version.parse("1.0"):
-            fixture_description = (
-                "Pipeline of transforms with a final estimator.\n\nSequentially"
-                " apply a list of transforms and a final estimator.\n"
-                "Intermediate steps of the pipeline must be 'transforms', that "
-                "is, they\nmust implement `fit` and `transform` methods.\nThe final "
-                "estimator only needs to implement `fit`.\nThe transformers in "
-                "the pipeline can be cached using ``memory`` argument.\n\nThe "
-                "purpose of the pipeline is to assemble several steps that can "
-                "be\ncross-validated together while setting different parameters"
-                ". For this, it\nenables setting parameters of the various steps"
-                " using their names and the\nparameter name separated by a `'__'`,"
-                " as in the example below. A step's\nestimator may be replaced "
-                "entirely by setting the parameter with its name\nto another "
-                "estimator, or a transformer removed by setting it to\n"
-                "`'passthrough'` or `None`."
-            )
-        elif version.parse(sklearn.__version__) >= version.parse("0.21.0"):
-            fixture_description = (
-                "Pipeline of transforms with a final estimator.\n\nSequentially"
-                " apply a list of transforms and a final estimator.\n"
-                "Intermediate steps of the pipeline must be 'transforms', that "
-                "is, they\nmust implement fit and transform methods.\nThe final "
-                "estimator only needs to implement fit.\nThe transformers in "
-                "the pipeline can be cached using ``memory`` argument.\n\nThe "
-                "purpose of the pipeline is to assemble several steps that can "
-                "be\ncross-validated together while setting different parameters"
-                ".\nFor this, it enables setting parameters of the various steps"
-                " using their\nnames and the parameter name separated by a '__',"
-                " as in the example below.\nA step's estimator may be replaced "
-                "entirely by setting the parameter\nwith its name to another "
-                "estimator, or a transformer removed by setting\nit to "
-                "'passthrough' or ``None``."
-            )
-        else:
-            fixture_description = self.extension._get_sklearn_description(model)
-
+        fixture_description = self._get_expected_pipeline_description(model)
         fixture_structure = {
             fixture_name: [],
             "sklearn.preprocessing.{}.StandardScaler".format(scaler_name): ["scaler"],
@@ -505,43 +508,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             "clusterer=sklearn.cluster.{}.KMeans)".format(scaler_name, cluster_name)
         )
         fixture_short_name = "sklearn.Pipeline(StandardScaler,KMeans)"
-
-        if version.parse(sklearn.__version__) >= version.parse("1.0"):
-            fixture_description = (
-                "Pipeline of transforms with a final estimator.\n\nSequentially"
-                " apply a list of transforms and a final estimator.\n"
-                "Intermediate steps of the pipeline must be 'transforms', that "
-                "is, they\nmust implement `fit` and `transform` methods.\nThe final "
-                "estimator only needs to implement `fit`.\nThe transformers in "
-                "the pipeline can be cached using ``memory`` argument.\n\nThe "
-                "purpose of the pipeline is to assemble several steps that can "
-                "be\ncross-validated together while setting different parameters"
-                ". For this, it\nenables setting parameters of the various steps"
-                " using their names and the\nparameter name separated by a `'__'`,"
-                " as in the example below. A step's\nestimator may be replaced "
-                "entirely by setting the parameter with its name\nto another "
-                "estimator, or a transformer removed by setting it to\n"
-                "`'passthrough'` or `None`."
-            )
-        elif version.parse(sklearn.__version__) >= version.parse("0.21.0"):
-            fixture_description = (
-                "Pipeline of transforms with a final estimator.\n\nSequentially"
-                " apply a list of transforms and a final estimator.\n"
-                "Intermediate steps of the pipeline must be 'transforms', that "
-                "is, they\nmust implement fit and transform methods.\nThe final "
-                "estimator only needs to implement fit.\nThe transformers in "
-                "the pipeline can be cached using ``memory`` argument.\n\nThe "
-                "purpose of the pipeline is to assemble several steps that can "
-                "be\ncross-validated together while setting different parameters"
-                ".\nFor this, it enables setting parameters of the various steps"
-                " using their\nnames and the parameter name separated by a '__',"
-                " as in the example below.\nA step's estimator may be replaced "
-                "entirely by setting the parameter\nwith its name to another "
-                "estimator, or a transformer removed by setting\nit to "
-                "'passthrough' or ``None``."
-            )
-        else:
-            fixture_description = self.extension._get_sklearn_description(model)
+        fixture_description = self._get_expected_pipeline_description(model)
         fixture_structure = {
             fixture_name: [],
             "sklearn.preprocessing.{}.StandardScaler".format(scaler_name): ["scaler"],
@@ -699,27 +666,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             fixture_name: [],
         }
 
-        if version.parse(sklearn.__version__) >= version.parse("0.21.0"):
-            # str obtained from self.extension._get_sklearn_description(model)
-            fixture_description = (
-                "Pipeline of transforms with a final estimator.\n\nSequentially"
-                " apply a list of transforms and a final estimator.\n"
-                "Intermediate steps of the pipeline must be 'transforms', that "
-                "is, they\nmust implement fit and transform methods.\nThe final"
-                " estimator only needs to implement fit.\nThe transformers in "
-                "the pipeline can be cached using ``memory`` argument.\n\nThe "
-                "purpose of the pipeline is to assemble several steps that can "
-                "be\ncross-validated together while setting different "
-                "parameters.\nFor this, it enables setting parameters of the "
-                "various steps using their\nnames and the parameter name "
-                "separated by a '__', as in the example below.\nA step's "
-                "estimator may be replaced entirely by setting the parameter\n"
-                "with its name to another estimator, or a transformer removed by"
-                " setting\nit to 'passthrough' or ``None``."
-            )
-        else:
-            fixture_description = self.extension._get_sklearn_description(model)
-
+        fixture_description = self._get_expected_pipeline_description(model)
         serialization, new_model = self._serialization_test_helper(
             model,
             X=None,
