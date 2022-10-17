@@ -2059,7 +2059,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         clf = sklearn.model_selection.RandomizedSearchCV(
             sklearn.neural_network.MLPClassifier(),
             param_grid,
-            num_iters,
+            n_iter=num_iters,
         )
         # just run the task on the model (without invoking any fancy extension & openml code)
         train, _ = task.get_train_test_split_indices(0, 0)
