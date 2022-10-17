@@ -1833,9 +1833,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
         class HardNaiveBayes(sklearn.naive_bayes.GaussianNB):
             # class for testing a naive bayes classifier that does not allow soft
             # predictions
-            def __init__(self, priors=None):
-                super(HardNaiveBayes, self).__init__(priors)
-
             def predict_proba(*args, **kwargs):
                 raise AttributeError("predict_proba is not available when " "probability=False")
 
