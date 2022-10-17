@@ -1441,9 +1441,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "Estimator",
                 sklearn.ensemble.AdaBoostClassifier(
                     sklearn.ensemble.BaggingClassifier(
-                        sklearn.ensemble.GradientBoostingClassifier(
-                            sklearn.neighbors.KNeighborsClassifier()
-                        )
+                        sklearn.ensemble.GradientBoostingClassifier()
                     )
                 ),
             ),
@@ -1458,7 +1456,6 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "Estimator__n_estimators": 10,
                 "Estimator__base_estimator__n_estimators": 10,
                 "Estimator__base_estimator__base_estimator__learning_rate": 0.1,
-                "Estimator__base_estimator__base_estimator__loss__n_neighbors": 13,
             }
         else:
             params = {
@@ -1467,7 +1464,6 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "Estimator__n_estimators": 50,
                 "Estimator__base_estimator__n_estimators": 10,
                 "Estimator__base_estimator__base_estimator__learning_rate": 0.1,
-                "Estimator__base_estimator__base_estimator__loss__n_neighbors": 5,
             }
         pipe_adjusted.set_params(**params)
         flow = self.extension.model_to_flow(pipe_adjusted)
