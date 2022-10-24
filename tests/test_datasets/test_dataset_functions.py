@@ -1240,7 +1240,7 @@ class TestOpenMLDataset(TestBase):
             try:
                 downloaded_dataset = openml.datasets.get_dataset(dataset_id)
                 break
-            except Exception as e:
+            except OpenMLServerException as e:
                 # returned code 273: Dataset not processed yet
                 # returned code 362: No qualities found
                 TestBase.logger.error(

@@ -3,6 +3,7 @@
 import io
 import logging
 import os
+from pyexpat import ExpatError
 from typing import List, Dict, Union, Optional, cast
 
 import numpy as np
@@ -19,6 +20,7 @@ import openml._api_calls
 from .dataset import OpenMLDataset
 from ..exceptions import (
     OpenMLHashException,
+    OpenMLServerError,
     OpenMLServerException,
     OpenMLPrivateDatasetError,
 )
@@ -437,7 +439,7 @@ def get_dataset(
             parquet_file = None
         remove_dataset_cache = False
     except OpenMLServerException as e:
-        # if there was an exception,
+        # if there was an exception
         # check if the user had access to the dataset
         if e.code == 112:
             raise OpenMLPrivateDatasetError(e.message) from None
@@ -949,13 +951,17 @@ def _get_dataset_description(did_cache_dir, dataset_id):
     try:
         with io.open(description_file, encoding="utf8") as fh:
             dataset_xml = fh.read()
+        description = xmltodict.parse(dataset_xml)["oml:data_set_description"]
     except Exception:
         url_extension = "data/{}".format(dataset_id)
         dataset_xml = openml._api_calls._perform_api_call(url_extension, "get")
+        try:
+            description = xmltodict.parse(dataset_xml)["oml:data_set_description"]
+        except ExpatError as e:
+            url = openml._api_calls._create_url_from_endpoint(url_extension)
+            raise OpenMLServerError(f"Dataset description XML at '{url}' is malformed.") from e
         with io.open(description_file, "w", encoding="utf8") as fh:
             fh.write(dataset_xml)
-
-    description = xmltodict.parse(dataset_xml)["oml:data_set_description"]
 
     return description
 

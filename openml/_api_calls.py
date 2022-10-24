@@ -23,6 +23,14 @@ from .exceptions import (
 )
 
 
+def _create_url_from_endpoint(endpoint: str) -> str:
+    url = config.server
+    if not url.endswith("/"):
+        url += "/"
+    url += endpoint
+    return url.replace("=", "%3d")
+
+
 def _perform_api_call(call, request_method, data=None, file_elements=None):
     """
     Perform an API call at the OpenML server.
@@ -50,12 +58,7 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
     return_value : str
         Return value of the OpenML server
     """
-    url = config.server
-    if not url.endswith("/"):
-        url += "/"
-    url += call
-
-    url = url.replace("=", "%3d")
+    url = _create_url_from_endpoint(call)
     logging.info("Starting [%s] request for the URL %s", request_method, url)
     start = time.time()
 
