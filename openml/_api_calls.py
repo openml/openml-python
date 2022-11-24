@@ -138,24 +138,15 @@ def _download_minio_bucket(
 
     # expect path format: /BUCKET/path/to/file.ext
     bucket = parsed_url.path[1:]
-    # if destination.is_dir():
-    #     destination = pathlib.Path(destination, object_name)
-    # if destination.is_file() and not exists_ok:
-    #     raise FileExistsError(f"File already exists in {destination}.")
 
     client = minio.Minio(endpoint=parsed_url.netloc, secure=False)
 
     for file_object in client.list_objects(bucket, recursive=True):
-        try:
-            # print(source + "/" + file_object.object_name)
-            _download_minio_file(
-                source=source + "/" + file_object.object_name,
-                destination=pathlib.Path(destination, file_object.object_name),
-                exists_ok=False
-            )
-        except FileExistsError:
-            # print("skip")
-            pass
+        _download_minio_file(
+            source=source + "/" + file_object.object_name,
+            destination=pathlib.Path(destination, file_object.object_name),
+            exists_ok=True
+        )
 
 def _download_text_file(
     source: str,
