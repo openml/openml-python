@@ -4,6 +4,7 @@ import io
 import logging
 import os
 from typing import List, Dict, Union, Optional, cast
+import warnings
 
 import numpy as np
 import arff
@@ -353,6 +354,7 @@ def get_dataset(
     error_if_multiple: bool = False,
     cache_format: str = "pickle",
     download_qualities: bool = True,
+    download_all_files: bool = False,
 ) -> OpenMLDataset:
     """ Download the OpenML dataset representation, optionally also download actual data file.
 
@@ -386,11 +388,20 @@ def get_dataset(
         no.of.rows is very high.
     download_qualities : bool (default=True)
         Option to download 'qualities' meta-data in addition to the minimal dataset description.
+    download_all_files: bool (default=False)
+        EXPERIMENTAL. Download all files related to the dataset that reside on the server.
+        Useful for datasets which refer to auxiliary files (e.g., meta-album). 
+
     Returns
     -------
     dataset : :class:`openml.OpenMLDataset`
         The downloaded dataset.
     """
+    if download_all_files:
+        warnings.warn(
+            "``download_all_files`` is experimental and is likely to break with new releases."
+        )
+
     if cache_format not in ["feather", "pickle"]:
         raise ValueError(
             "cache_format must be one of 'feather' or 'pickle. "
@@ -430,7 +441,7 @@ def get_dataset(
         arff_file = None
         if "oml:minio_url" in description and download_data:
             try:
-                parquet_file = _get_dataset_parquet(description)
+                parquet_file = _get_dataset_parquet(description, download_all_files=download_all_files)
             except urllib3.exceptions.MaxRetryError:
                 parquet_file = None
         else:
@@ -961,7 +972,9 @@ def _get_dataset_description(did_cache_dir, dataset_id):
 
 
 def _get_dataset_parquet(
-    description: Union[Dict, OpenMLDataset], cache_directory: str = None
+    description: Union[Dict, OpenMLDataset],
+    cache_directory: str = None,
+    download_all_files: bool = False,
 ) -> Optional[str]:
     """ Return the path to the local parquet file of the dataset. If is not cached, it is downloaded.
 
@@ -981,6 +994,10 @@ def _get_dataset_parquet(
         Folder to store the parquet file in.
         If None, use the default cache directory for the dataset.
 
+    download_all_files: bool, optional (default=False)
+        If `True`, download all data found in the bucket to which the description's
+        ``minio_url`` points, only download the parquet file otherwise.
+
     Returns
     -------
     output_filename : string, optional
@@ -997,19 +1014,24 @@ def _get_dataset_parquet(
 
     if cache_directory is None:
         cache_directory = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, did)
-    output_file_path = os.path.join(cache_directory, "dataset.pq")
+    output_file_path = os.path.join(cache_directory, f"dataset_{did}.pq")
 
-    if url.endswith(".pq"):
-        url, _ = url.rsplit("/", maxsplit=1)
+    old_file_path = os.path.join(cache_directory, f"dataset.pq")
+    if os.path.isfile(old_file_path):
+        os.rename(old_file_path, output_file_path)
 
     if not os.path.isfile(output_file_path):
         try:
-            # openml._api_calls._download_minio_file(
-            #     source=cast(str, url), destination=output_file_path
-            # )
-            openml._api_calls._download_minio_bucket(
-                source=cast(str, url), destination=cache_directory
-            )
+            if download_all_files:
+                if url.endswith(".pq"):
+                    url, _ = url.rsplit("/", maxsplit=1)
+                openml._api_calls._download_minio_bucket(
+                    source=cast(str, url), destination=cache_directory
+                )
+            else:
+                openml._api_calls._download_minio_file(
+                    source=cast(str, url), destination=output_file_path
+                )
         except FileNotFoundError:
             return None
     return output_file_path
