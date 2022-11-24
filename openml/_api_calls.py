@@ -10,6 +10,7 @@ import requests
 import urllib.parse
 import xml
 import xmltodict
+from urllib3 import ProxyManager
 from typing import Dict, Optional, Union
 
 import minio
@@ -22,6 +23,26 @@ from .exceptions import (
     OpenMLHashException,
 )
 
+
+def resolve_env_proxies(url: str) -> Optional[str]:
+    """Attempt to find a suitable proxy for this url.
+
+    Relies on ``requests`` internals to remain consistent. To disable this from the
+    environment, please set the enviornment varialbe ``no_proxy="*"``.
+
+    Parameters
+    ----------
+    url : str
+        The url endpoint
+
+    Returns
+    -------
+    Optional[str]
+        The proxy url if found, else None
+    """
+    resolved_proxies = requests.utils.get_environ_proxies(url)
+    selected_proxy = requests.utils.select_proxy(url, resolved_proxies)
+    return selected_proxy
 
 def _create_url_from_endpoint(endpoint: str) -> str:
     url = config.server
@@ -84,6 +105,7 @@ def _download_minio_file(
     source: str,
     destination: Union[str, pathlib.Path],
     exists_ok: bool = True,
+    proxy: Union[bool, str] = True
 ) -> None:
     """Download file ``source`` from a MinIO Bucket and store it at ``destination``.
 
@@ -95,7 +117,10 @@ def _download_minio_file(
         Path to store the file to, if a directory is provided the original filename is used.
     exists_ok : bool, optional (default=True)
         If False, raise FileExists if a file already exists in ``destination``.
-
+    proxy: Union[bool, str]
+        If True (default), environemnt variables will be parsed using ``requests`` to find a
+        suitable proxy. If False, no proxy will be used. Finally, pass a str to use a
+        custom proxy. To disable this from the environment varialbes, use ``no_proxy="*"``.
     """
     destination = pathlib.Path(destination)
     parsed_url = urllib.parse.urlparse(source)
@@ -107,7 +132,18 @@ def _download_minio_file(
     if destination.is_file() and not exists_ok:
         raise FileExistsError(f"File already exists in {destination}.")
 
-    client = minio.Minio(endpoint=parsed_url.netloc, secure=False)
+    if isinstance(proxy, str):
+        proxy_client = ProxyManager(proxy)
+    else:
+        proxy_url = resolve_env_proxies(parsed_url.geturl()) if proxy else None
+        if proxy_url:
+            proxy_client = ProxyManager(proxy_url)
+
+    client = minio.Minio(
+        endpoint=parsed_url.netloc,
+        secure=False,
+        http_client=proxy_client
+    )
 
     try:
         client.fget_object(
