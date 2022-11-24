@@ -390,7 +390,7 @@ def get_dataset(
         Option to download 'qualities' meta-data in addition to the minimal dataset description.
     download_all_files: bool (default=False)
         EXPERIMENTAL. Download all files related to the dataset that reside on the server.
-        Useful for datasets which refer to auxiliary files (e.g., meta-album). 
+        Useful for datasets which refer to auxiliary files (e.g., meta-album).
 
     Returns
     -------
@@ -1020,18 +1020,22 @@ def _get_dataset_parquet(
     if os.path.isfile(old_file_path):
         os.rename(old_file_path, output_file_path)
 
+    # For this release, we want to be able to force a new download even if the
+    # parquet file is already present when ``download_all_files`` is set.
+    # For now, it would be the only way for the user to fetch the additional
+    # files in the bucket (no function exists on an OpenMLDataset to do this).
+    if download_all_files:
+        if url.endswith(".pq"):
+            url, _ = url.rsplit("/", maxsplit=1)
+        openml._api_calls._download_minio_bucket(
+            source=cast(str, url), destination=cache_directory
+        )
+
     if not os.path.isfile(output_file_path):
         try:
-            if download_all_files:
-                if url.endswith(".pq"):
-                    url, _ = url.rsplit("/", maxsplit=1)
-                openml._api_calls._download_minio_bucket(
-                    source=cast(str, url), destination=cache_directory
-                )
-            else:
-                openml._api_calls._download_minio_file(
-                    source=cast(str, url), destination=output_file_path
-                )
+            openml._api_calls._download_minio_file(
+                source=cast(str, url), destination=output_file_path
+            )
         except FileNotFoundError:
             return None
     return output_file_path
