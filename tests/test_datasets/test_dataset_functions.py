@@ -318,6 +318,15 @@ class TestOpenMLDataset(TestBase):
         openml.config.server = self.production_server
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
 
+    @pytest.mark.skip("Feature is experimental, can not test against stable server.")
+    def test_get_dataset_download_all_files(self):
+        # openml.datasets.get_dataset(id, download_all_files=True)
+        # check for expected files
+        # checking that no additional files are downloaded if
+        # the default (false) is used, seems covered by
+        # test_get_dataset_lazy
+        raise NotImplementedError
+
     def test_get_dataset_uint8_dtype(self):
         dataset = openml.datasets.get_dataset(1)
         self.assertEqual(type(dataset), OpenMLDataset)
