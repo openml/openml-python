@@ -183,7 +183,11 @@ class TestRun(TestBase):
         predictions_prime = run_prime._generate_arff_dict()
 
         self._compare_predictions(predictions, predictions_prime)
-        pd.testing.assert_frame_equal(run.predictions, run_prime.predictions)
+        pd.testing.assert_frame_equal(
+            run.predictions,
+            run_prime.predictions,
+            check_dtype=False,  # Loaded ARFF reads NUMERIC as float, even if integer.
+        )
 
     def _perform_run(
         self,
