@@ -132,6 +132,7 @@ def _download_minio_file(
     if destination.is_file() and not exists_ok:
         raise FileExistsError(f"File already exists in {destination}.")
 
+    proxy_client = None
     if isinstance(proxy, str):
         proxy_client = ProxyManager(proxy)
     else:
