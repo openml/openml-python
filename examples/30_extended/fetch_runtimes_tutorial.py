@@ -72,7 +72,10 @@ print(task)
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
     "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-        task_id, n_repeats, n_folds, n_samples,
+        task_id,
+        n_repeats,
+        n_folds,
+        n_samples,
     )
 )
 
@@ -97,7 +100,10 @@ def print_compare_runtimes(measures):
 clf = RandomForestClassifier(n_estimators=10)
 
 run1 = openml.runs.run_model_on_task(
-    model=clf, task=task, upload_flow=False, avoid_duplicate_runs=False,
+    model=clf,
+    task=task,
+    upload_flow=False,
+    avoid_duplicate_runs=False,
 )
 measures = run1.fold_evaluations
 

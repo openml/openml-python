@@ -58,7 +58,8 @@ class TestOpenMLDataset(TestBase):
         self.lock_path = os.path.join(openml.config.get_cache_directory(), "locks")
         for did in ["-1", "2"]:
             with lockutils.external_lock(
-                name="datasets.functions.get_dataset:%s" % did, lock_path=self.lock_path,
+                name="datasets.functions.get_dataset:%s" % did,
+                lock_path=self.lock_path,
             ):
                 pickle_path = os.path.join(
                     openml.config.get_cache_directory(), "datasets", did, "dataset.pkl.py3"
@@ -175,7 +176,10 @@ class TestOpenMLDataset(TestBase):
     def test_check_datasets_active(self):
         # Have to test on live because there is no deactivated dataset on the test server.
         openml.config.server = self.production_server
-        active = openml.datasets.check_datasets_active([2, 17, 79], raise_error_if_not_exist=False,)
+        active = openml.datasets.check_datasets_active(
+            [2, 17, 79],
+            raise_error_if_not_exist=False,
+        )
         self.assertTrue(active[2])
         self.assertFalse(active[17])
         self.assertIsNone(active.get(79))
@@ -188,7 +192,7 @@ class TestOpenMLDataset(TestBase):
         openml.config.server = self.test_server
 
     def _datasets_retrieved_successfully(self, dids, metadata_only=True):
-        """ Checks that all files for the given dids have been downloaded.
+        """Checks that all files for the given dids have been downloaded.
 
         This includes:
             - description
@@ -229,24 +233,24 @@ class TestOpenMLDataset(TestBase):
             )
 
     def test__name_to_id_with_deactivated(self):
-        """ Check that an activated dataset is returned if an earlier deactivated one exists. """
+        """Check that an activated dataset is returned if an earlier deactivated one exists."""
         openml.config.server = self.production_server
         # /d/1 was deactivated
         self.assertEqual(openml.datasets.functions._name_to_id("anneal"), 2)
         openml.config.server = self.test_server
 
     def test__name_to_id_with_multiple_active(self):
-        """ With multiple active datasets, retrieve the least recent active. """
+        """With multiple active datasets, retrieve the least recent active."""
         openml.config.server = self.production_server
         self.assertEqual(openml.datasets.functions._name_to_id("iris"), 61)
 
     def test__name_to_id_with_version(self):
-        """ With multiple active datasets, retrieve the least recent active. """
+        """With multiple active datasets, retrieve the least recent active."""
         openml.config.server = self.production_server
         self.assertEqual(openml.datasets.functions._name_to_id("iris", version=3), 969)
 
     def test__name_to_id_with_multiple_active_error(self):
-        """ With multiple active datasets, retrieve the least recent active. """
+        """With multiple active datasets, retrieve the least recent active."""
         openml.config.server = self.production_server
         self.assertRaisesRegex(
             ValueError,
@@ -257,7 +261,7 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test__name_to_id_name_does_not_exist(self):
-        """ With multiple active datasets, retrieve the least recent active. """
+        """With multiple active datasets, retrieve the least recent active."""
         self.assertRaisesRegex(
             RuntimeError,
             "No active datasets exist with name does_not_exist",
@@ -266,7 +270,7 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test__name_to_id_version_does_not_exist(self):
-        """ With multiple active datasets, retrieve the least recent active. """
+        """With multiple active datasets, retrieve the least recent active."""
         self.assertRaisesRegex(
             RuntimeError,
             "No active datasets exist with name iris and version 100000",
@@ -365,7 +369,7 @@ class TestOpenMLDataset(TestBase):
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45, False)
 
     def test_get_dataset_lazy_all_functions(self):
-        """ Test that all expected functionality is available without downloading the dataset. """
+        """Test that all expected functionality is available without downloading the dataset."""
         dataset = openml.datasets.get_dataset(1, download_data=False)
         # We only tests functions as general integrity is tested by test_get_dataset_lazy
 
@@ -467,9 +471,9 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test__download_minio_file_works_with_bucket_subdirectory(self):
-        file_destination = pathlib.Path(self.workdir, "custom.csv")
+        file_destination = pathlib.Path(self.workdir, "custom.pq")
         _download_minio_file(
-            source="http://openml1.win.tue.nl/test/subdirectory/test.csv",
+            source="http://openml1.win.tue.nl/dataset61/dataset_61.pq",
             destination=file_destination,
             exists_ok=True,
         )
@@ -546,10 +550,14 @@ class TestOpenMLDataset(TestBase):
 
     def test_deletion_of_cache_dir(self):
         # Simple removal
-        did_cache_dir = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, 1,)
+        did_cache_dir = _create_cache_directory_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            1,
+        )
         self.assertTrue(os.path.exists(did_cache_dir))
         openml.utils._remove_cache_dir_for_id(
-            DATASETS_CACHE_DIR_NAME, did_cache_dir,
+            DATASETS_CACHE_DIR_NAME,
+            did_cache_dir,
         )
         self.assertFalse(os.path.exists(did_cache_dir))
 
@@ -1241,7 +1249,7 @@ class TestOpenMLDataset(TestBase):
             try:
                 downloaded_dataset = openml.datasets.get_dataset(dataset_id)
                 break
-            except Exception as e:
+            except OpenMLServerException as e:
                 # returned code 273: Dataset not processed yet
                 # returned code 362: No qualities found
                 TestBase.logger.error(
@@ -1535,11 +1543,17 @@ class TestOpenMLDataset(TestBase):
         self.assertNotEqual(did, result)
         # Check server exception when unknown dataset is provided
         self.assertRaisesRegex(
-            OpenMLServerException, "Unknown dataset", fork_dataset, data_id=999999,
+            OpenMLServerException,
+            "Unknown dataset",
+            fork_dataset,
+            data_id=999999,
         )
 
     def test_get_dataset_parquet(self):
-        dataset = openml.datasets.get_dataset(20)
+        # Parquet functionality is disabled on the test server
+        # There is no parquet-copy of the test server yet.
+        openml.config.server = self.production_server
+        dataset = openml.datasets.get_dataset(61)
         self.assertIsNotNone(dataset._minio_url)
         self.assertIsNotNone(dataset.parquet_file)
         self.assertTrue(os.path.isfile(dataset.parquet_file))

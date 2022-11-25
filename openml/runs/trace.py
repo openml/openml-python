@@ -331,7 +331,12 @@ class OpenMLRunTrace(object):
                 )
 
             current = OpenMLTraceIteration(
-                repeat, fold, iteration, setup_string, evaluation, selected,
+                repeat,
+                fold,
+                iteration,
+                setup_string,
+                evaluation,
+                selected,
             )
             trace[(repeat, fold, iteration)] = current
 
@@ -372,7 +377,8 @@ class OpenMLRunTrace(object):
 
     def __repr__(self):
         return "[Run id: {}, {} trace iterations]".format(
-            -1 if self.run_id is None else self.run_id, len(self.trace_iterations),
+            -1 if self.run_id is None else self.run_id,
+            len(self.trace_iterations),
         )
 
     def __iter__(self):
@@ -410,7 +416,14 @@ class OpenMLTraceIteration(object):
     """
 
     def __init__(
-        self, repeat, fold, iteration, setup_string, evaluation, selected, parameters=None,
+        self,
+        repeat,
+        fold,
+        iteration,
+        setup_string,
+        evaluation,
+        selected,
+        parameters=None,
     ):
 
         if not isinstance(selected, bool):

@@ -38,7 +38,7 @@ file_list = []
 
 
 def worker_id() -> str:
-    """ Returns the name of the worker process owning this function call.
+    """Returns the name of the worker process owning this function call.
 
     :return: str
         Possible outputs from the set of {'master', 'gw0', 'gw1', ..., 'gw(n-1)'}

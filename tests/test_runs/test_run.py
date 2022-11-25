@@ -79,8 +79,14 @@ class TestRun(TestBase):
             int_part_prime = [line[:3] for line in run_prime_trace_content]
             _check_array(int_part_prime, int)
 
-            float_part = np.array(np.array(run_trace_content)[:, 3:4], dtype=float,)
-            float_part_prime = np.array(np.array(run_prime_trace_content)[:, 3:4], dtype=float,)
+            float_part = np.array(
+                np.array(run_trace_content)[:, 3:4],
+                dtype=float,
+            )
+            float_part_prime = np.array(
+                np.array(run_prime_trace_content)[:, 3:4],
+                dtype=float,
+            )
             bool_part = [line[4] for line in run_trace_content]
             bool_part_prime = [line[4] for line in run_prime_trace_content]
             for bp, bpp in zip(bool_part, bool_part_prime):
@@ -113,7 +119,11 @@ class TestRun(TestBase):
             upload_flow=True,
         )
 
-        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)),)
+        cache_path = os.path.join(
+            self.workdir,
+            "runs",
+            str(random.getrandbits(128)),
+        )
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
@@ -146,7 +156,10 @@ class TestRun(TestBase):
 
         task = openml.tasks.get_task(119)  # diabetes; crossvalidation
         run = openml.runs.run_model_on_task(
-            model=model, task=task, add_local_measures=False, avoid_duplicate_runs=False,
+            model=model,
+            task=task,
+            add_local_measures=False,
+            avoid_duplicate_runs=False,
         )
 
         cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))

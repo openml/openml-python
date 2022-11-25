@@ -114,7 +114,7 @@ class TestBase(unittest.TestCase):
 
     @classmethod
     def _mark_entity_for_removal(self, entity_type, entity_id):
-        """ Static record of entities uploaded to test server
+        """Static record of entities uploaded to test server
 
         Dictionary of lists where the keys are 'entity_type'.
         Each such dictionary is a list of integer IDs.
@@ -128,7 +128,7 @@ class TestBase(unittest.TestCase):
 
     @classmethod
     def _delete_entity_from_tracker(self, entity_type, entity):
-        """ Deletes entity records from the static file_tracker
+        """Deletes entity records from the static file_tracker
 
         Given an entity type and corresponding ID, deletes all entries, including
         duplicate entries of the ID for the entity type.

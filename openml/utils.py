@@ -71,7 +71,7 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
 
 
 def _get_rest_api_type_alias(oml_object: "OpenMLBase") -> str:
-    """ Return the alias of the openml entity as it is defined for the REST API. """
+    """Return the alias of the openml entity as it is defined for the REST API."""
     rest_api_mapping = [
         (openml.datasets.OpenMLDataset, "data"),
         (openml.flows.OpenMLFlow, "flow"),

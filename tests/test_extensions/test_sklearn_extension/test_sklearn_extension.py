@@ -5,6 +5,7 @@ import json
 import re
 import os
 import sys
+from typing import Any
 import unittest
 from distutils.version import LooseVersion
 from collections import OrderedDict
@@ -72,6 +73,45 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.y = iris.target
 
         self.extension = SklearnExtension()
+
+    def _get_expected_pipeline_description(self, model: Any) -> str:
+        if version.parse(sklearn.__version__) >= version.parse("1.0"):
+            expected_fixture = (
+                "Pipeline of transforms with a final estimator.\n\nSequentially"
+                " apply a list of transforms and a final estimator.\n"
+                "Intermediate steps of the pipeline must be 'transforms', that "
+                "is, they\nmust implement `fit` and `transform` methods.\nThe final "
+                "estimator only needs to implement `fit`.\nThe transformers in "
+                "the pipeline can be cached using ``memory`` argument.\n\nThe "
+                "purpose of the pipeline is to assemble several steps that can "
+                "be\ncross-validated together while setting different parameters"
+                ". For this, it\nenables setting parameters of the various steps"
+                " using their names and the\nparameter name separated by a `'__'`,"
+                " as in the example below. A step's\nestimator may be replaced "
+                "entirely by setting the parameter with its name\nto another "
+                "estimator, or a transformer removed by setting it to\n"
+                "`'passthrough'` or `None`."
+            )
+        elif version.parse(sklearn.__version__) >= version.parse("0.21.0"):
+            expected_fixture = (
+                "Pipeline of transforms with a final estimator.\n\nSequentially"
+                " apply a list of transforms and a final estimator.\n"
+                "Intermediate steps of the pipeline must be 'transforms', that "
+                "is, they\nmust implement fit and transform methods.\nThe final "
+                "estimator only needs to implement fit.\nThe transformers in "
+                "the pipeline can be cached using ``memory`` argument.\n\nThe "
+                "purpose of the pipeline is to assemble several steps that can "
+                "be\ncross-validated together while setting different parameters"
+                ".\nFor this, it enables setting parameters of the various steps"
+                " using their\nnames and the parameter name separated by a '__',"
+                " as in the example below.\nA step's estimator may be replaced "
+                "entirely by setting the parameter\nwith its name to another "
+                "estimator, or a transformer removed by setting\nit to "
+                "'passthrough' or ``None``."
+            )
+        else:
+            expected_fixture = self.extension._get_sklearn_description(model)
+        return expected_fixture
 
     def _serialization_test_helper(
         self, model, X, y, subcomponent_parameters, dependencies_mock_call_count=(1, 2)
@@ -168,7 +208,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("splitter", '"best"'),
                 )
             )
-        else:
+        elif LooseVersion(sklearn.__version__) < "1.0":
             fixture_parameters = OrderedDict(
                 (
                     ("class_weight", "null"),
@@ -186,6 +226,24 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("splitter", '"best"'),
                 )
             )
+        else:
+            fixture_parameters = OrderedDict(
+                (
+                    ("class_weight", "null"),
+                    ("criterion", '"entropy"'),
+                    ("max_depth", "null"),
+                    ("max_features", '"auto"'),
+                    ("max_leaf_nodes", "2000"),
+                    ("min_impurity_decrease", "0.0"),
+                    ("min_samples_leaf", "1"),
+                    ("min_samples_split", "2"),
+                    ("min_weight_fraction_leaf", "0.0"),
+                    ("presort", presort_val),
+                    ("random_state", "null"),
+                    ("splitter", '"best"'),
+                )
+            )
+
         if LooseVersion(sklearn.__version__) >= "0.22":
             fixture_parameters.update({"ccp_alpha": "0.0"})
             fixture_parameters.move_to_end("ccp_alpha", last=False)
@@ -249,7 +307,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("verbose", "0"),
                 )
             )
-        else:
+        elif LooseVersion(sklearn.__version__) < "1.0":
             fixture_parameters = OrderedDict(
                 (
                     ("algorithm", '"auto"'),
@@ -260,6 +318,34 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("n_init", "10"),
                     ("n_jobs", n_jobs_val),
                     ("precompute_distances", precomp_val),
+                    ("random_state", "null"),
+                    ("tol", "0.0001"),
+                    ("verbose", "0"),
+                )
+            )
+        elif LooseVersion(sklearn.__version__) < "1.1":
+            fixture_parameters = OrderedDict(
+                (
+                    ("algorithm", '"auto"'),
+                    ("copy_x", "true"),
+                    ("init", '"k-means++"'),
+                    ("max_iter", "300"),
+                    ("n_clusters", "8"),
+                    ("n_init", "10"),
+                    ("random_state", "null"),
+                    ("tol", "0.0001"),
+                    ("verbose", "0"),
+                )
+            )
+        else:
+            fixture_parameters = OrderedDict(
+                (
+                    ("algorithm", '"lloyd"'),
+                    ("copy_x", "true"),
+                    ("init", '"k-means++"'),
+                    ("max_iter", "300"),
+                    ("n_clusters", "8"),
+                    ("n_init", "10"),
                     ("random_state", "null"),
                     ("tol", "0.0001"),
                     ("verbose", "0"),
@@ -352,27 +438,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             "dummy=sklearn.dummy.DummyClassifier)".format(scaler_name)
         )
         fixture_short_name = "sklearn.Pipeline(StandardScaler,DummyClassifier)"
-
-        if version.parse(sklearn.__version__) >= version.parse("0.21.0"):
-            fixture_description = (
-                "Pipeline of transforms with a final estimator.\n\nSequentially"
-                " apply a list of transforms and a final estimator.\n"
-                "Intermediate steps of the pipeline must be 'transforms', that "
-                "is, they\nmust implement fit and transform methods.\nThe final "
-                "estimator only needs to implement fit.\nThe transformers in "
-                "the pipeline can be cached using ``memory`` argument.\n\nThe "
-                "purpose of the pipeline is to assemble several steps that can "
-                "be\ncross-validated together while setting different parameters"
-                ".\nFor this, it enables setting parameters of the various steps"
-                " using their\nnames and the parameter name separated by a '__',"
-                " as in the example below.\nA step's estimator may be replaced "
-                "entirely by setting the parameter\nwith its name to another "
-                "estimator, or a transformer removed by setting\nit to "
-                "'passthrough' or ``None``."
-            )
-        else:
-            fixture_description = self.extension._get_sklearn_description(model)
-
+        fixture_description = self._get_expected_pipeline_description(model)
         fixture_structure = {
             fixture_name: [],
             "sklearn.preprocessing.{}.StandardScaler".format(scaler_name): ["scaler"],
@@ -442,26 +508,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             "clusterer=sklearn.cluster.{}.KMeans)".format(scaler_name, cluster_name)
         )
         fixture_short_name = "sklearn.Pipeline(StandardScaler,KMeans)"
-
-        if version.parse(sklearn.__version__) >= version.parse("0.21.0"):
-            fixture_description = (
-                "Pipeline of transforms with a final estimator.\n\nSequentially"
-                " apply a list of transforms and a final estimator.\n"
-                "Intermediate steps of the pipeline must be 'transforms', that "
-                "is, they\nmust implement fit and transform methods.\nThe final "
-                "estimator only needs to implement fit.\nThe transformers in "
-                "the pipeline can be cached using ``memory`` argument.\n\nThe "
-                "purpose of the pipeline is to assemble several steps that can "
-                "be\ncross-validated together while setting different parameters"
-                ".\nFor this, it enables setting parameters of the various steps"
-                " using their\nnames and the parameter name separated by a '__',"
-                " as in the example below.\nA step's estimator may be replaced "
-                "entirely by setting the parameter\nwith its name to another "
-                "estimator, or a transformer removed by setting\nit to "
-                "'passthrough' or ``None``."
-            )
-        else:
-            fixture_description = self.extension._get_sklearn_description(model)
+        fixture_description = self._get_expected_pipeline_description(model)
         fixture_structure = {
             fixture_name: [],
             "sklearn.preprocessing.{}.StandardScaler".format(scaler_name): ["scaler"],
@@ -619,27 +666,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             fixture_name: [],
         }
 
-        if version.parse(sklearn.__version__) >= version.parse("0.21.0"):
-            # str obtained from self.extension._get_sklearn_description(model)
-            fixture_description = (
-                "Pipeline of transforms with a final estimator.\n\nSequentially"
-                " apply a list of transforms and a final estimator.\n"
-                "Intermediate steps of the pipeline must be 'transforms', that "
-                "is, they\nmust implement fit and transform methods.\nThe final"
-                " estimator only needs to implement fit.\nThe transformers in "
-                "the pipeline can be cached using ``memory`` argument.\n\nThe "
-                "purpose of the pipeline is to assemble several steps that can "
-                "be\ncross-validated together while setting different "
-                "parameters.\nFor this, it enables setting parameters of the "
-                "various steps using their\nnames and the parameter name "
-                "separated by a '__', as in the example below.\nA step's "
-                "estimator may be replaced entirely by setting the parameter\n"
-                "with its name to another estimator, or a transformer removed by"
-                " setting\nit to 'passthrough' or ``None``."
-            )
-        else:
-            fixture_description = self.extension._get_sklearn_description(model)
-
+        fixture_description = self._get_expected_pipeline_description(model)
         serialization, new_model = self._serialization_test_helper(
             model,
             X=None,
@@ -736,10 +763,18 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fu2 = sklearn.pipeline.FeatureUnion(transformer_list=[("scaler", ohe), ("ohe", scaler)])
 
         fu1_serialization, _ = self._serialization_test_helper(
-            fu1, X=None, y=None, subcomponent_parameters=(), dependencies_mock_call_count=(3, 6),
+            fu1,
+            X=None,
+            y=None,
+            subcomponent_parameters=(),
+            dependencies_mock_call_count=(3, 6),
         )
         fu2_serialization, _ = self._serialization_test_helper(
-            fu2, X=None, y=None, subcomponent_parameters=(), dependencies_mock_call_count=(3, 6),
+            fu2,
+            X=None,
+            y=None,
+            subcomponent_parameters=(),
+            dependencies_mock_call_count=(3, 6),
         )
 
         # OneHotEncoder was moved to _encoders module in 0.20
@@ -1104,7 +1139,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         }
 
         clf = sklearn.model_selection.GridSearchCV(
-            sklearn.ensemble.BaggingClassifier(), param_grid=param_grid,
+            sklearn.ensemble.BaggingClassifier(),
+            param_grid=param_grid,
         )
         with self.assertRaisesRegex(
             TypeError, re.compile(r".*OpenML.*Flow.*is not JSON serializable", flags=re.DOTALL)
@@ -1215,36 +1251,6 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         for case in cases:
             self.assertRaises(PyOpenMLError, self.extension.model_to_flow, case)
 
-    def test_illegal_parameter_names_pipeline(self):
-        # illegal name: steps
-        steps = [
-            ("Imputer", SimpleImputer(strategy="median")),
-            (
-                "OneHotEncoder",
-                sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
-            ),
-            (
-                "steps",
-                sklearn.ensemble.BaggingClassifier(
-                    base_estimator=sklearn.tree.DecisionTreeClassifier
-                ),
-            ),
-        ]
-        self.assertRaises(ValueError, sklearn.pipeline.Pipeline, steps=steps)
-
-    def test_illegal_parameter_names_featureunion(self):
-        # illegal name: transformer_list
-        transformer_list = [
-            ("transformer_list", SimpleImputer(strategy="median")),
-            (
-                "OneHotEncoder",
-                sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
-            ),
-        ]
-        self.assertRaises(
-            ValueError, sklearn.pipeline.FeatureUnion, transformer_list=transformer_list
-        )
-
     def test_paralizable_check(self):
         # using this model should pass the test (if param distribution is
         # legal)
@@ -1326,10 +1332,17 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 (sklearn.tree.DecisionTreeClassifier.__init__, 14),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
-        else:
+        elif sklearn_version < "1.0":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 18),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 13),
+                (sklearn.pipeline.Pipeline.__init__, 2),
+            ]
+        else:
+            # Tested with 1.0 and 1.1
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 17),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 12),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
 
@@ -1428,9 +1441,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "Estimator",
                 sklearn.ensemble.AdaBoostClassifier(
                     sklearn.ensemble.BaggingClassifier(
-                        sklearn.ensemble.GradientBoostingClassifier(
-                            sklearn.neighbors.KNeighborsClassifier()
-                        )
+                        sklearn.ensemble.GradientBoostingClassifier()
                     )
                 ),
             ),
@@ -1445,7 +1456,6 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "Estimator__n_estimators": 10,
                 "Estimator__base_estimator__n_estimators": 10,
                 "Estimator__base_estimator__base_estimator__learning_rate": 0.1,
-                "Estimator__base_estimator__base_estimator__loss__n_neighbors": 13,
             }
         else:
             params = {
@@ -1454,7 +1464,6 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "Estimator__n_estimators": 50,
                 "Estimator__base_estimator__n_estimators": 10,
                 "Estimator__base_estimator__base_estimator__learning_rate": 0.1,
-                "Estimator__base_estimator__base_estimator__loss__n_neighbors": 5,
             }
         pipe_adjusted.set_params(**params)
         flow = self.extension.model_to_flow(pipe_adjusted)
@@ -1513,7 +1522,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.extension.obtain_parameter_values(flow)
 
         model = sklearn.ensemble.AdaBoostClassifier(
-            base_estimator=sklearn.linear_model.LogisticRegression(solver="lbfgs",)
+            base_estimator=sklearn.linear_model.LogisticRegression(
+                solver="lbfgs",
+            )
         )
         flow = self.extension.model_to_flow(model)
         flow.flow_id = 1
@@ -1546,14 +1557,14 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 self.assertEqual(parameter["oml:component"], 2)
 
     def test_numpy_type_allowed_in_flow(self):
-        """ Simple numpy types should be serializable. """
+        """Simple numpy types should be serializable."""
         dt = sklearn.tree.DecisionTreeClassifier(
             max_depth=np.float64(3.0), min_samples_leaf=np.int32(5)
         )
         self.extension.model_to_flow(dt)
 
     def test_numpy_array_not_allowed_in_flow(self):
-        """ Simple numpy arrays should not be serializable. """
+        """Simple numpy arrays should not be serializable."""
         bin = sklearn.preprocessing.MultiLabelBinarizer(classes=np.asarray([1, 2, 3]))
         with self.assertRaises(TypeError):
             self.extension.model_to_flow(bin)
@@ -1772,7 +1783,8 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y[test_indices]
 
         pipeline = sklearn.model_selection.GridSearchCV(
-            sklearn.tree.DecisionTreeClassifier(), {"max_depth": [1, 2]},
+            sklearn.tree.DecisionTreeClassifier(),
+            {"max_depth": [1, 2]},
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
@@ -1817,9 +1829,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
         class HardNaiveBayes(sklearn.naive_bayes.GaussianNB):
             # class for testing a naive bayes classifier that does not allow soft
             # predictions
-            def __init__(self, priors=None):
-                super(HardNaiveBayes, self).__init__(priors)
-
             def predict_proba(*args, **kwargs):
                 raise AttributeError("predict_proba is not available when " "probability=False")
 
@@ -1947,7 +1956,11 @@ class TestSklearnExtensionRunFunctions(TestBase):
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
-            model=pipeline, task=task, fold_no=0, rep_no=0, X_train=X,
+            model=pipeline,
+            task=task,
+            fold_no=0,
+            rep_no=0,
+            X_train=X,
         )
 
         y_hat, y_hat_proba, user_defined_measures, trace = res
@@ -1984,7 +1997,9 @@ class TestSklearnExtensionRunFunctions(TestBase):
         num_iters = 10
         task = openml.tasks.get_task(20)  # balance-scale; crossvalidation
         clf = sklearn.model_selection.RandomizedSearchCV(
-            sklearn.neural_network.MLPClassifier(), param_grid, num_iters,
+            sklearn.neural_network.MLPClassifier(),
+            param_grid,
+            n_iter=num_iters,
         )
         # just run the task on the model (without invoking any fancy extension & openml code)
         train, _ = task.get_train_test_split_indices(0, 0)
@@ -2149,7 +2164,8 @@ class TestSklearnExtensionRunFunctions(TestBase):
         self.assertEqual(flow.components["prep"].class_name, "sklearn.pipeline.Pipeline")
         self.assertIsInstance(flow.components["prep"].components["columntransformer"], OpenMLFlow)
         self.assertIsInstance(
-            flow.components["prep"].components["columntransformer"].components["cat"], OpenMLFlow,
+            flow.components["prep"].components["columntransformer"].components["cat"],
+            OpenMLFlow,
         )
         self.assertEqual(
             flow.components["prep"].components["columntransformer"].components["cat"].name, "drop"
@@ -2189,8 +2205,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         reason="columntransformer introduction in 0.20.0",
     )
     def test_failed_serialization_of_custom_class(self):
-        """Test to check if any custom class inherited from sklearn expectedly fails serialization
-        """
+        """Check if any custom class inherited from sklearn expectedly fails serialization"""
         try:
             from sklearn.impute import SimpleImputer
         except ImportError:
