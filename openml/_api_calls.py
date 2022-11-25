@@ -45,6 +45,7 @@ def resolve_env_proxies(url: str) -> Optional[str]:
     selected_proxy = requests.utils.select_proxy(url, resolved_proxies)
     return selected_proxy
 
+
 def _create_url_from_endpoint(endpoint: str) -> str:
     url = config.server
     if not url.endswith("/"):
@@ -138,11 +139,7 @@ def _download_minio_file(
 
     proxy_client = ProxyManager(proxy) if proxy else None
 
-    client = minio.Minio(
-        endpoint=parsed_url.netloc,
-        secure=False,
-        http_client=proxy_client
-    )
+    client = minio.Minio(endpoint=parsed_url.netloc, secure=False, http_client=proxy_client)
 
     try:
         client.fget_object(
@@ -151,7 +148,7 @@ def _download_minio_file(
             file_path=str(destination),
         )
         if destination.is_file() and destination.suffix == ".zip":
-            with zipfile.ZipFile(destination, 'r') as zip_ref:
+            with zipfile.ZipFile(destination, "r") as zip_ref:
                 zip_ref.extractall(destination.parent)
 
     except minio.error.S3Error as e:
@@ -163,9 +160,11 @@ def _download_minio_file(
 
 
 def _download_minio_bucket(
-    source: str, destination: Union[str, pathlib.Path], exists_ok: bool = True,
+    source: str,
+    destination: Union[str, pathlib.Path],
+    exists_ok: bool = True,
 ) -> None:
-    """ Download file ``source`` from a MinIO Bucket and store it at ``destination``.
+    """Download file ``source`` from a MinIO Bucket and store it at ``destination``.
 
     Parameters
     ----------
@@ -189,8 +188,9 @@ def _download_minio_bucket(
         _download_minio_file(
             source=source + "/" + file_object.object_name,
             destination=pathlib.Path(destination, file_object.object_name),
-            exists_ok=True
+            exists_ok=True,
         )
+
 
 def _download_text_file(
     source: str,

@@ -446,7 +446,9 @@ def get_dataset(
         arff_file = _get_dataset_arff(description) if download_data else None
         if "oml:minio_url" in description and download_data:
             try:
-                parquet_file = _get_dataset_parquet(description, download_all_files=download_all_files)
+                parquet_file = _get_dataset_parquet(
+                    description, download_all_files=download_all_files
+                )
             except urllib3.exceptions.MaxRetryError:
                 parquet_file = None
         else:
@@ -1013,10 +1015,10 @@ def _get_dataset_parquet(
         Location of the Parquet file if successfully downloaded, None otherwise.
     """
     if isinstance(description, dict):
-        url = description.get("oml:minio_url")
+        url = cast(str, description.get("oml:minio_url"))
         did = description.get("oml:id")
     elif isinstance(description, OpenMLDataset):
-        url = description._minio_url
+        url = cast(str, description._minio_url)
         did = description.dataset_id
     else:
         raise TypeError("`description` should be either OpenMLDataset or Dict.")
@@ -1025,7 +1027,7 @@ def _get_dataset_parquet(
         cache_directory = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, did)
     output_file_path = os.path.join(cache_directory, f"dataset_{did}.pq")
 
-    old_file_path = os.path.join(cache_directory, f"dataset.pq")
+    old_file_path = os.path.join(cache_directory, "dataset.pq")
     if os.path.isfile(old_file_path):
         os.rename(old_file_path, output_file_path)
 
@@ -1036,9 +1038,7 @@ def _get_dataset_parquet(
     if download_all_files:
         if url.endswith(".pq"):
             url, _ = url.rsplit("/", maxsplit=1)
-        openml._api_calls._download_minio_bucket(
-            source=cast(str, url), destination=cache_directory
-        )
+        openml._api_calls._download_minio_bucket(source=cast(str, url), destination=cache_directory)
 
     if not os.path.isfile(output_file_path):
         try:
