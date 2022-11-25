@@ -12,6 +12,7 @@ Changelog
  * FIX#1058, #1100: Avoid ``NoneType`` error when printing task without ``class_labels`` attribute.
  * FIX#1110: Make arguments to ``create_study`` and ``create_suite`` that are defined as optional by the OpenML XSD actually optional.
  * FIX#1147: ``openml.flow.flow_exists`` no longer requires an API key.
+ * FIX#1184: Automatically resolve proxies when downloading from minio. Turn this off by setting environment variable ``no_proxy="*"``.
  * MAIN#1088: Do CI for Windows on Github Actions instead of Appveyor.
  * MAINT#1104: Fix outdated docstring for ``list_task``.
  * MAIN#1146: Update the pre-commit dependencies.
