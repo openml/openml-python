@@ -16,6 +16,7 @@ Changelog
  * MAINT#1104: Fix outdated docstring for ``list_task``.
  * MAIN#1146: Update the pre-commit dependencies.
  * ADD#1103: Add a ``predictions`` property to OpenMLRun for easy accessibility of prediction data.
+ * ADD#1188: EXPERIMENTAL. Allow downloading all files from a minio bucket with ``download_all_files=True`` for ``get_dataset``.
 
 
 0.12.2
