@@ -13,7 +13,7 @@ from .utils import _tag_openml_base, _get_rest_api_type_alias
 
 
 class OpenMLBase(ABC):
-    """ Base object for functionality that is shared across entities. """
+    """Base object for functionality that is shared across entities."""
 
     def __repr__(self):
         body_fields = self._get_repr_body_fields()
@@ -22,32 +22,32 @@ class OpenMLBase(ABC):
     @property
     @abstractmethod
     def id(self) -> Optional[int]:
-        """ The id of the entity, it is unique for its entity type. """
+        """The id of the entity, it is unique for its entity type."""
         pass
 
     @property
     def openml_url(self) -> Optional[str]:
-        """ The URL of the object on the server, if it was uploaded, else None. """
+        """The URL of the object on the server, if it was uploaded, else None."""
         if self.id is None:
             return None
         return self.__class__.url_for_id(self.id)
 
     @classmethod
     def url_for_id(cls, id_: int) -> str:
-        """ Return the OpenML URL for the object of the class entity with the given id. """
+        """Return the OpenML URL for the object of the class entity with the given id."""
         # Sample url for a flow: openml.org/f/123
         return "{}/{}/{}".format(openml.config.get_server_base_url(), cls._entity_letter(), id_)
 
     @classmethod
     def _entity_letter(cls) -> str:
-        """ Return the letter which represents the entity type in urls, e.g. 'f' for flow."""
+        """Return the letter which represents the entity type in urls, e.g. 'f' for flow."""
         # We take advantage of the class naming convention (OpenMLX),
         # which holds for all entities except studies and tasks, which overwrite this method.
         return cls.__name__.lower()[len("OpenML") :][0]
 
     @abstractmethod
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
-        """ Collect all information to display in the __repr__ body.
+        """Collect all information to display in the __repr__ body.
 
         Returns
         ------
@@ -60,13 +60,13 @@ class OpenMLBase(ABC):
         pass
 
     def _apply_repr_template(self, body_fields: List[Tuple[str, str]]) -> str:
-        """ Generates the header and formats the body for string representation of the object.
+        """Generates the header and formats the body for string representation of the object.
 
-         Parameters
-         ----------
-         body_fields: List[Tuple[str, str]]
-            A list of (name, value) pairs to display in the body of the __repr__.
-         """
+        Parameters
+        ----------
+        body_fields: List[Tuple[str, str]]
+           A list of (name, value) pairs to display in the body of the __repr__.
+        """
         # We add spaces between capitals, e.g. ClassificationTask -> Classification Task
         name_with_spaces = re.sub(
             r"(\w)([A-Z])", r"\1 \2", self.__class__.__name__[len("OpenML") :]
@@ -81,7 +81,7 @@ class OpenMLBase(ABC):
 
     @abstractmethod
     def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
-        """ Creates a dictionary representation of self.
+        """Creates a dictionary representation of self.
 
         Uses OrderedDict to ensure consistent ordering when converting to xml.
         The return value (OrderedDict) will be used to create the upload xml file.
@@ -98,7 +98,7 @@ class OpenMLBase(ABC):
         pass
 
     def _to_xml(self) -> str:
-        """ Generate xml representation of self for upload to server. """
+        """Generate xml representation of self for upload to server."""
         dict_representation = self._to_dict()
         xml_representation = xmltodict.unparse(dict_representation, pretty=True)
 
@@ -108,7 +108,7 @@ class OpenMLBase(ABC):
         return xml_body
 
     def _get_file_elements(self) -> Dict:
-        """ Get file_elements to upload to the server, called during Publish.
+        """Get file_elements to upload to the server, called during Publish.
 
         Derived child classes should overwrite this method as necessary.
         The description field will be populated automatically if not provided.
@@ -117,7 +117,7 @@ class OpenMLBase(ABC):
 
     @abstractmethod
     def _parse_publish_response(self, xml_response: Dict):
-        """ Parse the id from the xml_response and assign it to self. """
+        """Parse the id from the xml_response and assign it to self."""
         pass
 
     def publish(self) -> "OpenMLBase":
@@ -136,7 +136,7 @@ class OpenMLBase(ABC):
         return self
 
     def open_in_browser(self):
-        """ Opens the OpenML web page corresponding to this object in your default browser. """
+        """Opens the OpenML web page corresponding to this object in your default browser."""
         webbrowser.open(self.openml_url)
 
     def push_tag(self, tag: str):

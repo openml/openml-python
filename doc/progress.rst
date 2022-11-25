@@ -8,8 +8,14 @@ Changelog
 
 0.13.0
 ~~~~~~
-
+ * FIX#1030: ``pre-commit`` hooks now no longer should issue a warning.
+ * FIX#1058, #1100: Avoid ``NoneType`` error when printing task without ``class_labels`` attribute.
+ * FIX#1110: Make arguments to ``create_study`` and ``create_suite`` that are defined as optional by the OpenML XSD actually optional.
+ * FIX#1147: ``openml.flow.flow_exists`` no longer requires an API key.
  * MAIN#1088: Do CI for Windows on Github Actions instead of Appveyor.
+ * MAINT#1104: Fix outdated docstring for ``list_task``.
+ * MAIN#1146: Update the pre-commit dependencies.
+ * ADD#1103: Add a ``predictions`` property to OpenMLRun for easy accessibility of prediction data.
 
 
 0.12.2

@@ -253,7 +253,7 @@ def __list_evaluations(api_call, output_format="object"):
 
 
 def list_evaluation_measures() -> List[str]:
-    """ Return list of evaluation measures available.
+    """Return list of evaluation measures available.
 
     The function performs an API call to retrieve the entire list of
     evaluation measures that are available.

@@ -204,7 +204,9 @@ class Extension(ABC):
 
     @abstractmethod
     def obtain_parameter_values(
-        self, flow: "OpenMLFlow", model: Any = None,
+        self,
+        flow: "OpenMLFlow",
+        model: Any = None,
     ) -> List[Dict[str, Any]]:
         """Extracts all parameter settings required for the flow from the model.
 
@@ -247,7 +249,9 @@ class Extension(ABC):
 
     @abstractmethod
     def instantiate_model_from_hpo_class(
-        self, model: Any, trace_iteration: "OpenMLTraceIteration",
+        self,
+        model: Any,
+        trace_iteration: "OpenMLTraceIteration",
     ) -> Any:
         """Instantiate a base model which can be searched over by the hyperparameter optimization
         model.

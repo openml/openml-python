@@ -85,7 +85,9 @@ flow_hyperparameters = dict(
 # but that does not matter for this demonstration.
 
 autosklearn_flow = openml.flows.get_flow(9313)  # auto-sklearn 0.5.1
-subflow = dict(components=OrderedDict(automl_tool=autosklearn_flow),)
+subflow = dict(
+    components=OrderedDict(automl_tool=autosklearn_flow),
+)
 
 ####################################################################################################
 # With all parameters of the flow defined, we can now initialize the OpenMLFlow and publish.
@@ -98,7 +100,10 @@ subflow = dict(components=OrderedDict(automl_tool=autosklearn_flow),)
 # the model of the flow to `None`.
 
 autosklearn_amlb_flow = openml.flows.OpenMLFlow(
-    **general, **flow_hyperparameters, **subflow, model=None,
+    **general,
+    **flow_hyperparameters,
+    **subflow,
+    model=None,
 )
 autosklearn_amlb_flow.publish()
 print(f"autosklearn flow created: {autosklearn_amlb_flow.flow_id}")

@@ -26,7 +26,7 @@ def looks_like_url(url: str) -> bool:
 def wait_until_valid_input(
     prompt: str, check: Callable[[str], str], sanitize: Union[Callable[[str], str], None]
 ) -> str:
-    """  Asks `prompt` until an input is received which returns True for `check`.
+    """Asks `prompt` until an input is received which returns True for `check`.
 
     Parameters
     ----------
@@ -252,7 +252,7 @@ def configure_field(
     input_message: str,
     sanitize: Union[Callable[[str], str], None] = None,
 ) -> None:
-    """ Configure `field` with `value`. If `value` is None ask the user for input.
+    """Configure `field` with `value`. If `value` is None ask the user for input.
 
     `value` and user input are first corrected/auto-completed with `convert_value` if provided,
     then validated with `check_with_message` function.
@@ -288,13 +288,15 @@ def configure_field(
     else:
         print(intro_message)
         value = wait_until_valid_input(
-            prompt=input_message, check=check_with_message, sanitize=sanitize,
+            prompt=input_message,
+            check=check_with_message,
+            sanitize=sanitize,
         )
     verbose_set(field, value)
 
 
 def configure(args: argparse.Namespace):
-    """ Calls the right submenu(s) to edit `args.field` in the configuration file. """
+    """Calls the right submenu(s) to edit `args.field` in the configuration file."""
     set_functions = {
         "apikey": configure_apikey,
         "server": configure_server,
@@ -348,7 +350,11 @@ def main() -> None:
     )
 
     parser_configure.add_argument(
-        "value", type=str, default=None, nargs="?", help="The value to set the FIELD to.",
+        "value",
+        type=str,
+        default=None,
+        nargs="?",
+        help="The value to set the FIELD to.",
     )
 
     args = parser.parse_args()

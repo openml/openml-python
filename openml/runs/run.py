@@ -8,6 +8,7 @@ import os
 
 import arff
 import numpy as np
+import pandas as pd
 
 import openml
 import openml._api_calls
@@ -116,13 +117,30 @@ class OpenMLRun(OpenMLBase):
         self.predictions_url = predictions_url
         self.description_text = description_text
         self.run_details = run_details
+        self._predictions = None
+
+    @property
+    def predictions(self) -> pd.DataFrame:
+        """Return a DataFrame with predictions for this run"""
+        if self._predictions is None:
+            if self.data_content:
+                arff_dict = self._generate_arff_dict()
+            elif self.predictions_url:
+                arff_text = openml._api_calls._download_text_file(self.predictions_url)
+                arff_dict = arff.loads(arff_text)
+            else:
+                raise RuntimeError("Run has no predictions.")
+            self._predictions = pd.DataFrame(
+                arff_dict["data"], columns=[name for name, _ in arff_dict["attributes"]]
+            )
+        return self._predictions
 
     @property
     def id(self) -> Optional[int]:
         return self.run_id
 
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
-        """ Collect all information to display in the __repr__ body. """
+        """Collect all information to display in the __repr__ body."""
         fields = {
             "Uploader Name": self.uploader_name,
             "Metric": self.task_evaluation_measure,
@@ -233,7 +251,11 @@ class OpenMLRun(OpenMLBase):
 
         return run
 
-    def to_filesystem(self, directory: str, store_model: bool = True,) -> None:
+    def to_filesystem(
+        self,
+        directory: str,
+        store_model: bool = True,
+    ) -> None:
         """
         The inverse of the from_filesystem method. Serializes a run
         on the filesystem, to be uploaded later.
@@ -390,7 +412,8 @@ class OpenMLRun(OpenMLBase):
             predictions_arff = self._generate_arff_dict()
         elif "predictions" in self.output_files:
             predictions_file_url = openml._api_calls._file_id_to_url(
-                self.output_files["predictions"], "predictions.arff",
+                self.output_files["predictions"],
+                "predictions.arff",
             )
             response = openml._api_calls._download_text_file(predictions_file_url)
             predictions_arff = arff.loads(response)
@@ -498,11 +521,11 @@ class OpenMLRun(OpenMLBase):
         return np.array(scores)
 
     def _parse_publish_response(self, xml_response: Dict):
-        """ Parse the id from the xml_response and assign it to self. """
+        """Parse the id from the xml_response and assign it to self."""
         self.run_id = int(xml_response["oml:upload_run"]["oml:run_id"])
 
     def _get_file_elements(self) -> Dict:
-        """ Get file_elements to upload to the server.
+        """Get file_elements to upload to the server.
 
         Derived child classes should overwrite this method as necessary.
         The description field will be populated automatically if not provided.
@@ -526,7 +549,8 @@ class OpenMLRun(OpenMLBase):
             if self.flow is None:
                 self.flow = openml.flows.get_flow(self.flow_id)
             self.parameter_settings = self.flow.extension.obtain_parameter_values(
-                self.flow, self.model,
+                self.flow,
+                self.model,
             )
 
         file_elements = {"description": ("description.xml", self._to_xml())}
@@ -541,7 +565,7 @@ class OpenMLRun(OpenMLBase):
         return file_elements
 
     def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
-        """ Creates a dictionary representation of self. """
+        """Creates a dictionary representation of self."""
         description = OrderedDict()  # type: 'OrderedDict'
         description["oml:run"] = OrderedDict()
         description["oml:run"]["@xmlns:oml"] = "http://openml.org/openml"

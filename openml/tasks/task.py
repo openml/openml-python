@@ -34,16 +34,16 @@ class TaskType(Enum):
 class OpenMLTask(OpenMLBase):
     """OpenML Task object.
 
-       Parameters
-       ----------
-       task_type_id : TaskType
-           Refers to the type of task.
-       task_type : str
-           Refers to the task.
-       data_set_id: int
-           Refers to the data.
-       estimation_procedure_id: int
-           Refers to the type of estimates used.
+    Parameters
+    ----------
+    task_type_id : TaskType
+        Refers to the type of task.
+    task_type : str
+        Refers to the task.
+    data_set_id: int
+        Refers to the data.
+    estimation_procedure_id: int
+        Refers to the type of estimates used.
     """
 
     def __init__(
@@ -82,7 +82,7 @@ class OpenMLTask(OpenMLBase):
         return self.task_id
 
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
-        """ Collect all information to display in the __repr__ body. """
+        """Collect all information to display in the __repr__ body."""
         fields = {
             "Task Type Description": "{}/tt/{}".format(
                 openml.config.get_server_base_url(), self.task_type_id
@@ -97,7 +97,7 @@ class OpenMLTask(OpenMLBase):
             fields["Estimation Procedure"] = self.estimation_procedure["type"]
         if getattr(self, "target_name", None) is not None:
             fields["Target Feature"] = getattr(self, "target_name")
-            if hasattr(self, "class_labels"):
+            if hasattr(self, "class_labels") and getattr(self, "class_labels") is not None:
                 fields["# of Classes"] = len(getattr(self, "class_labels"))
             if hasattr(self, "cost_matrix"):
                 fields["Cost Matrix"] = "Available"
@@ -120,14 +120,21 @@ class OpenMLTask(OpenMLBase):
         return datasets.get_dataset(self.dataset_id)
 
     def get_train_test_split_indices(
-        self, fold: int = 0, repeat: int = 0, sample: int = 0,
+        self,
+        fold: int = 0,
+        repeat: int = 0,
+        sample: int = 0,
     ) -> Tuple[np.ndarray, np.ndarray]:
 
         # Replace with retrieve from cache
         if self.split is None:
             self.split = self.download_split()
 
-        train_indices, test_indices = self.split.get(repeat=repeat, fold=fold, sample=sample,)
+        train_indices, test_indices = self.split.get(
+            repeat=repeat,
+            fold=fold,
+            sample=sample,
+        )
         return train_indices, test_indices
 
     def _download_split(self, cache_file: str):
@@ -137,14 +144,15 @@ class OpenMLTask(OpenMLBase):
         except (OSError, IOError):
             split_url = self.estimation_procedure["data_splits_url"]
             openml._api_calls._download_text_file(
-                source=str(split_url), output_path=cache_file,
+                source=str(split_url),
+                output_path=cache_file,
             )
 
     def download_split(self) -> OpenMLSplit:
-        """Download the OpenML split for a given task.
-        """
+        """Download the OpenML split for a given task."""
         cached_split_file = os.path.join(
-            _create_cache_directory_for_id("tasks", self.task_id), "datasplits.arff",
+            _create_cache_directory_for_id("tasks", self.task_id),
+            "datasplits.arff",
         )
 
         try:
@@ -164,11 +172,11 @@ class OpenMLTask(OpenMLBase):
         return self.split.repeats, self.split.folds, self.split.samples
 
     def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
-        """ Creates a dictionary representation of self. """
+        """Creates a dictionary representation of self."""
         task_container = OrderedDict()  # type: OrderedDict[str, OrderedDict]
         task_dict = OrderedDict(
             [("@xmlns:oml", "http://openml.org/openml")]
-        )  # type: OrderedDict[str, Union[List, str, TaskType]]
+        )  # type: OrderedDict[str, Union[List, str, int]]
 
         task_container["oml:task_inputs"] = task_dict
         task_dict["oml:task_type_id"] = self.task_type_id.value
@@ -192,17 +200,17 @@ class OpenMLTask(OpenMLBase):
         return task_container
 
     def _parse_publish_response(self, xml_response: Dict):
-        """ Parse the id from the xml_response and assign it to self. """
+        """Parse the id from the xml_response and assign it to self."""
         self.task_id = int(xml_response["oml:upload_task"]["oml:id"])
 
 
 class OpenMLSupervisedTask(OpenMLTask, ABC):
     """OpenML Supervised Classification object.
 
-       Parameters
-       ----------
-       target_name : str
-           Name of the target feature (the class variable).
+    Parameters
+    ----------
+    target_name : str
+        Name of the target feature (the class variable).
     """
 
     def __init__(
@@ -233,7 +241,8 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         self.target_name = target_name
 
     def get_X_and_y(
-        self, dataset_format: str = "array",
+        self,
+        dataset_format: str = "array",
     ) -> Tuple[
         Union[np.ndarray, pd.DataFrame, scipy.sparse.spmatrix], Union[np.ndarray, pd.Series]
     ]:
@@ -257,7 +266,10 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
             TaskType.LEARNING_CURVE,
         ):
             raise NotImplementedError(self.task_type)
-        X, y, _, _ = dataset.get_data(dataset_format=dataset_format, target=self.target_name,)
+        X, y, _, _ = dataset.get_data(
+            dataset_format=dataset_format,
+            target=self.target_name,
+        )
         return X, y
 
     def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
@@ -291,10 +303,10 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 class OpenMLClassificationTask(OpenMLSupervisedTask):
     """OpenML Classification object.
 
-       Parameters
-       ----------
-       class_labels : List of str (optional)
-       cost_matrix: array (optional)
+    Parameters
+    ----------
+    class_labels : List of str (optional)
+    cost_matrix: array (optional)
     """
 
     def __init__(
@@ -333,8 +345,7 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
 
 
 class OpenMLRegressionTask(OpenMLSupervisedTask):
-    """OpenML Regression object.
-    """
+    """OpenML Regression object."""
 
     def __init__(
         self,
@@ -366,11 +377,11 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
 class OpenMLClusteringTask(OpenMLTask):
     """OpenML Clustering object.
 
-       Parameters
-       ----------
-       target_name : str (optional)
-           Name of the target feature (class) that is not part of the
-           feature set for the clustering task.
+    Parameters
+    ----------
+    target_name : str (optional)
+        Name of the target feature (class) that is not part of the
+        feature set for the clustering task.
     """
 
     def __init__(
@@ -401,7 +412,8 @@ class OpenMLClusteringTask(OpenMLTask):
         self.target_name = target_name
 
     def get_X(
-        self, dataset_format: str = "array",
+        self,
+        dataset_format: str = "array",
     ) -> Union[np.ndarray, pd.DataFrame, scipy.sparse.spmatrix]:
         """Get data associated with the current task.
 
@@ -417,7 +429,10 @@ class OpenMLClusteringTask(OpenMLTask):
 
         """
         dataset = self.get_dataset()
-        data, *_ = dataset.get_data(dataset_format=dataset_format, target=None,)
+        data, *_ = dataset.get_data(
+            dataset_format=dataset_format,
+            target=None,
+        )
         return data
 
     def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
@@ -442,8 +457,7 @@ class OpenMLClusteringTask(OpenMLTask):
 
 
 class OpenMLLearningCurveTask(OpenMLClassificationTask):
-    """OpenML Learning Curve object.
-    """
+    """OpenML Learning Curve object."""
 
     def __init__(
         self,

@@ -87,7 +87,9 @@ class TestSetupFunctions(TestBase):
             self.priors = None
 
         with unittest.mock.patch.object(
-            sklearn.naive_bayes.GaussianNB, "__init__", side_effect,
+            sklearn.naive_bayes.GaussianNB,
+            "__init__",
+            side_effect,
         ):
             # Check a flow with zero hyperparameters
             nb = sklearn.naive_bayes.GaussianNB()
