@@ -437,8 +437,7 @@ def get_dataset(
             else:
                 raise
 
-        # arff_file = _get_dataset_arff(description) if download_data else None
-        arff_file = None
+        arff_file = _get_dataset_arff(description) if download_data else None
         if "oml:minio_url" in description and download_data:
             try:
                 parquet_file = _get_dataset_parquet(description, download_all_files=download_all_files)
