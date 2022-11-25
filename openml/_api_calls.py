@@ -94,7 +94,6 @@ def _download_minio_file(
 
     # expect path format: /BUCKET/path/to/file.ext
     bucket, object_name = parsed_url.path[1:].split("/", maxsplit=1)
-    #print(f"{source=}\n{destination=}\n{bucket=}\n{object_name=}")
     if destination.is_dir():
         destination = pathlib.Path(destination, object_name)
     if destination.is_file() and not exists_ok:
