@@ -12,6 +12,7 @@ import xml
 import xmltodict
 from urllib3 import ProxyManager
 from typing import Dict, Optional, Union
+import zipfile
 
 import minio
 
@@ -43,6 +44,7 @@ def resolve_env_proxies(url: str) -> Optional[str]:
     resolved_proxies = requests.utils.get_environ_proxies(url)
     selected_proxy = requests.utils.select_proxy(url, resolved_proxies)
     return selected_proxy
+
 
 def _create_url_from_endpoint(endpoint: str) -> str:
     url = config.server
@@ -137,11 +139,7 @@ def _download_minio_file(
 
     proxy_client = ProxyManager(proxy) if proxy else None
 
-    client = minio.Minio(
-        endpoint=parsed_url.netloc,
-        secure=False,
-        http_client=proxy_client
-    )
+    client = minio.Minio(endpoint=parsed_url.netloc, secure=False, http_client=proxy_client)
 
     try:
         client.fget_object(
@@ -149,12 +147,49 @@ def _download_minio_file(
             object_name=object_name,
             file_path=str(destination),
         )
+        if destination.is_file() and destination.suffix == ".zip":
+            with zipfile.ZipFile(destination, "r") as zip_ref:
+                zip_ref.extractall(destination.parent)
+
     except minio.error.S3Error as e:
         if e.message.startswith("Object does not exist"):
             raise FileNotFoundError(f"Object at '{source}' does not exist.") from e
         # e.g. permission error, or a bucket does not exist (which is also interpreted as a
         # permission error on minio level).
         raise FileNotFoundError("Bucket does not exist or is private.") from e
+
+
+def _download_minio_bucket(
+    source: str,
+    destination: Union[str, pathlib.Path],
+    exists_ok: bool = True,
+) -> None:
+    """Download file ``source`` from a MinIO Bucket and store it at ``destination``.
+
+    Parameters
+    ----------
+    source : Union[str, pathlib.Path]
+        URL to a MinIO bucket.
+    destination : str
+        Path to a directory to store the bucket content in.
+    exists_ok : bool, optional (default=True)
+        If False, raise FileExists if a file already exists in ``destination``.
+    """
+
+    destination = pathlib.Path(destination)
+    parsed_url = urllib.parse.urlparse(source)
+
+    # expect path format: /BUCKET/path/to/file.ext
+    bucket = parsed_url.path[1:]
+
+    client = minio.Minio(endpoint=parsed_url.netloc, secure=False)
+
+    for file_object in client.list_objects(bucket, recursive=True):
+        _download_minio_file(
+            source=source + "/" + file_object.object_name,
+            destination=pathlib.Path(destination, file_object.object_name),
+            exists_ok=True,
+        )
 
 
 def _download_text_file(
