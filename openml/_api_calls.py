@@ -105,7 +105,7 @@ def _download_minio_file(
     source: str,
     destination: Union[str, pathlib.Path],
     exists_ok: bool = True,
-    proxy: Union[bool, str] = True
+    proxy: Optional[str] = "auto",
 ) -> None:
     """Download file ``source`` from a MinIO Bucket and store it at ``destination``.
 
@@ -117,10 +117,10 @@ def _download_minio_file(
         Path to store the file to, if a directory is provided the original filename is used.
     exists_ok : bool, optional (default=True)
         If False, raise FileExists if a file already exists in ``destination``.
-    proxy: Union[bool, str]
-        If True (default), environemnt variables will be parsed using ``requests`` to find a
-        suitable proxy. If False, no proxy will be used. Finally, pass a str to use a
-        custom proxy. To disable this from the environment varialbes, use ``no_proxy="*"``.
+    proxy: str, optional (default = "auto")
+        The proxy server to use. By default it's "auto" which uses ``requests`` to
+        automatically find the proxy to use. Pass None or the environment variable
+        ``no_proxy="*"`` to disable proxies.
     """
     destination = pathlib.Path(destination)
     parsed_url = urllib.parse.urlparse(source)
@@ -132,13 +132,10 @@ def _download_minio_file(
     if destination.is_file() and not exists_ok:
         raise FileExistsError(f"File already exists in {destination}.")
 
-    proxy_client = None
-    if isinstance(proxy, str):
-        proxy_client = ProxyManager(proxy)
-    else:
-        proxy_url = resolve_env_proxies(parsed_url.geturl()) if proxy else None
-        if proxy_url:
-            proxy_client = ProxyManager(proxy_url)
+    if proxy == "auto":
+        proxy = resolve_env_proxies(parsed_url.geturl())
+
+    proxy_client = ProxyManager(proxy) if proxy else None
 
     client = minio.Minio(
         endpoint=parsed_url.netloc,
