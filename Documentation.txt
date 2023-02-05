@@ -1,0 +1,25 @@
+task_id: 				an integer representing the task id
+flow_id: 				an integer representing the flow id
+dataset_id: 			an integer representing the dataset id
+setup_string: 			a string representing the setup
+output_files: 			a dictionary representing the output files, where the key is the name of the file and the value is the file path
+setup_id: 				an integer representing the setup id
+tags: 				a list of strings representing tags
+uploader: 				an integer representing the uploader
+uploader_name: 			a string representing the uploader name
+evaluations: 			a dictionary representing the evaluations
+fold_evaluations: 		a dictionary representing the fold evaluations
+sample_evaluations: 		a dictionary representing the sample evaluations
+data_content: 			a list of lists representing the data content
+trace: 				an object of type OpenMLRunTrace
+model: 				an object representing the model
+task_type: 				a string representing the task type
+task_evaluation_measure: 	a string representing the task evaluation measure
+flow_name: 				a string representing the flow name
+parameter_settings: 		a list of ordered dictionaries representing the parameter settings
+predictions_url: 			a string representing the predictions url
+task: 				an object of type OpenMLTask
+flow: 				an object of type OpenMLFlow
+run_id: 				an integer representing the run id
+description_text: 		an optional string representing the description text
+run_details: 			an optional string representing the run details.
