@@ -1449,22 +1449,19 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
 
         pipe_adjusted = sklearn.clone(pipe_orig)
-        if LooseVersion(sklearn.__version__) < "0.23":
-            params = {
-                "Imputer__strategy": "median",
-                "OneHotEncoder__sparse": False,
-                "Estimator__n_estimators": 10,
-                "Estimator__base_estimator__n_estimators": 10,
-                "Estimator__base_estimator__base_estimator__learning_rate": 0.1,
-            }
-        else:
-            params = {
-                "Imputer__strategy": "mean",
-                "OneHotEncoder__sparse": True,
-                "Estimator__n_estimators": 50,
-                "Estimator__base_estimator__n_estimators": 10,
-                "Estimator__base_estimator__base_estimator__learning_rate": 0.1,
-            }
+        impute_strategy = "median" if LooseVersion(sklearn.__version__) < "0.23" else "mean"
+        sparse = LooseVersion(sklearn.__version__) >= "0.23"
+        estimator_name = (
+            "base_estimator" if LooseVersion(sklearn.__version__) < "1.2" else "estimator"
+        )
+        params = {
+            "Imputer__strategy": impute_strategy,
+            "OneHotEncoder__sparse": sparse,
+            "Estimator__n_estimators": 10,
+            f"Estimator__{estimator_name}__n_estimators": 10,
+            f"Estimator__{estimator_name}__{estimator_name}__learning_rate": 0.1,
+        }
+
         pipe_adjusted.set_params(**params)
         flow = self.extension.model_to_flow(pipe_adjusted)
         pipe_deserialized = self.extension.flow_to_model(flow, initialize_with_defaults=True)
