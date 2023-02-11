@@ -683,6 +683,7 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
+    @unittest.skip("https://github.com/openml/OpenML/issues/1180")
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
