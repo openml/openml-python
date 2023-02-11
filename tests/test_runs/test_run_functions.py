@@ -410,10 +410,13 @@ class TestRun(TestBase):
 
         # Invalid parameter values
         clf = LogisticRegression(C="abc", solver="lbfgs")
-        with self.assertRaisesRegex(
-            ValueError,
-            r"Penalty term must be positive; got \(C=u?'abc'\)",  # u? for 2.7/3.4-6 compability
-        ):
+        # The exact error message depends on scikit-learn version.
+        # Because the sklearn-extension module is to be separated,
+        # I will simply relax specifics of the raised Error.
+        # old: r"Penalty term must be positive; got \(C=u?'abc'\)"
+        # new: sklearn.utils._param_validation.InvalidParameterError:
+        #   The 'C' parameter of LogisticRegression must be a float in the range (0, inf]. Got 'abc' instead.  # noqa: E501
+        with self.assertRaises(Exception):
             openml.runs.run_model_on_task(
                 task=task,
                 model=clf,
