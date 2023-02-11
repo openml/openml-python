@@ -338,6 +338,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 )
             )
         else:
+            n_init = '"warn"' if LooseVersion(sklearn.__version__) >= "1.2" else "10"
             fixture_parameters = OrderedDict(
                 (
                     ("algorithm", '"lloyd"'),
@@ -345,7 +346,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("init", '"k-means++"'),
                     ("max_iter", "300"),
                     ("n_clusters", "8"),
-                    ("n_init", "10"),
+                    ("n_init", n_init),
                     ("random_state", "null"),
                     ("tol", "0.0001"),
                     ("verbose", "0"),
@@ -358,13 +359,13 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         structure = serialization.get_structure("name")
 
-        self.assertEqual(serialization.name, fixture_name)
-        self.assertEqual(serialization.class_name, fixture_name)
-        self.assertEqual(serialization.custom_name, fixture_short_name)
-        self.assertEqual(serialization.description, fixture_description)
-        self.assertEqual(serialization.parameters, fixture_parameters)
-        self.assertEqual(serialization.dependencies, version_fixture)
-        self.assertDictEqual(structure, fixture_structure)
+        assert serialization.name == fixture_name
+        assert serialization.class_name == fixture_name
+        assert serialization.custom_name == fixture_short_name
+        assert serialization.description == fixture_description
+        assert serialization.parameters == fixture_parameters
+        assert serialization.dependencies == version_fixture
+        assert structure == fixture_structure
 
     def test_serialize_model_with_subcomponent(self):
         model = sklearn.ensemble.AdaBoostClassifier(
