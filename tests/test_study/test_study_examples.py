@@ -3,6 +3,7 @@
 from openml.testing import TestBase
 from openml.extensions.sklearn import cat, cont
 
+import pytest
 import sklearn
 import unittest
 from distutils.version import LooseVersion
@@ -12,6 +13,7 @@ class TestStudyFunctions(TestBase):
     _multiprocess_can_split_ = True
     """Test the example code of Bischl et al. (2018)"""
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.24",
         reason="columntransformer introduction in 0.24.0",
