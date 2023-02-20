@@ -52,10 +52,16 @@ class TestRun(TestBase):
                     self.assertDictEqual(other, dict())
         self.assertEqual(run._to_xml(), run_prime._to_xml())
 
-        numeric_part = np.array(np.array(run.data_content)[:, 0:-2], dtype=float)
-        numeric_part_prime = np.array(np.array(run_prime.data_content)[:, 0:-2], dtype=float)
-        string_part = np.array(run.data_content)[:, -2:]
-        string_part_prime = np.array(run_prime.data_content)[:, -2:]
+        # Determine which attributes are numeric and which not
+        num_cols = np.array(
+            [d_type == "NUMERIC" for _, d_type in run._generate_arff_dict()["attributes"]]
+        )
+
+        # Assert numeric and string parts separately
+        numeric_part = np.array(np.array(run.data_content)[:, num_cols], dtype=float)
+        numeric_part_prime = np.array(np.array(run_prime.data_content)[:, num_cols], dtype=float)
+        string_part = np.array(run.data_content)[:, ~num_cols]
+        string_part_prime = np.array(run_prime.data_content)[:, ~num_cols]
         np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
         np.testing.assert_array_equal(string_part, string_part_prime)
 
