@@ -1,10 +1,10 @@
 # License: BSD 3-Clause
 
-import os
+from collections import OrderedDict
 import pickle
 import time
-from collections import OrderedDict
 from typing import Any, IO, TextIO, List, Union, Tuple, Optional, Dict  # noqa F401
+import os
 
 import arff
 import numpy as np

@@ -1,31 +1,29 @@
 # License: BSD 3-Clause
 
+from collections import OrderedDict
 import io
 import itertools
 import os
 import time
-import warnings
-from collections import OrderedDict
 from typing import Any, List, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
+import warnings
 
-import numpy as np
-import pandas as pd
 import sklearn.metrics
 import xmltodict
+import numpy as np
+import pandas as pd
 from joblib.parallel import Parallel, delayed
 
 import openml
-import openml._api_calls
 import openml.utils
-from openml import config
+import openml._api_calls
 from openml.exceptions import PyOpenMLError
 from openml.extensions import get_extension_by_model
+from openml import config
 from openml.flows.flow import _copy_server_fields
-from .run import OpenMLRun
-from .trace import OpenMLRunTrace
-from ..exceptions import OpenMLCacheException, OpenMLServerException, OpenMLRunsExistError
 from ..flows import get_flow, flow_exists, OpenMLFlow
 from ..setups import setup_exists, initialize_model
+from ..exceptions import OpenMLCacheException, OpenMLServerException, OpenMLRunsExistError
 from ..tasks import (
     OpenMLTask,
     OpenMLClassificationTask,
@@ -34,6 +32,8 @@ from ..tasks import (
     OpenMLSupervisedTask,
     OpenMLLearningCurveTask,
 )
+from .run import OpenMLRun
+from .trace import OpenMLRunTrace
 from ..tasks import TaskType, get_task
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
