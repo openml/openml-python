@@ -53,7 +53,7 @@ setuptools.setup(
         "python-dateutil",  # Installed through pandas anyway.
         "pandas>=1.0.0",
         "scipy>=0.13.3",
-        "numpy>=1.6.2",
+        "numpy>=1.6.2,<1.24",
         "minio",
         "pyarrow",
     ],
