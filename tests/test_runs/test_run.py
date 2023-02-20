@@ -11,6 +11,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
+from sklearn.base import clone
 
 from openml import OpenMLRun
 from openml.testing import TestBase, SimpleImputer
@@ -191,7 +192,7 @@ class TestRun(TestBase):
             openml.runs.OpenMLRun.from_filesystem(cache_path)
 
     @staticmethod
-    def assert_run_prediction_data(task, run):
+    def assert_run_prediction_data(task, run, model):
         # -- Get y_pred and y_true as it should be stored in the run
         fold_map = np.full(int(task.get_dataset().qualities["NumberOfInstances"]), -1)
         s_d = task.get_split_dimensions()
@@ -214,7 +215,7 @@ class TestRun(TestBase):
             y_train = y[train_mask]
             X_test = X[test_indices]
             y_test = y[test_indices]
-            y_pred = LinearRegression().fit(X_train, y_train).predict(X_test)
+            y_pred = model.fit(X_train, y_train).predict(X_test)
 
             # Get stored data for fold
             saved_fold_data = run.predictions[run.predictions["fold"] == fold_id].sort_values(
@@ -274,7 +275,7 @@ class TestRun(TestBase):
 
             # Make sure that the flow has not been uploaded as requested.
             self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
-            self.assert_run_prediction_data(task, run)
+            self.assert_run_prediction_data(task, run, clone(model))
 
             cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
             run.to_filesystem(cache_path)
