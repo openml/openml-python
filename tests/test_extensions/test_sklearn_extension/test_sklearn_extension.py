@@ -338,6 +338,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 )
             )
         else:
+            n_init = '"warn"' if LooseVersion(sklearn.__version__) >= "1.2" else "10"
             fixture_parameters = OrderedDict(
                 (
                     ("algorithm", '"lloyd"'),
@@ -345,7 +346,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("init", '"k-means++"'),
                     ("max_iter", "300"),
                     ("n_clusters", "8"),
-                    ("n_init", "10"),
+                    ("n_init", n_init),
                     ("random_state", "null"),
                     ("tol", "0.0001"),
                     ("verbose", "0"),
@@ -358,13 +359,13 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         structure = serialization.get_structure("name")
 
-        self.assertEqual(serialization.name, fixture_name)
-        self.assertEqual(serialization.class_name, fixture_name)
-        self.assertEqual(serialization.custom_name, fixture_short_name)
-        self.assertEqual(serialization.description, fixture_description)
-        self.assertEqual(serialization.parameters, fixture_parameters)
-        self.assertEqual(serialization.dependencies, version_fixture)
-        self.assertDictEqual(structure, fixture_structure)
+        assert serialization.name == fixture_name
+        assert serialization.class_name == fixture_name
+        assert serialization.custom_name == fixture_short_name
+        assert serialization.description == fixture_description
+        assert serialization.parameters == fixture_parameters
+        assert serialization.dependencies == version_fixture
+        assert structure == fixture_structure
 
     def test_serialize_model_with_subcomponent(self):
         model = sklearn.ensemble.AdaBoostClassifier(
@@ -1449,22 +1450,19 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
 
         pipe_adjusted = sklearn.clone(pipe_orig)
-        if LooseVersion(sklearn.__version__) < "0.23":
-            params = {
-                "Imputer__strategy": "median",
-                "OneHotEncoder__sparse": False,
-                "Estimator__n_estimators": 10,
-                "Estimator__base_estimator__n_estimators": 10,
-                "Estimator__base_estimator__base_estimator__learning_rate": 0.1,
-            }
-        else:
-            params = {
-                "Imputer__strategy": "mean",
-                "OneHotEncoder__sparse": True,
-                "Estimator__n_estimators": 50,
-                "Estimator__base_estimator__n_estimators": 10,
-                "Estimator__base_estimator__base_estimator__learning_rate": 0.1,
-            }
+        impute_strategy = "median" if LooseVersion(sklearn.__version__) < "0.23" else "mean"
+        sparse = LooseVersion(sklearn.__version__) >= "0.23"
+        estimator_name = (
+            "base_estimator" if LooseVersion(sklearn.__version__) < "1.2" else "estimator"
+        )
+        params = {
+            "Imputer__strategy": impute_strategy,
+            "OneHotEncoder__sparse": sparse,
+            "Estimator__n_estimators": 10,
+            f"Estimator__{estimator_name}__n_estimators": 10,
+            f"Estimator__{estimator_name}__{estimator_name}__learning_rate": 0.1,
+        }
+
         pipe_adjusted.set_params(**params)
         flow = self.extension.model_to_flow(pipe_adjusted)
         pipe_deserialized = self.extension.flow_to_model(flow, initialize_with_defaults=True)
