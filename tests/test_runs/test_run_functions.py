@@ -416,7 +416,13 @@ class TestRun(TestBase):
         # old: r"Penalty term must be positive; got \(C=u?'abc'\)"
         # new: sklearn.utils._param_validation.InvalidParameterError:
         #   The 'C' parameter of LogisticRegression must be a float in the range (0, inf]. Got 'abc' instead.  # noqa: E501
-        with self.assertRaises(Exception):
+        try:
+            from sklearn.utils._param_validation import InvalidParameterError
+
+            exceptions = (ValueError, InvalidParameterError)
+        except ImportError:
+            exceptions = (ValueError,)
+        with self.assertRaises(exceptions):
             openml.runs.run_model_on_task(
                 task=task,
                 model=clf,
