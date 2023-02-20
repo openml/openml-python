@@ -175,6 +175,7 @@ class TestRun(TestBase):
             "collected from {}: {}".format(__file__.split("/")[-1], run_prime.run_id)
         )
 
+    @pytest.mark.sklearn
     def test_to_from_filesystem_no_model(self):
 
         model = Pipeline(
