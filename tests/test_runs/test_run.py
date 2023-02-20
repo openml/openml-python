@@ -1,22 +1,22 @@
 # License: BSD 3-Clause
 
-import numpy as np
-import random
 import os
+import random
 from time import time
 
+import numpy as np
+import pytest
 import xmltodict
 from sklearn.dummy import DummyClassifier
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
+from sklearn.tree import DecisionTreeClassifier
 
-from openml import OpenMLRun
-from openml.testing import TestBase, SimpleImputer
 import openml
 import openml.extensions.sklearn
-
-import pytest
+from openml import OpenMLRun
+from openml.testing import TestBase, SimpleImputer
 
 
 class TestRun(TestBase):
@@ -189,6 +189,50 @@ class TestRun(TestBase):
         with self.assertRaises(ValueError, msg="Could not find model.pkl"):
             openml.runs.OpenMLRun.from_filesystem(cache_path)
 
+    @staticmethod
+    def assert_run_prediction_data(task, run):
+        # -- Get y_pred and y_true as it should be stored in the run
+        fold_map = np.full(int(task.get_dataset().qualities["NumberOfInstances"]), -1)
+        s_d = task.get_split_dimensions()
+        if (s_d[0] > 1) or (s_d[2] > 1):
+            raise ValueError("Test does not support this task type's split dimensions.")
+
+        for fold_id in range(s_d[1]):
+            _, test_indices = task.get_train_test_split_indices(repeat=0, fold=fold_id, sample=0)
+            fold_map[test_indices] = fold_id
+
+        X, y = task.get_X_and_y()
+
+        # Check correctness of y_ture and y_pred in run
+        for fold_id in range(s_d[1]):
+            # Get data for fold
+            test_indices = np.where(fold_map == fold_id)[0]
+            train_mask = np.full(len(fold_map), True)
+            train_mask[test_indices] = False
+            X_train = X[train_mask]
+            y_train = y[train_mask]
+            X_test = X[test_indices]
+            y_test = y[test_indices]
+            y_pred = LinearRegression().fit(X_train, y_train).predict(X_test)
+
+            # Get stored data for fold
+            saved_fold_data = run.predictions[run.predictions["fold"] == fold_id].sort_values(
+                by="row_id"
+            )
+            saved_y_pred = saved_fold_data["prediction"].values
+            gt_key = "truth" if "truth" in list(saved_fold_data) else "correct"
+            saved_y_test = saved_fold_data[gt_key].values
+
+            assert_method = np.testing.assert_array_almost_equal
+            if task.task_type == "Supervised Classification":
+                y_pred = np.take(task.class_labels, y_pred)
+                y_test = np.take(task.class_labels, y_test)
+                assert_method = np.testing.assert_array_equal
+
+            # Assert correctness
+            assert_method(y_pred, saved_y_pred)
+            assert_method(y_test, saved_y_test)
+
     def test_publish_with_local_loaded_flow(self):
         """
         Publish a run tied to a local flow after it has first been saved to
@@ -196,40 +240,54 @@ class TestRun(TestBase):
         """
         extension = openml.extensions.sklearn.SklearnExtension()
 
-        model = Pipeline(
+        model_clf = Pipeline(
             [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())]
         )
-        task = openml.tasks.get_task(119)  # diabetes; crossvalidation
-
-        # Make sure the flow does not exist on the server yet.
-        flow = extension.model_to_flow(model)
-        self._add_sentinel_to_flow_name(flow)
-        self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
-
-        run = openml.runs.run_flow_on_task(
-            flow=flow,
-            task=task,
-            add_local_measures=False,
-            avoid_duplicate_runs=False,
-            upload_flow=False,
+        model_reg = Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="mean")),
+                (
+                    "regressor",
+                    # LR because dummy does not produce enough float-like values
+                    LinearRegression(),
+                ),
+            ]
         )
 
-        # Make sure that the flow has not been uploaded as requested.
-        self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
+        task_clf = openml.tasks.get_task(119)  # diabetes; hold out validation
+        task_reg = openml.tasks.get_task(733)  # quake; crossvalidation
 
-        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
-        run.to_filesystem(cache_path)
-        # obtain run from filesystem
-        loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
-        loaded_run.publish()
-        TestBase._mark_entity_for_removal("run", loaded_run.run_id)
-        TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], loaded_run.run_id)
-        )
+        for model, task in [(model_clf, task_clf), (model_reg, task_reg)]:
+            # Make sure the flow does not exist on the server yet.
+            flow = extension.model_to_flow(model)
+            self._add_sentinel_to_flow_name(flow)
+            self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
 
-        # make sure the flow is published as part of publishing the run.
-        self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))
-        openml.runs.get_run(loaded_run.run_id)
+            run = openml.runs.run_flow_on_task(
+                flow=flow,
+                task=task,
+                add_local_measures=False,
+                avoid_duplicate_runs=False,
+                upload_flow=False,
+            )
+
+            # Make sure that the flow has not been uploaded as requested.
+            self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
+            self.assert_run_prediction_data(task, run)
+
+            cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
+            run.to_filesystem(cache_path)
+            # obtain run from filesystem
+            loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
+            loaded_run.publish()
+            TestBase._mark_entity_for_removal("run", loaded_run.run_id)
+            TestBase.logger.info(
+                "collected from {}: {}".format(__file__.split("/")[-1], loaded_run.run_id)
+            )
+
+            # make sure the flow is published as part of publishing the run.
+            self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))
+            openml.runs.get_run(loaded_run.run_id)
 
     def test_run_setup_string_included_in_xml(self):
         SETUP_STRING = "setup-string"

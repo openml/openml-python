@@ -1,29 +1,31 @@
 # License: BSD 3-Clause
 
-from collections import OrderedDict
 import io
 import itertools
 import os
 import time
-from typing import Any, List, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
 import warnings
+from collections import OrderedDict
+from typing import Any, List, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
 
-import sklearn.metrics
-import xmltodict
 import numpy as np
 import pandas as pd
+import sklearn.metrics
+import xmltodict
 from joblib.parallel import Parallel, delayed
 
 import openml
-import openml.utils
 import openml._api_calls
+import openml.utils
+from openml import config
 from openml.exceptions import PyOpenMLError
 from openml.extensions import get_extension_by_model
-from openml import config
 from openml.flows.flow import _copy_server_fields
+from .run import OpenMLRun
+from .trace import OpenMLRunTrace
+from ..exceptions import OpenMLCacheException, OpenMLServerException, OpenMLRunsExistError
 from ..flows import get_flow, flow_exists, OpenMLFlow
 from ..setups import setup_exists, initialize_model
-from ..exceptions import OpenMLCacheException, OpenMLServerException, OpenMLRunsExistError
 from ..tasks import (
     OpenMLTask,
     OpenMLClassificationTask,
@@ -32,8 +34,6 @@ from ..tasks import (
     OpenMLSupervisedTask,
     OpenMLLearningCurveTask,
 )
-from .run import OpenMLRun
-from .trace import OpenMLRunTrace
 from ..tasks import TaskType, get_task
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
@@ -155,7 +155,6 @@ def run_flow_on_task(
     dataset_format: str = "dataframe",
     n_jobs: Optional[int] = None,
 ) -> OpenMLRun:
-
     """Run the model provided by the flow on the dataset defined by task.
 
     Takes the flow and repeat information into account.
@@ -515,13 +514,13 @@ def _run_task_get_arffcontent(
                         else pred_y[i]
                     )
                     if isinstance(test_y, pd.Series):
-                        test_prediction = (
+                        truth = (
                             task.class_labels[test_y.iloc[i]]
                             if isinstance(test_y.iloc[i], int)
                             else test_y.iloc[i]
                         )
                     else:
-                        test_prediction = (
+                        truth = (
                             task.class_labels[test_y[i]]
                             if isinstance(test_y[i], (int, np.integer))
                             else test_y[i]
@@ -535,7 +534,7 @@ def _run_task_get_arffcontent(
                         sample=sample_no,
                         index=tst_idx,
                         prediction=prediction,
-                        truth=test_prediction,
+                        truth=truth,
                         proba=dict(zip(task.class_labels, pred_prob)),
                     )
                 else:
@@ -552,14 +551,14 @@ def _run_task_get_arffcontent(
         elif isinstance(task, OpenMLRegressionTask):
 
             for i, _ in enumerate(test_indices):
-                test_prediction = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
+                truth = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
                 arff_line = format_prediction(
                     task=task,
                     repeat=rep_no,
                     fold=fold_no,
                     index=test_indices[i],
                     prediction=pred_y[i],
-                    truth=test_prediction,
+                    truth=truth,
                 )
 
                 arff_datacontent.append(arff_line)
@@ -1186,6 +1185,10 @@ def format_prediction(
     -------
     A list with elements for the prediction results of a run.
 
+    The returned order of the elements is (if available):
+        [repeat, fold, sample, index, prediction, truth, *probabilities]
+
+    This order follows the R Client API.
     """
     if isinstance(task, OpenMLClassificationTask):
         if proba is None:
@@ -1200,8 +1203,8 @@ def format_prediction(
             else:
                 sample = 0
         probabilities = [proba[c] for c in task.class_labels]
-        return [repeat, fold, sample, index, *probabilities, truth, prediction]
+        return [repeat, fold, sample, index, prediction, truth, *probabilities]
     elif isinstance(task, OpenMLRegressionTask):
-        return [repeat, fold, index, truth, prediction]
+        return [repeat, fold, index, prediction, truth]
     else:
         raise NotImplementedError(f"Formatting for {type(task)} is not supported.")
