@@ -1,22 +1,23 @@
 # License: BSD 3-Clause
 
-import os
+import numpy as np
 import random
+import os
 from time import time
 
-import numpy as np
-import pytest
 import xmltodict
 from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
-from sklearn.tree import DecisionTreeClassifier
 
-import openml
-import openml.extensions.sklearn
 from openml import OpenMLRun
 from openml.testing import TestBase, SimpleImputer
+import openml
+import openml.extensions.sklearn
+
+import pytest
 
 
 class TestRun(TestBase):
