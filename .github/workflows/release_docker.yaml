@@ -39,7 +39,7 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./docker/
           push: true
           tags: ${{ steps.meta_dockerhub.outputs.tags }}
           labels: ${{ steps.meta_dockerhub.outputs.labels }}
