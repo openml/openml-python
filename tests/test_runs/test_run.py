@@ -281,6 +281,8 @@ class TestRun(TestBase):
 
             # Make sure that the flow has not been uploaded as requested.
             self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
+
+            # Make sure that the prediction data stored in the run is correct.
             self.assert_run_prediction_data(task, run, clone(model))
 
             cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
