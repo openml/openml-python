@@ -64,7 +64,7 @@ jobs:
       run: |
         if [ ${{ matrix.code-cov }} ]; then codecov='--cov=openml --long  --cov-report=xml'; fi
         # Most of the time, running only the scikit-learn tests is sufficient
-        if [ ! ${{ matrix.all-tests }} ]; then sklearn='-m "sklearn"'; fi
+        if [ ! ${{ matrix.all-tests }} ]; then sklearn='-m sklearn'; fi
         pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv $codecov $sklearn --reruns 5 --reruns-delay 1
     - name: Run tests on Windows
       if: matrix.os == 'windows-latest'
