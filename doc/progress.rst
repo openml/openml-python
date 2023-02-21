@@ -9,8 +9,7 @@ Changelog
 0.13.1
 ~~~~~~
 
- * Add new contributions here.
-
+ * FIX #1197 #559 #1131: Fix the order of ground truth and predictions in the ``OpenMLRun`` object and in ``format_prediction``.
 
 0.13.0
 ~~~~~~
