@@ -139,7 +139,7 @@ class OpenMLRun(OpenMLBase):
     def id(self) -> Optional[int]:
         return self.run_id
 
-    def evaluation_summary(self, metric: str):
+    def evaluation_summary(self, metric: str) -> str:
         """Summarizes the evaluation of a metric over all folds.
 
         The fold scores for the metric must exist already. During run creation,
