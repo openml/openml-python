@@ -158,8 +158,37 @@ class OpenMLRun(OpenMLBase):
     def id(self) -> Optional[int]:
         return self.run_id
 
+    def evaluation_summary(self, metric: str):
+        """Summarizes the evaluation of a metric over all folds.
+
+        The fold scores for the metric must exist already. During run creation,
+        by default, the MAE for OpenMLRegressionTask and the accuracy for
+        OpenMLClassificationTask/OpenMLLearningCurveTasktasks are computed.
+
+        If repetition exist, we take the mean over all repetitions.
+
+        Parameters
+        ----------
+        metric: str
+            Name of an evaluation metric that was used to compute fold scores.
+
+        Returns
+        -------
+        metric_summary: str
+            A formatted string that displays the metric's evaluation summary.
+            The summary consists of the mean and std.
+        """
+        fold_score_lists = self.fold_evaluations[metric].values()
+
+        # Get the mean and std over all repetitions
+        rep_means = [np.mean(list(x.values())) for x in fold_score_lists]
+        rep_stds = [np.std(list(x.values())) for x in fold_score_lists]
+
+        return "{:.4f} +- {:.4f}".format(np.mean(rep_means), np.mean(rep_stds))
+
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
         """Collect all information to display in the __repr__ body."""
+        # Set up fields
         fields = {
             "Uploader Name": self.uploader_name,
             "Metric": self.task_evaluation_measure,
@@ -175,6 +204,10 @@ class OpenMLRun(OpenMLBase):
             "Dataset ID": self.dataset_id,
             "Dataset URL": openml.datasets.OpenMLDataset.url_for_id(self.dataset_id),
         }
+
+        # determines the order of the initial fields in which the information will be printed
+        order = ["Uploader Name", "Uploader Profile", "Metric", "Result"]
+
         if self.uploader is not None:
             fields["Uploader Profile"] = "{}/u/{}".format(
                 openml.config.get_server_base_url(), self.uploader
@@ -183,13 +216,29 @@ class OpenMLRun(OpenMLBase):
             fields["Run URL"] = self.openml_url
         if self.evaluations is not None and self.task_evaluation_measure in self.evaluations:
             fields["Result"] = self.evaluations[self.task_evaluation_measure]
+        elif self.fold_evaluations is not None:
+            # -- Add Locally computed summary values to if possible
+            if "predictive_accuracy" in self.fold_evaluations:
+                # OpenMLClassificationTask; OpenMLLearningCurveTask
+                # default: predictive_accuracy
+                result_field = "Local Result - Accuracy (+- STD)"
+                fields[result_field] = self.evaluation_summary("predictive_accuracy")
+                order.append(result_field)
+            elif "mean_absolute_error" in self.fold_evaluations:
+                # OpenMLRegressionTask
+                # default: mean_absolute_error
+                result_field = "Local Result - MAE (+- STD)"
+                fields[result_field] = self.evaluation_summary("mean_absolute_error")
+                order.append(result_field)
 
-        # determines the order in which the information will be printed
-        order = [
-            "Uploader Name",
-            "Uploader Profile",
-            "Metric",
-            "Result",
+            rt_field = "Local Runtime - ms (+- STD)"
+            fields[rt_field] = self.evaluation_summary("usercpu_time_millis")
+
+            # Add to order to be below / same as results
+            order.append(rt_field)
+
+        # determines the remaining order
+        order += [
             "Run ID",
             "Run URL",
             "Task ID",
