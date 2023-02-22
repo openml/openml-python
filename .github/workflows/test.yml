@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   test:
-    name: (${{ matrix.os }}, Py${{ matrix.python-version }}, sk${{ matrix.scikit-learn }}, sk-only:${{ matrix.sklearn-only }})
+    name: (${{ matrix.os }}, Py${{ matrix.python-version }}, sk${{ matrix.scikit-learn }}, format('sk-only: {0}', ${{ matrix.sklearn-only }} ))
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
