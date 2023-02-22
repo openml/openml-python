@@ -106,10 +106,16 @@ def _get_estimation_procedure_list():
 
     procs = []
     for proc_ in procs_dict["oml:estimationprocedures"]["oml:estimationprocedure"]:
+        task_type_int = int(proc_["oml:ttid"])
+        try:
+            task_type_id = TaskType(task_type_int)
+        except ValueError as e:
+            warnings.warn("Could not create task type id for %d due to error %s" % (task_type_int, str(e)))
+            continue
         procs.append(
             {
                 "id": int(proc_["oml:id"]),
-                "task_type_id": TaskType(int(proc_["oml:ttid"])),
+                "task_type_id": task_type_id,
                 "name": proc_["oml:name"],
                 "type": proc_["oml:type"],
             }
