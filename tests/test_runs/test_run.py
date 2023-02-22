@@ -41,7 +41,32 @@ class TestRun(TestBase):
         run_list = openml.runs.list_runs(tag=tag)
         self.assertEqual(len(run_list), 0)
 
-    def _test_run_obj_equals(self, run, run_prime):
+    @staticmethod
+    def _test_prediction_data_equal(run, run_prime):
+        # Determine which attributes are numeric and which not
+        num_cols = np.array(
+            [d_type == "NUMERIC" for _, d_type in run._generate_arff_dict()["attributes"]]
+        )
+        # Get run data consistently
+        #   (For run from server, .data_content does not exist)
+        run_data_content = run.predictions.values
+        run_prime_data_content = run_prime.predictions.values
+
+        # Assert numeric and string parts separately
+        numeric_part = np.array(run_data_content[:, num_cols], dtype=float)
+        numeric_part_prime = np.array(run_prime_data_content[:, num_cols], dtype=float)
+        string_part = run_data_content[:, ~num_cols]
+        string_part_prime = run_prime_data_content[:, ~num_cols]
+        np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
+        np.testing.assert_array_equal(string_part, string_part_prime)
+
+    def _test_run_obj_equals(self, run, run_prime, only_check_prediction_data=False):
+
+        if only_check_prediction_data:
+            # Only check prediction data because other fields may not need to be equal
+            self._test_prediction_data_equal(run, run_prime)
+            return
+
         for dictionary in ["evaluations", "fold_evaluations", "sample_evaluations"]:
             if getattr(run, dictionary) is not None:
                 self.assertDictEqual(getattr(run, dictionary), getattr(run_prime, dictionary))
@@ -51,20 +76,9 @@ class TestRun(TestBase):
                 if other is not None:
                     self.assertDictEqual(other, dict())
         self.assertEqual(run._to_xml(), run_prime._to_xml())
+        self._test_prediction_data_equal(run, run_prime)
 
-        # Determine which attributes are numeric and which not
-        num_cols = np.array(
-            [d_type == "NUMERIC" for _, d_type in run._generate_arff_dict()["attributes"]]
-        )
-
-        # Assert numeric and string parts separately
-        numeric_part = np.array(np.array(run.data_content)[:, num_cols], dtype=float)
-        numeric_part_prime = np.array(np.array(run_prime.data_content)[:, num_cols], dtype=float)
-        string_part = np.array(run.data_content)[:, ~num_cols]
-        string_part_prime = np.array(run_prime.data_content)[:, ~num_cols]
-        np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
-        np.testing.assert_array_equal(string_part, string_part_prime)
-
+        # Test trace
         if run.trace is not None:
             run_trace_content = run.trace.trace_to_arff()["data"]
         else:
@@ -198,6 +212,27 @@ class TestRun(TestBase):
             openml.runs.OpenMLRun.from_filesystem(cache_path)
 
     @staticmethod
+    def _get_models_tasks_for_tests():
+        model_clf = Pipeline(
+            [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())]
+        )
+        model_reg = Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="mean")),
+                (
+                    "regressor",
+                    # LR because dummy does not produce enough float-like values
+                    LinearRegression(),
+                ),
+            ]
+        )
+
+        task_clf = openml.tasks.get_task(119)  # diabetes; hold out validation
+        task_reg = openml.tasks.get_task(733)  # quake; crossvalidation
+
+        return [(model_clf, task_clf), (model_reg, task_reg)]
+
+    @staticmethod
     def assert_run_prediction_data(task, run, model):
         # -- Get y_pred and y_true as it should be stored in the run
         fold_map = np.full(int(task.get_dataset().qualities["NumberOfInstances"]), -1)
@@ -248,24 +283,7 @@ class TestRun(TestBase):
         """
         extension = openml.extensions.sklearn.SklearnExtension()
 
-        model_clf = Pipeline(
-            [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())]
-        )
-        model_reg = Pipeline(
-            [
-                ("imputer", SimpleImputer(strategy="mean")),
-                (
-                    "regressor",
-                    # LR because dummy does not produce enough float-like values
-                    LinearRegression(),
-                ),
-            ]
-        )
-
-        task_clf = openml.tasks.get_task(119)  # diabetes; hold out validation
-        task_reg = openml.tasks.get_task(733)  # quake; crossvalidation
-
-        for model, task in [(model_clf, task_clf), (model_reg, task_reg)]:
+        for model, task in self._get_models_tasks_for_tests():
             # Make sure the flow does not exist on the server yet.
             flow = extension.model_to_flow(model)
             self._add_sentinel_to_flow_name(flow)
@@ -290,6 +308,8 @@ class TestRun(TestBase):
             # obtain run from filesystem
             loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
             loaded_run.publish()
+
+            # Clean up
             TestBase._mark_entity_for_removal("run", loaded_run.run_id)
             TestBase.logger.info(
                 "collected from {}: {}".format(__file__.split("/")[-1], loaded_run.run_id)
@@ -298,6 +318,49 @@ class TestRun(TestBase):
             # make sure the flow is published as part of publishing the run.
             self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))
             openml.runs.get_run(loaded_run.run_id)
+
+    def test_offline_and_online_run_identical(self):
+
+        extension = openml.extensions.sklearn.SklearnExtension()
+
+        for model, task in self._get_models_tasks_for_tests():
+            # Make sure the flow does not exist on the server yet.
+            flow = extension.model_to_flow(model)
+            self._add_sentinel_to_flow_name(flow)
+            self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
+
+            run = openml.runs.run_flow_on_task(
+                flow=flow,
+                task=task,
+                add_local_measures=False,
+                avoid_duplicate_runs=False,
+                upload_flow=False,
+            )
+
+            # Make sure that the flow has not been uploaded as requested.
+            self.assertFalse(openml.flows.flow_exists(flow.name, flow.external_version))
+
+            # Load from filesystem
+            cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
+            run.to_filesystem(cache_path)
+            loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
+
+            # Assert identical for offline - offline
+            self._test_run_obj_equals(run, loaded_run)
+
+            # Publish and test for offline - online
+            run.publish()
+            self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))
+
+            try:
+                online_run = openml.runs.get_run(run.run_id, ignore_cache=True)
+                self._test_run_obj_equals(run, online_run, only_check_prediction_data=True)
+            finally:
+                # Clean up
+                TestBase._mark_entity_for_removal("run", run.run_id)
+                TestBase.logger.info(
+                    "collected from {}: {}".format(__file__.split("/")[-1], loaded_run.run_id)
+                )
 
     def test_run_setup_string_included_in_xml(self):
         SETUP_STRING = "setup-string"
