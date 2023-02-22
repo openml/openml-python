@@ -10,7 +10,7 @@ Changelog
 ~~~~~~
 
  * Add new contributions here.
-
+ * ADD#1144: Add locally computed results to the ``OpenMLRun`` object's representation.
 
 0.13.0
 ~~~~~~
