@@ -90,7 +90,7 @@ def _get_estimation_procedure_list():
     procs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
     if "oml:estimationprocedures" not in procs_dict:
-        raise ValueError("Error in return XML, does not contain tag " "oml:estimationprocedures.")
+        raise ValueError("Error in return XML, does not contain tag oml:estimationprocedures.")
     elif "@xmlns:oml" not in procs_dict["oml:estimationprocedures"]:
         raise ValueError(
             "Error in return XML, does not contain tag "
@@ -110,7 +110,10 @@ def _get_estimation_procedure_list():
         try:
             task_type_id = TaskType(task_type_int)
         except ValueError as e:
-            warnings.warn("Could not create task type id for %d due to error %s" % (task_type_int, str(e)))
+            warnings.warn(
+                f"Could not create task type id for {task_type_int} due to error {e}",
+                warnings.RuntimeWarning,
+            )
             continue
         procs.append(
             {
@@ -130,7 +133,7 @@ def list_tasks(
     size: Optional[int] = None,
     tag: Optional[str] = None,
     output_format: str = "dict",
-    **kwargs
+    **kwargs,
 ) -> Union[Dict, pd.DataFrame]:
     """
     Return a number of tasks having the given tag and task_type
@@ -181,7 +184,7 @@ def list_tasks(
         offset=offset,
         size=size,
         tag=tag,
-        **kwargs
+        **kwargs,
     )
 
 
@@ -336,7 +339,10 @@ def get_task(
     task
     """
     if not isinstance(task_id, int):
-        warnings.warn("Task id must be specified as `int` from 0.14.0 onwards.", DeprecationWarning)
+        warnings.warn(
+            "Task id must be specified as `int` from 0.14.0 onwards.",
+            DeprecationWarning,
+        )
 
     try:
         task_id = int(task_id)
@@ -472,9 +478,12 @@ def create_task(
     estimation_procedure_id: int,
     target_name: Optional[str] = None,
     evaluation_measure: Optional[str] = None,
-    **kwargs
+    **kwargs,
 ) -> Union[
-    OpenMLClassificationTask, OpenMLRegressionTask, OpenMLLearningCurveTask, OpenMLClusteringTask
+    OpenMLClassificationTask,
+    OpenMLRegressionTask,
+    OpenMLLearningCurveTask,
+    OpenMLClusteringTask,
 ]:
     """Create a task based on different given attributes.
 
@@ -525,5 +534,5 @@ def create_task(
             target_name=target_name,
             estimation_procedure_id=estimation_procedure_id,
             evaluation_measure=evaluation_measure,
-            **kwargs
+            **kwargs,
         )
