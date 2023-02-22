@@ -4,14 +4,14 @@ on: [push, pull_request]
 
 jobs:
   test:
-    name: (${{ matrix.os }}, Py${{ matrix.python-version }}, sk${{ matrix.scikit-learn }}, ${{ format("sk-only:{0}", ${{ matrix.sklearn-only }} ) }} )
+    name: (matrix.os }}, Py${{ matrix.python-version }}, sk${{ matrix.scikit-learn }}, sk-only:${{ matrix.sklearn-only }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
         scikit-learn: [0.21.2, 0.22.2, 0.23.1, 0.24]
         os: [ubuntu-latest]
-        sklearn-only: [true]
+        sklearn-only: ['true']
         exclude:  # no scikit-learn 0.21.2 release for Python 3.8
           - python-version: 3.8
             scikit-learn: 0.21.2
@@ -29,10 +29,10 @@ jobs:
           - python-version: 3.8
             scikit-learn: 0.23.1
             code-cov: true
-            sklearn-only: false
+            sklearn-only: 'false'
             os: ubuntu-latest
           - os: windows-latest
-            sklearn-only: false
+            sklearn-only: 'false'
             scikit-learn: 0.24.*
       fail-fast:  false
       max-parallel: 4
@@ -66,7 +66,7 @@ jobs:
       run: |
         if [ ${{ matrix.code-cov }} ]; then codecov='--cov=openml --long  --cov-report=xml'; fi
         # Most of the time, running only the scikit-learn tests is sufficient
-        if [ ${{ matrix.sklearn-only }} ]; then sklearn='-m sklearn'; fi
+        if [ ${{ matrix.sklearn-only }} = 'true' ]; then sklearn='-m sklearn'; fi
         echo pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv $codecov $sklearn --reruns 5 --reruns-delay 1
         pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv $codecov $sklearn --reruns 5 --reruns-delay 1
     - name: Run tests on Windows
