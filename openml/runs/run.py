@@ -39,13 +39,13 @@ class OpenMLRun(OpenMLBase):
     setup_string: str
         The setup string of the run.
     output_files: Dict[str, str]
-        Specifies where each related file can be found. 
+        Specifies where each related file can be found.
     setup_id: int
         An integer representing the ID of the setup used for the run.
     tags: List[str]
         Representing the tags associated with the run.
     uploader: int
-        User ID of the uploader. 
+        User ID of the uploader.
     uploader_name: str
         The name of the person who uploaded the run.
     evaluations: Dict
@@ -79,7 +79,7 @@ class OpenMLRun(OpenMLBase):
     description_text: str, optional
         Description text to add to the predictions file. If left None, is set to the time the arff file is generated.
     run_details: str, optional (default=None)
-        Description of the run stored in the run meta-data. 
+        Description of the run stored in the run meta-data.
     """
 
     def __init__(
