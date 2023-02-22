@@ -11,6 +11,7 @@ Changelog
 
  * FIX #1197 #559 #1131: Fix the order of ground truth and predictions in the ``OpenMLRun`` object and in ``format_prediction``.
  * FIX #1198: Support numpy 1.24 and higher.
+ * ADD#1144: Add locally computed results to the ``OpenMLRun`` object's representation.
 
 0.13.0
 ~~~~~~
