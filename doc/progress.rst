@@ -9,7 +9,7 @@ Changelog
 0.13.1
 ~~~~~~
 
- * Add new contributions here.
+ * FIX #1198: Support numpy 1.24 and higher.
 
 
 0.13.0
