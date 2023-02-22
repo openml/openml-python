@@ -48,4 +48,4 @@ jobs:
         run: echo ${{ steps.docker_build.outputs.digest }}
 
       - name: Auto-Sklearn loaded
-        run: docker exec  -i openml-python python3 -c 'import openml; print(f"OpenML-Pytho imported from {autosklearn.__file__}")'
+        run: docker exec -i openml/openml-python python3 -c 'import openml; print(f"OpenML-Pytho imported from {autosklearn.__file__}")'
