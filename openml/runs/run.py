@@ -217,7 +217,7 @@ class OpenMLRun(OpenMLBase):
         if self.evaluations is not None and self.task_evaluation_measure in self.evaluations:
             fields["Result"] = self.evaluations[self.task_evaluation_measure]
         elif self.fold_evaluations is not None:
-            # -- Add Locally computed summary values to if possible
+            # -- Add locally computed summary values if possible
             if "predictive_accuracy" in self.fold_evaluations:
                 # OpenMLClassificationTask; OpenMLLearningCurveTask
                 # default: predictive_accuracy
@@ -231,6 +231,7 @@ class OpenMLRun(OpenMLBase):
                 fields[result_field] = self.evaluation_summary("mean_absolute_error")
                 order.append(result_field)
 
+            # Runtime should be available for any task type
             rt_field = "Local Runtime - ms (+- STD)"
             fields[rt_field] = self.evaluation_summary("usercpu_time_millis")
 
