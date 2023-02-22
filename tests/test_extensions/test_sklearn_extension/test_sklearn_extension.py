@@ -952,7 +952,10 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(extracted_info[2]["drop"].name, "drop")
 
     def test_serialize_type(self):
-        supported_types = [float, np.float, np.float32, np.float64, int, np.int, np.int32, np.int64]
+        supported_types = [float, np.float32, np.float64, int, np.int32, np.int64]
+        if LooseVersion(np.__version__) < "1.24":
+            supported_types.append(np.float)
+            supported_types.append(np.int)
 
         for supported_type in supported_types:
             serialized = self.extension.model_to_flow(supported_type)
