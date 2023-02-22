@@ -39,13 +39,13 @@ class OpenMLRun(OpenMLBase):
     setup_string: str
         A string that represents the setup string of the run.
     output_files: Dict[str, str]
-        A dictionary that maps the names of related files to their locations.
+        A dictionary that specifies where each related file can be found. 
     setup_id: int
         An integer representing the ID of the setup used for the run.
     tags: List[str]
         A list of strings representing the tags associated with the run.
     uploader: int
-        An integer representing the user ID of the person who uploaded the run.
+        User ID of the uploader. 
     uploader_name: str
         A string representing the name of the person who uploaded the run.
     evaluations: Dict
@@ -55,11 +55,11 @@ class OpenMLRun(OpenMLBase):
     sample_evaluations: Dict
         A dictionary representing the evaluations of the run for each sample.
     data_content: List[List]
-        A list of lists representing the predictions generated from executing the run.
+        The predictions generated from executing this run.
     trace: OpenMLRunTrace
-        An instance of the OpenMLRunTrace class, representing the trace of the run.
+        The trace containing information on internal model evaluations of this run.
     model: object
-        An object representing the model used in the run.
+        The untrained model that was evaluated in this run.
     task_type: str
         A string representing the type of the OpenML task associated with the run.
     task_evaluation_measure: str
@@ -77,9 +77,10 @@ class OpenMLRun(OpenMLBase):
     run_id: int
         An integer representing the ID of the run.
     description_text: str, optional
-        An optional string representing a description to be added to the predictions file. If not provided, it is set to the time the arff file was generated.
+        Description text to add to the predictions file. 
+        If left None, is set to the time the arff file is generated.
     run_details: str, optional (default=None)
-        An optional string representing a description of the run stored in the run meta-data.
+        Description of the run stored in the run meta-data. 
     """
 
     def __init__(
