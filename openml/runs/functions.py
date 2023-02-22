@@ -905,14 +905,6 @@ def _create_run_from_xml(xml, from_server=True):
 
     tags = openml.utils.extract_xml_tags("oml:tag", run)
 
-    # Make sure default values are used where needed to keep run objects identical
-    if not evaluations:
-        evaluations = None
-    if not fold_evaluations:
-        fold_evaluations = None
-    if not sample_evaluations:
-        sample_evaluations = None
-
     return OpenMLRun(
         run_id=run_id,
         uploader=uploader,
@@ -927,9 +919,10 @@ def _create_run_from_xml(xml, from_server=True):
         parameter_settings=parameters,
         dataset_id=dataset_id,
         output_files=files,
-        evaluations=evaluations,
-        fold_evaluations=fold_evaluations,
-        sample_evaluations=sample_evaluations,
+        # Make sure default values are used where needed to keep run objects identical
+        evaluations=evaluations or None,
+        fold_evaluations=fold_evaluations or None,
+        sample_evaluations=sample_evaluations or None,
         tags=tags,
         predictions_url=predictions_url,
         run_details=run_details,
