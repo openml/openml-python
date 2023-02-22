@@ -235,27 +235,26 @@ class TestRun(TestBase):
     @staticmethod
     def assert_run_prediction_data(task, run, model):
         # -- Get y_pred and y_true as it should be stored in the run
-        fold_map = np.full(int(task.get_dataset().qualities["NumberOfInstances"]), -1)
         s_d = task.get_split_dimensions()
         if (s_d[0] > 1) or (s_d[2] > 1):
             raise ValueError("Test does not support this task type's split dimensions.")
-
-        for fold_id in range(s_d[1]):
-            _, test_indices = task.get_train_test_split_indices(repeat=0, fold=fold_id, sample=0)
-            fold_map[test_indices] = fold_id
 
         X, y = task.get_X_and_y()
 
         # Check correctness of y_ture and y_pred in run
         for fold_id in range(s_d[1]):
             # Get data for fold
-            test_indices = np.where(fold_map == fold_id)[0]
-            train_mask = np.full(len(fold_map), True)
+            _, test_indices = task.get_train_test_split_indices(repeat=0, fold=fold_id, sample=0)
+            train_mask = np.full(len(X), True)
             train_mask[test_indices] = False
+
+            # Get train / test
             X_train = X[train_mask]
             y_train = y[train_mask]
             X_test = X[test_indices]
             y_test = y[test_indices]
+
+            # Get y_pred
             y_pred = model.fit(X_train, y_train).predict(X_test)
 
             # Get stored data for fold
