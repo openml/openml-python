@@ -275,6 +275,39 @@ def list_evaluation_measures() -> List[str]:
     return qualities
 
 
+def list_estimation_procedures():
+    """Return list of evaluation procedures available.
+
+    The function performs an API call to retrieve the entire list of
+    evaluation procedures' names that are available.
+
+    Returns
+    -------
+    list
+    """
+
+    api_call = "estimationprocedure/list"
+    xml_string = openml._api_calls._perform_api_call(api_call, "get")
+    api_results = xmltodict.parse(xml_string)
+
+    # Minimalistic check if the XML is useful
+    if "oml:estimationprocedures" not in api_results:
+        raise ValueError("Error in return XML, does not contain " '"oml:estimationprocedures"')
+    if "oml:estimationprocedure" not in api_results["oml:estimationprocedures"]:
+        raise ValueError("Error in return XML, does not contain " '"oml:estimationprocedure"')
+
+    if not isinstance(api_results["oml:estimationprocedures"]["oml:estimationprocedure"], list):
+        raise TypeError(
+            "Error in return XML, does not contain " '"oml:estimationprocedure" as a list'
+        )
+
+    prods = [
+        prod["oml:name"]
+        for prod in api_results["oml:estimationprocedures"]["oml:estimationprocedure"]
+    ]
+    return prods
+
+
 def list_evaluations_setups(
     function: str,
     offset: Optional[int] = None,
