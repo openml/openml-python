@@ -10,7 +10,7 @@ Changelog
 ~~~~~~
 
  * Add new contributions here.
- * ADD#1144: Add locally computed results to the ``OpenMLRun`` object's representation.
+ * ADD#1144: Add locally computed results to the ``OpenMLRun`` object's string and print representation for `SUPERVISED_CLASSIFICATION, LEARNING_CURVE, SUPERVISED_REGRESSION`.
 
 0.13.0
 ~~~~~~
