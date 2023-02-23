@@ -4,13 +4,14 @@ on: [push, pull_request]
 
 jobs:
   test:
-    name: (${{ matrix.os }}, Py${{ matrix.python-version }}, sk${{ matrix.scikit-learn }})
+    name: (${{ matrix.os }}, Py${{ matrix.python-version }}, sk${{ matrix.scikit-learn }}, sk-only:${{ matrix.sklearn-only }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
         scikit-learn: [0.21.2, 0.22.2, 0.23.1, 0.24]
         os: [ubuntu-latest]
+        sklearn-only: ['true']
         exclude:  # no scikit-learn 0.21.2 release for Python 3.8
           - python-version: 3.8
             scikit-learn: 0.21.2
@@ -19,17 +20,22 @@ jobs:
             scikit-learn: 0.18.2
             scipy: 1.2.0
             os: ubuntu-latest
+            sklearn-only: 'true'
           - python-version: 3.6
             scikit-learn: 0.19.2
             os: ubuntu-latest
+            sklearn-only: 'true'
           - python-version: 3.6
             scikit-learn: 0.20.2
             os: ubuntu-latest
+            sklearn-only: 'true'
           - python-version: 3.8
             scikit-learn: 0.23.1
             code-cov: true
+            sklearn-only: 'false'
             os: ubuntu-latest
           - os: windows-latest
+            sklearn-only: 'false'
             scikit-learn: 0.24.*
       fail-fast:  false
       max-parallel: 4
@@ -62,7 +68,10 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         if [ ${{ matrix.code-cov }} ]; then codecov='--cov=openml --long  --cov-report=xml'; fi
-        pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv $codecov --reruns 5 --reruns-delay 1
+        # Most of the time, running only the scikit-learn tests is sufficient
+        if [ ${{ matrix.sklearn-only }} = 'true' ]; then sklearn='-m sklearn'; fi
+        echo pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv $codecov $sklearn --reruns 5 --reruns-delay 1
+        pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv $codecov $sklearn --reruns 5 --reruns-delay 1
     - name: Run tests on Windows
       if: matrix.os == 'windows-latest'
       run: |  # we need a separate step because of the bash-specific if-statement in the previous one.

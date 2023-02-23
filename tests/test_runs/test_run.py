@@ -102,6 +102,7 @@ class TestRun(TestBase):
         else:
             self.assertIsNone(run_prime_trace_content)
 
+    @pytest.mark.sklearn
     def test_to_from_filesystem_vanilla(self):
 
         model = Pipeline(
@@ -137,6 +138,7 @@ class TestRun(TestBase):
             "collected from {}: {}".format(__file__.split("/")[-1], run_prime.run_id)
         )
 
+    @pytest.mark.sklearn
     @pytest.mark.flaky()
     def test_to_from_filesystem_search(self):
 
@@ -173,6 +175,7 @@ class TestRun(TestBase):
             "collected from {}: {}".format(__file__.split("/")[-1], run_prime.run_id)
         )
 
+    @pytest.mark.sklearn
     def test_to_from_filesystem_no_model(self):
 
         model = Pipeline(
@@ -189,6 +192,7 @@ class TestRun(TestBase):
         with self.assertRaises(ValueError, msg="Could not find model.pkl"):
             openml.runs.OpenMLRun.from_filesystem(cache_path)
 
+    @pytest.mark.sklearn
     def test_publish_with_local_loaded_flow(self):
         """
         Publish a run tied to a local flow after it has first been saved to

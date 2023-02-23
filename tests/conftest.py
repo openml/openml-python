@@ -174,6 +174,10 @@ def pytest_sessionfinish() -> None:
     logger.info("{} is killed".format(worker))
 
 
+def pytest_configure(config):
+    config.addinivalue_line("markers", "sklearn: marks tests that use scikit-learn")
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--long",
