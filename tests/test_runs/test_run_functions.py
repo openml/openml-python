@@ -533,6 +533,14 @@ class TestRun(TestBase):
 
         # todo: check if runtime is present
         self._check_fold_timing_evaluations(run.fold_evaluations, 1, num_folds, task_type=task_type)
+
+        # Check if run string and print representation do not run into an error
+        #   The above check already verifies that all columns needed for supported
+        #   representations are present.
+        #   Supported: SUPERVISED_CLASSIFICATION, LEARNING_CURVE, SUPERVISED_REGRESSION
+        str(run)
+        self.logger.info(run)
+
         return run
 
     def _run_and_upload_classification(
