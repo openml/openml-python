@@ -31,54 +31,53 @@ class OpenMLRun(OpenMLBase):
     Parameters
     ----------
     task_id: int
-        An integer representing the ID of the OpenML task associated with the run.
+        The ID of the OpenML task associated with the run.
     flow_id: int
-        An integer representing the ID of the OpenML flow associated with the run.
+        The ID of the OpenML flow associated with the run.
     dataset_id: int
-        An integer representing the ID of the OpenML dataset used for the run.
+        The ID of the OpenML dataset used for the run.
     setup_string: str
-        A string that represents the setup string of the run.
+        The setup string of the run.
     output_files: Dict[str, str]
-        A dictionary that specifies where each related file can be found. 
+        Specifies where each related file can be found. 
     setup_id: int
         An integer representing the ID of the setup used for the run.
     tags: List[str]
-        A list of strings representing the tags associated with the run.
+        Representing the tags associated with the run.
     uploader: int
         User ID of the uploader. 
     uploader_name: str
-        A string representing the name of the person who uploaded the run.
+        The name of the person who uploaded the run.
     evaluations: Dict
-        A dictionary representing the evaluations of the run.
+        Representing the evaluations of the run.
     fold_evaluations: Dict
-        A dictionary representing the evaluations of the run for each fold.
+        The evaluations of the run for each fold.
     sample_evaluations: Dict
-        A dictionary representing the evaluations of the run for each sample.
+        The evaluations of the run for each sample.
     data_content: List[List]
         The predictions generated from executing this run.
     trace: OpenMLRunTrace
         The trace containing information on internal model evaluations of this run.
     model: object
-        The untrained model that was evaluated in this run.
+        The untrained model that was evaluated in the run.
     task_type: str
-        A string representing the type of the OpenML task associated with the run.
+        The type of the OpenML task associated with the run.
     task_evaluation_measure: str
-        A string representing the evaluation measure used for the task.
+        The evaluation measure used for the task.
     flow_name: str
-        A string representing the name of the OpenML flow associated with the run.
+        The name of the OpenML flow associated with the run.
     parameter_settings: List[OrderedDict]
-        A list of ordered dictionaries representing the parameter settings used for the run.
+        Representing the parameter settings used for the run.
     predictions_url: str
-        A string representing the URL of the predictions file.
+        The URL of the predictions file.
     task: OpenMLTask
         An instance of the OpenMLTask class, representing the OpenML task associated with the run.
     flow: OpenMLFlow
         An instance of the OpenMLFlow class, representing the OpenML flow associated with the run.
     run_id: int
-        An integer representing the ID of the run.
+        The ID of the run.
     description_text: str, optional
-        Description text to add to the predictions file. 
-        If left None, is set to the time the arff file is generated.
+        Description text to add to the predictions file. If left None, is set to the time the arff file is generated.
     run_details: str, optional (default=None)
         Description of the run stored in the run meta-data. 
     """
