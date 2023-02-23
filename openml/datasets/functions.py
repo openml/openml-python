@@ -1274,7 +1274,10 @@ def _get_online_dataset_format(dataset_id):
 
 
 def delete_dataset(dataset_id: int) -> bool:
-    """Deletes a dataset from the OpenML server.
+    """Delete dataset with id `dataset_id` from the OpenML server.
+
+    This can only be done if you are the owner of the dataset and
+    no tasks are attached to the dataset.
 
     Parameters
     ----------
@@ -1284,6 +1287,6 @@ def delete_dataset(dataset_id: int) -> bool:
     Returns
     -------
     bool
-        True if the deletion was successful. False otherwise
+        True if the deletion was successful. False otherwise.
     """
     return openml.utils._delete_entity("dataset", dataset_id)

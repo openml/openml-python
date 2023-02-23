@@ -1208,7 +1208,9 @@ def format_prediction(
 
 
 def delete_run(run_id: int) -> bool:
-    """Deletes a run from the OpenML server.
+    """Delete run with id `run_id` from the OpenML server.
+
+    You can only delete runs which you uploaded.
 
     Parameters
     ----------
@@ -1218,6 +1220,6 @@ def delete_run(run_id: int) -> bool:
     Returns
     -------
     bool
-        True if the deletion was successful. False otherwise
+        True if the deletion was successful. False otherwise.
     """
     return openml.utils._delete_entity("run", run_id)

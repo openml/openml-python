@@ -548,7 +548,10 @@ def create_task(
 
 
 def delete_task(task_id: int) -> bool:
-    """Deletes a task from the OpenML server.
+    """Delete task with id `task_id` from the OpenML server.
+
+    You can only delete tasks which you created and have
+    no runs associated with them.
 
     Parameters
     ----------
@@ -558,6 +561,6 @@ def delete_task(task_id: int) -> bool:
     Returns
     -------
     bool
-        True if the deletion was successful. False otherwise
+        True if the deletion was successful. False otherwise.
     """
     return openml.utils._delete_entity("task", task_id)

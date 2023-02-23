@@ -550,7 +550,10 @@ def _create_flow_from_xml(flow_xml: str) -> OpenMLFlow:
 
 
 def delete_flow(flow_id: int) -> bool:
-    """Deletes a flow from the OpenML server.
+    """Delete flow with id `flow_id` from the OpenML server.
+
+    You can only delete flows which you uploaded and which
+    which are not linked to runs.
 
     Parameters
     ----------
@@ -560,6 +563,6 @@ def delete_flow(flow_id: int) -> bool:
     Returns
     -------
     bool
-        True if the deletion was successful. False otherwise
+        True if the deletion was successful. False otherwise.
     """
     return openml.utils._delete_entity("flow", flow_id)
