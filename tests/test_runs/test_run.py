@@ -60,13 +60,7 @@ class TestRun(TestBase):
         np.testing.assert_array_almost_equal(numeric_part, numeric_part_prime)
         np.testing.assert_array_equal(string_part, string_part_prime)
 
-    def _test_run_obj_equals(self, run, run_prime, only_check_prediction_data=False):
-
-        if only_check_prediction_data:
-            # Only check prediction data because other fields may not need to be equal
-            self._test_prediction_data_equal(run, run_prime)
-            return
-
+    def _test_run_obj_equals(self, run, run_prime):
         for dictionary in ["evaluations", "fold_evaluations", "sample_evaluations"]:
             if getattr(run, dictionary) is not None:
                 self.assertDictEqual(getattr(run, dictionary), getattr(run_prime, dictionary))
@@ -353,7 +347,7 @@ class TestRun(TestBase):
 
             try:
                 online_run = openml.runs.get_run(run.run_id, ignore_cache=True)
-                self._test_run_obj_equals(run, online_run, only_check_prediction_data=True)
+                self._test_prediction_data_equal(run, online_run)
             finally:
                 # Clean up
                 TestBase._mark_entity_for_removal("run", run.run_id)
