@@ -248,8 +248,8 @@ class TestRun(TestBase):
             # Get train / test
             X_train = X[train_mask]
             y_train = y[train_mask]
-            X_test = X[test_indices]
-            y_test = y[test_indices]
+            X_test = X[~train_mask]
+            y_test = y[~train_mask]
 
             # Get y_pred
             y_pred = model.fit(X_train, y_train).predict(X_test)
