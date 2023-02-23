@@ -15,7 +15,7 @@ jobs:
         pip install -e .[docs,examples,examples_unix]
         # dependency "fanova" does not work with numpy 1.24 or later
         # https://github.com/automl/fanova/issues/108
-        pip install numpy<1.24
+        pip install numpy==1.23.5
     - name: Make docs
       run: |
         cd doc
