@@ -118,6 +118,7 @@ class TestRun(TestBase):
         else:
             self.assertIsNone(run_prime_trace_content)
 
+    @pytest.mark.sklearn
     def test_to_from_filesystem_vanilla(self):
 
         model = Pipeline(
@@ -153,6 +154,7 @@ class TestRun(TestBase):
             "collected from {}: {}".format(__file__.split("/")[-1], run_prime.run_id)
         )
 
+    @pytest.mark.sklearn
     @pytest.mark.flaky()
     def test_to_from_filesystem_search(self):
 
@@ -189,6 +191,7 @@ class TestRun(TestBase):
             "collected from {}: {}".format(__file__.split("/")[-1], run_prime.run_id)
         )
 
+    @pytest.mark.sklearn
     def test_to_from_filesystem_no_model(self):
 
         model = Pipeline(
@@ -269,6 +272,7 @@ class TestRun(TestBase):
             assert_method(y_pred, saved_y_pred)
             assert_method(y_test, saved_y_test)
 
+    @pytest.mark.sklearn
     def test_publish_with_local_loaded_flow(self):
         """
         Publish a run tied to a local flow after it has first been saved to
@@ -312,6 +316,7 @@ class TestRun(TestBase):
             self.assertTrue(openml.flows.flow_exists(flow.name, flow.external_version))
             openml.runs.get_run(loaded_run.run_id)
 
+    @pytest.mark.sklearn
     def test_offline_and_online_run_identical(self):
 
         extension = openml.extensions.sklearn.SklearnExtension()
