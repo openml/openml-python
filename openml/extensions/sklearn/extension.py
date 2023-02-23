@@ -1252,14 +1252,16 @@ class SklearnExtension(Extension):
     def _serialize_type(self, o: Any) -> "OrderedDict[str, str]":
         mapping = {
             float: "float",
-            np.float: "np.float",  # type: ignore
             np.float32: "np.float32",
             np.float64: "np.float64",
             int: "int",
-            np.int: "np.int",  # type: ignore
             np.int32: "np.int32",
             np.int64: "np.int64",
         }
+        if LooseVersion(np.__version__) < "1.24":
+            mapping[np.float] = "np.float"
+            mapping[np.int] = "np.int"
+
         ret = OrderedDict()  # type: 'OrderedDict[str, str]'
         ret["oml-python:serialized_object"] = "type"
         ret["value"] = mapping[o]
@@ -1268,14 +1270,16 @@ class SklearnExtension(Extension):
     def _deserialize_type(self, o: str) -> Any:
         mapping = {
             "float": float,
-            "np.float": np.float,  # type: ignore
             "np.float32": np.float32,
             "np.float64": np.float64,
             "int": int,
-            "np.int": np.int,  # type: ignore
             "np.int32": np.int32,
             "np.int64": np.int64,
         }
+        if LooseVersion(np.__version__) < "1.24":
+            mapping["np.float"] = np.float
+            mapping["np.int"] = np.int
+
         return mapping[o]
 
     def _serialize_rv_frozen(self, o: Any) -> "OrderedDict[str, Union[str, Dict]]":
