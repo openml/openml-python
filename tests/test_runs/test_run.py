@@ -229,14 +229,14 @@ class TestRun(TestBase):
     @staticmethod
     def assert_run_prediction_data(task, run, model):
         # -- Get y_pred and y_true as it should be stored in the run
-        s_d = task.get_split_dimensions()
-        if (s_d[0] > 1) or (s_d[2] > 1):
+        n_repeats, n_folds, n_samples = task.get_split_dimensions()
+        if (n_repeats > 1) or (n_samples > 1):
             raise ValueError("Test does not support this task type's split dimensions.")
 
         X, y = task.get_X_and_y()
 
-        # Check correctness of y_ture and y_pred in run
-        for fold_id in range(s_d[1]):
+        # Check correctness of y_true and y_pred in run
+        for fold_id in range(n_folds):
             # Get data for fold
             _, test_indices = task.get_train_test_split_indices(repeat=0, fold=fold_id, sample=0)
             train_mask = np.full(len(X), True)
