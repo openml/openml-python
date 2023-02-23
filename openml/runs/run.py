@@ -139,7 +139,7 @@ class OpenMLRun(OpenMLBase):
     def id(self) -> Optional[int]:
         return self.run_id
 
-    def evaluation_summary(self, metric: str) -> str:
+    def _evaluation_summary(self, metric: str) -> str:
         """Summarizes the evaluation of a metric over all folds.
 
         The fold scores for the metric must exist already. During run creation,
@@ -203,21 +203,20 @@ class OpenMLRun(OpenMLBase):
                 # OpenMLClassificationTask; OpenMLLearningCurveTask
                 # default: predictive_accuracy
                 result_field = "Local Result - Accuracy (+- STD)"
-                fields[result_field] = self.evaluation_summary("predictive_accuracy")
+                fields[result_field] = self._evaluation_summary("predictive_accuracy")
                 order.append(result_field)
             elif "mean_absolute_error" in self.fold_evaluations:
                 # OpenMLRegressionTask
                 # default: mean_absolute_error
                 result_field = "Local Result - MAE (+- STD)"
-                fields[result_field] = self.evaluation_summary("mean_absolute_error")
+                fields[result_field] = self._evaluation_summary("mean_absolute_error")
                 order.append(result_field)
 
-            # Runtime should be available for any task type
-            rt_field = "Local Runtime - ms (+- STD)"
-            fields[rt_field] = self.evaluation_summary("usercpu_time_millis")
-
-            # Add to order to be below / same as results
-            order.append(rt_field)
+            if "usercpu_time_millis" in self.fold_evaluations:
+                # Runtime should be available for most tasks types
+                rt_field = "Local Runtime - ms (+- STD)"
+                fields[rt_field] = self._evaluation_summary("usercpu_time_millis")
+                order.append(rt_field)
 
         # determines the remaining order
         order += [
