@@ -112,7 +112,7 @@ def _get_estimation_procedure_list():
         except ValueError as e:
             warnings.warn(
                 f"Could not create task type id for {task_type_int} due to error {e}",
-                warnings.RuntimeWarning,
+                RuntimeWarning,
             )
             continue
         procs.append(
@@ -249,9 +249,18 @@ def __list_tasks(api_call, output_format="dict"):
         tid = None
         try:
             tid = int(task_["oml:task_id"])
+            task_type_int = int(task_["oml:task_type_id"])
+            try:
+                task_type_id = TaskType(task_type_int)
+            except ValueError as e:
+                warnings.warn(
+                    f"Could not create task type id for {task_type_int} due to error {e}",
+                    RuntimeWarning,
+                )
+                continue
             task = {
                 "tid": tid,
-                "ttid": TaskType(int(task_["oml:task_type_id"])),
+                "ttid": task_type_id,
                 "did": int(task_["oml:did"]),
                 "name": task_["oml:name"],
                 "task_type": task_["oml:task_type"],
