@@ -31,36 +31,55 @@ class OpenMLRun(OpenMLBase):
     Parameters
     ----------
     task_id: int
+        The ID of the OpenML task associated with the run.
     flow_id: int
+        The ID of the OpenML flow associated with the run.
     dataset_id: int
+        The ID of the OpenML dataset used for the run.
     setup_string: str
+        The setup string of the run.
     output_files: Dict[str, str]
-        A dictionary that specifies where each related file can be found.
+        Specifies where each related file can be found. 
     setup_id: int
+        An integer representing the ID of the setup used for the run.
     tags: List[str]
+        Representing the tags associated with the run.
     uploader: int
-        User ID of the uploader.
+        User ID of the uploader. 
     uploader_name: str
+        The name of the person who uploaded the run.
     evaluations: Dict
+        Representing the evaluations of the run.
     fold_evaluations: Dict
+        The evaluations of the run for each fold.
     sample_evaluations: Dict
+        The evaluations of the run for each sample.
     data_content: List[List]
         The predictions generated from executing this run.
     trace: OpenMLRunTrace
+        The trace containing information on internal model evaluations of this run.
     model: object
+        The untrained model that was evaluated in the run.
     task_type: str
+        The type of the OpenML task associated with the run.
     task_evaluation_measure: str
+        The evaluation measure used for the task.
     flow_name: str
+        The name of the OpenML flow associated with the run.
     parameter_settings: List[OrderedDict]
+        Representing the parameter settings used for the run.
     predictions_url: str
+        The URL of the predictions file.
     task: OpenMLTask
+        An instance of the OpenMLTask class, representing the OpenML task associated with the run.
     flow: OpenMLFlow
+        An instance of the OpenMLFlow class, representing the OpenML flow associated with the run.
     run_id: int
+        The ID of the run.
     description_text: str, optional
-        Description text to add to the predictions file.
-        If left None, is set to the time the arff file is generated.
+        Description text to add to the predictions file. If left None, is set to the time the arff file is generated.
     run_details: str, optional (default=None)
-        Description of the run stored in the run meta-data.
+        Description of the run stored in the run meta-data. 
     """
 
     def __init__(
