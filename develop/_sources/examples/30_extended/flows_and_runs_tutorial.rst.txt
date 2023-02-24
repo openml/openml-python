@@ -215,7 +215,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to https://test.openml.org/r/26355
+    Uploaded to https://test.openml.org/r/27995
 
 
 
@@ -356,10 +356,10 @@ variables and missing values in both.
 
     /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:828: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
       warnings.warn(
-    Uploaded to https://test.openml.org/r/26358
+    Uploaded to https://test.openml.org/r/28000
     /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:828: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
       warnings.warn(
-    Uploaded to https://test.openml.org/r/26359
+    Uploaded to https://test.openml.org/r/28001
 
 
 
@@ -416,8 +416,8 @@ a model on a task without uploading results or flows to the server immediately.
     ==========
     Uploader Name: None
     Metric.......: None
-    Run ID.......: 26360
-    Run URL......: https://test.openml.org/r/26360
+    Run ID.......: 28002
+    Run URL......: https://test.openml.org/r/28002
     Task ID......: 6
     Task Type....: None
     Task URL.....: https://test.openml.org/t/6
@@ -504,7 +504,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: https://test.openml.org/r/26362
+    kNN on diabetes: https://test.openml.org/r/28005
 
 
 
@@ -524,7 +524,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  19.487 seconds)
+   **Total running time of the script:** ( 0 minutes  22.692 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:
