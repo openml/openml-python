@@ -6,10 +6,25 @@
 Changelog
 =========
 
+0.13.1
+~~~~~~
+
+ * FIX #1197 #559 #1131: Fix the order of ground truth and predictions in the ``OpenMLRun`` object and in ``format_prediction``.
+ * FIX #1198: Support numpy 1.24 and higher.
+
 0.13.0
 ~~~~~~
+
+ * FIX#1030: ``pre-commit`` hooks now no longer should issue a warning.
+ * FIX#1058, #1100: Avoid ``NoneType`` error when printing task without ``class_labels`` attribute.
  * FIX#1110: Make arguments to ``create_study`` and ``create_suite`` that are defined as optional by the OpenML XSD actually optional.
+ * FIX#1147: ``openml.flow.flow_exists`` no longer requires an API key.
+ * FIX#1184: Automatically resolve proxies when downloading from minio. Turn this off by setting environment variable ``no_proxy="*"``.
  * MAIN#1088: Do CI for Windows on Github Actions instead of Appveyor.
+ * MAINT#1104: Fix outdated docstring for ``list_task``.
+ * MAIN#1146: Update the pre-commit dependencies.
+ * ADD#1103: Add a ``predictions`` property to OpenMLRun for easy accessibility of prediction data.
+ * ADD#1188: EXPERIMENTAL. Allow downloading all files from a minio bucket with ``download_all_files=True`` for ``get_dataset``.
 
 
 0.12.2

@@ -76,11 +76,9 @@ Exercise 0
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    First 10 of 3454 datasets...
+    First 10 of 5013 datasets...
 
 
 .. raw:: html
@@ -493,6 +491,278 @@ Exercise 1
           <td>129.0</td>
           <td>1000.0</td>
         </tr>
+        <tr>
+          <th>43723</th>
+          <td>43723</td>
+          <td>Toronto-Apartment-Rental-Price</td>
+          <td>1124.0</td>
+          <td>7.0</td>
+          <td>188.0</td>
+        </tr>
+        <tr>
+          <th>44282</th>
+          <td>44282</td>
+          <td>Meta_Album_PLK_Mini</td>
+          <td>3440.0</td>
+          <td>3.0</td>
+          <td>86.0</td>
+        </tr>
+        <tr>
+          <th>44283</th>
+          <td>44283</td>
+          <td>Meta_Album_FLW_Mini</td>
+          <td>4080.0</td>
+          <td>3.0</td>
+          <td>102.0</td>
+        </tr>
+        <tr>
+          <th>44284</th>
+          <td>44284</td>
+          <td>Meta_Album_SPT_Mini</td>
+          <td>2920.0</td>
+          <td>3.0</td>
+          <td>73.0</td>
+        </tr>
+        <tr>
+          <th>44285</th>
+          <td>44285</td>
+          <td>Meta_Album_BRD_Mini</td>
+          <td>12600.0</td>
+          <td>3.0</td>
+          <td>315.0</td>
+        </tr>
+        <tr>
+          <th>44288</th>
+          <td>44288</td>
+          <td>Meta_Album_TEX_Mini</td>
+          <td>2560.0</td>
+          <td>3.0</td>
+          <td>64.0</td>
+        </tr>
+        <tr>
+          <th>44289</th>
+          <td>44289</td>
+          <td>Meta_Album_CRS_Mini</td>
+          <td>7840.0</td>
+          <td>3.0</td>
+          <td>196.0</td>
+        </tr>
+        <tr>
+          <th>44292</th>
+          <td>44292</td>
+          <td>Meta_Album_INS_2_Mini</td>
+          <td>4080.0</td>
+          <td>3.0</td>
+          <td>102.0</td>
+        </tr>
+        <tr>
+          <th>44298</th>
+          <td>44298</td>
+          <td>Meta_Album_DOG_Mini</td>
+          <td>4800.0</td>
+          <td>3.0</td>
+          <td>120.0</td>
+        </tr>
+        <tr>
+          <th>44304</th>
+          <td>44304</td>
+          <td>Meta_Album_TEX_ALOT_Mini</td>
+          <td>10000.0</td>
+          <td>3.0</td>
+          <td>250.0</td>
+        </tr>
+        <tr>
+          <th>44306</th>
+          <td>44306</td>
+          <td>Meta_Album_INS_Mini</td>
+          <td>4160.0</td>
+          <td>3.0</td>
+          <td>104.0</td>
+        </tr>
+        <tr>
+          <th>44317</th>
+          <td>44317</td>
+          <td>Meta_Album_PLK_Extended</td>
+          <td>473273.0</td>
+          <td>3.0</td>
+          <td>102.0</td>
+        </tr>
+        <tr>
+          <th>44318</th>
+          <td>44318</td>
+          <td>Meta_Album_FLW_Extended</td>
+          <td>8189.0</td>
+          <td>3.0</td>
+          <td>102.0</td>
+        </tr>
+        <tr>
+          <th>44319</th>
+          <td>44319</td>
+          <td>Meta_Album_SPT_Extended</td>
+          <td>10416.0</td>
+          <td>3.0</td>
+          <td>73.0</td>
+        </tr>
+        <tr>
+          <th>44320</th>
+          <td>44320</td>
+          <td>Meta_Album_BRD_Extended</td>
+          <td>49054.0</td>
+          <td>3.0</td>
+          <td>315.0</td>
+        </tr>
+        <tr>
+          <th>44322</th>
+          <td>44322</td>
+          <td>Meta_Album_TEX_Extended</td>
+          <td>8675.0</td>
+          <td>3.0</td>
+          <td>64.0</td>
+        </tr>
+        <tr>
+          <th>44323</th>
+          <td>44323</td>
+          <td>Meta_Album_CRS_Extended</td>
+          <td>16185.0</td>
+          <td>3.0</td>
+          <td>196.0</td>
+        </tr>
+        <tr>
+          <th>44326</th>
+          <td>44326</td>
+          <td>Meta_Album_INS_2_Extended</td>
+          <td>75222.0</td>
+          <td>3.0</td>
+          <td>102.0</td>
+        </tr>
+        <tr>
+          <th>44331</th>
+          <td>44331</td>
+          <td>Meta_Album_DOG_Extended</td>
+          <td>20480.0</td>
+          <td>3.0</td>
+          <td>120.0</td>
+        </tr>
+        <tr>
+          <th>44337</th>
+          <td>44337</td>
+          <td>Meta_Album_TEX_ALOT_Extended</td>
+          <td>25000.0</td>
+          <td>3.0</td>
+          <td>250.0</td>
+        </tr>
+        <tr>
+          <th>44340</th>
+          <td>44340</td>
+          <td>Meta_Album_INS_Extended</td>
+          <td>170506.0</td>
+          <td>3.0</td>
+          <td>117.0</td>
+        </tr>
+        <tr>
+          <th>44533</th>
+          <td>44533</td>
+          <td>dionis_seed_0_nrows_2000_nclasses_10_ncols_100...</td>
+          <td>2000.0</td>
+          <td>61.0</td>
+          <td>355.0</td>
+        </tr>
+        <tr>
+          <th>44534</th>
+          <td>44534</td>
+          <td>dionis_seed_1_nrows_2000_nclasses_10_ncols_100...</td>
+          <td>2000.0</td>
+          <td>61.0</td>
+          <td>355.0</td>
+        </tr>
+        <tr>
+          <th>44535</th>
+          <td>44535</td>
+          <td>dionis_seed_2_nrows_2000_nclasses_10_ncols_100...</td>
+          <td>2000.0</td>
+          <td>61.0</td>
+          <td>355.0</td>
+        </tr>
+        <tr>
+          <th>44536</th>
+          <td>44536</td>
+          <td>dionis_seed_3_nrows_2000_nclasses_10_ncols_100...</td>
+          <td>2000.0</td>
+          <td>61.0</td>
+          <td>355.0</td>
+        </tr>
+        <tr>
+          <th>44537</th>
+          <td>44537</td>
+          <td>dionis_seed_4_nrows_2000_nclasses_10_ncols_100...</td>
+          <td>2000.0</td>
+          <td>61.0</td>
+          <td>355.0</td>
+        </tr>
+        <tr>
+          <th>44728</th>
+          <td>44728</td>
+          <td>helena_seed_0_nrows_2000_nclasses_10_ncols_100...</td>
+          <td>2000.0</td>
+          <td>28.0</td>
+          <td>100.0</td>
+        </tr>
+        <tr>
+          <th>44729</th>
+          <td>44729</td>
+          <td>helena_seed_1_nrows_2000_nclasses_10_ncols_100...</td>
+          <td>2000.0</td>
+          <td>28.0</td>
+          <td>100.0</td>
+        </tr>
+        <tr>
+          <th>44730</th>
+          <td>44730</td>
+          <td>helena_seed_2_nrows_2000_nclasses_10_ncols_100...</td>
+          <td>2000.0</td>
+          <td>28.0</td>
+          <td>100.0</td>
+        </tr>
+        <tr>
+          <th>44731</th>
+          <td>44731</td>
+          <td>helena_seed_3_nrows_2000_nclasses_10_ncols_100...</td>
+          <td>2000.0</td>
+          <td>28.0</td>
+          <td>100.0</td>
+        </tr>
+        <tr>
+          <th>44732</th>
+          <td>44732</td>
+          <td>helena_seed_4_nrows_2000_nclasses_10_ncols_100...</td>
+          <td>2000.0</td>
+          <td>28.0</td>
+          <td>100.0</td>
+        </tr>
+        <tr>
+          <th>45049</th>
+          <td>45049</td>
+          <td>MD_MIX_Mini_Copy</td>
+          <td>28240.0</td>
+          <td>69.0</td>
+          <td>706.0</td>
+        </tr>
+        <tr>
+          <th>45102</th>
+          <td>45102</td>
+          <td>dailybike</td>
+          <td>731.0</td>
+          <td>13.0</td>
+          <td>606.0</td>
+        </tr>
+        <tr>
+          <th>45103</th>
+          <td>45103</td>
+          <td>dailybike</td>
+          <td>731.0</td>
+          <td>13.0</td>
+          <td>606.0</td>
+        </tr>
       </tbody>
     </table>
     </div>
@@ -527,12 +797,10 @@ Download datasets
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     This is dataset 'eeg-eye-state', the target feature is 'Class'
-    URL: https://www.openml.org/data/v1/download/1587924/eeg-eye-state.arff
+    URL: https://api.openml.org/data/v1/download/1587924/eeg-eye-state.arff
     **Author**: Oliver Roesler  
     **Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/EEG+Eye+State), Baden-Wuerttemberg, Cooperative State University (DHBW), Stuttgart, Germany  
     **Please cite**: [UCI](https://archive.ics.uci.edu/ml/citation_policy.html)  
@@ -568,8 +836,6 @@ and manually create a dataframe.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -610,8 +876,6 @@ dataframe with the correct dtypes.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -724,11 +988,9 @@ This example uses the test server, to avoid editing a dataset on the main server
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+    /home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
       warnings.warn(
 
 
@@ -768,8 +1030,6 @@ original_data_url, paper_url
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Edited dataset ID: 128
@@ -800,8 +1060,6 @@ This example here only shows a failure when trying to work on a dataset not owne
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -836,12 +1094,10 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    4168
-    Forked dataset ID: 4168
+    17242
+    Forked dataset ID: 17242
 
 
 
@@ -849,28 +1105,23 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  13.612 seconds)
+   **Total running time of the script:** ( 0 minutes  12.745 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: datasets_tutorial.py <datasets_tutorial.py>`
 
-     :download:`Download Python source code: datasets_tutorial.py <datasets_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: datasets_tutorial.ipynb <datasets_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: datasets_tutorial.ipynb <datasets_tutorial.ipynb>`
 
 
 .. only:: html

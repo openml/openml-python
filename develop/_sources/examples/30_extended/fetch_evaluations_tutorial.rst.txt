@@ -84,8 +84,6 @@ Required filters can be applied to retrieve results from runs as required.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
        run_id  task_id  ...  values                                    array_data
@@ -120,8 +118,6 @@ Over here we shall briefly take a look at the details of the task.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -167,8 +163,6 @@ Note that we now filter the evaluations based on another parameter 'task'.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -223,9 +217,9 @@ We shall now plot a cumulative distributive function (CDF) for the accuracies ob
         plt.title("CDF")
         plt.xlabel(metric)
         plt.ylabel("Likelihood")
-        plt.grid(b=True, which="major", linestyle="-")
+        plt.grid(visible=True, which="major", linestyle="-")
         plt.minorticks_on()
-        plt.grid(b=True, which="minor", linestyle="--")
+        plt.grid(visible=True, which="minor", linestyle="--")
         plt.axvline(max_val, linestyle="--", color="gray")
         plt.text(max_val, 0, "%.3f" % max_val, fontsize=9)
         plt.show()
@@ -244,17 +238,6 @@ We shall now plot a cumulative distributive function (CDF) for the accuracies ob
    :srcset: /examples/30_extended/images/sphx_glr_fetch_evaluations_tutorial_001.png
    :class: sphx-glr-single-img
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /home/runner/work/openml-python/openml-python/examples/30_extended/fetch_evaluations_tutorial.py:93: MatplotlibDeprecationWarning: The 'b' parameter of grid() has been renamed 'visible' since Matplotlib 3.5; support for the old name will be dropped two minor releases later.
-      plt.grid(b=True, which="major", linestyle="-")
-    /home/runner/work/openml-python/openml-python/examples/30_extended/fetch_evaluations_tutorial.py:95: MatplotlibDeprecationWarning: The 'b' parameter of grid() has been renamed 'visible' since Matplotlib 3.5; support for the old name will be dropped two minor releases later.
-      plt.grid(b=True, which="minor", linestyle="--")
 
 
 
@@ -327,8 +310,6 @@ For this, we shall compare the top performing flows.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     (12736, 'sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)')
@@ -383,8 +364,6 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
         run_id  ...                                         parameters
@@ -416,28 +395,23 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  34.585 seconds)
+   **Total running time of the script:** ( 0 minutes  27.811 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_fetch_evaluations_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: fetch_evaluations_tutorial.py <fetch_evaluations_tutorial.py>`
 
-     :download:`Download Python source code: fetch_evaluations_tutorial.py <fetch_evaluations_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: fetch_evaluations_tutorial.ipynb <fetch_evaluations_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: fetch_evaluations_tutorial.ipynb <fetch_evaluations_tutorial.ipynb>`
 
 
 .. only:: html

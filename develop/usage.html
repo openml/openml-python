@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>User Guide &#8212; OpenML 0.12.2 documentation</title>
+    <title>User Guide &#8212; OpenML 0.13.1.dev documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
@@ -14,19 +14,18 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js "></script>
-<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
 
   </head><body>
   
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.13.1.dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -125,12 +124,12 @@
     <div class="body col-md-9 content" role="main">
       
   <section id="user-guide">
-<span id="usage"></span><h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
+<span id="usage"></span><h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this heading">¶</a></h1>
 <p>This document will guide you through the most important use cases, functions
 and classes in the OpenML Python API. Throughout this document, we will use
 <a class="reference external" href="https://pandas.pydata.org/">pandas</a> to format and filter tables.</p>
 <section id="installation-set-up">
-<span id="installation"></span><h2>Installation &amp; Set up<a class="headerlink" href="#installation-set-up" title="Permalink to this headline">¶</a></h2>
+<span id="installation"></span><h2>Installation &amp; Set up<a class="headerlink" href="#installation-set-up" title="Permalink to this heading">¶</a></h2>
 <p>The OpenML Python package is a connector to <a class="reference external" href="https://www.openml.org/">OpenML</a>.
 It allows you to use and share datasets and tasks, run
 machine learning algorithms on them and then share the results online.</p>
@@ -141,7 +140,7 @@ the OpenML Python connector, followed up by a simple example.</p>
 </ul>
 </section>
 <section id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">¶</a></h2>
 <p>The configuration file resides in a directory <code class="docutils literal notranslate"><span class="pre">.config/openml</span></code> in the home
 directory of the user and is called config (More specifically, it resides in the
 <a class="reference external" href="https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html">configuration directory specified by the XDGB Base Directory Specification</a>).
@@ -210,15 +209,15 @@ To see where the file is stored, and what its values are, use <cite>openml confi
 Set any field with <code class="docutils literal notranslate"><span class="pre">openml</span> <span class="pre">configure</span> <span class="pre">FIELD</span></code> or even all fields with just <code class="docutils literal notranslate"><span class="pre">openml</span> <span class="pre">configure</span></code>.</p>
 </section>
 <section id="docker">
-<h2>Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
+<h2>Docker<a class="headerlink" href="#docker" title="Permalink to this heading">¶</a></h2>
 <p>It is also possible to try out the latest development version of <code class="docutils literal notranslate"><span class="pre">openml-python</span></code> with docker:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker run -it openml/openml-python
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>openml/openml-python
 </pre></div>
 </div>
 <p>See the <a class="reference external" href="https://github.com/openml/openml-python/blob/main/docker/readme.md">openml-python docker documentation</a> for more information.</p>
 </section>
 <section id="key-concepts">
-<h2>Key concepts<a class="headerlink" href="#key-concepts" title="Permalink to this headline">¶</a></h2>
+<h2>Key concepts<a class="headerlink" href="#key-concepts" title="Permalink to this heading">¶</a></h2>
 <p>OpenML contains several key concepts which it needs to make machine learning
 research shareable. A machine learning experiment consists of one or several
 <strong>runs</strong>, which describe the performance of an algorithm (called a <strong>flow</strong> in
@@ -232,7 +231,7 @@ a list of <strong>tasks</strong>.</p>
 <a class="reference external" href="https://openml.github.io/OpenML/#concepts">OpenML user guide</a>.</p>
 </section>
 <section id="working-with-tasks">
-<h2>Working with tasks<a class="headerlink" href="#working-with-tasks" title="Permalink to this headline">¶</a></h2>
+<h2>Working with tasks<a class="headerlink" href="#working-with-tasks" title="Permalink to this heading">¶</a></h2>
 <p>You can think of a task as an experimentation protocol, describing how to apply
 a machine learning model to a dataset in a way that is comparable with the
 results of others (more on how to do that further down). Tasks are containers,
@@ -249,7 +248,7 @@ you can read the <a class="reference external" href="https://docs.openml.org/#ta
 </ul>
 </section>
 <section id="running-machine-learning-algorithms-and-uploading-results">
-<h2>Running machine learning algorithms and uploading results<a class="headerlink" href="#running-machine-learning-algorithms-and-uploading-results" title="Permalink to this headline">¶</a></h2>
+<h2>Running machine learning algorithms and uploading results<a class="headerlink" href="#running-machine-learning-algorithms-and-uploading-results" title="Permalink to this heading">¶</a></h2>
 <p>In order to upload and share results of running a machine learning algorithm
 on a task, we need to create an <code class="xref py py-class docutils literal notranslate"><span class="pre">OpenMLRun</span></code>. A run object can
 be created by running a <code class="xref py py-class docutils literal notranslate"><span class="pre">OpenMLFlow</span></code> or a scikit-learn compatible
@@ -274,7 +273,7 @@ how to run machine learning models on OpenML data and how to share the results:<
 </ul>
 </section>
 <section id="datasets">
-<h2>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
+<h2>Datasets<a class="headerlink" href="#datasets" title="Permalink to this heading">¶</a></h2>
 <p>OpenML provides a large collection of datasets and the benchmark
 “<a class="reference external" href="https://docs.openml.org/benchmark/">OpenML100</a>” which consists of a curated
 list of datasets.</p>
@@ -293,7 +292,7 @@ obtained on. Learn how to share your datasets in the following tutorial:</p>
 </section>
 </section>
 <section id="extending-openml-python">
-<h1>Extending OpenML-Python<a class="headerlink" href="#extending-openml-python" title="Permalink to this headline">¶</a></h1>
+<h1>Extending OpenML-Python<a class="headerlink" href="#extending-openml-python" title="Permalink to this heading">¶</a></h1>
 <p>OpenML-Python provides an extension interface to connect machine learning libraries directly to
 the API and ships a <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> extension. You can find more information in the Section
 <a class="reference internal" href="extensions.html#extensions"><span class="std std-ref">Extensions</span></a>’</p>
@@ -311,8 +310,8 @@ the API and ships a <code class="docutils literal notranslate"><span class="pre"
       
     </p>
     <p>
-        &copy; Copyright 2014-2022, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br/>
+        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.1.3.<br/>
     </p>
   </div>
 </footer>

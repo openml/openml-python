@@ -91,7 +91,7 @@ We shall cover these 5 representative scenarios for:
 Preparing tasks and scikit-learn models
 ***************************************
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-90
+.. GENERATED FROM PYTHON SOURCE LINES 65-93
 
 .. code-block:: default
 
@@ -105,7 +105,10 @@ Preparing tasks and scikit-learn models
     n_repeats, n_folds, n_samples = task.get_split_dimensions()
     print(
         "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-            task_id, n_repeats, n_folds, n_samples,
+            task_id,
+            n_repeats,
+            n_folds,
+            n_samples,
         )
     )
 
@@ -126,8 +129,6 @@ Preparing tasks and scikit-learn models
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     OpenML Classification Task
@@ -144,7 +145,7 @@ Preparing tasks and scikit-learn models
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-96
+.. GENERATED FROM PYTHON SOURCE LINES 94-99
 
 Case 1: Running a Random Forest model on an OpenML task
 *******************************************************
@@ -152,7 +153,7 @@ We'll run a Random Forest model and obtain an OpenML run object. We can
 see the evaluations recorded per fold for the dataset and the information
 available for this run.
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-118
+.. GENERATED FROM PYTHON SOURCE LINES 99-124
 
 .. code-block:: default
 
@@ -160,7 +161,10 @@ available for this run.
     clf = RandomForestClassifier(n_estimators=10)
 
     run1 = openml.runs.run_model_on_task(
-        model=clf, task=task, upload_flow=False, avoid_duplicate_runs=False,
+        model=clf,
+        task=task,
+        upload_flow=False,
+        avoid_duplicate_runs=False,
     )
     measures = run1.fold_evaluations
 
@@ -184,8 +188,6 @@ available for this run.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     The timing and performance metrics available: 
@@ -198,22 +200,22 @@ available for this run.
     predictive_accuracy
 
     The performance metric is recorded under `predictive_accuracy` per fold and can be retrieved as: 
-    Repeat #0-Fold #0: 0.7807
-    Repeat #0-Fold #1: 0.7769
-    Repeat #0-Fold #2: 0.7851
-    Repeat #0-Fold #3: 0.7863
-    Repeat #0-Fold #4: 0.7854
-    Repeat #0-Fold #5: 0.7865
-    Repeat #0-Fold #6: 0.7753
-    Repeat #0-Fold #7: 0.7782
-    Repeat #0-Fold #8: 0.7871
-    Repeat #0-Fold #9: 0.7782
+    Repeat #0-Fold #0: 0.7782
+    Repeat #0-Fold #1: 0.7675
+    Repeat #0-Fold #2: 0.7782
+    Repeat #0-Fold #3: 0.7869
+    Repeat #0-Fold #4: 0.7849
+    Repeat #0-Fold #5: 0.7778
+    Repeat #0-Fold #6: 0.7769
+    Repeat #0-Fold #7: 0.7807
+    Repeat #0-Fold #8: 0.7878
+    Repeat #0-Fold #9: 0.7873
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-132
+.. GENERATED FROM PYTHON SOURCE LINES 125-138
 
 The remaining entries recorded in `measures` are the runtime records
 related as:
@@ -229,7 +231,7 @@ is converted to `milliseconds` and stored. Similarly, `time.time()` is used
 to record the time entry for `wall_clock_time_*`. The `*_millis_testing` entry
 follows the same procedure but for time taken for the `.predict()` procedure.
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-136
+.. GENERATED FROM PYTHON SOURCE LINES 138-142
 
 .. code-block:: default
 
@@ -243,31 +245,29 @@ follows the same procedure but for time taken for the `.predict()` procedure.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-278.516 vs Wall-278.574
-    Repeat #0-Fold #1: CPU-275.052 vs Wall-275.123
-    Repeat #0-Fold #2: CPU-254.699 vs Wall-254.716
-    Repeat #0-Fold #3: CPU-258.778 vs Wall-258.815
-    Repeat #0-Fold #4: CPU-273.844 vs Wall-273.897
-    Repeat #0-Fold #5: CPU-270.862 vs Wall-270.875
-    Repeat #0-Fold #6: CPU-259.620 vs Wall-259.649
-    Repeat #0-Fold #7: CPU-254.511 vs Wall-254.582
-    Repeat #0-Fold #8: CPU-275.087 vs Wall-275.090
-    Repeat #0-Fold #9: CPU-261.824 vs Wall-261.837
+    Repeat #0-Fold #0: CPU-266.173 vs Wall-266.207
+    Repeat #0-Fold #1: CPU-269.997 vs Wall-270.254
+    Repeat #0-Fold #2: CPU-268.684 vs Wall-268.841
+    Repeat #0-Fold #3: CPU-266.862 vs Wall-266.933
+    Repeat #0-Fold #4: CPU-268.022 vs Wall-268.161
+    Repeat #0-Fold #5: CPU-268.349 vs Wall-268.372
+    Repeat #0-Fold #6: CPU-268.949 vs Wall-268.598
+    Repeat #0-Fold #7: CPU-269.894 vs Wall-270.023
+    Repeat #0-Fold #8: CPU-266.306 vs Wall-267.512
+    Repeat #0-Fold #9: CPU-269.219 vs Wall-268.942
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-140
+.. GENERATED FROM PYTHON SOURCE LINES 143-146
 
 Case 2: Running Scikit-learn model on an OpenML task in parallel
 ****************************************************************
 Redefining the model to allow parallelism with `n_jobs=2` (2 cores)
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-150
+.. GENERATED FROM PYTHON SOURCE LINES 146-156
 
 .. code-block:: default
 
@@ -287,29 +287,27 @@ Redefining the model to allow parallelism with `n_jobs=2` (2 cores)
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-124.557 vs Wall-953.982
-    Repeat #0-Fold #1: CPU-81.144 vs Wall-211.193
-    Repeat #0-Fold #2: CPU-88.571 vs Wall-207.195
-    Repeat #0-Fold #3: CPU-74.157 vs Wall-192.036
-    Repeat #0-Fold #4: CPU-79.557 vs Wall-220.961
-    Repeat #0-Fold #5: CPU-73.295 vs Wall-194.751
-    Repeat #0-Fold #6: CPU-76.300 vs Wall-194.103
-    Repeat #0-Fold #7: CPU-80.299 vs Wall-201.122
-    Repeat #0-Fold #8: CPU-81.776 vs Wall-213.422
-    Repeat #0-Fold #9: CPU-76.273 vs Wall-206.418
+    Repeat #0-Fold #0: CPU-109.053 vs Wall-853.647
+    Repeat #0-Fold #1: CPU-64.624 vs Wall-196.609
+    Repeat #0-Fold #2: CPU-68.522 vs Wall-194.724
+    Repeat #0-Fold #3: CPU-61.741 vs Wall-179.633
+    Repeat #0-Fold #4: CPU-61.789 vs Wall-182.892
+    Repeat #0-Fold #5: CPU-63.456 vs Wall-184.666
+    Repeat #0-Fold #6: CPU-63.155 vs Wall-183.830
+    Repeat #0-Fold #7: CPU-61.819 vs Wall-184.844
+    Repeat #0-Fold #8: CPU-62.494 vs Wall-183.414
+    Repeat #0-Fold #9: CPU-63.942 vs Wall-185.477
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-152
+.. GENERATED FROM PYTHON SOURCE LINES 157-158
 
 Running a Random Forest model on an OpenML task in parallel (all cores available):
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-165
+.. GENERATED FROM PYTHON SOURCE LINES 158-171
 
 .. code-block:: default
 
@@ -332,25 +330,23 @@ Running a Random Forest model on an OpenML task in parallel (all cores available
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-77.292 vs Wall-203.520
-    Repeat #0-Fold #1: CPU-75.741 vs Wall-198.293
-    Repeat #0-Fold #2: CPU-74.138 vs Wall-191.538
-    Repeat #0-Fold #3: CPU-77.415 vs Wall-207.310
-    Repeat #0-Fold #4: CPU-73.558 vs Wall-215.690
-    Repeat #0-Fold #5: CPU-74.956 vs Wall-197.264
-    Repeat #0-Fold #6: CPU-71.411 vs Wall-189.333
-    Repeat #0-Fold #7: CPU-72.858 vs Wall-192.235
-    Repeat #0-Fold #8: CPU-74.152 vs Wall-194.707
-    Repeat #0-Fold #9: CPU-73.052 vs Wall-211.792
+    Repeat #0-Fold #0: CPU-62.666 vs Wall-186.611
+    Repeat #0-Fold #1: CPU-61.637 vs Wall-181.487
+    Repeat #0-Fold #2: CPU-60.955 vs Wall-180.679
+    Repeat #0-Fold #3: CPU-60.821 vs Wall-182.336
+    Repeat #0-Fold #4: CPU-61.855 vs Wall-183.423
+    Repeat #0-Fold #5: CPU-62.393 vs Wall-182.127
+    Repeat #0-Fold #6: CPU-62.943 vs Wall-182.880
+    Repeat #0-Fold #7: CPU-64.480 vs Wall-190.207
+    Repeat #0-Fold #8: CPU-62.675 vs Wall-203.855
+    Repeat #0-Fold #9: CPU-62.729 vs Wall-184.523
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-171
+.. GENERATED FROM PYTHON SOURCE LINES 172-177
 
 We can now observe that the ratio of CPU time to wallclock time is lower
 than in case 1. This happens because joblib by default spawns subprocesses
@@ -358,14 +354,14 @@ for the workloads for which CPU time cannot be tracked. Therefore, interpreting
 the reported CPU and wallclock time requires knowledge of the parallelization
 applied at runtime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-177
+.. GENERATED FROM PYTHON SOURCE LINES 179-183
 
 Running the same task with a different parallel backend. Joblib provides multiple
 backends: {`loky` (default), `multiprocessing`, `dask`, `threading`, `sequential`}.
 The backend can be explicitly set using a joblib context manager. The behaviour of
 the job distribution can change and therefore the scale of runtimes recorded too.
 
-.. GENERATED FROM PYTHON SOURCE LINES 177-185
+.. GENERATED FROM PYTHON SOURCE LINES 183-191
 
 .. code-block:: default
 
@@ -383,25 +379,23 @@ the job distribution can change and therefore the scale of runtimes recorded too
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-304.867 vs Wall-305.054
-    Repeat #0-Fold #1: CPU-293.588 vs Wall-294.959
-    Repeat #0-Fold #2: CPU-300.319 vs Wall-310.452
-    Repeat #0-Fold #3: CPU-315.459 vs Wall-312.798
-    Repeat #0-Fold #4: CPU-303.202 vs Wall-310.035
-    Repeat #0-Fold #5: CPU-293.856 vs Wall-290.450
-    Repeat #0-Fold #6: CPU-301.160 vs Wall-301.221
-    Repeat #0-Fold #7: CPU-295.843 vs Wall-296.899
-    Repeat #0-Fold #8: CPU-289.801 vs Wall-289.870
-    Repeat #0-Fold #9: CPU-286.782 vs Wall-288.266
+    Repeat #0-Fold #0: CPU-283.416 vs Wall-283.461
+    Repeat #0-Fold #1: CPU-281.123 vs Wall-282.487
+    Repeat #0-Fold #2: CPU-282.181 vs Wall-282.334
+    Repeat #0-Fold #3: CPU-281.550 vs Wall-282.164
+    Repeat #0-Fold #4: CPU-272.787 vs Wall-272.823
+    Repeat #0-Fold #5: CPU-273.586 vs Wall-275.629
+    Repeat #0-Fold #6: CPU-270.000 vs Wall-272.307
+    Repeat #0-Fold #7: CPU-270.281 vs Wall-271.619
+    Repeat #0-Fold #8: CPU-272.532 vs Wall-277.432
+    Repeat #0-Fold #9: CPU-272.531 vs Wall-271.822
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-193
+.. GENERATED FROM PYTHON SOURCE LINES 192-199
 
 The CPU time interpretation becomes ambiguous when jobs are distributed over an
 unknown number of cores or when subprocesses are spawned for which the CPU time
@@ -411,7 +405,7 @@ utilisation and whether workloads are executed in subprocesses, for various
 cases that can arise as demonstrated in the rest of the example. Therefore,
 the final interpretation of the runtimes is left to the `user`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-203
+.. GENERATED FROM PYTHON SOURCE LINES 201-209
 
 Case 3: Running and benchmarking HPO algorithms with their runtimes
 *******************************************************************
@@ -422,7 +416,7 @@ RandomForest model's hyperparameter `n_estimators`. Scikit-learn also provides a
 and evaluating the model on the best found parameter setting. This is
 included in the `wall_clock_time_millis_training` measure recorded.
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-224
+.. GENERATED FROM PYTHON SOURCE LINES 209-230
 
 .. code-block:: default
 
@@ -453,25 +447,23 @@ included in the `wall_clock_time_millis_training` measure recorded.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-5907.040 vs Wall-5940.433
-    Repeat #0-Fold #1: CPU-5945.679 vs Wall-5945.516
-    Repeat #0-Fold #2: CPU-5987.347 vs Wall-6024.813
-    Repeat #0-Fold #3: CPU-5988.081 vs Wall-6019.677
-    Repeat #0-Fold #4: CPU-5947.024 vs Wall-5915.648
-    Repeat #0-Fold #5: CPU-5582.535 vs Wall-5602.689
-    Repeat #0-Fold #6: CPU-6036.992 vs Wall-6145.555
-    Repeat #0-Fold #7: CPU-5701.592 vs Wall-5660.994
-    Repeat #0-Fold #8: CPU-5370.089 vs Wall-5355.909
-    Repeat #0-Fold #9: CPU-5983.271 vs Wall-5676.756
+    Repeat #0-Fold #0: CPU-5134.306 vs Wall-5167.351
+    Repeat #0-Fold #1: CPU-5165.670 vs Wall-5166.929
+    Repeat #0-Fold #2: CPU-5139.334 vs Wall-5176.870
+    Repeat #0-Fold #3: CPU-5158.028 vs Wall-5177.699
+    Repeat #0-Fold #4: CPU-5108.673 vs Wall-5114.711
+    Repeat #0-Fold #5: CPU-5120.802 vs Wall-5146.263
+    Repeat #0-Fold #6: CPU-5107.740 vs Wall-5128.734
+    Repeat #0-Fold #7: CPU-5138.987 vs Wall-5139.616
+    Repeat #0-Fold #8: CPU-5097.989 vs Wall-5138.296
+    Repeat #0-Fold #9: CPU-5110.879 vs Wall-5115.847
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 225-236
+.. GENERATED FROM PYTHON SOURCE LINES 231-242
 
 Like any optimisation problem, scikit-learn's HPO estimators also generate
 a sequence of configurations which are evaluated, using which the best found
@@ -485,7 +477,7 @@ parameterized by the `cv` parameter. Since `GridSearchCV` in this example perfor
 is for the entire `fit()` procedure of GridSearchCV thus subsuming the runtimes of
 the 2-fold (inner) CV search performed.
 
-.. GENERATED FROM PYTHON SOURCE LINES 236-243
+.. GENERATED FROM PYTHON SOURCE LINES 242-249
 
 .. code-block:: default
 
@@ -502,24 +494,22 @@ the 2-fold (inner) CV search performed.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     # repeats: 1
     # folds: 10
-    5940.432548522949
+    5167.351007461548
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 244-247
+.. GENERATED FROM PYTHON SOURCE LINES 250-253
 
 To extract the training runtime of the 1-st repeat, 4-th (outer) fold and also
 to fetch the parameters and performance of the evaluations made during
 the 1-st repeat, 4-th fold evaluation by the Grid Search model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 247-264
+.. GENERATED FROM PYTHON SOURCE LINES 253-270
 
 .. code-block:: default
 
@@ -546,21 +536,19 @@ the 1-st repeat, 4-th fold evaluation by the Grid Search model.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    Total runtime for repeat 0's fold 3: 6019.676685 ms
-    n_estimators:  1 - score: 0.766
+    Total runtime for repeat 0's fold 3: 5177.699327 ms
+    n_estimators:  1 - score: 0.772
     n_estimators: 13 - score: 0.802
-    n_estimators: 25 - score: 0.803
+    n_estimators: 25 - score: 0.805
     n_estimators: 37 - score: 0.803
-    n_estimators: 50 - score: 0.804
+    n_estimators: 50 - score: 0.803
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 265-277
+.. GENERATED FROM PYTHON SOURCE LINES 271-283
 
 Scikit-learn's HPO estimators also come with an argument `refit=True` as a default.
 In our previous model definition it was set to True by default, which meant that the best
@@ -575,7 +563,7 @@ For HPO estimators, `wall_clock_time_millis = wall_clock_time_millis_training + 
 
 This refit time can therefore be explicitly extracted in this manner:
 
-.. GENERATED FROM PYTHON SOURCE LINES 277-296
+.. GENERATED FROM PYTHON SOURCE LINES 283-302
 
 .. code-block:: default
 
@@ -604,32 +592,30 @@ This refit time can therefore be explicitly extracted in this manner:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    Repeat #0-Fold #0: 1267.6189
-    Repeat #0-Fold #1: 1269.4635
-    Repeat #0-Fold #2: 1290.1821
-    Repeat #0-Fold #3: 1258.9173
-    Repeat #0-Fold #4: 1246.3782
-    Repeat #0-Fold #5: 972.5344
-    Repeat #0-Fold #6: 1400.3241
-    Repeat #0-Fold #7: 953.9440
-    Repeat #0-Fold #8: 654.3615
-    Repeat #0-Fold #9: 923.3475
+    Repeat #0-Fold #0: 634.4290
+    Repeat #0-Fold #1: 631.1371
+    Repeat #0-Fold #2: 635.6304
+    Repeat #0-Fold #3: 639.4644
+    Repeat #0-Fold #4: 631.0427
+    Repeat #0-Fold #5: 633.9197
+    Repeat #0-Fold #6: 627.5017
+    Repeat #0-Fold #7: 634.9111
+    Repeat #0-Fold #8: 633.7585
+    Repeat #0-Fold #9: 636.2493
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 297-301
+.. GENERATED FROM PYTHON SOURCE LINES 303-307
 
 Along with the GridSearchCV already used above, we demonstrate how such
 optimisation traces can be retrieved by showing an application of these
 traces - comparing the speed of finding the best configuration using
 RandomizedSearchCV and GridSearchCV available with scikit-learn.
 
-.. GENERATED FROM PYTHON SOURCE LINES 301-316
+.. GENERATED FROM PYTHON SOURCE LINES 307-322
 
 .. code-block:: default
 
@@ -655,7 +641,7 @@ RandomizedSearchCV and GridSearchCV available with scikit-learn.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 317-328
+.. GENERATED FROM PYTHON SOURCE LINES 323-334
 
 Since for the call to ``openml.runs.run_model_on_task`` the parameter
 ``n_jobs`` is set to its default ``None``, the evaluations across the OpenML folds
@@ -669,7 +655,7 @@ fold by the HPO model and the corresponding time taken for search across
 that fold. Moreover, since ``n_jobs=None`` for ``openml.runs.run_model_on_task``
 the runtimes per fold can be cumulatively added to plot the trace against time.
 
-.. GENERATED FROM PYTHON SOURCE LINES 328-372
+.. GENERATED FROM PYTHON SOURCE LINES 334-378
 
 .. code-block:: default
 
@@ -729,7 +715,7 @@ the runtimes per fold can be cumulatively added to plot the trace against time.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 373-381
+.. GENERATED FROM PYTHON SOURCE LINES 379-387
 
 Case 4: Running models that scikit-learn doesn't parallelize
 *************************************************************
@@ -740,7 +726,7 @@ depend on joblib for its parallelism. 2 such cases are illustrated below.
 Running a Decision Tree model that doesn't support parallelism implicitly, but
 using OpenML to parallelize evaluations for the outer-cross validation folds.
 
-.. GENERATED FROM PYTHON SOURCE LINES 381-390
+.. GENERATED FROM PYTHON SOURCE LINES 387-396
 
 .. code-block:: default
 
@@ -759,31 +745,29 @@ using OpenML to parallelize evaluations for the outer-cross validation folds.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-104.340 vs Wall-104.443
-    Repeat #0-Fold #1: CPU-104.409 vs Wall-106.984
-    Repeat #0-Fold #2: CPU-97.304 vs Wall-97.470
-    Repeat #0-Fold #3: CPU-97.596 vs Wall-97.597
-    Repeat #0-Fold #4: CPU-106.639 vs Wall-107.315
-    Repeat #0-Fold #5: CPU-99.719 vs Wall-99.778
-    Repeat #0-Fold #6: CPU-107.118 vs Wall-107.121
-    Repeat #0-Fold #7: CPU-105.031 vs Wall-111.668
-    Repeat #0-Fold #8: CPU-98.286 vs Wall-99.467
-    Repeat #0-Fold #9: CPU-97.235 vs Wall-98.589
+    Repeat #0-Fold #0: CPU-93.551 vs Wall-93.854
+    Repeat #0-Fold #1: CPU-93.985 vs Wall-93.986
+    Repeat #0-Fold #2: CPU-92.529 vs Wall-92.628
+    Repeat #0-Fold #3: CPU-92.749 vs Wall-92.904
+    Repeat #0-Fold #4: CPU-93.425 vs Wall-93.870
+    Repeat #0-Fold #5: CPU-92.960 vs Wall-92.984
+    Repeat #0-Fold #6: CPU-93.308 vs Wall-93.669
+    Repeat #0-Fold #7: CPU-92.395 vs Wall-92.428
+    Repeat #0-Fold #8: CPU-92.805 vs Wall-92.904
+    Repeat #0-Fold #9: CPU-92.924 vs Wall-92.978
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 391-394
+.. GENERATED FROM PYTHON SOURCE LINES 397-400
 
 Although the decision tree does not run in parallel, it can release the
 `Python GIL <https://docs.python.org/dev/glossary.html#term-global-interpreter-lock>`_.
 This can result in surprising runtime measures as demonstrated below:
 
-.. GENERATED FROM PYTHON SOURCE LINES 394-402
+.. GENERATED FROM PYTHON SOURCE LINES 400-408
 
 .. code-block:: default
 
@@ -801,31 +785,29 @@ This can result in surprising runtime measures as demonstrated below:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-176.927 vs Wall-123.140
-    Repeat #0-Fold #1: CPU-179.946 vs Wall-113.480
-    Repeat #0-Fold #2: CPU-196.300 vs Wall-139.197
-    Repeat #0-Fold #3: CPU-163.033 vs Wall-99.463
-    Repeat #0-Fold #4: CPU-219.778 vs Wall-150.218
-    Repeat #0-Fold #5: CPU-172.680 vs Wall-105.188
-    Repeat #0-Fold #6: CPU-209.348 vs Wall-147.600
-    Repeat #0-Fold #7: CPU-215.480 vs Wall-151.714
-    Repeat #0-Fold #8: CPU-198.299 vs Wall-139.309
-    Repeat #0-Fold #9: CPU-198.653 vs Wall-138.372
+    Repeat #0-Fold #0: CPU-187.837 vs Wall-130.115
+    Repeat #0-Fold #1: CPU-185.698 vs Wall-130.726
+    Repeat #0-Fold #2: CPU-187.139 vs Wall-128.877
+    Repeat #0-Fold #3: CPU-186.856 vs Wall-129.523
+    Repeat #0-Fold #4: CPU-185.302 vs Wall-127.044
+    Repeat #0-Fold #5: CPU-188.232 vs Wall-130.505
+    Repeat #0-Fold #6: CPU-188.403 vs Wall-129.827
+    Repeat #0-Fold #7: CPU-184.840 vs Wall-126.963
+    Repeat #0-Fold #8: CPU-155.673 vs Wall-93.336
+    Repeat #0-Fold #9: CPU-174.063 vs Wall-118.945
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 403-406
+.. GENERATED FROM PYTHON SOURCE LINES 409-412
 
 Running a Neural Network from scikit-learn that uses scikit-learn independent
 parallelism using libraries such as `MKL, OpenBLAS or BLIS
-<https://scikit-learn.org/stable/computing/parallelism.html#parallel-numpy-routines-from-numerical-libraries>`_.
+<https://scikit-learn.org/stable/computing/parallelism.html#parallel-numpy-and-scipy-routines-from-numerical-libraries>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 406-415
+.. GENERATED FROM PYTHON SOURCE LINES 412-421
 
 .. code-block:: default
 
@@ -844,45 +826,43 @@ parallelism using libraries such as `MKL, OpenBLAS or BLIS
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:692: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:684: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:692: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:684: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:692: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:684: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:692: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:684: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:692: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:684: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:692: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:684: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:692: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:684: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:692: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:684: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:692: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:684: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:692: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:684: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    Repeat #0-Fold #0: CPU-2332.323 vs Wall-2332.565
-    Repeat #0-Fold #1: CPU-2382.721 vs Wall-2284.700
-    Repeat #0-Fold #2: CPU-2342.433 vs Wall-2241.371
-    Repeat #0-Fold #3: CPU-2432.555 vs Wall-2325.533
-    Repeat #0-Fold #4: CPU-2330.020 vs Wall-2224.258
-    Repeat #0-Fold #5: CPU-2248.319 vs Wall-2141.142
-    Repeat #0-Fold #6: CPU-2362.569 vs Wall-2255.728
-    Repeat #0-Fold #7: CPU-2353.875 vs Wall-2247.746
-    Repeat #0-Fold #8: CPU-2289.429 vs Wall-2182.549
-    Repeat #0-Fold #9: CPU-2295.698 vs Wall-2296.120
+    Repeat #0-Fold #0: CPU-987.230 vs Wall-987.330
+    Repeat #0-Fold #1: CPU-1068.920 vs Wall-984.508
+    Repeat #0-Fold #2: CPU-1072.382 vs Wall-988.723
+    Repeat #0-Fold #3: CPU-1075.480 vs Wall-991.782
+    Repeat #0-Fold #4: CPU-1079.477 vs Wall-995.551
+    Repeat #0-Fold #5: CPU-1068.279 vs Wall-984.230
+    Repeat #0-Fold #6: CPU-1077.800 vs Wall-993.762
+    Repeat #0-Fold #7: CPU-1068.701 vs Wall-985.647
+    Repeat #0-Fold #8: CPU-1069.681 vs Wall-986.180
+    Repeat #0-Fold #9: CPU-1063.013 vs Wall-979.920
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 416-423
+.. GENERATED FROM PYTHON SOURCE LINES 422-429
 
 Case 5: Running Scikit-learn models that don't release GIL
 **********************************************************
@@ -892,7 +872,7 @@ are also not executed in parallel via a BLAS library. In such cases, the
 CPU times and wallclock times are most likely trustworthy. Note however
 that only very few models such as naive Bayes models are of this kind.
 
-.. GENERATED FROM PYTHON SOURCE LINES 423-433
+.. GENERATED FROM PYTHON SOURCE LINES 429-439
 
 .. code-block:: default
 
@@ -912,25 +892,23 @@ that only very few models such as naive Bayes models are of this kind.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-54.540 vs Wall-54.566
-    Repeat #0-Fold #1: CPU-54.354 vs Wall-57.327
-    Repeat #0-Fold #2: CPU-52.825 vs Wall-52.900
-    Repeat #0-Fold #3: CPU-50.981 vs Wall-54.654
-    Repeat #0-Fold #4: CPU-50.031 vs Wall-51.223
-    Repeat #0-Fold #5: CPU-48.845 vs Wall-48.883
-    Repeat #0-Fold #6: CPU-47.759 vs Wall-47.786
-    Repeat #0-Fold #7: CPU-48.084 vs Wall-48.118
-    Repeat #0-Fold #8: CPU-49.282 vs Wall-49.293
-    Repeat #0-Fold #9: CPU-48.329 vs Wall-48.348
+    Repeat #0-Fold #0: CPU-45.747 vs Wall-46.047
+    Repeat #0-Fold #1: CPU-45.415 vs Wall-45.593
+    Repeat #0-Fold #2: CPU-43.615 vs Wall-43.617
+    Repeat #0-Fold #3: CPU-43.176 vs Wall-43.348
+    Repeat #0-Fold #4: CPU-43.598 vs Wall-44.044
+    Repeat #0-Fold #5: CPU-42.997 vs Wall-42.999
+    Repeat #0-Fold #6: CPU-43.416 vs Wall-43.635
+    Repeat #0-Fold #7: CPU-43.003 vs Wall-43.075
+    Repeat #0-Fold #8: CPU-43.563 vs Wall-46.760
+    Repeat #0-Fold #9: CPU-43.285 vs Wall-43.366
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 434-480
+.. GENERATED FROM PYTHON SOURCE LINES 440-486
 
 Summmary
 *********
@@ -982,28 +960,23 @@ when reporting runtimes for scikit-learn models measured with OpenML-Python!
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  38.493 seconds)
+   **Total running time of the script:** ( 1 minutes  58.768 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_fetch_runtimes_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: fetch_runtimes_tutorial.py <fetch_runtimes_tutorial.py>`
 
-     :download:`Download Python source code: fetch_runtimes_tutorial.py <fetch_runtimes_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: fetch_runtimes_tutorial.ipynb <fetch_runtimes_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: fetch_runtimes_tutorial.ipynb <fetch_runtimes_tutorial.ipynb>`
 
 
 .. only:: html

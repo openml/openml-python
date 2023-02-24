@@ -222,28 +222,23 @@ two algorithms on various axis (not in the paper)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.795 seconds)
+   **Total running time of the script:** ( 0 minutes  4.019 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_ida_strang_example.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: 2018_ida_strang_example.py <2018_ida_strang_example.py>`
 
-     :download:`Download Python source code: 2018_ida_strang_example.py <2018_ida_strang_example.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: 2018_ida_strang_example.ipynb <2018_ida_strang_example.ipynb>`
+      :download:`Download Jupyter notebook: 2018_ida_strang_example.ipynb <2018_ida_strang_example.ipynb>`
 
 
 .. only:: html

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Fetching Evaluations &#8212; OpenML 0.12.2 documentation</title>
+    <title>Fetching Evaluations &#8212; OpenML 0.13.1.dev documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
@@ -14,19 +14,18 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js "></script>
-<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
 
   </head><body>
   
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.13.1.dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -132,7 +131,7 @@
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="fetching-evaluations">
-<span id="sphx-glr-examples-30-extended-fetch-evaluations-tutorial-py"></span><h1>Fetching Evaluations<a class="headerlink" href="#fetching-evaluations" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-examples-30-extended-fetch-evaluations-tutorial-py"></span><h1>Fetching Evaluations<a class="headerlink" href="#fetching-evaluations" title="Permalink to this heading">¶</a></h1>
 <p>Evaluations contain a concise summary of the results of all runs made. Each evaluation
 provides information on the dataset used, the flow applied, the setup used, the metric
 evaluated, and the result obtained on the metric, for each such run made. These collection
@@ -153,7 +152,7 @@ reuse of results from previous experiments on similar parameters.</p>
 </pre></div>
 </div>
 <section id="listing-evaluations">
-<h2>Listing evaluations<a class="headerlink" href="#listing-evaluations" title="Permalink to this headline">¶</a></h2>
+<h2>Listing evaluations<a class="headerlink" href="#listing-evaluations" title="Permalink to this heading">¶</a></h2>
 <p>Evaluations can be retrieved from the database in the chosen output format.
 Required filters can be applied to retrieve results from runs as required.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># We shall retrieve a small set (only 10 entries) to test the listing function for evaluations</span>
@@ -170,7 +169,6 @@ Required filters can be applied to retrieve results from runs as required.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">evals</span><span class="p">[</span><span class="n">evals</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mf">0.98</span><span class="p">])</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>   run_id  task_id  ...  values                                    array_data
 0      62        1  ...    None  [0.714286,0.98,0.992658,0,0.985294,0.904762]
 1     237        1  ...    None                [1,0.942857,0.991215,0,1,0.95]
@@ -181,7 +179,7 @@ Required filters can be applied to retrieve results from runs as required.</p>
 </pre></div>
 </div>
 <section id="viewing-a-sample-task">
-<h3>Viewing a sample task<a class="headerlink" href="#viewing-a-sample-task" title="Permalink to this headline">¶</a></h3>
+<h3>Viewing a sample task<a class="headerlink" href="#viewing-a-sample-task" title="Permalink to this heading">¶</a></h3>
 <p>Over here we shall briefly take a look at the details of the task.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># We will start by displaying a simple *supervised classification* task:</span>
 <span class="n">task_id</span> <span class="o">=</span> <span class="mi">167140</span>  <span class="c1"># https://www.openml.org/t/167140</span>
@@ -189,7 +187,6 @@ Required filters can be applied to retrieve results from runs as required.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Classification Task
 ==========================
 Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
@@ -203,7 +200,7 @@ Cost Matrix..........: Available
 </div>
 </section>
 <section id="obtaining-all-the-evaluations-for-the-task">
-<h3>Obtaining all the evaluations for the task<a class="headerlink" href="#obtaining-all-the-evaluations-for-the-task" title="Permalink to this headline">¶</a></h3>
+<h3>Obtaining all the evaluations for the task<a class="headerlink" href="#obtaining-all-the-evaluations-for-the-task" title="Permalink to this heading">¶</a></h3>
 <p>We’ll now obtain all the evaluations that were uploaded for the task
 we displayed previously.
 Note that we now filter the evaluations based on another parameter ‘task’.</p>
@@ -219,7 +216,6 @@ Note that we now filter the evaluations based on another parameter ‘task’.</
 <span class="nb">print</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>    run_id  task_id  setup_id  ...     value values  array_data
 0  9199772   167140   7130140  ...  0.938481   None        None
 1  9199845   167140   7130139  ...  0.623352   None        None
@@ -248,7 +244,7 @@ Displaying head of sorted dataframe:
 </section>
 </section>
 <section id="obtaining-cdf-of-metric-for-chosen-task">
-<h2>Obtaining CDF of metric for chosen task<a class="headerlink" href="#obtaining-cdf-of-metric-for-chosen-task" title="Permalink to this headline">¶</a></h2>
+<h2>Obtaining CDF of metric for chosen task<a class="headerlink" href="#obtaining-cdf-of-metric-for-chosen-task" title="Permalink to this heading">¶</a></h2>
 <p>We shall now analyse how the performance of various flows have been on this task,
 by seeing the likelihood of the accuracy obtained across all runs.
 We shall now plot a cumulative distributive function (CDF) for the accuracies obtained.</p>
@@ -263,9 +259,9 @@ We shall now plot a cumulative distributive function (CDF) for the accuracies ob
     <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;CDF&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Likelihood&quot;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">minorticks_on</span><span class="p">()</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;minor&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;minor&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">max_val</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">max_val</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">max_val</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -277,16 +273,9 @@ We shall now plot a cumulative distributive function (CDF) for the accuracies ob
 <span class="c1"># with non-zero probability. While the maximum accuracy seen till now is 96.5%.</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_fetch_evaluations_tutorial_001.png" srcset="../../_images/sphx_glr_fetch_evaluations_tutorial_001.png" alt="CDF" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/examples/30_extended/fetch_evaluations_tutorial.py:93: MatplotlibDeprecationWarning: The &#39;b&#39; parameter of grid() has been renamed &#39;visible&#39; since Matplotlib 3.5; support for the old name will be dropped two minor releases later.
-  plt.grid(b=True, which=&quot;major&quot;, linestyle=&quot;-&quot;)
-/home/runner/work/openml-python/openml-python/examples/30_extended/fetch_evaluations_tutorial.py:95: MatplotlibDeprecationWarning: The &#39;b&#39; parameter of grid() has been renamed &#39;visible&#39; since Matplotlib 3.5; support for the old name will be dropped two minor releases later.
-  plt.grid(b=True, which=&quot;minor&quot;, linestyle=&quot;--&quot;)
-</pre></div>
-</div>
-</section>
+<img src="../../_images/sphx_glr_fetch_evaluations_tutorial_001.png" srcset="../../_images/sphx_glr_fetch_evaluations_tutorial_001.png" alt="CDF" class = "sphx-glr-single-img"/></section>
 <section id="comparing-top-10-performing-flows">
-<h2>Comparing top 10 performing flows<a class="headerlink" href="#comparing-top-10-performing-flows" title="Permalink to this headline">¶</a></h2>
+<h2>Comparing top 10 performing flows<a class="headerlink" href="#comparing-top-10-performing-flows" title="Permalink to this heading">¶</a></h2>
 <p>Let us now try to see which flows generally performed the best for this task.
 For this, we shall compare the top performing flows.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -335,8 +324,7 @@ For this, we shall compare the top performing flows.</p>
     <span class="nb">print</span><span class="p">((</span><span class="n">flow_ids</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">flow_names</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" srcset="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" alt="Boxplot comparing predictive_accuracy for different flows" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(12736, &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)&#39;)
+<img src="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" srcset="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" alt="Boxplot comparing predictive_accuracy for different flows" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(12736, &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)&#39;)
 (8399, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)&#39;)
 (8353, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
 (12127, &#39;sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)&#39;)
@@ -349,7 +337,7 @@ For this, we shall compare the top performing flows.</p>
 </pre></div>
 </div>
 <section id="obtaining-evaluations-with-hyperparameter-settings">
-<h3>Obtaining evaluations with hyperparameter settings<a class="headerlink" href="#obtaining-evaluations-with-hyperparameter-settings" title="Permalink to this headline">¶</a></h3>
+<h3>Obtaining evaluations with hyperparameter settings<a class="headerlink" href="#obtaining-evaluations-with-hyperparameter-settings" title="Permalink to this heading">¶</a></h3>
 <p>We’ll now obtain the evaluations of a task and a flow with the hyperparameters</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># List evaluations in descending order based on predictive_accuracy with</span>
 <span class="c1"># hyperparameters</span>
@@ -374,7 +362,6 @@ For this, we shall compare the top performing flows.</p>
 <span class="s2">&quot;&quot;</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>    run_id  ...                                         parameters
 0  6725054  ...  {&#39;mlr.classif.ranger(13)_num.trees&#39;: &#39;48&#39;, &#39;ml...
 1  2083190  ...  {&#39;sklearn.ensemble.forest.RandomForestClassifi...
@@ -400,8 +387,8 @@ For this, we shall compare the top performing flows.</p>
 &#39;&#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  34.585 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-fetch-evaluations-tutorial-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  27.811 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-fetch-evaluations-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ae7e73aff29ef9ace1e17781346a204b/fetch_evaluations_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_evaluations_tutorial.py</span></code></a></p>
 </div>
@@ -426,8 +413,8 @@ For this, we shall compare the top performing flows.</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2022, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br/>
+        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.1.3.<br/>
     </p>
   </div>
 </footer>

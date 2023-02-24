@@ -62,11 +62,9 @@ A tutorial on how to create and upload a dataset to OpenML.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+    /home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
       warnings.warn(
 
 
@@ -217,11 +215,9 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/4169
+    URL for dataset: https://test.openml.org/d/17243
 
 
 
@@ -321,11 +317,9 @@ https://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/4170
+    URL for dataset: https://test.openml.org/d/17244
 
 
 
@@ -359,8 +353,6 @@ need to pass ``'auto'`` to the ``attributes`` parameter.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -432,11 +424,9 @@ fixing the parameter ``attributes`` to ``'auto'``.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/4171
+    URL for dataset: https://test.openml.org/d/17245
 
 
 
@@ -500,11 +490,9 @@ Dataset is a sparse matrix
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/4172
+    URL for dataset: https://test.openml.org/d/17246
 
 
 
@@ -549,8 +537,6 @@ Dataset is a pandas dataframe with sparse columns
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     <class 'pandas.core.frame.DataFrame'>
@@ -583,11 +569,9 @@ Dataset is a pandas dataframe with sparse columns
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/4173
+    URL for dataset: https://test.openml.org/d/17247
 
 
 
@@ -607,28 +591,23 @@ Dataset is a pandas dataframe with sparse columns
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.318 seconds)
+   **Total running time of the script:** ( 0 minutes  5.312 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: create_upload_tutorial.py <create_upload_tutorial.py>`
 
-     :download:`Download Python source code: create_upload_tutorial.py <create_upload_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: create_upload_tutorial.ipynb <create_upload_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: create_upload_tutorial.ipynb <create_upload_tutorial.ipynb>`
 
 
 .. only:: html

@@ -106,8 +106,6 @@ to have better visualization capabilities and easier access:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Index(['tid', 'ttid', 'did', 'name', 'task_type', 'status',
@@ -118,7 +116,7 @@ to have better visualization capabilities and easier access:
            'NumberOfMissingValues', 'NumberOfNumericFeatures',
            'NumberOfSymbolicFeatures', 'cost_matrix'],
           dtype='object')
-    First 5 of 3744 tasks:
+    First 5 of 3939 tasks:
        tid  ... cost_matrix
     2    2  ...         NaN
     3    3  ...         NaN
@@ -158,11 +156,9 @@ We can filter the list of tasks to only contain datasets with more than
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    [2, 11, 15, 29, 37, 41, 49, 53, 232, 241, 245, 259, 267, 271, 279, 283, 1766, 1775, 1779, 1793, 1801, 1805, 1813, 1817, 1882, 1891, 1895, 1909, 1917, 1921, 1929, 1933, 1945, 1952, 1956, 1967, 1973, 1977, 1983, 1987, 2079, 2125, 2944, 3022, 3034, 3047, 3049, 3053, 3054, 3055, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 4189, 4191, 4197, 4198, 4199, 4217, 4223, 4225, 4226, 4234, 4240, 4254, 4265, 4266, 4288, 4328, 4341, 4345, 4365, 4395, 4396, 4397, 4409, 4411, 4423, 4499, 4508, 4515, 4517, 4518, 4519, 4522, 4538, 4557, 4558, 4562, 4565, 4572, 4582, 4584, 4591, 4618, 4676, 4684, 4697, 4704, 7286, 7307, 7543, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 12738, 12739, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146574, 146576, 146577, 146578, 146583, 146587, 146588, 146593, 146596, 146597, 146600, 146818, 146819, 166859, 166875, 166882, 166884, 166893, 166905, 166906, 166907, 166913, 166915, 166919, 166947, 166953, 166956, 166957, 166958, 166959, 166960, 166967, 166976, 166977, 166978, 166980, 166983, 166988, 166989, 166992, 167016, 167020, 167031, 167037, 167062, 167067, 167068, 167095, 167096, 167100, 167104, 167106, 167151, 167154, 167160, 167163, 167167, 167168, 167171, 167173, 167174, 167175, 167180, 167184, 167187, 167194, 167198, 168300, 168783, 168819, 168820, 168821, 168822, 168823, 168824, 168825, 168907, 189786, 189859, 189899, 189900, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233090, 233094, 233109, 233115, 233171, 233206, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964]
+    [2, 11, 15, 29, 37, 41, 49, 53, 232, 241, 245, 259, 267, 271, 279, 283, 1766, 1775, 1779, 1793, 1801, 1805, 1813, 1817, 1882, 1891, 1895, 1909, 1917, 1921, 1929, 1933, 1945, 1952, 1956, 1967, 1973, 1977, 1983, 1987, 2079, 2125, 2944, 3022, 3034, 3047, 3049, 3053, 3054, 3055, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 4189, 4191, 4197, 4198, 4199, 4217, 4223, 4225, 4226, 4234, 4240, 4254, 4265, 4266, 4288, 4328, 4341, 4345, 4365, 4395, 4396, 4397, 4409, 4411, 4423, 4499, 4508, 4515, 4517, 4518, 4519, 4522, 4538, 4557, 4558, 4562, 4565, 4572, 4582, 4584, 4591, 4618, 4676, 4684, 4697, 4704, 7286, 7307, 7543, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 12738, 12739, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146574, 146576, 146577, 146578, 146583, 146587, 146588, 146593, 146596, 146597, 146600, 146818, 146819, 166859, 166875, 166882, 166884, 166893, 166905, 166906, 166907, 166913, 166915, 166919, 166947, 166953, 166956, 166957, 166958, 166959, 166960, 166967, 166976, 166977, 166978, 166980, 166983, 166988, 166989, 166992, 167016, 167020, 167031, 167037, 167062, 167067, 167068, 167095, 167096, 167100, 167104, 167106, 167151, 167154, 167160, 167163, 167167, 167168, 167171, 167173, 167174, 167175, 167180, 167184, 167187, 167194, 167198, 168300, 168783, 168819, 168820, 168821, 168822, 168823, 168824, 168825, 168907, 189786, 189859, 189899, 189900, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233090, 233094, 233109, 233115, 233171, 233206, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964, 361107, 361109, 361146, 361147, 361148, 361149, 361150, 361151, 361152, 361153, 361154, 361155, 361156, 361157, 361158, 361159, 361160, 361161, 361163, 361164, 361165, 361166, 361167, 361168, 361169, 361170, 361171, 361172, 361173, 361174, 361175, 361176, 361183, 361185, 361190, 361305]
 
 
 
@@ -181,11 +177,9 @@ We can filter the list of tasks to only contain datasets with more than
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    295
+    331
 
 
 
@@ -208,11 +202,9 @@ Then, we can further restrict the tasks to all have the same resampling strategy
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    [2, 11, 15, 29, 37, 41, 49, 53, 2079, 3022, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 7286, 7307, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146818, 146819, 168300, 168907, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233171, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964]
+    [2, 11, 15, 29, 37, 41, 49, 53, 2079, 3022, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 7286, 7307, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146818, 146819, 168300, 168907, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233171, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964, 361107, 361109, 361146, 361147, 361148, 361149, 361150, 361151, 361152, 361153, 361154, 361155, 361156, 361157, 361158, 361159, 361160, 361161, 361163, 361164, 361165, 361166, 361167, 361168, 361169, 361170, 361171, 361172, 361173, 361174, 361175, 361176, 361183, 361185, 361190, 361305]
 
 
 
@@ -231,11 +223,9 @@ Then, we can further restrict the tasks to all have the same resampling strategy
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    124
+    160
 
 
 
@@ -261,8 +251,6 @@ Similar to listing tasks by task type, we can list tasks by tags:
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -298,8 +286,6 @@ Furthermore, we can list tasks based on the dataset id:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     First 5 of 24 tasks:
@@ -332,8 +318,6 @@ In addition, a size limit and an offset can be applied both separately and simul
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -379,11 +363,17 @@ Finally, it is also possible to list all tasks on OpenML with:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    46461
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    46779
 
 
 
@@ -894,7 +884,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>13205</th>
+          <th>13204</th>
           <td>148117</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -925,7 +915,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>17310</th>
+          <th>17309</th>
           <td>170139</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -956,7 +946,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>20761</th>
+          <th>20760</th>
           <td>191646</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -987,7 +977,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>24447</th>
+          <th>24446</th>
           <td>213320</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1018,7 +1008,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>27656</th>
+          <th>27655</th>
           <td>234435</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1049,7 +1039,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>31980</th>
+          <th>31979</th>
           <td>256739</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1080,7 +1070,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>31990</th>
+          <th>31989</th>
           <td>256750</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1111,7 +1101,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>37167</th>
+          <th>37166</th>
           <td>297708</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1142,7 +1132,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>40371</th>
+          <th>40370</th>
           <td>318835</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1173,7 +1163,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
         </tr>
         <tr>
-          <th>43588</th>
+          <th>43587</th>
           <td>339990</td>
           <td>TaskType.CLUSTERING</td>
           <td>1471</td>
@@ -1251,8 +1241,6 @@ Properties of the task are stored as member variables:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     OpenML Classification Task
@@ -1286,8 +1274,6 @@ And:
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -1353,11 +1339,9 @@ We'll use the test server for the rest of this tutorial.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+    /home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
       warnings.warn(
 
 
@@ -1413,11 +1397,13 @@ will be returned.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    Task already exists. Task ID is 1308
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:113: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:256: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+      warnings.warn(
+    Task already exists. Task ID is 3496
 
 
 
@@ -1432,28 +1418,23 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  9.762 seconds)
+   **Total running time of the script:** ( 1 minutes  23.738 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: tasks_tutorial.py <tasks_tutorial.py>`
 
-     :download:`Download Python source code: tasks_tutorial.py <tasks_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: tasks_tutorial.ipynb <tasks_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: tasks_tutorial.ipynb <tasks_tutorial.ipynb>`
 
 
 .. only:: html

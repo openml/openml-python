@@ -71,8 +71,6 @@ uploaded runs (called *setup*).
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
         run_id  ...  sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)_memory
@@ -108,8 +106,6 @@ We can see all the hyperparameter names in the columns of the dataframe:
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -212,12 +208,10 @@ Option 1 - plotting via the pandas helper functions
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
-    <AxesSubplot:title={'center':'SVM performance landscape'}, xlabel='sklearn.svm.classes.SVC(16)_C', ylabel='sklearn.svm.classes.SVC(16)_gamma'>
+    <Axes: title={'center': 'SVM performance landscape'}, xlabel='sklearn.svm.classes.SVC(16)_C', ylabel='sklearn.svm.classes.SVC(16)_gamma'>
 
 
 
@@ -264,8 +258,6 @@ Option 2 - plotting via matplotlib
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -276,28 +268,23 @@ Option 2 - plotting via matplotlib
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.923 seconds)
+   **Total running time of the script:** ( 0 minutes  16.781 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_plot_svm_hyperparameters_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_svm_hyperparameters_tutorial.py <plot_svm_hyperparameters_tutorial.py>`
 
-     :download:`Download Python source code: plot_svm_hyperparameters_tutorial.py <plot_svm_hyperparameters_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_svm_hyperparameters_tutorial.ipynb <plot_svm_hyperparameters_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: plot_svm_hyperparameters_tutorial.ipynb <plot_svm_hyperparameters_tutorial.ipynb>`
 
 
 .. only:: html

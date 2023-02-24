@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>API &#8212; OpenML 0.12.2 documentation</title>
+    <title>API &#8212; OpenML 0.13.1.dev documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
@@ -14,19 +14,18 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js "></script>
-<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
 
   </head><body>
   
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.13.1.dev</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -160,18 +159,14 @@
     <div class="body col-md-9 content" role="main">
       
   <section id="api">
-<span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this heading">¶</a></h1>
 <section id="modules">
-<h2>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
+<h2>Modules<a class="headerlink" href="#modules" title="Permalink to this heading">¶</a></h2>
 <section id="module-openml.datasets">
-<span id="openml-datasets"></span><h3><a class="reference internal" href="#module-openml.datasets" title="openml.datasets"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code></a><a class="headerlink" href="#module-openml.datasets" title="Permalink to this headline">¶</a></h3>
+<span id="openml-datasets"></span><h3><a class="reference internal" href="#module-openml.datasets" title="openml.datasets"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code></a><a class="headerlink" href="#module-openml.datasets" title="Permalink to this heading">¶</a></h3>
 <section id="dataset-classes">
-<h4>Dataset Classes<a class="headerlink" href="#dataset-classes" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Dataset Classes<a class="headerlink" href="#dataset-classes" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.datasets.OpenMLDataFeature.html#openml.datasets.OpenMLDataFeature" title="openml.datasets.OpenMLDataFeature"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLDataFeature</span></code></a>(index, name, data_type, ...)</p></td>
 <td><p>Data Feature (a.k.a.</p></td>
@@ -183,12 +178,8 @@
 </table>
 </section>
 <section id="dataset-functions">
-<h4>Dataset Functions<a class="headerlink" href="#dataset-functions" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Dataset Functions<a class="headerlink" href="#dataset-functions" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.datasets.attributes_arff_from_df.html#openml.datasets.attributes_arff_from_df" title="openml.datasets.attributes_arff_from_df"><code class="xref py py-obj docutils literal notranslate"><span class="pre">attributes_arff_from_df</span></code></a>(df)</p></td>
 <td><p>Describe attributes of the dataframe according to ARFF specification.</p></td>
@@ -225,14 +216,10 @@
 </section>
 </section>
 <section id="module-openml.evaluations">
-<span id="openml-evaluations"></span><h3><a class="reference internal" href="#module-openml.evaluations" title="openml.evaluations"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.evaluations</span></code></a><a class="headerlink" href="#module-openml.evaluations" title="Permalink to this headline">¶</a></h3>
+<span id="openml-evaluations"></span><h3><a class="reference internal" href="#module-openml.evaluations" title="openml.evaluations"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.evaluations</span></code></a><a class="headerlink" href="#module-openml.evaluations" title="Permalink to this heading">¶</a></h3>
 <section id="evaluations-classes">
-<h4>Evaluations Classes<a class="headerlink" href="#evaluations-classes" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Evaluations Classes<a class="headerlink" href="#evaluations-classes" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.evaluations.OpenMLEvaluation.html#openml.evaluations.OpenMLEvaluation" title="openml.evaluations.OpenMLEvaluation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLEvaluation</span></code></a>(run_id, task_id, setup_id, ...)</p></td>
 <td><p>Contains all meta-information about a run / evaluation combination, according to the evaluation/list function</p></td>
@@ -241,12 +228,8 @@
 </table>
 </section>
 <section id="evaluations-functions">
-<h4>Evaluations Functions<a class="headerlink" href="#evaluations-functions" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Evaluations Functions<a class="headerlink" href="#evaluations-functions" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.evaluations.list_evaluations.html#openml.evaluations.list_evaluations" title="openml.evaluations.list_evaluations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_evaluations</span></code></a>(function[, offset, size, ...])</p></td>
 <td><p>List all run-evaluation pairs matching all of the given filters.</p></td>
@@ -262,14 +245,10 @@
 </section>
 </section>
 <section id="module-openml.flows">
-<span id="openml-flows-flow-functions"></span><h3><a class="reference internal" href="#module-openml.flows" title="openml.flows"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code></a>: Flow Functions<a class="headerlink" href="#module-openml.flows" title="Permalink to this headline">¶</a></h3>
+<span id="openml-flows-flow-functions"></span><h3><a class="reference internal" href="#module-openml.flows" title="openml.flows"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.flows</span></code></a>: Flow Functions<a class="headerlink" href="#module-openml.flows" title="Permalink to this heading">¶</a></h3>
 <section id="flow-classes">
-<h4>Flow Classes<a class="headerlink" href="#flow-classes" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Flow Classes<a class="headerlink" href="#flow-classes" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.flows.OpenMLFlow.html#openml.flows.OpenMLFlow" title="openml.flows.OpenMLFlow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLFlow</span></code></a>(name, description, model, ...[, ...])</p></td>
 <td><p>OpenML Flow.</p></td>
@@ -278,12 +257,8 @@
 </table>
 </section>
 <section id="flow-functions">
-<h4>Flow Functions<a class="headerlink" href="#flow-functions" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Flow Functions<a class="headerlink" href="#flow-functions" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.flows.assert_flows_equal.html#openml.flows.assert_flows_equal" title="openml.flows.assert_flows_equal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assert_flows_equal</span></code></a>(flow1, flow2[, ...])</p></td>
 <td><p>Check equality of two flows.</p></td>
@@ -302,14 +277,10 @@
 </section>
 </section>
 <section id="module-openml.runs">
-<span id="openml-runs-run-functions"></span><h3><a class="reference internal" href="#module-openml.runs" title="openml.runs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code></a>: Run Functions<a class="headerlink" href="#module-openml.runs" title="Permalink to this headline">¶</a></h3>
+<span id="openml-runs-run-functions"></span><h3><a class="reference internal" href="#module-openml.runs" title="openml.runs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.runs</span></code></a>: Run Functions<a class="headerlink" href="#module-openml.runs" title="Permalink to this heading">¶</a></h3>
 <section id="run-classes">
-<h4>Run Classes<a class="headerlink" href="#run-classes" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Run Classes<a class="headerlink" href="#run-classes" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.runs.OpenMLRun.html#openml.runs.OpenMLRun" title="openml.runs.OpenMLRun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLRun</span></code></a>(task_id, flow_id, dataset_id[, ...])</p></td>
 <td><p>OpenML Run: result of running a model on an openml dataset.</p></td>
@@ -318,12 +289,8 @@
 </table>
 </section>
 <section id="run-functions">
-<h4>Run Functions<a class="headerlink" href="#run-functions" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Run Functions<a class="headerlink" href="#run-functions" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.runs.get_run.html#openml.runs.get_run" title="openml.runs.get_run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_run</span></code></a>(run_id[, ignore_cache])</p></td>
 <td><p>Gets run corresponding to run_id.</p></td>
@@ -357,14 +324,10 @@
 </section>
 </section>
 <section id="module-openml.setups">
-<span id="openml-setups-setup-functions"></span><h3><a class="reference internal" href="#module-openml.setups" title="openml.setups"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.setups</span></code></a>: Setup Functions<a class="headerlink" href="#module-openml.setups" title="Permalink to this headline">¶</a></h3>
+<span id="openml-setups-setup-functions"></span><h3><a class="reference internal" href="#module-openml.setups" title="openml.setups"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.setups</span></code></a>: Setup Functions<a class="headerlink" href="#module-openml.setups" title="Permalink to this heading">¶</a></h3>
 <section id="setup-classes">
-<h4>Setup Classes<a class="headerlink" href="#setup-classes" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Setup Classes<a class="headerlink" href="#setup-classes" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.setups.OpenMLParameter.html#openml.setups.OpenMLParameter" title="openml.setups.OpenMLParameter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLParameter</span></code></a>(input_id, flow_id, ...)</p></td>
 <td><p>Parameter object (used in setup).</p></td>
@@ -376,12 +339,8 @@
 </table>
 </section>
 <section id="setup-functions">
-<h4>Setup Functions<a class="headerlink" href="#setup-functions" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Setup Functions<a class="headerlink" href="#setup-functions" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.setups.get_setup.html#openml.setups.get_setup" title="openml.setups.get_setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_setup</span></code></a>(setup_id)</p></td>
 <td><p>Downloads the setup (configuration) description from OpenML</p></td>
@@ -400,14 +359,10 @@
 </section>
 </section>
 <section id="module-openml.study">
-<span id="openml-study-study-functions"></span><h3><a class="reference internal" href="#module-openml.study" title="openml.study"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.study</span></code></a>: Study Functions<a class="headerlink" href="#module-openml.study" title="Permalink to this headline">¶</a></h3>
+<span id="openml-study-study-functions"></span><h3><a class="reference internal" href="#module-openml.study" title="openml.study"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.study</span></code></a>: Study Functions<a class="headerlink" href="#module-openml.study" title="Permalink to this heading">¶</a></h3>
 <section id="study-classes">
-<h4>Study Classes<a class="headerlink" href="#study-classes" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Study Classes<a class="headerlink" href="#study-classes" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.study.OpenMLBenchmarkSuite.html#openml.study.OpenMLBenchmarkSuite" title="openml.study.OpenMLBenchmarkSuite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLBenchmarkSuite</span></code></a>(suite_id, alias, name, ...)</p></td>
 <td><p>An OpenMLBenchmarkSuite represents the OpenML concept of a suite (a collection of tasks).</p></td>
@@ -419,12 +374,8 @@
 </table>
 </section>
 <section id="study-functions">
-<h4>Study Functions<a class="headerlink" href="#study-functions" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Study Functions<a class="headerlink" href="#study-functions" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.study.attach_to_study.html#openml.study.attach_to_study" title="openml.study.attach_to_study"><code class="xref py py-obj docutils literal notranslate"><span class="pre">attach_to_study</span></code></a>(study_id, run_ids)</p></td>
 <td><p>Attaches a set of runs to a study.</p></td>
@@ -473,14 +424,10 @@
 </section>
 </section>
 <section id="module-openml.tasks">
-<span id="openml-tasks-task-functions"></span><h3><a class="reference internal" href="#module-openml.tasks" title="openml.tasks"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code></a>: Task Functions<a class="headerlink" href="#module-openml.tasks" title="Permalink to this headline">¶</a></h3>
+<span id="openml-tasks-task-functions"></span><h3><a class="reference internal" href="#module-openml.tasks" title="openml.tasks"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code></a>: Task Functions<a class="headerlink" href="#module-openml.tasks" title="Permalink to this heading">¶</a></h3>
 <section id="task-classes">
-<h4>Task Classes<a class="headerlink" href="#task-classes" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Task Classes<a class="headerlink" href="#task-classes" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.tasks.OpenMLClassificationTask.html#openml.tasks.OpenMLClassificationTask" title="openml.tasks.OpenMLClassificationTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpenMLClassificationTask</span></code></a>(task_type_id, ...)</p></td>
 <td><p>OpenML Classification object.</p></td>
@@ -510,12 +457,8 @@
 </table>
 </section>
 <section id="task-functions">
-<h4>Task Functions<a class="headerlink" href="#task-functions" title="Permalink to this headline">¶</a></h4>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h4>Task Functions<a class="headerlink" href="#task-functions" title="Permalink to this heading">¶</a></h4>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.tasks.create_task.html#openml.tasks.create_task" title="openml.tasks.create_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_task</span></code></a>(task_type, dataset_id, ...[, ...])</p></td>
 <td><p>Create a task based on different given attributes.</p></td>
@@ -535,14 +478,10 @@
 </section>
 </section>
 <section id="module-openml.extensions">
-<span id="extensions"></span><span id="api-extensions"></span><h2>Extensions<a class="headerlink" href="#module-openml.extensions" title="Permalink to this headline">¶</a></h2>
+<span id="extensions"></span><span id="api-extensions"></span><h2>Extensions<a class="headerlink" href="#module-openml.extensions" title="Permalink to this heading">¶</a></h2>
 <section id="extension-classes">
-<h3>Extension Classes<a class="headerlink" href="#extension-classes" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h3>Extension Classes<a class="headerlink" href="#extension-classes" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.extensions.Extension.html#openml.extensions.Extension" title="openml.extensions.Extension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Extension</span></code></a>()</p></td>
 <td><p>Defines the interface to connect machine learning libraries to OpenML-Python.</p></td>
@@ -554,12 +493,8 @@
 </table>
 </section>
 <section id="extension-functions">
-<h3>Extension Functions<a class="headerlink" href="#extension-functions" title="Permalink to this headline">¶</a></h3>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h3>Extension Functions<a class="headerlink" href="#extension-functions" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/openml.extensions.get_extension_by_flow.html#openml.extensions.get_extension_by_flow" title="openml.extensions.get_extension_by_flow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extension_by_flow</span></code></a>(flow[, ...])</p></td>
 <td><p>Get an extension which can handle the given flow.</p></td>
@@ -588,8 +523,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2014-2022, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br/>
+        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.1.3.<br/>
     </p>
   </div>
 </footer>

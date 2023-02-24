@@ -62,11 +62,9 @@ analysis.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+    /home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
       warnings.warn(
 
 
@@ -110,11 +108,9 @@ Defining a classifier
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    14836
+    36940
 
 
 
@@ -145,11 +141,9 @@ To simplify the usage we have created a helper function which automates all thes
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    14836
+    36940
 
 
 
@@ -179,11 +173,9 @@ algorithm or implementation introduces, renames or drop hyperparameters over tim
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    sklearn.tree._classes.DecisionTreeClassifier openml==0.12.2,sklearn==1.0.2
+    sklearn.tree._classes.DecisionTreeClassifier openml==0.13.1.dev,sklearn==1.2.1
 
 
 
@@ -207,11 +199,9 @@ model. We can then use them to retrieve the flow id as follows:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    14836
+    36940
 
 
 
@@ -233,11 +223,19 @@ We can also retrieve all flows for a given name:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    [21, 22, 26, 30, 2004, 14729, 14738, 14836]
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    [119, 360, 364, 762, 5070, 17465, 17634, 17652, 19065, 28068, 30075, 30090, 30116, 32949, 33381, 36940, 44237]
 
 
 
@@ -261,11 +259,19 @@ This also works with the actual model (generalizing the first part of this examp
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    [21, 22, 26, 30, 2004, 14729, 14738, 14836]
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+      result = result.append(new_batch, ignore_index=True)
+    [119, 360, 364, 762, 5070, 17465, 17634, 17652, 19065, 28068, 30075, 30090, 30116, 32949, 33381, 36940, 44237]
 
 
 
@@ -273,28 +279,23 @@ This also works with the actual model (generalizing the first part of this examp
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.285 seconds)
+   **Total running time of the script:** ( 0 minutes  20.223 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flow_id_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: flow_id_tutorial.py <flow_id_tutorial.py>`
 
-     :download:`Download Python source code: flow_id_tutorial.py <flow_id_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: flow_id_tutorial.ipynb <flow_id_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: flow_id_tutorial.ipynb <flow_id_tutorial.ipynb>`
 
 
 .. only:: html

@@ -1,21 +1,21 @@
 :orphan:
 
-
-
-.. _sphx_glr_examples:
+.. _examples-index:
 
 ================
 Examples Gallery
 ================
 
 
+
 .. raw:: html
 
-    <div class="sphx-glr-clear"></div>
+    <div class="sphx-glr-thumbnails">
 
 
+.. raw:: html
 
-.. _sphx_glr_examples_20_basic:
+    </div>
 
 Introductory Examples
 =====================
@@ -26,24 +26,25 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This is a brief showcase of OpenML benchmark suites, which were introduced by `Bischl et al. (2...">
 
 .. only:: html
 
- .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_suites_tutorial_thumb.png
-     :alt: Benchmark suites
+  .. image:: /examples/20_basic/images/thumb/sphx_glr_simple_suites_tutorial_thumb.png
+    :alt: Benchmark suites
 
-     :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py`
+  :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Benchmark suites</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/20_basic/simple_suites_tutorial
 
 .. raw:: html
 
@@ -51,20 +52,16 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_flows_and_runs_tutorial_thumb.png
-     :alt: Flows and Runs
+  .. image:: /examples/20_basic/images/thumb/sphx_glr_simple_flows_and_runs_tutorial_thumb.png
+    :alt: Flows and Runs
 
-     :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py`
+  :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Flows and Runs</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/20_basic/simple_flows_and_runs_tutorial
 
 .. raw:: html
 
@@ -72,20 +69,16 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/20_basic/images/thumb/sphx_glr_introduction_tutorial_thumb.png
-     :alt: Introduction tutorial & Setup
+  .. image:: /examples/20_basic/images/thumb/sphx_glr_introduction_tutorial_thumb.png
+    :alt: Introduction tutorial & Setup
 
-     :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`
+  :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Introduction tutorial & Setup</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/20_basic/introduction_tutorial
 
 .. raw:: html
 
@@ -93,27 +86,20 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/20_basic/images/thumb/sphx_glr_simple_datasets_tutorial_thumb.png
-     :alt: Datasets
+  .. image:: /examples/20_basic/images/thumb/sphx_glr_simple_datasets_tutorial_thumb.png
+    :alt: Datasets
 
-     :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py`
+  :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Datasets</div>
+    </div>
+
 
 .. raw:: html
 
     </div>
-
-
-.. toctree::
-   :hidden:
-
-   /examples/20_basic/simple_datasets_tutorial
-.. raw:: html
-
-    <div class="sphx-glr-clear"></div>
-
-
-
-.. _sphx_glr_examples_30_extended:
 
 In-Depth Examples
 =================
@@ -123,24 +109,25 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This tutorial discusses different ways to obtain the ID of a flow in order to perform further a...">
 
 .. only:: html
 
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_flow_id_tutorial_thumb.png
-     :alt: Obtaining Flow IDs
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_flow_id_tutorial_thumb.png
+    :alt: Obtaining Flow IDs
 
-     :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py`
+  :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Obtaining Flow IDs</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/flow_id_tutorial
 
 .. raw:: html
 
@@ -148,20 +135,16 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_suites_tutorial_thumb.png
-     :alt: Benchmark suites
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_suites_tutorial_thumb.png
+    :alt: Benchmark suites
 
-     :ref:`sphx_glr_examples_30_extended_suites_tutorial.py`
+  :ref:`sphx_glr_examples_30_extended_suites_tutorial.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Benchmark suites</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/suites_tutorial
 
 .. raw:: html
 
@@ -169,20 +152,16 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_configure_logging_thumb.png
-     :alt: Logging
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_configure_logging_thumb.png
+    :alt: Logging
 
-     :ref:`sphx_glr_examples_30_extended_configure_logging.py`
+  :ref:`sphx_glr_examples_30_extended_configure_logging.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Logging</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/configure_logging
 
 .. raw:: html
 
@@ -190,20 +169,16 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_study_tutorial_thumb.png
-     :alt: Benchmark studies
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_study_tutorial_thumb.png
+    :alt: Benchmark studies
 
-     :ref:`sphx_glr_examples_30_extended_study_tutorial.py`
+  :ref:`sphx_glr_examples_30_extended_study_tutorial.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Benchmark studies</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/study_tutorial
 
 .. raw:: html
 
@@ -211,20 +186,16 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_plot_svm_hyperparameters_tutorial_thumb.png
-     :alt: Plotting hyperparameter surfaces
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_plot_svm_hyperparameters_tutorial_thumb.png
+    :alt: Plotting hyperparameter surfaces
 
-     :ref:`sphx_glr_examples_30_extended_plot_svm_hyperparameters_tutorial.py`
+  :ref:`sphx_glr_examples_30_extended_plot_svm_hyperparameters_tutorial.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Plotting hyperparameter surfaces</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/plot_svm_hyperparameters_tutorial
 
 .. raw:: html
 
@@ -232,20 +203,16 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_run_setup_tutorial_thumb.png
-     :alt: Run Setup
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_run_setup_tutorial_thumb.png
+    :alt: Run Setup
 
-     :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py`
+  :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Run Setup</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/run_setup_tutorial
 
 .. raw:: html
 
@@ -253,20 +220,16 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_tasks_tutorial_thumb.png
-     :alt: Tasks
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_tasks_tutorial_thumb.png
+    :alt: Tasks
 
-     :ref:`sphx_glr_examples_30_extended_tasks_tutorial.py`
+  :ref:`sphx_glr_examples_30_extended_tasks_tutorial.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Tasks</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/tasks_tutorial
 
 .. raw:: html
 
@@ -274,20 +237,16 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_datasets_tutorial_thumb.png
-     :alt: Datasets
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_datasets_tutorial_thumb.png
+    :alt: Datasets
 
-     :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py`
+  :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Datasets</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/datasets_tutorial
 
 .. raw:: html
 
@@ -295,41 +254,16 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_custom_flow__thumb.png
-     :alt: Creating and Using a Custom Flow
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_custom_flow__thumb.png
+    :alt: Creating and Using a Custom Flow
 
-     :ref:`sphx_glr_examples_30_extended_custom_flow_.py`
+  :ref:`sphx_glr_examples_30_extended_custom_flow_.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Creating and Using a Custom Flow</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/custom_flow_
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="Tasks define a target and a train/test split. Normally, they are the input to the function open...">
-
-.. only:: html
-
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_task_manual_iteration_tutorial_thumb.png
-     :alt: Tasks: retrieving splits
-
-     :ref:`sphx_glr_examples_30_extended_task_manual_iteration_tutorial.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/task_manual_iteration_tutorial
 
 .. raw:: html
 
@@ -337,20 +271,33 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_fetch_evaluations_tutorial_thumb.png
-     :alt: Fetching Evaluations
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_fetch_evaluations_tutorial_thumb.png
+    :alt: Fetching Evaluations
 
-     :ref:`sphx_glr_examples_30_extended_fetch_evaluations_tutorial.py`
+  :ref:`sphx_glr_examples_30_extended_fetch_evaluations_tutorial.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Fetching Evaluations</div>
     </div>
 
 
-.. toctree::
-   :hidden:
+.. raw:: html
 
-   /examples/30_extended/fetch_evaluations_tutorial
+    <div class="sphx-glr-thumbcontainer" tooltip="Tasks define a target and a train/test split. Normally, they are the input to the function open...">
+
+.. only:: html
+
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_task_manual_iteration_tutorial_thumb.png
+    :alt: Tasks: retrieving splits
+
+  :ref:`sphx_glr_examples_30_extended_task_manual_iteration_tutorial.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Tasks: retrieving splits</div>
+    </div>
+
 
 .. raw:: html
 
@@ -358,20 +305,16 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_flows_and_runs_tutorial_thumb.png
-     :alt: Flows and Runs
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_flows_and_runs_tutorial_thumb.png
+    :alt: Flows and Runs
 
-     :ref:`sphx_glr_examples_30_extended_flows_and_runs_tutorial.py`
+  :ref:`sphx_glr_examples_30_extended_flows_and_runs_tutorial.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Flows and Runs</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/flows_and_runs_tutorial
 
 .. raw:: html
 
@@ -379,20 +322,16 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_create_upload_tutorial_thumb.png
-     :alt: Dataset upload tutorial
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_create_upload_tutorial_thumb.png
+    :alt: Dataset upload tutorial
 
-     :ref:`sphx_glr_examples_30_extended_create_upload_tutorial.py`
+  :ref:`sphx_glr_examples_30_extended_create_upload_tutorial.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Dataset upload tutorial</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/create_upload_tutorial
 
 .. raw:: html
 
@@ -400,27 +339,20 @@ Extended examples for the usage of the OpenML python connector.
 
 .. only:: html
 
- .. figure:: /examples/30_extended/images/thumb/sphx_glr_fetch_runtimes_tutorial_thumb.png
-     :alt: Measuring runtimes for Scikit-learn models
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_fetch_runtimes_tutorial_thumb.png
+    :alt: Measuring runtimes for Scikit-learn models
 
-     :ref:`sphx_glr_examples_30_extended_fetch_runtimes_tutorial.py`
+  :ref:`sphx_glr_examples_30_extended_fetch_runtimes_tutorial.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Measuring runtimes for Scikit-learn models</div>
+    </div>
+
 
 .. raw:: html
 
     </div>
-
-
-.. toctree::
-   :hidden:
-
-   /examples/30_extended/fetch_runtimes_tutorial
-.. raw:: html
-
-    <div class="sphx-glr-clear"></div>
-
-
-
-.. _sphx_glr_examples_40_paper:
 
 Usage in research papers
 ========================
@@ -432,24 +364,25 @@ its use in recent publications.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to get the datasets used in the paper introducing *Auto-sklearn* by Feurer et...">
 
 .. only:: html
 
- .. figure:: /examples/40_paper/images/thumb/sphx_glr_2015_neurips_feurer_example_thumb.png
-     :alt: Feurer et al. (2015)
+  .. image:: /examples/40_paper/images/thumb/sphx_glr_2015_neurips_feurer_example_thumb.png
+    :alt: Feurer et al. (2015)
 
-     :ref:`sphx_glr_examples_40_paper_2015_neurips_feurer_example.py`
+  :ref:`sphx_glr_examples_40_paper_2015_neurips_feurer_example.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Feurer et al. (2015)</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/40_paper/2015_neurips_feurer_example
 
 .. raw:: html
 
@@ -457,20 +390,16 @@ its use in recent publications.
 
 .. only:: html
 
- .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_ida_strang_example_thumb.png
-     :alt: Strang et al. (2018)
+  .. image:: /examples/40_paper/images/thumb/sphx_glr_2018_ida_strang_example_thumb.png
+    :alt: Strang et al. (2018)
 
-     :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py`
+  :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">Strang et al. (2018)</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/40_paper/2018_ida_strang_example
 
 .. raw:: html
 
@@ -478,20 +407,16 @@ its use in recent publications.
 
 .. only:: html
 
- .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_kdd_rijn_example_thumb.png
-     :alt: van Rijn and Hutter (2018)
+  .. image:: /examples/40_paper/images/thumb/sphx_glr_2018_kdd_rijn_example_thumb.png
+    :alt: van Rijn and Hutter (2018)
 
-     :ref:`sphx_glr_examples_40_paper_2018_kdd_rijn_example.py`
+  :ref:`sphx_glr_examples_40_paper_2018_kdd_rijn_example.py`
 
 .. raw:: html
 
+      <div class="sphx-glr-thumbnail-title">van Rijn and Hutter (2018)</div>
     </div>
 
-
-.. toctree::
-   :hidden:
-
-   /examples/40_paper/2018_kdd_rijn_example
 
 .. raw:: html
 
@@ -499,10 +424,16 @@ its use in recent publications.
 
 .. only:: html
 
- .. figure:: /examples/40_paper/images/thumb/sphx_glr_2018_neurips_perrone_example_thumb.png
-     :alt: Perrone et al. (2018)
+  .. image:: /examples/40_paper/images/thumb/sphx_glr_2018_neurips_perrone_example_thumb.png
+    :alt: Perrone et al. (2018)
 
-     :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py`
+  :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Perrone et al. (2018)</div>
+    </div>
+
 
 .. raw:: html
 
@@ -511,29 +442,24 @@ its use in recent publications.
 
 .. toctree::
    :hidden:
+   :includehidden:
 
-   /examples/40_paper/2018_neurips_perrone_example
-.. raw:: html
-
-    <div class="sphx-glr-clear"></div>
-
-
-
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-gallery
+   /examples/20_basic/index.rst
+   /examples/30_extended/index.rst
+   /examples/40_paper/index.rst
 
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+.. only:: html
 
-    :download:`Download all examples in Python source code: examples_python.zip </examples/examples_python.zip>`
+  .. container:: sphx-glr-footer sphx-glr-footer-gallery
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
+      :download:`Download all examples in Python source code: examples_python.zip </examples/examples_python.zip>`
 
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-    :download:`Download all examples in Jupyter notebooks: examples_jupyter.zip </examples/examples_jupyter.zip>`
+      :download:`Download all examples in Jupyter notebooks: examples_jupyter.zip </examples/examples_jupyter.zip>`
 
 
 .. only:: html
