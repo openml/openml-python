@@ -11,15 +11,14 @@ class OpenMLServerError(PyOpenMLError):
     """class for when something is really wrong on the server
     (result did not parse to dict), contains unparsed error."""
 
-    def __init__(self, message: str):
-        super().__init__(message)
+    pass
 
 
 class OpenMLServerException(OpenMLServerError):
     """exception for when the result of the server was
     not 200 (e.g., listing call w/o results)."""
 
-    # Code needs to be optional to allow the exceptino to be picklable:
+    # Code needs to be optional to allow the exception to be picklable:
     # https://stackoverflow.com/questions/16244923/how-to-make-a-custom-exception-class-with-multiple-init-args-pickleable  # noqa: E501
     def __init__(self, message: str, code: int = None, url: str = None):
         self.message = message
@@ -36,7 +35,7 @@ class OpenMLServerException(OpenMLServerError):
 
 
 class OpenMLServerNoResult(OpenMLServerException):
-    """exception for when the result of the server is empty."""
+    """Exception for when the result of the server is empty."""
 
     pass
 
@@ -44,8 +43,7 @@ class OpenMLServerNoResult(OpenMLServerException):
 class OpenMLCacheException(PyOpenMLError):
     """Dataset / task etc not found in cache"""
 
-    def __init__(self, message: str):
-        super().__init__(message)
+    pass
 
 
 class OpenMLHashException(PyOpenMLError):
@@ -57,8 +55,7 @@ class OpenMLHashException(PyOpenMLError):
 class OpenMLPrivateDatasetError(PyOpenMLError):
     """Exception thrown when the user has no rights to access the dataset."""
 
-    def __init__(self, message: str):
-        super().__init__(message)
+    pass
 
 
 class OpenMLRunsExistError(PyOpenMLError):
@@ -69,3 +66,9 @@ class OpenMLRunsExistError(PyOpenMLError):
             raise ValueError("Set of run ids must be non-empty.")
         self.run_ids = run_ids
         super().__init__(message)
+
+
+class OpenMLNotAuthorizedError(OpenMLServerException):
+    """Indicates an authenticated user is not authorized to execute the requested action."""
+
+    pass
