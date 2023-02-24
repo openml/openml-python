@@ -275,7 +275,7 @@ class OpenMLDataset(OpenMLBase):
 
     def __eq__(self, other):
 
-        if type(other) != OpenMLDataset:
+        if not isinstance(other, OpenMLDataset):
             return False
 
         server_fields = {
@@ -287,14 +287,12 @@ class OpenMLDataset(OpenMLBase):
             "data_file",
         }
 
-        # check that the keys are identical
+        # check that common keys and values are identical
         self_keys = set(self.__dict__.keys()) - server_fields
         other_keys = set(other.__dict__.keys()) - server_fields
-        if self_keys != other_keys:
-            return False
-
-        # check that values of the common keys are identical
-        return all(self.__dict__[key] == other.__dict__[key] for key in self_keys)
+        return self_keys == other_keys and all(
+            self.__dict__[key] == other.__dict__[key] for key in self_keys
+        )
 
     def _download_data(self) -> None:
         """Download ARFF data file to standard cache directory. Set `self.data_file`."""

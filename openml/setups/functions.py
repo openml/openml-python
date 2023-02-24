@@ -55,10 +55,7 @@ def setup_exists(flow) -> int:
     )
     result_dict = xmltodict.parse(result)
     setup_id = int(result_dict["oml:setup_exists"]["oml:id"])
-    if setup_id > 0:
-        return setup_id
-    else:
-        return False
+    return setup_id if setup_id > 0 else False
 
 
 def _get_cached_setup(setup_id):

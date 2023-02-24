@@ -261,10 +261,7 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
 
     result_dict = xmltodict.parse(xml_response)
     flow_id = int(result_dict["oml:flow_exists"]["oml:id"])
-    if flow_id > 0:
-        return flow_id
-    else:
-        return False
+    return flow_id if flow_id > 0 else False
 
 
 def get_flow_id(

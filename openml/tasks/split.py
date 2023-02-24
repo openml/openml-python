@@ -47,12 +47,10 @@ class OpenMLSplit(object):
             or self.name != other.name
             or self.description != other.description
             or self.split.keys() != other.split.keys()
-        ):
-            return False
-
-        if any(
-            self.split[repetition].keys() != other.split[repetition].keys()
-            for repetition in self.split
+            or any(
+                self.split[repetition].keys() != other.split[repetition].keys()
+                for repetition in self.split
+            )
         ):
             return False
 

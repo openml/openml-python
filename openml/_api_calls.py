@@ -303,9 +303,7 @@ def __is_checksum_equal(downloaded_file, md5_checksum=None):
     md5 = hashlib.md5()
     md5.update(downloaded_file.encode("utf-8"))
     md5_checksum_download = md5.hexdigest()
-    if md5_checksum == md5_checksum_download:
-        return True
-    return False
+    return md5_checksum == md5_checksum_download
 
 
 def _send_request(request_method, url, data, files=None, md5_checksum=None):
