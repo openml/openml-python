@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.7, 3.8]
         scikit-learn: [0.21.2, 0.22.2, 0.23.1, 0.24]
         os: [ubuntu-latest]
         sklearn-only: ['true']
@@ -27,6 +27,22 @@ jobs:
             sklearn-only: 'true'
           - python-version: 3.6
             scikit-learn: 0.20.2
+            os: ubuntu-20.04 
+            sklearn-only: 'true'
+          - python-version: 3.6
+            scikit-learn: 0.21.2
+            os: ubuntu-20.04 
+            sklearn-only: 'true'
+          - python-version: 3.6
+            scikit-learn: 0.22.2
+            os: ubuntu-20.04 
+            sklearn-only: 'true'
+          - python-version: 3.6
+            scikit-learn: 0.23.1
+            os: ubuntu-20.04 
+            sklearn-only: 'true'
+          - python-version: 3.6
+            scikit-learn: 0.24
             os: ubuntu-20.04 
             sklearn-only: 'true'
           - python-version: 3.8
