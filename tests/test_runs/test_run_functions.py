@@ -1316,10 +1316,11 @@ class TestRun(TestBase):
             # check row id
             self.assertGreaterEqual(arff_line[2], 0)
             self.assertLessEqual(arff_line[2], num_instances - 1)
+            # check prediction and ground truth columns
+            self.assertIn(arff_line[4], ["won", "nowin"])
+            self.assertIn(arff_line[5], ["won", "nowin"])
             # check confidences
-            self.assertAlmostEqual(sum(arff_line[4:6]), 1.0)
-            self.assertIn(arff_line[6], ["won", "nowin"])
-            self.assertIn(arff_line[7], ["won", "nowin"])
+            self.assertAlmostEqual(sum(arff_line[6:]), 1.0)
 
     def test__create_trace_from_arff(self):
         with open(self.static_cache_dir + "/misc/trace.arff", "r") as arff_file:
