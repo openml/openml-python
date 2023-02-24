@@ -275,7 +275,7 @@ def list_evaluation_measures() -> List[str]:
     return qualities
 
 
-def list_estimation_procedures():
+def list_estimation_procedures() -> List[str]:
     """Return list of evaluation procedures available.
 
     The function performs an API call to retrieve the entire list of
