@@ -9,8 +9,8 @@ Changelog
 0.13.1
 ~~~~~~
 
+ * FIX #1197 #559 #1131: Fix the order of ground truth and predictions in the ``OpenMLRun`` object and in ``format_prediction``.
  * FIX #1198: Support numpy 1.24 and higher.
-
 
 0.13.0
 ~~~~~~

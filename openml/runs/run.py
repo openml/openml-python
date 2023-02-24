@@ -304,6 +304,8 @@ class OpenMLRun(OpenMLBase):
 
         Assumes that the run has been executed.
 
+        The order of the attributes follows the order defined by the Client API for R.
+
         Returns
         -------
         arf_dict : dict
@@ -337,11 +339,11 @@ class OpenMLRun(OpenMLBase):
             if class_labels is not None:
                 arff_dict["attributes"] = (
                     arff_dict["attributes"]
+                    + [("prediction", class_labels), ("correct", class_labels)]
                     + [
                         ("confidence." + class_labels[i], "NUMERIC")
                         for i in range(len(class_labels))
                     ]
-                    + [("prediction", class_labels), ("correct", class_labels)]
                 )
             else:
                 raise ValueError("The task has no class labels")
@@ -362,7 +364,7 @@ class OpenMLRun(OpenMLBase):
                 ]
                 prediction_and_true = [("prediction", class_labels), ("correct", class_labels)]
                 arff_dict["attributes"] = (
-                    arff_dict["attributes"] + prediction_confidences + prediction_and_true
+                    arff_dict["attributes"] + prediction_and_true + prediction_confidences
                 )
             else:
                 raise ValueError("The task has no class labels")

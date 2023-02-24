@@ -155,7 +155,6 @@ def run_flow_on_task(
     dataset_format: str = "dataframe",
     n_jobs: Optional[int] = None,
 ) -> OpenMLRun:
-
     """Run the model provided by the flow on the dataset defined by task.
 
     Takes the flow and repeat information into account.
@@ -515,13 +514,13 @@ def _run_task_get_arffcontent(
                         else pred_y[i]
                     )
                     if isinstance(test_y, pd.Series):
-                        test_prediction = (
+                        truth = (
                             task.class_labels[test_y.iloc[i]]
                             if isinstance(test_y.iloc[i], int)
                             else test_y.iloc[i]
                         )
                     else:
-                        test_prediction = (
+                        truth = (
                             task.class_labels[test_y[i]]
                             if isinstance(test_y[i], (int, np.integer))
                             else test_y[i]
@@ -535,7 +534,7 @@ def _run_task_get_arffcontent(
                         sample=sample_no,
                         index=tst_idx,
                         prediction=prediction,
-                        truth=test_prediction,
+                        truth=truth,
                         proba=dict(zip(task.class_labels, pred_prob)),
                     )
                 else:
@@ -552,14 +551,14 @@ def _run_task_get_arffcontent(
         elif isinstance(task, OpenMLRegressionTask):
 
             for i, _ in enumerate(test_indices):
-                test_prediction = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
+                truth = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
                 arff_line = format_prediction(
                     task=task,
                     repeat=rep_no,
                     fold=fold_no,
                     index=test_indices[i],
                     prediction=pred_y[i],
-                    truth=test_prediction,
+                    truth=truth,
                 )
 
                 arff_datacontent.append(arff_line)
@@ -920,9 +919,10 @@ def _create_run_from_xml(xml, from_server=True):
         parameter_settings=parameters,
         dataset_id=dataset_id,
         output_files=files,
-        evaluations=evaluations,
-        fold_evaluations=fold_evaluations,
-        sample_evaluations=sample_evaluations,
+        # Make sure default values are used where needed to keep run objects identical
+        evaluations=evaluations or None,
+        fold_evaluations=fold_evaluations or None,
+        sample_evaluations=sample_evaluations or None,
         tags=tags,
         predictions_url=predictions_url,
         run_details=run_details,
@@ -1186,6 +1186,10 @@ def format_prediction(
     -------
     A list with elements for the prediction results of a run.
 
+    The returned order of the elements is (if available):
+        [repeat, fold, sample, index, prediction, truth, *probabilities]
+
+    This order follows the R Client API.
     """
     if isinstance(task, OpenMLClassificationTask):
         if proba is None:
@@ -1200,8 +1204,8 @@ def format_prediction(
             else:
                 sample = 0
         probabilities = [proba[c] for c in task.class_labels]
-        return [repeat, fold, sample, index, *probabilities, truth, prediction]
+        return [repeat, fold, sample, index, prediction, truth, *probabilities]
     elif isinstance(task, OpenMLRegressionTask):
-        return [repeat, fold, index, truth, prediction]
+        return [repeat, fold, index, prediction, truth]
     else:
         raise NotImplementedError(f"Formatting for {type(task)} is not supported.")
