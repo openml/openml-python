@@ -19,15 +19,15 @@ jobs:
           - python-version: 3.6
             scikit-learn: 0.18.2
             scipy: 1.2.0
-            os: ubuntu-latest
+            os: ubuntu-20.04 
             sklearn-only: 'true'
           - python-version: 3.6
             scikit-learn: 0.19.2
-            os: ubuntu-latest
+            os: ubuntu-20.04 
             sklearn-only: 'true'
           - python-version: 3.6
             scikit-learn: 0.20.2
-            os: ubuntu-latest
+            os: ubuntu-20.04 
             sklearn-only: 'true'
           - python-version: 3.8
             scikit-learn: 0.23.1
