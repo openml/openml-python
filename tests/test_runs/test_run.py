@@ -211,7 +211,10 @@ class TestRun(TestBase):
     @staticmethod
     def _get_models_tasks_for_tests():
         model_clf = Pipeline(
-            [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())]
+            [
+                ("imputer", SimpleImputer(strategy="mean")),
+                ("classifier", DummyClassifier(strategy="prior")),
+            ]
         )
         model_reg = Pipeline(
             [
