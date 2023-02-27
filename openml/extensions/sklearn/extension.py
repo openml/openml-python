@@ -38,18 +38,15 @@ from openml.tasks import (
 
 logger = logging.getLogger(__name__)
 
-
 if sys.version_info >= (3, 5):
     from json.decoder import JSONDecodeError
 else:
     JSONDecodeError = ValueError
 
-
 DEPENDENCIES_PATTERN = re.compile(
     r"^(?P<name>[\w\-]+)((?P<operation>==|>=|>)"
     r"(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?[0-9]*))?$"
 )
-
 
 SIMPLE_NUMPY_TYPES = [
     nptype
@@ -580,13 +577,11 @@ class SklearnExtension(Extension):
 
     @classmethod
     def _is_sklearn_flow(cls, flow: OpenMLFlow) -> bool:
-        return (isinstance(flow.dependencies, str) and "sklearn" in flow.dependencies) or (
-            isinstance(flow.external_version, str)
-            and (
-                flow.external_version.startswith("sklearn==")
-                or ",sklearn==" in flow.external_version
-            )
+        sklearn_dependency = isinstance(flow.dependencies, str) and "sklearn" in flow.dependencies
+        sklearn_as_external = isinstance(flow.external_version, str) and (
+            flow.external_version.startswith("sklearn==") or ",sklearn==" in flow.external_version
         )
+        return sklearn_dependency or sklearn_as_external
 
     def _get_sklearn_description(self, model: Any, char_lim: int = 1024) -> str:
         """Fetches the sklearn function docstring for the flow description
