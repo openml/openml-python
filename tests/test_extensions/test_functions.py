@@ -9,6 +9,7 @@ from openml.extensions import get_extension_by_model, get_extension_by_flow, reg
 
 class DummyFlow:
     external_version = "DummyFlow==0.1"
+    dependencies = None
 
 
 class DummyModel:
