@@ -26,7 +26,7 @@ from ..tasks import (
 
 
 class OpenMLRun(OpenMLBase):
-    """OpenML Run: result of running a model on an openml dataset.
+    """OpenML Run: result of running a model on an OpenML dataset.
 
     Parameters
     ----------
@@ -71,13 +71,16 @@ class OpenMLRun(OpenMLBase):
     predictions_url: str
         The URL of the predictions file.
     task: OpenMLTask
-        An instance of the OpenMLTask class, representing the OpenML task associated with the run.
+        An instance of the OpenMLTask class, representing the OpenML task associated
+        with the run.
     flow: OpenMLFlow
-        An instance of the OpenMLFlow class, representing the OpenML flow associated with the run.
+        An instance of the OpenMLFlow class, representing the OpenML flow associated
+        with the run.
     run_id: int
         The ID of the run.
     description_text: str, optional
-        Description text to add to the predictions file. If left None, is set to the time the arff file is generated.
+        Description text to add to the predictions file. If left None, is set to the
+        time the arff file is generated.
     run_details: str, optional (default=None)
         Description of the run stored in the run meta-data.
     """
