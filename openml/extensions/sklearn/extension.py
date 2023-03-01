@@ -38,18 +38,15 @@ from openml.tasks import (
 
 logger = logging.getLogger(__name__)
 
-
 if sys.version_info >= (3, 5):
     from json.decoder import JSONDecodeError
 else:
     JSONDecodeError = ValueError
 
-
 DEPENDENCIES_PATTERN = re.compile(
     r"^(?P<name>[\w\-]+)((?P<operation>==|>=|>)"
     r"(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?[0-9]*))?$"
 )
-
 
 SIMPLE_NUMPY_TYPES = [
     nptype
@@ -580,15 +577,11 @@ class SklearnExtension(Extension):
 
     @classmethod
     def _is_sklearn_flow(cls, flow: OpenMLFlow) -> bool:
-        if getattr(flow, "dependencies", None) is not None and "sklearn" in flow.dependencies:
-            return True
-        if flow.external_version is None:
-            return False
-        else:
-            return (
-                flow.external_version.startswith("sklearn==")
-                or ",sklearn==" in flow.external_version
-            )
+        sklearn_dependency = isinstance(flow.dependencies, str) and "sklearn" in flow.dependencies
+        sklearn_as_external = isinstance(flow.external_version, str) and (
+            flow.external_version.startswith("sklearn==") or ",sklearn==" in flow.external_version
+        )
+        return sklearn_dependency or sklearn_as_external
 
     def _get_sklearn_description(self, model: Any, char_lim: int = 1024) -> str:
         """Fetches the sklearn function docstring for the flow description
@@ -1867,24 +1860,22 @@ class SklearnExtension(Extension):
                 # checks whether the current value can be a specification of
                 # subcomponents, as for example the value for steps parameter
                 # (in Pipeline) or transformers parameter (in
-                # ColumnTransformer). These are always lists/tuples of lists/
-                # tuples, size bigger than 2 and an OpenMLFlow item involved.
-                if not isinstance(values, (tuple, list)):
-                    return False
-                for item in values:
-                    if not isinstance(item, (tuple, list)):
-                        return False
-                    if len(item) < 2:
-                        return False
-                    if not isinstance(item[1], (openml.flows.OpenMLFlow, str)):
-                        if (
+                # ColumnTransformer).
+                return (
+                    # Specification requires list/tuple of list/tuple with
+                    # at least length 2.
+                    isinstance(values, (tuple, list))
+                    and all(isinstance(item, (tuple, list)) and len(item) > 1 for item in values)
+                    # And each component needs to be a flow or interpretable string
+                    and all(
+                        isinstance(item[1], openml.flows.OpenMLFlow)
+                        or (
                             isinstance(item[1], str)
                             and item[1] in SKLEARN_PIPELINE_STRING_COMPONENTS
-                        ):
-                            pass
-                        else:
-                            return False
-                return True
+                        )
+                        for item in values
+                    )
+                )
 
             # _flow is openml flow object, _param dict maps from flow name to flow
             # id for the main call, the param dict can be overridden (useful for

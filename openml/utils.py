@@ -174,10 +174,7 @@ def _delete_entity(entity_type, entity_id):
     url_suffix = "%s/%d" % (entity_type, entity_id)
     result_xml = openml._api_calls._perform_api_call(url_suffix, "delete")
     result = xmltodict.parse(result_xml)
-    if "oml:%s_delete" % entity_type in result:
-        return True
-    else:
-        return False
+    return "oml:%s_delete" % entity_type in result
 
 
 def _list_all(listing_call, output_format="dict", *args, **filters):

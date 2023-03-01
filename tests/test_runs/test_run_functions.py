@@ -127,7 +127,7 @@ class TestRun(TestBase):
             "evaluated correctly on the server".format(run_id)
         )
 
-    def _compare_predictions(self, predictions, predictions_prime):
+    def _assert_predictions_equal(self, predictions, predictions_prime):
         self.assertEqual(
             np.array(predictions_prime["data"]).shape, np.array(predictions["data"]).shape
         )
@@ -150,8 +150,6 @@ class TestRun(TestBase):
                     )
                 else:
                     self.assertEqual(val_1, val_2)
-
-        return True
 
     def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed, create_task_obj):
         run = openml.runs.get_run(run_id)
@@ -183,7 +181,7 @@ class TestRun(TestBase):
 
         predictions_prime = run_prime._generate_arff_dict()
 
-        self._compare_predictions(predictions, predictions_prime)
+        self._assert_predictions_equal(predictions, predictions_prime)
         pd.testing.assert_frame_equal(
             run.predictions,
             run_prime.predictions,
