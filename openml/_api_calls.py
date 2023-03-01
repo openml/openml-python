@@ -324,6 +324,24 @@ def _send_request(request_method, url, data, files=None, md5_checksum=None):
                     raise NotImplementedError()
                 __check_response(response=response, url=url, file_elements=files)
                 if request_method == "get" and not __is_checksum_equal(response.text, md5_checksum):
+
+                    # -- Check if encoding is not UTF-8 perhaps
+                    # Get checksum for binary response content
+                    md5 = hashlib.md5()
+                    md5.update(response.content)
+                    md5_checksum_content = md5.hexdigest()
+
+                    # Check if checksum is equal to the expected checksum and raise better error
+                    if md5_checksum_content == md5_checksum:
+                        raise OpenMLHashException(
+                            "Checksum of downloaded file is unequal to the expected checksum {}"
+                            "because the text encoding is not UTF-8 when downloading {}. "
+                            "There might be a sever-sided issue with the file, "
+                            "see: https://github.com/openml/openml-python/issues/1180.".format(
+                                md5_checksum, url
+                            )
+                        )
+
                     raise OpenMLHashException(
                         "Checksum of downloaded file is unequal to the expected checksum {} "
                         "when downloading {}.".format(md5_checksum, url)
@@ -384,7 +402,6 @@ def __parse_server_exception(
     url: str,
     file_elements: Dict,
 ) -> OpenMLServerError:
-
     if response.status_code == 414:
         raise OpenMLServerError("URI too long! ({})".format(url))
     try:
