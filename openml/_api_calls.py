@@ -297,11 +297,11 @@ def __read_url(url, request_method, data=None, md5_checksum=None):
     )
 
 
-def __is_checksum_equal(downloaded_file, md5_checksum=None):
+def __is_checksum_equal(downloaded_file_binary, md5_checksum=None):
     if md5_checksum is None:
         return True
     md5 = hashlib.md5()
-    md5.update(downloaded_file.encode("utf-8"))
+    md5.update(downloaded_file_binary)
     md5_checksum_download = md5.hexdigest()
     return md5_checksum == md5_checksum_download
 
@@ -323,16 +323,12 @@ def _send_request(request_method, url, data, files=None, md5_checksum=None):
                 else:
                     raise NotImplementedError()
                 __check_response(response=response, url=url, file_elements=files)
-                if request_method == "get" and not __is_checksum_equal(response.text, md5_checksum):
+                if request_method == "get" and not __is_checksum_equal(
+                    response.text.encode("utf-8"), md5_checksum
+                ):
 
                     # -- Check if encoding is not UTF-8 perhaps
-                    # Get checksum for binary response content
-                    md5 = hashlib.md5()
-                    md5.update(response.content)
-                    md5_checksum_content = md5.hexdigest()
-
-                    # Check if checksum is equal to the expected checksum and raise better error
-                    if md5_checksum_content == md5_checksum:
+                    if __is_checksum_equal(response.content, md5_checksum):
                         raise OpenMLHashException(
                             "Checksum of downloaded file is unequal to the expected checksum {}"
                             "because the text encoding is not UTF-8 when downloading {}. "
