@@ -297,7 +297,7 @@ def __read_url(url, request_method, data=None, md5_checksum=None):
     )
 
 
-def __is_checksum_equal(downloaded_file_binary, md5_checksum=None):
+def __is_checksum_equal(downloaded_file_binary: bytes, md5_checksum: Optional[str] = None) -> bool:
     if md5_checksum is None:
         return True
     md5 = hashlib.md5()
