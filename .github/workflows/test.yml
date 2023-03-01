@@ -76,8 +76,6 @@ jobs:
       # Python 3.8 & scikit-learn<0.24 requires numpy<=1.23.5
       if: ${{ matrix.python-version == '3.8' && contains(fromJSON('["0.23.1", "0.22.2", "0.21.2"]'), matrix.scikit-learn) }}
       run: |
-        echo ${{ matrix.python-version }} == '3.8'
-        echo ${{ matrix.python-version }}
         pip install numpy==1.23.5
     - name: Install scipy ${{ matrix.scipy }}
       if: ${{ matrix.scipy }}
