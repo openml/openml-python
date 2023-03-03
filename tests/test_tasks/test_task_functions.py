@@ -260,7 +260,9 @@ class TestTask(TestBase):
     @mock.patch.object(requests.Session, "delete")
     def test_delete_task_not_owned(self, mock_get):
         openml.config.start_using_configuration_for_example()
-        with open(self.static_cache_dir + "/misc/task_delete_not_owned.xml", "r") as xml_response:
+        with open(
+            self.static_cache_dir + "/mock_responses/tasks/task_delete_not_owned.xml", "r"
+        ) as xml_response:
             response_body = xml_response.read()
 
         response = requests.Response()
@@ -283,7 +285,9 @@ class TestTask(TestBase):
     @mock.patch.object(requests.Session, "delete")
     def test_delete_task_with_run(self, mock_get):
         openml.config.start_using_configuration_for_example()
-        with open(self.static_cache_dir + "/misc/task_delete_has_runs.xml", "r") as xml_response:
+        with open(
+            self.static_cache_dir + "/mock_responses/tasks/task_delete_has_runs.xml", "r"
+        ) as xml_response:
             response_body = xml_response.read()
 
         response = requests.Response()
@@ -306,7 +310,9 @@ class TestTask(TestBase):
     @mock.patch.object(requests.Session, "delete")
     def test_delete_success(self, mock_get):
         openml.config.start_using_configuration_for_example()
-        with open(self.static_cache_dir + "/misc/task_delete_successful.xml", "r") as xml_response:
+        with open(
+            self.static_cache_dir + "/mock_responses/tasks/task_delete_successful.xml", "r"
+        ) as xml_response:
             response_body = xml_response.read()
 
         response = requests.Response()
@@ -326,7 +332,9 @@ class TestTask(TestBase):
     @mock.patch.object(requests.Session, "delete")
     def test_delete_unknown_task(self, mock_get):
         openml.config.start_using_configuration_for_example()
-        with open(self.static_cache_dir + "/misc/task_delete_not_exist.xml", "r") as xml_response:
+        with open(
+            self.static_cache_dir + "/mock_responses/tasks/task_delete_not_exist.xml", "r"
+        ) as xml_response:
             response_body = xml_response.read()
 
         response = requests.Response()
