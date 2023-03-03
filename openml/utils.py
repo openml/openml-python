@@ -172,12 +172,36 @@ def _delete_entity(entity_type, entity_id):
         raise ValueError("Can't delete a %s" % entity_type)
 
     url_suffix = "%s/%d" % (entity_type, entity_id)
-    result_xml = openml._api_calls._perform_api_call(url_suffix, "delete")
-    result = xmltodict.parse(result_xml)
-    if "oml:%s_delete" % entity_type in result:
-        return True
-    else:
-        return False
+    try:
+        result_xml = openml._api_calls._perform_api_call(url_suffix, "delete")
+        result = xmltodict.parse(result_xml)
+        return f"oml:{entity_type}_delete" in result
+    except openml.exceptions.OpenMLServerException as e:
+        # https://github.com/openml/OpenML/blob/21f6188d08ac24fcd2df06ab94cf421c946971b0/openml_OS/views/pages/api_new/v1/xml/pre.php#L234-L239  # noqa: 501
+        # 451 isn't actually used but 103 is returned instead
+        # 452 is descriptive enough: 'Task does not exist - None'
+        if e.code == 453:
+            raise openml.exceptions.OpenMLNotAuthorizedError(
+                message="The task can not be deleted because it was not uploaded by you.",
+                code=e.code,
+                url=e.url,
+            )
+        if e.code == 454:
+            raise openml.exceptions.OpenMLNotAuthorizedError(
+                message="The task can not be deleted because it still has associated runs.",
+                code=e.code,
+                url=e.url,
+            )
+        if e.code == 455:
+            raise openml.exceptions.OpenMLServerException(
+                message=(
+                    "The task can not be deleted for unknown reason, please open an issue at: "
+                    "https://github.com/openml/openml-python/issues/new"
+                ),
+                code=e.code,
+                url=e.url,
+            )
+        raise
 
 
 def _list_all(listing_call, output_format="dict", *args, **filters):

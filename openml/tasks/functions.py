@@ -9,7 +9,7 @@ from typing import Union, Dict, Optional, List
 import pandas as pd
 import xmltodict
 
-from ..exceptions import OpenMLCacheException, OpenMLServerException, OpenMLNotAuthorizedError
+from ..exceptions import OpenMLCacheException
 from ..datasets import get_dataset
 from .task import (
     OpenMLClassificationTask,
@@ -563,31 +563,4 @@ def delete_task(task_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
-    try:
-        return openml.utils._delete_entity("task", task_id)
-    except OpenMLServerException as e:
-        # https://github.com/openml/OpenML/blob/21f6188d08ac24fcd2df06ab94cf421c946971b0/openml_OS/views/pages/api_new/v1/xml/pre.php#L234-L239  # noqa: 501
-        # 451 isn't actually used but 103 is returned instead
-        # 452 is descriptive enough: 'Task does not exist - None'
-        if e.code == 453:
-            raise OpenMLNotAuthorizedError(
-                message="The task can not be deleted because it was not uploaded by you.",
-                code=e.code,
-                url=e.url,
-            )
-        if e.code == 454:
-            raise OpenMLNotAuthorizedError(
-                message="The task can not be deleted because it still has associated runs.",
-                code=e.code,
-                url=e.url,
-            )
-        if e.code == 455:
-            raise OpenMLServerException(
-                message=(
-                    "The task can not be deleted for unknown reason, please open an issue at: "
-                    "https://github.com/openml/openml-python/issues/new"
-                ),
-                code=e.code,
-                url=e.url,
-            )
-        raise
+    return openml.utils._delete_entity("task", task_id)
