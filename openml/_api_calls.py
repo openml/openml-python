@@ -297,11 +297,11 @@ def __read_url(url, request_method, data=None, md5_checksum=None):
     )
 
 
-def __is_checksum_equal(downloaded_file, md5_checksum=None):
+def __is_checksum_equal(downloaded_file_binary: bytes, md5_checksum: Optional[str] = None) -> bool:
     if md5_checksum is None:
         return True
     md5 = hashlib.md5()
-    md5.update(downloaded_file.encode("utf-8"))
+    md5.update(downloaded_file_binary)
     md5_checksum_download = md5.hexdigest()
     return md5_checksum == md5_checksum_download
 
@@ -323,7 +323,21 @@ def _send_request(request_method, url, data, files=None, md5_checksum=None):
                 else:
                     raise NotImplementedError()
                 __check_response(response=response, url=url, file_elements=files)
-                if request_method == "get" and not __is_checksum_equal(response.text, md5_checksum):
+                if request_method == "get" and not __is_checksum_equal(
+                    response.text.encode("utf-8"), md5_checksum
+                ):
+
+                    # -- Check if encoding is not UTF-8 perhaps
+                    if __is_checksum_equal(response.content, md5_checksum):
+                        raise OpenMLHashException(
+                            "Checksum of downloaded file is unequal to the expected checksum {}"
+                            "because the text encoding is not UTF-8 when downloading {}. "
+                            "There might be a sever-sided issue with the file, "
+                            "see: https://github.com/openml/openml-python/issues/1180.".format(
+                                md5_checksum, url
+                            )
+                        )
+
                     raise OpenMLHashException(
                         "Checksum of downloaded file is unequal to the expected checksum {} "
                         "when downloading {}.".format(md5_checksum, url)
@@ -384,7 +398,6 @@ def __parse_server_exception(
     url: str,
     file_elements: Dict,
 ) -> OpenMLServerError:
-
     if response.status_code == 414:
         raise OpenMLServerError("URI too long! ({})".format(url))
     try:
