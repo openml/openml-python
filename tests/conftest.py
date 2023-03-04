@@ -24,6 +24,7 @@ Possible Future: class TestBase from openml/testing.py can be included
 
 import os
 import logging
+import pathlib
 from typing import List
 import pytest
 
@@ -51,26 +52,20 @@ def worker_id() -> str:
         return "master"
 
 
-def read_file_list() -> List[str]:
+def read_file_list() -> List[pathlib.Path]:
     """Returns a list of paths to all files that currently exist in 'openml/tests/files/'
 
-    :return: List[str]
+    :return: List[pathlib.Path]
     """
-    this_dir = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
-    directory = os.path.join(this_dir, "..")
-    logger.info("Collecting file lists from: {}".format(directory))
-    file_list = []
-    for root, _, filenames in os.walk(directory):
-        for filename in filenames:
-            file_list.append(os.path.join(root, filename))
-    return file_list
+    test_files_dir = pathlib.Path(__file__).parent / "files"
+    return [f for f in test_files_dir.rglob("*") if f.is_file()]
 
 
-def compare_delete_files(old_list, new_list) -> None:
+def compare_delete_files(old_list: List[pathlib.Path], new_list: List[pathlib.Path]) -> None:
     """Deletes files that are there in the new_list but not in the old_list
 
-    :param old_list: List[str]
-    :param new_list: List[str]
+    :param old_list: List[pathlib.Path]
+    :param new_list: List[pathlib.Path]
     :return: None
     """
     file_list = list(set(new_list) - set(old_list))
