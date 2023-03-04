@@ -225,13 +225,13 @@ And we can use the task listing functionality to learn more about them:
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+    /home/runner/work/openml-python/openml-python/openml/utils.py:253: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
       result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+    /home/runner/work/openml-python/openml-python/openml/utils.py:253: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
       result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+    /home/runner/work/openml-python/openml-python/openml/utils.py:253: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
       result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+    /home/runner/work/openml-python/openml-python/openml/utils.py:253: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
       result = result.append(new_batch, ignore_index=True)
                                         count          mean  ...       75%       max
     tid                                  72.0  41849.305556  ...  42707.50  167141.0
@@ -328,11 +328,11 @@ because we upload some random data.
       warnings.warn(
     OpenML Benchmark Suite
     ======================
-    ID..............: 4868
+    ID..............: 4897
     Name............: Test-Suite
     Status..........: None
     Main Entity Type: task
-    Study URL.......: https://test.openml.org/s/4868
+    Study URL.......: https://test.openml.org/s/4897
     # of Tasks......: 20
 
 
@@ -353,7 +353,7 @@ because we upload some random data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  45.939 seconds)
+   **Total running time of the script:** ( 0 minutes  44.439 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_suites_tutorial.py:

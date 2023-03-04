@@ -133,38 +133,60 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="openml.runs.OpenMLRun">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openml.runs.</span></span><span class="sig-name descname"><span class="pre">OpenMLRun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flow_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setup_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setup_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uploader</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uploader_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fold_evaluations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_evaluations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_content</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_evaluation_measure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flow_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictions_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.runs.OpenMLRun" title="Permalink to this definition">¶</a></dt>
-<dd><p>OpenML Run: result of running a model on an openml dataset.</p>
+<dd><p>OpenML Run: result of running a model on an OpenML dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>task_id: int</strong></dt><dd></dd>
-<dt><strong>flow_id: int</strong></dt><dd></dd>
-<dt><strong>dataset_id: int</strong></dt><dd></dd>
-<dt><strong>setup_string: str</strong></dt><dd></dd>
-<dt><strong>output_files: Dict[str, str]</strong></dt><dd><p>A dictionary that specifies where each related file can be found.</p>
+<dt><strong>task_id: int</strong></dt><dd><p>The ID of the OpenML task associated with the run.</p>
 </dd>
-<dt><strong>setup_id: int</strong></dt><dd></dd>
-<dt><strong>tags: List[str]</strong></dt><dd></dd>
+<dt><strong>flow_id: int</strong></dt><dd><p>The ID of the OpenML flow associated with the run.</p>
+</dd>
+<dt><strong>dataset_id: int</strong></dt><dd><p>The ID of the OpenML dataset used for the run.</p>
+</dd>
+<dt><strong>setup_string: str</strong></dt><dd><p>The setup string of the run.</p>
+</dd>
+<dt><strong>output_files: Dict[str, str]</strong></dt><dd><p>Specifies where each related file can be found.</p>
+</dd>
+<dt><strong>setup_id: int</strong></dt><dd><p>An integer representing the ID of the setup used for the run.</p>
+</dd>
+<dt><strong>tags: List[str]</strong></dt><dd><p>Representing the tags associated with the run.</p>
+</dd>
 <dt><strong>uploader: int</strong></dt><dd><p>User ID of the uploader.</p>
 </dd>
-<dt><strong>uploader_name: str</strong></dt><dd></dd>
-<dt><strong>evaluations: Dict</strong></dt><dd></dd>
-<dt><strong>fold_evaluations: Dict</strong></dt><dd></dd>
-<dt><strong>sample_evaluations: Dict</strong></dt><dd></dd>
+<dt><strong>uploader_name: str</strong></dt><dd><p>The name of the person who uploaded the run.</p>
+</dd>
+<dt><strong>evaluations: Dict</strong></dt><dd><p>Representing the evaluations of the run.</p>
+</dd>
+<dt><strong>fold_evaluations: Dict</strong></dt><dd><p>The evaluations of the run for each fold.</p>
+</dd>
+<dt><strong>sample_evaluations: Dict</strong></dt><dd><p>The evaluations of the run for each sample.</p>
+</dd>
 <dt><strong>data_content: List[List]</strong></dt><dd><p>The predictions generated from executing this run.</p>
 </dd>
-<dt><strong>trace: OpenMLRunTrace</strong></dt><dd></dd>
-<dt><strong>model: object</strong></dt><dd></dd>
-<dt><strong>task_type: str</strong></dt><dd></dd>
-<dt><strong>task_evaluation_measure: str</strong></dt><dd></dd>
-<dt><strong>flow_name: str</strong></dt><dd></dd>
-<dt><strong>parameter_settings: List[OrderedDict]</strong></dt><dd></dd>
-<dt><strong>predictions_url: str</strong></dt><dd></dd>
-<dt><strong>task: OpenMLTask</strong></dt><dd></dd>
-<dt><strong>flow: OpenMLFlow</strong></dt><dd></dd>
-<dt><strong>run_id: int</strong></dt><dd></dd>
-<dt><strong>description_text: str, optional</strong></dt><dd><p>Description text to add to the predictions file.
-If left None, is set to the time the arff file is generated.</p>
+<dt><strong>trace: OpenMLRunTrace</strong></dt><dd><p>The trace containing information on internal model evaluations of this run.</p>
+</dd>
+<dt><strong>model: object</strong></dt><dd><p>The untrained model that was evaluated in the run.</p>
+</dd>
+<dt><strong>task_type: str</strong></dt><dd><p>The type of the OpenML task associated with the run.</p>
+</dd>
+<dt><strong>task_evaluation_measure: str</strong></dt><dd><p>The evaluation measure used for the task.</p>
+</dd>
+<dt><strong>flow_name: str</strong></dt><dd><p>The name of the OpenML flow associated with the run.</p>
+</dd>
+<dt><strong>parameter_settings: List[OrderedDict]</strong></dt><dd><p>Representing the parameter settings used for the run.</p>
+</dd>
+<dt><strong>predictions_url: str</strong></dt><dd><p>The URL of the predictions file.</p>
+</dd>
+<dt><strong>task: OpenMLTask</strong></dt><dd><p>An instance of the OpenMLTask class, representing the OpenML task associated
+with the run.</p>
+</dd>
+<dt><strong>flow: OpenMLFlow</strong></dt><dd><p>An instance of the OpenMLFlow class, representing the OpenML flow associated
+with the run.</p>
+</dd>
+<dt><strong>run_id: int</strong></dt><dd><p>The ID of the run.</p>
+</dd>
+<dt><strong>description_text: str, optional</strong></dt><dd><p>Description text to add to the predictions file. If left None, is set to the
+time the arff file is generated.</p>
 </dd>
 <dt><strong>run_details: str, optional (default=None)</strong></dt><dd><p>Description of the run stored in the run meta-data.</p>
 </dd>

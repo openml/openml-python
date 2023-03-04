@@ -221,17 +221,17 @@ pre-processing all retrieved evaluations.
 
  .. code-block:: none
 
-                         cost degree             gamma      kernel
-    2853  0.00724597731610269    NaN  370.883929033335         NaN
-    2134    0.106967701565104      4               NaN  polynomial
-    574      340.011016671327    NaN               NaN      linear
-    2272     7.15062030869762      5               NaN  polynomial
-    104   0.00218331201579788      2               NaN  polynomial
-    Y :  2853    0.565117
-    2134    0.465115
-    574     0.956689
-    2272    0.528034
-    104     0.893283
+                        cost degree                gamma      kernel
+    3912    2.41165718115746    NaN  0.00304849909615302         NaN
+    2159  0.0606028475935303    NaN    0.140322616644157         NaN
+    2350    2.26226407085229    NaN                  NaN      linear
+    2960    32.6915161902113      5                  NaN  polynomial
+    3612    19.5217260003267    NaN    0.154104450187155         NaN
+    Y :  3912    0.627272
+    2159    0.748419
+    2350    0.641794
+    2960    0.540979
+    3612    0.863406
     Name: value, dtype: float64
 
 
@@ -308,7 +308,7 @@ time simple and quick.
  .. code-block:: none
 
     Task ID :  145878
-    Training RMSE : 1.5966e-05
+    Training RMSE : 2.4631e-05
 
 
 
@@ -360,17 +360,17 @@ NOTE: This section is written exclusively for the SVM flow
  .. code-block:: none
 
                cost    degree       gamma      kernel
-    0    651.694351  3.339935  693.636944      radial
-    1    713.241738  3.802402  132.424128      linear
-    2    824.843022  3.826855  177.533273      radial
-    3    971.564261  3.974141  840.960007     sigmoid
-    4    425.949925  4.605390  541.213296      linear
+    0    768.915909  4.606072  471.877858     sigmoid
+    1    556.590607  3.061682  256.044303      radial
+    2    271.687569  4.180482  833.687610     sigmoid
+    3    629.409869  2.415324  855.777670      radial
+    4     81.537032  3.391515  838.674282     sigmoid
     ..          ...       ...         ...         ...
-    995  964.139468  2.847424  809.147031      linear
-    996  870.554516  2.128670  153.421262     sigmoid
-    997  843.845518  3.514807  820.810363  polynomial
-    998  873.165874  2.935232  418.348670  polynomial
-    999  231.449994  2.202272  547.697701     sigmoid
+    995  172.402186  3.358400  783.867299  polynomial
+    996   27.402426  2.959110  498.560723      radial
+    997  548.468500  2.278891  544.339888     sigmoid
+    998  109.665585  3.867275  359.784330  polynomial
+    999  980.108041  4.318841  650.126189      radial
 
     [1000 rows x 4 columns]
 
@@ -414,7 +414,7 @@ NOTE: This section is written exclusively for the SVM flow
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  3.990 seconds)
+   **Total running time of the script:** ( 1 minutes  9.530 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_neurips_perrone_example.py:

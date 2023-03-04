@@ -365,13 +365,13 @@ Finally, it is also possible to list all tasks on OpenML with:
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+    /home/runner/work/openml-python/openml-python/openml/utils.py:253: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
       result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+    /home/runner/work/openml-python/openml-python/openml/utils.py:253: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
       result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+    /home/runner/work/openml-python/openml-python/openml/utils.py:253: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
       result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:256: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+    /home/runner/work/openml-python/openml-python/openml/utils.py:253: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
       result = result.append(new_batch, ignore_index=True)
     46779
 
@@ -1418,7 +1418,7 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  24.292 seconds)
+   **Total running time of the script:** ( 1 minutes  12.801 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:

@@ -122,19 +122,21 @@ Running a model on a task
 
     OpenML Run
     ==========
-    Uploader Name: None
-    Metric.......: None
-    Run ID.......: None
-    Task ID......: 119
-    Task Type....: None
-    Task URL.....: https://test.openml.org/t/119
-    Flow ID......: 36872
-    Flow Name....: sklearn.ensemble._forest.RandomForestClassifier
-    Flow URL.....: https://test.openml.org/f/36872
-    Setup ID.....: None
-    Setup String.: Python_3.8.16. Sklearn_1.2.1. NumPy_1.23.5. SciPy_1.10.1.
-    Dataset ID...: 20
-    Dataset URL..: https://test.openml.org/d/20
+    Uploader Name...................: None
+    Metric..........................: None
+    Local Result - Accuracy (+- STD): 0.7747 +- 0.0000
+    Local Runtime - ms (+- STD).....: 277.0309 +- 0.0000
+    Run ID..........................: None
+    Task ID.........................: 119
+    Task Type.......................: None
+    Task URL........................: https://test.openml.org/t/119
+    Flow ID.........................: 36872
+    Flow Name.......................: sklearn.ensemble._forest.RandomForestClassifier
+    Flow URL........................: https://test.openml.org/f/36872
+    Setup ID........................: None
+    Setup String....................: Python_3.8.16. Sklearn_1.2.1. NumPy_1.23.5. SciPy_1.10.1.
+    Dataset ID......................: 20
+    Dataset URL.....................: https://test.openml.org/d/20
 
 
 
@@ -161,7 +163,7 @@ Publishing the run
 
  .. code-block:: none
 
-    Run was uploaded to https://test.openml.org/r/27884
+    Run was uploaded to https://test.openml.org/r/28407
     The flow can be found at https://test.openml.org/f/36872
 
 
@@ -182,7 +184,7 @@ Publishing the run
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.710 seconds)
+   **Total running time of the script:** ( 0 minutes  6.881 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_flows_and_runs_tutorial.py:
