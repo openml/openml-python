@@ -196,7 +196,7 @@ Download the OpenML task for the eeg-eye-state.
 
  .. code-block:: none
 
-    kNN on eeg-eye-state: https://test.openml.org/r/28418
+    kNN on eeg-eye-state: https://test.openml.org/r/29258
 
 
 
@@ -216,7 +216,7 @@ Download the OpenML task for the eeg-eye-state.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  13.828 seconds)
+   **Total running time of the script:** ( 0 minutes  13.954 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_introduction_tutorial.py:

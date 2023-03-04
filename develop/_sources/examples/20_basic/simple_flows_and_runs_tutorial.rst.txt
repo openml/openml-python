@@ -124,8 +124,8 @@ Running a model on a task
     ==========
     Uploader Name...................: None
     Metric..........................: None
-    Local Result - Accuracy (+- STD): 0.7747 +- 0.0000
-    Local Runtime - ms (+- STD).....: 277.0309 +- 0.0000
+    Local Result - Accuracy (+- STD): 0.7628 +- 0.0000
+    Local Runtime - ms (+- STD).....: 193.0165 +- 0.0000
     Run ID..........................: None
     Task ID.........................: 119
     Task Type.......................: None
@@ -163,7 +163,7 @@ Publishing the run
 
  .. code-block:: none
 
-    Run was uploaded to https://test.openml.org/r/28407
+    Run was uploaded to https://test.openml.org/r/29252
     The flow can be found at https://test.openml.org/f/36872
 
 
@@ -184,7 +184,7 @@ Publishing the run
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.881 seconds)
+   **Total running time of the script:** ( 0 minutes  8.003 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_flows_and_runs_tutorial.py:
