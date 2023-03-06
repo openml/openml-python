@@ -1289,4 +1289,4 @@ def delete_dataset(dataset_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
-    return openml.utils._delete_entity("dataset", dataset_id)
+    return openml.utils._delete_entity("data", dataset_id)

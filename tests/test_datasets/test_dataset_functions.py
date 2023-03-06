@@ -13,6 +13,7 @@ import time
 import pytest
 import numpy as np
 import pandas as pd
+import requests
 import scipy.sparse
 from oslo_concurrency import lockutils
 
@@ -23,6 +24,7 @@ from openml.exceptions import (
     OpenMLHashException,
     OpenMLPrivateDatasetError,
     OpenMLServerException,
+    OpenMLNotAuthorizedError,
 )
 from openml.testing import TestBase
 from openml.utils import _tag_entity, _create_cache_directory_for_id
@@ -1718,3 +1720,104 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
         dataset.publish()
         _dataset_id = dataset.id
         self.assertTrue(openml.datasets.delete_dataset(_dataset_id))
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_dataset_not_owned(mock_get, test_files_directory):
+    openml.config.start_using_configuration_for_example()
+    with open(
+        test_files_directory / "mock_responses" / "datasets" / "data_delete_not_owned.xml", "r"
+    ) as xml_response:
+        response_body = xml_response.read()
+
+    response = requests.Response()
+    response.status_code = 353
+    response._content = response_body.encode()
+    mock_get.return_value = response
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The data can not be deleted because it was not uploaded by you.",
+    ):
+        openml.datasets.delete_dataset(40_000)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/data/40000",),
+        {"params": {"api_key": "c0c42819af31e706efe1f4b88c23c6c1"}},
+    ]
+    assert expected_call_args == list(mock_get.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_dataset_with_run(mock_get, test_files_directory):
+    openml.config.start_using_configuration_for_example()
+    with open(
+        test_files_directory / "mock_responses" / "datasets" / "data_delete_has_tasks.xml", "r"
+    ) as xml_response:
+        response_body = xml_response.read()
+
+    response = requests.Response()
+    response.status_code = 354
+    response._content = response_body.encode()
+    mock_get.return_value = response
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The data can not be deleted because it still has associated entities:",
+    ):
+        openml.datasets.delete_dataset(40_000)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/data/40000",),
+        {"params": {"api_key": "c0c42819af31e706efe1f4b88c23c6c1"}},
+    ]
+    assert expected_call_args == list(mock_get.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_dataset_success(mock_get, test_files_directory):
+    openml.config.start_using_configuration_for_example()
+    with open(
+        test_files_directory / "mock_responses" / "datasets" / "data_delete_successful.xml", "r"
+    ) as xml_response:
+        response_body = xml_response.read()
+
+    response = requests.Response()
+    response.status_code = 200
+    response._content = response_body.encode()
+    mock_get.return_value = response
+
+    success = openml.datasets.delete_dataset(40000)
+    assert success
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/data/40000",),
+        {"params": {"api_key": "c0c42819af31e706efe1f4b88c23c6c1"}},
+    ]
+    assert expected_call_args == list(mock_get.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_unknown_dataset(mock_get, test_files_directory):
+    openml.config.start_using_configuration_for_example()
+    with open(
+        test_files_directory / "mock_responses" / "datasets" / "data_delete_not_exist.xml", "r"
+    ) as xml_response:
+        response_body = xml_response.read()
+
+    response = requests.Response()
+    response.status_code = 352
+    response._content = response_body.encode()
+    mock_get.return_value = response
+
+    with pytest.raises(
+        OpenMLServerException,
+        match="Dataset does not exist",
+    ):
+        openml.datasets.delete_dataset(9_999_999)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/data/9999999",),
+        {"params": {"api_key": "c0c42819af31e706efe1f4b88c23c6c1"}},
+    ]
+    assert expected_call_args == list(mock_get.call_args)

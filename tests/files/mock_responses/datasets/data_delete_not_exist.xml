@@ -1,0 +1,4 @@
+<oml:error xmlns:oml="http://openml.org/openml">
+	<oml:code>352</oml:code>
+	<oml:message>Dataset does not exist</oml:message>
+</oml:error>
