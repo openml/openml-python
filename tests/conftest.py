@@ -24,6 +24,7 @@ Possible Future: class TestBase from openml/testing.py can be included
 
 import os
 import logging
+import pathlib
 from typing import List
 import pytest
 
@@ -186,3 +187,8 @@ def pytest_addoption(parser):
 @pytest.fixture(scope="class")
 def long_version(request):
     request.cls.long_version = request.config.getoption("--long")
+
+
+@pytest.fixture
+def test_files_directory() -> pathlib.Path:
+    return pathlib.Path(__file__).parent / "files"
