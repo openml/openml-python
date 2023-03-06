@@ -4,15 +4,19 @@ from collections import OrderedDict
 import copy
 import functools
 import unittest
+from unittest import mock
 from unittest.mock import patch
 
 from distutils.version import LooseVersion
+
+import requests
 import sklearn
 from sklearn import ensemble
 import pandas as pd
 import pytest
 
 import openml
+from openml.exceptions import OpenMLNotAuthorizedError, OpenMLServerException
 from openml.testing import TestBase
 import openml.extensions.sklearn
 
@@ -424,3 +428,130 @@ class TestFlowFunctions(TestBase):
         flow.publish()
         _flow_id = flow.flow_id
         self.assertTrue(openml.flows.delete_flow(_flow_id))
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_flow_not_owned(mock_get, test_files_directory):
+    openml.config.start_using_configuration_for_example()
+    with open(
+        test_files_directory / "mock_responses" / "flows" / "flow_delete_not_owned.xml", "r"
+    ) as xml_response:
+        response_body = xml_response.read()
+
+    response = requests.Response()
+    response.status_code = 323
+    response._content = response_body.encode()
+    mock_get.return_value = response
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The flow can not be deleted because it was not uploaded by you.",
+    ):
+        openml.flows.delete_flow(40_000)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/flow/40000",),
+        {"params": {"api_key": "c0c42819af31e706efe1f4b88c23c6c1"}},
+    ]
+    assert expected_call_args == list(mock_get.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_flow_with_run(mock_get, test_files_directory):
+    openml.config.start_using_configuration_for_example()
+    with open(
+        test_files_directory / "mock_responses" / "flows" / "flow_delete_has_runs.xml", "r"
+    ) as xml_response:
+        response_body = xml_response.read()
+
+    response = requests.Response()
+    response.status_code = 324
+    response._content = response_body.encode()
+    mock_get.return_value = response
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The flow can not be deleted because it still has associated entities:",
+    ):
+        openml.flows.delete_flow(40_000)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/flow/40000",),
+        {"params": {"api_key": "c0c42819af31e706efe1f4b88c23c6c1"}},
+    ]
+    assert expected_call_args == list(mock_get.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_subflow(mock_get, test_files_directory):
+    openml.config.start_using_configuration_for_example()
+    with open(
+        test_files_directory / "mock_responses" / "flows" / "flow_delete_is_subflow.xml", "r"
+    ) as xml_response:
+        response_body = xml_response.read()
+
+    response = requests.Response()
+    response.status_code = 328
+    response._content = response_body.encode()
+    mock_get.return_value = response
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The flow can not be deleted because it still has associated entities:",
+    ):
+        openml.flows.delete_flow(40_000)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/flow/40000",),
+        {"params": {"api_key": "c0c42819af31e706efe1f4b88c23c6c1"}},
+    ]
+    assert expected_call_args == list(mock_get.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_flow_success(mock_get, test_files_directory):
+    openml.config.start_using_configuration_for_example()
+    with open(
+        test_files_directory / "mock_responses" / "flows" / "flow_delete_successful.xml", "r"
+    ) as xml_response:
+        response_body = xml_response.read()
+
+    response = requests.Response()
+    response.status_code = 200
+    response._content = response_body.encode()
+    mock_get.return_value = response
+
+    success = openml.flows.delete_flow(33364)
+    assert success
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/flow/33364",),
+        {"params": {"api_key": "c0c42819af31e706efe1f4b88c23c6c1"}},
+    ]
+    assert expected_call_args == list(mock_get.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_unknown_flow(mock_get, test_files_directory):
+    openml.config.start_using_configuration_for_example()
+    with open(
+        test_files_directory / "mock_responses" / "flows" / "flow_delete_not_exist.xml", "r"
+    ) as xml_response:
+        response_body = xml_response.read()
+
+    response = requests.Response()
+    response.status_code = 322
+    response._content = response_body.encode()
+    mock_get.return_value = response
+
+    with pytest.raises(
+        OpenMLServerException,
+        match="flow does not exist",
+    ):
+        openml.flows.delete_flow(9_999_999)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/flow/9999999",),
+        {"params": {"api_key": "c0c42819af31e706efe1f4b88c23c6c1"}},
+    ]
+    assert expected_call_args == list(mock_get.call_args)
