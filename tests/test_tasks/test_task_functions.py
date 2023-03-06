@@ -297,7 +297,7 @@ class TestTask(TestBase):
 
         with pytest.raises(
             OpenMLNotAuthorizedError,
-            match="The task can not be deleted because it still has associated runs.",
+            match="The task can not be deleted because it still has associated entities:",
         ):
             openml.tasks.delete_task(3496)
 

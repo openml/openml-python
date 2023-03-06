@@ -27,11 +27,7 @@ class OpenMLServerException(OpenMLServerError):
         super().__init__(message)
 
     def __str__(self):
-        return "%s returned code %s: %s" % (
-            self.url,
-            self.code,
-            self.message,
-        )
+        return f"{self.url} returned code {self.code}: {self.message}"
 
 
 class OpenMLServerNoResult(OpenMLServerException):
@@ -68,7 +64,7 @@ class OpenMLRunsExistError(PyOpenMLError):
         super().__init__(message)
 
 
-class OpenMLNotAuthorizedError(OpenMLServerException):
+class OpenMLNotAuthorizedError(OpenMLServerError):
     """Indicates an authenticated user is not authorized to execute the requested action."""
 
     pass
