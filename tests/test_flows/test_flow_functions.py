@@ -453,7 +453,7 @@ def test_delete_flow_not_owned(mock_get, test_files_directory):
 def test_delete_flow_with_run(mock_get, test_files_directory):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_has_runs.xml"
-    mock_get.return_value = create_request_response(status_code=324, content_filepath=content_file)
+    mock_get.return_value = create_request_response(status_code=412, content_filepath=content_file)
 
     with pytest.raises(
         OpenMLNotAuthorizedError,
@@ -472,7 +472,7 @@ def test_delete_flow_with_run(mock_get, test_files_directory):
 def test_delete_subflow(mock_get, test_files_directory):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_is_subflow.xml"
-    mock_get.return_value = create_request_response(status_code=328, content_filepath=content_file)
+    mock_get.return_value = create_request_response(status_code=412, content_filepath=content_file)
 
     with pytest.raises(
         OpenMLNotAuthorizedError,
@@ -507,7 +507,7 @@ def test_delete_flow_success(mock_get, test_files_directory):
 def test_delete_unknown_flow(mock_get, test_files_directory):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_exist.xml"
-    mock_get.return_value = create_request_response(status_code=322, content_filepath=content_file)
+    mock_get.return_value = create_request_response(status_code=412, content_filepath=content_file)
 
     with pytest.raises(
         OpenMLServerException,

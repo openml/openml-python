@@ -262,7 +262,7 @@ class TestTask(TestBase):
 def test_delete_task_not_owned(mock_get, test_files_directory):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_not_owned.xml"
-    mock_get.return_value = create_request_response(status_code=453, content_filepath=content_file)
+    mock_get.return_value = create_request_response(status_code=412, content_filepath=content_file)
 
     with pytest.raises(
         OpenMLNotAuthorizedError,
@@ -281,7 +281,7 @@ def test_delete_task_not_owned(mock_get, test_files_directory):
 def test_delete_task_with_run(mock_get, test_files_directory):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_has_runs.xml"
-    mock_get.return_value = create_request_response(status_code=454, content_filepath=content_file)
+    mock_get.return_value = create_request_response(status_code=412, content_filepath=content_file)
 
     with pytest.raises(
         OpenMLNotAuthorizedError,
