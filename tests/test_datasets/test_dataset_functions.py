@@ -1728,7 +1728,7 @@ def test_delete_dataset_not_owned(mock_get, test_files_directory):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_owned.xml"
     )
-    mock_get.return_value = create_request_response(status_code=353, content_filepath=content_file)
+    mock_get.return_value = create_request_response(status_code=412, content_filepath=content_file)
 
     with pytest.raises(
         OpenMLNotAuthorizedError,
@@ -1749,7 +1749,7 @@ def test_delete_dataset_with_run(mock_get, test_files_directory):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_has_tasks.xml"
     )
-    mock_get.return_value = create_request_response(status_code=354, content_filepath=content_file)
+    mock_get.return_value = create_request_response(status_code=412, content_filepath=content_file)
 
     with pytest.raises(
         OpenMLNotAuthorizedError,
@@ -1788,7 +1788,7 @@ def test_delete_unknown_dataset(mock_get, test_files_directory):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_exist.xml"
     )
-    mock_get.return_value = create_request_response(status_code=352, content_filepath=content_file)
+    mock_get.return_value = create_request_response(status_code=412, content_filepath=content_file)
 
     with pytest.raises(
         OpenMLServerException,
