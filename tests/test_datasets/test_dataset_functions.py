@@ -1723,7 +1723,7 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_not_owned(mock_delete, test_files_directory):
+def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_owned.xml"
@@ -1740,13 +1740,13 @@ def test_delete_dataset_not_owned(mock_delete, test_files_directory):
 
     expected_call_args = [
         ("https://test.openml.org/api/v1/xml/data/40000",),
-        {"params": {"api_key": "c0c42819af31e706efe1f4b88c23c6c1"}},
+        {"params": {"api_key": test_api_key}},
     ]
     assert expected_call_args == list(mock_delete.call_args)
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_with_run(mock_delete, test_files_directory):
+def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_has_tasks.xml"
@@ -1763,13 +1763,13 @@ def test_delete_dataset_with_run(mock_delete, test_files_directory):
 
     expected_call_args = [
         ("https://test.openml.org/api/v1/xml/data/40000",),
-        {"params": {"api_key": "c0c42819af31e706efe1f4b88c23c6c1"}},
+        {"params": {"api_key": test_api_key}},
     ]
     assert expected_call_args == list(mock_delete.call_args)
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_success(mock_delete, test_files_directory):
+def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_successful.xml"
@@ -1783,13 +1783,13 @@ def test_delete_dataset_success(mock_delete, test_files_directory):
 
     expected_call_args = [
         ("https://test.openml.org/api/v1/xml/data/40000",),
-        {"params": {"api_key": "c0c42819af31e706efe1f4b88c23c6c1"}},
+        {"params": {"api_key": test_api_key}},
     ]
     assert expected_call_args == list(mock_delete.call_args)
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_unknown_dataset(mock_delete, test_files_directory):
+def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_exist.xml"
@@ -1806,6 +1806,6 @@ def test_delete_unknown_dataset(mock_delete, test_files_directory):
 
     expected_call_args = [
         ("https://test.openml.org/api/v1/xml/data/9999999",),
-        {"params": {"api_key": "c0c42819af31e706efe1f4b88c23c6c1"}},
+        {"params": {"api_key": test_api_key}},
     ]
     assert expected_call_args == list(mock_delete.call_args)

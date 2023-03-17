@@ -192,3 +192,8 @@ def long_version(request):
 @pytest.fixture
 def test_files_directory() -> pathlib.Path:
     return pathlib.Path(__file__).parent / "files"
+
+
+@pytest.fixture()
+def test_api_key() -> str:
+    return "c0c42819af31e706efe1f4b88c23c6c1"
