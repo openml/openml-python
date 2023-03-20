@@ -10,7 +10,6 @@ from unittest import mock
 
 import numpy as np
 import joblib
-import pytest
 import requests
 from joblib import parallel_backend
 
