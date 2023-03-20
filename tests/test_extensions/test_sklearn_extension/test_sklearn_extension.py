@@ -15,6 +15,7 @@ from packaging import version
 
 import numpy as np
 import pandas as pd
+import pytest
 import scipy.optimize
 import scipy.stats
 import sklearn.base
@@ -176,6 +177,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
             return serialization, new_model
 
+    @pytest.mark.sklearn
     def test_serialize_model(self):
         model = sklearn.tree.DecisionTreeClassifier(
             criterion="entropy", max_features="auto", max_leaf_nodes=2000
@@ -265,6 +267,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(serialization.dependencies, version_fixture)
         self.assertDictEqual(structure, structure_fixture)
 
+    @pytest.mark.sklearn
     def test_can_handle_flow(self):
         openml.config.server = self.production_server
 
@@ -275,6 +278,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         openml.config.server = self.test_server
 
+    @pytest.mark.sklearn
     def test_serialize_model_clustering(self):
         model = sklearn.cluster.KMeans()
 
@@ -367,6 +371,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         assert serialization.dependencies == version_fixture
         assert structure == fixture_structure
 
+    @pytest.mark.sklearn
     def test_serialize_model_with_subcomponent(self):
         model = sklearn.ensemble.AdaBoostClassifier(
             n_estimators=100, base_estimator=sklearn.tree.DecisionTreeClassifier()
@@ -427,6 +432,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         self.assertDictEqual(structure, fixture_structure)
 
+    @pytest.mark.sklearn
     def test_serialize_pipeline(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         dummy = sklearn.dummy.DummyClassifier(strategy="prior")
@@ -496,6 +502,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertIsNot(new_model.steps[0][1], model.steps[0][1])
         self.assertIsNot(new_model.steps[1][1], model.steps[1][1])
 
+    @pytest.mark.sklearn
     def test_serialize_pipeline_clustering(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         km = sklearn.cluster.KMeans()
@@ -564,6 +571,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertIsNot(new_model.steps[0][1], model.steps[0][1])
         self.assertIsNot(new_model.steps[1][1], model.steps[1][1])
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
@@ -622,6 +630,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(serialization.description, fixture_description)
         self.assertDictEqual(structure, fixture_structure)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
@@ -688,6 +697,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         self.assertDictEqual(structure, fixture_structure)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20", reason="Pipeline processing behaviour updated"
     )
@@ -756,6 +766,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         self.assertIs(new_model.transformer_list[1][1], "drop")
 
+    @pytest.mark.sklearn
     def test_serialize_feature_union_switched_names(self):
         ohe_params = {"categories": "auto"} if LooseVersion(sklearn.__version__) >= "0.20" else {}
         ohe = sklearn.preprocessing.OneHotEncoder(**ohe_params)
@@ -796,6 +807,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             "ohe=sklearn.preprocessing.{}.StandardScaler)".format(module_name_encoder, scaler_name),
         )
 
+    @pytest.mark.sklearn
     def test_serialize_complex_flow(self):
         ohe = sklearn.preprocessing.OneHotEncoder(handle_unknown="ignore")
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
@@ -856,6 +868,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(serialized.name, fixture_name)
         self.assertEqual(structure, fixture_structure)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="Pipeline till 0.20 doesn't support 'passthrough'",
@@ -951,6 +964,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertIsInstance(extracted_info[2]["drop"], OpenMLFlow)
         self.assertEqual(extracted_info[2]["drop"].name, "drop")
 
+    @pytest.mark.sklearn
     def test_serialize_type(self):
         supported_types = [float, np.float32, np.float64, int, np.int32, np.int64]
         if LooseVersion(np.__version__) < "1.24":
@@ -962,6 +976,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             deserialized = self.extension.flow_to_model(serialized)
             self.assertEqual(deserialized, supported_type)
 
+    @pytest.mark.sklearn
     def test_serialize_rvs(self):
         supported_rvs = [
             scipy.stats.norm(loc=1, scale=5),
@@ -977,11 +992,13 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             del supported_rv.dist
             self.assertEqual(deserialized.__dict__, supported_rv.__dict__)
 
+    @pytest.mark.sklearn
     def test_serialize_function(self):
         serialized = self.extension.model_to_flow(sklearn.feature_selection.chi2)
         deserialized = self.extension.flow_to_model(serialized)
         self.assertEqual(deserialized, sklearn.feature_selection.chi2)
 
+    @pytest.mark.sklearn
     def test_serialize_cvobject(self):
         methods = [sklearn.model_selection.KFold(3), sklearn.model_selection.LeaveOneOut()]
         fixtures = [
@@ -1031,6 +1048,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.assertIsNot(m_new, m)
             self.assertIsInstance(m_new, type(method))
 
+    @pytest.mark.sklearn
     def test_serialize_simple_parameter_grid(self):
 
         # We cannot easily test for scipy random variables in here, but they
@@ -1078,6 +1096,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             del deserialized_params["estimator"]
             self.assertEqual(hpo_params, deserialized_params)
 
+    @pytest.mark.sklearn
     @unittest.skip(
         "This feature needs further reworking. If we allow several "
         "components, we need to register them all in the downstream "
@@ -1132,6 +1151,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(grid[1]["reduce_dim__k"], deserialized[1]["reduce_dim__k"])
         self.assertEqual(grid[1]["classify__C"], deserialized[1]["classify__C"])
 
+    @pytest.mark.sklearn
     def test_serialize_advanced_grid_fails(self):
         # This unit test is checking that the test we skip above would actually fail
 
@@ -1151,6 +1171,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         ):
             self.extension.model_to_flow(clf)
 
+    @pytest.mark.sklearn
     def test_serialize_resampling(self):
         kfold = sklearn.model_selection.StratifiedKFold(n_splits=4, shuffle=True)
         serialized = self.extension.model_to_flow(kfold)
@@ -1159,6 +1180,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(str(deserialized), str(kfold))
         self.assertIsNot(deserialized, kfold)
 
+    @pytest.mark.sklearn
     def test_hypothetical_parameter_values(self):
         # The hypothetical parameter values of true, 1, 0.1 formatted as a
         # string (and their correct serialization and deserialization) an only
@@ -1172,6 +1194,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(deserialized.get_params(), model.get_params())
         self.assertIsNot(deserialized, model)
 
+    @pytest.mark.sklearn
     def test_gaussian_process(self):
         opt = scipy.optimize.fmin_l_bfgs_b
         kernel = sklearn.gaussian_process.kernels.Matern()
@@ -1182,6 +1205,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         ):
             self.extension.model_to_flow(gp)
 
+    @pytest.mark.sklearn
     def test_error_on_adding_component_multiple_times_to_flow(self):
         # this function implicitly checks
         # - openml.flows._check_multiple_occurence_of_component_in_flow()
@@ -1206,6 +1230,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         with self.assertRaisesRegex(ValueError, fixture):
             self.extension.model_to_flow(pipeline2)
 
+    @pytest.mark.sklearn
     def test_subflow_version_propagated(self):
         this_directory = os.path.dirname(os.path.abspath(__file__))
         tests_directory = os.path.abspath(os.path.join(this_directory, "..", ".."))
@@ -1230,12 +1255,14 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             ),
         )
 
+    @pytest.mark.sklearn
     @mock.patch("warnings.warn")
     def test_check_dependencies(self, warnings_mock):
         dependencies = ["sklearn==0.1", "sklearn>=99.99.99", "sklearn>99.99.99"]
         for dependency in dependencies:
             self.assertRaises(ValueError, self.extension._check_dependencies, dependency)
 
+    @pytest.mark.sklearn
     def test_illegal_parameter_names(self):
         # illegal name: estimators
         clf1 = sklearn.ensemble.VotingClassifier(
@@ -1255,6 +1282,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         for case in cases:
             self.assertRaises(PyOpenMLError, self.extension.model_to_flow, case)
 
+    @pytest.mark.sklearn
     def test_paralizable_check(self):
         # using this model should pass the test (if param distribution is
         # legal)
@@ -1304,6 +1332,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             with self.assertRaises(PyOpenMLError):
                 self.extension._prevent_optimize_n_jobs(model)
 
+    @pytest.mark.sklearn
     def test__get_fn_arguments_with_defaults(self):
         sklearn_version = LooseVersion(sklearn.__version__)
         if sklearn_version < "0.19":
@@ -1361,6 +1390,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.assertSetEqual(set(defaults.keys()), set(defaults.keys()) - defaultless)
             self.assertSetEqual(defaultless, defaultless - set(defaults.keys()))
 
+    @pytest.mark.sklearn
     def test_deserialize_with_defaults(self):
         # used the 'initialize_with_defaults' flag of the deserialization
         # method to return a flow that contains default hyperparameter
@@ -1396,6 +1426,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.extension.model_to_flow(pipe_deserialized),
         )
 
+    @pytest.mark.sklearn
     def test_deserialize_adaboost_with_defaults(self):
         # used the 'initialize_with_defaults' flag of the deserialization
         # method to return a flow that contains default hyperparameter
@@ -1434,6 +1465,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.extension.model_to_flow(pipe_deserialized),
         )
 
+    @pytest.mark.sklearn
     def test_deserialize_complex_with_defaults(self):
         # used the 'initialize_with_defaults' flag of the deserialization
         # method to return a flow that contains default hyperparameter
@@ -1477,6 +1509,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.extension.model_to_flow(pipe_deserialized),
         )
 
+    @pytest.mark.sklearn
     def test_openml_param_name_to_sklearn(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         boosting = sklearn.ensemble.AdaBoostClassifier(
@@ -1511,6 +1544,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             openml_name = "%s(%s)_%s" % (subflow.name, subflow.version, splitted[-1])
             self.assertEqual(parameter.full_name, openml_name)
 
+    @pytest.mark.sklearn
     def test_obtain_parameter_values_flow_not_from_server(self):
         model = sklearn.linear_model.LogisticRegression(solver="lbfgs")
         flow = self.extension.model_to_flow(model)
@@ -1532,6 +1566,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         with self.assertRaisesRegex(ValueError, msg):
             self.extension.obtain_parameter_values(flow)
 
+    @pytest.mark.sklearn
     def test_obtain_parameter_values(self):
 
         model = sklearn.model_selection.RandomizedSearchCV(
@@ -1557,6 +1592,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 self.assertEqual(parameter["oml:value"], "5")
                 self.assertEqual(parameter["oml:component"], 2)
 
+    @pytest.mark.sklearn
     def test_numpy_type_allowed_in_flow(self):
         """Simple numpy types should be serializable."""
         dt = sklearn.tree.DecisionTreeClassifier(
@@ -1564,6 +1600,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         self.extension.model_to_flow(dt)
 
+    @pytest.mark.sklearn
     def test_numpy_array_not_allowed_in_flow(self):
         """Simple numpy arrays should not be serializable."""
         bin = sklearn.preprocessing.MultiLabelBinarizer(classes=np.asarray([1, 2, 3]))
@@ -1581,6 +1618,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
     ################################################################################################
     # Test methods for performing runs with this extension module
 
+    @pytest.mark.sklearn
     def test_run_model_on_task(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         # using most_frequent imputer since dataset has mixed types and to keep things simple
@@ -1592,6 +1630,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         )
         openml.runs.run_model_on_task(pipe, task, dataset_format="array")
 
+    @pytest.mark.sklearn
     def test_seed_model(self):
         # randomized models that are initialized without seeds, can be seeded
         randomized_clfs = [
@@ -1634,6 +1673,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             if idx == 1:
                 self.assertEqual(clf.cv.random_state, 56422)
 
+    @pytest.mark.sklearn
     def test_seed_model_raises(self):
         # the _set_model_seed_where_none should raise exception if random_state is
         # anything else than an int
@@ -1646,6 +1686,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             with self.assertRaises(ValueError):
                 self.extension.seed_model(model=clf, seed=42)
 
+    @pytest.mark.sklearn
     def test_run_model_on_fold_classification_1_array(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
 
@@ -1702,6 +1743,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             check_scores=False,
         )
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="SimpleImputer, ColumnTransformer available only after 0.19 and "
@@ -1773,6 +1815,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             check_scores=False,
         )
 
+    @pytest.mark.sklearn
     def test_run_model_on_fold_classification_2(self):
         task = openml.tasks.get_task(7)  # kr-vs-kp; crossvalidation
 
@@ -1826,6 +1869,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             check_scores=False,
         )
 
+    @pytest.mark.sklearn
     def test_run_model_on_fold_classification_3(self):
         class HardNaiveBayes(sklearn.naive_bayes.GaussianNB):
             # class for testing a naive bayes classifier that does not allow soft
@@ -1896,6 +1940,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 X_test.shape[0] * len(task.class_labels),
             )
 
+    @pytest.mark.sklearn
     def test_run_model_on_fold_regression(self):
         # There aren't any regression tasks on the test server
         openml.config.server = self.production_server
@@ -1945,6 +1990,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             check_scores=False,
         )
 
+    @pytest.mark.sklearn
     def test_run_model_on_fold_clustering(self):
         # There aren't any regression tasks on the test server
         openml.config.server = self.production_server
@@ -1987,6 +2033,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             check_scores=False,
         )
 
+    @pytest.mark.sklearn
     def test__extract_trace_data(self):
 
         param_grid = {
@@ -2038,6 +2085,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 param_value = json.loads(trace_iteration.parameters[param_in_trace])
                 self.assertTrue(param_value in param_grid[param])
 
+    @pytest.mark.sklearn
     def test_trim_flow_name(self):
         import re
 
@@ -2100,6 +2148,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             "weka.IsolationForest", SklearnExtension.trim_flow_name("weka.IsolationForest")
         )
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="SimpleImputer, ColumnTransformer available only after 0.19 and "
@@ -2189,6 +2238,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         self.assertEqual(len(new_model.named_steps), 3)
         self.assertEqual(new_model.named_steps["dummystep"], "passthrough")
 
+    @pytest.mark.sklearn
     def test_sklearn_serialization_with_none_step(self):
         msg = (
             "Cannot serialize objects of None type. Please use a valid "
@@ -2201,6 +2251,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         with self.assertRaisesRegex(ValueError, msg):
             self.extension.model_to_flow(clf)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
@@ -2236,6 +2287,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             else:
                 raise Exception(e)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",

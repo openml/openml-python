@@ -63,7 +63,7 @@ class TestTrace(TestBase):
         ]
         trace_content = [[0, 0, 0, 0.5, "true", 1], [0, 0, 0, 0.9, "false", 2]]
         with self.assertRaisesRegex(
-            ValueError, "Either setup_string or parameters needs to be passed as argument."
+            ValueError, "Either `setup_string` or `parameters` needs to be passed as argument."
         ):
             OpenMLRunTrace.generate(trace_attributes, trace_content)
 

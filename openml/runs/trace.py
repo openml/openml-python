@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 
 from collections import OrderedDict
+from dataclasses import dataclass
 import json
 import os
 from typing import List, Tuple, Optional  # noqa F401
@@ -331,12 +332,12 @@ class OpenMLRunTrace(object):
                 )
 
             current = OpenMLTraceIteration(
-                repeat,
-                fold,
-                iteration,
-                setup_string,
-                evaluation,
-                selected,
+                repeat=repeat,
+                fold=fold,
+                iteration=iteration,
+                setup_string=setup_string,
+                evaluation=evaluation,
+                selected=selected,
             )
             trace[(repeat, fold, iteration)] = current
 
@@ -386,8 +387,11 @@ class OpenMLRunTrace(object):
             yield val
 
 
-class OpenMLTraceIteration(object):
-    """OpenML Trace Iteration: parsed output from Run Trace call
+@dataclass
+class OpenMLTraceIteration:
+    """
+    OpenML Trace Iteration: parsed output from Run Trace call
+    Exactly one of `setup_string` or `parameters` must be provided.
 
     Parameters
     ----------
@@ -400,8 +404,9 @@ class OpenMLTraceIteration(object):
     iteration : int
         iteration number of optimization procedure
 
-    setup_string : str
+    setup_string : str, optional
         json string representing the parameters
+        If not provided, ``parameters`` should be set.
 
     evaluation : double
         The evaluation that was awarded to this trace iteration.
@@ -412,41 +417,36 @@ class OpenMLTraceIteration(object):
         selected for making predictions. Per fold/repeat there
         should be only one iteration selected
 
-    parameters : OrderedDict
+    parameters : OrderedDict, optional
+        Dictionary specifying parameter names and their values.
+        If not provided, ``setup_string`` should be set.
     """
 
-    def __init__(
-        self,
-        repeat,
-        fold,
-        iteration,
-        setup_string,
-        evaluation,
-        selected,
-        parameters=None,
-    ):
+    repeat: int
+    fold: int
+    iteration: int
 
-        if not isinstance(selected, bool):
-            raise TypeError(type(selected))
-        if setup_string and parameters:
+    evaluation: float
+    selected: bool
+
+    setup_string: Optional[str] = None
+    parameters: Optional[OrderedDict] = None
+
+    def __post_init__(self):
+        # TODO: refactor into one argument of type <str | OrderedDict>
+        if self.setup_string and self.parameters:
             raise ValueError(
-                "Can only be instantiated with either " "setup_string or parameters argument."
+                "Can only be instantiated with either `setup_string` or `parameters` argument."
             )
-        elif not setup_string and not parameters:
-            raise ValueError("Either setup_string or parameters needs to be passed as " "argument.")
-        if parameters is not None and not isinstance(parameters, OrderedDict):
+        elif not (self.setup_string or self.parameters):
+            raise ValueError(
+                "Either `setup_string` or `parameters` needs to be passed as argument."
+            )
+        if self.parameters is not None and not isinstance(self.parameters, OrderedDict):
             raise TypeError(
                 "argument parameters is not an instance of OrderedDict, but %s"
-                % str(type(parameters))
+                % str(type(self.parameters))
             )
-
-        self.repeat = repeat
-        self.fold = fold
-        self.iteration = iteration
-        self.setup_string = setup_string
-        self.evaluation = evaluation
-        self.selected = selected
-        self.parameters = parameters
 
     def get_parameters(self):
         result = {}
@@ -461,15 +461,3 @@ class OpenMLTraceIteration(object):
             for param, value in self.parameters.items():
                 result[param[len(PREFIX) :]] = value
         return result
-
-    def __repr__(self):
-        """
-        tmp string representation, will be changed in the near future
-        """
-        return "[(%d,%d,%d): %f (%r)]" % (
-            self.repeat,
-            self.fold,
-            self.iteration,
-            self.evaluation,
-            self.selected,
-        )

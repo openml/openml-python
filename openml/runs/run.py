@@ -26,39 +26,61 @@ from ..tasks import (
 
 
 class OpenMLRun(OpenMLBase):
-    """OpenML Run: result of running a model on an openml dataset.
+    """OpenML Run: result of running a model on an OpenML dataset.
 
     Parameters
     ----------
     task_id: int
+        The ID of the OpenML task associated with the run.
     flow_id: int
+        The ID of the OpenML flow associated with the run.
     dataset_id: int
+        The ID of the OpenML dataset used for the run.
     setup_string: str
+        The setup string of the run.
     output_files: Dict[str, str]
-        A dictionary that specifies where each related file can be found.
+        Specifies where each related file can be found.
     setup_id: int
+        An integer representing the ID of the setup used for the run.
     tags: List[str]
+        Representing the tags associated with the run.
     uploader: int
         User ID of the uploader.
     uploader_name: str
+        The name of the person who uploaded the run.
     evaluations: Dict
+        Representing the evaluations of the run.
     fold_evaluations: Dict
+        The evaluations of the run for each fold.
     sample_evaluations: Dict
+        The evaluations of the run for each sample.
     data_content: List[List]
         The predictions generated from executing this run.
     trace: OpenMLRunTrace
+        The trace containing information on internal model evaluations of this run.
     model: object
+        The untrained model that was evaluated in the run.
     task_type: str
+        The type of the OpenML task associated with the run.
     task_evaluation_measure: str
+        The evaluation measure used for the task.
     flow_name: str
+        The name of the OpenML flow associated with the run.
     parameter_settings: List[OrderedDict]
+        Representing the parameter settings used for the run.
     predictions_url: str
+        The URL of the predictions file.
     task: OpenMLTask
+        An instance of the OpenMLTask class, representing the OpenML task associated
+        with the run.
     flow: OpenMLFlow
+        An instance of the OpenMLFlow class, representing the OpenML flow associated
+        with the run.
     run_id: int
+        The ID of the run.
     description_text: str, optional
-        Description text to add to the predictions file.
-        If left None, is set to the time the arff file is generated.
+        Description text to add to the predictions file. If left None, is set to the
+        time the arff file is generated.
     run_details: str, optional (default=None)
         Description of the run stored in the run meta-data.
     """
@@ -139,8 +161,37 @@ class OpenMLRun(OpenMLBase):
     def id(self) -> Optional[int]:
         return self.run_id
 
+    def _evaluation_summary(self, metric: str) -> str:
+        """Summarizes the evaluation of a metric over all folds.
+
+        The fold scores for the metric must exist already. During run creation,
+        by default, the MAE for OpenMLRegressionTask and the accuracy for
+        OpenMLClassificationTask/OpenMLLearningCurveTasktasks are computed.
+
+        If repetition exist, we take the mean over all repetitions.
+
+        Parameters
+        ----------
+        metric: str
+            Name of an evaluation metric that was used to compute fold scores.
+
+        Returns
+        -------
+        metric_summary: str
+            A formatted string that displays the metric's evaluation summary.
+            The summary consists of the mean and std.
+        """
+        fold_score_lists = self.fold_evaluations[metric].values()
+
+        # Get the mean and std over all repetitions
+        rep_means = [np.mean(list(x.values())) for x in fold_score_lists]
+        rep_stds = [np.std(list(x.values())) for x in fold_score_lists]
+
+        return "{:.4f} +- {:.4f}".format(np.mean(rep_means), np.mean(rep_stds))
+
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
         """Collect all information to display in the __repr__ body."""
+        # Set up fields
         fields = {
             "Uploader Name": self.uploader_name,
             "Metric": self.task_evaluation_measure,
@@ -156,6 +207,10 @@ class OpenMLRun(OpenMLBase):
             "Dataset ID": self.dataset_id,
             "Dataset URL": openml.datasets.OpenMLDataset.url_for_id(self.dataset_id),
         }
+
+        # determines the order of the initial fields in which the information will be printed
+        order = ["Uploader Name", "Uploader Profile", "Metric", "Result"]
+
         if self.uploader is not None:
             fields["Uploader Profile"] = "{}/u/{}".format(
                 openml.config.get_server_base_url(), self.uploader
@@ -164,13 +219,29 @@ class OpenMLRun(OpenMLBase):
             fields["Run URL"] = self.openml_url
         if self.evaluations is not None and self.task_evaluation_measure in self.evaluations:
             fields["Result"] = self.evaluations[self.task_evaluation_measure]
+        elif self.fold_evaluations is not None:
+            # -- Add locally computed summary values if possible
+            if "predictive_accuracy" in self.fold_evaluations:
+                # OpenMLClassificationTask; OpenMLLearningCurveTask
+                # default: predictive_accuracy
+                result_field = "Local Result - Accuracy (+- STD)"
+                fields[result_field] = self._evaluation_summary("predictive_accuracy")
+                order.append(result_field)
+            elif "mean_absolute_error" in self.fold_evaluations:
+                # OpenMLRegressionTask
+                # default: mean_absolute_error
+                result_field = "Local Result - MAE (+- STD)"
+                fields[result_field] = self._evaluation_summary("mean_absolute_error")
+                order.append(result_field)
 
-        # determines the order in which the information will be printed
-        order = [
-            "Uploader Name",
-            "Uploader Profile",
-            "Metric",
-            "Result",
+            if "usercpu_time_millis" in self.fold_evaluations:
+                # Runtime should be available for most tasks types
+                rt_field = "Local Runtime - ms (+- STD)"
+                fields[rt_field] = self._evaluation_summary("usercpu_time_millis")
+                order.append(rt_field)
+
+        # determines the remaining order
+        order += [
             "Run ID",
             "Run URL",
             "Task ID",
@@ -304,6 +375,8 @@ class OpenMLRun(OpenMLBase):
 
         Assumes that the run has been executed.
 
+        The order of the attributes follows the order defined by the Client API for R.
+
         Returns
         -------
         arf_dict : dict
@@ -337,11 +410,11 @@ class OpenMLRun(OpenMLBase):
             if class_labels is not None:
                 arff_dict["attributes"] = (
                     arff_dict["attributes"]
+                    + [("prediction", class_labels), ("correct", class_labels)]
                     + [
                         ("confidence." + class_labels[i], "NUMERIC")
                         for i in range(len(class_labels))
                     ]
-                    + [("prediction", class_labels), ("correct", class_labels)]
                 )
             else:
                 raise ValueError("The task has no class labels")
@@ -362,7 +435,7 @@ class OpenMLRun(OpenMLBase):
                 ]
                 prediction_and_true = [("prediction", class_labels), ("correct", class_labels)]
                 arff_dict["attributes"] = (
-                    arff_dict["attributes"] + prediction_confidences + prediction_and_true
+                    arff_dict["attributes"] + prediction_and_true + prediction_confidences
                 )
             else:
                 raise ValueError("The task has no class labels")

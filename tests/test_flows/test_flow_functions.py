@@ -275,6 +275,7 @@ class TestFlowFunctions(TestBase):
         )
         assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=None)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="OrdinalEncoder introduced in 0.20. "
@@ -306,6 +307,7 @@ class TestFlowFunctions(TestBase):
         flow = openml.flows.get_flow(1)
         self.assertIsNone(flow.external_version)
 
+    @pytest.mark.sklearn
     def test_get_flow_reinstantiate_model(self):
         model = ensemble.RandomForestClassifier(n_estimators=33)
         extension = openml.extensions.get_extension_by_model(model)
@@ -327,6 +329,7 @@ class TestFlowFunctions(TestBase):
             reinstantiate=True,
         )
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) == "0.19.1",
         reason="Requires scikit-learn!=0.19.1, because target flow is from that version.",
@@ -344,6 +347,7 @@ class TestFlowFunctions(TestBase):
             strict_version=True,
         )
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "1" and LooseVersion(sklearn.__version__) != "1.0.0",
         reason="Requires scikit-learn < 1.0.1."
@@ -356,6 +360,7 @@ class TestFlowFunctions(TestBase):
         assert flow.flow_id is None
         assert "sklearn==1.0.0" not in flow.dependencies
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         (LooseVersion(sklearn.__version__) < "0.23.2")
         or ("1.0" < LooseVersion(sklearn.__version__)),
@@ -368,6 +373,7 @@ class TestFlowFunctions(TestBase):
         assert flow.flow_id is None
         assert "sklearn==0.23.1" not in flow.dependencies
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         "0.23" < LooseVersion(sklearn.__version__),
         reason="Requires scikit-learn<=0.23, because the scikit-learn module structure changed.",
@@ -378,6 +384,7 @@ class TestFlowFunctions(TestBase):
         assert flow.flow_id is None
         assert "sklearn==0.19.1" not in flow.dependencies
 
+    @pytest.mark.sklearn
     def test_get_flow_id(self):
         if self.long_version:
             list_all = openml.utils._list_all

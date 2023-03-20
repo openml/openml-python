@@ -9,6 +9,7 @@ from openml.extensions import get_extension_by_model, get_extension_by_flow, reg
 
 class DummyFlow:
     external_version = "DummyFlow==0.1"
+    dependencies = None
 
 
 class DummyModel:
@@ -18,15 +19,11 @@ class DummyModel:
 class DummyExtension1:
     @staticmethod
     def can_handle_flow(flow):
-        if not inspect.stack()[2].filename.endswith("test_functions.py"):
-            return False
-        return True
+        return inspect.stack()[2].filename.endswith("test_functions.py")
 
     @staticmethod
     def can_handle_model(model):
-        if not inspect.stack()[2].filename.endswith("test_functions.py"):
-            return False
-        return True
+        return inspect.stack()[2].filename.endswith("test_functions.py")
 
 
 class DummyExtension2:

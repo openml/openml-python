@@ -21,6 +21,7 @@ import sklearn
 import unittest
 import warnings
 import pandas as pd
+import pytest
 
 import openml.extensions.sklearn
 from openml.testing import TestBase, SimpleImputer, CustomImputer, create_request_response
@@ -135,7 +136,7 @@ class TestRun(TestBase):
             "evaluated correctly on the server".format(run_id)
         )
 
-    def _compare_predictions(self, predictions, predictions_prime):
+    def _assert_predictions_equal(self, predictions, predictions_prime):
         self.assertEqual(
             np.array(predictions_prime["data"]).shape, np.array(predictions["data"]).shape
         )
@@ -158,8 +159,6 @@ class TestRun(TestBase):
                     )
                 else:
                     self.assertEqual(val_1, val_2)
-
-        return True
 
     def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed, create_task_obj):
         run = openml.runs.get_run(run_id)
@@ -191,7 +190,7 @@ class TestRun(TestBase):
 
         predictions_prime = run_prime._generate_arff_dict()
 
-        self._compare_predictions(predictions, predictions_prime)
+        self._assert_predictions_equal(predictions, predictions_prime)
         pd.testing.assert_frame_equal(
             run.predictions,
             run_prime.predictions,
@@ -396,6 +395,7 @@ class TestRun(TestBase):
                                 self.assertGreater(evaluation, 0)
                             self.assertLess(evaluation, max_time_allowed)
 
+    @pytest.mark.sklearn
     def test_run_regression_on_classif_task(self):
         task_id = 115  # diabetes; crossvalidation
 
@@ -413,6 +413,7 @@ class TestRun(TestBase):
                 dataset_format="array",
             )
 
+    @pytest.mark.sklearn
     def test_check_erronous_sklearn_flow_fails(self):
         task_id = 115  # diabetes; crossvalidation
         task = openml.tasks.get_task(task_id)
@@ -539,6 +540,14 @@ class TestRun(TestBase):
 
         # todo: check if runtime is present
         self._check_fold_timing_evaluations(run.fold_evaluations, 1, num_folds, task_type=task_type)
+
+        # Check if run string and print representation do not run into an error
+        #   The above check already verifies that all columns needed for supported
+        #   representations are present.
+        #   Supported: SUPERVISED_CLASSIFICATION, LEARNING_CURVE, SUPERVISED_REGRESSION
+        str(run)
+        self.logger.info(run)
+
         return run
 
     def _run_and_upload_classification(
@@ -587,6 +596,7 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
+    @pytest.mark.sklearn
     def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression(solver="lbfgs", max_iter=1000)
         task_id = self.TEST_SERVER_TASK_SIMPLE["task_id"]
@@ -594,6 +604,7 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.sklearn
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
         task_id = self.TEST_SERVER_TASK_REGRESSION["task_id"]
@@ -623,6 +634,7 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_REGRESSION["n_test_obs"]
         self._run_and_upload_regression(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.sklearn
     def test_run_and_upload_pipeline_dummy_pipeline(self):
 
         pipeline1 = Pipeline(
@@ -636,6 +648,7 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(pipeline1, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
@@ -698,6 +711,7 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
+    @pytest.mark.sklearn
     @unittest.skip("https://github.com/openml/OpenML/issues/1180")
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
@@ -749,6 +763,7 @@ class TestRun(TestBase):
                 call_count += 1
         self.assertEqual(call_count, 3)
 
+    @pytest.mark.sklearn
     def test_run_and_upload_gridsearch(self):
         gridsearch = GridSearchCV(
             BaggingClassifier(base_estimator=SVC()),
@@ -767,6 +782,7 @@ class TestRun(TestBase):
         )
         self.assertEqual(len(run.trace.trace_iterations), 9)
 
+    @pytest.mark.sklearn
     def test_run_and_upload_randomsearch(self):
         randomsearch = RandomizedSearchCV(
             RandomForestClassifier(n_estimators=5),
@@ -798,6 +814,7 @@ class TestRun(TestBase):
         trace = openml.runs.get_run_trace(run.run_id)
         self.assertEqual(len(trace.trace_iterations), 5)
 
+    @pytest.mark.sklearn
     def test_run_and_upload_maskedarrays(self):
         # This testcase is important for 2 reasons:
         # 1) it verifies the correct handling of masked arrays (not all
@@ -820,6 +837,7 @@ class TestRun(TestBase):
 
     ##########################################################################
 
+    @pytest.mark.sklearn
     def test_learning_curve_task_1(self):
         task_id = 801  # diabates dataset
         num_test_instances = 6144  # for learning curve
@@ -839,6 +857,7 @@ class TestRun(TestBase):
         )
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
+    @pytest.mark.sklearn
     def test_learning_curve_task_2(self):
         task_id = 801  # diabates dataset
         num_test_instances = 6144  # for learning curve
@@ -870,6 +889,7 @@ class TestRun(TestBase):
         )
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="Pipelines don't support indexing (used for the assert check)",
@@ -949,6 +969,7 @@ class TestRun(TestBase):
                 self.assertGreaterEqual(alt_scores[idx], 0)
                 self.assertLessEqual(alt_scores[idx], 1)
 
+    @pytest.mark.sklearn
     def test_local_run_swapped_parameter_order_model(self):
         clf = DecisionTreeClassifier()
         australian_task = 595  # Australian; crossvalidation
@@ -964,6 +985,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -993,6 +1015,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1030,6 +1053,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1091,6 +1115,7 @@ class TestRun(TestBase):
         self.assertEqual(flowS.components["Imputer"].parameters["strategy"], '"most_frequent"')
         self.assertEqual(flowS.components["VarianceThreshold"].parameters["threshold"], "0.05")
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1145,6 +1170,7 @@ class TestRun(TestBase):
             run_ids = run_exists(task.task_id, setup_exists)
             self.assertTrue(run_ids, msg=(run_ids, clf))
 
+    @pytest.mark.sklearn
     def test_run_with_illegal_flow_id(self):
         # check the case where the user adds an illegal flow id to a
         # non-existing flo
@@ -1163,6 +1189,7 @@ class TestRun(TestBase):
                 avoid_duplicate_runs=True,
             )
 
+    @pytest.mark.sklearn
     def test_run_with_illegal_flow_id_after_load(self):
         # Same as `test_run_with_illegal_flow_id`, but test this error is also
         # caught if the run is stored to and loaded from disk first.
@@ -1191,6 +1218,7 @@ class TestRun(TestBase):
             TestBase._mark_entity_for_removal("run", loaded_run.run_id)
             TestBase.logger.info("collected from test_run_functions: {}".format(loaded_run.run_id))
 
+    @pytest.mark.sklearn
     def test_run_with_illegal_flow_id_1(self):
         # Check the case where the user adds an illegal flow id to an existing
         # flow. Comes to a different value error than the previous test
@@ -1215,6 +1243,7 @@ class TestRun(TestBase):
                 avoid_duplicate_runs=True,
             )
 
+    @pytest.mark.sklearn
     def test_run_with_illegal_flow_id_1_after_load(self):
         # Same as `test_run_with_illegal_flow_id_1`, but test this error is
         # also caught if the run is stored to and loaded from disk first.
@@ -1248,6 +1277,7 @@ class TestRun(TestBase):
             openml.exceptions.PyOpenMLError, expected_message_regex, loaded_run.publish
         )
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="OneHotEncoder cannot handle mixed type DataFrame as input",
@@ -1293,10 +1323,11 @@ class TestRun(TestBase):
             # check row id
             self.assertGreaterEqual(arff_line[2], 0)
             self.assertLessEqual(arff_line[2], num_instances - 1)
+            # check prediction and ground truth columns
+            self.assertIn(arff_line[4], ["won", "nowin"])
+            self.assertIn(arff_line[5], ["won", "nowin"])
             # check confidences
-            self.assertAlmostEqual(sum(arff_line[4:6]), 1.0)
-            self.assertIn(arff_line[6], ["won", "nowin"])
-            self.assertIn(arff_line[7], ["won", "nowin"])
+            self.assertAlmostEqual(sum(arff_line[6:]), 1.0)
 
     def test__create_trace_from_arff(self):
         with open(self.static_cache_dir + "/misc/trace.arff", "r") as arff_file:
@@ -1464,6 +1495,7 @@ class TestRun(TestBase):
         runs = openml.runs.list_runs(tag="curves")
         self.assertGreaterEqual(len(runs), 1)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
@@ -1499,6 +1531,7 @@ class TestRun(TestBase):
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             self.assertEqual(len(row), 12)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
@@ -1550,6 +1583,7 @@ class TestRun(TestBase):
         with self.assertRaises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)
 
+    @pytest.mark.sklearn
     def test_run_flow_on_task_downloaded_flow(self):
         model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
         flow = self.extension.model_to_flow(model)
@@ -1642,6 +1676,7 @@ class TestRun(TestBase):
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="couldn't perform local tests successfully w/o bloating RAM",
@@ -1695,6 +1730,7 @@ class TestRun(TestBase):
             scores, expected_scores, decimal=2 if os.name == "nt" else 7
         )
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="couldn't perform local tests successfully w/o bloating RAM",
