@@ -3,10 +3,13 @@
 import os
 from unittest import mock
 
+import pytest
+import requests
+
 from openml.tasks import TaskType
-from openml.testing import TestBase
+from openml.testing import TestBase, create_request_response
 from openml import OpenMLSplit, OpenMLTask
-from openml.exceptions import OpenMLCacheException
+from openml.exceptions import OpenMLCacheException, OpenMLNotAuthorizedError, OpenMLServerException
 import openml
 import unittest
 import pandas as pd
@@ -253,3 +256,84 @@ class TestTask(TestBase):
         self.assertTrue(os.path.exists(tid_cache_dir))
         openml.utils._remove_cache_dir_for_id("tasks", tid_cache_dir)
         self.assertFalse(os.path.exists(tid_cache_dir))
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_task_not_owned(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_not_owned.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The task can not be deleted because it was not uploaded by you.",
+    ):
+        openml.tasks.delete_task(1)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/task/1",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_task_with_run(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_has_runs.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The task can not be deleted because it still has associated entities:",
+    ):
+        openml.tasks.delete_task(3496)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/task/3496",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_success(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_successful.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=200, content_filepath=content_file
+    )
+
+    success = openml.tasks.delete_task(361323)
+    assert success
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/task/361323",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_unknown_task(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_not_exist.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLServerException,
+        match="Task does not exist",
+    ):
+        openml.tasks.delete_task(9_999_999)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/task/9999999",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)

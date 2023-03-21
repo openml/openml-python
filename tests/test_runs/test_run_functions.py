@@ -1,5 +1,4 @@
 # License: BSD 3-Clause
-
 import arff
 from distutils.version import LooseVersion
 import os
@@ -7,10 +6,11 @@ import random
 import time
 import sys
 import ast
-import unittest.mock
+from unittest import mock
 
 import numpy as np
 import joblib
+import requests
 from joblib import parallel_backend
 
 import openml
@@ -23,13 +23,21 @@ import pandas as pd
 import pytest
 
 import openml.extensions.sklearn
-from openml.testing import TestBase, SimpleImputer, CustomImputer
+from openml.testing import TestBase, SimpleImputer, CustomImputer, create_request_response
 from openml.extensions.sklearn import cat, cont
-from openml.runs.functions import _run_task_get_arffcontent, run_exists, format_prediction
+from openml.runs.functions import (
+    _run_task_get_arffcontent,
+    run_exists,
+    format_prediction,
+    delete_run,
+)
 from openml.runs.trace import OpenMLRunTrace
 from openml.tasks import TaskType
 from openml.testing import check_task_existence
-from openml.exceptions import OpenMLServerException
+from openml.exceptions import (
+    OpenMLServerException,
+    OpenMLNotAuthorizedError,
+)
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
@@ -708,7 +716,7 @@ class TestRun(TestBase):
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
     )
-    @unittest.mock.patch("warnings.warn")
+    @mock.patch("warnings.warn")
     def test_run_and_upload_knn_pipeline(self, warnings_mock):
 
         cat_imp = make_pipeline(
@@ -1672,7 +1680,7 @@ class TestRun(TestBase):
         LooseVersion(sklearn.__version__) < "0.21",
         reason="couldn't perform local tests successfully w/o bloating RAM",
     )
-    @unittest.mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
+    @mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
     def test__run_task_get_arffcontent_2(self, parallel_mock):
         """Tests if a run executed in parallel is collated correctly."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
@@ -1726,7 +1734,7 @@ class TestRun(TestBase):
         LooseVersion(sklearn.__version__) < "0.21",
         reason="couldn't perform local tests successfully w/o bloating RAM",
     )
-    @unittest.mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
+    @mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
     def test_joblib_backends(self, parallel_mock):
         """Tests evaluation of a run using various joblib backends and n_jobs."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
@@ -1777,3 +1785,82 @@ class TestRun(TestBase):
             self.assertEqual(len(res[2]["predictive_accuracy"][0]), 10)
             self.assertEqual(len(res[3]["predictive_accuracy"][0]), 10)
             self.assertEqual(parallel_mock.call_count, call_count)
+
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="SimpleImputer doesn't handle mixed type DataFrame as input",
+    )
+    def test_delete_run(self):
+        rs = 1
+        clf = sklearn.pipeline.Pipeline(
+            steps=[("imputer", SimpleImputer()), ("estimator", DecisionTreeClassifier())]
+        )
+        task = openml.tasks.get_task(32)  # diabetes; crossvalidation
+
+        run = openml.runs.run_model_on_task(model=clf, task=task, seed=rs)
+        run.publish()
+        TestBase._mark_entity_for_removal("run", run.run_id)
+        TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
+
+        _run_id = run.run_id
+        self.assertTrue(delete_run(_run_id))
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_owned.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The run can not be deleted because it was not uploaded by you.",
+    ):
+        openml.runs.delete_run(40_000)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/run/40000",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_successful.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=200, content_filepath=content_file
+    )
+
+    success = openml.runs.delete_run(10591880)
+    assert success
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/run/10591880",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_exist.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLServerException,
+        match="Run does not exist",
+    ):
+        openml.runs.delete_run(9_999_999)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/run/9999999",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)

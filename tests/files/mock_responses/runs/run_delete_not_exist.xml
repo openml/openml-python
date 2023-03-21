@@ -1,0 +1,4 @@
+<oml:error xmlns:oml="http://openml.org/openml">
+	<oml:code>392</oml:code>
+	<oml:message>Run does not exist</oml:message>
+</oml:error>

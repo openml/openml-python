@@ -1,0 +1,4 @@
+<oml:error xmlns:oml="http://openml.org/openml">
+	<oml:code>452</oml:code>
+	<oml:message>Task does not exist</oml:message>
+</oml:error>

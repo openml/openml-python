@@ -1271,3 +1271,22 @@ def _get_online_dataset_format(dataset_id):
     dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id, "get")
     # build a dict from the xml and get the format from the dataset description
     return xmltodict.parse(dataset_xml)["oml:data_set_description"]["oml:format"].lower()
+
+
+def delete_dataset(dataset_id: int) -> bool:
+    """Delete dataset with id `dataset_id` from the OpenML server.
+
+    This can only be done if you are the owner of the dataset and
+    no tasks are attached to the dataset.
+
+    Parameters
+    ----------
+    dataset_id : int
+        OpenML id of the dataset
+
+    Returns
+    -------
+    bool
+        True if the deletion was successful. False otherwise.
+    """
+    return openml.utils._delete_entity("data", dataset_id)

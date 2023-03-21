@@ -13,6 +13,7 @@ import time
 import pytest
 import numpy as np
 import pandas as pd
+import requests
 import scipy.sparse
 from oslo_concurrency import lockutils
 
@@ -23,8 +24,9 @@ from openml.exceptions import (
     OpenMLHashException,
     OpenMLPrivateDatasetError,
     OpenMLServerException,
+    OpenMLNotAuthorizedError,
 )
-from openml.testing import TestBase
+from openml.testing import TestBase, create_request_response
 from openml.utils import _tag_entity, _create_cache_directory_for_id
 from openml.datasets.functions import (
     create_dataset,
@@ -1672,3 +1674,138 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
         original_data_url=original_data_url,
         paper_url=paper_url,
     )
+
+    def test_delete_dataset(self):
+        data = [
+            ["a", "sunny", 85.0, 85.0, "FALSE", "no"],
+            ["b", "sunny", 80.0, 90.0, "TRUE", "no"],
+            ["c", "overcast", 83.0, 86.0, "FALSE", "yes"],
+            ["d", "rainy", 70.0, 96.0, "FALSE", "yes"],
+            ["e", "rainy", 68.0, 80.0, "FALSE", "yes"],
+        ]
+        column_names = ["rnd_str", "outlook", "temperature", "humidity", "windy", "play"]
+        df = pd.DataFrame(data, columns=column_names)
+        # enforce the type of each column
+        df["outlook"] = df["outlook"].astype("category")
+        df["windy"] = df["windy"].astype("bool")
+        df["play"] = df["play"].astype("category")
+        # meta-information
+        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        description = "Synthetic dataset created from a Pandas DataFrame"
+        creator = "OpenML tester"
+        collection_date = "01-01-2018"
+        language = "English"
+        licence = "MIT"
+        citation = "None"
+        original_data_url = "http://openml.github.io/openml-python"
+        paper_url = "http://openml.github.io/openml-python"
+        dataset = openml.datasets.functions.create_dataset(
+            name=name,
+            description=description,
+            creator=creator,
+            contributor=None,
+            collection_date=collection_date,
+            language=language,
+            licence=licence,
+            default_target_attribute="play",
+            row_id_attribute=None,
+            ignore_attribute=None,
+            citation=citation,
+            attributes="auto",
+            data=df,
+            version_label="test",
+            original_data_url=original_data_url,
+            paper_url=paper_url,
+        )
+        dataset.publish()
+        _dataset_id = dataset.id
+        self.assertTrue(openml.datasets.delete_dataset(_dataset_id))
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = (
+        test_files_directory / "mock_responses" / "datasets" / "data_delete_not_owned.xml"
+    )
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The data can not be deleted because it was not uploaded by you.",
+    ):
+        openml.datasets.delete_dataset(40_000)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/data/40000",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = (
+        test_files_directory / "mock_responses" / "datasets" / "data_delete_has_tasks.xml"
+    )
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The data can not be deleted because it still has associated entities:",
+    ):
+        openml.datasets.delete_dataset(40_000)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/data/40000",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = (
+        test_files_directory / "mock_responses" / "datasets" / "data_delete_successful.xml"
+    )
+    mock_delete.return_value = create_request_response(
+        status_code=200, content_filepath=content_file
+    )
+
+    success = openml.datasets.delete_dataset(40000)
+    assert success
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/data/40000",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = (
+        test_files_directory / "mock_responses" / "datasets" / "data_delete_not_exist.xml"
+    )
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLServerException,
+        match="Dataset does not exist",
+    ):
+        openml.datasets.delete_dataset(9_999_999)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/data/9999999",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)

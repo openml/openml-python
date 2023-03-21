@@ -351,10 +351,12 @@ def _send_request(request_method, url, data, files=None, md5_checksum=None):
                 xml.parsers.expat.ExpatError,
                 OpenMLHashException,
             ) as e:
-                if isinstance(e, OpenMLServerException):
-                    if e.code not in [107]:
-                        # 107: database connection error
-                        raise
+                if isinstance(e, OpenMLServerException) and e.code != 107:
+                    # Propagate all server errors to the calling functions, except
+                    # for 107 which represents a database connection error.
+                    # These are typically caused by high server load,
+                    # which means trying again might resolve the issue.
+                    raise
                 elif isinstance(e, xml.parsers.expat.ExpatError):
                     if request_method != "get" or retry_counter >= n_retries:
                         raise OpenMLServerError(

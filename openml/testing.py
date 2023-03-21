@@ -3,12 +3,14 @@
 import hashlib
 import inspect
 import os
+import pathlib
 import shutil
 import sys
 import time
 from typing import Dict, Union, cast
 import unittest
 import pandas as pd
+import requests
 
 import openml
 from openml.tasks import TaskType
@@ -306,4 +308,22 @@ class CustomImputer(SimpleImputer):
     pass
 
 
-__all__ = ["TestBase", "SimpleImputer", "CustomImputer", "check_task_existence"]
+def create_request_response(
+    *, status_code: int, content_filepath: pathlib.Path
+) -> requests.Response:
+    with open(content_filepath, "r") as xml_response:
+        response_body = xml_response.read()
+
+    response = requests.Response()
+    response.status_code = status_code
+    response._content = response_body.encode()
+    return response
+
+
+__all__ = [
+    "TestBase",
+    "SimpleImputer",
+    "CustomImputer",
+    "check_task_existence",
+    "create_request_response",
+]

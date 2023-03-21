@@ -544,3 +544,22 @@ def _create_flow_from_xml(flow_xml: str) -> OpenMLFlow:
     """
 
     return OpenMLFlow._from_dict(xmltodict.parse(flow_xml))
+
+
+def delete_flow(flow_id: int) -> bool:
+    """Delete flow with id `flow_id` from the OpenML server.
+
+    You can only delete flows which you uploaded and which
+    which are not linked to runs.
+
+    Parameters
+    ----------
+    flow_id : int
+        OpenML id of the flow
+
+    Returns
+    -------
+    bool
+        True if the deletion was successful. False otherwise.
+    """
+    return openml.utils._delete_entity("flow", flow_id)
