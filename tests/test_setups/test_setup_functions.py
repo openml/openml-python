@@ -10,6 +10,7 @@ import openml.extensions.sklearn
 from openml.testing import TestBase
 from typing import Dict
 import pandas as pd
+import pytest
 
 import sklearn.tree
 import sklearn.naive_bayes
@@ -34,6 +35,7 @@ class TestSetupFunctions(TestBase):
         self.extension = openml.extensions.sklearn.SklearnExtension()
         super().setUp()
 
+    @pytest.mark.sklearn
     def test_nonexisting_setup_exists(self):
         # first publish a non-existing flow
         sentinel = get_sentinel()
@@ -81,22 +83,27 @@ class TestSetupFunctions(TestBase):
         setup_id = openml.setups.setup_exists(flow)
         self.assertEqual(setup_id, run.setup_id)
 
+    @pytest.mark.sklearn
     def test_existing_setup_exists_1(self):
         def side_effect(self):
             self.var_smoothing = 1e-9
             self.priors = None
 
         with unittest.mock.patch.object(
-            sklearn.naive_bayes.GaussianNB, "__init__", side_effect,
+            sklearn.naive_bayes.GaussianNB,
+            "__init__",
+            side_effect,
         ):
             # Check a flow with zero hyperparameters
             nb = sklearn.naive_bayes.GaussianNB()
             self._existing_setup_exists(nb)
 
+    @pytest.mark.sklearn
     def test_exisiting_setup_exists_2(self):
         # Check a flow with one hyperparameter
         self._existing_setup_exists(sklearn.naive_bayes.GaussianNB())
 
+    @pytest.mark.sklearn
     def test_existing_setup_exists_3(self):
         # Check a flow with many hyperparameters
         self._existing_setup_exists(

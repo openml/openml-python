@@ -3,12 +3,14 @@
 import hashlib
 import inspect
 import os
+import pathlib
 import shutil
 import sys
 import time
 from typing import Dict, Union, cast
 import unittest
 import pandas as pd
+import requests
 
 import openml
 from openml.tasks import TaskType
@@ -114,7 +116,7 @@ class TestBase(unittest.TestCase):
 
     @classmethod
     def _mark_entity_for_removal(self, entity_type, entity_id):
-        """ Static record of entities uploaded to test server
+        """Static record of entities uploaded to test server
 
         Dictionary of lists where the keys are 'entity_type'.
         Each such dictionary is a list of integer IDs.
@@ -128,7 +130,7 @@ class TestBase(unittest.TestCase):
 
     @classmethod
     def _delete_entity_from_tracker(self, entity_type, entity):
-        """ Deletes entity records from the static file_tracker
+        """Deletes entity records from the static file_tracker
 
         Given an entity type and corresponding ID, deletes all entries, including
         duplicate entries of the ID for the entity type.
@@ -306,4 +308,22 @@ class CustomImputer(SimpleImputer):
     pass
 
 
-__all__ = ["TestBase", "SimpleImputer", "CustomImputer", "check_task_existence"]
+def create_request_response(
+    *, status_code: int, content_filepath: pathlib.Path
+) -> requests.Response:
+    with open(content_filepath, "r") as xml_response:
+        response_body = xml_response.read()
+
+    response = requests.Response()
+    response.status_code = status_code
+    response._content = response_body.encode()
+    return response
+
+
+__all__ = [
+    "TestBase",
+    "SimpleImputer",
+    "CustomImputer",
+    "check_task_existence",
+    "create_request_response",
+]

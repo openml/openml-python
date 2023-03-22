@@ -71,7 +71,7 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
 
 
 def _get_rest_api_type_alias(oml_object: "OpenMLBase") -> str:
-    """ Return the alias of the openml entity as it is defined for the REST API. """
+    """Return the alias of the openml entity as it is defined for the REST API."""
     rest_api_mapping = [
         (openml.datasets.OpenMLDataset, "data"),
         (openml.flows.OpenMLFlow, "flow"),
@@ -172,12 +172,42 @@ def _delete_entity(entity_type, entity_id):
         raise ValueError("Can't delete a %s" % entity_type)
 
     url_suffix = "%s/%d" % (entity_type, entity_id)
-    result_xml = openml._api_calls._perform_api_call(url_suffix, "delete")
-    result = xmltodict.parse(result_xml)
-    if "oml:%s_delete" % entity_type in result:
-        return True
-    else:
-        return False
+    try:
+        result_xml = openml._api_calls._perform_api_call(url_suffix, "delete")
+        result = xmltodict.parse(result_xml)
+        return f"oml:{entity_type}_delete" in result
+    except openml.exceptions.OpenMLServerException as e:
+        # https://github.com/openml/OpenML/blob/21f6188d08ac24fcd2df06ab94cf421c946971b0/openml_OS/views/pages/api_new/v1/xml/pre.php
+        # Most exceptions are descriptive enough to be raised as their standard
+        # OpenMLServerException, however there are two cases where we add information:
+        #  - a generic "failed" message, we direct them to the right issue board
+        #  - when the user successfully authenticates with the server,
+        #    but user is not allowed to take the requested action,
+        #    in which case we specify a OpenMLNotAuthorizedError.
+        by_other_user = [323, 353, 393, 453, 594]
+        has_dependent_entities = [324, 326, 327, 328, 354, 454, 464, 595]
+        unknown_reason = [325, 355, 394, 455, 593]
+        if e.code in by_other_user:
+            raise openml.exceptions.OpenMLNotAuthorizedError(
+                message=(
+                    f"The {entity_type} can not be deleted because it was not uploaded by you."
+                ),
+            ) from e
+        if e.code in has_dependent_entities:
+            raise openml.exceptions.OpenMLNotAuthorizedError(
+                message=(
+                    f"The {entity_type} can not be deleted because "
+                    f"it still has associated entities: {e.message}"
+                )
+            ) from e
+        if e.code in unknown_reason:
+            raise openml.exceptions.OpenMLServerError(
+                message=(
+                    f"The {entity_type} can not be deleted for unknown reason,"
+                    " please open an issue at: https://github.com/openml/openml/issues/new"
+                ),
+            ) from e
+        raise
 
 
 def _list_all(listing_call, output_format="dict", *args, **filters):

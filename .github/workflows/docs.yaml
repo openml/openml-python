@@ -5,14 +5,17 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.8
     - name: Install dependencies
       run: |
         pip install -e .[docs,examples,examples_unix]
+        # dependency "fanova" does not work with numpy 1.24 or later
+        # https://github.com/automl/fanova/issues/108
+        pip install numpy==1.23.5
     - name: Make docs
       run: |
         cd doc

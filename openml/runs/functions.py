@@ -155,7 +155,6 @@ def run_flow_on_task(
     dataset_format: str = "dataframe",
     n_jobs: Optional[int] = None,
 ) -> OpenMLRun:
-
     """Run the model provided by the flow on the dataset defined by task.
 
     Takes the flow and repeat information into account.
@@ -353,7 +352,10 @@ def initialize_model_from_run(run_id: int) -> Any:
 
 
 def initialize_model_from_trace(
-    run_id: int, repeat: int, fold: int, iteration: Optional[int] = None,
+    run_id: int,
+    repeat: int,
+    fold: int,
+    iteration: Optional[int] = None,
 ) -> Any:
     """
     Initialize a model based on the parameters that were set
@@ -461,7 +463,12 @@ def _run_task_get_arffcontent(
 
     jobs = []
     for n_fit, (rep_no, fold_no, sample_no) in enumerate(
-        itertools.product(range(num_reps), range(num_folds), range(num_samples),), start=1
+        itertools.product(
+            range(num_reps),
+            range(num_folds),
+            range(num_samples),
+        ),
+        start=1,
     ):
         jobs.append((n_fit, rep_no, fold_no, sample_no))
 
@@ -507,13 +514,13 @@ def _run_task_get_arffcontent(
                         else pred_y[i]
                     )
                     if isinstance(test_y, pd.Series):
-                        test_prediction = (
+                        truth = (
                             task.class_labels[test_y.iloc[i]]
                             if isinstance(test_y.iloc[i], int)
                             else test_y.iloc[i]
                         )
                     else:
-                        test_prediction = (
+                        truth = (
                             task.class_labels[test_y[i]]
                             if isinstance(test_y[i], (int, np.integer))
                             else test_y[i]
@@ -527,7 +534,7 @@ def _run_task_get_arffcontent(
                         sample=sample_no,
                         index=tst_idx,
                         prediction=prediction,
-                        truth=test_prediction,
+                        truth=truth,
                         proba=dict(zip(task.class_labels, pred_prob)),
                     )
                 else:
@@ -537,27 +544,29 @@ def _run_task_get_arffcontent(
 
             if add_local_measures:
                 _calculate_local_measure(
-                    sklearn.metrics.accuracy_score, "predictive_accuracy",
+                    sklearn.metrics.accuracy_score,
+                    "predictive_accuracy",
                 )
 
         elif isinstance(task, OpenMLRegressionTask):
 
             for i, _ in enumerate(test_indices):
-                test_prediction = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
+                truth = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
                 arff_line = format_prediction(
                     task=task,
                     repeat=rep_no,
                     fold=fold_no,
                     index=test_indices[i],
                     prediction=pred_y[i],
-                    truth=test_prediction,
+                    truth=truth,
                 )
 
                 arff_datacontent.append(arff_line)
 
             if add_local_measures:
                 _calculate_local_measure(
-                    sklearn.metrics.mean_absolute_error, "mean_absolute_error",
+                    sklearn.metrics.mean_absolute_error,
+                    "mean_absolute_error",
                 )
 
         elif isinstance(task, OpenMLClusteringTask):
@@ -910,9 +919,10 @@ def _create_run_from_xml(xml, from_server=True):
         parameter_settings=parameters,
         dataset_id=dataset_id,
         output_files=files,
-        evaluations=evaluations,
-        fold_evaluations=fold_evaluations,
-        sample_evaluations=sample_evaluations,
+        # Make sure default values are used where needed to keep run objects identical
+        evaluations=evaluations or None,
+        fold_evaluations=fold_evaluations or None,
+        sample_evaluations=sample_evaluations or None,
         tags=tags,
         predictions_url=predictions_url,
         run_details=run_details,
@@ -921,7 +931,10 @@ def _create_run_from_xml(xml, from_server=True):
 
 def _get_cached_run(run_id):
     """Load a run from the cache."""
-    run_cache_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id,)
+    run_cache_dir = openml.utils._create_cache_directory_for_id(
+        RUNS_CACHE_DIR_NAME,
+        run_id,
+    )
     try:
         run_file = os.path.join(run_cache_dir, "description.xml")
         with io.open(run_file, encoding="utf8") as fh:
@@ -1144,7 +1157,7 @@ def format_prediction(
     sample: Optional[int] = None,
     proba: Optional[Dict[str, float]] = None,
 ) -> List[Union[str, int, float]]:
-    """ Format the predictions in the specific order as required for the run results.
+    """Format the predictions in the specific order as required for the run results.
 
     Parameters
     ----------
@@ -1173,6 +1186,10 @@ def format_prediction(
     -------
     A list with elements for the prediction results of a run.
 
+    The returned order of the elements is (if available):
+        [repeat, fold, sample, index, prediction, truth, *probabilities]
+
+    This order follows the R Client API.
     """
     if isinstance(task, OpenMLClassificationTask):
         if proba is None:
@@ -1187,8 +1204,26 @@ def format_prediction(
             else:
                 sample = 0
         probabilities = [proba[c] for c in task.class_labels]
-        return [repeat, fold, sample, index, *probabilities, truth, prediction]
+        return [repeat, fold, sample, index, prediction, truth, *probabilities]
     elif isinstance(task, OpenMLRegressionTask):
-        return [repeat, fold, index, truth, prediction]
+        return [repeat, fold, index, prediction, truth]
     else:
         raise NotImplementedError(f"Formatting for {type(task)} is not supported.")
+
+
+def delete_run(run_id: int) -> bool:
+    """Delete run with id `run_id` from the OpenML server.
+
+    You can only delete runs which you uploaded.
+
+    Parameters
+    ----------
+    run_id : int
+        OpenML id of the run
+
+    Returns
+    -------
+    bool
+        True if the deletion was successful. False otherwise.
+    """
+    return openml.utils._delete_entity("run", run_id)

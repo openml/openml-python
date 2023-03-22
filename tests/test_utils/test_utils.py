@@ -98,6 +98,7 @@ class OpenMLTaskTest(TestBase):
             os.chmod(subdir, 0o444)
             config_mock.return_value = subdir
             with self.assertRaisesRegex(
-                openml.exceptions.OpenMLCacheException, r"Cannot create cache directory",
+                openml.exceptions.OpenMLCacheException,
+                r"Cannot create cache directory",
             ):
                 openml.utils._create_cache_directory("ghi")

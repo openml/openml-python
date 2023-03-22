@@ -12,6 +12,7 @@ from .functions import (
     run_exists,
     initialize_model_from_run,
     initialize_model_from_trace,
+    delete_run,
 )
 
 __all__ = [
@@ -27,4 +28,5 @@ __all__ = [
     "run_exists",
     "initialize_model_from_run",
     "initialize_model_from_trace",
+    "delete_run",
 ]

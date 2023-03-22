@@ -42,7 +42,10 @@ def setup_exists(flow) -> int:
     # checks whether the flow exists on the server and flow ids align
     exists = flow_exists(flow.name, flow.external_version)
     if exists != flow.flow_id:
-        raise ValueError("This should not happen!")
+        raise ValueError(
+            f"Local flow id ({flow.id}) differs from server id ({exists}). "
+            "If this issue persists, please contact the developers."
+        )
 
     openml_param_settings = flow.extension.obtain_parameter_values(flow)
     description = xmltodict.unparse(_to_dict(flow.flow_id, openml_param_settings), pretty=True)
@@ -52,10 +55,7 @@ def setup_exists(flow) -> int:
     )
     result_dict = xmltodict.parse(result)
     setup_id = int(result_dict["oml:setup_exists"]["oml:id"])
-    if setup_id > 0:
-        return setup_id
-    else:
-        return False
+    return setup_id if setup_id > 0 else False
 
 
 def _get_cached_setup(setup_id):
@@ -175,7 +175,7 @@ def _list_setups(setup=None, output_format="object", **kwargs):
     Returns
     -------
     dict or dataframe
-        """
+    """
 
     api_call = "setup/list"
     if setup is not None:

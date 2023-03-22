@@ -14,11 +14,11 @@ Split = namedtuple("Split", ["train", "test"])
 class OpenMLSplit(object):
     """OpenML Split object.
 
-       Parameters
-       ----------
-       name : int or str
-       description : str
-       split : dict
+    Parameters
+    ----------
+    name : int or str
+    description : str
+    split : dict
     """
 
     def __init__(self, name, description, split):
@@ -47,12 +47,10 @@ class OpenMLSplit(object):
             or self.name != other.name
             or self.description != other.description
             or self.split.keys() != other.split.keys()
-        ):
-            return False
-
-        if any(
-            self.split[repetition].keys() != other.split[repetition].keys()
-            for repetition in self.split
+            or any(
+                self.split[repetition].keys() != other.split[repetition].keys()
+                for repetition in self.split
+            )
         ):
             return False
 

@@ -15,6 +15,7 @@ from .functions import (
     get_task,
     get_tasks,
     list_tasks,
+    delete_task,
 )
 
 __all__ = [
@@ -30,4 +31,5 @@ __all__ = [
     "list_tasks",
     "OpenMLSplit",
     "TaskType",
+    "delete_task",
 ]

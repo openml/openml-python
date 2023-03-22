@@ -7,6 +7,7 @@ import hashlib
 import re
 import time
 from unittest import mock
+import pytest
 
 import scipy.stats
 import sklearn
@@ -148,6 +149,7 @@ class TestFlow(TestBase):
 
             self.assertEqual(new_xml, flow_xml)
 
+    @pytest.mark.sklearn
     def test_to_xml_from_xml(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         boosting = sklearn.ensemble.AdaBoostClassifier(
@@ -166,6 +168,7 @@ class TestFlow(TestBase):
         openml.flows.functions.assert_flows_equal(new_flow, flow)
         self.assertIsNot(new_flow, flow)
 
+    @pytest.mark.sklearn
     def test_publish_flow(self):
         flow = openml.OpenMLFlow(
             name="sklearn.dummy.DummyClassifier",
@@ -176,7 +179,8 @@ class TestFlow(TestBase):
             parameters=collections.OrderedDict(),
             parameters_meta_info=collections.OrderedDict(),
             external_version=self.extension._format_external_version(
-                "sklearn", sklearn.__version__,
+                "sklearn",
+                sklearn.__version__,
             ),
             tags=[],
             language="English",
@@ -190,6 +194,7 @@ class TestFlow(TestBase):
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
         self.assertIsInstance(flow.flow_id, int)
 
+    @pytest.mark.sklearn
     @mock.patch("openml.flows.functions.flow_exists")
     def test_publish_existing_flow(self, flow_exists_mock):
         clf = sklearn.tree.DecisionTreeClassifier(max_depth=2)
@@ -205,6 +210,7 @@ class TestFlow(TestBase):
 
         self.assertTrue("OpenMLFlow already exists" in context_manager.exception.message)
 
+    @pytest.mark.sklearn
     def test_publish_flow_with_similar_components(self):
         clf = sklearn.ensemble.VotingClassifier(
             [("lr", sklearn.linear_model.LogisticRegression(solver="lbfgs"))]
@@ -258,6 +264,7 @@ class TestFlow(TestBase):
         TestBase._mark_entity_for_removal("flow", (flow3.flow_id, flow3.name))
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow3.flow_id))
 
+    @pytest.mark.sklearn
     def test_semi_legal_flow(self):
         # TODO: Test if parameters are set correctly!
         # should not throw error as it contains two differentiable forms of
@@ -274,6 +281,7 @@ class TestFlow(TestBase):
         TestBase._mark_entity_for_removal("flow", (flow.flow_id, flow.name))
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
 
+    @pytest.mark.sklearn
     @mock.patch("openml.flows.functions.get_flow")
     @mock.patch("openml.flows.functions.flow_exists")
     @mock.patch("openml._api_calls._perform_api_call")
@@ -330,6 +338,7 @@ class TestFlow(TestBase):
         self.assertEqual(context_manager.exception.args[0], fixture)
         self.assertEqual(get_flow_mock.call_count, 2)
 
+    @pytest.mark.sklearn
     def test_illegal_flow(self):
         # should throw error as it contains two imputers
         illegal = sklearn.pipeline.Pipeline(
@@ -358,6 +367,7 @@ class TestFlow(TestBase):
         flow_id = openml.flows.flow_exists(name, version)
         self.assertFalse(flow_id)
 
+    @pytest.mark.sklearn
     def test_existing_flow_exists(self):
         # create a flow
         nb = sklearn.naive_bayes.GaussianNB()
@@ -368,7 +378,10 @@ class TestFlow(TestBase):
         steps = [
             ("imputation", SimpleImputer(strategy="median")),
             ("hotencoding", sklearn.preprocessing.OneHotEncoder(**ohe_params)),
-            ("variencethreshold", sklearn.feature_selection.VarianceThreshold(),),
+            (
+                "variencethreshold",
+                sklearn.feature_selection.VarianceThreshold(),
+            ),
             ("classifier", sklearn.tree.DecisionTreeClassifier()),
         ]
         complicated = sklearn.pipeline.Pipeline(steps=steps)
@@ -387,9 +400,13 @@ class TestFlow(TestBase):
 
             # check if flow exists can find it
             flow = openml.flows.get_flow(flow.flow_id)
-            downloaded_flow_id = openml.flows.flow_exists(flow.name, flow.external_version,)
+            downloaded_flow_id = openml.flows.flow_exists(
+                flow.name,
+                flow.external_version,
+            )
             self.assertEqual(downloaded_flow_id, flow.flow_id)
 
+    @pytest.mark.sklearn
     def test_sklearn_to_upload_to_flow(self):
         iris = sklearn.datasets.load_iris()
         X = iris.data

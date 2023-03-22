@@ -4,16 +4,20 @@ from collections import OrderedDict
 import copy
 import functools
 import unittest
+from unittest import mock
 from unittest.mock import patch
 
 from distutils.version import LooseVersion
+
+import requests
 import sklearn
 from sklearn import ensemble
 import pandas as pd
 import pytest
 
 import openml
-from openml.testing import TestBase
+from openml.exceptions import OpenMLNotAuthorizedError, OpenMLServerException
+from openml.testing import TestBase, create_request_response
 import openml.extensions.sklearn
 
 
@@ -112,10 +116,14 @@ class TestFlowFunctions(TestBase):
             new_flow = copy.deepcopy(flow)
             setattr(new_flow, attribute, new_value)
             self.assertNotEqual(
-                getattr(flow, attribute), getattr(new_flow, attribute),
+                getattr(flow, attribute),
+                getattr(new_flow, attribute),
             )
             self.assertRaises(
-                ValueError, openml.flows.functions.assert_flows_equal, flow, new_flow,
+                ValueError,
+                openml.flows.functions.assert_flows_equal,
+                flow,
+                new_flow,
             )
 
         # Test that the API ignores several keys when comparing flows
@@ -134,7 +142,8 @@ class TestFlowFunctions(TestBase):
             new_flow = copy.deepcopy(flow)
             setattr(new_flow, attribute, new_value)
             self.assertNotEqual(
-                getattr(flow, attribute), getattr(new_flow, attribute),
+                getattr(flow, attribute),
+                getattr(new_flow, attribute),
             )
             openml.flows.functions.assert_flows_equal(flow, new_flow)
 
@@ -266,6 +275,7 @@ class TestFlowFunctions(TestBase):
         )
         assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=None)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="OrdinalEncoder introduced in 0.20. "
@@ -297,6 +307,7 @@ class TestFlowFunctions(TestBase):
         flow = openml.flows.get_flow(1)
         self.assertIsNone(flow.external_version)
 
+    @pytest.mark.sklearn
     def test_get_flow_reinstantiate_model(self):
         model = ensemble.RandomForestClassifier(n_estimators=33)
         extension = openml.extensions.get_extension_by_model(model)
@@ -318,34 +329,62 @@ class TestFlowFunctions(TestBase):
             reinstantiate=True,
         )
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) == "0.19.1", reason="Target flow is from sklearn 0.19.1"
+        LooseVersion(sklearn.__version__) == "0.19.1",
+        reason="Requires scikit-learn!=0.19.1, because target flow is from that version.",
     )
-    def test_get_flow_reinstantiate_model_wrong_version(self):
-        # Note that CI does not test against 0.19.1.
+    def test_get_flow_with_reinstantiate_strict_with_wrong_version_raises_exception(self):
         openml.config.server = self.production_server
-        _, sklearn_major, _ = LooseVersion(sklearn.__version__).version[:3]
-        if sklearn_major > 23:
-            flow = 18587  # 18687, 18725 --- flows building random forest on >= 0.23
-            flow_sklearn_version = "0.23.1"
-        else:
-            flow = 8175
-            flow_sklearn_version = "0.19.1"
-        expected = (
-            "Trying to deserialize a model with dependency "
-            "sklearn=={} not satisfied.".format(flow_sklearn_version)
-        )
+        flow = 8175
+        expected = "Trying to deserialize a model with dependency sklearn==0.19.1 not satisfied."
         self.assertRaisesRegex(
-            ValueError, expected, openml.flows.get_flow, flow_id=flow, reinstantiate=True
+            ValueError,
+            expected,
+            openml.flows.get_flow,
+            flow_id=flow,
+            reinstantiate=True,
+            strict_version=True,
         )
-        if LooseVersion(sklearn.__version__) > "0.19.1":
-            # 0.18 actually can't deserialize this because of incompatibility
-            flow = openml.flows.get_flow(flow_id=flow, reinstantiate=True, strict_version=False)
-            # ensure that a new flow was created
-            assert flow.flow_id is None
-            assert "sklearn==0.19.1" not in flow.dependencies
-            assert "sklearn>=0.19.1" not in flow.dependencies
 
+    @pytest.mark.sklearn
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "1" and LooseVersion(sklearn.__version__) != "1.0.0",
+        reason="Requires scikit-learn < 1.0.1."
+        # Because scikit-learn dropped min_impurity_split hyperparameter in 1.0,
+        # and the requested flow is from 1.0.0 exactly.
+    )
+    def test_get_flow_reinstantiate_flow_not_strict_post_1(self):
+        openml.config.server = self.production_server
+        flow = openml.flows.get_flow(flow_id=19190, reinstantiate=True, strict_version=False)
+        assert flow.flow_id is None
+        assert "sklearn==1.0.0" not in flow.dependencies
+
+    @pytest.mark.sklearn
+    @unittest.skipIf(
+        (LooseVersion(sklearn.__version__) < "0.23.2")
+        or ("1.0" < LooseVersion(sklearn.__version__)),
+        reason="Requires scikit-learn 0.23.2 or ~0.24."
+        # Because these still have min_impurity_split, but with new scikit-learn module structure."
+    )
+    def test_get_flow_reinstantiate_flow_not_strict_023_and_024(self):
+        openml.config.server = self.production_server
+        flow = openml.flows.get_flow(flow_id=18587, reinstantiate=True, strict_version=False)
+        assert flow.flow_id is None
+        assert "sklearn==0.23.1" not in flow.dependencies
+
+    @pytest.mark.sklearn
+    @unittest.skipIf(
+        "0.23" < LooseVersion(sklearn.__version__),
+        reason="Requires scikit-learn<=0.23, because the scikit-learn module structure changed.",
+    )
+    def test_get_flow_reinstantiate_flow_not_strict_pre_023(self):
+        openml.config.server = self.production_server
+        flow = openml.flows.get_flow(flow_id=8175, reinstantiate=True, strict_version=False)
+        assert flow.flow_id is None
+        assert "sklearn==0.19.1" not in flow.dependencies
+
+    @pytest.mark.sklearn
     def test_get_flow_id(self):
         if self.long_version:
             list_all = openml.utils._list_all
@@ -370,7 +409,131 @@ class TestFlowFunctions(TestBase):
                 name=flow.name, exact_version=True
             )
             flow_ids_exact_version_False = openml.flows.get_flow_id(
-                name=flow.name, exact_version=False,
+                name=flow.name,
+                exact_version=False,
             )
             self.assertEqual(flow_ids_exact_version_True, flow_ids_exact_version_False)
             self.assertIn(flow.flow_id, flow_ids_exact_version_True)
+
+    def test_delete_flow(self):
+        flow = openml.OpenMLFlow(
+            name="sklearn.dummy.DummyClassifier",
+            class_name="sklearn.dummy.DummyClassifier",
+            description="test description",
+            model=sklearn.dummy.DummyClassifier(),
+            components=OrderedDict(),
+            parameters=OrderedDict(),
+            parameters_meta_info=OrderedDict(),
+            external_version="1",
+            tags=[],
+            language="English",
+            dependencies=None,
+        )
+
+        flow, _ = self._add_sentinel_to_flow_name(flow, None)
+
+        flow.publish()
+        _flow_id = flow.flow_id
+        self.assertTrue(openml.flows.delete_flow(_flow_id))
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_flow_not_owned(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_owned.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The flow can not be deleted because it was not uploaded by you.",
+    ):
+        openml.flows.delete_flow(40_000)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/flow/40000",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_flow_with_run(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_has_runs.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The flow can not be deleted because it still has associated entities:",
+    ):
+        openml.flows.delete_flow(40_000)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/flow/40000",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_subflow(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_is_subflow.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The flow can not be deleted because it still has associated entities:",
+    ):
+        openml.flows.delete_flow(40_000)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/flow/40000",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_successful.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=200, content_filepath=content_file
+    )
+
+    success = openml.flows.delete_flow(33364)
+    assert success
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/flow/33364",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_unknown_flow(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_exist.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLServerException,
+        match="flow does not exist",
+    ):
+        openml.flows.delete_flow(9_999_999)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/flow/9999999",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)

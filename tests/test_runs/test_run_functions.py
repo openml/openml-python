@@ -1,5 +1,4 @@
 # License: BSD 3-Clause
-
 import arff
 from distutils.version import LooseVersion
 import os
@@ -7,10 +6,11 @@ import random
 import time
 import sys
 import ast
-import unittest.mock
+from unittest import mock
 
 import numpy as np
 import joblib
+import requests
 from joblib import parallel_backend
 
 import openml
@@ -20,15 +20,24 @@ import sklearn
 import unittest
 import warnings
 import pandas as pd
+import pytest
 
 import openml.extensions.sklearn
-from openml.testing import TestBase, SimpleImputer, CustomImputer
+from openml.testing import TestBase, SimpleImputer, CustomImputer, create_request_response
 from openml.extensions.sklearn import cat, cont
-from openml.runs.functions import _run_task_get_arffcontent, run_exists, format_prediction
+from openml.runs.functions import (
+    _run_task_get_arffcontent,
+    run_exists,
+    format_prediction,
+    delete_run,
+)
 from openml.runs.trace import OpenMLRunTrace
 from openml.tasks import TaskType
 from openml.testing import check_task_existence
-from openml.exceptions import OpenMLServerException
+from openml.exceptions import (
+    OpenMLServerException,
+    OpenMLNotAuthorizedError,
+)
 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection._search import BaseSearchCV
@@ -126,7 +135,7 @@ class TestRun(TestBase):
             "evaluated correctly on the server".format(run_id)
         )
 
-    def _compare_predictions(self, predictions, predictions_prime):
+    def _assert_predictions_equal(self, predictions, predictions_prime):
         self.assertEqual(
             np.array(predictions_prime["data"]).shape, np.array(predictions["data"]).shape
         )
@@ -143,12 +152,12 @@ class TestRun(TestBase):
                 val_2 = predictions_prime["data"][idx][col_idx]
                 if type(val_1) == float or type(val_2) == float:
                     self.assertAlmostEqual(
-                        float(val_1), float(val_2), places=6,
+                        float(val_1),
+                        float(val_2),
+                        places=6,
                     )
                 else:
                     self.assertEqual(val_1, val_2)
-
-        return True
 
     def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed, create_task_obj):
         run = openml.runs.get_run(run_id)
@@ -165,16 +174,27 @@ class TestRun(TestBase):
         if create_task_obj:
             task = openml.tasks.get_task(run.task_id)
             run_prime = openml.runs.run_model_on_task(
-                model=model_prime, task=task, avoid_duplicate_runs=False, seed=seed,
+                model=model_prime,
+                task=task,
+                avoid_duplicate_runs=False,
+                seed=seed,
             )
         else:
             run_prime = openml.runs.run_model_on_task(
-                model=model_prime, task=run.task_id, avoid_duplicate_runs=False, seed=seed,
+                model=model_prime,
+                task=run.task_id,
+                avoid_duplicate_runs=False,
+                seed=seed,
             )
 
         predictions_prime = run_prime._generate_arff_dict()
 
-        self._compare_predictions(predictions, predictions_prime)
+        self._assert_predictions_equal(predictions, predictions_prime)
+        pd.testing.assert_frame_equal(
+            run.predictions,
+            run_prime.predictions,
+            check_dtype=False,  # Loaded ARFF reads NUMERIC as float, even if integer.
+        )
 
     def _perform_run(
         self,
@@ -276,7 +296,9 @@ class TestRun(TestBase):
             # test the initialize setup function
             run_id = run_.run_id
             run_server = openml.runs.get_run(run_id)
-            clf_server = openml.setups.initialize_model(setup_id=run_server.setup_id,)
+            clf_server = openml.setups.initialize_model(
+                setup_id=run_server.setup_id,
+            )
             flow_local = self.extension.model_to_flow(clf)
             flow_server = self.extension.model_to_flow(clf_server)
 
@@ -298,7 +320,9 @@ class TestRun(TestBase):
             openml.flows.assert_flows_equal(flow_local, flow_server)
 
             # and test the initialize setup from run function
-            clf_server2 = openml.runs.initialize_model_from_run(run_id=run_server.run_id,)
+            clf_server2 = openml.runs.initialize_model_from_run(
+                run_id=run_server.run_id,
+            )
             flow_server2 = self.extension.model_to_flow(clf_server2)
             if flow.class_name not in classes_without_random_state:
                 self.assertEqual(flow_server2.parameters["random_state"], flow_expected_rsv)
@@ -366,13 +390,11 @@ class TestRun(TestBase):
                             evaluation = sample_evaluations[measure][rep][fold][sample]
                             self.assertIsInstance(evaluation, float)
                             if not (os.environ.get("CI_WINDOWS") or os.name == "nt"):
-                                # Either Appveyor is much faster than Travis
-                                # and/or measurements are not as accurate.
-                                # Either way, windows seems to get an eval-time
-                                # of 0 sometimes.
+                                # Windows seems to get an eval-time of 0 sometimes.
                                 self.assertGreater(evaluation, 0)
                             self.assertLess(evaluation, max_time_allowed)
 
+    @pytest.mark.sklearn
     def test_run_regression_on_classif_task(self):
         task_id = 115  # diabetes; crossvalidation
 
@@ -384,21 +406,35 @@ class TestRun(TestBase):
             AttributeError, "'LinearRegression' object has no attribute 'classes_'"
         ):
             openml.runs.run_model_on_task(
-                model=clf, task=task, avoid_duplicate_runs=False, dataset_format="array",
+                model=clf,
+                task=task,
+                avoid_duplicate_runs=False,
+                dataset_format="array",
             )
 
+    @pytest.mark.sklearn
     def test_check_erronous_sklearn_flow_fails(self):
         task_id = 115  # diabetes; crossvalidation
         task = openml.tasks.get_task(task_id)
 
         # Invalid parameter values
         clf = LogisticRegression(C="abc", solver="lbfgs")
-        with self.assertRaisesRegex(
-            ValueError,
-            r"Penalty term must be positive; got \(C=u?'abc'\)",  # u? for 2.7/3.4-6 compability
-        ):
+        # The exact error message depends on scikit-learn version.
+        # Because the sklearn-extension module is to be separated,
+        # I will simply relax specifics of the raised Error.
+        # old: r"Penalty term must be positive; got \(C=u?'abc'\)"
+        # new: sklearn.utils._param_validation.InvalidParameterError:
+        #   The 'C' parameter of LogisticRegression must be a float in the range (0, inf]. Got 'abc' instead.  # noqa: E501
+        try:
+            from sklearn.utils._param_validation import InvalidParameterError
+
+            exceptions = (ValueError, InvalidParameterError)
+        except ImportError:
+            exceptions = (ValueError,)
+        with self.assertRaises(exceptions):
             openml.runs.run_model_on_task(
-                task=task, model=clf,
+                task=task,
+                model=clf,
             )
 
     ###########################################################################
@@ -476,7 +512,9 @@ class TestRun(TestBase):
             self._wait_for_processed_run(run.run_id, 600)
             try:
                 model_prime = openml.runs.initialize_model_from_trace(
-                    run_id=run.run_id, repeat=0, fold=0,
+                    run_id=run.run_id,
+                    repeat=0,
+                    fold=0,
                 )
             except openml.exceptions.OpenMLServerException as e:
                 e.message = "%s; run_id %d" % (e.message, run.run_id)
@@ -501,6 +539,14 @@ class TestRun(TestBase):
 
         # todo: check if runtime is present
         self._check_fold_timing_evaluations(run.fold_evaluations, 1, num_folds, task_type=task_type)
+
+        # Check if run string and print representation do not run into an error
+        #   The above check already verifies that all columns needed for supported
+        #   representations are present.
+        #   Supported: SUPERVISED_CLASSIFICATION, LEARNING_CURVE, SUPERVISED_REGRESSION
+        str(run)
+        self.logger.info(run)
+
         return run
 
     def _run_and_upload_classification(
@@ -549,6 +595,7 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
+    @pytest.mark.sklearn
     def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression(solver="lbfgs", max_iter=1000)
         task_id = self.TEST_SERVER_TASK_SIMPLE["task_id"]
@@ -556,6 +603,7 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.sklearn
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
         task_id = self.TEST_SERVER_TASK_REGRESSION["task_id"]
@@ -585,6 +633,7 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_REGRESSION["n_test_obs"]
         self._run_and_upload_regression(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.sklearn
     def test_run_and_upload_pipeline_dummy_pipeline(self):
 
         pipeline1 = Pipeline(
@@ -598,6 +647,7 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(pipeline1, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
@@ -660,11 +710,13 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
+    @pytest.mark.sklearn
+    @unittest.skip("https://github.com/openml/OpenML/issues/1180")
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
     )
-    @unittest.mock.patch("warnings.warn")
+    @mock.patch("warnings.warn")
     def test_run_and_upload_knn_pipeline(self, warnings_mock):
 
         cat_imp = make_pipeline(
@@ -710,6 +762,7 @@ class TestRun(TestBase):
                 call_count += 1
         self.assertEqual(call_count, 3)
 
+    @pytest.mark.sklearn
     def test_run_and_upload_gridsearch(self):
         gridsearch = GridSearchCV(
             BaggingClassifier(base_estimator=SVC()),
@@ -728,6 +781,7 @@ class TestRun(TestBase):
         )
         self.assertEqual(len(run.trace.trace_iterations), 9)
 
+    @pytest.mark.sklearn
     def test_run_and_upload_randomsearch(self):
         randomsearch = RandomizedSearchCV(
             RandomForestClassifier(n_estimators=5),
@@ -759,6 +813,7 @@ class TestRun(TestBase):
         trace = openml.runs.get_run_trace(run.run_id)
         self.assertEqual(len(trace.trace_iterations), 5)
 
+    @pytest.mark.sklearn
     def test_run_and_upload_maskedarrays(self):
         # This testcase is important for 2 reasons:
         # 1) it verifies the correct handling of masked arrays (not all
@@ -781,6 +836,7 @@ class TestRun(TestBase):
 
     ##########################################################################
 
+    @pytest.mark.sklearn
     def test_learning_curve_task_1(self):
         task_id = 801  # diabates dataset
         num_test_instances = 6144  # for learning curve
@@ -800,6 +856,7 @@ class TestRun(TestBase):
         )
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
+    @pytest.mark.sklearn
     def test_learning_curve_task_2(self):
         task_id = 801  # diabates dataset
         num_test_instances = 6144  # for learning curve
@@ -817,8 +874,8 @@ class TestRun(TestBase):
                     RandomizedSearchCV(
                         DecisionTreeClassifier(),
                         {
-                            "min_samples_split": [2 ** x for x in range(1, 8)],
-                            "min_samples_leaf": [2 ** x for x in range(0, 7)],
+                            "min_samples_split": [2**x for x in range(1, 8)],
+                            "min_samples_leaf": [2**x for x in range(0, 7)],
                         },
                         cv=3,
                         n_iter=10,
@@ -831,6 +888,7 @@ class TestRun(TestBase):
         )
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="Pipelines don't support indexing (used for the assert check)",
@@ -860,7 +918,10 @@ class TestRun(TestBase):
 
         task = openml.tasks.get_task(11)  # kr-vs-kp; holdout
         run = openml.runs.run_model_on_task(
-            model=randomsearch, task=task, avoid_duplicate_runs=False, seed=1,
+            model=randomsearch,
+            task=task,
+            avoid_duplicate_runs=False,
+            seed=1,
         )
         run_ = run.publish()
         TestBase._mark_entity_for_removal("run", run.run_id)
@@ -898,12 +959,16 @@ class TestRun(TestBase):
         else:
             tests.append((sklearn.metrics.jaccard_score, {}))
         for test_idx, test in enumerate(tests):
-            alt_scores = run.get_metric_fn(sklearn_fn=test[0], kwargs=test[1],)
+            alt_scores = run.get_metric_fn(
+                sklearn_fn=test[0],
+                kwargs=test[1],
+            )
             self.assertEqual(len(alt_scores), 10)
             for idx in range(len(alt_scores)):
                 self.assertGreaterEqual(alt_scores[idx], 0)
                 self.assertLessEqual(alt_scores[idx], 1)
 
+    @pytest.mark.sklearn
     def test_local_run_swapped_parameter_order_model(self):
         clf = DecisionTreeClassifier()
         australian_task = 595  # Australian; crossvalidation
@@ -911,11 +976,15 @@ class TestRun(TestBase):
 
         # task and clf are purposely in the old order
         run = openml.runs.run_model_on_task(
-            task, clf, avoid_duplicate_runs=False, upload_flow=False,
+            task,
+            clf,
+            avoid_duplicate_runs=False,
+            upload_flow=False,
         )
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -937,11 +1006,15 @@ class TestRun(TestBase):
 
         # invoke OpenML run
         run = openml.runs.run_flow_on_task(
-            task, flow, avoid_duplicate_runs=False, upload_flow=False,
+            task,
+            flow,
+            avoid_duplicate_runs=False,
+            upload_flow=False,
         )
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -962,7 +1035,10 @@ class TestRun(TestBase):
 
         # invoke OpenML run
         run = openml.runs.run_model_on_task(
-            model=clf, task=task, avoid_duplicate_runs=False, upload_flow=False,
+            model=clf,
+            task=task,
+            avoid_duplicate_runs=False,
+            upload_flow=False,
         )
 
         self._test_local_evaluations(run)
@@ -976,6 +1052,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1015,7 +1092,11 @@ class TestRun(TestBase):
             TestBase.logger.info("collected from test_run_functions: {}".format(task_id))
 
         task = openml.tasks.get_task(task_id)
-        run = openml.runs.run_model_on_task(model=clf, task=task, avoid_duplicate_runs=False,)
+        run = openml.runs.run_model_on_task(
+            model=clf,
+            task=task,
+            avoid_duplicate_runs=False,
+        )
         run_ = run.publish()
         TestBase._mark_entity_for_removal("run", run_.run_id)
         TestBase.logger.info("collected from test_run_functions: {}".format(run_.run_id))
@@ -1033,6 +1114,7 @@ class TestRun(TestBase):
         self.assertEqual(flowS.components["Imputer"].parameters["strategy"], '"most_frequent"')
         self.assertEqual(flowS.components["VarianceThreshold"].parameters["threshold"], "0.05")
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1077,16 +1159,17 @@ class TestRun(TestBase):
 
             flow = self.extension.model_to_flow(clf)
             flow_exists = openml.flows.flow_exists(flow.name, flow.external_version)
-            self.assertGreater(flow_exists, 0)
+            self.assertGreater(flow_exists, 0, "Server says flow from run does not exist.")
             # Do NOT use get_flow reinitialization, this potentially sets
             # hyperparameter values wrong. Rather use the local model.
             downloaded_flow = openml.flows.get_flow(flow_exists)
             downloaded_flow.model = clf
             setup_exists = openml.setups.setup_exists(downloaded_flow)
-            self.assertGreater(setup_exists, 0)
+            self.assertGreater(setup_exists, 0, "Server says setup of run does not exist.")
             run_ids = run_exists(task.task_id, setup_exists)
             self.assertTrue(run_ids, msg=(run_ids, clf))
 
+    @pytest.mark.sklearn
     def test_run_with_illegal_flow_id(self):
         # check the case where the user adds an illegal flow id to a
         # non-existing flo
@@ -1100,9 +1183,12 @@ class TestRun(TestBase):
         )
         with self.assertRaisesRegex(openml.exceptions.PyOpenMLError, expected_message_regex):
             openml.runs.run_flow_on_task(
-                task=task, flow=flow, avoid_duplicate_runs=True,
+                task=task,
+                flow=flow,
+                avoid_duplicate_runs=True,
             )
 
+    @pytest.mark.sklearn
     def test_run_with_illegal_flow_id_after_load(self):
         # Same as `test_run_with_illegal_flow_id`, but test this error is also
         # caught if the run is stored to and loaded from disk first.
@@ -1115,7 +1201,11 @@ class TestRun(TestBase):
             task=task, flow=flow, avoid_duplicate_runs=False, upload_flow=False
         )
 
-        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)),)
+        cache_path = os.path.join(
+            self.workdir,
+            "runs",
+            str(random.getrandbits(128)),
+        )
         run.to_filesystem(cache_path)
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 
@@ -1127,6 +1217,7 @@ class TestRun(TestBase):
             TestBase._mark_entity_for_removal("run", loaded_run.run_id)
             TestBase.logger.info("collected from test_run_functions: {}".format(loaded_run.run_id))
 
+    @pytest.mark.sklearn
     def test_run_with_illegal_flow_id_1(self):
         # Check the case where the user adds an illegal flow id to an existing
         # flow. Comes to a different value error than the previous test
@@ -1146,9 +1237,12 @@ class TestRun(TestBase):
         expected_message_regex = "Local flow_id does not match server flow_id: " "'-1' vs '[0-9]+'"
         with self.assertRaisesRegex(openml.exceptions.PyOpenMLError, expected_message_regex):
             openml.runs.run_flow_on_task(
-                task=task, flow=flow_new, avoid_duplicate_runs=True,
+                task=task,
+                flow=flow_new,
+                avoid_duplicate_runs=True,
             )
 
+    @pytest.mark.sklearn
     def test_run_with_illegal_flow_id_1_after_load(self):
         # Same as `test_run_with_illegal_flow_id_1`, but test this error is
         # also caught if the run is stored to and loaded from disk first.
@@ -1169,7 +1263,11 @@ class TestRun(TestBase):
             task=task, flow=flow_new, avoid_duplicate_runs=False, upload_flow=False
         )
 
-        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)),)
+        cache_path = os.path.join(
+            self.workdir,
+            "runs",
+            str(random.getrandbits(128)),
+        )
         run.to_filesystem(cache_path)
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 
@@ -1178,6 +1276,7 @@ class TestRun(TestBase):
             openml.exceptions.PyOpenMLError, expected_message_regex, loaded_run.publish
         )
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="OneHotEncoder cannot handle mixed type DataFrame as input",
@@ -1223,10 +1322,11 @@ class TestRun(TestBase):
             # check row id
             self.assertGreaterEqual(arff_line[2], 0)
             self.assertLessEqual(arff_line[2], num_instances - 1)
+            # check prediction and ground truth columns
+            self.assertIn(arff_line[4], ["won", "nowin"])
+            self.assertIn(arff_line[5], ["won", "nowin"])
             # check confidences
-            self.assertAlmostEqual(sum(arff_line[4:6]), 1.0)
-            self.assertIn(arff_line[6], ["won", "nowin"])
-            self.assertIn(arff_line[7], ["won", "nowin"])
+            self.assertAlmostEqual(sum(arff_line[6:]), 1.0)
 
     def test__create_trace_from_arff(self):
         with open(self.static_cache_dir + "/misc/trace.arff", "r") as arff_file:
@@ -1255,7 +1355,7 @@ class TestRun(TestBase):
         assert "weka" in run.tags
         assert "weka_3.7.12" in run.tags
         assert run.predictions_url == (
-            "https://www.openml.org/data/download/1667125/"
+            "https://api.openml.org/data/download/1667125/"
             "weka_generated_predictions4575715871712251329.arff"
         )
 
@@ -1394,6 +1494,7 @@ class TestRun(TestBase):
         runs = openml.runs.list_runs(tag="curves")
         self.assertGreaterEqual(len(runs), 1)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
@@ -1429,6 +1530,7 @@ class TestRun(TestBase):
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             self.assertEqual(len(row), 12)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
@@ -1480,6 +1582,7 @@ class TestRun(TestBase):
         with self.assertRaises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)
 
+    @pytest.mark.sklearn
     def test_run_flow_on_task_downloaded_flow(self):
         model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
         flow = self.extension.model_to_flow(model)
@@ -1490,7 +1593,10 @@ class TestRun(TestBase):
         downloaded_flow = openml.flows.get_flow(flow.flow_id)
         task = openml.tasks.get_task(self.TEST_SERVER_TASK_SIMPLE["task_id"])
         run = openml.runs.run_flow_on_task(
-            flow=downloaded_flow, task=task, avoid_duplicate_runs=False, upload_flow=False,
+            flow=downloaded_flow,
+            task=task,
+            avoid_duplicate_runs=False,
+            upload_flow=False,
         )
 
         run.publish()
@@ -1569,13 +1675,14 @@ class TestRun(TestBase):
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="couldn't perform local tests successfully w/o bloating RAM",
     )
-    @unittest.mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
+    @mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
     def test__run_task_get_arffcontent_2(self, parallel_mock):
-        """ Tests if a run executed in parallel is collated correctly. """
+        """Tests if a run executed in parallel is collated correctly."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
         x, y = task.get_X_and_y(dataset_format="dataframe")
         num_instances = x.shape[0]
@@ -1622,13 +1729,14 @@ class TestRun(TestBase):
             scores, expected_scores, decimal=2 if os.name == "nt" else 7
         )
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="couldn't perform local tests successfully w/o bloating RAM",
     )
-    @unittest.mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
+    @mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
     def test_joblib_backends(self, parallel_mock):
-        """ Tests evaluation of a run using various joblib backends and n_jobs. """
+        """Tests evaluation of a run using various joblib backends and n_jobs."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
         x, y = task.get_X_and_y(dataset_format="dataframe")
         num_instances = x.shape[0]
@@ -1677,3 +1785,82 @@ class TestRun(TestBase):
             self.assertEqual(len(res[2]["predictive_accuracy"][0]), 10)
             self.assertEqual(len(res[3]["predictive_accuracy"][0]), 10)
             self.assertEqual(parallel_mock.call_count, call_count)
+
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) < "0.20",
+        reason="SimpleImputer doesn't handle mixed type DataFrame as input",
+    )
+    def test_delete_run(self):
+        rs = 1
+        clf = sklearn.pipeline.Pipeline(
+            steps=[("imputer", SimpleImputer()), ("estimator", DecisionTreeClassifier())]
+        )
+        task = openml.tasks.get_task(32)  # diabetes; crossvalidation
+
+        run = openml.runs.run_model_on_task(model=clf, task=task, seed=rs)
+        run.publish()
+        TestBase._mark_entity_for_removal("run", run.run_id)
+        TestBase.logger.info("collected from test_run_functions: {}".format(run.run_id))
+
+        _run_id = run.run_id
+        self.assertTrue(delete_run(_run_id))
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_owned.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLNotAuthorizedError,
+        match="The run can not be deleted because it was not uploaded by you.",
+    ):
+        openml.runs.delete_run(40_000)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/run/40000",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_successful.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=200, content_filepath=content_file
+    )
+
+    success = openml.runs.delete_run(10591880)
+    assert success
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/run/10591880",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)
+
+
+@mock.patch.object(requests.Session, "delete")
+def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
+    openml.config.start_using_configuration_for_example()
+    content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_exist.xml"
+    mock_delete.return_value = create_request_response(
+        status_code=412, content_filepath=content_file
+    )
+
+    with pytest.raises(
+        OpenMLServerException,
+        match="Run does not exist",
+    ):
+        openml.runs.delete_run(9_999_999)
+
+    expected_call_args = [
+        ("https://test.openml.org/api/v1/xml/run/9999999",),
+        {"params": {"api_key": test_api_key}},
+    ]
+    assert expected_call_args == list(mock_delete.call_args)

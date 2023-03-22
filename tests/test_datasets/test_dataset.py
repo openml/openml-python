@@ -143,6 +143,7 @@ class OpenMLDatasetTest(TestBase):
             self.assertTrue(X[col_name].dtype.name == col_dtype[col_name])
         self.assertTrue(y.dtype.name == col_dtype["survived"])
 
+    @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
     def test_get_data_boolean_pandas(self):
         # test to check that we are converting properly True and False even
         # with some inconsistency when dumping the data on openml
@@ -170,6 +171,7 @@ class OpenMLDatasetTest(TestBase):
 
         self.assertEqual(dtype.name, expected_type)
 
+    @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
     def test_get_data_with_rowid(self):
         self.dataset.row_id_attribute = "condition"
         rval, _, categorical, _ = self.dataset.get_data(include_row_id=True)
@@ -196,6 +198,7 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual(len(attribute_names), 38)
         self.assertNotIn("class", attribute_names)
 
+    @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
     def test_get_data_with_target_pandas(self):
         X, y, categorical, attribute_names = self.dataset.get_data(target="class")
         self.assertIsInstance(X, pd.DataFrame)
@@ -220,6 +223,7 @@ class OpenMLDatasetTest(TestBase):
         self.assertListEqual(categorical, cats)
         self.assertEqual(y.shape, (898,))
 
+    @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
     def test_get_data_with_ignore_attributes(self):
         self.dataset.ignore_attribute = ["condition"]
         rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=True)

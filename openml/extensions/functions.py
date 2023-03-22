@@ -30,7 +30,8 @@ def register_extension(extension: Type[Extension]) -> None:
 
 
 def get_extension_by_flow(
-    flow: "OpenMLFlow", raise_if_no_extension: bool = False,
+    flow: "OpenMLFlow",
+    raise_if_no_extension: bool = False,
 ) -> Optional[Extension]:
     """Get an extension which can handle the given flow.
 
@@ -66,7 +67,10 @@ def get_extension_by_flow(
         )
 
 
-def get_extension_by_model(model: Any, raise_if_no_extension: bool = False,) -> Optional[Extension]:
+def get_extension_by_model(
+    model: Any,
+    raise_if_no_extension: bool = False,
+) -> Optional[Extension]:
     """Get an extension which can handle the given flow.
 
     Iterates all registered extensions and checks whether they can handle the presented model.

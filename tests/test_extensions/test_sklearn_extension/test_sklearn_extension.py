@@ -5,6 +5,7 @@ import json
 import re
 import os
 import sys
+from typing import Any
 import unittest
 from distutils.version import LooseVersion
 from collections import OrderedDict
@@ -14,6 +15,7 @@ from packaging import version
 
 import numpy as np
 import pandas as pd
+import pytest
 import scipy.optimize
 import scipy.stats
 import sklearn.base
@@ -72,6 +74,45 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.y = iris.target
 
         self.extension = SklearnExtension()
+
+    def _get_expected_pipeline_description(self, model: Any) -> str:
+        if version.parse(sklearn.__version__) >= version.parse("1.0"):
+            expected_fixture = (
+                "Pipeline of transforms with a final estimator.\n\nSequentially"
+                " apply a list of transforms and a final estimator.\n"
+                "Intermediate steps of the pipeline must be 'transforms', that "
+                "is, they\nmust implement `fit` and `transform` methods.\nThe final "
+                "estimator only needs to implement `fit`.\nThe transformers in "
+                "the pipeline can be cached using ``memory`` argument.\n\nThe "
+                "purpose of the pipeline is to assemble several steps that can "
+                "be\ncross-validated together while setting different parameters"
+                ". For this, it\nenables setting parameters of the various steps"
+                " using their names and the\nparameter name separated by a `'__'`,"
+                " as in the example below. A step's\nestimator may be replaced "
+                "entirely by setting the parameter with its name\nto another "
+                "estimator, or a transformer removed by setting it to\n"
+                "`'passthrough'` or `None`."
+            )
+        elif version.parse(sklearn.__version__) >= version.parse("0.21.0"):
+            expected_fixture = (
+                "Pipeline of transforms with a final estimator.\n\nSequentially"
+                " apply a list of transforms and a final estimator.\n"
+                "Intermediate steps of the pipeline must be 'transforms', that "
+                "is, they\nmust implement fit and transform methods.\nThe final "
+                "estimator only needs to implement fit.\nThe transformers in "
+                "the pipeline can be cached using ``memory`` argument.\n\nThe "
+                "purpose of the pipeline is to assemble several steps that can "
+                "be\ncross-validated together while setting different parameters"
+                ".\nFor this, it enables setting parameters of the various steps"
+                " using their\nnames and the parameter name separated by a '__',"
+                " as in the example below.\nA step's estimator may be replaced "
+                "entirely by setting the parameter\nwith its name to another "
+                "estimator, or a transformer removed by setting\nit to "
+                "'passthrough' or ``None``."
+            )
+        else:
+            expected_fixture = self.extension._get_sklearn_description(model)
+        return expected_fixture
 
     def _serialization_test_helper(
         self, model, X, y, subcomponent_parameters, dependencies_mock_call_count=(1, 2)
@@ -136,6 +177,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
             return serialization, new_model
 
+    @pytest.mark.sklearn
     def test_serialize_model(self):
         model = sklearn.tree.DecisionTreeClassifier(
             criterion="entropy", max_features="auto", max_leaf_nodes=2000
@@ -168,7 +210,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("splitter", '"best"'),
                 )
             )
-        else:
+        elif LooseVersion(sklearn.__version__) < "1.0":
             fixture_parameters = OrderedDict(
                 (
                     ("class_weight", "null"),
@@ -186,6 +228,24 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("splitter", '"best"'),
                 )
             )
+        else:
+            fixture_parameters = OrderedDict(
+                (
+                    ("class_weight", "null"),
+                    ("criterion", '"entropy"'),
+                    ("max_depth", "null"),
+                    ("max_features", '"auto"'),
+                    ("max_leaf_nodes", "2000"),
+                    ("min_impurity_decrease", "0.0"),
+                    ("min_samples_leaf", "1"),
+                    ("min_samples_split", "2"),
+                    ("min_weight_fraction_leaf", "0.0"),
+                    ("presort", presort_val),
+                    ("random_state", "null"),
+                    ("splitter", '"best"'),
+                )
+            )
+
         if LooseVersion(sklearn.__version__) >= "0.22":
             fixture_parameters.update({"ccp_alpha": "0.0"})
             fixture_parameters.move_to_end("ccp_alpha", last=False)
@@ -207,6 +267,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(serialization.dependencies, version_fixture)
         self.assertDictEqual(structure, structure_fixture)
 
+    @pytest.mark.sklearn
     def test_can_handle_flow(self):
         openml.config.server = self.production_server
 
@@ -217,6 +278,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         openml.config.server = self.test_server
 
+    @pytest.mark.sklearn
     def test_serialize_model_clustering(self):
         model = sklearn.cluster.KMeans()
 
@@ -249,7 +311,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("verbose", "0"),
                 )
             )
-        else:
+        elif LooseVersion(sklearn.__version__) < "1.0":
             fixture_parameters = OrderedDict(
                 (
                     ("algorithm", '"auto"'),
@@ -265,6 +327,35 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("verbose", "0"),
                 )
             )
+        elif LooseVersion(sklearn.__version__) < "1.1":
+            fixture_parameters = OrderedDict(
+                (
+                    ("algorithm", '"auto"'),
+                    ("copy_x", "true"),
+                    ("init", '"k-means++"'),
+                    ("max_iter", "300"),
+                    ("n_clusters", "8"),
+                    ("n_init", "10"),
+                    ("random_state", "null"),
+                    ("tol", "0.0001"),
+                    ("verbose", "0"),
+                )
+            )
+        else:
+            n_init = '"warn"' if LooseVersion(sklearn.__version__) >= "1.2" else "10"
+            fixture_parameters = OrderedDict(
+                (
+                    ("algorithm", '"lloyd"'),
+                    ("copy_x", "true"),
+                    ("init", '"k-means++"'),
+                    ("max_iter", "300"),
+                    ("n_clusters", "8"),
+                    ("n_init", n_init),
+                    ("random_state", "null"),
+                    ("tol", "0.0001"),
+                    ("verbose", "0"),
+                )
+            )
         fixture_structure = {"sklearn.cluster.{}.KMeans".format(cluster_name): []}
 
         serialization, _ = self._serialization_test_helper(
@@ -272,14 +363,15 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         structure = serialization.get_structure("name")
 
-        self.assertEqual(serialization.name, fixture_name)
-        self.assertEqual(serialization.class_name, fixture_name)
-        self.assertEqual(serialization.custom_name, fixture_short_name)
-        self.assertEqual(serialization.description, fixture_description)
-        self.assertEqual(serialization.parameters, fixture_parameters)
-        self.assertEqual(serialization.dependencies, version_fixture)
-        self.assertDictEqual(structure, fixture_structure)
+        assert serialization.name == fixture_name
+        assert serialization.class_name == fixture_name
+        assert serialization.custom_name == fixture_short_name
+        assert serialization.description == fixture_description
+        assert serialization.parameters == fixture_parameters
+        assert serialization.dependencies == version_fixture
+        assert structure == fixture_structure
 
+    @pytest.mark.sklearn
     def test_serialize_model_with_subcomponent(self):
         model = sklearn.ensemble.AdaBoostClassifier(
             n_estimators=100, base_estimator=sklearn.tree.DecisionTreeClassifier()
@@ -340,6 +432,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         self.assertDictEqual(structure, fixture_structure)
 
+    @pytest.mark.sklearn
     def test_serialize_pipeline(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         dummy = sklearn.dummy.DummyClassifier(strategy="prior")
@@ -352,27 +445,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             "dummy=sklearn.dummy.DummyClassifier)".format(scaler_name)
         )
         fixture_short_name = "sklearn.Pipeline(StandardScaler,DummyClassifier)"
-
-        if version.parse(sklearn.__version__) >= version.parse("0.21.0"):
-            fixture_description = (
-                "Pipeline of transforms with a final estimator.\n\nSequentially"
-                " apply a list of transforms and a final estimator.\n"
-                "Intermediate steps of the pipeline must be 'transforms', that "
-                "is, they\nmust implement fit and transform methods.\nThe final "
-                "estimator only needs to implement fit.\nThe transformers in "
-                "the pipeline can be cached using ``memory`` argument.\n\nThe "
-                "purpose of the pipeline is to assemble several steps that can "
-                "be\ncross-validated together while setting different parameters"
-                ".\nFor this, it enables setting parameters of the various steps"
-                " using their\nnames and the parameter name separated by a '__',"
-                " as in the example below.\nA step's estimator may be replaced "
-                "entirely by setting the parameter\nwith its name to another "
-                "estimator, or a transformer removed by setting\nit to "
-                "'passthrough' or ``None``."
-            )
-        else:
-            fixture_description = self.extension._get_sklearn_description(model)
-
+        fixture_description = self._get_expected_pipeline_description(model)
         fixture_structure = {
             fixture_name: [],
             "sklearn.preprocessing.{}.StandardScaler".format(scaler_name): ["scaler"],
@@ -429,6 +502,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertIsNot(new_model.steps[0][1], model.steps[0][1])
         self.assertIsNot(new_model.steps[1][1], model.steps[1][1])
 
+    @pytest.mark.sklearn
     def test_serialize_pipeline_clustering(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         km = sklearn.cluster.KMeans()
@@ -442,26 +516,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             "clusterer=sklearn.cluster.{}.KMeans)".format(scaler_name, cluster_name)
         )
         fixture_short_name = "sklearn.Pipeline(StandardScaler,KMeans)"
-
-        if version.parse(sklearn.__version__) >= version.parse("0.21.0"):
-            fixture_description = (
-                "Pipeline of transforms with a final estimator.\n\nSequentially"
-                " apply a list of transforms and a final estimator.\n"
-                "Intermediate steps of the pipeline must be 'transforms', that "
-                "is, they\nmust implement fit and transform methods.\nThe final "
-                "estimator only needs to implement fit.\nThe transformers in "
-                "the pipeline can be cached using ``memory`` argument.\n\nThe "
-                "purpose of the pipeline is to assemble several steps that can "
-                "be\ncross-validated together while setting different parameters"
-                ".\nFor this, it enables setting parameters of the various steps"
-                " using their\nnames and the parameter name separated by a '__',"
-                " as in the example below.\nA step's estimator may be replaced "
-                "entirely by setting the parameter\nwith its name to another "
-                "estimator, or a transformer removed by setting\nit to "
-                "'passthrough' or ``None``."
-            )
-        else:
-            fixture_description = self.extension._get_sklearn_description(model)
+        fixture_description = self._get_expected_pipeline_description(model)
         fixture_structure = {
             fixture_name: [],
             "sklearn.preprocessing.{}.StandardScaler".format(scaler_name): ["scaler"],
@@ -516,6 +571,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertIsNot(new_model.steps[0][1], model.steps[0][1])
         self.assertIsNot(new_model.steps[1][1], model.steps[1][1])
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
@@ -574,6 +630,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(serialization.description, fixture_description)
         self.assertDictEqual(structure, fixture_structure)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
@@ -619,27 +676,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             fixture_name: [],
         }
 
-        if version.parse(sklearn.__version__) >= version.parse("0.21.0"):
-            # str obtained from self.extension._get_sklearn_description(model)
-            fixture_description = (
-                "Pipeline of transforms with a final estimator.\n\nSequentially"
-                " apply a list of transforms and a final estimator.\n"
-                "Intermediate steps of the pipeline must be 'transforms', that "
-                "is, they\nmust implement fit and transform methods.\nThe final"
-                " estimator only needs to implement fit.\nThe transformers in "
-                "the pipeline can be cached using ``memory`` argument.\n\nThe "
-                "purpose of the pipeline is to assemble several steps that can "
-                "be\ncross-validated together while setting different "
-                "parameters.\nFor this, it enables setting parameters of the "
-                "various steps using their\nnames and the parameter name "
-                "separated by a '__', as in the example below.\nA step's "
-                "estimator may be replaced entirely by setting the parameter\n"
-                "with its name to another estimator, or a transformer removed by"
-                " setting\nit to 'passthrough' or ``None``."
-            )
-        else:
-            fixture_description = self.extension._get_sklearn_description(model)
-
+        fixture_description = self._get_expected_pipeline_description(model)
         serialization, new_model = self._serialization_test_helper(
             model,
             X=None,
@@ -660,6 +697,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         self.assertDictEqual(structure, fixture_structure)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20", reason="Pipeline processing behaviour updated"
     )
@@ -728,6 +766,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         self.assertIs(new_model.transformer_list[1][1], "drop")
 
+    @pytest.mark.sklearn
     def test_serialize_feature_union_switched_names(self):
         ohe_params = {"categories": "auto"} if LooseVersion(sklearn.__version__) >= "0.20" else {}
         ohe = sklearn.preprocessing.OneHotEncoder(**ohe_params)
@@ -736,10 +775,18 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fu2 = sklearn.pipeline.FeatureUnion(transformer_list=[("scaler", ohe), ("ohe", scaler)])
 
         fu1_serialization, _ = self._serialization_test_helper(
-            fu1, X=None, y=None, subcomponent_parameters=(), dependencies_mock_call_count=(3, 6),
+            fu1,
+            X=None,
+            y=None,
+            subcomponent_parameters=(),
+            dependencies_mock_call_count=(3, 6),
         )
         fu2_serialization, _ = self._serialization_test_helper(
-            fu2, X=None, y=None, subcomponent_parameters=(), dependencies_mock_call_count=(3, 6),
+            fu2,
+            X=None,
+            y=None,
+            subcomponent_parameters=(),
+            dependencies_mock_call_count=(3, 6),
         )
 
         # OneHotEncoder was moved to _encoders module in 0.20
@@ -760,6 +807,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             "ohe=sklearn.preprocessing.{}.StandardScaler)".format(module_name_encoder, scaler_name),
         )
 
+    @pytest.mark.sklearn
     def test_serialize_complex_flow(self):
         ohe = sklearn.preprocessing.OneHotEncoder(handle_unknown="ignore")
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
@@ -820,6 +868,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(serialized.name, fixture_name)
         self.assertEqual(structure, fixture_structure)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="Pipeline till 0.20 doesn't support 'passthrough'",
@@ -915,14 +964,19 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertIsInstance(extracted_info[2]["drop"], OpenMLFlow)
         self.assertEqual(extracted_info[2]["drop"].name, "drop")
 
+    @pytest.mark.sklearn
     def test_serialize_type(self):
-        supported_types = [float, np.float, np.float32, np.float64, int, np.int, np.int32, np.int64]
+        supported_types = [float, np.float32, np.float64, int, np.int32, np.int64]
+        if LooseVersion(np.__version__) < "1.24":
+            supported_types.append(np.float)
+            supported_types.append(np.int)
 
         for supported_type in supported_types:
             serialized = self.extension.model_to_flow(supported_type)
             deserialized = self.extension.flow_to_model(serialized)
             self.assertEqual(deserialized, supported_type)
 
+    @pytest.mark.sklearn
     def test_serialize_rvs(self):
         supported_rvs = [
             scipy.stats.norm(loc=1, scale=5),
@@ -938,11 +992,13 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             del supported_rv.dist
             self.assertEqual(deserialized.__dict__, supported_rv.__dict__)
 
+    @pytest.mark.sklearn
     def test_serialize_function(self):
         serialized = self.extension.model_to_flow(sklearn.feature_selection.chi2)
         deserialized = self.extension.flow_to_model(serialized)
         self.assertEqual(deserialized, sklearn.feature_selection.chi2)
 
+    @pytest.mark.sklearn
     def test_serialize_cvobject(self):
         methods = [sklearn.model_selection.KFold(3), sklearn.model_selection.LeaveOneOut()]
         fixtures = [
@@ -992,6 +1048,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.assertIsNot(m_new, m)
             self.assertIsInstance(m_new, type(method))
 
+    @pytest.mark.sklearn
     def test_serialize_simple_parameter_grid(self):
 
         # We cannot easily test for scipy random variables in here, but they
@@ -1039,6 +1096,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             del deserialized_params["estimator"]
             self.assertEqual(hpo_params, deserialized_params)
 
+    @pytest.mark.sklearn
     @unittest.skip(
         "This feature needs further reworking. If we allow several "
         "components, we need to register them all in the downstream "
@@ -1093,6 +1151,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(grid[1]["reduce_dim__k"], deserialized[1]["reduce_dim__k"])
         self.assertEqual(grid[1]["classify__C"], deserialized[1]["classify__C"])
 
+    @pytest.mark.sklearn
     def test_serialize_advanced_grid_fails(self):
         # This unit test is checking that the test we skip above would actually fail
 
@@ -1104,13 +1163,15 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         }
 
         clf = sklearn.model_selection.GridSearchCV(
-            sklearn.ensemble.BaggingClassifier(), param_grid=param_grid,
+            sklearn.ensemble.BaggingClassifier(),
+            param_grid=param_grid,
         )
         with self.assertRaisesRegex(
             TypeError, re.compile(r".*OpenML.*Flow.*is not JSON serializable", flags=re.DOTALL)
         ):
             self.extension.model_to_flow(clf)
 
+    @pytest.mark.sklearn
     def test_serialize_resampling(self):
         kfold = sklearn.model_selection.StratifiedKFold(n_splits=4, shuffle=True)
         serialized = self.extension.model_to_flow(kfold)
@@ -1119,6 +1180,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(str(deserialized), str(kfold))
         self.assertIsNot(deserialized, kfold)
 
+    @pytest.mark.sklearn
     def test_hypothetical_parameter_values(self):
         # The hypothetical parameter values of true, 1, 0.1 formatted as a
         # string (and their correct serialization and deserialization) an only
@@ -1132,6 +1194,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertEqual(deserialized.get_params(), model.get_params())
         self.assertIsNot(deserialized, model)
 
+    @pytest.mark.sklearn
     def test_gaussian_process(self):
         opt = scipy.optimize.fmin_l_bfgs_b
         kernel = sklearn.gaussian_process.kernels.Matern()
@@ -1142,6 +1205,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         ):
             self.extension.model_to_flow(gp)
 
+    @pytest.mark.sklearn
     def test_error_on_adding_component_multiple_times_to_flow(self):
         # this function implicitly checks
         # - openml.flows._check_multiple_occurence_of_component_in_flow()
@@ -1166,6 +1230,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         with self.assertRaisesRegex(ValueError, fixture):
             self.extension.model_to_flow(pipeline2)
 
+    @pytest.mark.sklearn
     def test_subflow_version_propagated(self):
         this_directory = os.path.dirname(os.path.abspath(__file__))
         tests_directory = os.path.abspath(os.path.join(this_directory, "..", ".."))
@@ -1190,12 +1255,14 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             ),
         )
 
+    @pytest.mark.sklearn
     @mock.patch("warnings.warn")
     def test_check_dependencies(self, warnings_mock):
         dependencies = ["sklearn==0.1", "sklearn>=99.99.99", "sklearn>99.99.99"]
         for dependency in dependencies:
             self.assertRaises(ValueError, self.extension._check_dependencies, dependency)
 
+    @pytest.mark.sklearn
     def test_illegal_parameter_names(self):
         # illegal name: estimators
         clf1 = sklearn.ensemble.VotingClassifier(
@@ -1215,36 +1282,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         for case in cases:
             self.assertRaises(PyOpenMLError, self.extension.model_to_flow, case)
 
-    def test_illegal_parameter_names_pipeline(self):
-        # illegal name: steps
-        steps = [
-            ("Imputer", SimpleImputer(strategy="median")),
-            (
-                "OneHotEncoder",
-                sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
-            ),
-            (
-                "steps",
-                sklearn.ensemble.BaggingClassifier(
-                    base_estimator=sklearn.tree.DecisionTreeClassifier
-                ),
-            ),
-        ]
-        self.assertRaises(ValueError, sklearn.pipeline.Pipeline, steps=steps)
-
-    def test_illegal_parameter_names_featureunion(self):
-        # illegal name: transformer_list
-        transformer_list = [
-            ("transformer_list", SimpleImputer(strategy="median")),
-            (
-                "OneHotEncoder",
-                sklearn.preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
-            ),
-        ]
-        self.assertRaises(
-            ValueError, sklearn.pipeline.FeatureUnion, transformer_list=transformer_list
-        )
-
+    @pytest.mark.sklearn
     def test_paralizable_check(self):
         # using this model should pass the test (if param distribution is
         # legal)
@@ -1294,6 +1332,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             with self.assertRaises(PyOpenMLError):
                 self.extension._prevent_optimize_n_jobs(model)
 
+    @pytest.mark.sklearn
     def test__get_fn_arguments_with_defaults(self):
         sklearn_version = LooseVersion(sklearn.__version__)
         if sklearn_version < "0.19":
@@ -1326,10 +1365,17 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 (sklearn.tree.DecisionTreeClassifier.__init__, 14),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
-        else:
+        elif sklearn_version < "1.0":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 18),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 13),
+                (sklearn.pipeline.Pipeline.__init__, 2),
+            ]
+        else:
+            # Tested with 1.0 and 1.1
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 17),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 12),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
 
@@ -1344,6 +1390,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.assertSetEqual(set(defaults.keys()), set(defaults.keys()) - defaultless)
             self.assertSetEqual(defaultless, defaultless - set(defaults.keys()))
 
+    @pytest.mark.sklearn
     def test_deserialize_with_defaults(self):
         # used the 'initialize_with_defaults' flag of the deserialization
         # method to return a flow that contains default hyperparameter
@@ -1379,6 +1426,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.extension.model_to_flow(pipe_deserialized),
         )
 
+    @pytest.mark.sklearn
     def test_deserialize_adaboost_with_defaults(self):
         # used the 'initialize_with_defaults' flag of the deserialization
         # method to return a flow that contains default hyperparameter
@@ -1417,6 +1465,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.extension.model_to_flow(pipe_deserialized),
         )
 
+    @pytest.mark.sklearn
     def test_deserialize_complex_with_defaults(self):
         # used the 'initialize_with_defaults' flag of the deserialization
         # method to return a flow that contains default hyperparameter
@@ -1428,9 +1477,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "Estimator",
                 sklearn.ensemble.AdaBoostClassifier(
                     sklearn.ensemble.BaggingClassifier(
-                        sklearn.ensemble.GradientBoostingClassifier(
-                            sklearn.neighbors.KNeighborsClassifier()
-                        )
+                        sklearn.ensemble.GradientBoostingClassifier()
                     )
                 ),
             ),
@@ -1438,24 +1485,19 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         pipe_orig = sklearn.pipeline.Pipeline(steps=steps)
 
         pipe_adjusted = sklearn.clone(pipe_orig)
-        if LooseVersion(sklearn.__version__) < "0.23":
-            params = {
-                "Imputer__strategy": "median",
-                "OneHotEncoder__sparse": False,
-                "Estimator__n_estimators": 10,
-                "Estimator__base_estimator__n_estimators": 10,
-                "Estimator__base_estimator__base_estimator__learning_rate": 0.1,
-                "Estimator__base_estimator__base_estimator__loss__n_neighbors": 13,
-            }
-        else:
-            params = {
-                "Imputer__strategy": "mean",
-                "OneHotEncoder__sparse": True,
-                "Estimator__n_estimators": 50,
-                "Estimator__base_estimator__n_estimators": 10,
-                "Estimator__base_estimator__base_estimator__learning_rate": 0.1,
-                "Estimator__base_estimator__base_estimator__loss__n_neighbors": 5,
-            }
+        impute_strategy = "median" if LooseVersion(sklearn.__version__) < "0.23" else "mean"
+        sparse = LooseVersion(sklearn.__version__) >= "0.23"
+        estimator_name = (
+            "base_estimator" if LooseVersion(sklearn.__version__) < "1.2" else "estimator"
+        )
+        params = {
+            "Imputer__strategy": impute_strategy,
+            "OneHotEncoder__sparse": sparse,
+            "Estimator__n_estimators": 10,
+            f"Estimator__{estimator_name}__n_estimators": 10,
+            f"Estimator__{estimator_name}__{estimator_name}__learning_rate": 0.1,
+        }
+
         pipe_adjusted.set_params(**params)
         flow = self.extension.model_to_flow(pipe_adjusted)
         pipe_deserialized = self.extension.flow_to_model(flow, initialize_with_defaults=True)
@@ -1467,6 +1509,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.extension.model_to_flow(pipe_deserialized),
         )
 
+    @pytest.mark.sklearn
     def test_openml_param_name_to_sklearn(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         boosting = sklearn.ensemble.AdaBoostClassifier(
@@ -1501,6 +1544,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             openml_name = "%s(%s)_%s" % (subflow.name, subflow.version, splitted[-1])
             self.assertEqual(parameter.full_name, openml_name)
 
+    @pytest.mark.sklearn
     def test_obtain_parameter_values_flow_not_from_server(self):
         model = sklearn.linear_model.LogisticRegression(solver="lbfgs")
         flow = self.extension.model_to_flow(model)
@@ -1513,13 +1557,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             self.extension.obtain_parameter_values(flow)
 
         model = sklearn.ensemble.AdaBoostClassifier(
-            base_estimator=sklearn.linear_model.LogisticRegression(solver="lbfgs",)
+            base_estimator=sklearn.linear_model.LogisticRegression(
+                solver="lbfgs",
+            )
         )
         flow = self.extension.model_to_flow(model)
         flow.flow_id = 1
         with self.assertRaisesRegex(ValueError, msg):
             self.extension.obtain_parameter_values(flow)
 
+    @pytest.mark.sklearn
     def test_obtain_parameter_values(self):
 
         model = sklearn.model_selection.RandomizedSearchCV(
@@ -1545,15 +1592,17 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 self.assertEqual(parameter["oml:value"], "5")
                 self.assertEqual(parameter["oml:component"], 2)
 
+    @pytest.mark.sklearn
     def test_numpy_type_allowed_in_flow(self):
-        """ Simple numpy types should be serializable. """
+        """Simple numpy types should be serializable."""
         dt = sklearn.tree.DecisionTreeClassifier(
             max_depth=np.float64(3.0), min_samples_leaf=np.int32(5)
         )
         self.extension.model_to_flow(dt)
 
+    @pytest.mark.sklearn
     def test_numpy_array_not_allowed_in_flow(self):
-        """ Simple numpy arrays should not be serializable. """
+        """Simple numpy arrays should not be serializable."""
         bin = sklearn.preprocessing.MultiLabelBinarizer(classes=np.asarray([1, 2, 3]))
         with self.assertRaises(TypeError):
             self.extension.model_to_flow(bin)
@@ -1569,6 +1618,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
     ################################################################################################
     # Test methods for performing runs with this extension module
 
+    @pytest.mark.sklearn
     def test_run_model_on_task(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         # using most_frequent imputer since dataset has mixed types and to keep things simple
@@ -1580,6 +1630,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         )
         openml.runs.run_model_on_task(pipe, task, dataset_format="array")
 
+    @pytest.mark.sklearn
     def test_seed_model(self):
         # randomized models that are initialized without seeds, can be seeded
         randomized_clfs = [
@@ -1622,6 +1673,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             if idx == 1:
                 self.assertEqual(clf.cv.random_state, 56422)
 
+    @pytest.mark.sklearn
     def test_seed_model_raises(self):
         # the _set_model_seed_where_none should raise exception if random_state is
         # anything else than an int
@@ -1634,6 +1686,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             with self.assertRaises(ValueError):
                 self.extension.seed_model(model=clf, seed=42)
 
+    @pytest.mark.sklearn
     def test_run_model_on_fold_classification_1_array(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
 
@@ -1690,6 +1743,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             check_scores=False,
         )
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="SimpleImputer, ColumnTransformer available only after 0.19 and "
@@ -1761,6 +1815,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             check_scores=False,
         )
 
+    @pytest.mark.sklearn
     def test_run_model_on_fold_classification_2(self):
         task = openml.tasks.get_task(7)  # kr-vs-kp; crossvalidation
 
@@ -1772,7 +1827,8 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y[test_indices]
 
         pipeline = sklearn.model_selection.GridSearchCV(
-            sklearn.tree.DecisionTreeClassifier(), {"max_depth": [1, 2]},
+            sklearn.tree.DecisionTreeClassifier(),
+            {"max_depth": [1, 2]},
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
@@ -1813,13 +1869,11 @@ class TestSklearnExtensionRunFunctions(TestBase):
             check_scores=False,
         )
 
+    @pytest.mark.sklearn
     def test_run_model_on_fold_classification_3(self):
         class HardNaiveBayes(sklearn.naive_bayes.GaussianNB):
             # class for testing a naive bayes classifier that does not allow soft
             # predictions
-            def __init__(self, priors=None):
-                super(HardNaiveBayes, self).__init__(priors)
-
             def predict_proba(*args, **kwargs):
                 raise AttributeError("predict_proba is not available when " "probability=False")
 
@@ -1886,6 +1940,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 X_test.shape[0] * len(task.class_labels),
             )
 
+    @pytest.mark.sklearn
     def test_run_model_on_fold_regression(self):
         # There aren't any regression tasks on the test server
         openml.config.server = self.production_server
@@ -1935,6 +1990,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             check_scores=False,
         )
 
+    @pytest.mark.sklearn
     def test_run_model_on_fold_clustering(self):
         # There aren't any regression tasks on the test server
         openml.config.server = self.production_server
@@ -1947,7 +2003,11 @@ class TestSklearnExtensionRunFunctions(TestBase):
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
-            model=pipeline, task=task, fold_no=0, rep_no=0, X_train=X,
+            model=pipeline,
+            task=task,
+            fold_no=0,
+            rep_no=0,
+            X_train=X,
         )
 
         y_hat, y_hat_proba, user_defined_measures, trace = res
@@ -1973,6 +2033,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             check_scores=False,
         )
 
+    @pytest.mark.sklearn
     def test__extract_trace_data(self):
 
         param_grid = {
@@ -1984,7 +2045,9 @@ class TestSklearnExtensionRunFunctions(TestBase):
         num_iters = 10
         task = openml.tasks.get_task(20)  # balance-scale; crossvalidation
         clf = sklearn.model_selection.RandomizedSearchCV(
-            sklearn.neural_network.MLPClassifier(), param_grid, num_iters,
+            sklearn.neural_network.MLPClassifier(),
+            param_grid,
+            n_iter=num_iters,
         )
         # just run the task on the model (without invoking any fancy extension & openml code)
         train, _ = task.get_train_test_split_indices(0, 0)
@@ -2022,6 +2085,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 param_value = json.loads(trace_iteration.parameters[param_in_trace])
                 self.assertTrue(param_value in param_grid[param])
 
+    @pytest.mark.sklearn
     def test_trim_flow_name(self):
         import re
 
@@ -2084,6 +2148,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             "weka.IsolationForest", SklearnExtension.trim_flow_name("weka.IsolationForest")
         )
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.21",
         reason="SimpleImputer, ColumnTransformer available only after 0.19 and "
@@ -2149,7 +2214,8 @@ class TestSklearnExtensionRunFunctions(TestBase):
         self.assertEqual(flow.components["prep"].class_name, "sklearn.pipeline.Pipeline")
         self.assertIsInstance(flow.components["prep"].components["columntransformer"], OpenMLFlow)
         self.assertIsInstance(
-            flow.components["prep"].components["columntransformer"].components["cat"], OpenMLFlow,
+            flow.components["prep"].components["columntransformer"].components["cat"],
+            OpenMLFlow,
         )
         self.assertEqual(
             flow.components["prep"].components["columntransformer"].components["cat"].name, "drop"
@@ -2172,6 +2238,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         self.assertEqual(len(new_model.named_steps), 3)
         self.assertEqual(new_model.named_steps["dummystep"], "passthrough")
 
+    @pytest.mark.sklearn
     def test_sklearn_serialization_with_none_step(self):
         msg = (
             "Cannot serialize objects of None type. Please use a valid "
@@ -2184,13 +2251,13 @@ class TestSklearnExtensionRunFunctions(TestBase):
         with self.assertRaisesRegex(ValueError, msg):
             self.extension.model_to_flow(clf)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",
     )
     def test_failed_serialization_of_custom_class(self):
-        """Test to check if any custom class inherited from sklearn expectedly fails serialization
-        """
+        """Check if any custom class inherited from sklearn expectedly fails serialization"""
         try:
             from sklearn.impute import SimpleImputer
         except ImportError:
@@ -2220,6 +2287,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             else:
                 raise Exception(e)
 
+    @pytest.mark.sklearn
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="columntransformer introduction in 0.20.0",

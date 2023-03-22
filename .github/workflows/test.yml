@@ -1,0 +1,117 @@
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: (${{ matrix.os }}, Py${{ matrix.python-version }}, sk${{ matrix.scikit-learn }}, sk-only:${{ matrix.sklearn-only }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+        scikit-learn: [0.21.2, 0.22.2, 0.23.1, 0.24]
+        os: [ubuntu-latest]
+        sklearn-only: ['true']
+        exclude:  # no scikit-learn 0.21.2 release for Python 3.8
+          - python-version: 3.8
+            scikit-learn: 0.21.2
+        include:
+          - python-version: 3.6
+            scikit-learn: 0.18.2
+            scipy: 1.2.0
+            os: ubuntu-20.04 
+            sklearn-only: 'true'
+          - python-version: 3.6
+            scikit-learn: 0.19.2
+            os: ubuntu-20.04 
+            sklearn-only: 'true'
+          - python-version: 3.6
+            scikit-learn: 0.20.2
+            os: ubuntu-20.04 
+            sklearn-only: 'true'
+          - python-version: 3.6
+            scikit-learn: 0.21.2
+            os: ubuntu-20.04 
+            sklearn-only: 'true'
+          - python-version: 3.6
+            scikit-learn: 0.22.2
+            os: ubuntu-20.04 
+            sklearn-only: 'true'
+          - python-version: 3.6
+            scikit-learn: 0.23.1
+            os: ubuntu-20.04 
+            sklearn-only: 'true'
+          - python-version: 3.6
+            scikit-learn: 0.24
+            os: ubuntu-20.04 
+            sklearn-only: 'true'
+          - python-version: 3.8
+            scikit-learn: 0.23.1
+            code-cov: true
+            sklearn-only: 'false'
+            os: ubuntu-latest
+          - os: windows-latest
+            sklearn-only: 'false'
+            scikit-learn: 0.24.*
+      fail-fast:  false
+      max-parallel: 4
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
+    - name: Setup Python ${{ matrix.python-version }}
+      if: matrix.os != 'windows-latest'  # windows-latest only uses preinstalled Python (3.7.9)
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install test dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[test]
+    - name: Install scikit-learn ${{ matrix.scikit-learn }}
+      run: |
+        pip install scikit-learn==${{ matrix.scikit-learn }}
+    - name: Install numpy for Python 3.8
+      # Python 3.8 & scikit-learn<0.24 requires numpy<=1.23.5
+      if: ${{ matrix.python-version == '3.8' && contains(fromJSON('["0.23.1", "0.22.2", "0.21.2"]'), matrix.scikit-learn) }}
+      run: |
+        pip install numpy==1.23.5
+    - name: Install scipy ${{ matrix.scipy }}
+      if: ${{ matrix.scipy }}
+      run: |
+        pip install scipy==${{ matrix.scipy }}
+    - name: Store repository status
+      id: status-before
+      run: |
+        echo "::set-output name=BEFORE::$(git status --porcelain -b)"
+    - name: Run tests on Ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        if [ ${{ matrix.code-cov }} ]; then codecov='--cov=openml --long  --cov-report=xml'; fi
+        # Most of the time, running only the scikit-learn tests is sufficient
+        if [ ${{ matrix.sklearn-only }} = 'true' ]; then sklearn='-m sklearn'; fi
+        echo pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv $codecov $sklearn --reruns 5 --reruns-delay 1 -o log_cli=true
+        pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv $codecov $sklearn --reruns 5 --reruns-delay 1 -o log_cli=true
+    - name: Run tests on Windows
+      if: matrix.os == 'windows-latest'
+      run: |  # we need a separate step because of the bash-specific if-statement in the previous one.
+        pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv --reruns 5 --reruns-delay 1
+    - name: Check for files left behind by test
+      if: matrix.os != 'windows-latest' && always()
+      run: |
+        before="${{ steps.status-before.outputs.BEFORE }}"
+        after="$(git status --porcelain -b)"
+        if [[ "$before" != "$after" ]]; then
+            echo "git status from before: $before"
+            echo "git status from after: $after"
+            echo "Not all generated files have been deleted!"
+            exit 1
+        fi
+    - name: Upload coverage
+      if: matrix.code-cov && always()
+      uses: codecov/codecov-action@v3
+      with:
+        files: coverage.xml
+        fail_ci_if_error: true
+        verbose: true

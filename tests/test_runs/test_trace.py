@@ -25,19 +25,22 @@ class TestTrace(TestBase):
         # This next one should simply not fail
         self.assertEqual(trace.get_selected_iteration(2, 2), 2)
         with self.assertRaisesRegex(
-            ValueError, "Could not find the selected iteration for rep/fold 3/3",
+            ValueError,
+            "Could not find the selected iteration for rep/fold 3/3",
         ):
 
             trace.get_selected_iteration(3, 3)
 
     def test_initialization(self):
-        """Check all different ways to fail the initialization """
+        """Check all different ways to fail the initialization"""
         with self.assertRaisesRegex(
-            ValueError, "Trace content not available.",
+            ValueError,
+            "Trace content not available.",
         ):
             OpenMLRunTrace.generate(attributes="foo", content=None)
         with self.assertRaisesRegex(
-            ValueError, "Trace attributes not available.",
+            ValueError,
+            "Trace attributes not available.",
         ):
             OpenMLRunTrace.generate(attributes=None, content="foo")
         with self.assertRaisesRegex(ValueError, "Trace content is empty."):
@@ -60,7 +63,7 @@ class TestTrace(TestBase):
         ]
         trace_content = [[0, 0, 0, 0.5, "true", 1], [0, 0, 0, 0.9, "false", 2]]
         with self.assertRaisesRegex(
-            ValueError, "Either setup_string or parameters needs to be passed as argument."
+            ValueError, "Either `setup_string` or `parameters` needs to be passed as argument."
         ):
             OpenMLRunTrace.generate(trace_attributes, trace_content)
 

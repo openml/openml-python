@@ -1,0 +1,4 @@
+<oml:error xmlns:oml="http://openml.org/openml">
+	<oml:code>354</oml:code>
+	<oml:message>Dataset is in use by other content. Can not be deleted</oml:message>
+</oml:error>

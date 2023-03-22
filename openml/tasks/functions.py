@@ -90,7 +90,7 @@ def _get_estimation_procedure_list():
     procs_dict = xmltodict.parse(xml_string)
     # Minimalistic check if the XML is useful
     if "oml:estimationprocedures" not in procs_dict:
-        raise ValueError("Error in return XML, does not contain tag " "oml:estimationprocedures.")
+        raise ValueError("Error in return XML, does not contain tag oml:estimationprocedures.")
     elif "@xmlns:oml" not in procs_dict["oml:estimationprocedures"]:
         raise ValueError(
             "Error in return XML, does not contain tag "
@@ -106,10 +106,19 @@ def _get_estimation_procedure_list():
 
     procs = []
     for proc_ in procs_dict["oml:estimationprocedures"]["oml:estimationprocedure"]:
+        task_type_int = int(proc_["oml:ttid"])
+        try:
+            task_type_id = TaskType(task_type_int)
+        except ValueError as e:
+            warnings.warn(
+                f"Could not create task type id for {task_type_int} due to error {e}",
+                RuntimeWarning,
+            )
+            continue
         procs.append(
             {
                 "id": int(proc_["oml:id"]),
-                "task_type_id": TaskType(int(proc_["oml:ttid"])),
+                "task_type_id": task_type_id,
                 "name": proc_["oml:name"],
                 "type": proc_["oml:type"],
             }
@@ -124,7 +133,7 @@ def list_tasks(
     size: Optional[int] = None,
     tag: Optional[str] = None,
     output_format: str = "dict",
-    **kwargs
+    **kwargs,
 ) -> Union[Dict, pd.DataFrame]:
     """
     Return a number of tasks having the given tag and task_type
@@ -135,15 +144,7 @@ def list_tasks(
     it is used as task_type in the task description, but it is named
     type when used as a filter in list tasks call.
     task_type : TaskType, optional
-        ID of the task type as detailed `here <https://www.openml.org/search?type=task_type>`_.
-        - Supervised classification: 1
-        - Supervised regression: 2
-        - Learning curve: 3
-        - Supervised data stream classification: 4
-        - Clustering: 5
-        - Machine Learning Challenge: 6
-        - Survival Analysis: 7
-        - Subgroup Discovery: 8
+        Refers to the type of task.
     offset : int, optional
         the number of tasks to skip, starting from the first
     size : int, optional
@@ -183,7 +184,7 @@ def list_tasks(
         offset=offset,
         size=size,
         tag=tag,
-        **kwargs
+        **kwargs,
     )
 
 
@@ -196,16 +197,7 @@ def _list_tasks(task_type=None, output_format="dict", **kwargs):
     it is used as task_type in the task description, but it is named
     type when used as a filter in list tasks call.
     task_type : TaskType, optional
-        ID of the task type as detailed
-        `here <https://www.openml.org/search?type=task_type>`_.
-        - Supervised classification: 1
-        - Supervised regression: 2
-        - Learning curve: 3
-        - Supervised data stream classification: 4
-        - Clustering: 5
-        - Machine Learning Challenge: 6
-        - Survival Analysis: 7
-        - Subgroup Discovery: 8
+        Refers to the type of task.
     output_format: str, optional (default='dict')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
@@ -257,9 +249,18 @@ def __list_tasks(api_call, output_format="dict"):
         tid = None
         try:
             tid = int(task_["oml:task_id"])
+            task_type_int = int(task_["oml:task_type_id"])
+            try:
+                task_type_id = TaskType(task_type_int)
+            except ValueError as e:
+                warnings.warn(
+                    f"Could not create task type id for {task_type_int} due to error {e}",
+                    RuntimeWarning,
+                )
+                continue
             task = {
                 "tid": tid,
-                "ttid": TaskType(int(task_["oml:task_type_id"])),
+                "ttid": task_type_id,
                 "did": int(task_["oml:did"]),
                 "name": task_["oml:name"],
                 "task_type": task_["oml:task_type"],
@@ -347,14 +348,20 @@ def get_task(
     task
     """
     if not isinstance(task_id, int):
-        warnings.warn("Task id must be specified as `int` from 0.14.0 onwards.", DeprecationWarning)
+        warnings.warn(
+            "Task id must be specified as `int` from 0.14.0 onwards.",
+            DeprecationWarning,
+        )
 
     try:
         task_id = int(task_id)
     except (ValueError, TypeError):
         raise ValueError("Dataset ID is neither an Integer nor can be cast to an Integer.")
 
-    tid_cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id,)
+    tid_cache_dir = openml.utils._create_cache_directory_for_id(
+        TASKS_CACHE_DIR_NAME,
+        task_id,
+    )
 
     try:
         task = _get_task_description(task_id)
@@ -371,7 +378,8 @@ def get_task(
                 task.download_split()
     except Exception as e:
         openml.utils._remove_cache_dir_for_id(
-            TASKS_CACHE_DIR_NAME, tid_cache_dir,
+            TASKS_CACHE_DIR_NAME,
+            tid_cache_dir,
         )
         raise e
 
@@ -384,7 +392,11 @@ def _get_task_description(task_id):
         return _get_cached_task(task_id)
     except OpenMLCacheException:
         xml_file = os.path.join(
-            openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id,), "task.xml",
+            openml.utils._create_cache_directory_for_id(
+                TASKS_CACHE_DIR_NAME,
+                task_id,
+            ),
+            "task.xml",
         )
         task_xml = openml._api_calls._perform_api_call("task/%d" % task_id, "get")
 
@@ -475,9 +487,12 @@ def create_task(
     estimation_procedure_id: int,
     target_name: Optional[str] = None,
     evaluation_measure: Optional[str] = None,
-    **kwargs
+    **kwargs,
 ) -> Union[
-    OpenMLClassificationTask, OpenMLRegressionTask, OpenMLLearningCurveTask, OpenMLClusteringTask
+    OpenMLClassificationTask,
+    OpenMLRegressionTask,
+    OpenMLLearningCurveTask,
+    OpenMLClusteringTask,
 ]:
     """Create a task based on different given attributes.
 
@@ -528,5 +543,24 @@ def create_task(
             target_name=target_name,
             estimation_procedure_id=estimation_procedure_id,
             evaluation_measure=evaluation_measure,
-            **kwargs
+            **kwargs,
         )
+
+
+def delete_task(task_id: int) -> bool:
+    """Delete task with id `task_id` from the OpenML server.
+
+    You can only delete tasks which you created and have
+    no runs associated with them.
+
+    Parameters
+    ----------
+    task_id : int
+        OpenML id of the task
+
+    Returns
+    -------
+    bool
+        True if the deletion was successful. False otherwise.
+    """
+    return openml.utils._delete_entity("task", task_id)

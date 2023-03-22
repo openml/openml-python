@@ -1,6 +1,6 @@
 # Dockerfile to build an image with preinstalled dependencies
 # Useful building docs or running unix tests from a Windows host.
-FROM python:3
+FROM python:3.10
 
 RUN git clone  https://github.com/openml/openml-python.git omlp
 WORKDIR omlp

@@ -239,7 +239,7 @@ class OpenMLDataset(OpenMLBase):
         return self.dataset_id
 
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
-        """ Collect all information to display in the __repr__ body. """
+        """Collect all information to display in the __repr__ body."""
         fields = {
             "Name": self.name,
             "Version": self.version,
@@ -275,7 +275,7 @@ class OpenMLDataset(OpenMLBase):
 
     def __eq__(self, other):
 
-        if type(other) != OpenMLDataset:
+        if not isinstance(other, OpenMLDataset):
             return False
 
         server_fields = {
@@ -287,17 +287,15 @@ class OpenMLDataset(OpenMLBase):
             "data_file",
         }
 
-        # check that the keys are identical
+        # check that common keys and values are identical
         self_keys = set(self.__dict__.keys()) - server_fields
         other_keys = set(other.__dict__.keys()) - server_fields
-        if self_keys != other_keys:
-            return False
-
-        # check that values of the common keys are identical
-        return all(self.__dict__[key] == other.__dict__[key] for key in self_keys)
+        return self_keys == other_keys and all(
+            self.__dict__[key] == other.__dict__[key] for key in self_keys
+        )
 
     def _download_data(self) -> None:
-        """ Download ARFF data file to standard cache directory. Set `self.data_file`. """
+        """Download ARFF data file to standard cache directory. Set `self.data_file`."""
         # import required here to avoid circular import.
         from .functions import _get_dataset_arff, _get_dataset_parquet
 
@@ -354,8 +352,8 @@ class OpenMLDataset(OpenMLBase):
             return decoder.decode(fh, encode_nominal=True, return_type=return_type)
 
         if filename[-3:] == ".gz":
-            with gzip.open(filename) as fh:
-                return decode_arff(fh)
+            with gzip.open(filename) as zipfile:
+                return decode_arff(zipfile)
         else:
             with open(filename, encoding="utf8") as fh:
                 return decode_arff(fh)
@@ -363,7 +361,7 @@ class OpenMLDataset(OpenMLBase):
     def _parse_data_from_arff(
         self, arff_file_path: str
     ) -> Tuple[Union[pd.DataFrame, scipy.sparse.csr_matrix], List[bool], List[str]]:
-        """ Parse all required data from arff file.
+        """Parse all required data from arff file.
 
         Parameters
         ----------
@@ -473,7 +471,7 @@ class OpenMLDataset(OpenMLBase):
     def _cache_compressed_file_from_file(
         self, data_file: str
     ) -> Tuple[Union[pd.DataFrame, scipy.sparse.csr_matrix], List[bool], List[str]]:
-        """ Store data from the local file in compressed format.
+        """Store data from the local file in compressed format.
 
         If a local parquet file is present it will be used instead of the arff file.
         Sets cache_format to 'pickle' if data is sparse.
@@ -519,7 +517,7 @@ class OpenMLDataset(OpenMLBase):
         return data, categorical, attribute_names
 
     def _load_data(self):
-        """ Load data from compressed format or arff. Download data if not present on disk. """
+        """Load data from compressed format or arff. Download data if not present on disk."""
         need_to_create_pickle = self.cache_format == "pickle" and self.data_pickle_file is None
         need_to_create_feather = self.cache_format == "feather" and self.data_feather_file is None
 
@@ -544,15 +542,23 @@ class OpenMLDataset(OpenMLBase):
                     data, categorical, attribute_names = pickle.load(fh)
         except FileNotFoundError:
             raise ValueError(f"Cannot find file for dataset {self.name} at location '{fpath}'.")
-        except (EOFError, ModuleNotFoundError, ValueError) as e:
+        except (EOFError, ModuleNotFoundError, ValueError, AttributeError) as e:
             error_message = e.message if hasattr(e, "message") else e.args[0]
             hint = ""
 
             if isinstance(e, EOFError):
                 readable_error = "Detected a corrupt cache file"
-            elif isinstance(e, ModuleNotFoundError):
+            elif isinstance(e, (ModuleNotFoundError, AttributeError)):
                 readable_error = "Detected likely dependency issues"
-                hint = "This is most likely due to https://github.com/openml/openml-python/issues/918. "  # noqa: 501
+                hint = (
+                    "This can happen if the cache was constructed with a different pandas version "
+                    "than the one that is used to load the data. See also "
+                )
+                if isinstance(e, ModuleNotFoundError):
+                    hint += "https://github.com/openml/openml-python/issues/918. "
+                elif isinstance(e, AttributeError):
+                    hint += "https://github.com/openml/openml-python/pull/1121. "
+
             elif isinstance(e, ValueError) and "unsupported pickle protocol" in e.args[0]:
                 readable_error = "Encountered unsupported pickle protocol"
             else:
@@ -667,7 +673,7 @@ class OpenMLDataset(OpenMLBase):
         List[bool],
         List[str],
     ]:
-        """ Returns dataset content as dataframes or sparse matrices.
+        """Returns dataset content as dataframes or sparse matrices.
 
         Parameters
         ----------
@@ -855,7 +861,7 @@ class OpenMLDataset(OpenMLBase):
         return result
 
     def _get_file_elements(self) -> Dict:
-        """ Adds the 'dataset' to file elements. """
+        """Adds the 'dataset' to file elements."""
         file_elements = {}
         path = None if self.data_file is None else os.path.abspath(self.data_file)
 
@@ -874,11 +880,11 @@ class OpenMLDataset(OpenMLBase):
         return file_elements
 
     def _parse_publish_response(self, xml_response: Dict):
-        """ Parse the id from the xml_response and assign it to self. """
+        """Parse the id from the xml_response and assign it to self."""
         self.dataset_id = int(xml_response["oml:upload_data_set"]["oml:id"])
 
     def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
-        """ Creates a dictionary representation of self. """
+        """Creates a dictionary representation of self."""
         props = [
             "id",
             "name",

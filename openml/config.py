@@ -23,7 +23,7 @@ file_handler = None
 
 
 def _create_log_handlers(create_file_handler=True):
-    """ Creates but does not attach the log handlers. """
+    """Creates but does not attach the log handlers."""
     global console_handler, file_handler
     if console_handler is not None or file_handler is not None:
         logger.debug("Requested to create log handlers, but they are already created.")
@@ -36,7 +36,7 @@ def _create_log_handlers(create_file_handler=True):
     console_handler.setFormatter(output_formatter)
 
     if create_file_handler:
-        one_mb = 2 ** 20
+        one_mb = 2**20
         log_path = os.path.join(cache_directory, "openml_python.log")
         file_handler = logging.handlers.RotatingFileHandler(
             log_path, maxBytes=one_mb, backupCount=1, delay=True
@@ -45,7 +45,7 @@ def _create_log_handlers(create_file_handler=True):
 
 
 def _convert_log_levels(log_level: int) -> Tuple[int, int]:
-    """ Converts a log level that's either defined by OpenML/Python to both specifications. """
+    """Converts a log level that's either defined by OpenML/Python to both specifications."""
     # OpenML verbosity level don't match Python values directly:
     openml_to_python = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
     python_to_openml = {
@@ -62,7 +62,7 @@ def _convert_log_levels(log_level: int) -> Tuple[int, int]:
 
 
 def _set_level_register_and_store(handler: logging.Handler, log_level: int):
-    """ Set handler log level, register it if needed, save setting to config file if specified. """
+    """Set handler log level, register it if needed, save setting to config file if specified."""
     oml_level, py_level = _convert_log_levels(log_level)
     handler.setLevel(py_level)
 
@@ -74,13 +74,13 @@ def _set_level_register_and_store(handler: logging.Handler, log_level: int):
 
 
 def set_console_log_level(console_output_level: int):
-    """ Set console output to the desired level and register it with openml logger if needed. """
+    """Set console output to the desired level and register it with openml logger if needed."""
     global console_handler
     _set_level_register_and_store(cast(logging.Handler, console_handler), console_output_level)
 
 
 def set_file_log_level(file_output_level: int):
-    """ Set file output to the desired level and register it with openml logger if needed. """
+    """Set file output to the desired level and register it with openml logger if needed."""
     global file_handler
     _set_level_register_and_store(cast(logging.Handler, file_handler), file_output_level)
 
@@ -90,7 +90,14 @@ _defaults = {
     "apikey": "",
     "server": "https://www.openml.org/api/v1/xml",
     "cachedir": (
-        os.environ.get("XDG_CACHE_HOME", os.path.join("~", ".cache", "openml",))
+        os.environ.get(
+            "XDG_CACHE_HOME",
+            os.path.join(
+                "~",
+                ".cache",
+                "openml",
+            ),
+        )
         if platform.system() == "Linux"
         else os.path.join("~", ".openml")
     ),
@@ -144,7 +151,7 @@ def set_retry_policy(value: str, n_retries: Optional[int] = None) -> None:
 
 
 class ConfigurationForExamples:
-    """ Allows easy switching to and from a test configuration, used for examples. """
+    """Allows easy switching to and from a test configuration, used for examples."""
 
     _last_used_server = None
     _last_used_key = None
@@ -154,7 +161,7 @@ class ConfigurationForExamples:
 
     @classmethod
     def start_using_configuration_for_example(cls):
-        """ Sets the configuration to connect to the test server with valid apikey.
+        """Sets the configuration to connect to the test server with valid apikey.
 
         To configuration as was before this call is stored, and can be recovered
         by using the `stop_use_example_configuration` method.
@@ -181,7 +188,7 @@ class ConfigurationForExamples:
 
     @classmethod
     def stop_using_configuration_for_example(cls):
-        """ Return to configuration as it was before `start_use_example_configuration`. """
+        """Return to configuration as it was before `start_use_example_configuration`."""
         if not cls._start_last_called:
             # We don't want to allow this because it will (likely) result in the `server` and
             # `apikey` variables being set to None.
@@ -281,7 +288,7 @@ def _setup(config=None):
 
 
 def set_field_in_config_file(field: str, value: Any):
-    """ Overwrites the `field` in the configuration file with the new `value`. """
+    """Overwrites the `field` in the configuration file with the new `value`."""
     if field not in _defaults:
         return ValueError(f"Field '{field}' is not valid and must be one of '{_defaults.keys()}'.")
 
@@ -302,7 +309,7 @@ def set_field_in_config_file(field: str, value: Any):
 
 
 def _parse_config(config_file: str):
-    """ Parse the config file, set up defaults. """
+    """Parse the config file, set up defaults."""
     config = configparser.RawConfigParser(defaults=_defaults)
 
     # The ConfigParser requires a [SECTION_HEADER], which we do not expect in our config file.
