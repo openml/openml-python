@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_examples_30_extended_task_manual_iteration_tutorial.py>`
+        :ref:`Go to the end <sphx_glr_download_examples_30_extended_task_manual_iteration_tutorial.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -582,7 +582,7 @@ And then again perform the aforementioned iteration over all splits:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  13.547 seconds)
+   **Total running time of the script:** ( 0 minutes  6.971 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_task_manual_iteration_tutorial.py:
@@ -590,6 +590,8 @@ And then again perform the aforementioned iteration over all splits:
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

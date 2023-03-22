@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_examples_30_extended_run_setup_tutorial.py>`
+        :ref:`Go to the end <sphx_glr_download_examples_30_extended_run_setup_tutorial.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -150,7 +150,7 @@ In this tutorial we will
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:828: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:868: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
       warnings.warn(
     /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1788: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
@@ -189,7 +189,7 @@ In this tutorial we will
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:828: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:868: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
       warnings.warn(
     /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1788: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
@@ -233,7 +233,7 @@ In this tutorial we will
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.728 seconds)
+   **Total running time of the script:** ( 0 minutes  7.552 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_run_setup_tutorial.py:
@@ -241,6 +241,8 @@ In this tutorial we will
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

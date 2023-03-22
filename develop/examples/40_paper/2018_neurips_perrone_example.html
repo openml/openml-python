@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Perrone et al. (2018) &#8212; OpenML 0.13.1.dev documentation</title>
+    <title>Perrone et al. (2018) &#8212; OpenML 0.13.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.13.1.dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.13.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -124,7 +124,7 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py"><span class="std std-ref">here</span></a>
+<p><a class="reference internal" href="#sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="perrone-et-al-2018">
@@ -286,17 +286,17 @@ pre-processing all retrieved evaluations.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Y : &quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                    cost degree              gamma      kernel
-1598  0.0104801929437984      4                NaN  polynomial
-1411    528.972409366975      4                NaN  polynomial
-4990  0.0135428139435041    NaN  0.193828195206289         NaN
-2058  0.0534133215088147    NaN                NaN      linear
-3147   0.627280721015758      2                NaN  polynomial
-Y :  1598    0.603968
-1411    0.461506
-4990    0.979282
-2058    0.904009
-3147    0.565799
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                   cost degree                gamma      kernel
+4496   2.79191671899954    NaN   0.0277202381261179         NaN
+421    23.8973478229798    NaN                  NaN  polynomial
+1069   14.7190897828721    NaN                  NaN      linear
+2832  0.141297656781024    NaN  0.00602325661939196         NaN
+4448   15.4307583820024    NaN     169.408370330347         NaN
+Y :  4496    0.995838
+421     0.905147
+1069    0.906592
+2832    0.713471
+4448    0.493572
 Name: value, dtype: float64
 </pre></div>
 </div>
@@ -342,7 +342,7 @@ time simple and quick.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 1.7237e-05
+Training RMSE : 1.9303e-05
 </pre></div>
 </div>
 </section>
@@ -375,18 +375,18 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <span class="nb">print</span><span class="p">(</span><span class="n">configs</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
-0    358.684040  2.228814  446.843073      linear
-1    859.507889  4.119058  631.951351     sigmoid
-2    264.005461  2.874865  266.718021     sigmoid
-3    594.729493  3.038376  582.186165  polynomial
-4    427.117100  3.268922  637.903746     sigmoid
-..          ...       ...         ...         ...
-995  206.523307  3.142141  329.538605      linear
-996  864.423422  2.097202  604.553313      radial
-997  545.491275  2.671869  236.370629      radial
-998  578.390636  4.956636  604.503304  polynomial
-999  236.059447  4.639368  606.257165      radial
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma   kernel
+0    703.547463  3.124285  400.424860  sigmoid
+1    220.168827  4.855083    9.939735   radial
+2    611.259417  4.669106  294.340486  sigmoid
+3    662.367022  3.220873  380.480008   linear
+4    203.968762  3.422637  231.227621   radial
+..          ...       ...         ...      ...
+995  934.695785  4.940245  166.026111  sigmoid
+996  652.586571  4.636055  215.717232   linear
+997  775.505728  2.288518  884.844300   radial
+998  165.529699  2.717633  324.145383  sigmoid
+999  196.395075  4.826799  129.167333   linear
 
 [1000 rows x 4 columns]
 </pre></div>
@@ -408,7 +408,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <img src="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" srcset="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" alt="AUC regret for Random Search on surrogate" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(42.722222222222214, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  57.462 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  3.826 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>

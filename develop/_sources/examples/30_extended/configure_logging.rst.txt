@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_examples_30_extended_configure_logging.py>`
+        :ref:`Go to the end <sphx_glr_download_examples_30_extended_configure_logging.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -89,6 +89,8 @@ When downloading a dataset from OpenML, a `DEBUG`-level message is written:
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

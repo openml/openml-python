@@ -1,0 +1,10 @@
+﻿:mod:`openml.runs`.delete_run
+==========================================
+
+.. currentmodule:: openml.runs
+
+.. autofunction:: delete_run
+
+.. raw:: html
+
+    <div class="clearer"></div>

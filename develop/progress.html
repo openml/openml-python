@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Changelog &#8212; OpenML 0.13.1.dev documentation</title>
+    <title>Changelog &#8212; OpenML 0.13.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css" />
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.13.1.dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.13.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -135,11 +135,19 @@
 <h2>0.13.1<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
-<li><p>Add new contributions here.</p></li>
-<li><p>ADD#1144: Add locally computed results to the <code class="docutils literal notranslate"><span class="pre">OpenMLRun</span></code> object’s representation.</p></li>
+<li><p>ADD #1028: Add functions to delete runs, flows, datasets, and tasks (e.g., <code class="docutils literal notranslate"><span class="pre">openml.datasets.delete_dataset</span></code>).</p></li>
+<li><p>ADD #1144: Add locally computed results to the <code class="docutils literal notranslate"><span class="pre">OpenMLRun</span></code> object’s representation if the run was created locally and not downloaded from the server.</p></li>
+<li><p>ADD #1180: Improve the error message when the checksum of a downloaded dataset does not match the checksum provided by the API.</p></li>
+<li><p>ADD #1201: Make <code class="docutils literal notranslate"><span class="pre">OpenMLTraceIteration</span></code> a dataclass.</p></li>
+<li><p>DOC #1069: Add argument documentation for the <code class="docutils literal notranslate"><span class="pre">OpenMLRun</span></code> class.</p></li>
 <li><p>FIX #1197 #559 #1131: Fix the order of ground truth and predictions in the <code class="docutils literal notranslate"><span class="pre">OpenMLRun</span></code> object and in <code class="docutils literal notranslate"><span class="pre">format_prediction</span></code>.</p></li>
 <li><p>FIX #1198: Support numpy 1.24 and higher.</p></li>
-<li><p>ADD#1144: Add locally computed results to the <code class="docutils literal notranslate"><span class="pre">OpenMLRun</span></code> object’s representation if the run was created locally and not downloaded from the server.</p></li>
+<li><p>FIX #1216: Allow unknown task types on the server. This is only relevant when new task types are added to the test server.</p></li>
+<li><p>MAINT #1155: Add dependabot github action to automatically update other github actions.</p></li>
+<li><p>MAINT #1199: Obtain pre-commit’s flake8 from github.com instead of gitlab.com.</p></li>
+<li><p>MAINT #1215: Support latest numpy version.</p></li>
+<li><p>MAINT #1218: Test Python3.6 on Ubuntu 20.04 instead of the latest Ubuntu (which is 22.04).</p></li>
+<li><p>MAINT #1221 #1212 #1206 #1211: Update github actions to the latest versions.</p></li>
 </ul>
 </div></blockquote>
 </section>
@@ -147,16 +155,16 @@
 <h2>0.13.0<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
-<li><p>FIX#1030: <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> hooks now no longer should issue a warning.</p></li>
-<li><p>FIX#1058, #1100: Avoid <code class="docutils literal notranslate"><span class="pre">NoneType</span></code> error when printing task without <code class="docutils literal notranslate"><span class="pre">class_labels</span></code> attribute.</p></li>
-<li><p>FIX#1110: Make arguments to <code class="docutils literal notranslate"><span class="pre">create_study</span></code> and <code class="docutils literal notranslate"><span class="pre">create_suite</span></code> that are defined as optional by the OpenML XSD actually optional.</p></li>
-<li><p>FIX#1147: <code class="docutils literal notranslate"><span class="pre">openml.flow.flow_exists</span></code> no longer requires an API key.</p></li>
-<li><p>FIX#1184: Automatically resolve proxies when downloading from minio. Turn this off by setting environment variable <code class="docutils literal notranslate"><span class="pre">no_proxy=&quot;*&quot;</span></code>.</p></li>
-<li><p>MAIN#1088: Do CI for Windows on Github Actions instead of Appveyor.</p></li>
-<li><p>MAINT#1104: Fix outdated docstring for <code class="docutils literal notranslate"><span class="pre">list_task</span></code>.</p></li>
-<li><p>MAIN#1146: Update the pre-commit dependencies.</p></li>
-<li><p>ADD#1103: Add a <code class="docutils literal notranslate"><span class="pre">predictions</span></code> property to OpenMLRun for easy accessibility of prediction data.</p></li>
-<li><p>ADD#1188: EXPERIMENTAL. Allow downloading all files from a minio bucket with <code class="docutils literal notranslate"><span class="pre">download_all_files=True</span></code> for <code class="docutils literal notranslate"><span class="pre">get_dataset</span></code>.</p></li>
+<li><p>FIX #1030: <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> hooks now no longer should issue a warning.</p></li>
+<li><p>FIX #1058, #1100: Avoid <code class="docutils literal notranslate"><span class="pre">NoneType</span></code> error when printing task without <code class="docutils literal notranslate"><span class="pre">class_labels</span></code> attribute.</p></li>
+<li><p>FIX #1110: Make arguments to <code class="docutils literal notranslate"><span class="pre">create_study</span></code> and <code class="docutils literal notranslate"><span class="pre">create_suite</span></code> that are defined as optional by the OpenML XSD actually optional.</p></li>
+<li><p>FIX #1147: <code class="docutils literal notranslate"><span class="pre">openml.flow.flow_exists</span></code> no longer requires an API key.</p></li>
+<li><p>FIX #1184: Automatically resolve proxies when downloading from minio. Turn this off by setting environment variable <code class="docutils literal notranslate"><span class="pre">no_proxy=&quot;*&quot;</span></code>.</p></li>
+<li><p>MAINT #1088: Do CI for Windows on Github Actions instead of Appveyor.</p></li>
+<li><p>MAINT #1104: Fix outdated docstring for <code class="docutils literal notranslate"><span class="pre">list_task</span></code>.</p></li>
+<li><p>MAINT #1146: Update the pre-commit dependencies.</p></li>
+<li><p>ADD #1103: Add a <code class="docutils literal notranslate"><span class="pre">predictions</span></code> property to OpenMLRun for easy accessibility of prediction data.</p></li>
+<li><p>ADD #1188: EXPERIMENTAL. Allow downloading all files from a minio bucket with <code class="docutils literal notranslate"><span class="pre">download_all_files=True</span></code> for <code class="docutils literal notranslate"><span class="pre">get_dataset</span></code>.</p></li>
 </ul>
 </div></blockquote>
 </section>

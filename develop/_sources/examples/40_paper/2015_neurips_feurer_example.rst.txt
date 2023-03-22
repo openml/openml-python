@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_examples_40_paper_2015_neurips_feurer_example.py>`
+        :ref:`Go to the end <sphx_glr_download_examples_40_paper_2015_neurips_feurer_example.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -157,7 +157,7 @@ datasets can be found in the `online docs <https://docs.openml.org/#dataset-stat
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.696 seconds)
+   **Total running time of the script:** ( 0 minutes  4.337 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2015_neurips_feurer_example.py:
@@ -165,6 +165,8 @@ datasets can be found in the `online docs <https://docs.openml.org/#dataset-stat
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

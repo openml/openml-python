@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Flows and Runs &#8212; OpenML 0.13.1.dev documentation</title>
+    <title>Flows and Runs &#8212; OpenML 0.13.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.13.1.dev</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.13.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -124,7 +124,7 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py"><span class="std std-ref">here</span></a>
+<p><a class="reference internal" href="#sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="flows-and-runs">
@@ -209,17 +209,17 @@ The use of this test server can affect behaviour and performance of the OpenML-P
 ==========
 Uploader Name...................: None
 Metric..........................: None
-Local Result - Accuracy (+- STD): 0.8441 +- 0.0120
-Local Runtime - ms (+- STD).....: 168.3005 +- 2.7461
+Local Result - Accuracy (+- STD): 0.8435 +- 0.0119
+Local Runtime - ms (+- STD).....: 192.8117 +- 4.8619
 Run ID..........................: None
 Task ID.........................: 403
 Task Type.......................: None
 Task URL........................: https://test.openml.org/t/403
-Flow ID.........................: 36940
+Flow ID.........................: 90855
 Flow Name.......................: sklearn.tree._classes.DecisionTreeClassifier
-Flow URL........................: https://test.openml.org/f/36940
+Flow URL........................: https://test.openml.org/f/90855
 Setup ID........................: None
-Setup String....................: Python_3.8.16. Sklearn_1.2.1. NumPy_1.23.5. SciPy_1.10.1.
+Setup String....................: Python_3.8.16. Sklearn_1.2.2. NumPy_1.23.5. SciPy_1.10.1.
 Dataset ID......................: 68
 Dataset URL.....................: https://test.openml.org/d/68
 </pre></div>
@@ -233,7 +233,7 @@ the run is sent to the OpenML server:</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Uploaded to </span><span class="si">{</span><span class="n">myrun</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to https://test.openml.org/r/29390
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Uploaded to https://test.openml.org/r/33524
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -243,12 +243,12 @@ the run is sent to the OpenML server:</p>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Flow
 ===========
-Flow ID.........: 36940 (version 18)
-Flow URL........: https://test.openml.org/f/36940
+Flow ID.........: 90855 (version 26)
+Flow URL........: https://test.openml.org/f/90855
 Flow Name.......: sklearn.tree._classes.DecisionTreeClassifier
 Flow Description: A decision tree classifier.
-Upload Date.....: 2023-02-20 16:11:00
-Dependencies....: sklearn==1.2.1
+Upload Date.....: 2023-03-21 09:23:29
+Dependencies....: sklearn==1.2.2
 numpy&gt;=1.17.3
 scipy&gt;=1.3.2
 joblib&gt;=1.1.1
@@ -338,12 +338,12 @@ variables and missing values in both.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Uploaded to </span><span class="si">{</span><span class="n">myrun</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:828: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:868: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
   warnings.warn(
-Uploaded to https://test.openml.org/r/29391
-/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:828: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
+Uploaded to https://test.openml.org/r/33525
+/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:868: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
   warnings.warn(
-Uploaded to https://test.openml.org/r/29392
+Uploaded to https://test.openml.org/r/33526
 </pre></div>
 </div>
 </section>
@@ -376,7 +376,7 @@ a model on a task without uploading results or flows to the server immediately.<
 <span class="c1"># it does not yet exist on the server.</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:828: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:868: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
   warnings.warn(
 /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1788: UserWarning: Estimator only predicted for 5/6 classes!
   warnings.warn(message)
@@ -386,17 +386,17 @@ OpenML Run
 Uploader Name...................: None
 Metric..........................: None
 Local Result - Accuracy (+- STD): 1.0000 +- 0.0000
-Local Runtime - ms (+- STD).....: 23.5179 +- 0.0000
-Run ID..........................: 29394
-Run URL.........................: https://test.openml.org/r/29394
+Local Runtime - ms (+- STD).....: 33.9047 +- 0.0000
+Run ID..........................: 33528
+Run URL.........................: https://test.openml.org/r/33528
 Task ID.........................: 6
 Task Type.......................: None
 Task URL........................: https://test.openml.org/t/6
-Flow ID.........................: 63553
+Flow ID.........................: 91119
 Flow Name.......................: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(categorical=sklearn.preprocessing._encoders.OneHotEncoder,continuous=sklearn.impute._base.SimpleImputer),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
-Flow URL........................: https://test.openml.org/f/63553
+Flow URL........................: https://test.openml.org/f/91119
 Setup ID........................: None
-Setup String....................: Python_3.8.16. Sklearn_1.2.1. NumPy_1.23.5. SciPy_1.10.1.
+Setup String....................: Python_3.8.16. Sklearn_1.2.2. NumPy_1.23.5. SciPy_1.10.1.
 Dataset ID......................: None
 Dataset URL.....................: https://test.openml.org/d/None
 </pre></div>
@@ -445,13 +445,13 @@ task_id:<a class="reference external" href="https://www.openml.org/t/52950">5295
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;kNN on </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">myrun</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: https://test.openml.org/r/29401
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>kNN on diabetes: https://test.openml.org/r/33529
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  25.173 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  23.771 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9e0617073c8209f15abf91f273871776/flows_and_runs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flows_and_runs_tutorial.py</span></code></a></p>

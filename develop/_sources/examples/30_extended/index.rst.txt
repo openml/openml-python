@@ -20,7 +20,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_flow_id_tutorial_thumb.png
-    :alt: Obtaining Flow IDs
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py`
 
@@ -37,7 +37,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_suites_tutorial_thumb.png
-    :alt: Benchmark suites
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_suites_tutorial.py`
 
@@ -54,7 +54,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_configure_logging_thumb.png
-    :alt: Logging
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_configure_logging.py`
 
@@ -71,7 +71,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_study_tutorial_thumb.png
-    :alt: Benchmark studies
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_study_tutorial.py`
 
@@ -88,7 +88,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_plot_svm_hyperparameters_tutorial_thumb.png
-    :alt: Plotting hyperparameter surfaces
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_plot_svm_hyperparameters_tutorial.py`
 
@@ -105,7 +105,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_run_setup_tutorial_thumb.png
-    :alt: Run Setup
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py`
 
@@ -122,7 +122,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_tasks_tutorial_thumb.png
-    :alt: Tasks
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_tasks_tutorial.py`
 
@@ -139,7 +139,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_datasets_tutorial_thumb.png
-    :alt: Datasets
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py`
 
@@ -156,7 +156,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_custom_flow__thumb.png
-    :alt: Creating and Using a Custom Flow
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_custom_flow_.py`
 
@@ -173,7 +173,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_fetch_evaluations_tutorial_thumb.png
-    :alt: Fetching Evaluations
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_fetch_evaluations_tutorial.py`
 
@@ -190,7 +190,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_task_manual_iteration_tutorial_thumb.png
-    :alt: Tasks: retrieving splits
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_task_manual_iteration_tutorial.py`
 
@@ -207,7 +207,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_flows_and_runs_tutorial_thumb.png
-    :alt: Flows and Runs
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_flows_and_runs_tutorial.py`
 
@@ -224,7 +224,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_create_upload_tutorial_thumb.png
-    :alt: Dataset upload tutorial
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_create_upload_tutorial.py`
 
@@ -241,7 +241,7 @@ Extended examples for the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/30_extended/images/thumb/sphx_glr_fetch_runtimes_tutorial_thumb.png
-    :alt: Measuring runtimes for Scikit-learn models
+    :alt:
 
   :ref:`sphx_glr_examples_30_extended_fetch_runtimes_tutorial.py`
 

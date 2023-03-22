@@ -16,12 +16,12 @@ Introductory examples to the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This is a brief showcase of OpenML benchmark suites, which were introduced by `Bischl et al. (2...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This is a brief showcase of OpenML benchmark suites, which were introduced by Bischl et al. (20...">
 
 .. only:: html
 
   .. image:: /examples/20_basic/images/thumb/sphx_glr_simple_suites_tutorial_thumb.png
-    :alt: Benchmark suites
+    :alt:
 
   :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py`
 
@@ -38,7 +38,7 @@ Introductory examples to the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/20_basic/images/thumb/sphx_glr_simple_flows_and_runs_tutorial_thumb.png
-    :alt: Flows and Runs
+    :alt:
 
   :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py`
 
@@ -55,7 +55,7 @@ Introductory examples to the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/20_basic/images/thumb/sphx_glr_introduction_tutorial_thumb.png
-    :alt: Introduction tutorial & Setup
+    :alt:
 
   :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`
 
@@ -72,7 +72,7 @@ Introductory examples to the usage of the OpenML python connector.
 .. only:: html
 
   .. image:: /examples/20_basic/images/thumb/sphx_glr_simple_datasets_tutorial_thumb.png
-    :alt: Datasets
+    :alt:
 
   :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py`
 
