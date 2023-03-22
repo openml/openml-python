@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Tasks &#8212; OpenML 0.12.2 documentation</title>
+    <title>Tasks &#8212; OpenML 0.13.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
 
   </head><body>
   
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.13.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -127,11 +126,11 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-tasks-tutorial-py"><span class="std std-ref">here</span></a>
+<p><a class="reference internal" href="#sphx-glr-download-examples-30-extended-tasks-tutorial-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="tasks">
-<span id="sphx-glr-examples-30-extended-tasks-tutorial-py"></span><h1>Tasks<a class="headerlink" href="#tasks" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-examples-30-extended-tasks-tutorial-py"></span><h1>Tasks<a class="headerlink" href="#tasks" title="Permalink to this heading">¶</a></h1>
 <p>A tutorial on how to list and download tasks.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
 
@@ -153,7 +152,7 @@ metric, the splits and an iterator which can be used to access the
 splits in a useful manner.</p></li>
 </ol>
 <section id="listing-tasks">
-<h2>Listing tasks<a class="headerlink" href="#listing-tasks" title="Permalink to this headline">¶</a></h2>
+<h2>Listing tasks<a class="headerlink" href="#listing-tasks" title="Permalink to this heading">¶</a></h2>
 <p>We will start by simply listing only <em>supervised classification</em> tasks:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">)</span>
 </pre></div>
@@ -175,7 +174,6 @@ to have better visualization capabilities and easier access:</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks_df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;tid&#39;, &#39;ttid&#39;, &#39;did&#39;, &#39;name&#39;, &#39;task_type&#39;, &#39;status&#39;,
        &#39;estimation_procedure&#39;, &#39;evaluation_measures&#39;, &#39;source_data&#39;,
        &#39;target_feature&#39;, &#39;MajorityClassSize&#39;, &#39;MaxNominalAttDistinctValues&#39;,
@@ -184,7 +182,7 @@ to have better visualization capabilities and easier access:</p>
        &#39;NumberOfMissingValues&#39;, &#39;NumberOfNumericFeatures&#39;,
        &#39;NumberOfSymbolicFeatures&#39;, &#39;cost_matrix&#39;],
       dtype=&#39;object&#39;)
-First 5 of 3724 tasks:
+First 5 of 3962 tasks:
    tid  ... cost_matrix
 2    2  ...         NaN
 3    3  ...         NaN
@@ -209,16 +207,14 @@ First 5 of 3724 tasks:
 <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 232, 241, 245, 259, 267, 271, 279, 283, 1766, 1775, 1779, 1793, 1801, 1805, 1813, 1817, 1882, 1891, 1895, 1909, 1917, 1921, 1929, 1933, 1945, 1952, 1956, 1967, 1973, 1977, 1983, 1987, 2079, 2125, 2944, 3022, 3034, 3047, 3049, 3053, 3054, 3055, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 4189, 4191, 4197, 4198, 4199, 4217, 4223, 4225, 4226, 4234, 4240, 4254, 4265, 4266, 4288, 4328, 4341, 4345, 4365, 4395, 4396, 4397, 4409, 4411, 4423, 4499, 4508, 4515, 4517, 4518, 4519, 4522, 4538, 4557, 4558, 4562, 4565, 4572, 4582, 4584, 4591, 4618, 4676, 4684, 4697, 4704, 7286, 7307, 7543, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 12738, 12739, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146574, 146576, 146577, 146578, 146583, 146587, 146588, 146593, 146596, 146597, 146600, 146818, 146819, 166859, 166875, 166882, 166884, 166893, 166905, 166906, 166907, 166913, 166915, 166919, 166947, 166953, 166956, 166957, 166958, 166959, 166960, 166967, 166976, 166977, 166978, 166980, 166983, 166988, 166989, 166992, 167016, 167020, 167031, 167037, 167062, 167067, 167068, 167095, 167096, 167100, 167104, 167106, 167151, 167154, 167160, 167163, 167167, 167168, 167171, 167173, 167174, 167175, 167180, 167184, 167187, 167194, 167198, 168300, 168783, 168819, 168820, 168821, 168822, 168823, 168824, 168825, 168907, 189786, 189859, 189899, 189900, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233090, 233094, 233109, 233115, 233171, 233206, 359953, 359954, 359955, 360857, 360865, 360868, 360869]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 232, 241, 245, 259, 267, 271, 279, 283, 1766, 1775, 1779, 1793, 1801, 1805, 1813, 1817, 1882, 1891, 1895, 1909, 1917, 1921, 1929, 1933, 1945, 1952, 1956, 1967, 1973, 1977, 1983, 1987, 2079, 2125, 2944, 3022, 3034, 3047, 3049, 3053, 3054, 3055, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 4189, 4191, 4197, 4198, 4199, 4217, 4223, 4225, 4226, 4234, 4240, 4254, 4265, 4266, 4288, 4328, 4341, 4345, 4365, 4395, 4396, 4397, 4409, 4411, 4423, 4499, 4508, 4515, 4517, 4518, 4519, 4522, 4538, 4557, 4558, 4562, 4565, 4572, 4582, 4584, 4591, 4618, 4676, 4684, 4697, 4704, 7286, 7307, 7543, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 12738, 12739, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146574, 146576, 146577, 146578, 146583, 146587, 146588, 146593, 146596, 146597, 146600, 146818, 146819, 166859, 166875, 166882, 166884, 166893, 166905, 166906, 166907, 166913, 166915, 166919, 166947, 166953, 166956, 166957, 166958, 166959, 166960, 166967, 166976, 166977, 166978, 166980, 166983, 166988, 166989, 166992, 167016, 167020, 167031, 167037, 167062, 167067, 167068, 167095, 167096, 167100, 167104, 167106, 167151, 167154, 167160, 167163, 167167, 167168, 167171, 167173, 167174, 167175, 167180, 167184, 167187, 167194, 167198, 168300, 168783, 168819, 168820, 168821, 168822, 168823, 168824, 168825, 168907, 189786, 189859, 189899, 189900, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233090, 233094, 233109, 233115, 233171, 233206, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964, 361107, 361109, 361146, 361147, 361148, 361149, 361150, 361151, 361152, 361153, 361154, 361155, 361156, 361157, 361158, 361159, 361160, 361161, 361163, 361164, 361165, 361166, 361167, 361168, 361169, 361170, 361171, 361172, 361173, 361174, 361175, 361176, 361183, 361185, 361190, 361305, 361338, 361340]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="p">))</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>292
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>333
 </pre></div>
 </div>
 <p>Then, we can further restrict the tasks to all have the same resampling strategy:</p>
@@ -226,16 +222,14 @@ First 5 of 3724 tasks:
 <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 2079, 3022, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 7286, 7307, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146818, 146819, 168300, 168907, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233171, 359953, 359954, 359955, 360857, 360865, 360868, 360869]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 2079, 3022, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 7286, 7307, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146818, 146819, 168300, 168907, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233171, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964, 361107, 361109, 361146, 361147, 361148, 361149, 361150, 361151, 361152, 361153, 361154, 361155, 361156, 361157, 361158, 361159, 361160, 361161, 361163, 361164, 361165, 361166, 361167, 361168, 361169, 361170, 361171, 361172, 361173, 361174, 361175, 361176, 361183, 361185, 361190, 361305, 361338, 361340]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="p">))</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>121
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>162
 </pre></div>
 </div>
 <p>Resampling strategies can be found on the
@@ -246,7 +240,6 @@ First 5 of 3724 tasks:
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 5 of 91 tasks:
     tid  ... NumberOfSymbolicFeatures
 3     3  ...                       37
@@ -264,7 +257,6 @@ First 5 of 3724 tasks:
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 5 of 24 tasks:
          tid  ... number_samples
 9983    9983  ...            NaN
@@ -281,7 +273,6 @@ First 5 of 3724 tasks:
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>    tid  ... number_samples
 59   59  ...            NaN
 60   60  ...            NaN
@@ -309,12 +300,19 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>46364
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  result = result.append(new_batch, ignore_index=True)
+/home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  result = result.append(new_batch, ignore_index=True)
+/home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  result = result.append(new_batch, ignore_index=True)
+/home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+  result = result.append(new_batch, ignore_index=True)
+46802
 </pre></div>
 </div>
 <section id="exercise">
-<h3>Exercise<a class="headerlink" href="#exercise" title="Permalink to this headline">¶</a></h3>
+<h3>Exercise<a class="headerlink" href="#exercise" title="Permalink to this heading">¶</a></h3>
 <p>Search for the tasks on the ‘eeg-eye-state’ dataset.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;name==&quot;eeg-eye-state&quot;&#39;</span><span class="p">)</span>
 </pre></div>
@@ -773,7 +771,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>11918</th>
+      <th>11920</th>
       <td>146761</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -804,7 +802,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>13203</th>
+      <th>13204</th>
       <td>148117</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -835,7 +833,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>17301</th>
+      <th>17309</th>
       <td>170139</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -866,7 +864,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>20744</th>
+      <th>20760</th>
       <td>191646</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -897,7 +895,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>24418</th>
+      <th>24446</th>
       <td>213320</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -928,7 +926,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>27619</th>
+      <th>27655</th>
       <td>234435</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -959,7 +957,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>31935</th>
+      <th>31979</th>
       <td>256739</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -990,7 +988,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>31945</th>
+      <th>31989</th>
       <td>256750</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1021,7 +1019,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>37108</th>
+      <th>37166</th>
       <td>297708</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1052,7 +1050,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>40306</th>
+      <th>40370</th>
       <td>318835</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1083,7 +1081,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
       <td>NaN</td>
     </tr>
     <tr>
-      <th>43527</th>
+      <th>43587</th>
       <td>339990</td>
       <td>TaskType.CLUSTERING</td>
       <td>1471</td>
@@ -1121,7 +1119,7 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 <br /></section>
 </section>
 <section id="downloading-tasks">
-<h2>Downloading tasks<a class="headerlink" href="#downloading-tasks" title="Permalink to this headline">¶</a></h2>
+<h2>Downloading tasks<a class="headerlink" href="#downloading-tasks" title="Permalink to this heading">¶</a></h2>
 <p>We provide two functions to download tasks, one which downloads only a
 single task by its ID, and one which takes a list of IDs and downloads
 all of these tasks:</p>
@@ -1133,7 +1131,6 @@ all of these tasks:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Classification Task
 ==========================
 Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
@@ -1151,7 +1148,6 @@ Cost Matrix..........: Available
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Classification Task
 ==========================
 Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
@@ -1166,7 +1162,7 @@ Cost Matrix..........: Available
 </div>
 </section>
 <section id="creating-tasks">
-<h2>Creating tasks<a class="headerlink" href="#creating-tasks" title="Permalink to this headline">¶</a></h2>
+<h2>Creating tasks<a class="headerlink" href="#creating-tasks" title="Permalink to this heading">¶</a></h2>
 <p>You can also create new tasks. Take the following into account:</p>
 <ul class="simple">
 <li><p>You can only create tasks on <em>active</em> datasets</p></li>
@@ -1200,13 +1196,12 @@ The use of this test server can affect behaviour and performance of the OpenML-P
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
   warnings.warn(
 </pre></div>
 </div>
 <section id="example">
-<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h3>
 <p>Let’s create a classification task on a dataset. In this example we will do this on the
 Iris dataset (ID=128 (on test server)). We’ll use 10-fold cross-validation (ID=1),
 and <em>predictive accuracy</em> as the predefined measure (this can also be left open).
@@ -1239,8 +1234,11 @@ will be returned.</p>
 <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task already exists. Task ID is 1317
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:113: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+  warnings.warn(
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:256: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+  warnings.warn(
+Task already exists. Task ID is 3496
 </pre></div>
 </div>
 <ul class="simple">
@@ -1248,8 +1246,8 @@ will be returned.</p>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&amp;type=measure">Complete list of model estimation procedures</a>.</p></li>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=measure_type%3Aevaluation_measure&amp;type=measure">Complete list of evaluation measures</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  59.800 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-tasks-tutorial-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  44.722 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-tasks-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e6648ddbb54e75b09dd01d69be33f340/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></p>
 </div>
@@ -1274,8 +1272,8 @@ will be returned.</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
+        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.1.3.<br/>
     </p>
   </div>
 </footer>

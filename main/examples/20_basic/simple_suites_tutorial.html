@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Benchmark suites &#8212; OpenML 0.12.2 documentation</title>
+    <title>Benchmark suites &#8212; OpenML 0.13.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
 
   </head><body>
   
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.13.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -121,11 +120,11 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-20-basic-simple-suites-tutorial-py"><span class="std std-ref">here</span></a>
+<p><a class="reference internal" href="#sphx-glr-download-examples-20-basic-simple-suites-tutorial-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="benchmark-suites">
-<span id="sphx-glr-examples-20-basic-simple-suites-tutorial-py"></span><h1>Benchmark suites<a class="headerlink" href="#benchmark-suites" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-examples-20-basic-simple-suites-tutorial-py"></span><h1>Benchmark suites<a class="headerlink" href="#benchmark-suites" title="Permalink to this heading">¶</a></h1>
 <p>This is a brief showcase of OpenML benchmark suites, which were introduced by
 <a class="reference external" href="https://arxiv.org/abs/1708.03731v2">Bischl et al. (2019)</a>. Benchmark suites standardize the
 datasets and splits to be used in an experiment or paper. They are fully integrated into OpenML
@@ -136,7 +135,7 @@ and simplify both the sharing of the setup and the results.</p>
 </pre></div>
 </div>
 <section id="openml-cc18">
-<h2>OpenML-CC18<a class="headerlink" href="#openml-cc18" title="Permalink to this headline">¶</a></h2>
+<h2>OpenML-CC18<a class="headerlink" href="#openml-cc18" title="Permalink to this heading">¶</a></h2>
 <p>As an example we have a look at the OpenML-CC18, which is a suite of 72 classification datasets
 from OpenML which were carefully selected to be usable by many algorithms and also represent
 datasets commonly used in machine learning research. These are all datasets from mid-2018 that
@@ -154,17 +153,16 @@ measures).</p></li>
 <p>In this example we’ll focus on how to use benchmark suites in practice.</p>
 </section>
 <section id="downloading-benchmark-suites">
-<h2>Downloading benchmark suites<a class="headerlink" href="#downloading-benchmark-suites" title="Permalink to this headline">¶</a></h2>
+<h2>Downloading benchmark suites<a class="headerlink" href="#downloading-benchmark-suites" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">suite</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">get_suite</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">suite</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Benchmark Suite
 ======================
 ID..............: 99
-Name............: OpenML Benchmarking Suites and the OpenML-CC18
-Status..........: in_preparation
+Name............: OpenML-CC18 Curated Classification benchmark
+Status..........: active
 Main Entity Type: task
 Study URL.......: https://www.openml.org/s/99
 # of Data.......: 72
@@ -180,7 +178,6 @@ a list of which tasks constitute the study.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[3, 6, 11, 12, 14, 15, 16, 18, 22, 23, 28, 29, 31, 32, 37, 43, 45, 49, 53, 219, 2074, 2079, 3021, 3022, 3481, 3549, 3560, 3573, 3902, 3903, 3904, 3913, 3917, 3918, 7592, 9910, 9946, 9952, 9957, 9960, 9964, 9971, 9976, 9977, 9978, 9981, 9985, 10093, 10101, 14952, 14954, 14965, 14969, 14970, 125920, 125922, 146195, 146800, 146817, 146819, 146820, 146821, 146822, 146824, 146825, 167119, 167120, 167121, 167124, 167125, 167140, 167141]
 </pre></div>
 </div>
@@ -190,7 +187,6 @@ a list of which tasks constitute the study.</p>
     <span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Classification Task
 ==========================
 Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
@@ -222,14 +218,14 @@ Cost Matrix..........: Available
 </div>
 </section>
 <section id="further-examples">
-<h2>Further examples<a class="headerlink" href="#further-examples" title="Permalink to this headline">¶</a></h2>
+<h2>Further examples<a class="headerlink" href="#further-examples" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="../30_extended/suites_tutorial.html#sphx-glr-examples-30-extended-suites-tutorial-py"><span class="std std-ref">Benchmark suites</span></a></p></li>
 <li><p><a class="reference internal" href="../30_extended/study_tutorial.html#sphx-glr-examples-30-extended-study-tutorial-py"><span class="std std-ref">Benchmark studies</span></a></p></li>
 <li><p><a class="reference internal" href="../40_paper/2018_ida_strang_example.html#sphx-glr-examples-40-paper-2018-ida-strang-example-py"><span class="std std-ref">Strang et al. (2018)</span></a></p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  11.041 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-20-basic-simple-suites-tutorial-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  29.196 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-20-basic-simple-suites-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/25a00d3d6385de3b0fbf8dd033ff9db0/simple_suites_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">simple_suites_tutorial.py</span></code></a></p>
 </div>
@@ -253,8 +249,8 @@ Cost Matrix..........: Available
       
     </p>
     <p>
-        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
+        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.1.3.<br/>
     </p>
   </div>
 </footer>

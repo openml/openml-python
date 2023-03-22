@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Datasets &#8212; OpenML 0.12.2 documentation</title>
+    <title>Datasets &#8212; OpenML 0.13.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
 
   </head><body>
   
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.13.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -128,11 +127,11 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-datasets-tutorial-py"><span class="std std-ref">here</span></a>
+<p><a class="reference internal" href="#sphx-glr-download-examples-30-extended-datasets-tutorial-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="datasets">
-<span id="sphx-glr-examples-30-extended-datasets-tutorial-py"></span><h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-examples-30-extended-datasets-tutorial-py"></span><h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this heading">¶</a></h1>
 <p>How to list and download datasets.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clauses</span>
 
@@ -142,7 +141,7 @@ to download the full example code</p>
 </pre></div>
 </div>
 <section id="exercise-0">
-<h2>Exercise 0<a class="headerlink" href="#exercise-0" title="Permalink to this headline">¶</a></h2>
+<h2>Exercise 0<a class="headerlink" href="#exercise-0" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>List datasets</p>
 <ul>
@@ -165,8 +164,7 @@ to download the full example code</p>
 <span class="n">openml_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 3348 datasets...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 5012 datasets...
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -404,7 +402,7 @@ to download the full example code</p>
 <br />
 <br /></section>
 <section id="exercise-1">
-<h2>Exercise 1<a class="headerlink" href="#exercise-1" title="Permalink to this headline">¶</a></h2>
+<h2>Exercise 1<a class="headerlink" href="#exercise-1" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Find datasets with more than 10000 examples.</p></li>
 <li><p>Find a dataset called ‘eeg_eye_state’.</p></li>
@@ -564,13 +562,285 @@ to download the full example code</p>
       <td>129.0</td>
       <td>1000.0</td>
     </tr>
+    <tr>
+      <th>43723</th>
+      <td>43723</td>
+      <td>Toronto-Apartment-Rental-Price</td>
+      <td>1124.0</td>
+      <td>7.0</td>
+      <td>188.0</td>
+    </tr>
+    <tr>
+      <th>44282</th>
+      <td>44282</td>
+      <td>Meta_Album_PLK_Mini</td>
+      <td>3440.0</td>
+      <td>3.0</td>
+      <td>86.0</td>
+    </tr>
+    <tr>
+      <th>44283</th>
+      <td>44283</td>
+      <td>Meta_Album_FLW_Mini</td>
+      <td>4080.0</td>
+      <td>3.0</td>
+      <td>102.0</td>
+    </tr>
+    <tr>
+      <th>44284</th>
+      <td>44284</td>
+      <td>Meta_Album_SPT_Mini</td>
+      <td>2920.0</td>
+      <td>3.0</td>
+      <td>73.0</td>
+    </tr>
+    <tr>
+      <th>44285</th>
+      <td>44285</td>
+      <td>Meta_Album_BRD_Mini</td>
+      <td>12600.0</td>
+      <td>3.0</td>
+      <td>315.0</td>
+    </tr>
+    <tr>
+      <th>44288</th>
+      <td>44288</td>
+      <td>Meta_Album_TEX_Mini</td>
+      <td>2560.0</td>
+      <td>3.0</td>
+      <td>64.0</td>
+    </tr>
+    <tr>
+      <th>44289</th>
+      <td>44289</td>
+      <td>Meta_Album_CRS_Mini</td>
+      <td>7840.0</td>
+      <td>3.0</td>
+      <td>196.0</td>
+    </tr>
+    <tr>
+      <th>44292</th>
+      <td>44292</td>
+      <td>Meta_Album_INS_2_Mini</td>
+      <td>4080.0</td>
+      <td>3.0</td>
+      <td>102.0</td>
+    </tr>
+    <tr>
+      <th>44298</th>
+      <td>44298</td>
+      <td>Meta_Album_DOG_Mini</td>
+      <td>4800.0</td>
+      <td>3.0</td>
+      <td>120.0</td>
+    </tr>
+    <tr>
+      <th>44304</th>
+      <td>44304</td>
+      <td>Meta_Album_TEX_ALOT_Mini</td>
+      <td>10000.0</td>
+      <td>3.0</td>
+      <td>250.0</td>
+    </tr>
+    <tr>
+      <th>44306</th>
+      <td>44306</td>
+      <td>Meta_Album_INS_Mini</td>
+      <td>4160.0</td>
+      <td>3.0</td>
+      <td>104.0</td>
+    </tr>
+    <tr>
+      <th>44317</th>
+      <td>44317</td>
+      <td>Meta_Album_PLK_Extended</td>
+      <td>473273.0</td>
+      <td>3.0</td>
+      <td>102.0</td>
+    </tr>
+    <tr>
+      <th>44318</th>
+      <td>44318</td>
+      <td>Meta_Album_FLW_Extended</td>
+      <td>8189.0</td>
+      <td>3.0</td>
+      <td>102.0</td>
+    </tr>
+    <tr>
+      <th>44319</th>
+      <td>44319</td>
+      <td>Meta_Album_SPT_Extended</td>
+      <td>10416.0</td>
+      <td>3.0</td>
+      <td>73.0</td>
+    </tr>
+    <tr>
+      <th>44320</th>
+      <td>44320</td>
+      <td>Meta_Album_BRD_Extended</td>
+      <td>49054.0</td>
+      <td>3.0</td>
+      <td>315.0</td>
+    </tr>
+    <tr>
+      <th>44322</th>
+      <td>44322</td>
+      <td>Meta_Album_TEX_Extended</td>
+      <td>8675.0</td>
+      <td>3.0</td>
+      <td>64.0</td>
+    </tr>
+    <tr>
+      <th>44323</th>
+      <td>44323</td>
+      <td>Meta_Album_CRS_Extended</td>
+      <td>16185.0</td>
+      <td>3.0</td>
+      <td>196.0</td>
+    </tr>
+    <tr>
+      <th>44326</th>
+      <td>44326</td>
+      <td>Meta_Album_INS_2_Extended</td>
+      <td>75222.0</td>
+      <td>3.0</td>
+      <td>102.0</td>
+    </tr>
+    <tr>
+      <th>44331</th>
+      <td>44331</td>
+      <td>Meta_Album_DOG_Extended</td>
+      <td>20480.0</td>
+      <td>3.0</td>
+      <td>120.0</td>
+    </tr>
+    <tr>
+      <th>44337</th>
+      <td>44337</td>
+      <td>Meta_Album_TEX_ALOT_Extended</td>
+      <td>25000.0</td>
+      <td>3.0</td>
+      <td>250.0</td>
+    </tr>
+    <tr>
+      <th>44340</th>
+      <td>44340</td>
+      <td>Meta_Album_INS_Extended</td>
+      <td>170506.0</td>
+      <td>3.0</td>
+      <td>117.0</td>
+    </tr>
+    <tr>
+      <th>44533</th>
+      <td>44533</td>
+      <td>dionis_seed_0_nrows_2000_nclasses_10_ncols_100...</td>
+      <td>2000.0</td>
+      <td>61.0</td>
+      <td>355.0</td>
+    </tr>
+    <tr>
+      <th>44534</th>
+      <td>44534</td>
+      <td>dionis_seed_1_nrows_2000_nclasses_10_ncols_100...</td>
+      <td>2000.0</td>
+      <td>61.0</td>
+      <td>355.0</td>
+    </tr>
+    <tr>
+      <th>44535</th>
+      <td>44535</td>
+      <td>dionis_seed_2_nrows_2000_nclasses_10_ncols_100...</td>
+      <td>2000.0</td>
+      <td>61.0</td>
+      <td>355.0</td>
+    </tr>
+    <tr>
+      <th>44536</th>
+      <td>44536</td>
+      <td>dionis_seed_3_nrows_2000_nclasses_10_ncols_100...</td>
+      <td>2000.0</td>
+      <td>61.0</td>
+      <td>355.0</td>
+    </tr>
+    <tr>
+      <th>44537</th>
+      <td>44537</td>
+      <td>dionis_seed_4_nrows_2000_nclasses_10_ncols_100...</td>
+      <td>2000.0</td>
+      <td>61.0</td>
+      <td>355.0</td>
+    </tr>
+    <tr>
+      <th>44728</th>
+      <td>44728</td>
+      <td>helena_seed_0_nrows_2000_nclasses_10_ncols_100...</td>
+      <td>2000.0</td>
+      <td>28.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>44729</th>
+      <td>44729</td>
+      <td>helena_seed_1_nrows_2000_nclasses_10_ncols_100...</td>
+      <td>2000.0</td>
+      <td>28.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>44730</th>
+      <td>44730</td>
+      <td>helena_seed_2_nrows_2000_nclasses_10_ncols_100...</td>
+      <td>2000.0</td>
+      <td>28.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>44731</th>
+      <td>44731</td>
+      <td>helena_seed_3_nrows_2000_nclasses_10_ncols_100...</td>
+      <td>2000.0</td>
+      <td>28.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>44732</th>
+      <td>44732</td>
+      <td>helena_seed_4_nrows_2000_nclasses_10_ncols_100...</td>
+      <td>2000.0</td>
+      <td>28.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>45049</th>
+      <td>45049</td>
+      <td>MD_MIX_Mini_Copy</td>
+      <td>28240.0</td>
+      <td>69.0</td>
+      <td>706.0</td>
+    </tr>
+    <tr>
+      <th>45102</th>
+      <td>45102</td>
+      <td>dailybike</td>
+      <td>731.0</td>
+      <td>13.0</td>
+      <td>606.0</td>
+    </tr>
+    <tr>
+      <th>45103</th>
+      <td>45103</td>
+      <td>dailybike</td>
+      <td>731.0</td>
+      <td>13.0</td>
+      <td>606.0</td>
+    </tr>
   </tbody>
 </table>
 </div>
 </div>
 <br />
 <br /><section id="download-datasets">
-<h3>Download datasets<a class="headerlink" href="#download-datasets" title="Permalink to this headline">¶</a></h3>
+<h3>Download datasets<a class="headerlink" href="#download-datasets" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is done based on the dataset ID.</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">)</span>
 
@@ -583,9 +853,8 @@ to download the full example code</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">description</span><span class="p">[:</span><span class="mi">500</span><span class="p">])</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>This is dataset &#39;eeg-eye-state&#39;, the target feature is &#39;Class&#39;
-URL: https://www.openml.org/data/v1/download/1587924/eeg-eye-state.arff
+URL: https://api.openml.org/data/v1/download/1587924/eeg-eye-state.arff
 **Author**: Oliver Roesler
 **Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/EEG+Eye+State), Baden-Wuerttemberg, Cooperative State University (DHBW), Stuttgart, Germany
 **Please cite**: [UCI](https://archive.ics.uci.edu/ml/citation_policy.html)
@@ -607,7 +876,6 @@ and manually create a dataframe.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">eeg</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>            V1           V2           V3  ...          V13          V14  class
 0  4329.229980  4009.229980  4289.229980  ...  4635.899902  4393.850098      0
 1  4324.620117  4004.620117  4293.850098  ...  4632.819824  4384.100098      0
@@ -632,7 +900,6 @@ dataframe with the correct dtypes.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>        V1       V2       V3       V4  ...      V11      V12      V13      V14
 0  4329.23  4009.23  4289.23  4148.21  ...  4211.28  4280.51  4635.90  4393.85
 1  4324.62  4004.62  4293.85  4148.72  ...  4207.69  4279.49  4632.82  4384.10
@@ -676,7 +943,7 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 </section>
 </section>
 <section id="exercise-2">
-<h2>Exercise 2<a class="headerlink" href="#exercise-2" title="Permalink to this headline">¶</a></h2>
+<h2>Exercise 2<a class="headerlink" href="#exercise-2" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Explore the data visually.</p></li>
 </ul>
@@ -692,9 +959,8 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<img alt="datasets tutorial" class="sphx-glr-single-img" src="../../_images/sphx_glr_datasets_tutorial_001.png" />
-<section id="edit-a-created-dataset">
-<h3>Edit a created dataset<a class="headerlink" href="#edit-a-created-dataset" title="Permalink to this headline">¶</a></h3>
+<img src="../../_images/sphx_glr_datasets_tutorial_001.png" srcset="../../_images/sphx_glr_datasets_tutorial_001.png" alt="datasets tutorial" class = "sphx-glr-single-img"/><section id="edit-a-created-dataset">
+<h3>Edit a created dataset<a class="headerlink" href="#edit-a-created-dataset" title="Permalink to this heading">¶</a></h3>
 <p>This example uses the test server, to avoid editing a dataset on the main server.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -705,8 +971,7 @@ The use of this test server can affect behaviour and performance of the OpenML-P
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
   warnings.warn(
 </pre></div>
 </div>
@@ -731,7 +996,6 @@ original_data_url, paper_url</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Edited dataset ID: </span><span class="si">{</span><span class="n">data_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Edited dataset ID: 128
 </pre></div>
 </div>
@@ -747,13 +1011,12 @@ This example here only shows a failure when trying to work on a dataset not owne
     <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>https://test.openml.org/api/v1/xml/data/edit returned code 1065: Critical features default_target_attribute, row_id_attribute and ignore_attribute can be edited only by the owner. Fork the dataset if changes are required. - None
 </pre></div>
 </div>
 </section>
 <section id="fork-dataset">
-<h3>Fork dataset<a class="headerlink" href="#fork-dataset" title="Permalink to this headline">¶</a></h3>
+<h3>Fork dataset<a class="headerlink" href="#fork-dataset" title="Permalink to this heading">¶</a></h3>
 <p>Used to create a copy of the dataset with you as the owner.
 Use this API only if you are unable to edit the critical fields (default_target_attribute,
 ignore_attribute, row_id_attribute) of a dataset through the edit_dataset API.
@@ -766,13 +1029,12 @@ After the dataset is forked, you can edit the new version of the dataset using e
 <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>92458
-Forked dataset ID: 92458
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>19428
+Forked dataset ID: 19428
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  14.655 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-datasets-tutorial-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  15.981 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-datasets-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/b95c071188526f5ef5d991e382df9fa5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>
 </div>
@@ -797,8 +1059,8 @@ Forked dataset ID: 92458
       
     </p>
     <p>
-        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
+        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.1.3.<br/>
     </p>
   </div>
 </footer>

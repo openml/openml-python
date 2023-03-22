@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_examples_30_extended_task_manual_iteration_tutorial.py>`
+        :ref:`Go to the end <sphx_glr_download_examples_30_extended_task_manual_iteration_tutorial.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -99,14 +99,17 @@ A list of all available estimation procedures is available
 Task ``233`` is a simple task using the holdout estimation procedure and therefore has only a
 single repeat, a single fold and a single sample size:
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-51
+.. GENERATED FROM PYTHON SOURCE LINES 44-54
 
 .. code-block:: default
 
 
     print(
         "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-            task_id, n_repeats, n_folds, n_samples,
+            task_id,
+            n_repeats,
+            n_folds,
+            n_samples,
         )
     )
 
@@ -116,8 +119,6 @@ single repeat, a single fold and a single sample size:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Task 233: number of repeats: 1, number of folds: 1, number of samples 1.
@@ -125,18 +126,22 @@ single repeat, a single fold and a single sample size:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-55
+.. GENERATED FROM PYTHON SOURCE LINES 55-58
 
 We can now retrieve the train/test split for this combination of repeats, folds and number of
 samples (indexing is zero-based). Usually, one would loop over all repeats, folds and sample
 sizes, but we can neglect this here as there is only a single repetition.
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-61
+.. GENERATED FROM PYTHON SOURCE LINES 58-68
 
 .. code-block:: default
 
 
-    train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0,)
+    train_indices, test_indices = task.get_train_test_split_indices(
+        repeat=0,
+        fold=0,
+        sample=0,
+    )
 
     print(train_indices.shape, train_indices.dtype)
     print(test_indices.shape, test_indices.dtype)
@@ -147,8 +152,6 @@ sizes, but we can neglect this here as there is only a single repetition.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     (2142,) int32
@@ -157,11 +160,11 @@ sizes, but we can neglect this here as there is only a single repetition.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-63
+.. GENERATED FROM PYTHON SOURCE LINES 69-70
 
 And then split the data based on this:
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-76
+.. GENERATED FROM PYTHON SOURCE LINES 70-86
 
 .. code-block:: default
 
@@ -174,7 +177,10 @@ And then split the data based on this:
 
     print(
         "X_train.shape: {}, y_train.shape: {}, X_test.shape: {}, y_test.shape: {}".format(
-            X_train.shape, y_train.shape, X_test.shape, y_test.shape,
+            X_train.shape,
+            y_train.shape,
+            X_test.shape,
+            y_test.shape,
         )
     )
 
@@ -184,8 +190,6 @@ And then split the data based on this:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     X_train.shape: (2142, 36), y_train.shape: (2142,), X_test.shape: (1054, 36), y_test.shape: (1054,)
@@ -193,11 +197,11 @@ And then split the data based on this:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-78
+.. GENERATED FROM PYTHON SOURCE LINES 87-88
 
 Obviously, we can also retrieve cross-validation versions of the dataset used in task ``233``:
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-89
+.. GENERATED FROM PYTHON SOURCE LINES 88-102
 
 .. code-block:: default
 
@@ -208,7 +212,10 @@ Obviously, we can also retrieve cross-validation versions of the dataset used in
     n_repeats, n_folds, n_samples = task.get_split_dimensions()
     print(
         "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-            task_id, n_repeats, n_folds, n_samples,
+            task_id,
+            n_repeats,
+            n_folds,
+            n_samples,
         )
     )
 
@@ -218,8 +225,6 @@ Obviously, we can also retrieve cross-validation versions of the dataset used in
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Task 3: number of repeats: 1, number of folds: 10, number of samples 1.
@@ -227,11 +232,11 @@ Obviously, we can also retrieve cross-validation versions of the dataset used in
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-91
+.. GENERATED FROM PYTHON SOURCE LINES 103-104
 
 And then perform the aforementioned iteration over all splits:
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-115
+.. GENERATED FROM PYTHON SOURCE LINES 104-130
 
 .. code-block:: default
 
@@ -239,7 +244,9 @@ And then perform the aforementioned iteration over all splits:
         for fold_idx in range(n_folds):
             for sample_idx in range(n_samples):
                 train_indices, test_indices = task.get_train_test_split_indices(
-                    repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
+                    repeat=repeat_idx,
+                    fold=fold_idx,
+                    sample=sample_idx,
                 )
                 X_train = X.iloc[train_indices]
                 y_train = y.iloc[train_indices]
@@ -264,8 +271,6 @@ And then perform the aforementioned iteration over all splits:
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -283,11 +288,11 @@ And then perform the aforementioned iteration over all splits:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-117
+.. GENERATED FROM PYTHON SOURCE LINES 131-132
 
 And also versions with multiple repeats:
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-128
+.. GENERATED FROM PYTHON SOURCE LINES 132-146
 
 .. code-block:: default
 
@@ -298,7 +303,10 @@ And also versions with multiple repeats:
     n_repeats, n_folds, n_samples = task.get_split_dimensions()
     print(
         "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-            task_id, n_repeats, n_folds, n_samples,
+            task_id,
+            n_repeats,
+            n_folds,
+            n_samples,
         )
     )
 
@@ -308,8 +316,6 @@ And also versions with multiple repeats:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Task 1767: number of repeats: 5, number of folds: 2, number of samples 1.
@@ -317,11 +323,11 @@ And also versions with multiple repeats:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-130
+.. GENERATED FROM PYTHON SOURCE LINES 147-148
 
 And then again perform the aforementioned iteration over all splits:
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-154
+.. GENERATED FROM PYTHON SOURCE LINES 148-174
 
 .. code-block:: default
 
@@ -329,7 +335,9 @@ And then again perform the aforementioned iteration over all splits:
         for fold_idx in range(n_folds):
             for sample_idx in range(n_samples):
                 train_indices, test_indices = task.get_train_test_split_indices(
-                    repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
+                    repeat=repeat_idx,
+                    fold=fold_idx,
+                    sample=sample_idx,
                 )
                 X_train = X.iloc[train_indices]
                 y_train = y.iloc[train_indices]
@@ -354,8 +362,6 @@ And then again perform the aforementioned iteration over all splits:
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -373,11 +379,11 @@ And then again perform the aforementioned iteration over all splits:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-156
+.. GENERATED FROM PYTHON SOURCE LINES 175-176
 
 And finally a task based on learning curves:
 
-.. GENERATED FROM PYTHON SOURCE LINES 156-167
+.. GENERATED FROM PYTHON SOURCE LINES 176-190
 
 .. code-block:: default
 
@@ -388,7 +394,10 @@ And finally a task based on learning curves:
     n_repeats, n_folds, n_samples = task.get_split_dimensions()
     print(
         "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-            task_id, n_repeats, n_folds, n_samples,
+            task_id,
+            n_repeats,
+            n_folds,
+            n_samples,
         )
     )
 
@@ -398,8 +407,6 @@ And finally a task based on learning curves:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Task 1702: number of repeats: 1, number of folds: 10, number of samples 12.
@@ -407,11 +414,11 @@ And finally a task based on learning curves:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-169
+.. GENERATED FROM PYTHON SOURCE LINES 191-192
 
 And then again perform the aforementioned iteration over all splits:
 
-.. GENERATED FROM PYTHON SOURCE LINES 169-192
+.. GENERATED FROM PYTHON SOURCE LINES 192-217
 
 .. code-block:: default
 
@@ -419,7 +426,9 @@ And then again perform the aforementioned iteration over all splits:
         for fold_idx in range(n_folds):
             for sample_idx in range(n_samples):
                 train_indices, test_indices = task.get_train_test_split_indices(
-                    repeat=repeat_idx, fold=fold_idx, sample=sample_idx,
+                    repeat=repeat_idx,
+                    fold=fold_idx,
+                    sample=sample_idx,
                 )
                 X_train = X.iloc[train_indices]
                 y_train = y.iloc[train_indices]
@@ -443,8 +452,6 @@ And then again perform the aforementioned iteration over all splits:
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -575,28 +582,25 @@ And then again perform the aforementioned iteration over all splits:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.040 seconds)
+   **Total running time of the script:** ( 0 minutes  5.358 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_task_manual_iteration_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
 
-  .. container:: sphx-glr-download sphx-glr-download-python
 
-     :download:`Download Python source code: task_manual_iteration_tutorial.py <task_manual_iteration_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-python
 
+      :download:`Download Python source code: task_manual_iteration_tutorial.py <task_manual_iteration_tutorial.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: task_manual_iteration_tutorial.ipynb <task_manual_iteration_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: task_manual_iteration_tutorial.ipynb <task_manual_iteration_tutorial.ipynb>`
 
 
 .. only:: html

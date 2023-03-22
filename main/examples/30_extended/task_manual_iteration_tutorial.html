@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Tasks: retrieving splits &#8212; OpenML 0.12.2 documentation</title>
+    <title>Tasks: retrieving splits &#8212; OpenML 0.13.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
 
   </head><body>
   
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.13.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -116,11 +115,11 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-task-manual-iteration-tutorial-py"><span class="std std-ref">here</span></a>
+<p><a class="reference internal" href="#sphx-glr-download-examples-30-extended-task-manual-iteration-tutorial-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="tasks-retrieving-splits">
-<span id="sphx-glr-examples-30-extended-task-manual-iteration-tutorial-py"></span><h1>Tasks: retrieving splits<a class="headerlink" href="#tasks-retrieving-splits" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-examples-30-extended-task-manual-iteration-tutorial-py"></span><h1>Tasks: retrieving splits<a class="headerlink" href="#tasks-retrieving-splits" title="Permalink to this heading">¶</a></h1>
 <p>Tasks define a target and a train/test split. Normally, they are the input to the function
 <code class="docutils literal notranslate"><span class="pre">openml.runs.run_model_on_task</span></code> which automatically runs the model on all splits of the task.
 However, sometimes it is necessary to manually split a dataset to perform experiments outside of
@@ -158,25 +157,30 @@ defined by the task:</p>
 single repeat, a single fold and a single sample size:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span>
     <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="n">task_id</span><span class="p">,</span> <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span>
+        <span class="n">task_id</span><span class="p">,</span>
+        <span class="n">n_repeats</span><span class="p">,</span>
+        <span class="n">n_folds</span><span class="p">,</span>
+        <span class="n">n_samples</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task 233: number of repeats: 1, number of folds: 1, number of samples 1.
 </pre></div>
 </div>
 <p>We can now retrieve the train/test split for this combination of repeats, folds and number of
 samples (indexing is zero-based). Usually, one would loop over all repeats, folds and sample
 sizes, but we can neglect this here as there is only a single repetition.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span><span class="n">repeat</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="mi">0</span><span class="p">,)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
+    <span class="n">repeat</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">fold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">sample</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">train_indices</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">train_indices</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">test_indices</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">test_indices</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(2142,) int32
 (1054,) int32
 </pre></div>
@@ -190,12 +194,14 @@ sizes, but we can neglect this here as there is only a single repetition.</p>
 
 <span class="nb">print</span><span class="p">(</span>
     <span class="s2">&quot;X_train.shape: </span><span class="si">{}</span><span class="s2">, y_train.shape: </span><span class="si">{}</span><span class="s2">, X_test.shape: </span><span class="si">{}</span><span class="s2">, y_test.shape: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+        <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+        <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+        <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+        <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>X_train.shape: (2142, 36), y_train.shape: (2142,), X_test.shape: (1054, 36), y_test.shape: (1054,)
 </pre></div>
 </div>
@@ -206,12 +212,14 @@ sizes, but we can neglect this here as there is only a single repetition.</p>
 <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="n">task_id</span><span class="p">,</span> <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span>
+        <span class="n">task_id</span><span class="p">,</span>
+        <span class="n">n_repeats</span><span class="p">,</span>
+        <span class="n">n_folds</span><span class="p">,</span>
+        <span class="n">n_samples</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task 3: number of repeats: 1, number of folds: 10, number of samples 1.
 </pre></div>
 </div>
@@ -220,7 +228,9 @@ sizes, but we can neglect this here as there is only a single repetition.</p>
     <span class="k">for</span> <span class="n">fold_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">sample_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
             <span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
-                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span> <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
+                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span>
+                <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span>
+                <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
             <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
@@ -241,7 +251,6 @@ sizes, but we can neglect this here as there is only a single repetition.</p>
             <span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0, fold #0, samples 0: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
 Repeat #0, fold #1, samples 0: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
 Repeat #0, fold #2, samples 0: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
@@ -261,12 +270,14 @@ Repeat #0, fold #9, samples 0: X_train.shape: (2877, 36), y_train.shape (2877,),
 <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="n">task_id</span><span class="p">,</span> <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span>
+        <span class="n">task_id</span><span class="p">,</span>
+        <span class="n">n_repeats</span><span class="p">,</span>
+        <span class="n">n_folds</span><span class="p">,</span>
+        <span class="n">n_samples</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task 1767: number of repeats: 5, number of folds: 2, number of samples 1.
 </pre></div>
 </div>
@@ -275,7 +286,9 @@ Repeat #0, fold #9, samples 0: X_train.shape: (2877, 36), y_train.shape (2877,),
     <span class="k">for</span> <span class="n">fold_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">sample_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
             <span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
-                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span> <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
+                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span>
+                <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span>
+                <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
             <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
@@ -296,7 +309,6 @@ Repeat #0, fold #9, samples 0: X_train.shape: (2877, 36), y_train.shape (2877,),
             <span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0, fold #0, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,), X_test.shape (1598, 36), y_test.shape (1598,)
 Repeat #0, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,), X_test.shape (1598, 36), y_test.shape (1598,)
 Repeat #1, fold #0, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,), X_test.shape (1598, 36), y_test.shape (1598,)
@@ -316,12 +328,14 @@ Repeat #4, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,),
 <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="n">task_id</span><span class="p">,</span> <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span>
+        <span class="n">task_id</span><span class="p">,</span>
+        <span class="n">n_repeats</span><span class="p">,</span>
+        <span class="n">n_folds</span><span class="p">,</span>
+        <span class="n">n_samples</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task 1702: number of repeats: 1, number of folds: 10, number of samples 12.
 </pre></div>
 </div>
@@ -330,7 +344,9 @@ Repeat #4, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,),
     <span class="k">for</span> <span class="n">fold_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">sample_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
             <span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
-                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span> <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
+                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span>
+                <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span>
+                <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
             <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
@@ -351,7 +367,6 @@ Repeat #4, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,),
             <span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0, fold #0, samples 0: X_train.shape: (64, 36), y_train.shape (64,), X_test.shape (320, 36), y_test.shape (320,)
 Repeat #0, fold #0, samples 1: X_train.shape: (91, 36), y_train.shape (91,), X_test.shape (320, 36), y_test.shape (320,)
 Repeat #0, fold #0, samples 2: X_train.shape: (128, 36), y_train.shape (128,), X_test.shape (320, 36), y_test.shape (320,)
@@ -474,8 +489,8 @@ Repeat #0, fold #9, samples 10: X_train.shape: (2048, 36), y_train.shape (2048,)
 Repeat #0, fold #9, samples 11: X_train.shape: (2877, 36), y_train.shape (2877,), X_test.shape (319, 36), y_test.shape (319,)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.040 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-task-manual-iteration-tutorial-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.358 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-task-manual-iteration-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c4948b7cf528f51a636efd320e0f6d57/task_manual_iteration_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">task_manual_iteration_tutorial.py</span></code></a></p>
 </div>
@@ -498,8 +513,8 @@ Repeat #0, fold #9, samples 11: X_train.shape: (2877, 36), y_train.shape (2877,)
       
     </p>
     <p>
-        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
+        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.1.3.<br/>
     </p>
   </div>
 </footer>

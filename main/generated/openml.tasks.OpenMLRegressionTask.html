@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>openml.tasks.OpenMLRegressionTask &#8212; OpenML 0.12.2 documentation</title>
+    <title>openml.tasks.OpenMLRegressionTask &#8212; OpenML 0.13.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
 
   </head><body>
   
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.13.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -107,7 +106,21 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>.OpenMLRegressionTask</a></li>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>.OpenMLRegressionTask</a><ul>
+<li><a class="reference internal" href="#openml.tasks.OpenMLRegressionTask"><code class="docutils literal notranslate"><span class="pre">OpenMLRegressionTask</span></code></a><ul>
+<li><a class="reference internal" href="#openml.tasks.OpenMLRegressionTask.download_split"><code class="docutils literal notranslate"><span class="pre">OpenMLRegressionTask.download_split()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLRegressionTask.get_X_and_y"><code class="docutils literal notranslate"><span class="pre">OpenMLRegressionTask.get_X_and_y()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLRegressionTask.get_dataset"><code class="docutils literal notranslate"><span class="pre">OpenMLRegressionTask.get_dataset()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLRegressionTask.id"><code class="docutils literal notranslate"><span class="pre">OpenMLRegressionTask.id</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLRegressionTask.open_in_browser"><code class="docutils literal notranslate"><span class="pre">OpenMLRegressionTask.open_in_browser()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLRegressionTask.openml_url"><code class="docutils literal notranslate"><span class="pre">OpenMLRegressionTask.openml_url</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLRegressionTask.push_tag"><code class="docutils literal notranslate"><span class="pre">OpenMLRegressionTask.push_tag()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLRegressionTask.remove_tag"><code class="docutils literal notranslate"><span class="pre">OpenMLRegressionTask.remove_tag()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLRegressionTask.url_for_id"><code class="docutils literal notranslate"><span class="pre">OpenMLRegressionTask.url_for_id()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -115,30 +128,30 @@
     <div class="body col-md-9 content" role="main">
       
   <section id="openml-tasks-openmlregressiontask">
-<h1><a class="reference internal" href="../api.html#module-openml.tasks" title="openml.tasks"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code></a>.OpenMLRegressionTask<a class="headerlink" href="#openml-tasks-openmlregressiontask" title="Permalink to this headline">¶</a></h1>
+<h1><a class="reference internal" href="../api.html#module-openml.tasks" title="openml.tasks"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code></a>.OpenMLRegressionTask<a class="headerlink" href="#openml-tasks-openmlregressiontask" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="openml.tasks.OpenMLRegressionTask">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">openml.tasks.</span></span><span class="sig-name descname"><span class="pre">OpenMLRegressionTask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_type_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="openml.tasks.TaskType.html#openml.tasks.TaskType" title="openml.tasks.task.TaskType"><span class="pre">openml.tasks.task.TaskType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_set_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimation_procedure_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimation_procedure_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimation_parameters</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_splits_url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_measure</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openml.tasks.</span></span><span class="sig-name descname"><span class="pre">OpenMLRegressionTask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_type_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="openml.tasks.TaskType.html#openml.tasks.TaskType" title="openml.tasks.task.TaskType"><span class="pre">TaskType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_set_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimation_procedure_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimation_procedure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimation_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_splits_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_measure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>OpenML Regression object.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="openml.tasks.OpenMLRegressionTask.download_split">
-<span class="sig-name descname"><span class="pre">download_split</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="openml.tasks.OpenMLSplit.html#openml.tasks.OpenMLSplit" title="openml.tasks.split.OpenMLSplit"><span class="pre">openml.tasks.split.OpenMLSplit</span></a><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.download_split" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">download_split</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="openml.tasks.OpenMLSplit.html#openml.tasks.OpenMLSplit" title="openml.tasks.split.OpenMLSplit"><span class="pre">OpenMLSplit</span></a></span></span><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.download_split" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download the OpenML split for a given task.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="openml.tasks.OpenMLRegressionTask.get_X_and_y">
-<span class="sig-name descname"><span class="pre">get_X_and_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'array'</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">,</span> </span><span class="pre">scipy.sparse.base.spmatrix</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas.core.series.Series</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.get_X_and_y" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_X_and_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'array'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">spmatrix</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Series</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.get_X_and_y" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get data associated with the current task.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>dataset_format</strong><span class="classifier">str</span></dt><dd><p>Data structure of the returned data. See <a class="reference internal" href="openml.datasets.OpenMLDataset.html#openml.datasets.OpenMLDataset.get_data" title="openml.datasets.OpenMLDataset.get_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">openml.datasets.OpenMLDataset.get_data()</span></code></a>
 for possible options.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt>tuple - X and y</dt><dd></dd>
 </dl>
@@ -148,13 +161,13 @@ for possible options.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="openml.tasks.OpenMLRegressionTask.get_dataset">
-<span class="sig-name descname"><span class="pre">get_dataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="openml.datasets.OpenMLDataset.html#openml.datasets.OpenMLDataset" title="openml.datasets.dataset.OpenMLDataset"><span class="pre">openml.datasets.dataset.OpenMLDataset</span></a><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.get_dataset" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_dataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="openml.datasets.OpenMLDataset.html#openml.datasets.OpenMLDataset" title="openml.datasets.dataset.OpenMLDataset"><span class="pre">OpenMLDataset</span></a></span></span><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.get_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download dataset associated with task</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="openml.tasks.OpenMLRegressionTask.id">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[int]</span></em><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.id" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>The id of the entity, it is unique for its entity type.</p>
 </dd></dl>
 
@@ -166,16 +179,16 @@ for possible options.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="openml.tasks.OpenMLRegressionTask.openml_url">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">openml_url</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[str]</span></em><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.openml_url" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">openml_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.openml_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>The URL of the object on the server, if it was uploaded, else None.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="openml.tasks.OpenMLRegressionTask.push_tag">
-<span class="sig-name descname"><span class="pre">push_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.push_tag" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">push_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.push_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Annotates this entity with a tag on the server.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
 </dd>
@@ -186,10 +199,10 @@ for possible options.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="openml.tasks.OpenMLRegressionTask.remove_tag">
-<span class="sig-name descname"><span class="pre">remove_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.remove_tag" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">remove_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.remove_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes a tag from this entity on the server.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
 </dd>
@@ -200,7 +213,7 @@ for possible options.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="openml.tasks.OpenMLRegressionTask.url_for_id">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">url_for_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.url_for_id" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">url_for_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#openml.tasks.OpenMLRegressionTask.url_for_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the OpenML URL for the object of the class entity with the given id.</p>
 </dd></dl>
 
@@ -220,8 +233,8 @@ for possible options.</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
+        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.1.3.<br/>
     </p>
   </div>
 </footer>

@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_examples_30_extended_run_setup_tutorial.py>`
+        :ref:`Go to the end <sphx_glr_download_examples_30_extended_run_setup_tutorial.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -86,11 +86,9 @@ In this tutorial we will
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+    /home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
       warnings.warn(
 
 
@@ -101,7 +99,7 @@ In this tutorial we will
 1) Create a flow and use it to solve a task
 ##############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-81
+.. GENERATED FROM PYTHON SOURCE LINES 50-89
 
 .. code-block:: default
 
@@ -115,10 +113,18 @@ In this tutorial we will
     # easy as you want it to be
 
 
-    cat_imp = make_pipeline(OneHotEncoder(handle_unknown="ignore", sparse=False), TruncatedSVD(),)
+    cat_imp = make_pipeline(
+        OneHotEncoder(handle_unknown="ignore", sparse=False),
+        TruncatedSVD(),
+    )
     cont_imp = SimpleImputer(strategy="median")
     ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
-    model_original = Pipeline(steps=[("transform", ct), ("estimator", RandomForestClassifier()),])
+    model_original = Pipeline(
+        steps=[
+            ("transform", ct),
+            ("estimator", RandomForestClassifier()),
+        ]
+    )
 
     # Let's change some hyperparameters. Of course, in any good application we
     # would tune them using, e.g., Random Search or Bayesian Optimization, but for
@@ -142,22 +148,22 @@ In this tutorial we will
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1782: UserWarning: Estimator only predicted for 5/6 classes!
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:868: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1788: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-84
+.. GENERATED FROM PYTHON SOURCE LINES 90-92
 
 2) Download the flow and solve the same task again.
 ##############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-98
+.. GENERATED FROM PYTHON SOURCE LINES 92-106
 
 .. code-block:: default
 
@@ -181,22 +187,22 @@ In this tutorial we will
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1782: UserWarning: Estimator only predicted for 5/6 classes!
+    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:868: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1788: UserWarning: Estimator only predicted for 5/6 classes!
       warnings.warn(message)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-101
+.. GENERATED FROM PYTHON SOURCE LINES 107-109
 
 3) We will verify that the obtained results are exactly the same.
 ##############################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-105
+.. GENERATED FROM PYTHON SOURCE LINES 109-113
 
 .. code-block:: default
 
@@ -211,7 +217,7 @@ In this tutorial we will
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-108
+.. GENERATED FROM PYTHON SOURCE LINES 114-116
 
 .. code-block:: default
 
@@ -227,28 +233,25 @@ In this tutorial we will
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.353 seconds)
+   **Total running time of the script:** ( 0 minutes  6.000 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_run_setup_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
 
-  .. container:: sphx-glr-download sphx-glr-download-python
 
-     :download:`Download Python source code: run_setup_tutorial.py <run_setup_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-python
 
+      :download:`Download Python source code: run_setup_tutorial.py <run_setup_tutorial.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: run_setup_tutorial.ipynb <run_setup_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: run_setup_tutorial.ipynb <run_setup_tutorial.ipynb>`
 
 
 .. only:: html

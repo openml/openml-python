@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_examples_30_extended_configure_logging.py>`
+        :ref:`Go to the end <sphx_glr_download_examples_30_extended_configure_logging.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -86,23 +86,20 @@ When downloading a dataset from OpenML, a `DEBUG`-level message is written:
 
 .. _sphx_glr_download_examples_30_extended_configure_logging.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
 
-  .. container:: sphx-glr-download sphx-glr-download-python
 
-     :download:`Download Python source code: configure_logging.py <configure_logging.py>`
+    .. container:: sphx-glr-download sphx-glr-download-python
 
+      :download:`Download Python source code: configure_logging.py <configure_logging.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: configure_logging.ipynb <configure_logging.ipynb>`
+      :download:`Download Jupyter notebook: configure_logging.ipynb <configure_logging.ipynb>`
 
 
 .. only:: html

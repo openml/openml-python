@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_examples_20_basic_introduction_tutorial.py>`
+        :ref:`Go to the end <sphx_glr_download_examples_20_basic_introduction_tutorial.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -110,11 +110,9 @@ you authenticate for the duration of the python process.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:177: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+    /home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
       warnings.warn(
 
 
@@ -196,11 +194,9 @@ Download the OpenML task for the eeg-eye-state.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    kNN on eeg-eye-state: https://test.openml.org/r/116470
+    kNN on eeg-eye-state: https://test.openml.org/r/33833
 
 
 
@@ -220,28 +216,25 @@ Download the OpenML task for the eeg-eye-state.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  21.634 seconds)
+   **Total running time of the script:** ( 0 minutes  11.344 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_introduction_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
 
-  .. container:: sphx-glr-download sphx-glr-download-python
 
-     :download:`Download Python source code: introduction_tutorial.py <introduction_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-python
 
+      :download:`Download Python source code: introduction_tutorial.py <introduction_tutorial.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: introduction_tutorial.ipynb <introduction_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: introduction_tutorial.ipynb <introduction_tutorial.ipynb>`
 
 
 .. only:: html

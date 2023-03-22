@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_examples_30_extended_fetch_evaluations_tutorial.py>`
+        :ref:`Go to the end <sphx_glr_download_examples_30_extended_fetch_evaluations_tutorial.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -84,8 +84,6 @@ Required filters can be applied to retrieve results from runs as required.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
        run_id  task_id  ...  values                                    array_data
@@ -120,8 +118,6 @@ Over here we shall briefly take a look at the details of the task.
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -168,8 +164,6 @@ Note that we now filter the evaluations based on another parameter 'task'.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
         run_id  task_id  setup_id  ...     value values  array_data
@@ -188,11 +182,11 @@ Note that we now filter the evaluations based on another parameter 'task'.
 
     Displaying head of sorted dataframe: 
             run_id  task_id  setup_id  ...     value values  array_data
-    2780  10279797   167140   8166877  ...  0.968613   None        None
-    2781  10279798   167140   8166877  ...  0.968613   None        None
-    2238  10232158   167140   8157180  ...  0.967671   None        None
-    2255  10232987   167140   8157961  ...  0.967671   None        None
-    2845  10291679   167140   8157545  ...  0.967043   None        None
+    2788  10279797   167140   8166877  ...  0.968613   None        None
+    2789  10279798   167140   8166877  ...  0.968613   None        None
+    2246  10232158   167140   8157180  ...  0.967671   None        None
+    2263  10232987   167140   8157961  ...  0.967671   None        None
+    2314  10271558   167140   8154506  ...  0.967043   None        None
 
     [5 rows x 14 columns]
 
@@ -223,9 +217,9 @@ We shall now plot a cumulative distributive function (CDF) for the accuracies ob
         plt.title("CDF")
         plt.xlabel(metric)
         plt.ylabel("Likelihood")
-        plt.grid(b=True, which="major", linestyle="-")
+        plt.grid(visible=True, which="major", linestyle="-")
         plt.minorticks_on()
-        plt.grid(b=True, which="minor", linestyle="--")
+        plt.grid(visible=True, which="minor", linestyle="--")
         plt.axvline(max_val, linestyle="--", color="gray")
         plt.text(max_val, 0, "%.3f" % max_val, fontsize=9)
         plt.show()
@@ -239,9 +233,10 @@ We shall now plot a cumulative distributive function (CDF) for the accuracies ob
 
 
 
-.. image:: /examples/30_extended/images/sphx_glr_fetch_evaluations_tutorial_001.png
-    :alt: CDF
-    :class: sphx-glr-single-img
+.. image-sg:: /examples/30_extended/images/sphx_glr_fetch_evaluations_tutorial_001.png
+   :alt: CDF
+   :srcset: /examples/30_extended/images/sphx_glr_fetch_evaluations_tutorial_001.png
+   :class: sphx-glr-single-img
 
 
 
@@ -307,27 +302,26 @@ For this, we shall compare the top performing flows.
 
 
 
-.. image:: /examples/30_extended/images/sphx_glr_fetch_evaluations_tutorial_002.png
-    :alt: Boxplot comparing predictive_accuracy for different flows
-    :class: sphx-glr-single-img
+.. image-sg:: /examples/30_extended/images/sphx_glr_fetch_evaluations_tutorial_002.png
+   :alt: Boxplot comparing predictive_accuracy for different flows
+   :srcset: /examples/30_extended/images/sphx_glr_fetch_evaluations_tutorial_002.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     (12736, 'sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)')
-    (8353, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
     (8399, 'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)')
+    (8353, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
     (12127, 'sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)')
     (16347, 'sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,onehotencoder=sklearn.preprocessing._encoders.OneHotEncoder,svc=sklearn.svm.classes.SVC)(1)')
-    (8317, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
     (17373, 'sklearn.model_selection._search_successive_halving.HalvingRandomSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(4)')
+    (8317, 'sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)')
     (17369, 'sklearn.model_selection._search_successive_halving.HalvingRandomSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(3)')
-    (17371, 'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(3)')
     (17374, 'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(4)')
+    (17371, 'sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(3)')
 
 
 
@@ -370,8 +364,6 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
         run_id  ...                                         parameters
@@ -403,28 +395,25 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  14.321 seconds)
+   **Total running time of the script:** ( 0 minutes  36.299 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_fetch_evaluations_tutorial.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
 
-  .. container:: sphx-glr-download sphx-glr-download-python
 
-     :download:`Download Python source code: fetch_evaluations_tutorial.py <fetch_evaluations_tutorial.py>`
+    .. container:: sphx-glr-download sphx-glr-download-python
 
+      :download:`Download Python source code: fetch_evaluations_tutorial.py <fetch_evaluations_tutorial.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: fetch_evaluations_tutorial.ipynb <fetch_evaluations_tutorial.ipynb>`
+      :download:`Download Jupyter notebook: fetch_evaluations_tutorial.ipynb <fetch_evaluations_tutorial.ipynb>`
 
 
 .. only:: html

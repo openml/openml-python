@@ -6,6 +6,38 @@
 Changelog
 =========
 
+0.13.1
+~~~~~~
+
+ * ADD #1028: Add functions to delete runs, flows, datasets, and tasks (e.g., ``openml.datasets.delete_dataset``).
+ * ADD #1144: Add locally computed results to the ``OpenMLRun`` object's representation if the run was created locally and not downloaded from the server.
+ * ADD #1180: Improve the error message when the checksum of a downloaded dataset does not match the checksum provided by the API.
+ * ADD #1201: Make ``OpenMLTraceIteration`` a dataclass.
+ * DOC #1069: Add argument documentation for the ``OpenMLRun`` class.
+ * FIX #1197 #559 #1131: Fix the order of ground truth and predictions in the ``OpenMLRun`` object and in ``format_prediction``.
+ * FIX #1198: Support numpy 1.24 and higher.
+ * FIX #1216: Allow unknown task types on the server. This is only relevant when new task types are added to the test server.
+ * MAINT #1155: Add dependabot github action to automatically update other github actions.
+ * MAINT #1199: Obtain pre-commit's flake8 from github.com instead of gitlab.com.
+ * MAINT #1215: Support latest numpy version.
+ * MAINT #1218: Test Python3.6 on Ubuntu 20.04 instead of the latest Ubuntu (which is 22.04).
+ * MAINT #1221 #1212 #1206 #1211: Update github actions to the latest versions.
+
+0.13.0
+~~~~~~
+
+ * FIX #1030: ``pre-commit`` hooks now no longer should issue a warning.
+ * FIX #1058, #1100: Avoid ``NoneType`` error when printing task without ``class_labels`` attribute.
+ * FIX #1110: Make arguments to ``create_study`` and ``create_suite`` that are defined as optional by the OpenML XSD actually optional.
+ * FIX #1147: ``openml.flow.flow_exists`` no longer requires an API key.
+ * FIX #1184: Automatically resolve proxies when downloading from minio. Turn this off by setting environment variable ``no_proxy="*"``.
+ * MAINT #1088: Do CI for Windows on Github Actions instead of Appveyor.
+ * MAINT #1104: Fix outdated docstring for ``list_task``.
+ * MAINT #1146: Update the pre-commit dependencies.
+ * ADD #1103: Add a ``predictions`` property to OpenMLRun for easy accessibility of prediction data.
+ * ADD #1188: EXPERIMENTAL. Allow downloading all files from a minio bucket with ``download_all_files=True`` for ``get_dataset``.
+
+
 0.12.2
 ~~~~~~
 

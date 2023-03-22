@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Creating and Using a Custom Flow &#8212; OpenML 0.12.2 documentation</title>
+    <title>Creating and Using a Custom Flow &#8212; OpenML 0.13.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
 
   </head><body>
   
@@ -56,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.13.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -120,11 +119,11 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-examples-30-extended-custom-flow-py"><span class="std std-ref">here</span></a>
+<p><a class="reference internal" href="#sphx-glr-download-examples-30-extended-custom-flow-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="creating-and-using-a-custom-flow">
-<span id="sphx-glr-examples-30-extended-custom-flow-py"></span><h1>Creating and Using a Custom Flow<a class="headerlink" href="#creating-and-using-a-custom-flow" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-examples-30-extended-custom-flow-py"></span><h1>Creating and Using a Custom Flow<a class="headerlink" href="#creating-and-using-a-custom-flow" title="Permalink to this heading">¶</a></h1>
 <p>The most convenient way to create a flow for your machine learning workflow is to generate it
 automatically as described in the <a class="reference internal" href="flow_id_tutorial.html#sphx-glr-examples-30-extended-flow-id-tutorial-py"><span class="std std-ref">Obtaining Flow IDs</span></a> tutorial.
 However, there are scenarios where this is not possible, such
@@ -152,7 +151,7 @@ The use of this test server can affect behaviour and performance of the OpenML-P
 </pre></div>
 </div>
 <section id="defining-the-flow">
-<h2>1. Defining the flow<a class="headerlink" href="#defining-the-flow" title="Permalink to this headline">¶</a></h2>
+<h2>1. Defining the flow<a class="headerlink" href="#defining-the-flow" title="Permalink to this heading">¶</a></h2>
 <p>The first step is to define all the hyperparameters of your flow.
 The API pages feature a descriptions of each variable of the <a class="reference internal" href="../../generated/openml.flows.OpenMLFlow.html#openml.flows.OpenMLFlow" title="openml.flows.OpenMLFlow"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.flows.OpenMLFlow</span></code></a>.
 Note that <cite>external version</cite> and <cite>name</cite> together uniquely identify a flow.</p>
@@ -201,7 +200,9 @@ In general, using a subflow is not required.</p>
 <p>Note: flow 9313 is not actually the right flow on the test server,
 but that does not matter for this demonstration.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">autosklearn_flow</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(</span><span class="mi">9313</span><span class="p">)</span>  <span class="c1"># auto-sklearn 0.5.1</span>
-<span class="n">subflow</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">automl_tool</span><span class="o">=</span><span class="n">autosklearn_flow</span><span class="p">),)</span>
+<span class="n">subflow</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">components</span><span class="o">=</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">automl_tool</span><span class="o">=</span><span class="n">autosklearn_flow</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>With all parameters of the flow defined, we can now initialize the OpenMLFlow and publish.
@@ -212,7 +213,10 @@ to automatically extract the hyperparameters.
 So whether you have a model with no extension or no model at all, explicitly set
 the model of the flow to <cite>None</cite>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">autosklearn_amlb_flow</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">OpenMLFlow</span><span class="p">(</span>
-    <span class="o">**</span><span class="n">general</span><span class="p">,</span> <span class="o">**</span><span class="n">flow_hyperparameters</span><span class="p">,</span> <span class="o">**</span><span class="n">subflow</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">general</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">flow_hyperparameters</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">subflow</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">autosklearn_amlb_flow</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;autosklearn flow created: </span><span class="si">{</span><span class="n">autosklearn_amlb_flow</span><span class="o">.</span><span class="n">flow_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -220,7 +224,7 @@ the model of the flow to <cite>None</cite>.</p>
 </div>
 </section>
 <section id="using-the-flow">
-<h2>2. Using the flow<a class="headerlink" href="#using-the-flow" title="Permalink to this headline">¶</a></h2>
+<h2>2. Using the flow<a class="headerlink" href="#using-the-flow" title="Permalink to this heading">¶</a></h2>
 <p>This Section will show how to upload run data for your custom flow.
 Take care to change the values of parameters as well as the task id,
 to reflect the actual run.
@@ -315,7 +319,7 @@ We use the argument setup_string because the used flow was a script.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-custom-flow-py">
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-custom-flow-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/8c360a24a862fc5b2df293439dbd1564/custom_flow_.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">custom_flow_.py</span></code></a></p>
 </div>
@@ -339,8 +343,8 @@ We use the argument setup_string because the used flow was a script.</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2021, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.2.<br/>
+        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 6.1.3.<br/>
     </p>
   </div>
 </footer>
