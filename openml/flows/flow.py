@@ -523,6 +523,18 @@ class OpenMLFlow(OpenMLBase):
 
 
 def _copy_server_fields(source_flow, target_flow):
+    """ Recursively copies the fields added by the server from the `source_flow` to the `target_flow`.
+    
+    Parameters
+    ----------
+    source_flow : OpenMLFlow
+        To copy the fields from.
+    target_flow : OpenMLFlow
+        To copy the fields to.
+    Returns
+    -------
+    None
+    """
     fields_added_by_the_server = ["flow_id", "uploader", "version", "upload_date"]
     for field in fields_added_by_the_server:
         setattr(target_flow, field, getattr(source_flow, field))
@@ -533,5 +545,19 @@ def _copy_server_fields(source_flow, target_flow):
 
 
 def _add_if_nonempty(dic, key, value):
+     """ Adds a key-value pair to a dictionary if the value is not None.
+     
+    Parameters
+    ----------
+    dic : dict
+        To add the key-value pair to.
+    key : hashable
+        To add to the dictionary.
+    value : Any
+        To add to the dictionary.
+    Returns
+    -------
+    None
+    """
     if value is not None:
         dic[key] = value
