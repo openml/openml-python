@@ -59,7 +59,7 @@ def setup_exists(flow) -> int:
 
 
 def _get_cached_setup(setup_id):
-    
+
     """Load a run from the cache.
 
     Parameters
@@ -278,7 +278,7 @@ def initialize_model(setup_id: int) -> Any:
 
 
 def _to_dict(flow_id, openml_parameter_settings):
-    """ Convert a flow ID and a list of OpenML parameter settings to a dictionary representation that can be serialized to XML.
+    """Convert a flow ID and a list of OpenML parameter settings to a dictionary representation that can be serialized to XML.
 
     Parameters
     ----------
@@ -340,7 +340,7 @@ def _create_setup_from_xml(result_dict, output_format="object"):
 
 def _create_setup_parameter_from_xml(result_dict, output_format="object"):
     """
-        Create an OpenMLParameter object or a dictionary from an API xml result.
+    Create an OpenMLParameter object or a dictionary from an API xml result.
     """
     if output_format == "object":
         return OpenMLParameter(

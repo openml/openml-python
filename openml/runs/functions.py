@@ -121,7 +121,7 @@ def run_model_on_task(
     flow = extension.model_to_flow(model)
 
     def get_task_and_type_conversion(task: Union[int, str, OpenMLTask]) -> OpenMLTask:
-        """ Retrieve an OpenMLTask object from either an integer or string ID, or directly from an OpenMLTask object.
+        """Retrieve an OpenMLTask object from either an integer or string ID, or directly from an OpenMLTask object.
 
         Parameters
         ----------
@@ -457,8 +457,8 @@ def _run_task_get_arffcontent(
     "OrderedDict[str, OrderedDict]",
     "OrderedDict[str, OrderedDict]",
 ]:
-    
-    """ Runs the hyperparameter optimization on the given task and returns the arfftrace content.
+
+    """Runs the hyperparameter optimization on the given task and returns the arfftrace content.
 
     Parameters
     ----------
@@ -480,7 +480,7 @@ def _run_task_get_arffcontent(
     Tuple[List[List], Optional[OpenMLRunTrace], OrderedDict[str, OrderedDict], OrderedDict[str, OrderedDict]]
         A tuple containing the arfftrace content, the OpenML run trace, the global and local evaluation measures.
     """
-    
+
     arff_datacontent = []  # type: List[List]
     traces = []  # type: List[OpenMLRunTrace]
     # stores fold-based evaluation measures. In case of a sample based task,
@@ -670,7 +670,7 @@ def _run_task_get_arffcontent_parallel_helper(
     Optional[OpenMLRunTrace],
     "OrderedDict[str, float]",
 ]:
-    """ Helper function that runs a single model on a single task fold sample.
+    """Helper function that runs a single model on a single task fold sample.
 
     Parameters
     ----------

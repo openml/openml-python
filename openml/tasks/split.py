@@ -137,7 +137,7 @@ class OpenMLSplit(object):
         return cls(name, "", repetitions)
 
     def from_dataset(self, X, Y, folds, repeats):
-        """ Generates a new OpenML dataset object from input data and cross-validation settings.
+        """Generates a new OpenML dataset object from input data and cross-validation settings.
 
         Parameters
         ----------
@@ -162,7 +162,7 @@ class OpenMLSplit(object):
         raise NotImplementedError()
 
     def get(self, repeat=0, fold=0, sample=0):
-        """ Returns the specified data split from the CrossValidationSplit object.
+        """Returns the specified data split from the CrossValidationSplit object.
 
         Parameters
         ----------
