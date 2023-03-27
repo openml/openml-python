@@ -332,6 +332,20 @@ def get_flow_id(
 
 
 def __list_flows(api_call: str, output_format: str = "dict") -> Union[Dict, pd.DataFrame]:
+    """ Retrieve information about flows from OpenML API and parse it to a dictionary or a Pandas DataFrame.
+
+    Parameters
+    ----------
+    api_call : str
+        Retrieves the information about flows.
+    output_format : str
+        The output format. 
+
+    Returns
+    -------
+    Union[Dict, pd.DataFrame]
+        The flows information in the specified output format.
+    """
 
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     flows_dict = xmltodict.parse(xml_string, force_list=("oml:flow",))
