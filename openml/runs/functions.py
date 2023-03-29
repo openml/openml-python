@@ -104,7 +104,7 @@ def run_model_on_task(
             "avoid_duplicate_runs is set to True, but no API key is set. "
             "Please set your API key in the OpenML configuration file "
             "or pass it directly to the function.",
-            DeprecationWarning
+            DeprecationWarning,
         )
 
     # TODO: At some point in the future do not allow for arguments in old order (6-2018).
