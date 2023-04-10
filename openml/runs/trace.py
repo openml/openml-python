@@ -55,7 +55,7 @@ class OpenMLRunTrace(object):
             The trace iteration from the given fold and repeat that was
             selected as the best iteration by the search procedure
         """
-        for (r, f, i) in self.trace_iterations:
+        for r, f, i in self.trace_iterations:
             if r == repeat and f == fold and self.trace_iterations[(r, f, i)].selected is True:
                 return i
         raise ValueError(
@@ -345,7 +345,6 @@ class OpenMLRunTrace(object):
 
     @classmethod
     def merge_traces(cls, traces: List["OpenMLRunTrace"]) -> "OpenMLRunTrace":
-
         merged_trace = (
             OrderedDict()
         )  # type: OrderedDict[Tuple[int, int, int], OpenMLTraceIteration]  # noqa E501

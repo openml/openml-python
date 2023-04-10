@@ -73,7 +73,6 @@ class BaseStudy(OpenMLBase):
         runs: Optional[List[int]],
         setups: Optional[List[int]],
     ):
-
         self.study_id = study_id
         self.alias = alias
         self.main_entity_type = main_entity_type

@@ -274,7 +274,6 @@ class OpenMLDataset(OpenMLBase):
         return [(key, fields[key]) for key in order if key in fields]
 
     def __eq__(self, other):
-
         if not isinstance(other, OpenMLDataset):
             return False
 

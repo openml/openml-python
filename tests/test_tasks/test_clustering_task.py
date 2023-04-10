@@ -8,11 +8,9 @@ from openml.exceptions import OpenMLServerException
 
 
 class OpenMLClusteringTaskTest(OpenMLTaskTest):
-
     __test__ = True
 
     def setUp(self, n_levels: int = 1):
-
         super(OpenMLClusteringTaskTest, self).setUp()
         self.task_id = 146714
         self.task_type = TaskType.CLUSTERING

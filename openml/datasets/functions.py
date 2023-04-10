@@ -74,7 +74,6 @@ def list_datasets(
     output_format: str = "dict",
     **kwargs,
 ) -> Union[Dict, pd.DataFrame]:
-
     """
     Return a list of all dataset which are on OpenML.
     Supports large amount of results.
@@ -182,7 +181,6 @@ def _list_datasets(data_id: Optional[List] = None, output_format="dict", **kwarg
 
 
 def __list_datasets(api_call, output_format="dict"):
-
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     datasets_dict = xmltodict.parse(xml_string, force_list=("oml:dataset",))
 

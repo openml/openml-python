@@ -387,7 +387,6 @@ def get_task(
 
 
 def _get_task_description(task_id):
-
     try:
         return _get_cached_task(task_id)
     except OpenMLCacheException:

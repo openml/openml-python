@@ -58,7 +58,6 @@ class OpenMLTask(OpenMLBase):
         evaluation_measure: Optional[str] = None,
         data_splits_url: Optional[str] = None,
     ):
-
         self.task_id = int(task_id) if task_id is not None else None
         self.task_type_id = task_type_id
         self.task_type = task_type
@@ -125,7 +124,6 @@ class OpenMLTask(OpenMLBase):
         repeat: int = 0,
         sample: int = 0,
     ) -> Tuple[np.ndarray, np.ndarray]:
-
         # Replace with retrieve from cache
         if self.split is None:
             self.split = self.download_split()
@@ -165,7 +163,6 @@ class OpenMLTask(OpenMLBase):
         return split
 
     def get_split_dimensions(self) -> Tuple[int, int, int]:
-
         if self.split is None:
             self.split = self.download_split()
 
@@ -273,7 +270,6 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         return X, y
 
     def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
-
         task_container = super(OpenMLSupervisedTask, self)._to_dict()
         task_dict = task_container["oml:task_inputs"]
 
@@ -285,7 +281,6 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
     @property
     def estimation_parameters(self):
-
         warn(
             "The estimation_parameters attribute will be "
             "deprecated in the future, please use "
@@ -296,7 +291,6 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
     @estimation_parameters.setter
     def estimation_parameters(self, est_parameters):
-
         self.estimation_procedure["parameters"] = est_parameters
 
 
@@ -324,7 +318,6 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
         class_labels: Optional[List[str]] = None,
         cost_matrix: Optional[np.ndarray] = None,
     ):
-
         super(OpenMLClassificationTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
@@ -436,7 +429,6 @@ class OpenMLClusteringTask(OpenMLTask):
         return data
 
     def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
-
         task_container = super(OpenMLClusteringTask, self)._to_dict()
 
         # Right now, it is not supported as a feature.

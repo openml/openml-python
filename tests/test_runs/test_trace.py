@@ -28,7 +28,6 @@ class TestTrace(TestBase):
             ValueError,
             "Could not find the selected iteration for rep/fold 3/3",
         ):
-
             trace.get_selected_iteration(3, 3)
 
     def test_initialization(self):

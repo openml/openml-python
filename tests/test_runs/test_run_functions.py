@@ -635,7 +635,6 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn
     def test_run_and_upload_pipeline_dummy_pipeline(self):
-
         pipeline1 = Pipeline(
             steps=[
                 ("scaler", StandardScaler(with_mean=False)),
@@ -718,7 +717,6 @@ class TestRun(TestBase):
     )
     @mock.patch("warnings.warn")
     def test_run_and_upload_knn_pipeline(self, warnings_mock):
-
         cat_imp = make_pipeline(
             SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore")
         )
@@ -935,7 +933,6 @@ class TestRun(TestBase):
         self.assertEqual(modelR[-1].cv.random_state, 62501)
 
     def _test_local_evaluations(self, run):
-
         # compare with the scores in user defined measures
         accuracy_scores_provided = []
         for rep in run.fold_evaluations["predictive_accuracy"].keys():
@@ -990,7 +987,6 @@ class TestRun(TestBase):
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     def test_local_run_swapped_parameter_order_flow(self):
-
         # construct sci-kit learn classifier
         clf = Pipeline(
             steps=[
@@ -1020,7 +1016,6 @@ class TestRun(TestBase):
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     def test_local_run_metric_score(self):
-
         # construct sci-kit learn classifier
         clf = Pipeline(
             steps=[

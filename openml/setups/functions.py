@@ -97,7 +97,7 @@ def get_setup(setup_id):
 
     try:
         return _get_cached_setup(setup_id)
-    except (openml.exceptions.OpenMLCacheException):
+    except openml.exceptions.OpenMLCacheException:
         url_suffix = "/setup/%d" % setup_id
         setup_xml = openml._api_calls._perform_api_call(url_suffix, "get")
         with io.open(setup_file, "w", encoding="utf8") as fh:
