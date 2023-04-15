@@ -124,7 +124,7 @@ parameters = [
     OrderedDict([("oml:name", "time"), ("oml:value", 120), ("oml:component", flow_id)]),
 ]
 
-task_id = 1965  # Iris Task
+task_id = 1200  # Iris Task
 task = openml.tasks.get_task(task_id)
 dataset_id = task.get_dataset().dataset_id
 
