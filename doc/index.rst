@@ -30,7 +30,7 @@ Example
             ('estimator', tree.DecisionTreeClassifier())
         ]
     )
-    # Download the OpenML task for the german credit card dataset with 10-fold
+    # Download the OpenML task for the pendigits dataset with 10-fold
     # cross-validation.
     task = openml.tasks.get_task(32)
     # Run the scikit-learn model on the task.
