@@ -288,9 +288,10 @@ def __list_tasks(api_call, output_format="dict"):
             tasks[tid] = task
         except KeyError as e:
             if tid is not None:
-                raise KeyError("Invalid xml for task %d: %s\nFrom %s" % (tid, e, task_))
+                warnings.warn("Invalid xml for task %d: %s\nFrom %s" % (tid, e, task_))
             else:
-                raise KeyError("Could not find key %s in %s!" % (e, task_))
+                warnings.warn("Could not find key %s in %s!" % (e, task_))
+            continue
 
     if output_format == "dataframe":
         tasks = pd.DataFrame.from_dict(tasks, orient="index")
