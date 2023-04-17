@@ -157,6 +157,11 @@ class OpenMLSplit(object):
         ------
         NotImplementedError
             This method is not implemented yet.
+            
+        Returns
+        -------
+        OpenMLDataset
+            The newly generated OpenMLDataset object.
 
         """
         raise NotImplementedError()
