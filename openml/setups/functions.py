@@ -305,7 +305,20 @@ def _to_dict(flow_id, openml_parameter_settings):
 def _create_setup_from_xml(result_dict, output_format="object"):
     """
     Turns an API xml result into a OpenMLSetup object (or dict)
+    
+    Parameters
+    ----------
+    result_dict : dict
+        The OpenML setup parameters obtained from the API.
+    output_format : str, default='object'
+        The format in which the output should be returned.
+
+    Returns
+    -------
+    Union[OpenMLSetup, dict]
+        An OpenMLSetup object or dictionary, depending on the value of `output_format`.
     """
+    
     setup_id = int(result_dict["oml:setup_parameters"]["oml:setup_id"])
     flow_id = int(result_dict["oml:setup_parameters"]["oml:flow_id"])
     parameters = {}
@@ -341,7 +354,20 @@ def _create_setup_from_xml(result_dict, output_format="object"):
 def _create_setup_parameter_from_xml(result_dict, output_format="object"):
     """
     Create an OpenMLParameter object or a dictionary from an API xml result.
+    
+    Parameters
+    ----------
+    result_dict : dict
+        The dictionary containing the xml result.
+    output_format : str, optional (default='object')
+        The format in which the output should be returned.
+
+    Returns
+    -------
+    Union[OpenMLParameter, Dict[str, Any]]
+        An OpenMLParameter object or a dictionary, depending on the value of `output_format`
     """
+    
     if output_format == "object":
         return OpenMLParameter(
             input_id=int(result_dict["oml:id"]),
