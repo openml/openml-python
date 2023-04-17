@@ -591,7 +591,7 @@ def __list_studies(api_call, output_format="object") -> Union[Dict, pd.DataFrame
     ----------
     api_call : str
         The API call for retrieving the list of OpenML studies.
-    output_format : str
+    output_format : str in {"object", "dataframe"}
         Format of the output, either 'object' for a dictionary or 'dataframe' for a Pandas DataFrame.
 
     Returns

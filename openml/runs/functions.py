@@ -466,12 +466,12 @@ def _run_task_get_arffcontent(
     "OrderedDict[str, OrderedDict]",
 ]:
 
-    """Runs the hyperparameter optimization on the given task and returns the arfftrace content.
+    """Evaluates a model on the given task and returns the evaluations as arff trace content.
 
     Parameters
     ----------
     model : Any
-        A fitted hyperparameter optimization model.
+        The model that is to be evalauted.
     task : OpenMLTask
         The OpenMLTask to evaluate.
     extension : Extension
@@ -481,7 +481,7 @@ def _run_task_get_arffcontent(
     dataset_format : str
         The format in which to download the dataset.
     n_jobs : int
-        Number of jobs to run in parallel. If None, uses all available cores.
+        Number of jobs to run in parallel. If None, use 1 core by default. If -1, use all available cores.
 
     Returns
     -------
@@ -687,7 +687,7 @@ def _run_task_get_arffcontent_parallel_helper(
     fold_no : int
         The fold number to be run.
     model : Any
-        A fitted hyperparameter optimization model.
+        The model that is to be evaluated.
     rep_no : int
         Repetition number to be run.
     sample_no : int

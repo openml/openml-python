@@ -229,7 +229,7 @@ def __list_tasks(api_call, output_format="dict"):
     ----------
     api_call : str
         The API call specifying which tasks to return.
-    output_format : str
+    output_format : str in {"dict", "dataframe"}
         Output format for the returned object.
 
     Returns

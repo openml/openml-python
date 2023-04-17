@@ -58,7 +58,7 @@ def setup_exists(flow) -> int:
     return setup_id if setup_id > 0 else False
 
 
-def _get_cached_setup(setup_id):
+def _get_cached_setup(setup_id: int):
 
     """Load a run from the cache.
 
