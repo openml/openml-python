@@ -152,16 +152,16 @@ class OpenMLSplit(object):
 
         repeats : int
             Number of times to repeat the cross-validation process.
+            
+        Returns
+        -------
+        OpenMLDataset
+            The newly generated OpenMLDataset object.
 
         Raises
         ------
         NotImplementedError
             This method is not implemented yet.
-
-        Returns
-        -------
-        OpenMLDataset
-            The newly generated OpenMLDataset object.
 
         """
         raise NotImplementedError()
