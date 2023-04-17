@@ -157,7 +157,7 @@ class OpenMLSplit(object):
         ------
         NotImplementedError
             This method is not implemented yet.
-            
+
         Returns
         -------
         OpenMLDataset
