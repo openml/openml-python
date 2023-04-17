@@ -152,7 +152,7 @@ class OpenMLSplit(object):
 
         repeats : int
             Number of times to repeat the cross-validation process.
-            
+
         Returns
         -------
         OpenMLDataset
