@@ -195,7 +195,7 @@ def _download_minio_bucket(
 def _download_text_file(
     source: str,
     output_path: Optional[str] = None,
-    md5_checksum: str = None,
+    md5_checksum: Optional[str] = None,
     exists_ok: bool = True,
     encoding: str = "utf8",
 ) -> Optional[str]:

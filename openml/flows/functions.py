@@ -374,7 +374,7 @@ def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
 def assert_flows_equal(
     flow1: OpenMLFlow,
     flow2: OpenMLFlow,
-    ignore_parameter_values_on_older_children: str = None,
+    ignore_parameter_values_on_older_children: Optional[str] = None,
     ignore_parameter_values: bool = False,
     ignore_custom_name_if_none: bool = False,
     check_description: bool = True,
