@@ -9,7 +9,7 @@ Changelog
 0.13.1
 ~~~~~~
 
- * DOC #1241 #1229 #1231: Minor documentation fixes.
+ * DOC #1241 #1229 #1231: Minor documentation fixes and resolve documentation examples not working.
  * ADD #1028: Add functions to delete runs, flows, datasets, and tasks (e.g., ``openml.datasets.delete_dataset``).
  * ADD #1144: Add locally computed results to the ``OpenMLRun`` object's representation if the run was created locally and not downloaded from the server.
  * ADD #1180: Improve the error message when the checksum of a downloaded dataset does not match the checksum provided by the API.

@@ -37,8 +37,8 @@ openml.datasets.get_dataset("iris")
 
 import logging
 
-openml.config.console_log.setLevel(logging.DEBUG)
-openml.config.file_log.setLevel(logging.WARNING)
+openml.config.set_console_log_level(logging.DEBUG)
+openml.config.set_file_log_level(logging.WARNING)
 openml.datasets.get_dataset("iris")
 
 # Now the log level that was previously written to file should also be shown in the console.
