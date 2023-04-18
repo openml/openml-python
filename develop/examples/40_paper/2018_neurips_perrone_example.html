@@ -286,17 +286,17 @@ pre-processing all retrieved evaluations.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Y : &quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                   cost degree                gamma      kernel
-4496   2.79191671899954    NaN   0.0277202381261179         NaN
-421    23.8973478229798    NaN                  NaN  polynomial
-1069   14.7190897828721    NaN                  NaN      linear
-2832  0.141297656781024    NaN  0.00602325661939196         NaN
-4448   15.4307583820024    NaN     169.408370330347         NaN
-Y :  4496    0.995838
-421     0.905147
-1069    0.906592
-2832    0.713471
-4448    0.493572
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                     cost degree              gamma      kernel
+399      547.316021142369    NaN                NaN      linear
+1532     8.70864517402193      5                NaN  polynomial
+923   0.00165702808054037    NaN   21.7898732881873         NaN
+4516     3.37327001971644    NaN  0.116792465127693         NaN
+672     0.698179114534487    NaN                NaN      linear
+Y :  399     0.956689
+1532    0.482062
+923     0.500210
+4516    0.988359
+672     0.975312
 Name: value, dtype: float64
 </pre></div>
 </div>
@@ -342,7 +342,7 @@ time simple and quick.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 1.9303e-05
+Training RMSE : 1.4043e-05
 </pre></div>
 </div>
 </section>
@@ -375,18 +375,18 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <span class="nb">print</span><span class="p">(</span><span class="n">configs</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma   kernel
-0    703.547463  3.124285  400.424860  sigmoid
-1    220.168827  4.855083    9.939735   radial
-2    611.259417  4.669106  294.340486  sigmoid
-3    662.367022  3.220873  380.480008   linear
-4    203.968762  3.422637  231.227621   radial
-..          ...       ...         ...      ...
-995  934.695785  4.940245  166.026111  sigmoid
-996  652.586571  4.636055  215.717232   linear
-997  775.505728  2.288518  884.844300   radial
-998  165.529699  2.717633  324.145383  sigmoid
-999  196.395075  4.826799  129.167333   linear
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
+0    597.973656  3.548418  131.038899      radial
+1    511.010426  3.837156  864.698938  polynomial
+2    438.647231  4.754094  861.961448     sigmoid
+3    128.749764  2.582001  144.472588      linear
+4    924.603606  3.565490  674.265227     sigmoid
+..          ...       ...         ...         ...
+995  248.712707  3.067220  315.398964     sigmoid
+996  911.235190  4.058504  683.188887  polynomial
+997  348.470783  2.251186  859.257952      linear
+998  973.802495  2.579046   33.360799     sigmoid
+999  215.842336  4.375309  182.945575     sigmoid
 
 [1000 rows x 4 columns]
 </pre></div>
@@ -408,7 +408,7 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <img src="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" srcset="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" alt="AUC regret for Random Search on surrogate" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(42.722222222222214, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  3.826 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  13.243 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>

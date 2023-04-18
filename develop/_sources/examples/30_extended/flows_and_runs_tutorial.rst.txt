@@ -175,8 +175,8 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     ==========
     Uploader Name...................: None
     Metric..........................: None
-    Local Result - Accuracy (+- STD): 0.8435 +- 0.0119
-    Local Runtime - ms (+- STD).....: 192.8117 +- 4.8619
+    Local Result - Accuracy (+- STD): 0.8419 +- 0.0105
+    Local Runtime - ms (+- STD).....: 162.0834 +- 4.3129
     Run ID..........................: None
     Task ID.........................: 403
     Task Type.......................: None
@@ -217,7 +217,7 @@ the run is sent to the OpenML server:
 
  .. code-block:: none
 
-    Uploaded to https://test.openml.org/r/33524
+    Uploaded to https://test.openml.org/r/41975
 
 
 
@@ -358,10 +358,10 @@ variables and missing values in both.
 
     /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:868: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
       warnings.warn(
-    Uploaded to https://test.openml.org/r/33525
+    Uploaded to https://test.openml.org/r/41978
     /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:868: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
       warnings.warn(
-    Uploaded to https://test.openml.org/r/33526
+    Uploaded to https://test.openml.org/r/41979
 
 
 
@@ -418,10 +418,10 @@ a model on a task without uploading results or flows to the server immediately.
     ==========
     Uploader Name...................: None
     Metric..........................: None
-    Local Result - Accuracy (+- STD): 1.0000 +- 0.0000
-    Local Runtime - ms (+- STD).....: 33.9047 +- 0.0000
-    Run ID..........................: 33528
-    Run URL.........................: https://test.openml.org/r/33528
+    Local Result - Accuracy (+- STD): 0.9966 +- 0.0000
+    Local Runtime - ms (+- STD).....: 30.0422 +- 0.0000
+    Run ID..........................: 41981
+    Run URL.........................: https://test.openml.org/r/41981
     Task ID.........................: 6
     Task Type.......................: None
     Task URL........................: https://test.openml.org/t/6
@@ -508,7 +508,7 @@ them. Some tasks you could try (or browse openml.org):
 
  .. code-block:: none
 
-    kNN on diabetes: https://test.openml.org/r/33529
+    kNN on diabetes: https://test.openml.org/r/41982
 
 
 
@@ -528,7 +528,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  23.771 seconds)
+   **Total running time of the script:** ( 0 minutes  26.892 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:

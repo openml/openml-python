@@ -77,6 +77,8 @@ flow_hyperparameters = dict(
 # you can use the Random Forest Classifier flow as a *subflow*. It allows for
 # all hyperparameters of the Random Classifier Flow to also be specified in your pipeline flow.
 #
+# Note: you can currently only specific one subflow as part of the components.
+#
 # In this example, the auto-sklearn flow is a subflow: the auto-sklearn flow is entirely executed as part of this flow.
 # This allows people to specify auto-sklearn hyperparameters used in this flow.
 # In general, using a subflow is not required.
@@ -87,6 +89,8 @@ flow_hyperparameters = dict(
 autosklearn_flow = openml.flows.get_flow(9313)  # auto-sklearn 0.5.1
 subflow = dict(
     components=OrderedDict(automl_tool=autosklearn_flow),
+    # If you do not want to reference a subflow, you can use the following:
+    # components=OrderedDict(),
 )
 
 ####################################################################################################
@@ -124,7 +128,7 @@ parameters = [
     OrderedDict([("oml:name", "time"), ("oml:value", 120), ("oml:component", flow_id)]),
 ]
 
-task_id = 1965  # Iris Task
+task_id = 1200  # Iris Task
 task = openml.tasks.get_task(task_id)
 dataset_id = task.get_dataset().dataset_id
 

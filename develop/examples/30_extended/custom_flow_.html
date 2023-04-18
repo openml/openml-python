@@ -194,6 +194,7 @@ For example, the Random Forest Classifier is a flow, but you could also construc
 which uses a Random Forest Classifier in a ML pipeline. When constructing the pipeline flow,
 you can use the Random Forest Classifier flow as a <em>subflow</em>. It allows for
 all hyperparameters of the Random Classifier Flow to also be specified in your pipeline flow.</p>
+<p>Note: you can currently only specific one subflow as part of the components.</p>
 <p>In this example, the auto-sklearn flow is a subflow: the auto-sklearn flow is entirely executed as part of this flow.
 This allows people to specify auto-sklearn hyperparameters used in this flow.
 In general, using a subflow is not required.</p>
@@ -202,6 +203,8 @@ but that does not matter for this demonstration.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">autosklearn_flow</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">get_flow</span><span class="p">(</span><span class="mi">9313</span><span class="p">)</span>  <span class="c1"># auto-sklearn 0.5.1</span>
 <span class="n">subflow</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
     <span class="n">components</span><span class="o">=</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">automl_tool</span><span class="o">=</span><span class="n">autosklearn_flow</span><span class="p">),</span>
+    <span class="c1"># If you do not want to reference a subflow, you can use the following:</span>
+    <span class="c1"># components=OrderedDict(),</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -237,7 +240,7 @@ Task and parameter values in the example are fictional.</p>
     <span class="n">OrderedDict</span><span class="p">([(</span><span class="s2">&quot;oml:name&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;oml:value&quot;</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;oml:component&quot;</span><span class="p">,</span> <span class="n">flow_id</span><span class="p">)]),</span>
 <span class="p">]</span>
 
-<span class="n">task_id</span> <span class="o">=</span> <span class="mi">1965</span>  <span class="c1"># Iris Task</span>
+<span class="n">task_id</span> <span class="o">=</span> <span class="mi">1200</span>  <span class="c1"># Iris Task</span>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 <span class="n">dataset_id</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">()</span><span class="o">.</span><span class="n">dataset_id</span>
 </pre></div>

@@ -225,21 +225,7 @@ We can also retrieve all flows for a given name:
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    [119, 360, 364, 762, 5070, 17465, 17634, 17652, 19065, 28068, 30075, 30090, 30116, 32949, 33381, 36940, 44237, 84683, 84690, 85007, 90589, 90597, 90611, 90855, 91177]
+    [119, 360, 364, 762, 5070, 17465, 17634, 17652, 19065, 28068, 30075, 30090, 30116, 32949, 33381, 36940, 44237, 84683, 84690, 85007, 90589, 90597, 90611, 90855, 91177, 108870]
 
 
 
@@ -265,21 +251,7 @@ This also works with the actual model (generalizing the first part of this examp
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    [119, 360, 364, 762, 5070, 17465, 17634, 17652, 19065, 28068, 30075, 30090, 30116, 32949, 33381, 36940, 44237, 84683, 84690, 85007, 90589, 90597, 90611, 90855, 91177]
+    [119, 360, 364, 762, 5070, 17465, 17634, 17652, 19065, 28068, 30075, 30090, 30116, 32949, 33381, 36940, 44237, 84683, 84690, 85007, 90589, 90597, 90611, 90855, 91177, 108870]
 
 
 
@@ -287,7 +259,7 @@ This also works with the actual model (generalizing the first part of this examp
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  25.535 seconds)
+   **Total running time of the script:** ( 0 minutes  33.379 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flow_id_tutorial.py:
