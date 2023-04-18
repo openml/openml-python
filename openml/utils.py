@@ -72,13 +72,13 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
 
 def _get_rest_api_type_alias(oml_object: "OpenMLBase") -> str:
     """Return the alias of the openml entity as it is defined for the REST API."""
-    rest_api_mapping = [
+    rest_api_mapping: List[Tuple[Union[Type, Tuple], str]] = [
         (openml.datasets.OpenMLDataset, "data"),
         (openml.flows.OpenMLFlow, "flow"),
         (openml.tasks.OpenMLTask, "task"),
         (openml.runs.OpenMLRun, "run"),
         ((openml.study.OpenMLStudy, openml.study.OpenMLBenchmarkSuite), "study"),
-    ]  # type: List[Tuple[Union[Type, Tuple], str]]
+    ]
     _, api_type_alias = [
         (python_type, api_alias)
         for (python_type, api_alias) in rest_api_mapping
