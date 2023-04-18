@@ -18,6 +18,16 @@ class OpenMLTaskTest(TestBase):
 
     def test_list_all(self):
         openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
+        openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks, output_format="dataframe")
+
+    def test_list_all_with_multiple_batches(self):
+        res = openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks, output_format="dict",
+                                     batch_size=2000)
+        # Verify that test server state is still valid for this test to work as intended
+        #  -> If the number of results is less than 2000, the test can not test the batching operation.
+        assert len(res) > 2000
+        openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks, output_format="dataframe",
+                               batch_size=2000)
 
     @unittest.mock.patch("openml._api_calls._perform_api_call", side_effect=mocked_perform_api_call)
     def test_list_all_few_results_available(self, _perform_api_call):
@@ -98,7 +108,7 @@ class OpenMLTaskTest(TestBase):
             os.chmod(subdir, 0o444)
             config_mock.return_value = subdir
             with self.assertRaisesRegex(
-                openml.exceptions.OpenMLCacheException,
-                r"Cannot create cache directory",
+                    openml.exceptions.OpenMLCacheException,
+                    r"Cannot create cache directory",
             ):
                 openml.utils._create_cache_directory("ghi")

@@ -283,7 +283,7 @@ def _list_all(listing_call, output_format="dict", *args, **filters):
             if len(result) == 0:
                 result = new_batch
             else:
-                result = result.append(new_batch, ignore_index=True)
+                result = pd.concat([result, new_batch], ignore_index=True)
         else:
             # For output_format = 'dict' or 'object'
             result.update(new_batch)
