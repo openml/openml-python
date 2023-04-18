@@ -33,7 +33,17 @@ class OpenMLRunTrace(object):
 
     """
 
-    def __init__(self, run_id, trace_iterations):
+    def __init__(self, run_id: int, trace_iterations: List[List]):
+        """
+        Object to hold the trace content of a run.
+
+        Parameters
+        ----------
+        run_id : int
+            Id for which the trace content is to be stored.
+        trace_iterations : List[List]
+            The trace content obtained by running a flow on a task.
+        """
         self.run_id = run_id
         self.trace_iterations = trace_iterations
 
@@ -228,6 +238,24 @@ class OpenMLRunTrace(object):
 
     @classmethod
     def _trace_from_arff_struct(cls, attributes, content, error_message):
+        """Generate a trace dictionary from ARFF structure.
+
+        Parameters
+        ----------
+        cls : type
+            The trace object to be created.
+        attributes : List[Tuple[str, str]]
+            Attribute descriptions.
+        content : List[List[Union[int, float, str]]]
+            List of instances.
+        error_message : str
+            Error message to raise if `setup_string` is in `attributes`.
+
+        Returns
+        -------
+        OrderedDict
+            A dictionary representing the trace.
+        """
         trace = OrderedDict()
         attribute_idx = {att[0]: idx for idx, att in enumerate(attributes)}
 
@@ -345,7 +373,26 @@ class OpenMLRunTrace(object):
 
     @classmethod
     def merge_traces(cls, traces: List["OpenMLRunTrace"]) -> "OpenMLRunTrace":
+        """Merge multiple traces into a single trace.
 
+        Parameters
+        ----------
+        cls : type
+            Type of the trace object to be created.
+        traces : List[OpenMLRunTrace]
+            List of traces to merge.
+
+        Returns
+        -------
+        OpenMLRunTrace
+            A trace object representing the merged traces.
+
+        Raises
+        ------
+        ValueError
+            If the parameters in the iterations of the traces being merged are not equal.
+            If a key (repeat, fold, iteration) is encountered twice while merging the traces.
+        """
         merged_trace = (
             OrderedDict()
         )  # type: OrderedDict[Tuple[int, int, int], OpenMLTraceIteration]  # noqa E501

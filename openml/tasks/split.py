@@ -137,9 +137,59 @@ class OpenMLSplit(object):
         return cls(name, "", repetitions)
 
     def from_dataset(self, X, Y, folds, repeats):
+        """Generates a new OpenML dataset object from input data and cross-validation settings.
+
+        Parameters
+        ----------
+        X : array-like or sparse matrix
+            The input feature matrix.
+
+        Y : array-like, shape
+            The target variable values.
+
+        folds : int
+            Number of cross-validation folds to generate.
+
+        repeats : int
+            Number of times to repeat the cross-validation process.
+
+        Returns
+        -------
+        OpenMLDataset
+            The newly generated OpenMLDataset object.
+
+        Raises
+        ------
+        NotImplementedError
+            This method is not implemented yet.
+
+        """
         raise NotImplementedError()
 
     def get(self, repeat=0, fold=0, sample=0):
+        """Returns the specified data split from the CrossValidationSplit object.
+
+        Parameters
+        ----------
+        repeat : int
+            Index of the repeat to retrieve.
+
+        fold : int
+            Index of the fold to retrieve.
+
+        sample : int
+            Index of the sample to retrieve.
+
+        Returns
+        -------
+        numpy.ndarray
+            The data split for the specified repeat, fold, and sample.
+
+        Raises
+        ------
+        ValueError
+            If the specified repeat, fold, or sample is not known.
+        """
         if repeat not in self.split:
             raise ValueError("Repeat %s not known" % str(repeat))
         if fold not in self.split[repeat]:
