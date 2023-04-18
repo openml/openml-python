@@ -27,7 +27,8 @@ class OpenMLTaskTest(TestBase):
             listing_call=openml.tasks.functions._list_tasks, output_format="dict", batch_size=2000
         )
         # Verify that test server state is still valid for this test to work as intended
-        #  -> If the number of results is less than 2000, the test can not test the batching operation.
+        #  -> If the number of results is less than 2000, the test can not test the
+        #  batching operation.
         assert len(res) > 2000
         openml.utils._list_all(
             listing_call=openml.tasks.functions._list_tasks,
