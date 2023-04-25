@@ -79,6 +79,7 @@ print(
     )
 )
 
+
 # Creating utility function
 def print_compare_runtimes(measures):
     for repeat, val1 in measures["usercpu_time_millis_training"].items():

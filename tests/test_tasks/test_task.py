@@ -28,15 +28,12 @@ class OpenMLTaskTest(TestBase):
         super(OpenMLTaskTest, cls).setUpClass()
 
     def setUp(self, n_levels: int = 1):
-
         super(OpenMLTaskTest, self).setUp()
 
     def test_download_task(self):
-
         return get_task(self.task_id)
 
     def test_upload_task(self):
-
         # We don't know if the task in question already exists, so we try a few times. Checking
         # beforehand would not be an option because a concurrent unit test could potentially
         # create the same task and make this unit test fail (i.e. getting a dataset and creating
@@ -74,7 +71,6 @@ class OpenMLTaskTest(TestBase):
             )
 
     def _get_compatible_rand_dataset(self) -> List:
-
         compatible_datasets = []
         active_datasets = list_datasets(status="active")
 
@@ -107,7 +103,6 @@ class OpenMLTaskTest(TestBase):
         # return compatible_datasets[random_dataset_pos]
 
     def _get_random_feature(self, dataset_id: int) -> str:
-
         random_dataset = get_dataset(dataset_id)
         # necessary loop to overcome string and date type
         # features.

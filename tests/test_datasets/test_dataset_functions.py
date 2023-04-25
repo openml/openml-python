@@ -73,7 +73,6 @@ class TestOpenMLDataset(TestBase):
                     pass
 
     def _get_empty_param_for_dataset(self):
-
         return {
             "name": None,
             "description": None,
@@ -604,7 +603,6 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(labels, ["C", "H", "G"])
 
     def test_upload_dataset_with_url(self):
-
         dataset = OpenMLDataset(
             "%s-UploadTestWithURL" % self._get_sentinel(),
             "test",
@@ -721,7 +719,6 @@ class TestOpenMLDataset(TestBase):
                 attributes_arff_from_df(df)
 
     def test_create_dataset_numpy(self):
-
         data = np.array([[1, 2, 3], [1.2, 2.5, 3.8], [2, 5, 8], [0, 1, 0]]).T
 
         attributes = [("col_{}".format(i), "REAL") for i in range(data.shape[1])]
@@ -757,7 +754,6 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(_get_online_dataset_format(dataset.id), "arff", "Wrong format for dataset")
 
     def test_create_dataset_list(self):
-
         data = [
             ["a", "sunny", 85.0, 85.0, "FALSE", "no"],
             ["b", "sunny", 80.0, 90.0, "TRUE", "no"],
@@ -814,7 +810,6 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(_get_online_dataset_format(dataset.id), "arff", "Wrong format for dataset")
 
     def test_create_dataset_sparse(self):
-
         # test the scipy.sparse.coo_matrix
         sparse_data = scipy.sparse.coo_matrix(
             ([0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1]))
@@ -892,7 +887,6 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test_create_invalid_dataset(self):
-
         data = [
             "sunny",
             "overcast",
@@ -956,7 +950,6 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test_get_online_dataset_format(self):
-
         # Phoneme dataset
         dataset_id = 77
         dataset = openml.datasets.get_dataset(dataset_id, download_data=False)
@@ -1411,7 +1404,6 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(len(attribute_names), X.shape[1])
 
     def test_get_dataset_cache_format_feather(self):
-
         dataset = openml.datasets.get_dataset(128, cache_format="feather")
         dataset.get_data()
 

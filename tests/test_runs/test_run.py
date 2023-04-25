@@ -26,7 +26,6 @@ class TestRun(TestBase):
     # less than 1 seconds
 
     def test_tagging(self):
-
         runs = openml.runs.list_runs(size=1)
         run_id = list(runs.keys())[0]
         run = openml.runs.get_run(run_id)
@@ -120,7 +119,6 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn
     def test_to_from_filesystem_vanilla(self):
-
         model = Pipeline(
             [
                 ("imputer", SimpleImputer(strategy="mean")),
@@ -157,7 +155,6 @@ class TestRun(TestBase):
     @pytest.mark.sklearn
     @pytest.mark.flaky()
     def test_to_from_filesystem_search(self):
-
         model = Pipeline(
             [
                 ("imputer", SimpleImputer(strategy="mean")),
@@ -193,7 +190,6 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn
     def test_to_from_filesystem_no_model(self):
-
         model = Pipeline(
             [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())]
         )
@@ -321,7 +317,6 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn
     def test_offline_and_online_run_identical(self):
-
         extension = openml.extensions.sklearn.SklearnExtension()
 
         for model, task in self._get_models_tasks_for_tests():

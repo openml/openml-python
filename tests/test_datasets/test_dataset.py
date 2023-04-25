@@ -176,14 +176,14 @@ class OpenMLDatasetTest(TestBase):
         self.dataset.row_id_attribute = "condition"
         rval, _, categorical, _ = self.dataset.get_data(include_row_id=True)
         self.assertIsInstance(rval, pd.DataFrame)
-        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+        for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
             self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
 
         rval, _, categorical, _ = self.dataset.get_data()
         self.assertIsInstance(rval, pd.DataFrame)
-        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+        for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
             self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
@@ -202,7 +202,7 @@ class OpenMLDatasetTest(TestBase):
     def test_get_data_with_target_pandas(self):
         X, y, categorical, attribute_names = self.dataset.get_data(target="class")
         self.assertIsInstance(X, pd.DataFrame)
-        for (dtype, is_cat, col) in zip(X.dtypes, categorical, X):
+        for dtype, is_cat, col in zip(X.dtypes, categorical, X):
             self._check_expected_type(dtype, is_cat, X[col])
         self.assertIsInstance(y, pd.Series)
         self.assertEqual(y.dtype.name, "category")
@@ -227,13 +227,13 @@ class OpenMLDatasetTest(TestBase):
     def test_get_data_with_ignore_attributes(self):
         self.dataset.ignore_attribute = ["condition"]
         rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=True)
-        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+        for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
             self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
 
         rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=False)
-        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+        for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
             self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)

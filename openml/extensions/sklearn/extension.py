@@ -1021,7 +1021,6 @@ class SklearnExtension(Extension):
                     # when deserializing the parameter
                     sub_components_explicit.add(identifier)
                     if isinstance(sub_component, str):
-
                         external_version = self._get_external_version_string(None, {})
                         dependencies = self._get_dependencies()
                         tags = self._get_tags()
@@ -1072,7 +1071,6 @@ class SklearnExtension(Extension):
                 parameters[k] = parameter_json
 
             elif isinstance(rval, OpenMLFlow):
-
                 # A subcomponent, for example the base model in
                 # AdaBoostClassifier
                 sub_components[k] = rval
@@ -1762,7 +1760,6 @@ class SklearnExtension(Extension):
         )
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
-
             try:
                 proba_y = model_copy.predict_proba(X_test)
                 proba_y = pd.DataFrame(proba_y, columns=model_classes)  # handles X_test as numpy

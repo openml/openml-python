@@ -24,11 +24,9 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
         super(OpenMLSupervisedTaskTest, cls).setUpClass()
 
     def setUp(self, n_levels: int = 1):
-
         super(OpenMLSupervisedTaskTest, self).setUp()
 
     def test_get_X_and_Y(self) -> Tuple[np.ndarray, np.ndarray]:
-
         task = get_task(self.task_id)
         X, Y = task.get_X_and_y()
         return X, Y

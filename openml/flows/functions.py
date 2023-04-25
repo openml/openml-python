@@ -120,7 +120,6 @@ def _get_flow_description(flow_id: int) -> OpenMLFlow:
     try:
         return _get_cached_flow(flow_id)
     except OpenMLCacheException:
-
         xml_file = os.path.join(
             openml.utils._create_cache_directory_for_id(FLOWS_CACHE_DIR_NAME, flow_id),
             "flow.xml",
@@ -140,7 +139,6 @@ def list_flows(
     output_format: str = "dict",
     **kwargs
 ) -> Union[Dict, pd.DataFrame]:
-
     """
     Return a list of all flows which are on OpenML.
     (Supports large amount of results)
@@ -329,7 +327,6 @@ def get_flow_id(
 
 
 def __list_flows(api_call: str, output_format: str = "dict") -> Union[Dict, pd.DataFrame]:
-
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     flows_dict = xmltodict.parse(xml_string, force_list=("oml:flow",))
 
@@ -377,7 +374,7 @@ def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
 def assert_flows_equal(
     flow1: OpenMLFlow,
     flow2: OpenMLFlow,
-    ignore_parameter_values_on_older_children: str = None,
+    ignore_parameter_values_on_older_children: Optional[str] = None,
     ignore_parameter_values: bool = False,
     ignore_custom_name_if_none: bool = False,
     check_description: bool = True,

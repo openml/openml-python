@@ -74,7 +74,6 @@ def list_datasets(
     output_format: str = "dict",
     **kwargs,
 ) -> Union[Dict, pd.DataFrame]:
-
     """
     Return a list of all dataset which are on OpenML.
     Supports large amount of results.
@@ -182,7 +181,6 @@ def _list_datasets(data_id: Optional[List] = None, output_format="dict", **kwarg
 
 
 def __list_datasets(api_call, output_format="dict"):
-
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     datasets_dict = xmltodict.parse(xml_string, force_list=("oml:dataset",))
 
@@ -353,7 +351,7 @@ def get_datasets(
 def get_dataset(
     dataset_id: Union[int, str],
     download_data: bool = True,
-    version: int = None,
+    version: Optional[int] = None,
     error_if_multiple: bool = False,
     cache_format: str = "pickle",
     download_qualities: bool = True,
@@ -984,7 +982,7 @@ def _get_dataset_description(did_cache_dir, dataset_id):
 
 def _get_dataset_parquet(
     description: Union[Dict, OpenMLDataset],
-    cache_directory: str = None,
+    cache_directory: Optional[str] = None,
     download_all_files: bool = False,
 ) -> Optional[str]:
     """Return the path to the local parquet file of the dataset. If is not cached, it is downloaded.
@@ -1051,7 +1049,9 @@ def _get_dataset_parquet(
     return output_file_path
 
 
-def _get_dataset_arff(description: Union[Dict, OpenMLDataset], cache_directory: str = None) -> str:
+def _get_dataset_arff(
+    description: Union[Dict, OpenMLDataset], cache_directory: Optional[str] = None
+) -> str:
     """Return the path to the local arff file of the dataset. If is not cached, it is downloaded.
 
     Checks if the file is in the cache, if yes, return the path to the file.
@@ -1173,8 +1173,8 @@ def _create_dataset_from_description(
     description: Dict[str, str],
     features_file: str,
     qualities_file: str,
-    arff_file: str = None,
-    parquet_file: str = None,
+    arff_file: Optional[str] = None,
+    parquet_file: Optional[str] = None,
     cache_format: str = "pickle",
 ) -> OpenMLDataset:
     """Create a dataset object from a description dict.

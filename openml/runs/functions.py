@@ -49,8 +49,8 @@ def run_model_on_task(
     model: Any,
     task: Union[int, str, OpenMLTask],
     avoid_duplicate_runs: bool = True,
-    flow_tags: List[str] = None,
-    seed: int = None,
+    flow_tags: Optional[List[str]] = None,
+    seed: Optional[int] = None,
     add_local_measures: bool = True,
     upload_flow: bool = False,
     return_flow: bool = False,
@@ -148,8 +148,8 @@ def run_flow_on_task(
     flow: OpenMLFlow,
     task: OpenMLTask,
     avoid_duplicate_runs: bool = True,
-    flow_tags: List[str] = None,
-    seed: int = None,
+    flow_tags: Optional[List[str]] = None,
+    seed: Optional[int] = None,
     add_local_measures: bool = True,
     upload_flow: bool = False,
     dataset_format: str = "dataframe",
@@ -438,7 +438,7 @@ def _run_task_get_arffcontent(
     extension: "Extension",
     add_local_measures: bool,
     dataset_format: str,
-    n_jobs: int = None,
+    n_jobs: Optional[int] = None,
 ) -> Tuple[
     List[List],
     Optional[OpenMLRunTrace],
@@ -505,7 +505,6 @@ def _run_task_get_arffcontent(
             user_defined_measures_fold[openml_name] = sklearn_fn(test_y, pred_y)
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
-
             for i, tst_idx in enumerate(test_indices):
                 if task.class_labels is not None:
                     prediction = (
@@ -549,7 +548,6 @@ def _run_task_get_arffcontent(
                 )
 
         elif isinstance(task, OpenMLRegressionTask):
-
             for i, _ in enumerate(test_indices):
                 truth = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
                 arff_line = format_prediction(
@@ -570,7 +568,6 @@ def _run_task_get_arffcontent(
                 )
 
         elif isinstance(task, OpenMLClusteringTask):
-
             for i, _ in enumerate(test_indices):
                 arff_line = [test_indices[i], pred_y[i]]  # row_id, cluster ID
                 arff_datacontent.append(arff_line)
@@ -579,7 +576,6 @@ def _run_task_get_arffcontent(
             raise TypeError(type(task))
 
         for measure in user_defined_measures_fold:
-
             if measure not in user_defined_measures_per_fold:
                 user_defined_measures_per_fold[measure] = OrderedDict()
             if rep_no not in user_defined_measures_per_fold[measure]:
@@ -625,7 +621,7 @@ def _run_task_get_arffcontent_parallel_helper(
     sample_no: int,
     task: OpenMLTask,
     dataset_format: str,
-    configuration: Dict = None,
+    configuration: Optional[Dict] = None,
 ) -> Tuple[
     np.ndarray,
     Optional[pd.DataFrame],
@@ -674,7 +670,12 @@ def _run_task_get_arffcontent_parallel_helper(
             sample_no,
         )
     )
-    pred_y, proba_y, user_defined_measures_fold, trace, = extension._run_model_on_fold(
+    (
+        pred_y,
+        proba_y,
+        user_defined_measures_fold,
+        trace,
+    ) = extension._run_model_on_fold(
         model=model,
         task=task,
         X_train=train_x,

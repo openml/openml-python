@@ -195,7 +195,7 @@ def _download_minio_bucket(
 def _download_text_file(
     source: str,
     output_path: Optional[str] = None,
-    md5_checksum: str = None,
+    md5_checksum: Optional[str] = None,
     exists_ok: bool = True,
     encoding: str = "utf8",
 ) -> Optional[str]:
@@ -326,7 +326,6 @@ def _send_request(request_method, url, data, files=None, md5_checksum=None):
                 if request_method == "get" and not __is_checksum_equal(
                     response.text.encode("utf-8"), md5_checksum
                 ):
-
                     # -- Check if encoding is not UTF-8 perhaps
                     if __is_checksum_equal(response.content, md5_checksum):
                         raise OpenMLHashException(

@@ -70,7 +70,6 @@ class OpenMLSplit(object):
 
     @classmethod
     def _from_arff_file(cls, filename: str) -> "OpenMLSplit":
-
         repetitions = None
 
         pkl_filename = filename.replace(".arff", ".pkl.py3")

@@ -54,7 +54,6 @@ class TestSetupFunctions(TestBase):
         self.assertFalse(setup_id)
 
     def _existing_setup_exists(self, classif):
-
         flow = self.extension.model_to_flow(classif)
         flow.name = "TEST%s%s" % (get_sentinel(), flow.name)
         flow.publish()
