@@ -1569,11 +1569,11 @@ class TestRun(TestBase):
             self.assertEqual(len(row), 12)
 
     def test_get_cached_run(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config._cache_directory = self.static_cache_dir
         openml.runs.functions._get_cached_run(1)
 
     def test_get_uncached_run(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config._cache_directory = self.static_cache_dir
         with self.assertRaises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)
 

@@ -25,19 +25,19 @@ class TestTask(TestBase):
         super(TestTask, self).tearDown()
 
     def test__get_cached_tasks(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config._cache_directory = self.static_cache_dir
         tasks = openml.tasks.functions._get_cached_tasks()
         self.assertIsInstance(tasks, dict)
         self.assertEqual(len(tasks), 3)
         self.assertIsInstance(list(tasks.values())[0], OpenMLTask)
 
     def test__get_cached_task(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config._cache_directory = self.static_cache_dir
         task = openml.tasks.functions._get_cached_task(1)
         self.assertIsInstance(task, OpenMLTask)
 
     def test__get_cached_task_not_cached(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config._cache_directory = self.static_cache_dir
         self.assertRaisesRegex(
             OpenMLCacheException,
             "Task file for tid 2 not cached",
@@ -129,7 +129,7 @@ class TestTask(TestBase):
                     self._check_task(tasks[tid])
 
     def test__get_task(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config._cache_directory = self.static_cache_dir
         openml.tasks.get_task(1882)
 
     @unittest.skip(
@@ -224,7 +224,7 @@ class TestTask(TestBase):
         self.assertFalse(os.path.exists(os.path.join(os.getcwd(), "tasks", "1", "tasks.xml")))
 
     def test_get_task_with_cache(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config._cache_directory = self.static_cache_dir
         task = openml.tasks.get_task(1)
         self.assertIsInstance(task, OpenMLTask)
 

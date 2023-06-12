@@ -37,7 +37,7 @@ def _create_log_handlers(create_file_handler=True):
 
     if create_file_handler:
         one_mb = 2**20
-        log_path = os.path.join(cache_directory, "openml_python.log")
+        log_path = os.path.join(_cache_directory, "openml_python.log")
         file_handler = logging.handlers.RotatingFileHandler(
             log_path, maxBytes=one_mb, backupCount=1, delay=True
         )
@@ -125,7 +125,7 @@ def get_server_base_url() -> str:
 
 apikey = _defaults["apikey"]
 # The current cache directory (without the server name)
-cache_directory = str(_defaults["cachedir"])  # so mypy knows it is a string
+_cache_directory = str(_defaults["cachedir"])  # so mypy knows it is a string
 avoid_duplicate_runs = True if _defaults["avoid_duplicate_runs"] == "True" else False
 
 retry_policy = _defaults["retry_policy"]
@@ -226,7 +226,7 @@ def _setup(config=None):
     """
     global apikey
     global server
-    global cache_directory
+    global _cache_directory
     global avoid_duplicate_runs
 
     config_file = determine_config_file_path()
@@ -266,15 +266,15 @@ def _setup(config=None):
 
     set_retry_policy(_get(config, "retry_policy"), n_retries)
 
-    cache_directory = os.path.expanduser(short_cache_dir)
+    _cache_directory = os.path.expanduser(short_cache_dir)
     # create the cache subdirectory
-    if not os.path.exists(cache_directory):
+    if not os.path.exists(_cache_directory):
         try:
-            os.makedirs(cache_directory, exist_ok=True)
+            os.makedirs(_cache_directory, exist_ok=True)
         except PermissionError:
             openml_logger.warning(
                 "No permission to create openml cache directory at %s! This can result in "
-                "OpenML-Python not working properly." % cache_directory
+                "OpenML-Python not working properly." % _cache_directory
             )
 
     if cache_exists:
@@ -333,7 +333,7 @@ def get_config_as_dict():
     config = dict()
     config["apikey"] = apikey
     config["server"] = server
-    config["cachedir"] = cache_directory
+    config["cachedir"] = _cache_directory
     config["avoid_duplicate_runs"] = avoid_duplicate_runs
     config["connection_n_retries"] = connection_n_retries
     config["retry_policy"] = retry_policy
@@ -351,7 +351,7 @@ def get_cache_directory():
     """
     url_suffix = urlparse(server).netloc
     reversed_url_suffix = os.sep.join(url_suffix.split(".")[::-1])
-    _cachedir = os.path.join(cache_directory, reversed_url_suffix)
+    _cachedir = os.path.join(_cache_directory, reversed_url_suffix)
     return _cachedir
 
 
@@ -370,8 +370,8 @@ def set_cache_directory(cachedir):
     get_cache_directory
     """
 
-    global cache_directory
-    cache_directory = cachedir
+    global _cache_directory
+    _cache_directory = cachedir
 
 
 start_using_configuration_for_example = (
