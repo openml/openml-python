@@ -343,6 +343,17 @@ def get_config_as_dict():
 def get_cache_directory():
     """Get the current cache directory.
 
+    This gets the cache directory for the current server relative
+    to the base cache directory that can be set via
+    ``set_base_cache_directory()``. The cache directory is the
+    ``base_cache_directory`` with additional information on which
+    subdirectory to use based on the server name. By default it is
+    ``base_cache_directory / org / openml / www`` for the standard
+    OpenML.org server and is defined as
+    ``base_cache_directory / top-level domain / second-level domain /
+    hostname``
+    ```
+
     Returns
     -------
     cachedir : string
@@ -355,14 +366,19 @@ def get_cache_directory():
     return _cachedir
 
 
-def set_cache_directory(cachedir):
-    """Set module-wide cache directory.
+def set_base_cache_directory(base_cache_directory):
+    """Set module-wide base cache directory.
 
-    Sets the cache directory into which to download datasets, tasks etc.
+    Sets the base cache directory that defines how the actual cache
+    directory for the server being used is derived. This is
+    ``base_cache_directory / top-level domain / second-level domain /
+    hostname``, and by default is set to
+    ``base_cache_directory / org / openml / www`` for the standard
+    OpenML.org server.
 
     Parameters
     ----------
-    cachedir : string
+    base_cache_directory : string
          Path to use as cache directory.
 
     See also
@@ -371,7 +387,7 @@ def set_cache_directory(cachedir):
     """
 
     global _cache_directory
-    _cache_directory = cachedir
+    _cache_directory = base_cache_directory
 
 
 start_using_configuration_for_example = (
@@ -382,7 +398,7 @@ stop_using_configuration_for_example = ConfigurationForExamples.stop_using_confi
 
 __all__ = [
     "get_cache_directory",
-    "set_cache_directory",
+    "set_base_cache_directory",
     "start_using_configuration_for_example",
     "stop_using_configuration_for_example",
     "get_config_as_dict",
