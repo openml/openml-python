@@ -789,7 +789,8 @@ class OpenMLDataset(OpenMLBase):
         return data, targets, categorical, attribute_names
 
     def load_metadata(self, features: bool = False, qualities: bool = False):
-        """Load the missing medata information from the server and store it in the server.
+        """Load the missing metadata information from the server and store it in the
+        dataset object.
 
         The purpose of the function is to support lazy loading.
 
