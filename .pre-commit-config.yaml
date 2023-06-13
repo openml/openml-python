@@ -13,12 +13,15 @@ repos:
         additional_dependencies:
           - types-requests
           - types-python-dateutil
-        args: [ --disallow-untyped-defs, --disallow-any-generics,
-              --disallow-any-explicit,
-              --implicit-optional]
       - id: mypy
         name: mypy tests
         files: tests/.*
+        additional_dependencies:
+          - types-requests
+          - types-python-dateutil
+      - id: mypy
+        name: mypy type-def-check
+        files: openml/datasets/dataset.py
         additional_dependencies:
           - types-requests
           - types-python-dateutil
@@ -29,7 +32,9 @@ repos:
           - types-requests
           - types-python-dateutil
         args: [ --disallow-untyped-defs, --disallow-any-generics,
-                --disallow-any-explicit, --implicit-optional ]
+                --disallow-any-explicit,
+              --implicit-optional ]
+
   - repo: https://github.com/pycqa/flake8
     rev: 6.0.0
     hooks:

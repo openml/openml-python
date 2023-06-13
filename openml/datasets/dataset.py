@@ -118,30 +118,30 @@ class OpenMLDataset(OpenMLBase):
         description: str,
         data_format: str = "arff",
         cache_format: str = "pickle",
-        dataset_id: int = None,
-        version: int = None,
-        creator: str = None,
-        contributor: str = None,
-        collection_date: str = None,
-        upload_date: str = None,
-        language: str = None,
-        licence: str = None,
-        url: str = None,
-        default_target_attribute: str = None,
-        row_id_attribute: str = None,
-        ignore_attribute: str = None,
-        version_label: str = None,
-        citation: str = None,
-        tag: str = None,
-        visibility: str = None,
-        original_data_url: str = None,
-        paper_url: str = None,
-        update_comment: str = None,
-        md5_checksum: str = None,
-        data_file: str = None,
+        dataset_id: Optional[int] = None,
+        version: Optional[int] = None,
+        creator: Optional[str] = None,
+        contributor: Optional[str] = None,
+        collection_date: Optional[str] = None,
+        upload_date: Optional[str] = None,
+        language: Optional[str] = None,
+        licence: Optional[str] = None,
+        url: Optional[str] = None,
+        default_target_attribute: Optional[str] = None,
+        row_id_attribute: Optional[str] = None,
+        ignore_attribute: Optional[str] = None,
+        version_label: Optional[str] = None,
+        citation: Optional[str] = None,
+        tag: Optional[str] = None,
+        visibility: Optional[str] = None,
+        original_data_url: Optional[str] = None,
+        paper_url: Optional[str] = None,
+        update_comment: Optional[str] = None,
+        md5_checksum: Optional[str] = None,
+        data_file: Optional[str] = None,
         features_file: Optional[str] = None,
         qualities_file: Optional[str] = None,
-        dataset: str = None,
+        dataset: Optional[str] = None,
         minio_url: Optional[str] = None,
         parquet_file: Optional[str] = None,
     ):
@@ -217,7 +217,6 @@ class OpenMLDataset(OpenMLBase):
         self.paper_url = paper_url
         self.update_comment = update_comment
         self.md5_checksum = md5_checksum
-        self.data_file = cast(str, data_file)
         self.parquet_file = parquet_file
         self._dataset = dataset
         self._minio_url = minio_url
@@ -243,6 +242,7 @@ class OpenMLDataset(OpenMLBase):
             self._qualities = _read_qualities(qualities_file)
 
         if data_file is not None:
+            self.data_file = data_file
             rval = self._compressed_cache_file_paths(data_file)
             self.data_pickle_file = rval[0] if os.path.exists(rval[0]) else None
             self.data_feather_file = rval[1] if os.path.exists(rval[1]) else None
@@ -838,7 +838,7 @@ class OpenMLDataset(OpenMLBase):
     def get_features_by_type(
         self,
         data_type: str,
-        exclude: List[str] = None,
+        exclude: Optional[List[str]] = None,
         exclude_ignore_attribute: bool = True,
         exclude_row_id_attribute: bool = True,
     ) -> List[int]:
@@ -898,6 +898,10 @@ class OpenMLDataset(OpenMLBase):
                 else:
                     if self.features[idx].data_type == data_type:
                         result.append(idx - offset)
+        else:
+            raise ValueError(
+                "get_features_by_type can only be called if feature information is available."
+            )
         return result
 
     def _get_file_elements(self) -> Dict[str, str]:
@@ -962,7 +966,7 @@ class OpenMLDataset(OpenMLBase):
 
         return data_container
 
-    def _get_arff(self, format: str) -> Dict:  # type: ignore
+    def _get_arff(self, format: str) -> Dict[str, Union[arff.DENSE, arff.COO]]:
         """Read ARFF file and return decoded arff.
 
         Reads the file referenced in self.data_file.
@@ -1015,9 +1019,8 @@ class OpenMLDataset(OpenMLBase):
         if filename[-3:] == ".gz":
             with gzip.open(filename) as zipfile:
                 return decode_arff(zipfile)
-        elif filename:
-            with open(filename, encoding="utf8") as fh:
-                return decode_arff(fh)
+        with open(filename, encoding="utf8") as fh:
+            return decode_arff(fh)
 
 
 def _read_features(features_file: str) -> Dict[int, OpenMLDataFeature]:
