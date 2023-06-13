@@ -249,7 +249,7 @@ class OpenMLDataset(OpenMLBase):
         """Collect all information to display in the __repr__ body."""
 
         # Obtain number of features in accordance with lazy loading.
-        if self.qualities is not None:
+        if self.qualities is not None and self.qualities["NumberOfFeatures"] is not None:
             n_features = int(self.qualities["NumberOfFeatures"])  # type: Optional[int]
         else:
             n_features = len(self.features) if self.features is not None else None
