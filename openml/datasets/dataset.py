@@ -963,62 +963,63 @@ class OpenMLDataset(OpenMLBase):
         return data_container
 
 
-def _get_arff(data_file: str, format: str) -> Dict:  # type: ignore
-    """Read ARFF file and return decoded arff.
+    def _get_arff(self, format: str) -> Dict:  # type: ignore
 
-    Reads the file referenced in self.data_file.
+        """Read ARFF file and return decoded arff.
 
-    Parameters
-    ----------
-    format : str
-        Format of the ARFF file.
-        Must be one of 'arff' or 'sparse_arff' or a string that will be either of those
-        when converted to lower case.
+        Reads the file referenced in self.data_file.
+
+        Parameters
+        ----------
+        format : str
+            Format of the ARFF file.
+            Must be one of 'arff' or 'sparse_arff' or a string that will be either of those
+            when converted to lower case.
 
 
 
-    Returns
-    -------
-    dict
-        Decoded arff.
+        Returns
+        -------
+        dict
+            Decoded arff.
 
-    """
+        """
 
-    # TODO: add a partial read method which only returns the attribute
-    # headers of the corresponding .arff file!
-    import struct
+        # TODO: add a partial read method which only returns the attribute
+        # headers of the corresponding .arff file!
+        import struct
 
-    filename = data_file
-    bits = 8 * struct.calcsize("P")
-    # Files can be considered too large on a 32-bit system,
-    # if it exceeds 120mb (slightly more than covtype dataset size)
-    # This number is somewhat arbitrary.
-    if bits != 64 and os.path.getsize(filename) > 120000000:
-        raise NotImplementedError(
-            "File {} too big for {}-bit system ({} bytes).".format(
-                filename, os.path.getsize(filename), bits
+        filename = cast(str, self.data_file)
+        bits = 8 * struct.calcsize("P")
+        # Files can be considered too large on a 32-bit system,
+        # if it exceeds 120mb (slightly more than covtype dataset size)
+        # This number is somewhat arbitrary.
+        if bits != 64 and os.path.getsize(filename) > 120000000:
+            raise NotImplementedError(
+                "File {} too big for {}-bit system ({} bytes).".format(
+                    filename, os.path.getsize(filename), bits
+                )
             )
-        )
 
-    if format.lower() == "arff":
-        return_type = arff.DENSE
-    elif format.lower() == "sparse_arff":
-        return_type = arff.COO
-    else:
-        raise ValueError("Unknown data format {}".format(format))
+        if format.lower() == "arff":
+            return_type = arff.DENSE
+        elif format.lower() == "sparse_arff":
+            return_type = arff.COO
+        else:
+            raise ValueError("Unknown data format {}".format(format))
 
-    def decode_arff(
-        fh: Union[TextIO, BinaryIO, gzip.GzipFile, str, os.PathLike[str], None]
-    ) -> Union[arff.DENSE, arff.COO]:
-        decoder = arff.ArffDecoder()
-        return decoder.decode(fh, encode_nominal=True, return_type=return_type)
+        def decode_arff(
+            fh: Union[TextIO, BinaryIO, gzip.GzipFile, str, os.PathLike[str], None]
+        ) -> Union[arff.DENSE, arff.COO]:
+            decoder = arff.ArffDecoder()
+            return decoder.decode(fh, encode_nominal=True, return_type=return_type)
 
-    if filename[-3:] == ".gz":
-        with gzip.open(filename) as zipfile:
-            return decode_arff(zipfile)
-    elif filename:
-        with open(filename, encoding="utf8") as fh:
-            return decode_arff(fh)
+        if filename[-3:] == ".gz":
+            with gzip.open(filename) as zipfile:
+                return decode_arff(zipfile)
+        elif filename:
+            with open(filename, encoding="utf8") as fh:
+                return decode_arff(fh)
 
 
 def _read_features(features_file: str) -> Dict[int, OpenMLDataFeature]:
