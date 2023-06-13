@@ -30,9 +30,9 @@ from ..utils import (
     _create_cache_directory_for_id,
 )
 
-
 DATASETS_CACHE_DIR_NAME = "datasets"
 logger = logging.getLogger(__name__)
+
 
 ############################################################################
 # Local getters/accessors to the cache directory
@@ -355,6 +355,7 @@ def get_dataset(
     error_if_multiple: bool = False,
     cache_format: str = "pickle",
     download_qualities: bool = True,
+    download_features_meta_data: bool = True,
     download_all_files: bool = False,
 ) -> OpenMLDataset:
     """Download the OpenML dataset representation, optionally also download actual data file.
@@ -389,6 +390,8 @@ def get_dataset(
         no.of.rows is very high.
     download_qualities : bool (default=True)
         Option to download 'qualities' meta-data in addition to the minimal dataset description.
+    download_features_meta_data : bool (default=True)
+        Option to download 'features' meta-data in addition to the minimal dataset description.
     download_all_files: bool (default=False)
         EXPERIMENTAL. Download all files related to the dataset that reside on the server.
         Useful for datasets which refer to auxiliary files (e.g., meta-album).
@@ -427,7 +430,11 @@ def get_dataset(
     remove_dataset_cache = True
     try:
         description = _get_dataset_description(did_cache_dir, dataset_id)
-        features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
+
+        if download_features_meta_data:
+            features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
+        else:
+            features_file = None
 
         try:
             if download_qualities:
@@ -1171,8 +1178,8 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id):
 
 def _create_dataset_from_description(
     description: Dict[str, str],
-    features_file: str,
-    qualities_file: str,
+    features_file: Optional[str] = None,
+    qualities_file: Optional[str] = None,
     arff_file: Optional[str] = None,
     parquet_file: Optional[str] = None,
     cache_format: str = "pickle",

@@ -7,6 +7,7 @@ import logging
 import os
 import pickle
 from typing import List, Optional, Union, Tuple, Iterable, Dict
+import warnings
 
 import arff
 import numpy as np
@@ -17,7 +18,6 @@ import xmltodict
 from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
-
 
 logger = logging.getLogger(__name__)
 
@@ -219,6 +219,13 @@ class OpenMLDataset(OpenMLBase):
         else:
             self.features = None
 
+        if qualities_file == "":
+            # TODO: to switch to "qualities_file is not None" below
+            warnings.warn(
+                "Starting from Version 0.14 `qualities_file` must be None and not an empty string.",
+                DeprecationWarning,
+            )
+
         if qualities_file:
             self.qualities = _read_qualities(qualities_file)  # type: Optional[Dict[str, float]]
         else:
@@ -240,6 +247,13 @@ class OpenMLDataset(OpenMLBase):
 
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
         """Collect all information to display in the __repr__ body."""
+
+        # Obtain number of features in accordance with lazy loading.
+        if self.qualities is not None:
+            n_features = int(self.qualities["NumberOfFeatures"])  # type: Optional[int]
+        else:
+            n_features = len(self.features) if self.features is not None else None
+
         fields = {
             "Name": self.name,
             "Version": self.version,
@@ -248,7 +262,7 @@ class OpenMLDataset(OpenMLBase):
             "Download URL": self.url,
             "Data file": self.data_file,
             "Pickle file": self.data_pickle_file,
-            "# of features": len(self.features) if self.features is not None else None,
+            "# of features": n_features,
         }
         if self.upload_date is not None:
             fields["Upload Date"] = self.upload_date.replace("T", " ")
