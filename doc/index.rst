@@ -93,17 +93,21 @@ Citing OpenML-Python
 If you use OpenML-Python in a scientific publication, we would appreciate a
 reference to the following paper:
 
-
- `OpenML-Python: an extensible Python API for OpenML
- <https://arxiv.org/abs/1911.02490>`_,
- Feurer *et al.*, arXiv:1911.02490.
+| Matthias Feurer, Jan N. van Rijn, Arlind Kadra, Pieter Gijsbers, Neeratyoy Mallik, Sahithya Ravi, Andreas Müller, Joaquin Vanschoren, Frank Hutter
+| **OpenML-Python: an extensible Python API for OpenML**
+| Journal of Machine Learning Research, 22(100):1−5, 2021
+| `https://www.jmlr.org/papers/v22/19-920.html <https://www.jmlr.org/papers/v22/19-920.html>`_
 
  Bibtex entry::
 
-     @article{feurer-arxiv19a,
-         author    = {Matthias Feurer and Jan N. van Rijn and Arlind Kadra and Pieter Gijsbers and Neeratyoy Mallik and Sahithya Ravi and Andreas Müller and Joaquin Vanschoren and Frank Hutter},
-         title     = {OpenML-Python: an extensible Python API for OpenML},
-         journal   = {arXiv:1911.02490},
-         year      = {2019},
-     }
+    @article{JMLR:v22:19-920,
+        author  = {Matthias Feurer and Jan N. van Rijn and Arlind Kadra and Pieter Gijsbers and Neeratyoy Mallik and Sahithya Ravi and Andreas MÃ¼ller and Joaquin Vanschoren and Frank Hutter},
+        title   = {OpenML-Python: an extensible Python API for OpenML},
+        journal = {Journal of Machine Learning Research},
+        year    = {2021},
+        volume  = {22},
+        number  = {100},
+        pages   = {1--5},
+        url     = {http://jmlr.org/papers/v22/19-920.html}
+    }
 
