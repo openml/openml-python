@@ -28,7 +28,7 @@ class OpenMLTaskMethodsTest(TestBase):
         self.assertEqual(len(task_list), 0)
 
     def test_get_train_and_test_split_indices(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config.set_root_cache_directory(self.static_cache_dir)
         task = openml.tasks.get_task(1882)
         train_indices, test_indices = task.get_train_test_split_indices(0, 0)
         self.assertEqual(16, train_indices[0])

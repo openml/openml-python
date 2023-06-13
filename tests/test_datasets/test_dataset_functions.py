@@ -420,7 +420,7 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(os.path.exists(description_xml_path))
 
     def test__getarff_path_dataset_arff(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config.set_root_cache_directory(self.static_cache_dir)
         description = _get_dataset_description(self.workdir, 2)
         arff_path = _get_dataset_arff(description, cache_directory=self.workdir)
         self.assertIsInstance(arff_path, str)
@@ -494,7 +494,7 @@ class TestOpenMLDataset(TestBase):
 
     @mock.patch("openml._api_calls._download_minio_file")
     def test__get_dataset_parquet_is_cached(self, patch):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config.set_root_cache_directory(self.static_cache_dir)
         patch.side_effect = RuntimeError(
             "_download_minio_file should not be called when loading from cache"
         )
@@ -594,7 +594,7 @@ class TestOpenMLDataset(TestBase):
         self.assertIsInstance(dataset.dataset_id, int)
 
     def test__retrieve_class_labels(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config.set_root_cache_directory(self.static_cache_dir)
         labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels()
         self.assertEqual(labels, ["1", "2", "3", "4", "5", "U"])
         labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels(
