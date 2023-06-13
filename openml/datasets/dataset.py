@@ -7,6 +7,7 @@ import gzip
 import logging
 import os
 import pickle
+from io import TextIOWrapper
 from typing import (
     List,
     Optional,
@@ -14,8 +15,6 @@ from typing import (
     Tuple,
     Iterable,
     Dict,
-    TextIO,
-    BinaryIO,
     cast,
 )
 
@@ -1011,8 +1010,16 @@ class OpenMLDataset(OpenMLBase):
             raise ValueError("Unknown data format {}".format(format))
 
         def decode_arff(
-            fh: Union[TextIO, BinaryIO, gzip.GzipFile, str, os.PathLike[str], None]
-        ) -> Union[arff.DENSE, arff.COO]:
+            fh: Union[gzip.GzipFile, TextIOWrapper]
+        ) -> Dict[
+            str,
+            Union[
+                str,
+                List[Union[List[str], Tuple[str, List[str]]]],
+                List[List[Union[int, float, str]]],
+                Tuple[List[float], List[int], List[int]],
+            ],
+        ]:
             decoder = arff.ArffDecoder()
             return decoder.decode(fh, encode_nominal=True, return_type=return_type)
 
