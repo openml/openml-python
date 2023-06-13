@@ -962,9 +962,7 @@ class OpenMLDataset(OpenMLBase):
 
         return data_container
 
-
     def _get_arff(self, format: str) -> Dict:  # type: ignore
-
         """Read ARFF file and return decoded arff.
 
         Reads the file referenced in self.data_file.
