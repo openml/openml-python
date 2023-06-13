@@ -262,6 +262,19 @@ class OpenMLDatasetTest(TestBase):
         self.assertIsInstance(xy, pd.DataFrame)
         self.assertEqual(xy.shape, (150, 5))
 
+    def test_load_metadata(self):
+        _compare_dataset = openml.datasets.get_dataset(
+            2, download_data=False, download_features_meta_data=True, download_qualities=True
+        )
+
+        _dataset = openml.datasets.get_dataset(
+            2, download_data=False, download_features_meta_data=False, download_qualities=False
+        )
+        _dataset.load_metadata(features=True, qualities=True)
+
+        self.assertEqual(_dataset.features, _compare_dataset.features)
+        self.assertEqual(_dataset.qualities, _compare_dataset.qualities)
+
 
 class OpenMLDatasetTestOnTestServer(TestBase):
     def setUp(self):
