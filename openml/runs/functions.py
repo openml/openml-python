@@ -98,6 +98,13 @@ def run_model_on_task(
     flow : OpenMLFlow (optional, only if `return_flow` is True).
         Flow generated from the model.
     """
+    if avoid_duplicate_runs and not config.apikey:
+        warnings.warn(
+            "avoid_duplicate_runs is set to True, but no API key is set. "
+            "Please set your API key in the OpenML configuration file, see"
+            "https://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial.html#authentication"
+            "for more information on authentication.",
+        )
 
     # TODO: At some point in the future do not allow for arguments in old order (6-2018).
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
