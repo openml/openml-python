@@ -22,6 +22,7 @@ import arff
 import numpy as np
 import pandas as pd
 import scipy.sparse
+import typing
 import xmltodict
 
 from openml.base import OpenMLBase
@@ -341,6 +342,7 @@ class OpenMLDataset(OpenMLBase):
         if self._minio_url is not None:
             self.parquet_file = _get_dataset_parquet(self)
 
+    @typing.no_type_check
     def _parse_data_from_arff(
         self, arff_file_path: str
     ) -> Tuple[Union[pd.DataFrame, scipy.sparse.csr_matrix], List[bool], List[str]]:
@@ -965,7 +967,17 @@ class OpenMLDataset(OpenMLBase):
 
         return data_container
 
-    def _get_arff(self, format: str) -> Dict[str, Union[arff.DENSE, arff.COO]]:
+    def _get_arff(
+        self, format: str
+    ) -> Dict[
+        str,
+        Union[
+            str,
+            List[Union[List[str], Tuple[str, List[str]]]],
+            List[List[Union[int, float, str]]],
+            Tuple[List[float], List[int], List[int]],
+        ],
+    ]:
         """Read ARFF file and return decoded arff.
 
         Reads the file referenced in self.data_file.
