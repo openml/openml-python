@@ -264,8 +264,9 @@ class OpenMLDatasetTest(TestBase):
 
     def test_load_metadata(self):
         # Initial Setup
-        did_cache_dir = openml.utils._create_cache_directory_for_id(openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
-                                                                    2)
+        did_cache_dir = openml.utils._create_cache_directory_for_id(
+            openml.datasets.functions.DATASETS_CACHE_DIR_NAME, 2
+        )
         _compare_dataset = openml.datasets.get_dataset(
             2, download_data=False, download_features_meta_data=True, download_qualities=True
         )
@@ -282,7 +283,9 @@ class OpenMLDatasetTest(TestBase):
         self.assertEqual(_dataset.qualities, _compare_dataset.qualities)
 
         # -- Test without cache
-        openml.utils._remove_cache_dir_for_id(openml.datasets.functions.DATASETS_CACHE_DIR_NAME, did_cache_dir)
+        openml.utils._remove_cache_dir_for_id(
+            openml.datasets.functions.DATASETS_CACHE_DIR_NAME, did_cache_dir
+        )
 
         _dataset = openml.datasets.get_dataset(
             2, download_data=False, download_features_meta_data=False, download_qualities=False
