@@ -549,8 +549,12 @@ class TestOpenMLDataset(TestBase):
         dataset = openml.datasets.get_dataset(
             2, download_qualities=False, download_features_meta_data=False
         )
-        self.assertIsNone(dataset.qualities)
-        self.assertIsNone(dataset.features)
+        # Internal representation without lazy loading
+        self.assertIsNone(dataset._qualities)
+        self.assertIsNone(dataset._features)
+        # External representation with lazy loading
+        self.assertIsNotNone(dataset.qualities)
+        self.assertIsNotNone(dataset.features)
 
     def test_get_dataset_force_refresh_cache(self):
         did_cache_dir = _create_cache_directory_for_id(

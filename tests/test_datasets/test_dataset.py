@@ -262,7 +262,7 @@ class OpenMLDatasetTest(TestBase):
         self.assertIsInstance(xy, pd.DataFrame)
         self.assertEqual(xy.shape, (150, 5))
 
-    def test_load_metadata(self):
+    def test_lazy_loading_metadata(self):
         # Initial Setup
         did_cache_dir = openml.utils._create_cache_directory_for_id(
             openml.datasets.functions.DATASETS_CACHE_DIR_NAME, 2
@@ -276,8 +276,6 @@ class OpenMLDatasetTest(TestBase):
         _dataset = openml.datasets.get_dataset(
             2, download_data=False, download_features_meta_data=False, download_qualities=False
         )
-        _dataset.load_metadata(features=True, qualities=True)
-
         self.assertEqual(change_time, os.stat(did_cache_dir).st_mtime)
         self.assertEqual(_dataset.features, _compare_dataset.features)
         self.assertEqual(_dataset.qualities, _compare_dataset.qualities)
@@ -290,8 +288,6 @@ class OpenMLDatasetTest(TestBase):
         _dataset = openml.datasets.get_dataset(
             2, download_data=False, download_features_meta_data=False, download_qualities=False
         )
-        _dataset.load_metadata(features=True, qualities=True)
-
         self.assertNotEqual(change_time, os.stat(did_cache_dir).st_mtime)
         self.assertEqual(_dataset.features, _compare_dataset.features)
         self.assertEqual(_dataset.qualities, _compare_dataset.qualities)

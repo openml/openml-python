@@ -212,12 +212,12 @@ class OpenMLDataset(OpenMLBase):
         self._dataset = dataset
         self._minio_url = minio_url
 
+        self._features = None  # type: Optional[Dict[int, OpenMLDataFeature]]
+        self._qualities = None  # type: Optional[Dict[str, float]]
+        self._no_qualities_found = False
+
         if features_file is not None:
-            self.features = _read_features(
-                features_file
-            )  # type: Optional[Dict[int, OpenMLDataFeature]]
-        else:
-            self.features = None
+            self._features = _read_features(features_file)
 
         if qualities_file == "":
             # TODO: to switch to "qualities_file is not None" below
@@ -227,9 +227,7 @@ class OpenMLDataset(OpenMLBase):
             )
 
         if qualities_file:
-            self.qualities = _read_qualities(qualities_file)  # type: Optional[Dict[str, float]]
-        else:
-            self.qualities = None
+            self._qualities = _read_qualities(qualities_file)
 
         if data_file is not None:
             rval = self._compressed_cache_file_paths(data_file)
@@ -242,6 +240,23 @@ class OpenMLDataset(OpenMLBase):
             self.feather_attribute_file = None
 
     @property
+    def features(self):
+        # Lazy loading of features
+        if self._features is None:
+            self._load_metadata(features=True)
+
+        return self._features
+
+    @property
+    def qualities(self):
+        # Lazy loading of qualities
+        # We have to check `_no_qualities_found` as there might not be qualities for a dataset
+        if self._qualities is None and (not self._no_qualities_found):
+            self._load_metadata(qualities=True)
+
+        return self._qualities
+
+    @property
     def id(self) -> Optional[int]:
         return self.dataset_id
 
@@ -249,10 +264,10 @@ class OpenMLDataset(OpenMLBase):
         """Collect all information to display in the __repr__ body."""
 
         # Obtain number of features in accordance with lazy loading.
-        if self.qualities is not None and self.qualities["NumberOfFeatures"] is not None:
-            n_features = int(self.qualities["NumberOfFeatures"])  # type: Optional[int]
+        if self._qualities is not None and self._qualities["NumberOfFeatures"] is not None:
+            n_features = int(self._qualities["NumberOfFeatures"])  # type: Optional[int]
         else:
-            n_features = len(self.features) if self.features is not None else None
+            n_features = len(self._features) if self._features is not None else None
 
         fields = {
             "Name": self.name,
@@ -268,8 +283,8 @@ class OpenMLDataset(OpenMLBase):
             fields["Upload Date"] = self.upload_date.replace("T", " ")
         if self.dataset_id is not None:
             fields["OpenML URL"] = self.openml_url
-        if self.qualities is not None and self.qualities["NumberOfInstances"] is not None:
-            fields["# of instances"] = int(self.qualities["NumberOfInstances"])
+        if self._qualities is not None and self._qualities["NumberOfInstances"] is not None:
+            fields["# of instances"] = int(self._qualities["NumberOfInstances"])
 
         # determines the order in which the information will be printed
         order = [
@@ -787,7 +802,7 @@ class OpenMLDataset(OpenMLBase):
 
         return data, targets, categorical, attribute_names
 
-    def load_metadata(self, features: bool = False, qualities: bool = False):
+    def _load_metadata(self, features: bool = False, qualities: bool = False):
         """Load the missing metadata information from the server and store it in the
         dataset object.
 
@@ -810,19 +825,16 @@ class OpenMLDataset(OpenMLBase):
                                 Otherwise we cannot load metadata."""
             )
 
-        # Only load the data if it is not already stored in the dataset object.
-        features = features if self.features is None else False
-        qualities = qualities if self.qualities is None else False
-
         features_file, qualities_file = _get_dataset_metadata(
             self.dataset_id, features=features, qualities=qualities
         )
 
         if features_file is not None:
-            self.features = _read_features(features_file)
+            self._features = _read_features(features_file)
 
         if qualities_file is not None:
-            self.qualities = _read_qualities(qualities_file)
+            self._qualities = _read_qualities(qualities_file)
+            self._no_qualities_found = self._qualities is None
 
     def retrieve_class_labels(self, target_name: str = "class") -> Union[None, List[str]]:
         """Reads the datasets arff to determine the class-labels.
@@ -841,10 +853,6 @@ class OpenMLDataset(OpenMLBase):
         -------
         list
         """
-        if self.features is None:
-            raise ValueError(
-                "retrieve_class_labels can only be called if feature information is available."
-            )
         for feature in self.features.values():
             if (feature.name == target_name) and (feature.data_type == "nominal"):
                 return feature.nominal_values
