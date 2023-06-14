@@ -314,17 +314,13 @@ because we upload some random data.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:113: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
-      warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:256: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
-      warnings.warn(
     OpenML Benchmark Suite
     ======================
-    ID..............: 5665
+    ID..............: 2
     Name............: Test-Suite
     Status..........: None
     Main Entity Type: task
-    Study URL.......: https://test.openml.org/s/5665
+    Study URL.......: https://test.openml.org/s/2
     # of Tasks......: 20
 
 
@@ -345,7 +341,7 @@ because we upload some random data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  14.677 seconds)
+   **Total running time of the script:** ( 0 minutes  38.483 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_suites_tutorial.py:
