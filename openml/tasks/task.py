@@ -29,6 +29,7 @@ class TaskType(Enum):
     SURVIVAL_ANALYSIS = 7
     SUBGROUP_DISCOVERY = 8
     MULTITASK_REGRESSION = 9
+    QUESTION_ANSWERING = 11
 
 
 class OpenMLTask(OpenMLBase):
@@ -480,3 +481,41 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
             class_labels=class_labels,
             cost_matrix=cost_matrix,
         )
+
+
+class OpenMLQuestionAnsweringTask(OpenMLSupervisedTask):
+    """OpenML Question Answering object.
+
+    Parameters
+    ----------
+    class_labels : List of str (optional)
+    cost_matrix: array (optional)
+    """
+
+    def __init__(
+        self,
+        task_type_id: TaskType,
+        task_type: str,
+        data_set_id: int,
+        target_name: str,
+        estimation_procedure_id: int = 30,
+        estimation_procedure_type: Optional[str] = None,
+        estimation_parameters: Optional[Dict[str, str]] = None,
+        evaluation_measure: Optional[str] = None,
+        data_splits_url: Optional[str] = None,
+        task_id: Optional[int] = None,
+        cost_matrix: Optional[np.ndarray] = None,
+    ):
+        super(OpenMLQuestionAnsweringTask, self).__init__(
+            task_id=task_id,
+            task_type_id=task_type_id,
+            task_type=task_type,
+            data_set_id=data_set_id,
+            estimation_procedure_id=estimation_procedure_id,
+            estimation_procedure_type=estimation_procedure_type,
+            estimation_parameters=estimation_parameters,
+            evaluation_measure=evaluation_measure,
+            target_name=target_name,
+            data_splits_url=data_splits_url,
+        )
+
