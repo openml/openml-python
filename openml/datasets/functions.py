@@ -347,12 +347,12 @@ def get_datasets(
 @openml.utils.thread_safe_if_oslo_installed
 def get_dataset(
     dataset_id: Union[int, str],
-    download_data: bool = True,
+    download_data: Optional[bool] = None,  # Optional for deprecation warning; later again only bool
     version: Optional[int] = None,
     error_if_multiple: bool = False,
     cache_format: str = "pickle",
-    download_qualities: bool = True,
-    download_features_meta_data: bool = True,
+    download_qualities: Optional[bool] = None,  # Same as above
+    download_features_meta_data: Optional[bool] = None,  # Same as above
     download_all_files: bool = False,
     force_refresh_cache: bool = False,
 ) -> OpenMLDataset:
@@ -362,9 +362,13 @@ def get_dataset(
     A check will be performed to determine if the information has previously been downloaded to a
     cache, and if so be loaded from disk instead of retrieved from the server.
 
-    To make this function thread/multiprocessing safe initialize the cache first by calling
-    `get_dataset(args)` once before calling `get_datasett(args)` many times in parallel. This will
-    initialize the cache and later calls will use the cache in a thread/multiprocessing safe way.
+    To make this function thread safe, you can install the python package ``oslo.concurrency``.
+    If ``oslo.concurrency`` is installed `get_dataset` becomes thread safe.
+
+    Alternatively, to make this function thread/multiprocessing safe initialize the cache first by
+    calling `get_dataset(args)` once before calling `get_datasett(args)` many times in parallel.
+    This will initialize the cache and later calls will use the cache in a thread/multiprocessing
+    safe way.
 
     If dataset is retrieved by name, a version may be specified.
     If no version is specified and multiple versions of the dataset exist,
@@ -394,7 +398,7 @@ def get_dataset(
         Option to download 'qualities' meta-data in addition to the minimal dataset description.
         If True, download and cache the qualities file.
         If False, create the OpenMLDataset without qualities metadata. The data may later be added
-        to the OpenMLDataset hrough the `OpenMLDataset.load_metadata(qualities=True)` method.
+        to the OpenMLDataset through the `OpenMLDataset.load_metadata(qualities=True)` method.
     download_features_meta_data : bool (default=True)
         Option to download 'features' meta-data in addition to the minimal dataset description.
         If True, download and cache the features file.
@@ -414,13 +418,23 @@ def get_dataset(
     dataset : :class:`openml.OpenMLDataset`
         The downloaded dataset.
     """
-    if any([download_qualities, download_features_meta_data]):
+    if any(
+        download_flag is None
+        for download_flag in [download_data, download_qualities, download_features_meta_data]
+    ):
         warnings.warn(
-            """Starting from Version 0.14 `download_data`, `download_qualities`, and
-            `download_features_meta_data` will all be ``False`` by default to enable
-            lazy loading.""",
-            DeprecationWarning,
+            "Starting from Version 0.14 `download_data`, `download_qualities`, and `download_featu"
+            "res_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy "
+            "loading. To disable this message until version 0.14 explicitly set `download_data`, "
+            "`download_qualities`, and `download_features_meta_data` to a bool while calling "
+            "`get_dataset`."
         )
+
+    download_data = True if download_data is None else download_data
+    download_qualities = True if download_qualities is None else download_qualities
+    download_features_meta_data = (
+        True if download_features_meta_data is None else download_features_meta_data
+    )
 
     if download_all_files:
         warnings.warn(
@@ -443,10 +457,10 @@ def get_dataset(
             "`dataset_id` must be one of `str` or `int`, not {}.".format(type(dataset_id))
         )
 
-    # Note: we could also (quite heavily) re-implement the below to only download the
-    # data and do not cache the data at all. This would always be thread/multiprocessing
-    # safe. However, this would likely drastically increase the strain on the server.
-    # Hence, we should stick to the alternative mentioned in the docstring.
+    # Developer Documentation: we could also (quite heavily) re-implement the below to only download
+    # the data and do not cache the data at all. This would always be thread/multiprocessing safe.
+    # However, this would likely drastically increase the strain on the server and make working with
+    # OpenML really slow. Hence, we stick to the alternatives mentioned in the docstring.
     if force_refresh_cache:
         did_cache_dir = _get_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, dataset_id)
         if os.path.exists(did_cache_dir):

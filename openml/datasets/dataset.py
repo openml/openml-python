@@ -809,10 +809,12 @@ class OpenMLDataset(OpenMLBase):
             )
 
         if features and self.features is None:
-            self.features = _parse_features_xml(_get_features_xml(self.dataset_id))
+            feature_xml = _get_features_xml(self.dataset_id)
+            self.features = _parse_features_xml(feature_xml)
 
         if qualities and self.qualities is None:
-            self.qualities = _parse_qualities_xml(_get_qualities_xml(self.dataset_id))
+            qualities_xml = _get_qualities_xml(self.dataset_id)
+            self.qualities = _parse_qualities_xml(qualities_xml)
 
     def retrieve_class_labels(self, target_name: str = "class") -> Union[None, List[str]]:
         """Reads the datasets arff to determine the class-labels.

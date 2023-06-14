@@ -66,13 +66,7 @@ class OpenMLDataFeature(object):
         if not isinstance(other, OpenMLDataFeature):
             return False
 
-        return (
-            self.index == other.index
-            and self.name == other.name
-            and self.data_type == other.data_type
-            and self.nominal_values == other.nominal_values
-            and self.number_missing_values == other.number_missing_values
-        )
+        return self.__dict__ == other.__dict__
 
     def _repr_pretty_(self, pp, cycle):
         pp.text(str(self))
