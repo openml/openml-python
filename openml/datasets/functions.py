@@ -427,7 +427,8 @@ def get_dataset(
             "res_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy "
             "loading. To disable this message until version 0.14 explicitly set `download_data`, "
             "`download_qualities`, and `download_features_meta_data` to a bool while calling "
-            "`get_dataset`."
+            "`get_dataset`.",
+            DeprecationWarning,
         )
 
     download_data = True if download_data is None else download_data
