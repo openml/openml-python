@@ -4,7 +4,7 @@ import io
 import logging
 import os
 from pyexpat import ExpatError
-from typing import List, Dict, Union, Optional, cast
+from typing import List, Dict, Union, Optional, cast, Tuple
 import warnings
 
 import numpy as np
@@ -18,7 +18,7 @@ from collections import OrderedDict
 
 import openml.utils
 import openml._api_calls
-from .dataset import OpenMLDataset, _get_features_xml, _get_qualities_xml
+from .dataset import OpenMLDataset
 from ..exceptions import (
     OpenMLHashException,
     OpenMLServerError,
@@ -475,22 +475,9 @@ def get_dataset(
     try:
         description = _get_dataset_description(did_cache_dir, dataset_id)
 
-        if download_features_meta_data:
-            features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
-        else:
-            features_file = None
-
-        try:
-            if download_qualities:
-                qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
-            else:
-                qualities_file = ""
-        except OpenMLServerException as e:
-            if e.code == 362 and str(e) == "No qualities found - None":
-                logger.warning("No qualities found for dataset {}".format(dataset_id))
-                qualities_file = None
-            else:
-                raise
+        features_file, qualities_file = _get_dataset_metadata(
+            dataset_id, download_features_meta_data, download_qualities, did_cache_dir
+        )
 
         arff_file = _get_dataset_arff(description) if download_data else None
         if "oml:minio_url" in description and download_data:
@@ -1152,6 +1139,11 @@ def _get_dataset_arff(
     return output_file_path
 
 
+def _get_features_xml(dataset_id):
+    url_extension = "data/features/{}".format(dataset_id)
+    return openml._api_calls._perform_api_call(url_extension, "get")
+
+
 def _get_dataset_features_file(did_cache_dir: str, dataset_id: int) -> str:
     """API call to load dataset features. Loads from cache or downloads them.
 
@@ -1182,6 +1174,11 @@ def _get_dataset_features_file(did_cache_dir: str, dataset_id: int) -> str:
             fh.write(features_xml)
 
     return features_file
+
+
+def _get_qualities_xml(dataset_id):
+    url_extension = "data/qualities/{}".format(dataset_id)
+    return openml._api_calls._perform_api_call(url_extension, "get")
 
 
 def _get_dataset_qualities_file(did_cache_dir, dataset_id):
@@ -1216,6 +1213,57 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id):
         with io.open(qualities_file, "w", encoding="utf8") as fh:
             fh.write(qualities_xml)
     return qualities_file
+
+
+def _get_dataset_metadata(
+    dataset_id: int, features: bool, qualities: bool, did_cache_dir: Optional[str] = None
+) -> Tuple[Union[str, None], Union[str, None]]:
+    """Download the files and initialize the cache for the metadata for a dataset. If the cache is
+    already initialized, the files are only loaded from the cache.
+
+    This includes the features and qualities of the dataset.
+
+    Parameters
+    ----------
+    dataset_id: int
+        ID of the dataset for which the metadata is requested.
+    features: bool
+        Whether to return the features in the metadata.
+    qualities
+
+    did_cache_dir
+
+    Returns
+    -------
+    features_file: str or None
+        Path to the features file. None if features=False.
+    qualities_file: str or None
+        Path to the qualities file. None if qualities=False.
+    """
+
+    # Init cache directory if needed
+    if did_cache_dir is None:
+        did_cache_dir = _create_cache_directory_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            dataset_id,
+        )
+    features_file = None
+    qualities_file = None
+
+    if features:
+        features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
+
+    if qualities:
+        try:
+            qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
+        except OpenMLServerException as e:
+            if e.code == 362 and str(e) == "No qualities found - None":
+                # quality file stays as None
+                logger.warning("No qualities found for dataset {}".format(dataset_id))
+            else:
+                raise
+
+    return features_file, qualities_file
 
 
 def _create_dataset_from_description(

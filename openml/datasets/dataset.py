@@ -16,7 +16,6 @@ import scipy.sparse
 import xmltodict
 
 from openml.base import OpenMLBase
-from openml._api_calls import _perform_api_call
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
 
@@ -801,6 +800,8 @@ class OpenMLDataset(OpenMLBase):
         qualities: bool (default=False)
             If True, load the `self.qualities` data if not already loaded.
         """
+        # Delayed Import to avoid circular imports or having to import all of dataset.functions to import OpenMLDataset
+        from openml.datasets.functions import _get_dataset_metadata
 
         if self.dataset_id is None:
             raise ValueError(
@@ -808,13 +809,19 @@ class OpenMLDataset(OpenMLBase):
                                 Otherwise we cannot load metadata."""
             )
 
-        if features and self.features is None:
-            feature_xml = _get_features_xml(self.dataset_id)
-            self.features = _parse_features_xml(feature_xml)
+        # Only load the data if it is not already stored in the dataset object.
+        features = features if self.features is None else False
+        qualities = qualities if self.qualities is None else False
 
-        if qualities and self.qualities is None:
-            qualities_xml = _get_qualities_xml(self.dataset_id)
-            self.qualities = _parse_qualities_xml(qualities_xml)
+        features_file, qualities_file = _get_dataset_metadata(
+            self.dataset_id, features=features, qualities=qualities
+        )
+
+        if features_file is not None:
+            self.features = _read_features(features_file)
+
+        if qualities_file is not None:
+            self.qualities = _read_qualities(qualities_file)
 
     def retrieve_class_labels(self, target_name: str = "class") -> Union[None, List[str]]:
         """Reads the datasets arff to determine the class-labels.
@@ -982,11 +989,6 @@ def _read_features(features_file: str) -> Dict[int, OpenMLDataFeature]:
     return features
 
 
-def _get_features_xml(dataset_id):
-    url_extension = "data/features/{}".format(dataset_id)
-    return _perform_api_call(url_extension, "get")
-
-
 def _parse_features_xml(features_xml_string):
     xml_dict = xmltodict.parse(features_xml_string, force_list=("oml:feature", "oml:nominal_value"))
     features_xml = xml_dict["oml:data_features"]
@@ -1026,11 +1028,6 @@ def _read_qualities(qualities_file: str) -> Dict[str, float]:
         with open(qualities_pickle_file, "wb") as fh_binary:
             pickle.dump(qualities, fh_binary)
     return qualities
-
-
-def _get_qualities_xml(dataset_id):
-    url_extension = "data/qualities/{}".format(dataset_id)
-    return _perform_api_call(url_extension, "get")
 
 
 def _check_qualities(qualities: List[Dict[str, str]]) -> Dict[str, float]:
