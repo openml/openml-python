@@ -800,7 +800,8 @@ class OpenMLDataset(OpenMLBase):
         qualities: bool (default=False)
             If True, load the `self.qualities` data if not already loaded.
         """
-        # Delayed Import to avoid circular imports or having to import all of dataset.functions to import OpenMLDataset
+        # Delayed Import to avoid circular imports or having to import all of dataset.functions to
+        # import OpenMLDataset
         from openml.datasets.functions import _get_dataset_metadata
 
         if self.dataset_id is None:
