@@ -46,6 +46,16 @@ class OpenMLTaskTest(TestBase):
         self.assertEqual(len(datasets), 1)
         self.assertEqual(_perform_api_call.call_count, 1)
 
+    def test_list_all_for_datasets(self):
+        required_size = 127  # default test server reset value
+        datasets = openml.datasets.list_datasets(
+            batch_size=100, size=required_size, output_format="dataframe"
+        )
+
+        self.assertEqual(len(datasets), required_size)
+        for did in datasets:
+            self._check_dataset(datasets[did])
+
     def test_list_all_for_tasks(self):
         required_size = 1068  # default test server reset value
         tasks = openml.tasks.list_tasks(batch_size=1000, size=required_size)
@@ -54,8 +64,9 @@ class OpenMLTaskTest(TestBase):
 
     def test_list_all_for_flows(self):
         required_size = 15  # default test server reset value
-        flows = openml.flows.list_flows(batch_size=25, size=required_size)
-
+        flows = openml.flows.list_flows(
+            batch_size=25, size=required_size, output_format="dataframe"
+        )
         self.assertEqual(len(flows), required_size)
 
     def test_list_all_for_setups(self):
