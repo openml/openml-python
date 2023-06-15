@@ -370,7 +370,7 @@ def get_task(
         download_splits = get_dataset_kwargs.get("download_data", True)
 
     if not isinstance(task_id, int):
-        # TODO(0.14): Remove warning
+        # TODO(0.15): Remove warning
         warnings.warn(
             "Task id must be specified as `int` from 0.14.0 onwards.",
             FutureWarning,
