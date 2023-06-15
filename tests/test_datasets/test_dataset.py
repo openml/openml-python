@@ -288,6 +288,7 @@ class OpenMLDatasetTest(TestBase):
         _dataset = openml.datasets.get_dataset(
             2, download_data=False, download_features_meta_data=False, download_qualities=False
         )
+        self.assertEqual(["description.xml"], os.listdir(did_cache_dir))
         self.assertNotEqual(change_time, os.stat(did_cache_dir).st_mtime)
         self.assertEqual(_dataset.features, _compare_dataset.features)
         self.assertEqual(_dataset.qualities, _compare_dataset.qualities)

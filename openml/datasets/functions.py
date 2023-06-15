@@ -4,7 +4,7 @@ import io
 import logging
 import os
 from pyexpat import ExpatError
-from typing import List, Dict, Union, Optional, cast, Tuple
+from typing import List, Dict, Union, Optional, cast
 import warnings
 
 import numpy as np
@@ -366,7 +366,7 @@ def get_dataset(
     If ``oslo.concurrency`` is installed `get_dataset` becomes thread safe.
 
     Alternatively, to make this function thread/multiprocessing safe initialize the cache first by
-    calling `get_dataset(args)` once before calling `get_datasett(args)` many times in parallel.
+    calling `get_dataset(args)` once before calling `get_dataset(args)` many times in parallel.
     This will initialize the cache and later calls will use the cache in a thread/multiprocessing
     safe way.
 
@@ -460,10 +460,6 @@ def get_dataset(
             "`dataset_id` must be one of `str` or `int`, not {}.".format(type(dataset_id))
         )
 
-    # Developer Documentation: we could also (quite heavily) re-implement the below to only download
-    # the data and do not cache the data at all. This would always be thread/multiprocessing safe.
-    # However, this would likely drastically increase the strain on the server and make working with
-    # OpenML really slow. Hence, we stick to the alternatives mentioned in the docstring.
     if force_refresh_cache:
         did_cache_dir = _get_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, dataset_id)
         if os.path.exists(did_cache_dir):
@@ -477,10 +473,13 @@ def get_dataset(
     remove_dataset_cache = True
     try:
         description = _get_dataset_description(did_cache_dir, dataset_id)
+        features_file = None
+        qualities_file = None
 
-        features_file, qualities_file = _get_dataset_metadata(
-            dataset_id, download_features_meta_data, download_qualities, did_cache_dir
-        )
+        if download_features_meta_data:
+            features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
+        if download_qualities:
+            qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
 
         arff_file = _get_dataset_arff(description) if download_data else None
         if "oml:minio_url" in description and download_data:
@@ -1143,11 +1142,11 @@ def _get_dataset_arff(
 
 
 def _get_features_xml(dataset_id):
-    url_extension = "data/features/{}".format(dataset_id)
+    url_extension = f"data/features/{dataset_id}"
     return openml._api_calls._perform_api_call(url_extension, "get")
 
 
-def _get_dataset_features_file(did_cache_dir: str, dataset_id: int) -> str:
+def _get_dataset_features_file(did_cache_dir: Union[str, None], dataset_id: int) -> str:
     """API call to load dataset features. Loads from cache or downloads them.
 
     Features are feature descriptions for each column.
@@ -1157,7 +1156,7 @@ def _get_dataset_features_file(did_cache_dir: str, dataset_id: int) -> str:
 
     Parameters
     ----------
-    did_cache_dir : str
+    did_cache_dir : str or None
         Cache subdirectory for this dataset
 
     dataset_id : int
@@ -1168,6 +1167,13 @@ def _get_dataset_features_file(did_cache_dir: str, dataset_id: int) -> str:
     str
         Path of the cached dataset feature file
     """
+
+    if did_cache_dir is None:
+        did_cache_dir = _create_cache_directory_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            dataset_id,
+        )
+
     features_file = os.path.join(did_cache_dir, "features.xml")
 
     # Dataset features aren't subject to change...
@@ -1180,11 +1186,13 @@ def _get_dataset_features_file(did_cache_dir: str, dataset_id: int) -> str:
 
 
 def _get_qualities_xml(dataset_id):
-    url_extension = "data/qualities/{}".format(dataset_id)
+    url_extension = f"data/qualities/{dataset_id}"
     return openml._api_calls._perform_api_call(url_extension, "get")
 
 
-def _get_dataset_qualities_file(did_cache_dir, dataset_id):
+def _get_dataset_qualities_file(
+    did_cache_dir: Union[str, None], dataset_id: int
+) -> Union[str, None]:
     """API call to load dataset qualities. Loads from cache or downloads them.
 
     Features are metafeatures (number of features, number of classes, ...)
@@ -1193,7 +1201,7 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id):
 
     Parameters
     ----------
-    did_cache_dir : str
+    did_cache_dir : str or None
         Cache subdirectory for this dataset
 
     dataset_id : int
@@ -1206,67 +1214,31 @@ def _get_dataset_qualities_file(did_cache_dir, dataset_id):
     str
         Path of the cached qualities file
     """
+    if did_cache_dir is None:
+        did_cache_dir = _create_cache_directory_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            dataset_id,
+        )
+
     # Dataset qualities are subject to change and must be fetched every time
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")
     try:
         with io.open(qualities_file, encoding="utf8") as fh:
             qualities_xml = fh.read()
     except (OSError, IOError):
-        qualities_xml = _get_qualities_xml(dataset_id)
-        with io.open(qualities_file, "w", encoding="utf8") as fh:
-            fh.write(qualities_xml)
-    return qualities_file
-
-
-def _get_dataset_metadata(
-    dataset_id: int, features: bool, qualities: bool, did_cache_dir: Optional[str] = None
-) -> Tuple[Union[str, None], Union[str, None]]:
-    """Download the files and initialize the cache for the metadata for a dataset. If the cache is
-    already initialized, the files are only loaded from the cache.
-
-    This includes the features and qualities of the dataset.
-
-    Parameters
-    ----------
-    dataset_id: int
-        ID of the dataset for which the metadata is requested.
-    features: bool
-        Whether to return the features in the metadata.
-    qualities
-
-    did_cache_dir
-
-    Returns
-    -------
-    features_file: str or None
-        Path to the features file. None if features=False.
-    qualities_file: str or None
-        Path to the qualities file. None if qualities=False.
-    """
-
-    # Init cache directory if needed
-    if did_cache_dir is None:
-        did_cache_dir = _create_cache_directory_for_id(
-            DATASETS_CACHE_DIR_NAME,
-            dataset_id,
-        )
-    features_file = None
-    qualities_file = None
-
-    if features:
-        features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
-
-    if qualities:
         try:
-            qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
+            qualities_xml = _get_qualities_xml(dataset_id)
+            with io.open(qualities_file, "w", encoding="utf8") as fh:
+                fh.write(qualities_xml)
         except OpenMLServerException as e:
             if e.code == 362 and str(e) == "No qualities found - None":
                 # quality file stays as None
                 logger.warning("No qualities found for dataset {}".format(dataset_id))
+                return None
             else:
                 raise
 
-    return features_file, qualities_file
+    return qualities_file
 
 
 def _create_dataset_from_description(

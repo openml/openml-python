@@ -331,8 +331,8 @@ def get_task(
     """Download OpenML task for a given task ID.
 
     Downloads the task representation. By default, this will also download the data splits and
-    the dataset. From version 0.15.0 onwards, the splits will not be downloaded by default
-    nor the dataset.
+    the dataset. From version 0.15.0 onwards, the splits nor the dataset will not be downloaded by
+    default.
 
     Use the `download_splits` parameter to control whether the splits are downloaded.
     Moreover, you may pass additional parameter (args or kwargs) that are passed to

@@ -572,6 +572,17 @@ class TestOpenMLDataset(TestBase):
         openml.datasets.get_dataset(2, force_refresh_cache=True)
         self.assertNotEqual(change_time, os.stat(did_cache_dir).st_mtime)
 
+        # Final clean up
+        openml.utils._remove_cache_dir_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            did_cache_dir,
+        )
+
+    def test_get_dataset_force_refresh_cache_clean_start(self):
+        did_cache_dir = _create_cache_directory_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            2,
+        )
         # Clean up
         openml.utils._remove_cache_dir_for_id(
             DATASETS_CACHE_DIR_NAME,

@@ -219,10 +219,13 @@ class OpenMLDataset(OpenMLBase):
         if features_file is not None:
             self._features = _read_features(features_file)
 
+        # "" was the old default value by `get_dataset` and maybe still used by some
         if qualities_file == "":
             # TODO(0.15): to switch to "qualities_file is not None" below and remove warning
             warnings.warn(
-                "Starting from Version 0.15 `qualities_file` must be None and not an empty string.",
+                "Starting from Version 0.15 `qualities_file` must be None and not an empty string "
+                "to avoid reading the qualities from file. Set `qualities_file` to None to avoid "
+                "this warning.",
                 FutureWarning,
             )
 
@@ -241,18 +244,16 @@ class OpenMLDataset(OpenMLBase):
 
     @property
     def features(self):
-        # Lazy loading of features
         if self._features is None:
-            self._load_metadata(features=True)
+            self._load_features()
 
         return self._features
 
     @property
     def qualities(self):
-        # Lazy loading of qualities
         # We have to check `_no_qualities_found` as there might not be qualities for a dataset
         if self._qualities is None and (not self._no_qualities_found):
-            self._load_metadata(qualities=True)
+            self._load_qualities()
 
         return self._qualities
 
@@ -802,39 +803,38 @@ class OpenMLDataset(OpenMLBase):
 
         return data, targets, categorical, attribute_names
 
-    def _load_metadata(self, features: bool = False, qualities: bool = False):
-        """Load the missing metadata information from the server and store it in the
-        dataset object.
-
-        The purpose of the function is to support lazy loading.
-
-        Parameters
-        ----------
-        features : bool (default=False)
-            If True, load the `self.features` data if not already loaded.
-        qualities: bool (default=False)
-            If True, load the `self.qualities` data if not already loaded.
-        """
+    def _load_features(self):
+        """Load the features metadata from the server and store it in the dataset object."""
         # Delayed Import to avoid circular imports or having to import all of dataset.functions to
-        # import OpenMLDataset
-        from openml.datasets.functions import _get_dataset_metadata
+        # import OpenMLDataset.
+        from openml.datasets.functions import _get_dataset_features_file
 
         if self.dataset_id is None:
             raise ValueError(
-                """No dataset id specified. Please set the dataset id.
-                                Otherwise we cannot load metadata."""
+                "No dataset id specified. Please set the dataset id. Otherwise we cannot load "
+                "metadata."
             )
 
-        features_file, qualities_file = _get_dataset_metadata(
-            self.dataset_id, features=features, qualities=qualities
-        )
+        features_file = _get_dataset_features_file(None, self.dataset_id)
+        self._features = _read_features(features_file)
 
-        if features_file is not None:
-            self._features = _read_features(features_file)
+    def _load_qualities(self):
+        """Load qualities information from the server and store it in the dataset object."""
+        # same reason as above for _load_features
+        from openml.datasets.functions import _get_dataset_qualities_file
 
-        if qualities_file is not None:
+        if self.dataset_id is None:
+            raise ValueError(
+                "No dataset id specified. Please set the dataset id. Otherwise we cannot load "
+                "metadata."
+            )
+
+        qualities_file = _get_dataset_qualities_file(None, self.dataset_id)
+
+        if qualities_file is None:
+            self._no_qualities_found = True
+        else:
             self._qualities = _read_qualities(qualities_file)
-            self._no_qualities_found = self._qualities is None
 
     def retrieve_class_labels(self, target_name: str = "class") -> Union[None, List[str]]:
         """Reads the datasets arff to determine the class-labels.
@@ -981,7 +981,6 @@ class OpenMLDataset(OpenMLBase):
         return data_container
 
 
-# -- Code for Features Property
 def _read_features(features_file: str) -> Dict[int, OpenMLDataFeature]:
     features_pickle_file = _get_features_pickle_file(features_file)
     try:
@@ -1024,7 +1023,6 @@ def _get_features_pickle_file(features_file: str) -> str:
     return features_file + ".pkl"
 
 
-# -- Code for Qualities Property
 def _read_qualities(qualities_file: str) -> Dict[str, float]:
     qualities_pickle_file = _get_qualities_pickle_file(qualities_file)
     try:
