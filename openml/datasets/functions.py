@@ -317,7 +317,7 @@ def _name_to_id(
         raise ValueError(msg)
     if candidates.empty:
         no_dataset_for_name = f"No active datasets exist with name '{dataset_name}'"
-        and_version = f" and version '{version}'." if version is not None else ""
+        and_version = f" and version '{version}'." if version is not None else "."
         raise RuntimeError(no_dataset_for_name + and_version)
 
     # Dataset ids are chronological so we can just sort based on ids (instead of version)
