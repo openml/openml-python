@@ -27,6 +27,7 @@ class TestRun(TestBase):
 
     def test_tagging(self):
         runs = openml.runs.list_runs(size=1, output_format="dataframe")
+        assert not runs.empty, "Test server state is incorrect"
         run_id = runs["run_id"].iloc[0]
         run = openml.runs.get_run(run_id)
         tag = "testing_tag_{}_{}".format(self.id(), time())

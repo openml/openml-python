@@ -1393,7 +1393,7 @@ class TestRun(TestBase):
         task_ids.append(21)
         runs = openml.runs.list_runs(task=task_ids, output_format="dataframe")
         self.assertGreaterEqual(len(runs), num_runs + 1)
-        for run in runs.to_dict(orient="index"):
+        for run in runs.to_dict(orient="index").values():
             self.assertIn(run["task_id"], task_ids)
             self._check_run(run)
 
@@ -1405,7 +1405,7 @@ class TestRun(TestBase):
 
         runs = openml.runs.list_runs(uploader=uploader_ids, output_format="dataframe")
         self.assertGreaterEqual(len(runs), 2)
-        for run in runs.to_dict(orient="index"):
+        for run in runs.to_dict(orient="index").values():
             self.assertIn(run["uploader"], uploader_ids)
             self._check_run(run)
         num_runs = len(runs)

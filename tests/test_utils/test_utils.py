@@ -53,8 +53,8 @@ class OpenMLTaskTest(TestBase):
         )
 
         self.assertEqual(len(datasets), required_size)
-        for did in datasets:
-            self._check_dataset(datasets[did])
+        for dataset in datasets.to_dict(orient="index").values():
+            self._check_dataset(dataset)
 
     def test_list_all_for_tasks(self):
         required_size = 1068  # default test server reset value

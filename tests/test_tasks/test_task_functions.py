@@ -95,7 +95,7 @@ class TestTask(TestBase):
         num_basic_tasks = 100  # number is flexible, check server if fails
         tasks = openml.tasks.list_tasks(tag="OpenML100", output_format="dataframe")
         self.assertGreaterEqual(len(tasks), num_basic_tasks)
-        for task in tasks.to_dict(orient="index"):
+        for task in tasks.to_dict(orient="index").values():
             self._check_task(task)
 
     def test_list_tasks(self):
