@@ -26,18 +26,18 @@ class TestRun(TestBase):
     # less than 1 seconds
 
     def test_tagging(self):
-        runs = openml.runs.list_runs(size=1)
-        run_id = list(runs.keys())[0]
+        runs = openml.runs.list_runs(size=1, output_format="dataframe")
+        run_id = runs["run_id"].iloc[0]
         run = openml.runs.get_run(run_id)
         tag = "testing_tag_{}_{}".format(self.id(), time())
-        run_list = openml.runs.list_runs(tag=tag)
+        run_list = openml.runs.list_runs(tag=tag, output_format="dataframe")
         self.assertEqual(len(run_list), 0)
         run.push_tag(tag)
-        run_list = openml.runs.list_runs(tag=tag)
+        run_list = openml.runs.list_runs(tag=tag, output_format="dataframe")
         self.assertEqual(len(run_list), 1)
-        self.assertIn(run_id, run_list)
+        self.assertIn(run_id, run_list["run_id"])
         run.remove_tag(tag)
-        run_list = openml.runs.list_runs(tag=tag)
+        run_list = openml.runs.list_runs(tag=tag, output_format="dataframe")
         self.assertEqual(len(run_list), 0)
 
     @staticmethod

@@ -5,7 +5,7 @@ import io
 import itertools
 import os
 import time
-from typing import Any, List, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
+from typing import Any, List, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING, cast  # noqa F401
 import warnings
 
 import sklearn.metrics
@@ -428,11 +428,10 @@ def run_exists(task_id: int, setup_id: int) -> Set[int]:
         return set()
 
     try:
-        result = list_runs(task=[task_id], setup=[setup_id])
-        if len(result) > 0:
-            return set(result.keys())
-        else:
-            return set()
+        result = cast(
+            pd.DataFrame, list_runs(task=[task_id], setup=[setup_id], output_format="dataframe")
+        )
+        return set() if result.empty else set(result["run_id"])
     except OpenMLServerException as exception:
         # error code 512 implies no results. The run does not exist yet
         assert exception.code == 512
