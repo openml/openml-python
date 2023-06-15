@@ -241,7 +241,7 @@ class TestStudyFunctions(TestBase):
         self.assertListEqual(study_original.runs, study_downloaded.runs)
 
     def test_study_list(self):
-        study_list = openml.study.list_studies(status="in_preparation")
+        study_list = openml.study.list_studies(status="in_preparation", output_format="dataframe")
         # might fail if server is recently reset
         self.assertGreaterEqual(len(study_list), 2)
 
