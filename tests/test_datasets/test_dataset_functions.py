@@ -546,8 +546,47 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(os.path.exists(qualities_xml_path))
 
     def test__get_dataset_skip_download(self):
-        qualities = openml.datasets.get_dataset(2, download_qualities=False).qualities
-        self.assertIsNone(qualities)
+        dataset = openml.datasets.get_dataset(
+            2, download_qualities=False, download_features_meta_data=False
+        )
+        # Internal representation without lazy loading
+        self.assertIsNone(dataset._qualities)
+        self.assertIsNone(dataset._features)
+        # External representation with lazy loading
+        self.assertIsNotNone(dataset.qualities)
+        self.assertIsNotNone(dataset.features)
+
+    def test_get_dataset_force_refresh_cache(self):
+        did_cache_dir = _create_cache_directory_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            2,
+        )
+        openml.datasets.get_dataset(2)
+        change_time = os.stat(did_cache_dir).st_mtime
+
+        # Test default
+        openml.datasets.get_dataset(2)
+        self.assertEqual(change_time, os.stat(did_cache_dir).st_mtime)
+
+        # Test refresh
+        openml.datasets.get_dataset(2, force_refresh_cache=True)
+        self.assertNotEqual(change_time, os.stat(did_cache_dir).st_mtime)
+
+        # Clean up
+        openml.utils._remove_cache_dir_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            did_cache_dir,
+        )
+
+        # Test clean start
+        openml.datasets.get_dataset(2, force_refresh_cache=True)
+        self.assertTrue(os.path.exists(did_cache_dir))
+
+        # Final clean up
+        openml.utils._remove_cache_dir_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            did_cache_dir,
+        )
 
     def test_deletion_of_cache_dir(self):
         # Simple removal

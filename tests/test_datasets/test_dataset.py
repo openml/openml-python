@@ -262,6 +262,36 @@ class OpenMLDatasetTest(TestBase):
         self.assertIsInstance(xy, pd.DataFrame)
         self.assertEqual(xy.shape, (150, 5))
 
+    def test_lazy_loading_metadata(self):
+        # Initial Setup
+        did_cache_dir = openml.utils._create_cache_directory_for_id(
+            openml.datasets.functions.DATASETS_CACHE_DIR_NAME, 2
+        )
+        _compare_dataset = openml.datasets.get_dataset(
+            2, download_data=False, download_features_meta_data=True, download_qualities=True
+        )
+        change_time = os.stat(did_cache_dir).st_mtime
+
+        # Test with cache
+        _dataset = openml.datasets.get_dataset(
+            2, download_data=False, download_features_meta_data=False, download_qualities=False
+        )
+        self.assertEqual(change_time, os.stat(did_cache_dir).st_mtime)
+        self.assertEqual(_dataset.features, _compare_dataset.features)
+        self.assertEqual(_dataset.qualities, _compare_dataset.qualities)
+
+        # -- Test without cache
+        openml.utils._remove_cache_dir_for_id(
+            openml.datasets.functions.DATASETS_CACHE_DIR_NAME, did_cache_dir
+        )
+
+        _dataset = openml.datasets.get_dataset(
+            2, download_data=False, download_features_meta_data=False, download_qualities=False
+        )
+        self.assertNotEqual(change_time, os.stat(did_cache_dir).st_mtime)
+        self.assertEqual(_dataset.features, _compare_dataset.features)
+        self.assertEqual(_dataset.qualities, _compare_dataset.qualities)
+
 
 class OpenMLDatasetTestOnTestServer(TestBase):
     def setUp(self):
