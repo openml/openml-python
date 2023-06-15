@@ -189,6 +189,7 @@ def list_flows(
             "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
         )
 
+    # TODO: [0.15]
     if output_format == "dict":
         msg = (
             "Support for `output_format` of 'dict' will be removed in 0.15 "

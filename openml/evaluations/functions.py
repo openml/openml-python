@@ -79,6 +79,7 @@ def list_evaluations(
             "Invalid output format selected. " "Only 'object', 'dataframe', or 'dict' applicable."
         )
 
+    # TODO: [0.15]
     if output_format == "dict":
         msg = (
             "Support for `output_format` of 'dict' will be removed in 0.15. "
