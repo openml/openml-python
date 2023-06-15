@@ -1773,7 +1773,7 @@ def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key)
 
 def _assert_datasets_have_id_and_valid_status(datasets: pd.DataFrame):
     assert int == datasets["did"].dtype
-    assert {"in_preparation", "active", "deactivated"} == set(datasets["status"])
+    assert {"in_preparation", "active", "deactivated"} >= set(datasets["status"])
 
 
 @pytest.fixture(scope="module")
@@ -1826,7 +1826,9 @@ def test_list_datasets_by_number_classes(all_datasets: pd.DataFrame):
 
 
 def test_list_datasets_by_number_missing_values(all_datasets: pd.DataFrame):
-    na_datasets = openml.datasets.list_datasets(number_missing_values="5..100")
+    na_datasets = openml.datasets.list_datasets(
+        number_missing_values="5..100", output_format="dataframe"
+    )
     assert 5 <= len(na_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(na_datasets)
 
