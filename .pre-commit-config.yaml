@@ -19,6 +19,14 @@ repos:
         additional_dependencies:
           - types-requests
           - types-python-dateutil
+      - id: mypy
+        name: mypy top-level-functions
+        files: openml/_api_calls.py
+        additional_dependencies:
+          - types-requests
+          - types-python-dateutil
+        args: [ --disallow-untyped-defs, --disallow-any-generics,
+                --disallow-any-explicit, --implicit-optional ]
   - repo: https://github.com/pycqa/flake8
     rev: 6.0.0
     hooks:
