@@ -418,17 +418,19 @@ def get_dataset(
     dataset : :class:`openml.OpenMLDataset`
         The downloaded dataset.
     """
+    # TODO(0.15): Remove the deprecation warning and make the default False; adjust types above
+    #   and documentation. Also remove None-to-True-cases below
     if any(
         download_flag is None
         for download_flag in [download_data, download_qualities, download_features_meta_data]
     ):
         warnings.warn(
-            "Starting from Version 0.14 `download_data`, `download_qualities`, and `download_featu"
+            "Starting from Version 0.15 `download_data`, `download_qualities`, and `download_featu"
             "res_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy "
-            "loading. To disable this message until version 0.14 explicitly set `download_data`, "
+            "loading. To disable this message until version 0.15 explicitly set `download_data`, "
             "`download_qualities`, and `download_features_meta_data` to a bool while calling "
             "`get_dataset`.",
-            DeprecationWarning,
+            FutureWarning,
         )
 
     download_data = True if download_data is None else download_data

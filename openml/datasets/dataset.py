@@ -220,10 +220,10 @@ class OpenMLDataset(OpenMLBase):
             self._features = _read_features(features_file)
 
         if qualities_file == "":
-            # TODO: to switch to "qualities_file is not None" below
+            # TODO(0.15): to switch to "qualities_file is not None" below and remove warning
             warnings.warn(
-                "Starting from Version 0.14 `qualities_file` must be None and not an empty string.",
-                DeprecationWarning,
+                "Starting from Version 0.15 `qualities_file` must be None and not an empty string.",
+                FutureWarning,
             )
 
         if qualities_file:
