@@ -58,8 +58,9 @@ class OpenMLTaskTest(TestBase):
 
     def test_list_all_for_tasks(self):
         required_size = 1068  # default test server reset value
-        tasks = openml.tasks.list_tasks(batch_size=1000, size=required_size)
-
+        tasks = openml.tasks.list_tasks(
+            batch_size=1000, size=required_size, output_format="dataframe"
+        )
         self.assertEqual(len(tasks), required_size)
 
     def test_list_all_for_flows(self):

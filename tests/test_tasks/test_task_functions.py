@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 
 import os
+from typing import cast
 from unittest import mock
 
 import pytest
@@ -56,7 +57,7 @@ class TestTask(TestBase):
     def test_list_clustering_task(self):
         # as shown by #383, clustering tasks can give list/dict casting problems
         openml.config.server = self.production_server
-        openml.tasks.list_tasks(task_type=TaskType.CLUSTERING, size=10)
+        openml.tasks.list_tasks(task_type=TaskType.CLUSTERING, size=10, output_format="dataframe")
         # the expected outcome is that it doesn't crash. No assertions.
 
     def _check_task(self, task):
@@ -71,11 +72,11 @@ class TestTask(TestBase):
     def test_list_tasks_by_type(self):
         num_curves_tasks = 198  # number is flexible, check server if fails
         ttid = TaskType.LEARNING_CURVE
-        tasks = openml.tasks.list_tasks(task_type=ttid)
+        tasks = openml.tasks.list_tasks(task_type=ttid, output_format="dataframe")
         self.assertGreaterEqual(len(tasks), num_curves_tasks)
-        for tid in tasks:
-            self.assertEqual(ttid, tasks[tid]["ttid"])
-            self._check_task(tasks[tid])
+        for task in tasks.to_dict(orient="index").values():
+            self.assertEqual(ttid, task["ttid"])
+            self._check_task(task)
 
     def test_list_tasks_output_format(self):
         ttid = TaskType.LEARNING_CURVE
@@ -84,33 +85,33 @@ class TestTask(TestBase):
         self.assertGreater(len(tasks), 100)
 
     def test_list_tasks_empty(self):
-        tasks = openml.tasks.list_tasks(tag="NoOneWillEverUseThisTag")
-        if len(tasks) > 0:
-            raise ValueError("UnitTest Outdated, got somehow results (tag is used, please adapt)")
-
-        self.assertIsInstance(tasks, dict)
+        tasks = cast(
+            pd.DataFrame,
+            openml.tasks.list_tasks(tag="NoOneWillEverUseThisTag", output_format="dataframe"),
+        )
+        assert tasks.empty
 
     def test_list_tasks_by_tag(self):
         num_basic_tasks = 100  # number is flexible, check server if fails
-        tasks = openml.tasks.list_tasks(tag="OpenML100")
+        tasks = openml.tasks.list_tasks(tag="OpenML100", output_format="dataframe")
         self.assertGreaterEqual(len(tasks), num_basic_tasks)
-        for tid in tasks:
-            self._check_task(tasks[tid])
+        for task in tasks.to_dict(orient="index"):
+            self._check_task(task)
 
     def test_list_tasks(self):
-        tasks = openml.tasks.list_tasks()
+        tasks = openml.tasks.list_tasks(output_format="dataframe")
         self.assertGreaterEqual(len(tasks), 900)
-        for tid in tasks:
-            self._check_task(tasks[tid])
+        for task in tasks.to_dict(orient="index").values():
+            self._check_task(task)
 
     def test_list_tasks_paginate(self):
         size = 10
         max = 100
         for i in range(0, max, size):
-            tasks = openml.tasks.list_tasks(offset=i, size=size)
+            tasks = openml.tasks.list_tasks(offset=i, size=size, output_format="dataframe")
             self.assertGreaterEqual(size, len(tasks))
-            for tid in tasks:
-                self._check_task(tasks[tid])
+            for task in tasks.to_dict(orient="index").values():
+                self._check_task(task)
 
     def test_list_tasks_per_type_paginate(self):
         size = 40
@@ -122,11 +123,13 @@ class TestTask(TestBase):
         ]
         for j in task_types:
             for i in range(0, max, size):
-                tasks = openml.tasks.list_tasks(task_type=j, offset=i, size=size)
+                tasks = openml.tasks.list_tasks(
+                    task_type=j, offset=i, size=size, output_format="dataframe"
+                )
                 self.assertGreaterEqual(size, len(tasks))
-                for tid in tasks:
-                    self.assertEqual(j, tasks[tid]["ttid"])
-                    self._check_task(tasks[tid])
+                for task in tasks.to_dict(orient="index").values():
+                    self.assertEqual(j, task["ttid"])
+                    self._check_task(task)
 
     def test__get_task(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)

@@ -17,14 +17,14 @@ class OpenMLTaskMethodsTest(TestBase):
     def test_tagging(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         tag = "testing_tag_{}_{}".format(self.id(), time())
-        task_list = openml.tasks.list_tasks(tag=tag)
+        task_list = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
         self.assertEqual(len(task_list), 0)
         task.push_tag(tag)
-        task_list = openml.tasks.list_tasks(tag=tag)
+        task_list = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
         self.assertEqual(len(task_list), 1)
-        self.assertIn(1, task_list)
+        self.assertIn(1, task_list["tid"])
         task.remove_tag(tag)
-        task_list = openml.tasks.list_tasks(tag=tag)
+        task_list = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
         self.assertEqual(len(task_list), 0)
 
     def test_get_train_and_test_split_indices(self):
