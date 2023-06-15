@@ -23,10 +23,7 @@ from openml.datasets import edit_dataset, fork_dataset, get_dataset
 #
 # Note: list_datasets will return a pandas dataframe by default from 0.15. When using
 # openml-python 0.14, `list_datasets` will warn you to use output_format='dataframe'.
-openml_list = openml.datasets.list_datasets()  # returns a dict
-
-# Show a nice table with some key data properties
-datalist = pd.DataFrame.from_dict(openml_list, orient="index")
+datalist = openml.datasets.list_datasets(output_format="dataframe")
 datalist = datalist[["did", "name", "NumberOfInstances", "NumberOfFeatures", "NumberOfClasses"]]
 
 print(f"First 10 of {len(datalist)} datasets...")
