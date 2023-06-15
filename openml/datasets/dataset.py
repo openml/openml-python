@@ -7,7 +7,6 @@ import logging
 import os
 import pickle
 from typing import List, Optional, Union, Tuple, Iterable, Dict
-import warnings
 
 import arff
 import numpy as np
@@ -18,6 +17,7 @@ import xmltodict
 from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
 from ..exceptions import PyOpenMLError
+
 
 logger = logging.getLogger(__name__)
 
@@ -212,22 +212,17 @@ class OpenMLDataset(OpenMLBase):
         self._dataset = dataset
         self._minio_url = minio_url
 
-        self._features = None  # type: Optional[Dict[int, OpenMLDataFeature]]
-        self._qualities = None  # type: Optional[Dict[str, float]]
-        self._no_qualities_found = False
-
         if features_file is not None:
-            self._features = _read_features(features_file)
-
-        if qualities_file == "":
-            # TODO(0.15): to switch to "qualities_file is not None" below and remove warning
-            warnings.warn(
-                "Starting from Version 0.15 `qualities_file` must be None and not an empty string.",
-                FutureWarning,
-            )
+            self.features = _read_features(
+                features_file
+            )  # type: Optional[Dict[int, OpenMLDataFeature]]
+        else:
+            self.features = None
 
         if qualities_file:
-            self._qualities = _read_qualities(qualities_file)
+            self.qualities = _read_qualities(qualities_file)  # type: Optional[Dict[str, float]]
+        else:
+            self.qualities = None
 
         if data_file is not None:
             rval = self._compressed_cache_file_paths(data_file)
@@ -240,35 +235,11 @@ class OpenMLDataset(OpenMLBase):
             self.feather_attribute_file = None
 
     @property
-    def features(self):
-        # Lazy loading of features
-        if self._features is None:
-            self._load_metadata(features=True)
-
-        return self._features
-
-    @property
-    def qualities(self):
-        # Lazy loading of qualities
-        # We have to check `_no_qualities_found` as there might not be qualities for a dataset
-        if self._qualities is None and (not self._no_qualities_found):
-            self._load_metadata(qualities=True)
-
-        return self._qualities
-
-    @property
     def id(self) -> Optional[int]:
         return self.dataset_id
 
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
         """Collect all information to display in the __repr__ body."""
-
-        # Obtain number of features in accordance with lazy loading.
-        if self._qualities is not None and self._qualities["NumberOfFeatures"] is not None:
-            n_features = int(self._qualities["NumberOfFeatures"])  # type: Optional[int]
-        else:
-            n_features = len(self._features) if self._features is not None else None
-
         fields = {
             "Name": self.name,
             "Version": self.version,
@@ -277,14 +248,14 @@ class OpenMLDataset(OpenMLBase):
             "Download URL": self.url,
             "Data file": self.data_file,
             "Pickle file": self.data_pickle_file,
-            "# of features": n_features,
+            "# of features": len(self.features) if self.features is not None else None,
         }
         if self.upload_date is not None:
             fields["Upload Date"] = self.upload_date.replace("T", " ")
         if self.dataset_id is not None:
             fields["OpenML URL"] = self.openml_url
-        if self._qualities is not None and self._qualities["NumberOfInstances"] is not None:
-            fields["# of instances"] = int(self._qualities["NumberOfInstances"])
+        if self.qualities is not None and self.qualities["NumberOfInstances"] is not None:
+            fields["# of instances"] = int(self.qualities["NumberOfInstances"])
 
         # determines the order in which the information will be printed
         order = [
@@ -802,40 +773,6 @@ class OpenMLDataset(OpenMLBase):
 
         return data, targets, categorical, attribute_names
 
-    def _load_metadata(self, features: bool = False, qualities: bool = False):
-        """Load the missing metadata information from the server and store it in the
-        dataset object.
-
-        The purpose of the function is to support lazy loading.
-
-        Parameters
-        ----------
-        features : bool (default=False)
-            If True, load the `self.features` data if not already loaded.
-        qualities: bool (default=False)
-            If True, load the `self.qualities` data if not already loaded.
-        """
-        # Delayed Import to avoid circular imports or having to import all of dataset.functions to
-        # import OpenMLDataset
-        from openml.datasets.functions import _get_dataset_metadata
-
-        if self.dataset_id is None:
-            raise ValueError(
-                """No dataset id specified. Please set the dataset id.
-                                Otherwise we cannot load metadata."""
-            )
-
-        features_file, qualities_file = _get_dataset_metadata(
-            self.dataset_id, features=features, qualities=qualities
-        )
-
-        if features_file is not None:
-            self._features = _read_features(features_file)
-
-        if qualities_file is not None:
-            self._qualities = _read_qualities(qualities_file)
-            self._no_qualities_found = self._qualities is None
-
     def retrieve_class_labels(self, target_name: str = "class") -> Union[None, List[str]]:
         """Reads the datasets arff to determine the class-labels.
 
@@ -853,6 +790,10 @@ class OpenMLDataset(OpenMLBase):
         -------
         list
         """
+        if self.features is None:
+            raise ValueError(
+                "retrieve_class_labels can only be called if feature information is available."
+            )
         for feature in self.features.values():
             if (feature.name == target_name) and (feature.data_type == "nominal"):
                 return feature.nominal_values
@@ -981,7 +922,6 @@ class OpenMLDataset(OpenMLBase):
         return data_container
 
 
-# -- Code for Features Property
 def _read_features(features_file: str) -> Dict[int, OpenMLDataFeature]:
     features_pickle_file = _get_features_pickle_file(features_file)
     try:
@@ -990,32 +930,27 @@ def _read_features(features_file: str) -> Dict[int, OpenMLDataFeature]:
     except:  # noqa E722
         with open(features_file, encoding="utf8") as fh:
             features_xml_string = fh.read()
+        xml_dict = xmltodict.parse(
+            features_xml_string, force_list=("oml:feature", "oml:nominal_value")
+        )
+        features_xml = xml_dict["oml:data_features"]
 
-        features = _parse_features_xml(features_xml_string)
+        features = {}
+        for idx, xmlfeature in enumerate(features_xml["oml:feature"]):
+            nr_missing = xmlfeature.get("oml:number_of_missing_values", 0)
+            feature = OpenMLDataFeature(
+                int(xmlfeature["oml:index"]),
+                xmlfeature["oml:name"],
+                xmlfeature["oml:data_type"],
+                xmlfeature.get("oml:nominal_value"),
+                int(nr_missing),
+            )
+            if idx != feature.index:
+                raise ValueError("Data features not provided in right order")
+            features[feature.index] = feature
 
         with open(features_pickle_file, "wb") as fh_binary:
             pickle.dump(features, fh_binary)
-    return features
-
-
-def _parse_features_xml(features_xml_string):
-    xml_dict = xmltodict.parse(features_xml_string, force_list=("oml:feature", "oml:nominal_value"))
-    features_xml = xml_dict["oml:data_features"]
-
-    features = {}
-    for idx, xmlfeature in enumerate(features_xml["oml:feature"]):
-        nr_missing = xmlfeature.get("oml:number_of_missing_values", 0)
-        feature = OpenMLDataFeature(
-            int(xmlfeature["oml:index"]),
-            xmlfeature["oml:name"],
-            xmlfeature["oml:data_type"],
-            xmlfeature.get("oml:nominal_value"),
-            int(nr_missing),
-        )
-        if idx != feature.index:
-            raise ValueError("Data features not provided in right order")
-        features[feature.index] = feature
-
     return features
 
 
@@ -1024,7 +959,6 @@ def _get_features_pickle_file(features_file: str) -> str:
     return features_file + ".pkl"
 
 
-# -- Code for Qualities Property
 def _read_qualities(qualities_file: str) -> Dict[str, float]:
     qualities_pickle_file = _get_qualities_pickle_file(qualities_file)
     try:
@@ -1033,10 +967,17 @@ def _read_qualities(qualities_file: str) -> Dict[str, float]:
     except:  # noqa E722
         with open(qualities_file, encoding="utf8") as fh:
             qualities_xml = fh.read()
-        qualities = _parse_qualities_xml(qualities_xml)
+        xml_as_dict = xmltodict.parse(qualities_xml, force_list=("oml:quality",))
+        qualities = xml_as_dict["oml:data_qualities"]["oml:quality"]
+        qualities = _check_qualities(qualities)
         with open(qualities_pickle_file, "wb") as fh_binary:
             pickle.dump(qualities, fh_binary)
     return qualities
+
+
+def _get_qualities_pickle_file(qualities_file: str) -> str:
+    """This function only exists so it can be mocked during unit testing"""
+    return qualities_file + ".pkl"
 
 
 def _check_qualities(qualities: List[Dict[str, str]]) -> Dict[str, float]:
@@ -1051,14 +992,3 @@ def _check_qualities(qualities: List[Dict[str, str]]) -> Dict[str, float]:
             value = float(xmlquality["oml:value"])
         qualities_[name] = value
     return qualities_
-
-
-def _parse_qualities_xml(qualities_xml):
-    xml_as_dict = xmltodict.parse(qualities_xml, force_list=("oml:quality",))
-    qualities = xml_as_dict["oml:data_qualities"]["oml:quality"]
-    return _check_qualities(qualities)
-
-
-def _get_qualities_pickle_file(qualities_file: str) -> str:
-    """This function only exists so it can be mocked during unit testing"""
-    return qualities_file + ".pkl"

@@ -62,11 +62,5 @@ class OpenMLDataFeature(object):
     def __repr__(self):
         return "[%d - %s (%s)]" % (self.index, self.name, self.data_type)
 
-    def __eq__(self, other):
-        if not isinstance(other, OpenMLDataFeature):
-            return False
-
-        return self.__dict__ == other.__dict__
-
     def _repr_pretty_(self, pp, cycle):
         pp.text(str(self))
