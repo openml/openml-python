@@ -321,7 +321,7 @@ def _name_to_id(
         raise RuntimeError(no_dataset_for_name + and_version)
 
     # Dataset ids are chronological so we can just sort based on ids (instead of version)
-    return candidates["id"].min()
+    return candidates["did"].min()
 
 
 def get_datasets(
