@@ -1509,6 +1509,17 @@ class TestOpenMLDataset(TestBase):
         self.assertIsNotNone(dataset.parquet_file)
         self.assertTrue(os.path.isfile(dataset.parquet_file))
 
+    def test_list_datasets_with_high_size_parameter(self):
+        # Testing on prod since concurrent deletion of uploded datasets make the test fail
+        openml.config.server = self.production_server
+
+        datasets_a = openml.datasets.list_datasets(output_format="dataframe")
+        datasets_b = openml.datasets.list_datasets(output_format="dataframe", size=np.inf)
+
+        # Reverting to test server
+        openml.config.server = self.test_server
+        self.assertEqual(len(datasets_a), len(datasets_b))
+
 
 @pytest.mark.parametrize(
     "default_target_attribute,row_id_attribute,ignore_attribute",

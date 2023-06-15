@@ -2,8 +2,6 @@ import os
 import tempfile
 import unittest.mock
 
-import numpy as np
-
 import openml
 from openml.testing import TestBase
 
@@ -57,18 +55,6 @@ class OpenMLTaskTest(TestBase):
         self.assertEqual(len(datasets), required_size)
         for did in datasets:
             self._check_dataset(datasets[did])
-
-    def test_list_datasets_with_high_size_parameter(self):
-        # Testing on prod since concurrent deletion of uploded datasets make the test fail
-        openml.config.server = self.production_server
-
-        datasets_a = openml.datasets.list_datasets(output_format="dataframe")
-        datasets_b = openml.datasets.list_datasets(output_format="dataframe", size=np.inf)
-
-        # Reverting to test server
-        openml.config.server = self.test_server
-
-        self.assertEqual(len(datasets_a), len(datasets_b))
 
     def test_list_all_for_tasks(self):
         required_size = 1068  # default test server reset value
