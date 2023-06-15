@@ -252,7 +252,8 @@ def check_datasets_active(
     Check if the dataset ids provided are active.
 
     Raises an error if a dataset_id in the given list
-    of dataset_ids does not exist on the server.
+    of dataset_ids does not exist on the server and
+    `raise_error_if_not_exist` is set to True (default).
 
     Parameters
     ----------
@@ -267,17 +268,11 @@ def check_datasets_active(
     dict
         A dictionary with items {did: bool}
     """
-    dataset_list = list_datasets(status="all", data_id=dataset_ids, output_format="dataframe")
-    active = {}
-
-    for did in dataset_ids:
-        dataset = dataset_list.get(did, None)
-        if dataset is None:
-            if raise_error_if_not_exist:
-                raise ValueError(f"Could not find dataset {did} in OpenML dataset list.")
-        else:
-            active[did] = dataset["status"] == "active"
-
+    datasets = list_datasets(status="all", data_id=dataset_ids, output_format="dataframe")
+    active = dict(datasets["status"] == "active")
+    missing = set(dataset_ids) - set(datasets["did"])
+    if raise_error_if_not_exist and missing:
+        raise ValueError(f"Could not find dataset(s) {missing} in OpenML dataset list.")
     return active
 
 
