@@ -102,8 +102,8 @@ def run_model_on_task(
         warnings.warn(
             "avoid_duplicate_runs is set to True, but no API key is set. "
             "Please set your API key in the OpenML configuration file, see"
-            "https://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial.html#authentication"  # noqa: E501
-            "for more information on authentication.",
+            "https://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial"
+            ".html#authentication for more information on authentication.",
         )
 
     # TODO: At some point in the future do not allow for arguments in old order (6-2018).
