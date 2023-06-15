@@ -270,11 +270,10 @@ def check_datasets_active(
         A dictionary with items {did: bool}
     """
     datasets = list_datasets(status="all", data_id=dataset_ids, output_format="dataframe")
-    active = dict(datasets["status"] == "active")
     missing = set(dataset_ids) - set(datasets["did"])
     if raise_error_if_not_exist and missing:
         raise ValueError(f"Could not find dataset(s) {missing} in OpenML dataset list.")
-    return active
+    return dict(datasets["status"] == "active")
 
 
 def _name_to_id(
