@@ -271,15 +271,15 @@ class OpenMLDatasetTestOnTestServer(TestBase):
 
     def test_tagging(self):
         tag = "testing_tag_{}_{}".format(self.id(), time())
-        ds_list = openml.datasets.list_datasets(tag=tag)
-        self.assertEqual(len(ds_list), 0)
+        datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
+        self.assertTrue(datasets.empty)
         self.dataset.push_tag(tag)
-        ds_list = openml.datasets.list_datasets(tag=tag)
-        self.assertEqual(len(ds_list), 1)
-        self.assertIn(125, ds_list)
+        datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
+        self.assertEqual(len(datasets), 1)
+        self.assertIn(125, datasets["did"])
         self.dataset.remove_tag(tag)
-        ds_list = openml.datasets.list_datasets(tag=tag)
-        self.assertEqual(len(ds_list), 0)
+        datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
+        self.assertTrue(datasets.empty)
 
 
 class OpenMLDatasetTestSparse(TestBase):

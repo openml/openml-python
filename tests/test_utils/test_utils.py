@@ -42,13 +42,17 @@ class OpenMLTaskTest(TestBase):
         # Although we have multiple versions of the iris dataset, there is only
         # one with this name/version combination
 
-        datasets = openml.datasets.list_datasets(size=1000, data_name="iris", data_version=1)
+        datasets = openml.datasets.list_datasets(
+            size=1000, data_name="iris", data_version=1, output_format="dataframe"
+        )
         self.assertEqual(len(datasets), 1)
         self.assertEqual(_perform_api_call.call_count, 1)
 
     def test_list_all_for_datasets(self):
         required_size = 127  # default test server reset value
-        datasets = openml.datasets.list_datasets(batch_size=100, size=required_size)
+        datasets = openml.datasets.list_datasets(
+            batch_size=100, size=required_size, output_format="dataframe"
+        )
 
         self.assertEqual(len(datasets), required_size)
         for did in datasets:
@@ -58,8 +62,8 @@ class OpenMLTaskTest(TestBase):
         # Testing on prod since concurrent deletion of uploded datasets make the test fail
         openml.config.server = self.production_server
 
-        datasets_a = openml.datasets.list_datasets()
-        datasets_b = openml.datasets.list_datasets(size=np.inf)
+        datasets_a = openml.datasets.list_datasets(output_format="dataframe")
+        datasets_b = openml.datasets.list_datasets(output_format="dataframe", size=np.inf)
 
         # Reverting to test server
         openml.config.server = self.test_server
