@@ -1454,7 +1454,13 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(len(attribute_names), X.shape[1])
 
     def test_get_dataset_cache_format_feather(self):
+        # This test crashed due to using the parquet file by default, which is downloaded
+        # from minio. However, there is a mismatch between OpenML test server and minio IDs.
+        # The parquet file on minio with ID 128 is not the iris dataset from the test server.
         dataset = openml.datasets.get_dataset(128, cache_format="feather")
+        # Workaround
+        dataset._minio_url = None
+        dataset.parquet_file = None
         dataset.get_data()
 
         # Check if dataset is written to cache directory using feather
