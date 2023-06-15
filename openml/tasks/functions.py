@@ -12,6 +12,7 @@ import xmltodict
 from ..exceptions import OpenMLCacheException
 from ..datasets import get_dataset
 from .task import (
+    OpenMLQuestionAnsweringTask,
     OpenMLClassificationTask,
     OpenMLClusteringTask,
     OpenMLLearningCurveTask,
@@ -531,6 +532,7 @@ def create_task(
         TaskType.SUPERVISED_REGRESSION: OpenMLRegressionTask,
         TaskType.CLUSTERING: OpenMLClusteringTask,
         TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
+        TaskType.QUESTION_ANSWERING: OpenMLQuestionAnsweringTask,
     }.get(task_type)
 
     if task_cls is None:
