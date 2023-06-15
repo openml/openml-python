@@ -131,6 +131,14 @@ def list_datasets(
             "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
         )
 
+    if output_format == "dict":
+        msg = (
+            "Support for `output_format` of 'dict' will be removed in 0.15 "
+            "and pandas dataframes will be returned instead. To ensure your code "
+            "will continue to work, use `output_format`='dataframe'."
+        )
+        warnings.warn(msg, category=FutureWarning, stacklevel=2)
+
     return openml.utils._list_all(
         data_id=data_id,
         output_format=output_format,
@@ -259,7 +267,7 @@ def check_datasets_active(
     dict
         A dictionary with items {did: bool}
     """
-    dataset_list = list_datasets(status="all", data_id=dataset_ids)
+    dataset_list = list_datasets(status="all", data_id=dataset_ids, output_format="dataframe")
     active = {}
 
     for did in dataset_ids:
@@ -288,7 +296,7 @@ def _name_to_id(
     ----------
     dataset_name : str
         The name of the dataset for which to find its id.
-    version : int
+    version : int, optional
         Version to retrieve. If not specified, the oldest active version is returned.
     error_if_multiple : bool (default=False)
         If `False`, if multiple datasets match, return the least recent active dataset.
@@ -302,16 +310,22 @@ def _name_to_id(
        The id of the dataset.
     """
     status = None if version is not None else "active"
-    candidates = list_datasets(data_name=dataset_name, status=status, data_version=version)
+    candidates = cast(
+        pd.DataFrame,
+        list_datasets(
+            data_name=dataset_name, status=status, data_version=version, output_format="dataframe"
+        ),
+    )
     if error_if_multiple and len(candidates) > 1:
-        raise ValueError("Multiple active datasets exist with name {}".format(dataset_name))
-    if len(candidates) == 0:
-        no_dataset_for_name = "No active datasets exist with name {}".format(dataset_name)
-        and_version = " and version {}".format(version) if version is not None else ""
+        msg = f"Multiple active datasets exist with name '{dataset_name}'."
+        raise ValueError(msg)
+    if candidates.empty:
+        no_dataset_for_name = f"No active datasets exist with name '{dataset_name}'"
+        and_version = f" and version '{version}'." if version is not None else ""
         raise RuntimeError(no_dataset_for_name + and_version)
 
     # Dataset ids are chronological so we can just sort based on ids (instead of version)
-    return sorted(candidates)[0]
+    return candidates["id"].min()
 
 
 def get_datasets(

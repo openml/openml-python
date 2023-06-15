@@ -102,7 +102,7 @@ def run_model_on_task(
         warnings.warn(
             "avoid_duplicate_runs is set to True, but no API key is set. "
             "Please set your API key in the OpenML configuration file, see"
-            "https://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial.html#authentication"
+            "https://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial.html#authentication"  # noqa: E501
             "for more information on authentication.",
         )
 
@@ -1012,6 +1012,13 @@ def list_runs(
         raise ValueError(
             "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
         )
+    if output_format == "dict":
+        msg = (
+            "Support for `output_format` of 'dict' will be removed in 0.15 "
+            "and pandas dataframes will be returned instead. To ensure your code "
+            "will continue to work, use `output_format`='dataframe'."
+        )
+        warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
     if id is not None and (not isinstance(id, list)):
         raise TypeError("id must be of type list.")

@@ -459,6 +459,13 @@ def list_suites(
         raise ValueError(
             "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
         )
+    if output_format == "dict":
+        msg = (
+            "Support for `output_format` of 'dict' will be removed in 0.15 "
+            "and pandas dataframes will be returned instead. To ensure your code "
+            "will continue to work, use `output_format`='dataframe'."
+        )
+        warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
     return openml.utils._list_all(
         output_format=output_format,
@@ -532,6 +539,13 @@ def list_studies(
         raise ValueError(
             "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
         )
+    if output_format == "dict":
+        msg = (
+            "Support for `output_format` of 'dict' will be removed in 0.15 "
+            "and pandas dataframes will be returned instead. To ensure your code "
+            "will continue to work, use `output_format`='dataframe'."
+        )
+        warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
     return openml.utils._list_all(
         output_format=output_format,

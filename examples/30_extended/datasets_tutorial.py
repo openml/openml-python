@@ -21,6 +21,8 @@ from openml.datasets import edit_dataset, fork_dataset, get_dataset
 #   * Use the output_format parameter to select output type
 #   * Default gives 'dict' (other option: 'dataframe', see below)
 #
+# Note: list_datasets will return a pandas dataframe by default from 0.15. When using
+# openml-python 0.14, `list_datasets` will warn you to use output_format='dataframe'.
 openml_list = openml.datasets.list_datasets()  # returns a dict
 
 # Show a nice table with some key data properties
