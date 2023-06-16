@@ -7,7 +7,7 @@ import pathlib
 import shutil
 import sys
 import time
-from typing import Dict, Union, cast
+from typing import Dict, List, Optional, Tuple, Union, cast  # noqa: F401
 import unittest
 import pandas as pd
 import requests
@@ -35,7 +35,8 @@ class TestBase(unittest.TestCase):
         "task": [],
         "study": [],
         "user": [],
-    }  # type: dict
+    }  # type: Dict[str, List[int]]
+    flow_name_tracker = []  # type: List[str]
     test_server = "https://test.openml.org/api/v1/xml"
     # amueller's read/write key that he will throw away later
     apikey = "610344db6388d9ba34f6db45a3cf71de"
@@ -44,7 +45,7 @@ class TestBase(unittest.TestCase):
     logger = logging.getLogger("unit_tests_published_entities")
     logger.setLevel(logging.DEBUG)
 
-    def setUp(self, n_levels: int = 1):
+    def setUp(self, n_levels: int = 1) -> None:
         """Setup variables and temporary directories.
 
         In particular, this methods:
@@ -100,7 +101,7 @@ class TestBase(unittest.TestCase):
         self.connection_n_retries = openml.config.connection_n_retries
         openml.config.set_retry_policy("robot", n_retries=20)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         os.chdir(self.cwd)
         try:
             shutil.rmtree(self.workdir)
@@ -115,7 +116,9 @@ class TestBase(unittest.TestCase):
         openml.config.retry_policy = self.retry_policy
 
     @classmethod
-    def _mark_entity_for_removal(self, entity_type, entity_id):
+    def _mark_entity_for_removal(
+        self, entity_type: str, entity_id: int, entity_name: Optional[str] = None
+    ) -> None:
         """Static record of entities uploaded to test server
 
         Dictionary of lists where the keys are 'entity_type'.
@@ -127,9 +130,12 @@ class TestBase(unittest.TestCase):
             TestBase.publish_tracker[entity_type] = [entity_id]
         else:
             TestBase.publish_tracker[entity_type].append(entity_id)
+        if isinstance(entity_type, openml.flows.OpenMLFlow):
+            assert entity_name is not None
+            self.flow_name_tracker.append(entity_name)
 
     @classmethod
-    def _delete_entity_from_tracker(self, entity_type, entity):
+    def _delete_entity_from_tracker(self, entity_type: str, entity: int) -> None:
         """Deletes entity records from the static file_tracker
 
         Given an entity type and corresponding ID, deletes all entries, including
@@ -141,7 +147,9 @@ class TestBase(unittest.TestCase):
             if entity_type == "flow":
                 delete_index = [
                     i
-                    for i, (id_, _) in enumerate(TestBase.publish_tracker[entity_type])
+                    for i, (id_, _) in enumerate(
+                        zip(TestBase.publish_tracker[entity_type], TestBase.flow_name_tracker)
+                    )
                     if id_ == entity
                 ][0]
             else:
@@ -152,7 +160,7 @@ class TestBase(unittest.TestCase):
                 ][0]
             TestBase.publish_tracker[entity_type].pop(delete_index)
 
-    def _get_sentinel(self, sentinel=None):
+    def _get_sentinel(self, sentinel: Optional[str] = None) -> str:
         if sentinel is None:
             # Create a unique prefix for the flow. Necessary because the flow
             # is identified by its name and external version online. Having a
@@ -164,7 +172,9 @@ class TestBase(unittest.TestCase):
             sentinel = "TEST%s" % sentinel
         return sentinel
 
-    def _add_sentinel_to_flow_name(self, flow, sentinel=None):
+    def _add_sentinel_to_flow_name(
+        self, flow: openml.flows.OpenMLFlow, sentinel: Optional[str] = None
+    ) -> Tuple[openml.flows.OpenMLFlow, str]:
         sentinel = self._get_sentinel(sentinel=sentinel)
         flows_to_visit = list()
         flows_to_visit.append(flow)
@@ -176,7 +186,7 @@ class TestBase(unittest.TestCase):
 
         return flow, sentinel
 
-    def _check_dataset(self, dataset):
+    def _check_dataset(self, dataset: Dict[str, Union[str, int]]) -> None:
         self.assertEqual(type(dataset), dict)
         self.assertGreaterEqual(len(dataset), 2)
         self.assertIn("did", dataset)
@@ -187,13 +197,13 @@ class TestBase(unittest.TestCase):
 
     def _check_fold_timing_evaluations(
         self,
-        fold_evaluations: Dict,
+        fold_evaluations: Dict[str, Dict[int, Dict[int, float]]],
         num_repeats: int,
         num_folds: int,
         max_time_allowed: float = 60000.0,
         task_type: TaskType = TaskType.SUPERVISED_CLASSIFICATION,
         check_scores: bool = True,
-    ):
+    ) -> None:
         """
         Checks whether the right timing measures are attached to the run
         (before upload). Test is only performed for versions >= Python3.3
@@ -245,7 +255,10 @@ class TestBase(unittest.TestCase):
 
 
 def check_task_existence(
-    task_type: TaskType, dataset_id: int, target_name: str, **kwargs
+    task_type: TaskType,
+    dataset_id: int,
+    target_name: str,
+    **kwargs: Dict[str, Union[str, int, Dict[str, Union[str, int, openml.tasks.TaskType]]]]
 ) -> Union[int, None]:
     """Checks if any task with exists on test server that matches the meta data.
 

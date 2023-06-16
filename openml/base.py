@@ -15,7 +15,7 @@ from .utils import _tag_openml_base, _get_rest_api_type_alias
 class OpenMLBase(ABC):
     """Base object for functionality that is shared across entities."""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         body_fields = self._get_repr_body_fields()
         return self._apply_repr_template(body_fields)
 
@@ -59,7 +59,9 @@ class OpenMLBase(ABC):
         # Should be implemented in the base class.
         pass
 
-    def _apply_repr_template(self, body_fields: List[Tuple[str, str]]) -> str:
+    def _apply_repr_template(
+        self, body_fields: List[Tuple[str, Union[str, int, List[str]]]]
+    ) -> str:
         """Generates the header and formats the body for string representation of the object.
 
         Parameters
@@ -80,7 +82,7 @@ class OpenMLBase(ABC):
         return header + body
 
     @abstractmethod
-    def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
+    def _to_dict(self) -> "OrderedDict[str, OrderedDict[str, str]]":
         """Creates a dictionary representation of self.
 
         Uses OrderedDict to ensure consistent ordering when converting to xml.
@@ -107,7 +109,7 @@ class OpenMLBase(ABC):
         encoding_specification, xml_body = xml_representation.split("\n", 1)
         return xml_body
 
-    def _get_file_elements(self) -> Dict:
+    def _get_file_elements(self) -> openml._api_calls.FILE_ELEMENTS_TYPE:
         """Get file_elements to upload to the server, called during Publish.
 
         Derived child classes should overwrite this method as necessary.
@@ -116,7 +118,7 @@ class OpenMLBase(ABC):
         return {}
 
     @abstractmethod
-    def _parse_publish_response(self, xml_response: Dict):
+    def _parse_publish_response(self, xml_response: Dict[str, str]) -> None:
         """Parse the id from the xml_response and assign it to self."""
         pass
 
@@ -135,11 +137,16 @@ class OpenMLBase(ABC):
         self._parse_publish_response(xml_response)
         return self
 
-    def open_in_browser(self):
+    def open_in_browser(self) -> None:
         """Opens the OpenML web page corresponding to this object in your default browser."""
-        webbrowser.open(self.openml_url)
+        if self.openml_url is None:
+            raise ValueError(
+                "Cannot open element on OpenML.org when attribute `openml_url` is `None`"
+            )
+        else:
+            webbrowser.open(self.openml_url)
 
-    def push_tag(self, tag: str):
+    def push_tag(self, tag: str) -> None:
         """Annotates this entity with a tag on the server.
 
         Parameters
@@ -149,7 +156,7 @@ class OpenMLBase(ABC):
         """
         _tag_openml_base(self, tag)
 
-    def remove_tag(self, tag: str):
+    def remove_tag(self, tag: str) -> None:
         """Removes a tag from this entity on the server.
 
         Parameters

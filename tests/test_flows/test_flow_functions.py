@@ -290,7 +290,7 @@ class TestFlowFunctions(TestBase):
         # Test flow is accepted by server
         self._add_sentinel_to_flow_name(flow)
         flow.publish()
-        TestBase._mark_entity_for_removal("flow", (flow.flow_id, flow.name))
+        TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
         # Test deserialization works
         server_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
@@ -310,7 +310,7 @@ class TestFlowFunctions(TestBase):
         extension = openml.extensions.get_extension_by_model(model)
         flow = extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
-        TestBase._mark_entity_for_removal("flow", (flow.flow_id, flow.name))
+        TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
@@ -390,7 +390,7 @@ class TestFlowFunctions(TestBase):
         with patch("openml.utils._list_all", list_all):
             clf = sklearn.tree.DecisionTreeClassifier()
             flow = openml.extensions.get_extension_by_model(clf).model_to_flow(clf).publish()
-            TestBase._mark_entity_for_removal("flow", (flow.flow_id, flow.name))
+            TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
             TestBase.logger.info(
                 "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id)
             )

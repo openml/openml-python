@@ -55,7 +55,7 @@ def wait_until_valid_input(
             return response
 
 
-def print_configuration():
+def print_configuration() -> None:
     file = config.determine_config_file_path()
     header = f"File '{file}' contains (or defaults to):"
     print(header)
@@ -65,7 +65,7 @@ def print_configuration():
         print(f"{field.ljust(max_key_length)}: {value}")
 
 
-def verbose_set(field, value):
+def verbose_set(field: str, value: str) -> None:
     config.set_field_in_config_file(field, value)
     print(f"{field} set to '{value}'.")
 
@@ -295,7 +295,7 @@ def configure_field(
     verbose_set(field, value)
 
 
-def configure(args: argparse.Namespace):
+def configure(args: argparse.Namespace) -> None:
     """Calls the right submenu(s) to edit `args.field` in the configuration file."""
     set_functions = {
         "apikey": configure_apikey,
@@ -307,7 +307,7 @@ def configure(args: argparse.Namespace):
         "verbosity": configure_verbosity,
     }
 
-    def not_supported_yet(_):
+    def not_supported_yet(_: str) -> None:
         print(f"Setting '{args.field}' is not supported yet.")
 
     if args.field not in ["all", "none"]:
