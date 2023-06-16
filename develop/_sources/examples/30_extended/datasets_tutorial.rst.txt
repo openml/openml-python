@@ -42,7 +42,7 @@ How to list and download datasets.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 16-24
+.. GENERATED FROM PYTHON SOURCE LINES 16-26
 
 Exercise 0
 **********
@@ -52,15 +52,14 @@ Exercise 0
   * Use the output_format parameter to select output type
   * Default gives 'dict' (other option: 'dataframe', see below)
 
+Note: list_datasets will return a pandas dataframe by default from 0.15. When using
+openml-python 0.14, `list_datasets` will warn you to use output_format='dataframe'.
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-37
+.. GENERATED FROM PYTHON SOURCE LINES 26-36
 
 .. code-block:: default
 
-    openml_list = openml.datasets.list_datasets()  # returns a dict
-
-    # Show a nice table with some key data properties
-    datalist = pd.DataFrame.from_dict(openml_list, orient="index")
+    datalist = openml.datasets.list_datasets(output_format="dataframe")
     datalist = datalist[["did", "name", "NumberOfInstances", "NumberOfFeatures", "NumberOfClasses"]]
 
     print(f"First 10 of {len(datalist)} datasets...")
@@ -318,7 +317,7 @@ Exercise 0
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-44
+.. GENERATED FROM PYTHON SOURCE LINES 37-43
 
 Exercise 1
 **********
@@ -327,7 +326,7 @@ Exercise 1
 * Find a dataset called 'eeg_eye_state'.
 * Find all datasets with more than 50 classes.
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-50
+.. GENERATED FROM PYTHON SOURCE LINES 43-49
 
 .. code-block:: default
 
@@ -794,12 +793,12 @@ Exercise 1
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-53
+.. GENERATED FROM PYTHON SOURCE LINES 50-52
 
 Download datasets
 =================
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-65
+.. GENERATED FROM PYTHON SOURCE LINES 52-64
 
 .. code-block:: default
 
@@ -823,7 +822,7 @@ Download datasets
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:427: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
     This is dataset 'eeg-eye-state', the target feature is 'Class'
     URL: https://api.openml.org/data/v1/download/1587924/eeg-eye-state.arff
@@ -836,7 +835,7 @@ Download datasets
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-73
+.. GENERATED FROM PYTHON SOURCE LINES 65-72
 
 Get the actual data.
 
@@ -846,7 +845,7 @@ controlled with the parameter ``dataset_format`` which can be either 'array'
 (default) or 'dataframe'. Let's first build our dataset from a NumPy array
 and manually create a dataframe.
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-80
+.. GENERATED FROM PYTHON SOURCE LINES 72-79
 
 .. code-block:: default
 
@@ -882,12 +881,12 @@ and manually create a dataframe.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-83
+.. GENERATED FROM PYTHON SOURCE LINES 80-82
 
 Instead of manually creating the dataframe, you can already request a
 dataframe with the correct dtypes.
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-89
+.. GENERATED FROM PYTHON SOURCE LINES 82-88
 
 .. code-block:: default
 
@@ -939,7 +938,7 @@ dataframe with the correct dtypes.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-95
+.. GENERATED FROM PYTHON SOURCE LINES 89-94
 
 Sometimes you only need access to a dataset's metadata.
 In those cases, you can download the dataset without downloading the
@@ -947,7 +946,7 @@ data file. The dataset object can be used as normal.
 Whenever you use any functionality that requires the data,
 such as `get_data`, the data will be downloaded.
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-97
+.. GENERATED FROM PYTHON SOURCE LINES 94-96
 
 .. code-block:: default
 
@@ -961,19 +960,19 @@ such as `get_data`, the data will be downloaded.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:427: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-101
+.. GENERATED FROM PYTHON SOURCE LINES 97-100
 
 Exercise 2
 **********
 * Explore the data visually.
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-113
+.. GENERATED FROM PYTHON SOURCE LINES 100-112
 
 .. code-block:: default
 
@@ -1001,7 +1000,7 @@ Exercise 2
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-120
+.. GENERATED FROM PYTHON SOURCE LINES 113-119
 
 Edit a created dataset
 ======================
@@ -1010,7 +1009,7 @@ This example uses the test server, to avoid editing a dataset on the main server
 .. warning::
    .. include:: ../../test_server_usage_warning.txt
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-121
+.. GENERATED FROM PYTHON SOURCE LINES 119-120
 
 .. code-block:: default
 
@@ -1029,13 +1028,13 @@ This example uses the test server, to avoid editing a dataset on the main server
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-125
+.. GENERATED FROM PYTHON SOURCE LINES 121-124
 
 Edit non-critical fields, allowed for all authorized users:
 description, creator, contributor, collection_date, language, citation,
 original_data_url, paper_url
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-143
+.. GENERATED FROM PYTHON SOURCE LINES 124-142
 
 .. code-block:: default
 
@@ -1070,7 +1069,7 @@ original_data_url, paper_url
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-150
+.. GENERATED FROM PYTHON SOURCE LINES 143-149
 
 Editing critical fields (default_target_attribute, row_id_attribute, ignore_attribute) is allowed
 only for the dataset owner. Further, critical fields cannot be edited if the dataset has any
@@ -1079,7 +1078,7 @@ configure the API key:
 openml.config.apikey = 'FILL_IN_OPENML_API_KEY'
 This example here only shows a failure when trying to work on a dataset not owned by you:
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-155
+.. GENERATED FROM PYTHON SOURCE LINES 149-154
 
 .. code-block:: default
 
@@ -1101,7 +1100,7 @@ This example here only shows a failure when trying to work on a dataset not owne
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 156-162
+.. GENERATED FROM PYTHON SOURCE LINES 155-161
 
 Fork dataset
 ============
@@ -1110,7 +1109,7 @@ Use this API only if you are unable to edit the critical fields (default_target_
 ignore_attribute, row_id_attribute) of a dataset through the edit_dataset API.
 After the dataset is forked, you can edit the new version of the dataset using edit_dataset.
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-169
+.. GENERATED FROM PYTHON SOURCE LINES 161-168
 
 .. code-block:: default
 
@@ -1129,8 +1128,8 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
  .. code-block:: none
 
-    372
-    Forked dataset ID: 372
+    842
+    Forked dataset ID: 842
 
 
 
@@ -1138,7 +1137,7 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  24.784 seconds)
+   **Total running time of the script:** ( 0 minutes  9.280 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:

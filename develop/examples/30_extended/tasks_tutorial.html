@@ -153,25 +153,17 @@ splits in a useful manner.</p></li>
 </ol>
 <section id="listing-tasks">
 <h2>Listing tasks<a class="headerlink" href="#listing-tasks" title="Permalink to this heading">¶</a></h2>
-<p>We will start by simply listing only <em>supervised classification</em> tasks:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><strong>openml.tasks.list_tasks()</strong> returns a dictionary of dictionaries by default, which we convert
-into a
+<p>We will start by simply listing only <em>supervised classification</em> tasks.
+<strong>openml.tasks.list_tasks()</strong> returns a dictionary of dictionaries by default, but we
+request a
 <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html">pandas dataframe</a>
-to have better visualization capabilities and easier access:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">tasks</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
+instead to have better visualization capabilities and easier access:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span>
+    <span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First 5 of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span><span class="si">}</span><span class="s2"> tasks:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
-
-<span class="c1"># As conversion to a pandas dataframe is a common task, we have added this functionality to the</span>
-<span class="c1"># OpenML-Python library which can be used by passing ``output_format=&#39;dataframe&#39;``:</span>
-<span class="n">tasks_df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span>
-    <span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tasks_df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;tid&#39;, &#39;ttid&#39;, &#39;did&#39;, &#39;name&#39;, &#39;task_type&#39;, &#39;status&#39;,
@@ -183,14 +175,6 @@ to have better visualization capabilities and easier access:</p>
        &#39;NumberOfSymbolicFeatures&#39;, &#39;cost_matrix&#39;],
       dtype=&#39;object&#39;)
 First 5 of 4225 tasks:
-   tid  ... cost_matrix
-2    2  ...         NaN
-3    3  ...         NaN
-4    4  ...         NaN
-5    5  ...         NaN
-6    6  ...         NaN
-
-[5 rows x 21 columns]
    tid  ... cost_matrix
 2    2  ...         NaN
 3    3  ...         NaN
@@ -1150,9 +1134,9 @@ all of these tasks:</p>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:364: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
   warnings.warn(
-/home/runner/work/openml-python/openml-python/openml/datasets/functions.py:427: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+/home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
   warnings.warn(
 </pre></div>
 </div>
@@ -1275,7 +1259,7 @@ Task already exists. Task ID is 1305
 <li><p><a class="reference external" href="https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&amp;type=measure">Complete list of model estimation procedures</a>.</p></li>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=measure_type%3Aevaluation_measure&amp;type=measure">Complete list of evaluation measures</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  56.825 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  56.868 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-tasks-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e6648ddbb54e75b09dd01d69be33f340/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></p>

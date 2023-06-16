@@ -55,50 +55,28 @@ Tasks are identified by IDs and can be accessed in two different ways:
    metric, the splits and an iterator which can be used to access the
    splits in a useful manner.
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-33
+.. GENERATED FROM PYTHON SOURCE LINES 29-37
 
 Listing tasks
 ^^^^^^^^^^^^^
 
-We will start by simply listing only *supervised classification* tasks:
-
-.. GENERATED FROM PYTHON SOURCE LINES 33-36
-
-.. code-block:: default
-
-
-    tasks = openml.tasks.list_tasks(task_type=TaskType.SUPERVISED_CLASSIFICATION)
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 37-41
-
-**openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, which we convert
-into a
+We will start by simply listing only *supervised classification* tasks.
+**openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, but we
+request a
 `pandas dataframe <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
-to have better visualization capabilities and easier access:
+instead to have better visualization capabilities and easier access:
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-54
+.. GENERATED FROM PYTHON SOURCE LINES 37-45
 
 .. code-block:: default
 
 
-    tasks = pd.DataFrame.from_dict(tasks, orient="index")
+    tasks = openml.tasks.list_tasks(
+        task_type=TaskType.SUPERVISED_CLASSIFICATION, output_format="dataframe"
+    )
     print(tasks.columns)
     print(f"First 5 of {len(tasks)} tasks:")
     print(tasks.head())
-
-    # As conversion to a pandas dataframe is a common task, we have added this functionality to the
-    # OpenML-Python library which can be used by passing ``output_format='dataframe'``:
-    tasks_df = openml.tasks.list_tasks(
-        task_type=TaskType.SUPERVISED_CLASSIFICATION, output_format="dataframe"
-    )
-    print(tasks_df.head())
 
 
 
@@ -125,24 +103,16 @@ to have better visualization capabilities and easier access:
     6    6  ...         NaN
 
     [5 rows x 21 columns]
-       tid  ... cost_matrix
-    2    2  ...         NaN
-    3    3  ...         NaN
-    4    4  ...         NaN
-    5    5  ...         NaN
-    6    6  ...         NaN
-
-    [5 rows x 21 columns]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-57
+.. GENERATED FROM PYTHON SOURCE LINES 46-48
 
 We can filter the list of tasks to only contain datasets with more than
 500 samples, but less than 1000 samples:
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-61
+.. GENERATED FROM PYTHON SOURCE LINES 48-52
 
 .. code-block:: default
 
@@ -163,7 +133,7 @@ We can filter the list of tasks to only contain datasets with more than
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-66
+.. GENERATED FROM PYTHON SOURCE LINES 53-57
 
 .. code-block:: default
 
@@ -184,11 +154,11 @@ We can filter the list of tasks to only contain datasets with more than
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-68
+.. GENERATED FROM PYTHON SOURCE LINES 58-59
 
 Then, we can further restrict the tasks to all have the same resampling strategy:
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-72
+.. GENERATED FROM PYTHON SOURCE LINES 59-63
 
 .. code-block:: default
 
@@ -209,7 +179,7 @@ Then, we can further restrict the tasks to all have the same resampling strategy
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-77
+.. GENERATED FROM PYTHON SOURCE LINES 64-68
 
 .. code-block:: default
 
@@ -230,14 +200,14 @@ Then, we can further restrict the tasks to all have the same resampling strategy
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-82
+.. GENERATED FROM PYTHON SOURCE LINES 69-73
 
 Resampling strategies can be found on the
 `OpenML Website <https://www.openml.org/search?type=measure&q=estimation%20procedure>`_.
 
 Similar to listing tasks by task type, we can list tasks by tags:
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-87
+.. GENERATED FROM PYTHON SOURCE LINES 73-78
 
 .. code-block:: default
 
@@ -267,11 +237,11 @@ Similar to listing tasks by task type, we can list tasks by tags:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-89
+.. GENERATED FROM PYTHON SOURCE LINES 79-80
 
 Furthermore, we can list tasks based on the dataset id:
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-94
+.. GENERATED FROM PYTHON SOURCE LINES 80-85
 
 .. code-block:: default
 
@@ -301,11 +271,11 @@ Furthermore, we can list tasks based on the dataset id:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-96
+.. GENERATED FROM PYTHON SOURCE LINES 86-87
 
 In addition, a size limit and an offset can be applied both separately and simultaneously:
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-100
+.. GENERATED FROM PYTHON SOURCE LINES 87-91
 
 .. code-block:: default
 
@@ -338,7 +308,7 @@ In addition, a size limit and an offset can be applied both separately and simul
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-110
+.. GENERATED FROM PYTHON SOURCE LINES 92-101
 
 **OpenML 100**
 is a curated list of 100 tasks to start using OpenML. They are all
@@ -350,7 +320,7 @@ categorical features. You can find out more about the *OpenML 100* on
 
 Finally, it is also possible to list all tasks on OpenML with:
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-116
+.. GENERATED FROM PYTHON SOURCE LINES 104-107
 
 .. code-block:: default
 
@@ -370,14 +340,14 @@ Finally, it is also possible to list all tasks on OpenML with:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-121
+.. GENERATED FROM PYTHON SOURCE LINES 108-112
 
 Exercise
 ########
 
 Search for the tasks on the 'eeg-eye-state' dataset.
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-124
+.. GENERATED FROM PYTHON SOURCE LINES 112-115
 
 .. code-block:: default
 
@@ -1223,7 +1193,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-131
+.. GENERATED FROM PYTHON SOURCE LINES 116-122
 
 Downloading tasks
 ^^^^^^^^^^^^^^^^^
@@ -1232,7 +1202,7 @@ We provide two functions to download tasks, one which downloads only a
 single task by its ID, and one which takes a list of IDs and downloads
 all of these tasks:
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-135
+.. GENERATED FROM PYTHON SOURCE LINES 122-126
 
 .. code-block:: default
 
@@ -1248,19 +1218,19 @@ all of these tasks:
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:364: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
       warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:427: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-137
+.. GENERATED FROM PYTHON SOURCE LINES 127-128
 
 Properties of the task are stored as member variables:
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-140
+.. GENERATED FROM PYTHON SOURCE LINES 128-131
 
 .. code-block:: default
 
@@ -1288,11 +1258,11 @@ Properties of the task are stored as member variables:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-142
+.. GENERATED FROM PYTHON SOURCE LINES 132-133
 
 And:
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-147
+.. GENERATED FROM PYTHON SOURCE LINES 133-138
 
 .. code-block:: default
 
@@ -1323,7 +1293,7 @@ And:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-174
+.. GENERATED FROM PYTHON SOURCE LINES 139-165
 
 Creating tasks
 ^^^^^^^^^^^^^^
@@ -1352,14 +1322,14 @@ or sort results on your favourite measure afterwards. Only add an evaluation mea
 necessary (e.g. when other measure make no sense), since it will create a new task, which
 scatters results across tasks.
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-180
+.. GENERATED FROM PYTHON SOURCE LINES 167-171
 
 We'll use the test server for the rest of this tutorial.
 
 .. warning::
    .. include:: ../../test_server_usage_warning.txt
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-182
+.. GENERATED FROM PYTHON SOURCE LINES 171-173
 
 .. code-block:: default
 
@@ -1379,7 +1349,7 @@ We'll use the test server for the rest of this tutorial.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-192
+.. GENERATED FROM PYTHON SOURCE LINES 174-183
 
 Example
 #######
@@ -1391,7 +1361,7 @@ If a task with these parameters exists, we will get an appropriate exception.
 If such a task doesn't exist, a task will be created and the corresponding task_id
 will be returned.
 
-.. GENERATED FROM PYTHON SOURCE LINES 192-220
+.. GENERATED FROM PYTHON SOURCE LINES 183-211
 
 .. code-block:: default
 
@@ -1440,7 +1410,7 @@ will be returned.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 221-225
+.. GENERATED FROM PYTHON SOURCE LINES 212-216
 
 * `Complete list of task types <https://www.openml.org/search?type=task_type>`_.
 * `Complete list of model estimation procedures <https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure>`_.
@@ -1450,7 +1420,7 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  56.825 seconds)
+   **Total running time of the script:** ( 0 minutes  56.868 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:

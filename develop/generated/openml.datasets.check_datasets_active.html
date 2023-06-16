@@ -123,7 +123,8 @@
 <span class="sig-prename descclassname"><span class="pre">openml.datasets.</span></span><span class="sig-name descname"><span class="pre">check_datasets_active</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_error_if_not_exist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#openml.datasets.check_datasets_active" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the dataset ids provided are active.</p>
 <p>Raises an error if a dataset_id in the given list
-of dataset_ids does not exist on the server.</p>
+of dataset_ids does not exist on the server and
+<cite>raise_error_if_not_exist</cite> is set to True (default).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">

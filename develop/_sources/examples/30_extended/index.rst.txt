@@ -100,23 +100,6 @@ Extended examples for the usage of the OpenML python connector.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="By: Jan N. van Rijn">
-
-.. only:: html
-
-  .. image:: /examples/30_extended/images/thumb/sphx_glr_run_setup_tutorial_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Run Setup</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to list and download tasks.">
 
 .. only:: html
@@ -146,6 +129,23 @@ Extended examples for the usage of the OpenML python connector.
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Datasets</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="By: Jan N. van Rijn">
+
+.. only:: html
+
+  .. image:: /examples/30_extended/images/thumb/sphx_glr_run_setup_tutorial_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Run Setup</div>
     </div>
 
 
@@ -264,9 +264,9 @@ Extended examples for the usage of the OpenML python connector.
    /examples/30_extended/configure_logging
    /examples/30_extended/study_tutorial
    /examples/30_extended/plot_svm_hyperparameters_tutorial
-   /examples/30_extended/run_setup_tutorial
    /examples/30_extended/tasks_tutorial
    /examples/30_extended/datasets_tutorial
+   /examples/30_extended/run_setup_tutorial
    /examples/30_extended/custom_flow_
    /examples/30_extended/fetch_evaluations_tutorial
    /examples/30_extended/task_manual_iteration_tutorial
