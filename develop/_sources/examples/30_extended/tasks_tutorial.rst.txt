@@ -1244,6 +1244,15 @@ all of these tasks:
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:364: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:427: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+
 
 
 
@@ -1418,6 +1427,16 @@ will be returned.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:112: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:112: RuntimeWarning: Could not create task type id for 11 due to error 11 is not a valid TaskType
+      warnings.warn(
+    Task already exists. Task ID is 1305
+
 
 
 
@@ -1431,7 +1450,7 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  5.135 seconds)
+   **Total running time of the script:** ( 2 minutes  56.825 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:

@@ -114,6 +114,8 @@ Download a dataset
 
  .. code-block:: none
 
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:427: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
     This is dataset 'iris', the target feature is 'class'
     URL: https://api.openml.org/data/v1/download/61/iris.arff
     **Author**: R.A. Fisher  
@@ -194,7 +196,7 @@ Visualize the dataset
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  13.421 seconds)
+   **Total running time of the script:** ( 0 minutes  11.633 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_datasets_tutorial.py:

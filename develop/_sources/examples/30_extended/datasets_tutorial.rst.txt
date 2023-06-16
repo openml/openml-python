@@ -78,7 +78,7 @@ Exercise 0
 
  .. code-block:: none
 
-    First 10 of 5297 datasets...
+    First 10 of 5299 datasets...
 
 
 .. raw:: html
@@ -823,6 +823,8 @@ Download datasets
 
  .. code-block:: none
 
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:427: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
     This is dataset 'eeg-eye-state', the target feature is 'Class'
     URL: https://api.openml.org/data/v1/download/1587924/eeg-eye-state.arff
     **Author**: Oliver Roesler  
@@ -954,6 +956,13 @@ such as `get_data`, the data will be downloaded.
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:427: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
 
 
 
@@ -1120,8 +1129,8 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
  .. code-block:: none
 
-    131
-    Forked dataset ID: 131
+    372
+    Forked dataset ID: 372
 
 
 
@@ -1129,7 +1138,7 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.400 seconds)
+   **Total running time of the script:** ( 0 minutes  24.784 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:
