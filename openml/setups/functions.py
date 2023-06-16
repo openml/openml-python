@@ -49,7 +49,9 @@ def setup_exists(flow) -> int:
 
     openml_param_settings = flow.extension.obtain_parameter_values(flow)
     description = xmltodict.unparse(_to_dict(flow.flow_id, openml_param_settings), pretty=True)
-    file_elements = {"description": ("description.arff", description)}
+    file_elements = {
+        "description": ("description.arff", description)
+    }  # type: openml._api_calls.FILE_ELEMENTS_TYPE
     result = openml._api_calls._perform_api_call(
         "/setup/exists/", "post", file_elements=file_elements
     )

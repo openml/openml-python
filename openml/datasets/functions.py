@@ -4,7 +4,7 @@ import io
 import logging
 import os
 from pyexpat import ExpatError
-from typing import List, Dict, Union, Optional, cast
+from typing import List, Dict, Optional, Union, cast
 import warnings
 
 import numpy as np
@@ -867,7 +867,7 @@ def edit_dataset(
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
 
     # compose data edit parameters as xml
-    form_data = {"data_id": data_id}
+    form_data = {"data_id": data_id}  # type: openml._api_calls.DATA_TYPE
     xml = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
     xml["oml:data_edit_parameters"] = OrderedDict()
     xml["oml:data_edit_parameters"]["@xmlns:oml"] = "http://openml.org/openml"
@@ -888,7 +888,9 @@ def edit_dataset(
         if not xml["oml:data_edit_parameters"][k]:
             del xml["oml:data_edit_parameters"][k]
 
-    file_elements = {"edit_parameters": ("description.xml", xmltodict.unparse(xml))}
+    file_elements = {
+        "edit_parameters": ("description.xml", xmltodict.unparse(xml))
+    }  # type: openml._api_calls.FILE_ELEMENTS_TYPE
     result_xml = openml._api_calls._perform_api_call(
         "data/edit", "post", data=form_data, file_elements=file_elements
     )
@@ -929,7 +931,7 @@ def fork_dataset(data_id: int) -> int:
     if not isinstance(data_id, int):
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
     # compose data fork parameters
-    form_data = {"data_id": data_id}
+    form_data = {"data_id": data_id}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call("data/fork", "post", data=form_data)
     result = xmltodict.parse(result_xml)
     data_id = result["oml:data_fork"]["oml:id"]
@@ -949,7 +951,7 @@ def _topic_add_dataset(data_id: int, topic: str):
     """
     if not isinstance(data_id, int):
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
-    form_data = {"data_id": data_id, "topic": topic}
+    form_data = {"data_id": data_id, "topic": topic}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call("data/topicadd", "post", data=form_data)
     result = xmltodict.parse(result_xml)
     data_id = result["oml:data_topic"]["oml:id"]
@@ -970,7 +972,7 @@ def _topic_delete_dataset(data_id: int, topic: str):
     """
     if not isinstance(data_id, int):
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
-    form_data = {"data_id": data_id, "topic": topic}
+    form_data = {"data_id": data_id, "topic": topic}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call("data/topicdelete", "post", data=form_data)
     result = xmltodict.parse(result_xml)
     data_id = result["oml:data_topic"]["oml:id"]
