@@ -5,7 +5,7 @@ import io
 import itertools
 import os
 import time
-from typing import Any, List, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING  # noqa F401
+from typing import Any, List, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING, cast  # noqa F401
 import warnings
 
 import sklearn.metrics
@@ -103,7 +103,7 @@ def run_model_on_task(
             "avoid_duplicate_runs is set to True, but no API key is set. "
             "Please set your API key in the OpenML configuration file, see"
             "https://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial"
-            + ".html#authentication for more information on authentication.",
+            ".html#authentication for more information on authentication.",
         )
 
     # TODO: At some point in the future do not allow for arguments in old order (6-2018).
@@ -428,11 +428,10 @@ def run_exists(task_id: int, setup_id: int) -> Set[int]:
         return set()
 
     try:
-        result = list_runs(task=[task_id], setup=[setup_id])
-        if len(result) > 0:
-            return set(result.keys())
-        else:
-            return set()
+        result = cast(
+            pd.DataFrame, list_runs(task=[task_id], setup=[setup_id], output_format="dataframe")
+        )
+        return set() if result.empty else set(result["run_id"])
     except OpenMLServerException as exception:
         # error code 512 implies no results. The run does not exist yet
         assert exception.code == 512
@@ -1012,6 +1011,14 @@ def list_runs(
         raise ValueError(
             "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
         )
+    # TODO: [0.15]
+    if output_format == "dict":
+        msg = (
+            "Support for `output_format` of 'dict' will be removed in 0.15 "
+            "and pandas dataframes will be returned instead. To ensure your code "
+            "will continue to work, use `output_format`='dataframe'."
+        )
+        warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
     if id is not None and (not isinstance(id, list)):
         raise TypeError("id must be of type list.")

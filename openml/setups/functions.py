@@ -1,5 +1,5 @@
 # License: BSD 3-Clause
-
+import warnings
 from collections import OrderedDict
 import io
 import os
@@ -141,6 +141,15 @@ def list_setups(
         raise ValueError(
             "Invalid output format selected. " "Only 'dict', 'object', or 'dataframe' applicable."
         )
+
+    # TODO: [0.15]
+    if output_format == "dict":
+        msg = (
+            "Support for `output_format` of 'dict' will be removed in 0.15. "
+            "To ensure your code will continue to work, "
+            "use `output_format`='dataframe' or `output_format`='object'."
+        )
+        warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
     batch_size = 1000  # batch size for setups is lower
     return openml.utils._list_all(

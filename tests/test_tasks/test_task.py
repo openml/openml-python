@@ -71,29 +71,19 @@ class OpenMLTaskTest(TestBase):
             )
 
     def _get_compatible_rand_dataset(self) -> List:
-        compatible_datasets = []
-        active_datasets = list_datasets(status="active")
+        active_datasets = list_datasets(status="active", output_format="dataframe")
 
         # depending on the task type, find either datasets
         # with only symbolic features or datasets with only
         # numerical features.
         if self.task_type == TaskType.SUPERVISED_REGRESSION:
-            # regression task
-            for dataset_id, dataset_info in active_datasets.items():
-                if "NumberOfSymbolicFeatures" in dataset_info:
-                    if dataset_info["NumberOfSymbolicFeatures"] == 0:
-                        compatible_datasets.append(dataset_id)
+            compatible_datasets = active_datasets[active_datasets["NumberOfSymbolicFeatures"] == 0]
         elif self.task_type == TaskType.CLUSTERING:
-            # clustering task
-            compatible_datasets = list(active_datasets.keys())
+            compatible_datasets = active_datasets
         else:
-            for dataset_id, dataset_info in active_datasets.items():
-                # extra checks because of:
-                # https://github.com/openml/OpenML/issues/959
-                if "NumberOfNumericFeatures" in dataset_info:
-                    if dataset_info["NumberOfNumericFeatures"] == 0:
-                        compatible_datasets.append(dataset_id)
+            compatible_datasets = active_datasets[active_datasets["NumberOfNumericFeatures"] == 0]
 
+        compatible_datasets = list(compatible_datasets["did"])
         # in-place shuffling
         shuffle(compatible_datasets)
         return compatible_datasets

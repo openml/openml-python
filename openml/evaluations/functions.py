@@ -1,6 +1,8 @@
 # License: BSD 3-Clause
 
 import json
+import warnings
+
 import xmltodict
 import pandas as pd
 import numpy as np
@@ -76,6 +78,15 @@ def list_evaluations(
         raise ValueError(
             "Invalid output format selected. " "Only 'object', 'dataframe', or 'dict' applicable."
         )
+
+    # TODO: [0.15]
+    if output_format == "dict":
+        msg = (
+            "Support for `output_format` of 'dict' will be removed in 0.15. "
+            "To ensure your code will continue to work, "
+            "use `output_format`='dataframe' or `output_format`='object'."
+        )
+        warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
     per_fold_str = None
     if per_fold is not None:

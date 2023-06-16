@@ -162,7 +162,9 @@ class TestSetupFunctions(TestBase):
         self.assertIsInstance(setups, pd.DataFrame)
         self.assertEqual(len(setups), 10)
 
-        setups = openml.setups.list_setups(flow=flow_id, output_format="dict", size=10)
+        # TODO: [0.15] Remove section as `dict` is no longer supported.
+        with pytest.warns(FutureWarning):
+            setups = openml.setups.list_setups(flow=flow_id, output_format="dict", size=10)
         self.assertIsInstance(setups, Dict)
         self.assertIsInstance(setups[list(setups.keys())[0]], Dict)
         self.assertEqual(len(setups), 10)
