@@ -30,13 +30,14 @@ class OpenMLTaskTest(TestBase):
         # was triggered. 1050 appears to be a number of tasks that is available on a fresh
         # test server.
         assert len(res) > 1050
-        res2 = openml.utils._list_all(
+        openml.utils._list_all(
             listing_call=openml.tasks.functions._list_tasks,
             output_format="dataframe",
             batch_size=1050,
         )
-        # It might be possible that someone added a new task in the meantime
-        assert len(res) <= len(res2)
+        # Comparing the number of tasks is not possible as other unit tests running in
+        # parallel might be adding or removing tasks!
+        # assert len(res) <= len(res2)
 
     @unittest.mock.patch("openml._api_calls._perform_api_call", side_effect=mocked_perform_api_call)
     def test_list_all_few_results_available(self, _perform_api_call):
