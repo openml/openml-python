@@ -187,18 +187,19 @@ class TestStudyFunctions(TestBase):
         )
         self.assertSetEqual(set(run_ids), set(study_downloaded.runs))
 
-        # attach more runs
-        run_list_additional = openml.runs.list_runs(size=10, offset=10)
-        openml.study.attach_to_study(study.id, list(run_list_additional.keys()))
+        # attach more runs, since we fetch 11 here, at least one is non-overlapping
+        run_list_additional = openml.runs.list_runs(size=11, offset=10)
+        run_list_additional = set(run_list_additional) - set(run_ids)
+        openml.study.attach_to_study(study.id, list(run_list_additional))
         study_downloaded = openml.study.get_study(study.id)
         # verify again
-        all_run_ids = set(run_list_additional.keys()) | set(run_list.keys())
+        all_run_ids = run_list_additional | set(run_list.keys())
         self.assertSetEqual(set(study_downloaded.runs), all_run_ids)
 
         # test detach function
         openml.study.detach_from_study(study.id, list(run_list.keys()))
         study_downloaded = openml.study.get_study(study.id)
-        self.assertSetEqual(set(study_downloaded.runs), set(run_list_additional.keys()))
+        self.assertSetEqual(set(study_downloaded.runs), run_list_additional)
 
         # test status update function
         openml.study.update_study_status(study.id, "deactivated")
