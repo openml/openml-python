@@ -1828,7 +1828,7 @@ def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key)
 
 
 def _assert_datasets_have_id_and_valid_status(datasets: pd.DataFrame):
-    assert int == datasets["did"].dtype
+    assert pd.api.types.is_integer_dtype(datasets["did"])
     assert {"in_preparation", "active", "deactivated"} >= set(datasets["status"])
 
 
