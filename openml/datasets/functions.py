@@ -4,7 +4,7 @@ import io
 import logging
 import os
 from pyexpat import ExpatError
-from typing import List, Dict, Optional, Tuple, Union, cast  # noqa: F401
+from typing import List, Dict, Optional, Union, cast
 import warnings
 
 import numpy as np

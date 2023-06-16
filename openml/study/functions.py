@@ -277,7 +277,7 @@ def update_study_status(study_id: int, status: str) -> None:
     legal_status = {"active", "deactivated"}
     if status not in legal_status:
         raise ValueError("Illegal status value. " "Legal values: %s" % legal_status)
-    data = {"study_id": study_id, "status": status}  # type: Dict[str, Union[str, int]]
+    data = {"study_id": study_id, "status": status}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call("study/status/update", "post", data=data)
     result = xmltodict.parse(result_xml)
     server_study_id = result["oml:study_status_update"]["oml:id"]
