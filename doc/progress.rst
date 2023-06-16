@@ -9,13 +9,14 @@ Changelog
 0.14.0
 ~~~~~~
 
-**IMPORTANT:** This release paves the way towards a braking update of OpenML-Python. From version
+**IMPORTANT:** This release paves the way towards a breaking update of OpenML-Python. From version
 0.15, functions that had the option to return a pandas DataFrame will return a pandas DataFrame
 by default. This version (0.14) emits a warning if you still use the old access functionality.
-You can disable these warning by requesting a pandas DataFrame as the output.
+You can disable these warning by requesting a pandas DataFrame as the output (using ``output_format="dataframe"``).
 
 Furthermore, from version 0.15, OpenML-Python will no longer download datasets and dataset metadata
-by default. This version (0.14) emits a warning if you don't explicitly specifiy the desired behavior.
+by default, and support for returning dictionaries will be removed. This version (0.14) emits a 
+warning if you don't explicitly specifiy the desired behavior.
 
 Please see the pull requests #1258 and #1260 for further information.
 
