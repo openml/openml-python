@@ -6,25 +6,48 @@
 Changelog
 =========
 
+0.14.0
+~~~~~~
+
+**IMPORTANT:** This release paves the way towards a braking update of OpenML-Python. From version
+0.15, functions that had the option to return a pandas DataFrame will return a pandas DataFrame
+by default. This version (0.14) emits a warning if you still use the old access functionality.
+You can disable these warning by requesting a pandas DataFrame as the output.
+
+Furthermore, from version 0.15, OpenML-Python will no longer download datasets and dataset metadata
+by default. This version (0.14) emits a warning if you don't explicitly specifiy the desired behavior.
+
+Please see the pull requests #1258 and #1260 for further information.
+
+* ADD #1081: New flag that allows disabling downloading dataset features.
+* ADD #1132: New flag that forces a redownload of cached data.
+* FIX #1244: Fixes a rare bug where task listing could fail when the server returned invalid data.
+* DOC #1229: Fixes a comment string for the main example.
+* DOC #1241: Fixes a comment in an example.
+* MAINT #1124: Improve naming of helper functions that govern the cache directories.
+* MAINT #1223, #1250: Update tools used in pre-commit to the latest versions (``black==23.30``, ``mypy==1.3.0``, ``flake8==6.0.0``).
+* MAINT #1253: Update the citation request to the JMLR paper.
+* MAINT #1246: Add a warning that warns the user that checking for duplicate runs on the server cannot be done without an API key.
+
 0.13.1
 ~~~~~~
 
- * ADD #1081 #1132: Add additional options for (not) downloading datasets ``openml.datasets.get_dataset`` and cache management.
- * ADD #1028: Add functions to delete runs, flows, datasets, and tasks (e.g., ``openml.datasets.delete_dataset``).
- * ADD #1144: Add locally computed results to the ``OpenMLRun`` object's representation if the run was created locally and not downloaded from the server.
- * ADD #1180: Improve the error message when the checksum of a downloaded dataset does not match the checksum provided by the API.
- * ADD #1201: Make ``OpenMLTraceIteration`` a dataclass.
- * DOC #1069: Add argument documentation for the ``OpenMLRun`` class.
- * DOC #1241 #1229 #1231: Minor documentation fixes and resolve documentation examples not working.
- * FIX #1197 #559 #1131: Fix the order of ground truth and predictions in the ``OpenMLRun`` object and in ``format_prediction``.
- * FIX #1198: Support numpy 1.24 and higher.
- * FIX #1216: Allow unknown task types on the server. This is only relevant when new task types are added to the test server.
- * FIX #1223: Fix mypy errors for implicit optional typing.
- * MAINT #1155: Add dependabot github action to automatically update other github actions.
- * MAINT #1199: Obtain pre-commit's flake8 from github.com instead of gitlab.com.
- * MAINT #1215: Support latest numpy version.
- * MAINT #1218: Test Python3.6 on Ubuntu 20.04 instead of the latest Ubuntu (which is 22.04).
- * MAINT #1221 #1212 #1206 #1211: Update github actions to the latest versions.
+* ADD #1081 #1132: Add additional options for (not) downloading datasets ``openml.datasets.get_dataset`` and cache management.
+* ADD #1028: Add functions to delete runs, flows, datasets, and tasks (e.g., ``openml.datasets.delete_dataset``).
+* ADD #1144: Add locally computed results to the ``OpenMLRun`` object's representation if the run was created locally and not downloaded from the server.
+* ADD #1180: Improve the error message when the checksum of a downloaded dataset does not match the checksum provided by the API.
+* ADD #1201: Make ``OpenMLTraceIteration`` a dataclass.
+* DOC #1069: Add argument documentation for the ``OpenMLRun`` class.
+* DOC #1241 #1229 #1231: Minor documentation fixes and resolve documentation examples not working.
+* FIX #1197 #559 #1131: Fix the order of ground truth and predictions in the ``OpenMLRun`` object and in ``format_prediction``.
+* FIX #1198: Support numpy 1.24 and higher.
+* FIX #1216: Allow unknown task types on the server. This is only relevant when new task types are added to the test server.
+* FIX #1223: Fix mypy errors for implicit optional typing.
+* MAINT #1155: Add dependabot github action to automatically update other github actions.
+* MAINT #1199: Obtain pre-commit's flake8 from github.com instead of gitlab.com.
+* MAINT #1215: Support latest numpy version.
+* MAINT #1218: Test Python3.6 on Ubuntu 20.04 instead of the latest Ubuntu (which is 22.04).
+* MAINT #1221 #1212 #1206 #1211: Update github actions to the latest versions.
 
 0.13.0
 ~~~~~~
