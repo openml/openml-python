@@ -267,9 +267,10 @@ def check_datasets_active(
         A dictionary with items {did: bool}
     """
     datasets = list_datasets(status="all", data_id=dataset_ids, output_format="dataframe")
-    missing = set(dataset_ids) - set(datasets["did"])
+    missing = set(dataset_ids) - set(datasets.get("did", []))
     if raise_error_if_not_exist and missing:
-        raise ValueError(f"Could not find dataset(s) {missing} in OpenML dataset list.")
+        missing_str = ", ".join(str(did) for did in missing)
+        raise ValueError(f"Could not find dataset(s) {missing_str} in OpenML dataset list.")
     return dict(datasets["status"] == "active")
 
 

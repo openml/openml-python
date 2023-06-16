@@ -140,7 +140,7 @@ class TestOpenMLDataset(TestBase):
         self.assertIsNone(active.get(79))
         self.assertRaisesRegex(
             ValueError,
-            "Could not find dataset 79 in OpenML dataset list.",
+            r"Could not find dataset\(s\) 79 in OpenML dataset list.",
             openml.datasets.check_datasets_active,
             [79],
         )

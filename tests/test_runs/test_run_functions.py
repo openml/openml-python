@@ -1414,7 +1414,7 @@ class TestRun(TestBase):
 
         runs = openml.runs.list_runs(uploader=uploader_ids, output_format="dataframe")
         self.assertGreaterEqual(len(runs), num_runs + 1)
-        for run in runs.to_dict(orient="index"):
+        for run in runs.to_dict(orient="index").values():
             self.assertIn(run["uploader"], uploader_ids)
             self._check_run(run)
 
