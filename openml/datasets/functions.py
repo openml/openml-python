@@ -29,6 +29,7 @@ from ..exceptions import (
 from ..utils import _remove_cache_dir_for_id, _create_cache_directory_for_id, _get_cache_dir_for_id
 
 DATASETS_CACHE_DIR_NAME = "datasets"
+ARFF_ATTRIBUTE_TYPE = List[Union[Tuple[str, str], Tuple[str, List[str]]]]
 logger = logging.getLogger(__name__)
 
 
@@ -70,7 +71,7 @@ def list_datasets(
     status: Optional[str] = None,
     tag: Optional[str] = None,
     output_format: str = "dict",
-    **kwargs: Optional[Union[str, int]],
+    **kwargs: Optional[Union[Dict[str, Union[str, int]], str | int]],
 ) -> Union[Dict[int, Dict[str, Union[str, int]]], pd.DataFrame]:
     """
     Return a list of all dataset which are on OpenML.
@@ -224,7 +225,7 @@ def __list_datasets(api_call: str, output_format: str = "dict") -> pd.DataFrame:
     return datasets
 
 
-def _expand_parameter(parameter: Union[str, List[str]]) -> List[str]:
+def _expand_parameter(parameter: Union[str, List[str], None]) -> List[str]:
     expanded_parameter = []
     if isinstance(parameter, str):
         expanded_parameter = [x.strip() for x in parameter.split(",")]
@@ -235,7 +236,7 @@ def _expand_parameter(parameter: Union[str, List[str]]) -> List[str]:
 
 def _validated_data_attributes(
     attributes: List[str],
-    data_attributes: List[Union[Tuple[str, str], Tuple[str, List[str]]]],
+    data_attributes: ARFF_ATTRIBUTE_TYPE,
     parameter_name: str,
 ) -> None:
     for attribute_ in attributes:
@@ -310,6 +311,7 @@ def _name_to_id(
        The id of the dataset.
     """
     status = None if version is not None else "active"
+    candidates = list_datasets(status=status, data_name=dataset_name, data_version=version)
     candidates = cast(
         pd.DataFrame,
         list_datasets(

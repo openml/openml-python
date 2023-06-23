@@ -1,6 +1,6 @@
 # License: BSD 3-Clause
-
 from typing import List
+from prettyprinter import PrettyPrinter
 
 
 class OpenMLDataFeature(object):
@@ -62,6 +62,7 @@ class OpenMLDataFeature(object):
     def __repr__(self) -> str:
         return "[%d - %s (%s)]" % (self.index, self.name, self.data_type)
 
+    def _repr_pretty_(self, pp: PrettyPrinter, cycle: bool) -> None:
     def _repr_pretty_(self, pp, cycle) -> None:  # type: ignore
     def __eq__(self, other):
         return isinstance(other, OpenMLDataFeature) and self.__dict__ == other.__dict__
