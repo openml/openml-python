@@ -77,7 +77,7 @@ openml-python 0.14, `list_datasets` will warn you to use output_format='datafram
 
  .. code-block:: none
 
-    First 10 of 5299 datasets...
+    First 10 of 5301 datasets...
 
 
 .. raw:: html
@@ -1128,8 +1128,8 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
  .. code-block:: none
 
-    1274
-    Forked dataset ID: 1274
+    1671
+    Forked dataset ID: 1671
 
 
 
@@ -1137,7 +1137,7 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  38.870 seconds)
+   **Total running time of the script:** ( 0 minutes  9.966 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:

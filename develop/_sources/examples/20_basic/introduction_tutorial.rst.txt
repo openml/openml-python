@@ -242,7 +242,7 @@ Download the OpenML task for the eeg-eye-state.
       warnings.warn(
     /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
-    kNN on eeg-eye-state: https://test.openml.org/r/6097
+    kNN on eeg-eye-state: https://test.openml.org/r/8416
 
 
 
@@ -262,7 +262,7 @@ Download the OpenML task for the eeg-eye-state.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.903 seconds)
+   **Total running time of the script:** ( 0 minutes  12.059 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_introduction_tutorial.py:
