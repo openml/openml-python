@@ -64,23 +64,16 @@ print(dataset.description[:500])
 ############################################################################
 # Get the actual data.
 #
-# The dataset can be returned in 3 possible formats: as a NumPy array, a SciPy
-# sparse matrix, or as a Pandas DataFrame. The format is
-# controlled with the parameter ``dataset_format`` which can be either 'array'
-# (default) or 'dataframe'. Let's first build our dataset from a NumPy array
-# and manually create a dataframe.
-X, y, categorical_indicator, attribute_names = dataset.get_data(
-    dataset_format="array", target=dataset.default_target_attribute
-)
-eeg = pd.DataFrame(X, columns=attribute_names)
-eeg["class"] = y
-print(eeg[:10])
+# openml-python returns data as pandas dataframes (stored in the `eeg` variable below),
+# and also some additional metadata that we don't care about right now.
+eeg, *_ = dataset.get_data()
 
 ############################################################################
-# Instead of manually creating the dataframe, you can already request a
-# dataframe with the correct dtypes.
+# You can optionally choose to have openml separate out a column from the
+# dataset. In particular, many datasets for supervised problems have a set
+# `default_target_attribute` which may help identify the target variable.
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    target=dataset.default_target_attribute, dataset_format="dataframe"
+    target=dataset.default_target_attribute
 )
 print(X.head())
 print(X.info())
@@ -91,6 +84,9 @@ print(X.info())
 # data file. The dataset object can be used as normal.
 # Whenever you use any functionality that requires the data,
 # such as `get_data`, the data will be downloaded.
+# Starting from 0.15, not downloading data will be the default behavior instead.
+# The data will be downloading automatically when you try to access it through
+# openml objects, e.g., using `dataset.features`.
 dataset = openml.datasets.get_dataset(1471, download_data=False)
 
 ############################################################################
