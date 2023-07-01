@@ -95,8 +95,8 @@ dataset = openml.datasets.get_dataset(1471, download_data=False)
 # * Explore the data visually.
 eegs = eeg.sample(n=1000)
 _ = pd.plotting.scatter_matrix(
-    eegs.iloc[:100, :4],
-    c=eegs[:100]["class"],
+    X.iloc[:100, :4],
+    c=y[:100],
     figsize=(10, 10),
     marker="o",
     hist_kwds={"bins": 20},
