@@ -71,7 +71,7 @@ def list_datasets(
     status: Optional[str] = None,
     tag: Optional[str] = None,
     output_format: str = "dict",
-    **kwargs: Optional[Union[Dict[str, Union[str, int]], str | int]],
+    **kwargs: Optional[Union[Dict[str, Union[str, int]], Union[str, int]]],
 ) -> Union[Dict[int, Dict[str, Union[str, int]]], pd.DataFrame]:
     """
     Return a list of all dataset which are on OpenML.
