@@ -275,11 +275,11 @@ def check_datasets_active(
         A dictionary with items {did: bool}
     """
     datasets = list_datasets(status="all", data_id=dataset_ids, output_format="dataframe")
-    missing = set(dataset_ids) - set(datasets.get("did", []))
+    missing = set(dataset_ids) - set(datasets.get("did", []))  # type: ignore
     if raise_error_if_not_exist and missing:
         missing_str = ", ".join(str(did) for did in missing)
         raise ValueError(f"Could not find dataset(s) {missing_str} in OpenML dataset list.")
-    return dict(datasets["status"] == "active")
+    return dict(datasets["status"] == "active")  # type: ignore
 
 
 def _name_to_id(
@@ -1167,7 +1167,7 @@ def _get_dataset_arff(
     return output_file_path
 
 
-def _get_features_xml(dataset_id):
+def _get_features_xml(dataset_id: int) -> str:
     url_extension = f"data/features/{dataset_id}"
     return openml._api_calls._perform_api_call(url_extension, "get")
 
@@ -1211,7 +1211,7 @@ def _get_dataset_features_file(did_cache_dir: Union[str, None], dataset_id: int)
     return features_file
 
 
-def _get_qualities_xml(dataset_id):
+def _get_qualities_xml(dataset_id: int) -> str:
     url_extension = f"data/qualities/{dataset_id}"
     return openml._api_calls._perform_api_call(url_extension, "get")
 

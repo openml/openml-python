@@ -253,14 +253,14 @@ class OpenMLDataset(OpenMLBase):
             self.feather_attribute_file = None
 
     @property
-    def features(self):
+    def features(self) -> Optional[Dict[int, OpenMLDataFeature]]:
         if self._features is None:
             self._load_features()
 
         return self._features
 
     @property
-    def qualities(self):
+    def qualities(self) -> Optional[Dict[str, float]]:
         # We have to check `_no_qualities_found` as there might not be qualities for a dataset
         if self._qualities is None and (not self._no_qualities_found):
             self._load_qualities()
@@ -781,7 +781,7 @@ class OpenMLDataset(OpenMLBase):
 
         return data, targets, categorical, attribute_names
 
-    def _load_features(self):
+    def _load_features(self) -> None:
         """Load the features metadata from the server and store it in the dataset object."""
         # Delayed Import to avoid circular imports or having to import all of dataset.functions to
         # import OpenMLDataset.
@@ -796,7 +796,7 @@ class OpenMLDataset(OpenMLBase):
         features_file = _get_dataset_features_file(None, self.dataset_id)
         self._features = _read_features(features_file)
 
-    def _load_qualities(self):
+    def _load_qualities(self) -> None:
         """Load qualities information from the server and store it in the dataset object."""
         # same reason as above for _load_features
         from openml.datasets.functions import _get_dataset_qualities_file
