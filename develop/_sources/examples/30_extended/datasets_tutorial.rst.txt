@@ -1113,8 +1113,8 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
  .. code-block:: none
 
-    2112
-    Forked dataset ID: 2112
+    2238
+    Forked dataset ID: 2238
 
 
 
@@ -1122,7 +1122,7 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.444 seconds)
+   **Total running time of the script:** ( 0 minutes  9.280 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:
