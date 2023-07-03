@@ -433,11 +433,11 @@ suite which is available on the OpenML test server.
       warnings.warn(
     OpenML Study
     ============
-    ID..............: 633
+    ID..............: 697
     Name............: Test-Study
     Status..........: None
     Main Entity Type: run
-    Study URL.......: https://test.openml.org/s/633
+    Study URL.......: https://test.openml.org/s/697
     # of Runs.......: 3
 
 
@@ -458,7 +458,7 @@ suite which is available on the OpenML test server.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  22.790 seconds)
+   **Total running time of the script:** ( 0 minutes  23.869 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_study_tutorial.py:

@@ -226,8 +226,8 @@ We can run (many) scikit-learn algorithms on (many) OpenML tasks.
     ==========
     Uploader Name...................: None
     Metric..........................: None
-    Local Result - Accuracy (+- STD): 0.8433 +- 0.0112
-    Local Runtime - ms (+- STD).....: 181.7759 +- 2.8136
+    Local Result - Accuracy (+- STD): 0.8446 +- 0.0112
+    Local Runtime - ms (+- STD).....: 191.8279 +- 2.9398
     Run ID..........................: None
     Task ID.........................: 403
     Task Type.......................: None
@@ -272,7 +272,7 @@ the run is sent to the OpenML server:
       warnings.warn(
     /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
-    Uploaded to https://test.openml.org/r/12070
+    Uploaded to https://test.openml.org/r/13184
 
 
 
@@ -419,7 +419,7 @@ variables and missing values in both.
       warnings.warn(
     /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
-    Uploaded to https://test.openml.org/r/12076
+    Uploaded to https://test.openml.org/r/13186
     /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
     /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:972: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
@@ -428,7 +428,7 @@ variables and missing values in both.
       warnings.warn(
     /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
-    Uploaded to https://test.openml.org/r/12077
+    Uploaded to https://test.openml.org/r/13187
 
 
 
@@ -488,10 +488,10 @@ a model on a task without uploading results or flows to the server immediately.
     ==========
     Uploader Name...................: None
     Metric..........................: None
-    Local Result - Accuracy (+- STD): 0.8678 +- 0.0000
-    Local Runtime - ms (+- STD).....: 34.0015 +- 0.0000
-    Run ID..........................: 12079
-    Run URL.........................: https://test.openml.org/r/12079
+    Local Result - Accuracy (+- STD): 0.8546 +- 0.0000
+    Local Runtime - ms (+- STD).....: 31.6171 +- 0.0000
+    Run ID..........................: 13188
+    Run URL.........................: https://test.openml.org/r/13188
     Task ID.........................: 96
     Task Type.......................: None
     Task URL........................: https://test.openml.org/t/96
@@ -667,7 +667,7 @@ them. Some tasks you could try (or browse openml.org):
       warnings.warn(
     /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
-    kNN on diabetes: https://test.openml.org/r/12081
+    kNN on diabetes: https://test.openml.org/r/13191
 
 
 
@@ -687,7 +687,7 @@ them. Some tasks you could try (or browse openml.org):
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  16.870 seconds)
+   **Total running time of the script:** ( 0 minutes  17.117 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_flows_and_runs_tutorial.py:
