@@ -835,63 +835,38 @@ Download datasets
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-72
+.. GENERATED FROM PYTHON SOURCE LINES 65-69
 
 Get the actual data.
 
-The dataset can be returned in 3 possible formats: as a NumPy array, a SciPy
-sparse matrix, or as a Pandas DataFrame. The format is
-controlled with the parameter ``dataset_format`` which can be either 'array'
-(default) or 'dataframe'. Let's first build our dataset from a NumPy array
-and manually create a dataframe.
+openml-python returns data as pandas dataframes (stored in the `eeg` variable below),
+and also some additional metadata that we don't care about right now.
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-79
+.. GENERATED FROM PYTHON SOURCE LINES 69-71
+
+.. code-block:: default
+
+    eeg, *_ = dataset.get_data()
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 72-75
+
+You can optionally choose to have openml separate out a column from the
+dataset. In particular, many datasets for supervised problems have a set
+`default_target_attribute` which may help identify the target variable.
+
+.. GENERATED FROM PYTHON SOURCE LINES 75-81
 
 .. code-block:: default
 
     X, y, categorical_indicator, attribute_names = dataset.get_data(
-        dataset_format="array", target=dataset.default_target_attribute
-    )
-    eeg = pd.DataFrame(X, columns=attribute_names)
-    eeg["class"] = y
-    print(eeg[:10])
-
-
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-                V1           V2           V3  ...          V13          V14  class
-    0  4329.229980  4009.229980  4289.229980  ...  4635.899902  4393.850098      0
-    1  4324.620117  4004.620117  4293.850098  ...  4632.819824  4384.100098      0
-    2  4327.689941  4006.669922  4295.379883  ...  4628.720215  4389.229980      0
-    3  4328.720215  4011.790039  4296.410156  ...  4632.310059  4396.410156      0
-    4  4326.149902  4011.790039  4292.310059  ...  4632.819824  4398.459961      0
-    5  4321.029785  4004.620117  4284.100098  ...  4628.209961  4389.740234      0
-    6  4319.490234  4001.030029  4280.509766  ...  4625.129883  4378.459961      0
-    7  4325.640137  4006.669922  4278.459961  ...  4622.049805  4380.509766      0
-    8  4326.149902  4010.770020  4276.410156  ...  4627.180176  4389.740234      0
-    9  4326.149902  4011.280029  4276.919922  ...  4637.439941  4393.330078      0
-
-    [10 rows x 15 columns]
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 80-82
-
-Instead of manually creating the dataframe, you can already request a
-dataframe with the correct dtypes.
-
-.. GENERATED FROM PYTHON SOURCE LINES 82-88
-
-.. code-block:: default
-
-    X, y, categorical_indicator, attribute_names = dataset.get_data(
-        target=dataset.default_target_attribute, dataset_format="dataframe"
+        target=dataset.default_target_attribute
     )
     print(X.head())
     print(X.info())
@@ -938,15 +913,18 @@ dataframe with the correct dtypes.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-94
+.. GENERATED FROM PYTHON SOURCE LINES 82-90
 
 Sometimes you only need access to a dataset's metadata.
 In those cases, you can download the dataset without downloading the
 data file. The dataset object can be used as normal.
 Whenever you use any functionality that requires the data,
 such as `get_data`, the data will be downloaded.
+Starting from 0.15, not downloading data will be the default behavior instead.
+The data will be downloading automatically when you try to access it through
+openml objects, e.g., using `dataset.features`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-96
+.. GENERATED FROM PYTHON SOURCE LINES 90-92
 
 .. code-block:: default
 
@@ -966,20 +944,20 @@ such as `get_data`, the data will be downloaded.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-100
+.. GENERATED FROM PYTHON SOURCE LINES 93-96
 
 Exercise 2
 **********
 * Explore the data visually.
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-112
+.. GENERATED FROM PYTHON SOURCE LINES 96-108
 
 .. code-block:: default
 
     eegs = eeg.sample(n=1000)
     _ = pd.plotting.scatter_matrix(
-        eegs.iloc[:100, :4],
-        c=eegs[:100]["class"],
+        X.iloc[:100, :4],
+        c=y[:100],
         figsize=(10, 10),
         marker="o",
         hist_kwds={"bins": 20},
@@ -997,10 +975,17 @@ Exercise 2
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/pandas/plotting/_matplotlib/misc.py:97: UserWarning: No data for colormapping provided via 'c'. Parameters 'cmap' will be ignored
+      ax.scatter(
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-119
+
+.. GENERATED FROM PYTHON SOURCE LINES 109-115
 
 Edit a created dataset
 ======================
@@ -1009,7 +994,7 @@ This example uses the test server, to avoid editing a dataset on the main server
 .. warning::
    .. include:: ../../test_server_usage_warning.txt
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-120
+.. GENERATED FROM PYTHON SOURCE LINES 115-116
 
 .. code-block:: default
 
@@ -1028,13 +1013,13 @@ This example uses the test server, to avoid editing a dataset on the main server
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-124
+.. GENERATED FROM PYTHON SOURCE LINES 117-120
 
 Edit non-critical fields, allowed for all authorized users:
 description, creator, contributor, collection_date, language, citation,
 original_data_url, paper_url
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-142
+.. GENERATED FROM PYTHON SOURCE LINES 120-138
 
 .. code-block:: default
 
@@ -1069,7 +1054,7 @@ original_data_url, paper_url
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-149
+.. GENERATED FROM PYTHON SOURCE LINES 139-145
 
 Editing critical fields (default_target_attribute, row_id_attribute, ignore_attribute) is allowed
 only for the dataset owner. Further, critical fields cannot be edited if the dataset has any
@@ -1078,7 +1063,7 @@ configure the API key:
 openml.config.apikey = 'FILL_IN_OPENML_API_KEY'
 This example here only shows a failure when trying to work on a dataset not owned by you:
 
-.. GENERATED FROM PYTHON SOURCE LINES 149-154
+.. GENERATED FROM PYTHON SOURCE LINES 145-150
 
 .. code-block:: default
 
@@ -1100,7 +1085,7 @@ This example here only shows a failure when trying to work on a dataset not owne
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-161
+.. GENERATED FROM PYTHON SOURCE LINES 151-157
 
 Fork dataset
 ============
@@ -1109,7 +1094,7 @@ Use this API only if you are unable to edit the critical fields (default_target_
 ignore_attribute, row_id_attribute) of a dataset through the edit_dataset API.
 After the dataset is forked, you can edit the new version of the dataset using edit_dataset.
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-168
+.. GENERATED FROM PYTHON SOURCE LINES 157-164
 
 .. code-block:: default
 
@@ -1128,8 +1113,8 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
  .. code-block:: none
 
-    1671
-    Forked dataset ID: 1671
+    2112
+    Forked dataset ID: 2112
 
 
 
@@ -1137,7 +1122,7 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  9.966 seconds)
+   **Total running time of the script:** ( 0 minutes  10.444 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:

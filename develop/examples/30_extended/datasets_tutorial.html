@@ -888,38 +888,16 @@ All data is from one continuous EEG measurement with the Emotiv EEG Neuroheadset
 </pre></div>
 </div>
 <p>Get the actual data.</p>
-<p>The dataset can be returned in 3 possible formats: as a NumPy array, a SciPy
-sparse matrix, or as a Pandas DataFrame. The format is
-controlled with the parameter <code class="docutils literal notranslate"><span class="pre">dataset_format</span></code> which can be either ‘array’
-(default) or ‘dataframe’. Let’s first build our dataset from a NumPy array
-and manually create a dataframe.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_indicator</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
-    <span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
-<span class="p">)</span>
-<span class="n">eeg</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">attribute_names</span><span class="p">)</span>
-<span class="n">eeg</span><span class="p">[</span><span class="s2">&quot;class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">eeg</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+<p>openml-python returns data as pandas dataframes (stored in the <cite>eeg</cite> variable below),
+and also some additional metadata that we don’t care about right now.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eeg</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>            V1           V2           V3  ...          V13          V14  class
-0  4329.229980  4009.229980  4289.229980  ...  4635.899902  4393.850098      0
-1  4324.620117  4004.620117  4293.850098  ...  4632.819824  4384.100098      0
-2  4327.689941  4006.669922  4295.379883  ...  4628.720215  4389.229980      0
-3  4328.720215  4011.790039  4296.410156  ...  4632.310059  4396.410156      0
-4  4326.149902  4011.790039  4292.310059  ...  4632.819824  4398.459961      0
-5  4321.029785  4004.620117  4284.100098  ...  4628.209961  4389.740234      0
-6  4319.490234  4001.030029  4280.509766  ...  4625.129883  4378.459961      0
-7  4325.640137  4006.669922  4278.459961  ...  4622.049805  4380.509766      0
-8  4326.149902  4010.770020  4276.410156  ...  4627.180176  4389.740234      0
-9  4326.149902  4011.280029  4276.919922  ...  4637.439941  4393.330078      0
-
-[10 rows x 15 columns]
-</pre></div>
-</div>
-<p>Instead of manually creating the dataframe, you can already request a
-dataframe with the correct dtypes.</p>
+<p>You can optionally choose to have openml separate out a column from the
+dataset. In particular, many datasets for supervised problems have a set
+<cite>default_target_attribute</cite> which may help identify the target variable.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_indicator</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
-    <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span><span class="p">,</span> <span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span>
+    <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
@@ -961,7 +939,10 @@ None
 In those cases, you can download the dataset without downloading the
 data file. The dataset object can be used as normal.
 Whenever you use any functionality that requires the data,
-such as <cite>get_data</cite>, the data will be downloaded.</p>
+such as <cite>get_data</cite>, the data will be downloaded.
+Starting from 0.15, not downloading data will be the default behavior instead.
+The data will be downloading automatically when you try to access it through
+openml objects, e.g., using <cite>dataset.features</cite>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">,</span> <span class="n">download_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -978,8 +959,8 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eegs</span> <span class="o">=</span> <span class="n">eeg</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">_</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">(</span>
-    <span class="n">eegs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">100</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">],</span>
-    <span class="n">c</span><span class="o">=</span><span class="n">eegs</span><span class="p">[:</span><span class="mi">100</span><span class="p">][</span><span class="s2">&quot;class&quot;</span><span class="p">],</span>
+    <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">100</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">],</span>
+    <span class="n">c</span><span class="o">=</span><span class="n">y</span><span class="p">[:</span><span class="mi">100</span><span class="p">],</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
     <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
     <span class="n">hist_kwds</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bins&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span>
@@ -988,7 +969,11 @@ such as <cite>get_data</cite>, the data will be downloaded.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_datasets_tutorial_001.png" srcset="../../_images/sphx_glr_datasets_tutorial_001.png" alt="datasets tutorial" class = "sphx-glr-single-img"/><section id="edit-a-created-dataset">
+<img src="../../_images/sphx_glr_datasets_tutorial_001.png" srcset="../../_images/sphx_glr_datasets_tutorial_001.png" alt="datasets tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/pandas/plotting/_matplotlib/misc.py:97: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+  ax.scatter(
+</pre></div>
+</div>
+<section id="edit-a-created-dataset">
 <h3>Edit a created dataset<a class="headerlink" href="#edit-a-created-dataset" title="Permalink to this heading">¶</a></h3>
 <p>This example uses the test server, to avoid editing a dataset on the main server.</p>
 <div class="admonition warning">
@@ -1058,11 +1043,11 @@ After the dataset is forked, you can edit the new version of the dataset using e
 <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1671
-Forked dataset ID: 1671
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2112
+Forked dataset ID: 2112
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.966 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  10.444 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-datasets-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/b95c071188526f5ef5d991e382df9fa5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>

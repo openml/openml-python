@@ -27,7 +27,7 @@ openml.config.start_using_configuration_for_example()
 # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
 dataset = openml.datasets.get_dataset(68)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    dataset_format="array", target=dataset.default_target_attribute
+    target=dataset.default_target_attribute
 )
 clf = neighbors.KNeighborsClassifier(n_neighbors=1)
 clf.fit(X, y)
@@ -38,7 +38,7 @@ clf.fit(X, y)
 # * e.g. categorical features -> do feature encoding
 dataset = openml.datasets.get_dataset(17)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    dataset_format="array", target=dataset.default_target_attribute
+    target=dataset.default_target_attribute
 )
 print(f"Categorical features: {categorical_indicator}")
 transformer = compose.ColumnTransformer(
@@ -160,7 +160,7 @@ pipe = pipeline.Pipeline(
     ]
 )
 
-run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False, dataset_format="array")
+run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
 myrun = run.publish()
 print(f"Uploaded to {myrun.openml_url}")
 
@@ -172,7 +172,7 @@ print(f"Uploaded to {myrun.openml_url}")
 
 # To perform the following line offline, it is required to have been called before
 # such that the task is cached on the local openml cache directory:
-task = openml.tasks.get_task(6)
+task = openml.tasks.get_task(96)
 
 # The following lines can then be executed offline:
 run = openml.runs.run_model_on_task(
@@ -180,7 +180,6 @@ run = openml.runs.run_model_on_task(
     task,
     avoid_duplicate_runs=False,
     upload_flow=False,
-    dataset_format="array",
 )
 
 # The run may be stored offline, and the flow will be stored along with it:
