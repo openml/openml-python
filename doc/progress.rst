@@ -13,6 +13,7 @@ Changelog
 0.15, functions that had the option to return a pandas DataFrame will return a pandas DataFrame
 by default. This version (0.14) emits a warning if you still use the old access functionality. 
 More concretely:
+
 * In 0.15 we will drop the ability to return dictionaries in listing calls and only provide
   pandas DataFrames. To disable warnings in 0.14 you have to request a pandas DataFrame
   (using ``output_format="dataframe"``).
