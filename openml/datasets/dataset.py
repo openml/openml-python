@@ -716,8 +716,10 @@ class OpenMLDataset(OpenMLBase):
             on the server in the dataset.
         dataset_format : string (default='dataframe')
             The format of returned dataset.
-            If ``array``, the returned dataset will be a NumPy array or a SciPy sparse matrix.
+            If ``array``, the returned dataset will be a NumPy array or a SciPy sparse
+            matrix. Support for ``array`` will be removed in 0.15.
             If ``dataframe``, the returned dataset will be a Pandas DataFrame.
+
 
         Returns
         -------
@@ -730,6 +732,16 @@ class OpenMLDataset(OpenMLBase):
         attribute_names : List[str]
             List of attribute names.
         """
+        # TODO: [0.15]
+        if dataset_format == "array":
+            warnings.warn(
+                "Support for `dataset_format='array'` will be removed in 0.15,"
+                "start using `dataset_format='dataframe' to ensure your code "
+                "will continue to work. You can use the dataframe's `to_numpy` "
+                "function to continue using numpy arrays.",
+                category=FutureWarning,
+                stacklevel=2,
+            )
         data, categorical, attribute_names = self._load_data()
 
         to_exclude = []

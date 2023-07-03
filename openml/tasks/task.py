@@ -1,5 +1,5 @@
 # License: BSD 3-Clause
-
+import warnings
 from abc import ABC
 from collections import OrderedDict
 from enum import Enum
@@ -256,6 +256,16 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         tuple - X and y
 
         """
+        # TODO: [0.15]
+        if dataset_format == "array":
+            warnings.warn(
+                "Support for `dataset_format='array'` will be removed in 0.15,"
+                "start using `dataset_format='dataframe' to ensure your code "
+                "will continue to work. You can use the dataframe's `to_numpy` "
+                "function to continue using numpy arrays.",
+                category=FutureWarning,
+                stacklevel=2,
+            )
         dataset = self.get_dataset()
         if self.task_type_id not in (
             TaskType.SUPERVISED_CLASSIFICATION,
