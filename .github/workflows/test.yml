@@ -53,6 +53,7 @@ jobs:
           - os: windows-latest
             sklearn-only: 'false'
             scikit-learn: 0.24.*
+            scipy: 1.10.0
       fail-fast:  false
       max-parallel: 4
 
