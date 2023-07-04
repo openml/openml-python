@@ -23,7 +23,6 @@ from .task import (
 import openml.utils
 import openml._api_calls
 
-
 TASKS_CACHE_DIR_NAME = "tasks"
 
 
@@ -177,6 +176,14 @@ def list_tasks(
         raise ValueError(
             "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
         )
+    # TODO: [0.15]
+    if output_format == "dict":
+        msg = (
+            "Support for `output_format` of 'dict' will be removed in 0.15 "
+            "and pandas dataframes will be returned instead. To ensure your code "
+            "will continue to work, use `output_format`='dataframe'."
+        )
+        warnings.warn(msg, category=FutureWarning, stacklevel=2)
     return openml.utils._list_all(
         output_format=output_format,
         listing_call=_list_tasks,
@@ -288,9 +295,10 @@ def __list_tasks(api_call, output_format="dict"):
             tasks[tid] = task
         except KeyError as e:
             if tid is not None:
-                raise KeyError("Invalid xml for task %d: %s\nFrom %s" % (tid, e, task_))
+                warnings.warn("Invalid xml for task %d: %s\nFrom %s" % (tid, e, task_))
             else:
-                raise KeyError("Could not find key %s in %s!" % (e, task_))
+                warnings.warn("Could not find key %s in %s!" % (e, task_))
+            continue
 
     if output_format == "dataframe":
         tasks = pd.DataFrame.from_dict(tasks, orient="index")
@@ -326,31 +334,54 @@ def get_tasks(
 
 @openml.utils.thread_safe_if_oslo_installed
 def get_task(
-    task_id: int, download_data: bool = True, download_qualities: bool = True
+    task_id: int, *dataset_args, download_splits: Optional[bool] = None, **get_dataset_kwargs
 ) -> OpenMLTask:
     """Download OpenML task for a given task ID.
 
-    Downloads the task representation, while the data splits can be
-    downloaded optionally based on the additional parameter. Else,
-    splits will either way be downloaded when the task is being used.
+    Downloads the task representation. By default, this will also download the data splits and
+    the dataset. From version 0.15.0 onwards, the splits nor the dataset will not be downloaded by
+    default.
+
+    Use the `download_splits` parameter to control whether the splits are downloaded.
+    Moreover, you may pass additional parameter (args or kwargs) that are passed to
+    :meth:`openml.datasets.get_dataset`.
+    For backwards compatibility, if `download_data` is passed as an additional parameter and
+    `download_splits` is not explicitly set, `download_data` also overrules `download_splits`'s
+    value (deprecated from Version 0.15.0 onwards).
 
     Parameters
     ----------
     task_id : int
         The OpenML task id of the task to download.
-    download_data : bool (default=True)
-        Option to trigger download of data along with the meta data.
-    download_qualities : bool (default=True)
-        Option to download 'qualities' meta-data in addition to the minimal dataset description.
+    download_splits: bool (default=True)
+        Whether to download the splits as well. From version 0.15.0 onwards this is independent
+        of download_data and will default to ``False``.
+    dataset_args, get_dataset_kwargs :
+        Args and kwargs can be used pass optional parameters to :meth:`openml.datasets.get_dataset`.
+        This includes `download_data`. If set to True the splits are downloaded as well
+        (deprecated from Version 0.15.0 onwards). The args are only present for backwards
+        compatibility and will be removed from version 0.15.0 onwards.
 
     Returns
     -------
-    task
+    task: OpenMLTask
     """
+    if download_splits is None:
+        # TODO(0.15): Switch download splits to False by default, adjust typing above, adjust
+        #  documentation above, and remove warning.
+        warnings.warn(
+            "Starting from Version 0.15.0 `download_splits` will default to ``False`` instead "
+            "of ``True`` and be independent from `download_data`. To disable this message until "
+            "version 0.15 explicitly set `download_splits` to a bool.",
+            FutureWarning,
+        )
+        download_splits = get_dataset_kwargs.get("download_data", True)
+
     if not isinstance(task_id, int):
+        # TODO(0.15): Remove warning
         warnings.warn(
             "Task id must be specified as `int` from 0.14.0 onwards.",
-            DeprecationWarning,
+            FutureWarning,
         )
 
     try:
@@ -365,15 +396,15 @@ def get_task(
 
     try:
         task = _get_task_description(task_id)
-        dataset = get_dataset(task.dataset_id, download_data, download_qualities=download_qualities)
-        # List of class labels availaible in dataset description
+        dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+        # List of class labels available in dataset description
         # Including class labels as part of task meta data handles
         #   the case where data download was initially disabled
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
             task.class_labels = dataset.retrieve_class_labels(task.target_name)
         # Clustering tasks do not have class labels
         # and do not offer download_split
-        if download_data:
+        if download_splits:
             if isinstance(task, OpenMLSupervisedTask):
                 task.download_split()
     except Exception as e:
@@ -387,7 +418,6 @@ def get_task(
 
 
 def _get_task_description(task_id):
-
     try:
         return _get_cached_task(task_id)
     except OpenMLCacheException:

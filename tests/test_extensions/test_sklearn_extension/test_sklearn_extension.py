@@ -117,7 +117,6 @@ class TestSklearnExtensionFlowFunctions(TestBase):
     def _serialization_test_helper(
         self, model, X, y, subcomponent_parameters, dependencies_mock_call_count=(1, 2)
     ):
-
         # Regex pattern for memory addresses of style 0x7f8e0f31ecf8
         pattern = re.compile("0x[0-9a-f]{12}")
 
@@ -1050,7 +1049,6 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
     @pytest.mark.sklearn
     def test_serialize_simple_parameter_grid(self):
-
         # We cannot easily test for scipy random variables in here, but they
         # should be covered
 
@@ -1568,7 +1566,6 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
     @pytest.mark.sklearn
     def test_obtain_parameter_values(self):
-
         model = sklearn.model_selection.RandomizedSearchCV(
             estimator=sklearn.ensemble.RandomForestClassifier(n_estimators=5),
             param_distributions={
@@ -2035,7 +2032,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
     @pytest.mark.sklearn
     def test__extract_trace_data(self):
-
         param_grid = {
             "hidden_layer_sizes": [[5, 5], [10, 10], [20, 20]],
             "activation": ["identity", "logistic", "tanh", "relu"],
@@ -2078,7 +2074,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
             self.assertEqual(len(trace_iteration.parameters), len(param_grid))
             for param in param_grid:
-
                 # Prepend with the "parameter_" prefix
                 param_in_trace = "parameter_%s" % param
                 self.assertIn(param_in_trace, trace_iteration.parameters)

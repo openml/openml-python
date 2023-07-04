@@ -18,7 +18,6 @@ from . import config
 if TYPE_CHECKING:
     from openml.base import OpenMLBase
 
-
 oslo_installed = False
 try:
     # Currently, importing oslo raises a lot of warning that it will stop working
@@ -72,13 +71,13 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
 
 def _get_rest_api_type_alias(oml_object: "OpenMLBase") -> str:
     """Return the alias of the openml entity as it is defined for the REST API."""
-    rest_api_mapping = [
+    rest_api_mapping: List[Tuple[Union[Type, Tuple], str]] = [
         (openml.datasets.OpenMLDataset, "data"),
         (openml.flows.OpenMLFlow, "flow"),
         (openml.tasks.OpenMLTask, "task"),
         (openml.runs.OpenMLRun, "run"),
         ((openml.study.OpenMLStudy, openml.study.OpenMLBenchmarkSuite), "study"),
-    ]  # type: List[Tuple[Union[Type, Tuple], str]]
+    ]
     _, api_type_alias = [
         (python_type, api_alias)
         for (python_type, api_alias) in rest_api_mapping
@@ -283,7 +282,7 @@ def _list_all(listing_call, output_format="dict", *args, **filters):
             if len(result) == 0:
                 result = new_batch
             else:
-                result = result.append(new_batch, ignore_index=True)
+                result = pd.concat([result, new_batch], ignore_index=True)
         else:
             # For output_format = 'dict' or 'object'
             result.update(new_batch)
@@ -303,16 +302,31 @@ def _list_all(listing_call, output_format="dict", *args, **filters):
     return result
 
 
-def _create_cache_directory(key):
+def _get_cache_dir_for_key(key):
     cache = config.get_cache_directory()
-    cache_dir = os.path.join(cache, key)
+    return os.path.join(cache, key)
+
+
+def _create_cache_directory(key):
+    cache_dir = _get_cache_dir_for_key(key)
+
     try:
         os.makedirs(cache_dir, exist_ok=True)
     except Exception as e:
         raise openml.exceptions.OpenMLCacheException(
             f"Cannot create cache directory {cache_dir}."
         ) from e
+
     return cache_dir
+
+
+def _get_cache_dir_for_id(key, id_, create=False):
+    if create:
+        cache_dir = _create_cache_directory(key)
+    else:
+        cache_dir = _get_cache_dir_for_key(key)
+
+    return os.path.join(cache_dir, str(id_))
 
 
 def _create_cache_directory_for_id(key, id_):
@@ -336,7 +350,7 @@ def _create_cache_directory_for_id(key, id_):
     str
         Path of the created dataset cache directory.
     """
-    cache_dir = os.path.join(_create_cache_directory(key), str(id_))
+    cache_dir = _get_cache_dir_for_id(key, id_, create=True)
     if os.path.isdir(cache_dir):
         pass
     elif os.path.exists(cache_dir):

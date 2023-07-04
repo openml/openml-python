@@ -1,5 +1,5 @@
 # License: BSD 3-Clause
-
+import warnings
 from collections import OrderedDict
 import io
 import os
@@ -49,7 +49,9 @@ def setup_exists(flow) -> int:
 
     openml_param_settings = flow.extension.obtain_parameter_values(flow)
     description = xmltodict.unparse(_to_dict(flow.flow_id, openml_param_settings), pretty=True)
-    file_elements = {"description": ("description.arff", description)}
+    file_elements = {
+        "description": ("description.arff", description)
+    }  # type: openml._api_calls.FILE_ELEMENTS_TYPE
     result = openml._api_calls._perform_api_call(
         "/setup/exists/", "post", file_elements=file_elements
     )
@@ -97,7 +99,7 @@ def get_setup(setup_id):
 
     try:
         return _get_cached_setup(setup_id)
-    except (openml.exceptions.OpenMLCacheException):
+    except openml.exceptions.OpenMLCacheException:
         url_suffix = "/setup/%d" % setup_id
         setup_xml = openml._api_calls._perform_api_call(url_suffix, "get")
         with io.open(setup_file, "w", encoding="utf8") as fh:
@@ -139,6 +141,15 @@ def list_setups(
         raise ValueError(
             "Invalid output format selected. " "Only 'dict', 'object', or 'dataframe' applicable."
         )
+
+    # TODO: [0.15]
+    if output_format == "dict":
+        msg = (
+            "Support for `output_format` of 'dict' will be removed in 0.15. "
+            "To ensure your code will continue to work, "
+            "use `output_format`='dataframe' or `output_format`='object'."
+        )
+        warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
     batch_size = 1000  # batch size for setups is lower
     return openml.utils._list_all(

@@ -73,7 +73,6 @@ class TestOpenMLDataset(TestBase):
                     pass
 
     def _get_empty_param_for_dataset(self):
-
         return {
             "name": None,
             "description": None,
@@ -110,55 +109,10 @@ class TestOpenMLDataset(TestBase):
         all_tags = _tag_entity("data", 1, tag, untag=True)
         self.assertTrue(tag not in all_tags)
 
-    def test_list_datasets(self):
-        # We can only perform a smoke test here because we test on dynamic
-        # data from the internet...
-        datasets = openml.datasets.list_datasets()
-        # 1087 as the number of datasets on openml.org
-        self.assertGreaterEqual(len(datasets), 100)
-        self._check_datasets(datasets)
-
     def test_list_datasets_output_format(self):
         datasets = openml.datasets.list_datasets(output_format="dataframe")
         self.assertIsInstance(datasets, pd.DataFrame)
         self.assertGreaterEqual(len(datasets), 100)
-
-    def test_list_datasets_by_tag(self):
-        datasets = openml.datasets.list_datasets(tag="study_14")
-        self.assertGreaterEqual(len(datasets), 100)
-        self._check_datasets(datasets)
-
-    def test_list_datasets_by_size(self):
-        datasets = openml.datasets.list_datasets(size=10050)
-        self.assertGreaterEqual(len(datasets), 120)
-        self._check_datasets(datasets)
-
-    def test_list_datasets_by_number_instances(self):
-        datasets = openml.datasets.list_datasets(number_instances="5..100")
-        self.assertGreaterEqual(len(datasets), 4)
-        self._check_datasets(datasets)
-
-    def test_list_datasets_by_number_features(self):
-        datasets = openml.datasets.list_datasets(number_features="50..100")
-        self.assertGreaterEqual(len(datasets), 8)
-        self._check_datasets(datasets)
-
-    def test_list_datasets_by_number_classes(self):
-        datasets = openml.datasets.list_datasets(number_classes="5")
-        self.assertGreaterEqual(len(datasets), 3)
-        self._check_datasets(datasets)
-
-    def test_list_datasets_by_number_missing_values(self):
-        datasets = openml.datasets.list_datasets(number_missing_values="5..100")
-        self.assertGreaterEqual(len(datasets), 5)
-        self._check_datasets(datasets)
-
-    def test_list_datasets_combined_filters(self):
-        datasets = openml.datasets.list_datasets(
-            tag="study_14", number_instances="100..1000", number_missing_values="800..1000"
-        )
-        self.assertGreaterEqual(len(datasets), 1)
-        self._check_datasets(datasets)
 
     def test_list_datasets_paginate(self):
         size = 10
@@ -169,11 +123,10 @@ class TestOpenMLDataset(TestBase):
             self._check_datasets(datasets)
 
     def test_list_datasets_empty(self):
-        datasets = openml.datasets.list_datasets(tag="NoOneWouldUseThisTagAnyway")
-        if len(datasets) > 0:
-            raise ValueError("UnitTest Outdated, tag was already used (please remove)")
-
-        self.assertIsInstance(datasets, dict)
+        datasets = openml.datasets.list_datasets(
+            tag="NoOneWouldUseThisTagAnyway", output_format="dataframe"
+        )
+        self.assertTrue(datasets.empty)
 
     def test_check_datasets_active(self):
         # Have to test on live because there is no deactivated dataset on the test server.
@@ -187,7 +140,7 @@ class TestOpenMLDataset(TestBase):
         self.assertIsNone(active.get(79))
         self.assertRaisesRegex(
             ValueError,
-            "Could not find dataset 79 in OpenML dataset list.",
+            r"Could not find dataset\(s\) 79 in OpenML dataset list.",
             openml.datasets.check_datasets_active,
             [79],
         )
@@ -256,7 +209,7 @@ class TestOpenMLDataset(TestBase):
         openml.config.server = self.production_server
         self.assertRaisesRegex(
             ValueError,
-            "Multiple active datasets exist with name iris",
+            "Multiple active datasets exist with name 'iris'.",
             openml.datasets.functions._name_to_id,
             dataset_name="iris",
             error_if_multiple=True,
@@ -266,7 +219,7 @@ class TestOpenMLDataset(TestBase):
         """With multiple active datasets, retrieve the least recent active."""
         self.assertRaisesRegex(
             RuntimeError,
-            "No active datasets exist with name does_not_exist",
+            "No active datasets exist with name 'does_not_exist'.",
             openml.datasets.functions._name_to_id,
             dataset_name="does_not_exist",
         )
@@ -275,7 +228,7 @@ class TestOpenMLDataset(TestBase):
         """With multiple active datasets, retrieve the least recent active."""
         self.assertRaisesRegex(
             RuntimeError,
-            "No active datasets exist with name iris and version 100000",
+            "No active datasets exist with name 'iris' and version '100000'.",
             openml.datasets.functions._name_to_id,
             dataset_name="iris",
             version=100000,
@@ -421,7 +374,7 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(os.path.exists(description_xml_path))
 
     def test__getarff_path_dataset_arff(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config.set_root_cache_directory(self.static_cache_dir)
         description = _get_dataset_description(self.workdir, 2)
         arff_path = _get_dataset_arff(description, cache_directory=self.workdir)
         self.assertIsInstance(arff_path, str)
@@ -495,7 +448,7 @@ class TestOpenMLDataset(TestBase):
 
     @mock.patch("openml._api_calls._download_minio_file")
     def test__get_dataset_parquet_is_cached(self, patch):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config.set_root_cache_directory(self.static_cache_dir)
         patch.side_effect = RuntimeError(
             "_download_minio_file should not be called when loading from cache"
         )
@@ -547,8 +500,58 @@ class TestOpenMLDataset(TestBase):
         self.assertTrue(os.path.exists(qualities_xml_path))
 
     def test__get_dataset_skip_download(self):
-        qualities = openml.datasets.get_dataset(2, download_qualities=False).qualities
-        self.assertIsNone(qualities)
+        dataset = openml.datasets.get_dataset(
+            2, download_qualities=False, download_features_meta_data=False
+        )
+        # Internal representation without lazy loading
+        self.assertIsNone(dataset._qualities)
+        self.assertIsNone(dataset._features)
+        # External representation with lazy loading
+        self.assertIsNotNone(dataset.qualities)
+        self.assertIsNotNone(dataset.features)
+
+    def test_get_dataset_force_refresh_cache(self):
+        did_cache_dir = _create_cache_directory_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            2,
+        )
+        openml.datasets.get_dataset(2)
+        change_time = os.stat(did_cache_dir).st_mtime
+
+        # Test default
+        openml.datasets.get_dataset(2)
+        self.assertEqual(change_time, os.stat(did_cache_dir).st_mtime)
+
+        # Test refresh
+        openml.datasets.get_dataset(2, force_refresh_cache=True)
+        self.assertNotEqual(change_time, os.stat(did_cache_dir).st_mtime)
+
+        # Final clean up
+        openml.utils._remove_cache_dir_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            did_cache_dir,
+        )
+
+    def test_get_dataset_force_refresh_cache_clean_start(self):
+        did_cache_dir = _create_cache_directory_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            2,
+        )
+        # Clean up
+        openml.utils._remove_cache_dir_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            did_cache_dir,
+        )
+
+        # Test clean start
+        openml.datasets.get_dataset(2, force_refresh_cache=True)
+        self.assertTrue(os.path.exists(did_cache_dir))
+
+        # Final clean up
+        openml.utils._remove_cache_dir_for_id(
+            DATASETS_CACHE_DIR_NAME,
+            did_cache_dir,
+        )
 
     def test_deletion_of_cache_dir(self):
         # Simple removal
@@ -595,7 +598,7 @@ class TestOpenMLDataset(TestBase):
         self.assertIsInstance(dataset.dataset_id, int)
 
     def test__retrieve_class_labels(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config.set_root_cache_directory(self.static_cache_dir)
         labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels()
         self.assertEqual(labels, ["1", "2", "3", "4", "5", "U"])
         labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels(
@@ -604,7 +607,6 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(labels, ["C", "H", "G"])
 
     def test_upload_dataset_with_url(self):
-
         dataset = OpenMLDataset(
             "%s-UploadTestWithURL" % self._get_sentinel(),
             "test",
@@ -618,6 +620,18 @@ class TestOpenMLDataset(TestBase):
             "collected from {}: {}".format(__file__.split("/")[-1], dataset.dataset_id)
         )
         self.assertIsInstance(dataset.dataset_id, int)
+
+    def _assert_status_of_dataset(self, *, did: int, status: str):
+        """Asserts there is exactly one dataset with id `did` and its current status is `status`"""
+        # need to use listing fn, as this is immune to cache
+        result = openml.datasets.list_datasets(
+            data_id=[did], status="all", output_format="dataframe"
+        )
+        result = result.to_dict(orient="index")
+        # I think we should drop the test that one result is returned,
+        # the server should never return multiple results?
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[did]["status"], status)
 
     @pytest.mark.flaky()
     def test_data_status(self):
@@ -638,26 +652,17 @@ class TestOpenMLDataset(TestBase):
         openml.config.apikey = "d488d8afd93b32331cf6ea9d7003d4c3"
 
         openml.datasets.status_update(did, "active")
-        # need to use listing fn, as this is immune to cache
-        result = openml.datasets.list_datasets(data_id=[did], status="all")
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[did]["status"], "active")
+        self._assert_status_of_dataset(did=did, status="active")
+
         openml.datasets.status_update(did, "deactivated")
-        # need to use listing fn, as this is immune to cache
-        result = openml.datasets.list_datasets(data_id=[did], status="all")
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[did]["status"], "deactivated")
+        self._assert_status_of_dataset(did=did, status="deactivated")
+
         openml.datasets.status_update(did, "active")
-        # need to use listing fn, as this is immune to cache
-        result = openml.datasets.list_datasets(data_id=[did], status="all")
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[did]["status"], "active")
+        self._assert_status_of_dataset(did=did, status="active")
+
         with self.assertRaises(ValueError):
             openml.datasets.status_update(did, "in_preparation")
-        # need to use listing fn, as this is immune to cache
-        result = openml.datasets.list_datasets(data_id=[did], status="all")
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[did]["status"], "active")
+        self._assert_status_of_dataset(did=did, status="active")
 
     def test_attributes_arff_from_df(self):
         # DataFrame case
@@ -721,7 +726,6 @@ class TestOpenMLDataset(TestBase):
                 attributes_arff_from_df(df)
 
     def test_create_dataset_numpy(self):
-
         data = np.array([[1, 2, 3], [1.2, 2.5, 3.8], [2, 5, 8], [0, 1, 0]]).T
 
         attributes = [("col_{}".format(i), "REAL") for i in range(data.shape[1])]
@@ -757,7 +761,6 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(_get_online_dataset_format(dataset.id), "arff", "Wrong format for dataset")
 
     def test_create_dataset_list(self):
-
         data = [
             ["a", "sunny", 85.0, 85.0, "FALSE", "no"],
             ["b", "sunny", 80.0, 90.0, "TRUE", "no"],
@@ -814,7 +817,6 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(_get_online_dataset_format(dataset.id), "arff", "Wrong format for dataset")
 
     def test_create_dataset_sparse(self):
-
         # test the scipy.sparse.coo_matrix
         sparse_data = scipy.sparse.coo_matrix(
             ([0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1]))
@@ -892,7 +894,6 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test_create_invalid_dataset(self):
-
         data = [
             "sunny",
             "overcast",
@@ -956,7 +957,6 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test_get_online_dataset_format(self):
-
         # Phoneme dataset
         dataset_id = 77
         dataset = openml.datasets.get_dataset(dataset_id, download_data=False)
@@ -1411,8 +1411,13 @@ class TestOpenMLDataset(TestBase):
         self.assertEqual(len(attribute_names), X.shape[1])
 
     def test_get_dataset_cache_format_feather(self):
-
+        # This test crashed due to using the parquet file by default, which is downloaded
+        # from minio. However, there is a mismatch between OpenML test server and minio IDs.
+        # The parquet file on minio with ID 128 is not the iris dataset from the test server.
         dataset = openml.datasets.get_dataset(128, cache_format="feather")
+        # Workaround
+        dataset._minio_url = None
+        dataset.parquet_file = None
         dataset.get_data()
 
         # Check if dataset is written to cache directory using feather
@@ -1559,6 +1564,17 @@ class TestOpenMLDataset(TestBase):
         self.assertIsNotNone(dataset._minio_url)
         self.assertIsNotNone(dataset.parquet_file)
         self.assertTrue(os.path.isfile(dataset.parquet_file))
+
+    def test_list_datasets_with_high_size_parameter(self):
+        # Testing on prod since concurrent deletion of uploded datasets make the test fail
+        openml.config.server = self.production_server
+
+        datasets_a = openml.datasets.list_datasets(output_format="dataframe")
+        datasets_b = openml.datasets.list_datasets(output_format="dataframe", size=np.inf)
+
+        # Reverting to test server
+        openml.config.server = self.test_server
+        self.assertEqual(len(datasets_a), len(datasets_b))
 
 
 @pytest.mark.parametrize(
@@ -1809,3 +1825,76 @@ def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key)
         {"params": {"api_key": test_api_key}},
     ]
     assert expected_call_args == list(mock_delete.call_args)
+
+
+def _assert_datasets_have_id_and_valid_status(datasets: pd.DataFrame):
+    assert pd.api.types.is_integer_dtype(datasets["did"])
+    assert {"in_preparation", "active", "deactivated"} >= set(datasets["status"])
+
+
+@pytest.fixture(scope="module")
+def all_datasets():
+    return openml.datasets.list_datasets(output_format="dataframe")
+
+
+def test_list_datasets(all_datasets: pd.DataFrame):
+    # We can only perform a smoke test here because we test on dynamic
+    # data from the internet...
+    # 1087 as the number of datasets on openml.org
+    assert 100 <= len(all_datasets)
+    _assert_datasets_have_id_and_valid_status(all_datasets)
+
+
+def test_list_datasets_by_tag(all_datasets: pd.DataFrame):
+    tag_datasets = openml.datasets.list_datasets(tag="study_14", output_format="dataframe")
+    assert 0 < len(tag_datasets) < len(all_datasets)
+    _assert_datasets_have_id_and_valid_status(tag_datasets)
+
+
+def test_list_datasets_by_size():
+    datasets = openml.datasets.list_datasets(size=5, output_format="dataframe")
+    assert 5 == len(datasets)
+    _assert_datasets_have_id_and_valid_status(datasets)
+
+
+def test_list_datasets_by_number_instances(all_datasets: pd.DataFrame):
+    small_datasets = openml.datasets.list_datasets(
+        number_instances="5..100", output_format="dataframe"
+    )
+    assert 0 < len(small_datasets) <= len(all_datasets)
+    _assert_datasets_have_id_and_valid_status(small_datasets)
+
+
+def test_list_datasets_by_number_features(all_datasets: pd.DataFrame):
+    wide_datasets = openml.datasets.list_datasets(
+        number_features="50..100", output_format="dataframe"
+    )
+    assert 8 <= len(wide_datasets) < len(all_datasets)
+    _assert_datasets_have_id_and_valid_status(wide_datasets)
+
+
+def test_list_datasets_by_number_classes(all_datasets: pd.DataFrame):
+    five_class_datasets = openml.datasets.list_datasets(
+        number_classes="5", output_format="dataframe"
+    )
+    assert 3 <= len(five_class_datasets) < len(all_datasets)
+    _assert_datasets_have_id_and_valid_status(five_class_datasets)
+
+
+def test_list_datasets_by_number_missing_values(all_datasets: pd.DataFrame):
+    na_datasets = openml.datasets.list_datasets(
+        number_missing_values="5..100", output_format="dataframe"
+    )
+    assert 5 <= len(na_datasets) < len(all_datasets)
+    _assert_datasets_have_id_and_valid_status(na_datasets)
+
+
+def test_list_datasets_combined_filters(all_datasets: pd.DataFrame):
+    combined_filter_datasets = openml.datasets.list_datasets(
+        tag="study_14",
+        number_instances="100..1000",
+        number_missing_values="800..1000",
+        output_format="dataframe",
+    )
+    assert 1 <= len(combined_filter_datasets) < len(all_datasets)
+    _assert_datasets_have_id_and_valid_status(combined_filter_datasets)

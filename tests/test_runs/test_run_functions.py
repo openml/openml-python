@@ -635,7 +635,6 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn
     def test_run_and_upload_pipeline_dummy_pipeline(self):
-
         pipeline1 = Pipeline(
             steps=[
                 ("scaler", StandardScaler(with_mean=False)),
@@ -718,7 +717,6 @@ class TestRun(TestBase):
     )
     @mock.patch("warnings.warn")
     def test_run_and_upload_knn_pipeline(self, warnings_mock):
-
         cat_imp = make_pipeline(
             SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore")
         )
@@ -935,7 +933,6 @@ class TestRun(TestBase):
         self.assertEqual(modelR[-1].cv.random_state, 62501)
 
     def _test_local_evaluations(self, run):
-
         # compare with the scores in user defined measures
         accuracy_scores_provided = []
         for rep in run.fold_evaluations["predictive_accuracy"].keys():
@@ -990,7 +987,6 @@ class TestRun(TestBase):
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     def test_local_run_swapped_parameter_order_flow(self):
-
         # construct sci-kit learn classifier
         clf = Pipeline(
             steps=[
@@ -1020,7 +1016,6 @@ class TestRun(TestBase):
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     def test_local_run_metric_score(self):
-
         # construct sci-kit learn classifier
         clf = Pipeline(
             steps=[
@@ -1371,17 +1366,14 @@ class TestRun(TestBase):
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
-        runs = openml.runs.list_runs(id=[2], show_errors=True)
+        runs = openml.runs.list_runs(id=[2], show_errors=True, output_format="dataframe")
         self.assertEqual(len(runs), 1)
-        for rid in runs:
-            self._check_run(runs[rid])
+        for run in runs.to_dict(orient="index").values():
+            self._check_run(run)
 
     def test_list_runs_empty(self):
-        runs = openml.runs.list_runs(task=[0])
-        if len(runs) > 0:
-            raise ValueError("UnitTest Outdated, got somehow results")
-
-        self.assertIsInstance(runs, dict)
+        runs = openml.runs.list_runs(task=[0], output_format="dataframe")
+        assert runs.empty
 
     def test_list_runs_output_format(self):
         runs = openml.runs.list_runs(size=1000, output_format="dataframe")
@@ -1391,19 +1383,19 @@ class TestRun(TestBase):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
         task_ids = [20]
-        runs = openml.runs.list_runs(task=task_ids)
+        runs = openml.runs.list_runs(task=task_ids, output_format="dataframe")
         self.assertGreaterEqual(len(runs), 590)
-        for rid in runs:
-            self.assertIn(runs[rid]["task_id"], task_ids)
-            self._check_run(runs[rid])
+        for run in runs.to_dict(orient="index").values():
+            self.assertIn(run["task_id"], task_ids)
+            self._check_run(run)
         num_runs = len(runs)
 
         task_ids.append(21)
-        runs = openml.runs.list_runs(task=task_ids)
+        runs = openml.runs.list_runs(task=task_ids, output_format="dataframe")
         self.assertGreaterEqual(len(runs), num_runs + 1)
-        for rid in runs:
-            self.assertIn(runs[rid]["task_id"], task_ids)
-            self._check_run(runs[rid])
+        for run in runs.to_dict(orient="index").values():
+            self.assertIn(run["task_id"], task_ids)
+            self._check_run(run)
 
     def test_get_runs_list_by_uploader(self):
         # TODO: comes from live, no such lists on test
@@ -1411,38 +1403,38 @@ class TestRun(TestBase):
         # 29 is Dominik Kirchhoff
         uploader_ids = [29]
 
-        runs = openml.runs.list_runs(uploader=uploader_ids)
+        runs = openml.runs.list_runs(uploader=uploader_ids, output_format="dataframe")
         self.assertGreaterEqual(len(runs), 2)
-        for rid in runs:
-            self.assertIn(runs[rid]["uploader"], uploader_ids)
-            self._check_run(runs[rid])
+        for run in runs.to_dict(orient="index").values():
+            self.assertIn(run["uploader"], uploader_ids)
+            self._check_run(run)
         num_runs = len(runs)
 
         uploader_ids.append(274)
 
-        runs = openml.runs.list_runs(uploader=uploader_ids)
+        runs = openml.runs.list_runs(uploader=uploader_ids, output_format="dataframe")
         self.assertGreaterEqual(len(runs), num_runs + 1)
-        for rid in runs:
-            self.assertIn(runs[rid]["uploader"], uploader_ids)
-            self._check_run(runs[rid])
+        for run in runs.to_dict(orient="index").values():
+            self.assertIn(run["uploader"], uploader_ids)
+            self._check_run(run)
 
     def test_get_runs_list_by_flow(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
         flow_ids = [1154]
-        runs = openml.runs.list_runs(flow=flow_ids)
+        runs = openml.runs.list_runs(flow=flow_ids, output_format="dataframe")
         self.assertGreaterEqual(len(runs), 1)
-        for rid in runs:
-            self.assertIn(runs[rid]["flow_id"], flow_ids)
-            self._check_run(runs[rid])
+        for run in runs.to_dict(orient="index").values():
+            self.assertIn(run["flow_id"], flow_ids)
+            self._check_run(run)
         num_runs = len(runs)
 
         flow_ids.append(1069)
-        runs = openml.runs.list_runs(flow=flow_ids)
+        runs = openml.runs.list_runs(flow=flow_ids, output_format="dataframe")
         self.assertGreaterEqual(len(runs), num_runs + 1)
-        for rid in runs:
-            self.assertIn(runs[rid]["flow_id"], flow_ids)
-            self._check_run(runs[rid])
+        for run in runs.to_dict(orient="index").values():
+            self.assertIn(run["flow_id"], flow_ids)
+            self._check_run(run)
 
     def test_get_runs_pagination(self):
         # TODO: comes from live, no such lists on test
@@ -1451,10 +1443,12 @@ class TestRun(TestBase):
         size = 10
         max = 100
         for i in range(0, max, size):
-            runs = openml.runs.list_runs(offset=i, size=size, uploader=uploader_ids)
+            runs = openml.runs.list_runs(
+                offset=i, size=size, uploader=uploader_ids, output_format="dataframe"
+            )
             self.assertGreaterEqual(size, len(runs))
-            for rid in runs:
-                self.assertIn(runs[rid]["uploader"], uploader_ids)
+            for run in runs.to_dict(orient="index").values():
+                self.assertIn(run["uploader"], uploader_ids)
 
     def test_get_runs_list_by_filters(self):
         # TODO: comes from live, no such lists on test
@@ -1473,25 +1467,28 @@ class TestRun(TestBase):
         # self.assertRaises(openml.exceptions.OpenMLServerError,
         # openml.runs.list_runs)
 
-        runs = openml.runs.list_runs(id=ids)
+        runs = openml.runs.list_runs(id=ids, output_format="dataframe")
         self.assertEqual(len(runs), 2)
 
-        runs = openml.runs.list_runs(task=tasks)
+        runs = openml.runs.list_runs(task=tasks, output_format="dataframe")
         self.assertGreaterEqual(len(runs), 2)
 
-        runs = openml.runs.list_runs(uploader=uploaders_2)
+        runs = openml.runs.list_runs(uploader=uploaders_2, output_format="dataframe")
         self.assertGreaterEqual(len(runs), 10)
 
-        runs = openml.runs.list_runs(flow=flows)
+        runs = openml.runs.list_runs(flow=flows, output_format="dataframe")
         self.assertGreaterEqual(len(runs), 100)
 
-        runs = openml.runs.list_runs(id=ids, task=tasks, uploader=uploaders_1)
+        runs = openml.runs.list_runs(
+            id=ids, task=tasks, uploader=uploaders_1, output_format="dataframe"
+        )
+        self.assertEqual(len(runs), 2)
 
     def test_get_runs_list_by_tag(self):
         # TODO: comes from live, no such lists on test
         # Unit test works on production server only
         openml.config.server = self.production_server
-        runs = openml.runs.list_runs(tag="curves")
+        runs = openml.runs.list_runs(tag="curves", output_format="dataframe")
         self.assertGreaterEqual(len(runs), 1)
 
     @pytest.mark.sklearn
@@ -1574,11 +1571,11 @@ class TestRun(TestBase):
             self.assertEqual(len(row), 12)
 
     def test_get_cached_run(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config.set_root_cache_directory(self.static_cache_dir)
         openml.runs.functions._get_cached_run(1)
 
     def test_get_uncached_run(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config.set_root_cache_directory(self.static_cache_dir)
         with self.assertRaises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)
 

@@ -2,8 +2,6 @@ import os
 import tempfile
 import unittest.mock
 
-import numpy as np
-
 import openml
 from openml.testing import TestBase
 
@@ -18,6 +16,28 @@ class OpenMLTaskTest(TestBase):
 
     def test_list_all(self):
         openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
+        openml.utils._list_all(
+            listing_call=openml.tasks.functions._list_tasks, output_format="dataframe"
+        )
+
+    def test_list_all_with_multiple_batches(self):
+        res = openml.utils._list_all(
+            listing_call=openml.tasks.functions._list_tasks, output_format="dict", batch_size=1050
+        )
+        # Verify that test server state is still valid for this test to work as intended
+        #  -> If the number of results is less than 1050, the test can not test the
+        #  batching operation. By having more than 1050 results we know that batching
+        # was triggered. 1050 appears to be a number of tasks that is available on a fresh
+        # test server.
+        assert len(res) > 1050
+        openml.utils._list_all(
+            listing_call=openml.tasks.functions._list_tasks,
+            output_format="dataframe",
+            batch_size=1050,
+        )
+        # Comparing the number of tasks is not possible as other unit tests running in
+        # parallel might be adding or removing tasks!
+        # assert len(res) <= len(res2)
 
     @unittest.mock.patch("openml._api_calls._perform_api_call", side_effect=mocked_perform_api_call)
     def test_list_all_few_results_available(self, _perform_api_call):
@@ -25,40 +45,34 @@ class OpenMLTaskTest(TestBase):
         # Although we have multiple versions of the iris dataset, there is only
         # one with this name/version combination
 
-        datasets = openml.datasets.list_datasets(size=1000, data_name="iris", data_version=1)
+        datasets = openml.datasets.list_datasets(
+            size=1000, data_name="iris", data_version=1, output_format="dataframe"
+        )
         self.assertEqual(len(datasets), 1)
         self.assertEqual(_perform_api_call.call_count, 1)
 
     def test_list_all_for_datasets(self):
         required_size = 127  # default test server reset value
-        datasets = openml.datasets.list_datasets(batch_size=100, size=required_size)
+        datasets = openml.datasets.list_datasets(
+            batch_size=100, size=required_size, output_format="dataframe"
+        )
 
         self.assertEqual(len(datasets), required_size)
-        for did in datasets:
-            self._check_dataset(datasets[did])
-
-    def test_list_datasets_with_high_size_parameter(self):
-        # Testing on prod since concurrent deletion of uploded datasets make the test fail
-        openml.config.server = self.production_server
-
-        datasets_a = openml.datasets.list_datasets()
-        datasets_b = openml.datasets.list_datasets(size=np.inf)
-
-        # Reverting to test server
-        openml.config.server = self.test_server
-
-        self.assertEqual(len(datasets_a), len(datasets_b))
+        for dataset in datasets.to_dict(orient="index").values():
+            self._check_dataset(dataset)
 
     def test_list_all_for_tasks(self):
         required_size = 1068  # default test server reset value
-        tasks = openml.tasks.list_tasks(batch_size=1000, size=required_size)
-
+        tasks = openml.tasks.list_tasks(
+            batch_size=1000, size=required_size, output_format="dataframe"
+        )
         self.assertEqual(len(tasks), required_size)
 
     def test_list_all_for_flows(self):
         required_size = 15  # default test server reset value
-        flows = openml.flows.list_flows(batch_size=25, size=required_size)
-
+        flows = openml.flows.list_flows(
+            batch_size=25, size=required_size, output_format="dataframe"
+        )
         self.assertEqual(len(flows), required_size)
 
     def test_list_all_for_setups(self):

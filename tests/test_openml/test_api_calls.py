@@ -10,7 +10,7 @@ class TestConfig(openml.testing.TestBase):
             openml.exceptions.OpenMLServerError,
             "URI too long!",
         ):
-            openml.datasets.list_datasets(data_id=list(range(10000)))
+            openml.datasets.list_datasets(data_id=list(range(10000)), output_format="dataframe")
 
     @unittest.mock.patch("time.sleep")
     @unittest.mock.patch("requests.Session")

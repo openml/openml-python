@@ -48,11 +48,11 @@ class TestFlowFunctions(TestBase):
         openml.config.server = self.production_server
         # We can only perform a smoke test here because we test on dynamic
         # data from the internet...
-        flows = openml.flows.list_flows()
+        flows = openml.flows.list_flows(output_format="dataframe")
         # 3000 as the number of flows on openml.org
         self.assertGreaterEqual(len(flows), 1500)
-        for fid in flows:
-            self._check_flow(flows[fid])
+        for flow in flows.to_dict(orient="index").values():
+            self._check_flow(flow)
 
     def test_list_flows_output_format(self):
         openml.config.server = self.production_server
@@ -64,28 +64,25 @@ class TestFlowFunctions(TestBase):
 
     def test_list_flows_empty(self):
         openml.config.server = self.production_server
-        flows = openml.flows.list_flows(tag="NoOneEverUsesThisTag123")
-        if len(flows) > 0:
-            raise ValueError("UnitTest Outdated, got somehow results (please adapt)")
-
-        self.assertIsInstance(flows, dict)
+        flows = openml.flows.list_flows(tag="NoOneEverUsesThisTag123", output_format="dataframe")
+        assert flows.empty
 
     def test_list_flows_by_tag(self):
         openml.config.server = self.production_server
-        flows = openml.flows.list_flows(tag="weka")
+        flows = openml.flows.list_flows(tag="weka", output_format="dataframe")
         self.assertGreaterEqual(len(flows), 5)
-        for did in flows:
-            self._check_flow(flows[did])
+        for flow in flows.to_dict(orient="index").values():
+            self._check_flow(flow)
 
     def test_list_flows_paginate(self):
         openml.config.server = self.production_server
         size = 10
         maximum = 100
         for i in range(0, maximum, size):
-            flows = openml.flows.list_flows(offset=i, size=size)
+            flows = openml.flows.list_flows(offset=i, size=size, output_format="dataframe")
             self.assertGreaterEqual(size, len(flows))
-            for did in flows:
-                self._check_flow(flows[did])
+            for flow in flows.to_dict(orient="index").values():
+                self._check_flow(flow)
 
     def test_are_flows_equal(self):
         flow = openml.flows.OpenMLFlow(

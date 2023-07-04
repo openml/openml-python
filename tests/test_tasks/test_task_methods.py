@@ -17,18 +17,18 @@ class OpenMLTaskMethodsTest(TestBase):
     def test_tagging(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         tag = "testing_tag_{}_{}".format(self.id(), time())
-        task_list = openml.tasks.list_tasks(tag=tag)
-        self.assertEqual(len(task_list), 0)
+        tasks = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
+        self.assertEqual(len(tasks), 0)
         task.push_tag(tag)
-        task_list = openml.tasks.list_tasks(tag=tag)
-        self.assertEqual(len(task_list), 1)
-        self.assertIn(1, task_list)
+        tasks = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
+        self.assertEqual(len(tasks), 1)
+        self.assertIn(1, tasks["tid"])
         task.remove_tag(tag)
-        task_list = openml.tasks.list_tasks(tag=tag)
-        self.assertEqual(len(task_list), 0)
+        tasks = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
+        self.assertEqual(len(tasks), 0)
 
     def test_get_train_and_test_split_indices(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config.set_root_cache_directory(self.static_cache_dir)
         task = openml.tasks.get_task(1882)
         train_indices, test_indices = task.get_train_test_split_indices(0, 0)
         self.assertEqual(16, train_indices[0])

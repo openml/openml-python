@@ -166,7 +166,7 @@ class Extension(ABC):
         y_train: Optional[np.ndarray] = None,
         X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix]] = None,
     ) -> Tuple[np.ndarray, np.ndarray, "OrderedDict[str, float]", Optional["OpenMLRunTrace"]]:
-        """Run a model on a repeat,fold,subsample triplet of the task and return prediction information.
+        """Run a model on a repeat, fold, subsample triplet of the task.
 
         Returns the data that is necessary to construct the OpenML Run object. Is used by
         :func:`openml.runs.run_flow_on_task`.

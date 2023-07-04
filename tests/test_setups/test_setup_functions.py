@@ -54,7 +54,6 @@ class TestSetupFunctions(TestBase):
         self.assertFalse(setup_id)
 
     def _existing_setup_exists(self, classif):
-
         flow = self.extension.model_to_flow(classif)
         flow.name = "TEST%s%s" % (get_sentinel(), flow.name)
         flow.publish()
@@ -163,7 +162,9 @@ class TestSetupFunctions(TestBase):
         self.assertIsInstance(setups, pd.DataFrame)
         self.assertEqual(len(setups), 10)
 
-        setups = openml.setups.list_setups(flow=flow_id, output_format="dict", size=10)
+        # TODO: [0.15] Remove section as `dict` is no longer supported.
+        with pytest.warns(FutureWarning):
+            setups = openml.setups.list_setups(flow=flow_id, output_format="dict", size=10)
         self.assertIsInstance(setups, Dict)
         self.assertIsInstance(setups[list(setups.keys())[0]], Dict)
         self.assertEqual(len(setups), 10)
@@ -183,10 +184,10 @@ class TestSetupFunctions(TestBase):
         self.assertEqual(len(all), size * 2)
 
     def test_get_cached_setup(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config.set_root_cache_directory(self.static_cache_dir)
         openml.setups.functions._get_cached_setup(1)
 
     def test_get_uncached_setup(self):
-        openml.config.cache_directory = self.static_cache_dir
+        openml.config.set_root_cache_directory(self.static_cache_dir)
         with self.assertRaises(openml.exceptions.OpenMLCacheException):
             openml.setups.functions._get_cached_setup(10)

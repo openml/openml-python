@@ -1,5 +1,5 @@
 # License: BSD 3-Clause
-
+import warnings
 from abc import ABC
 from collections import OrderedDict
 from enum import Enum
@@ -58,7 +58,6 @@ class OpenMLTask(OpenMLBase):
         evaluation_measure: Optional[str] = None,
         data_splits_url: Optional[str] = None,
     ):
-
         self.task_id = int(task_id) if task_id is not None else None
         self.task_type_id = task_type_id
         self.task_type = task_type
@@ -83,11 +82,11 @@ class OpenMLTask(OpenMLBase):
 
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
         """Collect all information to display in the __repr__ body."""
-        fields = {
+        fields: Dict[str, Any] = {
             "Task Type Description": "{}/tt/{}".format(
                 openml.config.get_server_base_url(), self.task_type_id
             )
-        }  # type: Dict[str, Any]
+        }
         if self.task_id is not None:
             fields["Task ID"] = self.task_id
             fields["Task URL"] = self.openml_url
@@ -125,7 +124,6 @@ class OpenMLTask(OpenMLBase):
         repeat: int = 0,
         sample: int = 0,
     ) -> Tuple[np.ndarray, np.ndarray]:
-
         # Replace with retrieve from cache
         if self.split is None:
             self.split = self.download_split()
@@ -165,7 +163,6 @@ class OpenMLTask(OpenMLBase):
         return split
 
     def get_split_dimensions(self) -> Tuple[int, int, int]:
-
         if self.split is None:
             self.split = self.download_split()
 
@@ -259,6 +256,16 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         tuple - X and y
 
         """
+        # TODO: [0.15]
+        if dataset_format == "array":
+            warnings.warn(
+                "Support for `dataset_format='array'` will be removed in 0.15,"
+                "start using `dataset_format='dataframe' to ensure your code "
+                "will continue to work. You can use the dataframe's `to_numpy` "
+                "function to continue using numpy arrays.",
+                category=FutureWarning,
+                stacklevel=2,
+            )
         dataset = self.get_dataset()
         if self.task_type_id not in (
             TaskType.SUPERVISED_CLASSIFICATION,
@@ -273,7 +280,6 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         return X, y
 
     def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
-
         task_container = super(OpenMLSupervisedTask, self)._to_dict()
         task_dict = task_container["oml:task_inputs"]
 
@@ -285,7 +291,6 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
     @property
     def estimation_parameters(self):
-
         warn(
             "The estimation_parameters attribute will be "
             "deprecated in the future, please use "
@@ -296,7 +301,6 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
     @estimation_parameters.setter
     def estimation_parameters(self, est_parameters):
-
         self.estimation_procedure["parameters"] = est_parameters
 
 
@@ -324,7 +328,6 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
         class_labels: Optional[List[str]] = None,
         cost_matrix: Optional[np.ndarray] = None,
     ):
-
         super(OpenMLClassificationTask, self).__init__(
             task_id=task_id,
             task_type_id=task_type_id,
@@ -436,7 +439,6 @@ class OpenMLClusteringTask(OpenMLTask):
         return data
 
     def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
-
         task_container = super(OpenMLClusteringTask, self)._to_dict()
 
         # Right now, it is not supported as a feature.

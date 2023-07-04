@@ -277,7 +277,7 @@ def update_study_status(study_id: int, status: str) -> None:
     legal_status = {"active", "deactivated"}
     if status not in legal_status:
         raise ValueError("Illegal status value. " "Legal values: %s" % legal_status)
-    data = {"study_id": study_id, "status": status}
+    data = {"study_id": study_id, "status": status}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call("study/status/update", "post", data=data)
     result = xmltodict.parse(result_xml)
     server_study_id = result["oml:study_status_update"]["oml:id"]
@@ -357,8 +357,10 @@ def attach_to_study(study_id: int, run_ids: List[int]) -> int:
 
     # Interestingly, there's no need to tell the server about the entity type, it knows by itself
     uri = "study/%d/attach" % study_id
-    post_variables = {"ids": ",".join(str(x) for x in run_ids)}
-    result_xml = openml._api_calls._perform_api_call(uri, "post", post_variables)
+    post_variables = {"ids": ",".join(str(x) for x in run_ids)}  # type: openml._api_calls.DATA_TYPE
+    result_xml = openml._api_calls._perform_api_call(
+        call=uri, request_method="post", data=post_variables
+    )
     result = xmltodict.parse(result_xml)["oml:study_attach"]
     return int(result["oml:linked_entities"])
 
@@ -400,8 +402,10 @@ def detach_from_study(study_id: int, run_ids: List[int]) -> int:
 
     # Interestingly, there's no need to tell the server about the entity type, it knows by itself
     uri = "study/%d/detach" % study_id
-    post_variables = {"ids": ",".join(str(x) for x in run_ids)}
-    result_xml = openml._api_calls._perform_api_call(uri, "post", post_variables)
+    post_variables = {"ids": ",".join(str(x) for x in run_ids)}  # type: openml._api_calls.DATA_TYPE
+    result_xml = openml._api_calls._perform_api_call(
+        call=uri, request_method="post", data=post_variables
+    )
     result = xmltodict.parse(result_xml)["oml:study_detach"]
     return int(result["oml:linked_entities"])
 
@@ -459,6 +463,14 @@ def list_suites(
         raise ValueError(
             "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
         )
+    # TODO: [0.15]
+    if output_format == "dict":
+        msg = (
+            "Support for `output_format` of 'dict' will be removed in 0.15 "
+            "and pandas dataframes will be returned instead. To ensure your code "
+            "will continue to work, use `output_format`='dataframe'."
+        )
+        warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
     return openml.utils._list_all(
         output_format=output_format,
@@ -532,6 +544,14 @@ def list_studies(
         raise ValueError(
             "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
         )
+    # TODO: [0.15]
+    if output_format == "dict":
+        msg = (
+            "Support for `output_format` of 'dict' will be removed in 0.15 "
+            "and pandas dataframes will be returned instead. To ensure your code "
+            "will continue to work, use `output_format`='dataframe'."
+        )
+        warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
     return openml.utils._list_all(
         output_format=output_format,

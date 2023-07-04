@@ -73,7 +73,6 @@ class BaseStudy(OpenMLBase):
         runs: Optional[List[int]],
         setups: Optional[List[int]],
     ):
-
         self.study_id = study_id
         self.alias = alias
         self.main_entity_type = main_entity_type
@@ -100,11 +99,11 @@ class BaseStudy(OpenMLBase):
 
     def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
         """Collect all information to display in the __repr__ body."""
-        fields = {
+        fields: Dict[str, Any] = {
             "Name": self.name,
             "Status": self.status,
             "Main Entity Type": self.main_entity_type,
-        }  # type: Dict[str, Any]
+        }
         if self.study_id is not None:
             fields["ID"] = self.study_id
             fields["Study URL"] = self.openml_url

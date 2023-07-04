@@ -75,7 +75,7 @@ openml.config.start_using_configuration_for_example()
 
 # We'll take a random subset of at least ten tasks of all available tasks on
 # the test server:
-all_tasks = list(openml.tasks.list_tasks().keys())
+all_tasks = list(openml.tasks.list_tasks(output_format="dataframe")["tid"])
 task_ids_for_suite = sorted(np.random.choice(all_tasks, replace=False, size=20))
 
 # The study needs a machine-readable and unique alias. To obtain this,

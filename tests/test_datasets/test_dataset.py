@@ -176,14 +176,14 @@ class OpenMLDatasetTest(TestBase):
         self.dataset.row_id_attribute = "condition"
         rval, _, categorical, _ = self.dataset.get_data(include_row_id=True)
         self.assertIsInstance(rval, pd.DataFrame)
-        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+        for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
             self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
 
         rval, _, categorical, _ = self.dataset.get_data()
         self.assertIsInstance(rval, pd.DataFrame)
-        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+        for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
             self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
@@ -202,7 +202,7 @@ class OpenMLDatasetTest(TestBase):
     def test_get_data_with_target_pandas(self):
         X, y, categorical, attribute_names = self.dataset.get_data(target="class")
         self.assertIsInstance(X, pd.DataFrame)
-        for (dtype, is_cat, col) in zip(X.dtypes, categorical, X):
+        for dtype, is_cat, col in zip(X.dtypes, categorical, X):
             self._check_expected_type(dtype, is_cat, X[col])
         self.assertIsInstance(y, pd.Series)
         self.assertEqual(y.dtype.name, "category")
@@ -227,13 +227,13 @@ class OpenMLDatasetTest(TestBase):
     def test_get_data_with_ignore_attributes(self):
         self.dataset.ignore_attribute = ["condition"]
         rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=True)
-        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+        for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
             self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 39))
         self.assertEqual(len(categorical), 39)
 
         rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=False)
-        for (dtype, is_cat, col) in zip(rval.dtypes, categorical, rval):
+        for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
             self._check_expected_type(dtype, is_cat, rval[col])
         self.assertEqual(rval.shape, (898, 38))
         self.assertEqual(len(categorical), 38)
@@ -262,6 +262,37 @@ class OpenMLDatasetTest(TestBase):
         self.assertIsInstance(xy, pd.DataFrame)
         self.assertEqual(xy.shape, (150, 5))
 
+    def test_lazy_loading_metadata(self):
+        # Initial Setup
+        did_cache_dir = openml.utils._create_cache_directory_for_id(
+            openml.datasets.functions.DATASETS_CACHE_DIR_NAME, 2
+        )
+        _compare_dataset = openml.datasets.get_dataset(
+            2, download_data=False, download_features_meta_data=True, download_qualities=True
+        )
+        change_time = os.stat(did_cache_dir).st_mtime
+
+        # Test with cache
+        _dataset = openml.datasets.get_dataset(
+            2, download_data=False, download_features_meta_data=False, download_qualities=False
+        )
+        self.assertEqual(change_time, os.stat(did_cache_dir).st_mtime)
+        self.assertEqual(_dataset.features, _compare_dataset.features)
+        self.assertEqual(_dataset.qualities, _compare_dataset.qualities)
+
+        # -- Test without cache
+        openml.utils._remove_cache_dir_for_id(
+            openml.datasets.functions.DATASETS_CACHE_DIR_NAME, did_cache_dir
+        )
+
+        _dataset = openml.datasets.get_dataset(
+            2, download_data=False, download_features_meta_data=False, download_qualities=False
+        )
+        self.assertEqual(["description.xml"], os.listdir(did_cache_dir))
+        self.assertNotEqual(change_time, os.stat(did_cache_dir).st_mtime)
+        self.assertEqual(_dataset.features, _compare_dataset.features)
+        self.assertEqual(_dataset.qualities, _compare_dataset.qualities)
+
 
 class OpenMLDatasetTestOnTestServer(TestBase):
     def setUp(self):
@@ -271,15 +302,15 @@ class OpenMLDatasetTestOnTestServer(TestBase):
 
     def test_tagging(self):
         tag = "testing_tag_{}_{}".format(self.id(), time())
-        ds_list = openml.datasets.list_datasets(tag=tag)
-        self.assertEqual(len(ds_list), 0)
+        datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
+        self.assertTrue(datasets.empty)
         self.dataset.push_tag(tag)
-        ds_list = openml.datasets.list_datasets(tag=tag)
-        self.assertEqual(len(ds_list), 1)
-        self.assertIn(125, ds_list)
+        datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
+        self.assertEqual(len(datasets), 1)
+        self.assertIn(125, datasets["did"])
         self.dataset.remove_tag(tag)
-        ds_list = openml.datasets.list_datasets(tag=tag)
-        self.assertEqual(len(ds_list), 0)
+        datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
+        self.assertTrue(datasets.empty)
 
 
 class OpenMLDatasetTestSparse(TestBase):

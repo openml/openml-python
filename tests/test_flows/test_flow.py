@@ -99,19 +99,19 @@ class TestFlow(TestBase):
                 self.assertEqual(subflow.flow_id, sub_flow_id)
 
     def test_tagging(self):
-        flow_list = openml.flows.list_flows(size=1)
-        flow_id = list(flow_list.keys())[0]
+        flows = openml.flows.list_flows(size=1, output_format="dataframe")
+        flow_id = flows["id"].iloc[0]
         flow = openml.flows.get_flow(flow_id)
         tag = "testing_tag_{}_{}".format(self.id(), time.time())
-        flow_list = openml.flows.list_flows(tag=tag)
-        self.assertEqual(len(flow_list), 0)
+        flows = openml.flows.list_flows(tag=tag, output_format="dataframe")
+        self.assertEqual(len(flows), 0)
         flow.push_tag(tag)
-        flow_list = openml.flows.list_flows(tag=tag)
-        self.assertEqual(len(flow_list), 1)
-        self.assertIn(flow_id, flow_list)
+        flows = openml.flows.list_flows(tag=tag, output_format="dataframe")
+        self.assertEqual(len(flows), 1)
+        self.assertIn(flow_id, flows["id"])
         flow.remove_tag(tag)
-        flow_list = openml.flows.list_flows(tag=tag)
-        self.assertEqual(len(flow_list), 0)
+        flows = openml.flows.list_flows(tag=tag, output_format="dataframe")
+        self.assertEqual(len(flows), 0)
 
     def test_from_xml_to_xml(self):
         # Get the raw xml thing

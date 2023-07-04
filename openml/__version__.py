@@ -3,4 +3,4 @@
 # License: BSD 3-Clause
 
 # The following line *must* be the last in the module, exactly as formatted:
-__version__ = "0.13.1"
+__version__ = "0.14.0"

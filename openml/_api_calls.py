@@ -11,7 +11,7 @@ import urllib.parse
 import xml
 import xmltodict
 from urllib3 import ProxyManager
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Tuple, Union
 import zipfile
 
 import minio
@@ -23,6 +23,9 @@ from .exceptions import (
     OpenMLServerNoResult,
     OpenMLHashException,
 )
+
+DATA_TYPE = Dict[str, Union[str, int]]
+FILE_ELEMENTS_TYPE = Dict[str, Union[str, Tuple[str, str]]]
 
 
 def resolve_env_proxies(url: str) -> Optional[str]:
@@ -54,7 +57,12 @@ def _create_url_from_endpoint(endpoint: str) -> str:
     return url.replace("=", "%3d")
 
 
-def _perform_api_call(call, request_method, data=None, file_elements=None):
+def _perform_api_call(
+    call: str,
+    request_method: str,
+    data: Optional[DATA_TYPE] = None,
+    file_elements: Optional[FILE_ELEMENTS_TYPE] = None,
+) -> str:
     """
     Perform an API call at the OpenML server.
 
@@ -76,8 +84,6 @@ def _perform_api_call(call, request_method, data=None, file_elements=None):
 
     Returns
     -------
-    return_code : int
-        HTTP return code
     return_value : str
         Return value of the OpenML server
     """
@@ -195,7 +201,7 @@ def _download_minio_bucket(
 def _download_text_file(
     source: str,
     output_path: Optional[str] = None,
-    md5_checksum: str = None,
+    md5_checksum: Optional[str] = None,
     exists_ok: bool = True,
     encoding: str = "utf8",
 ) -> Optional[str]:
@@ -257,7 +263,7 @@ def _download_text_file(
         return None
 
 
-def _file_id_to_url(file_id, filename=None):
+def _file_id_to_url(file_id: str, filename: Optional[str] = None) -> str:
     """
     Presents the URL how to download a given file id
     filename is optional
@@ -269,7 +275,9 @@ def _file_id_to_url(file_id, filename=None):
     return url
 
 
-def _read_url_files(url, data=None, file_elements=None):
+def _read_url_files(
+    url: str, data: Optional[DATA_TYPE] = None, file_elements: Optional[FILE_ELEMENTS_TYPE] = None
+) -> requests.Response:
     """do a post request to url with data
     and sending file_elements as files"""
 
@@ -288,7 +296,12 @@ def _read_url_files(url, data=None, file_elements=None):
     return response
 
 
-def __read_url(url, request_method, data=None, md5_checksum=None):
+def __read_url(
+    url: str,
+    request_method: str,
+    data: Optional[DATA_TYPE] = None,
+    md5_checksum: Optional[str] = None,
+) -> requests.Response:
     data = {} if data is None else data
     if config.apikey:
         data["api_key"] = config.apikey
@@ -306,10 +319,16 @@ def __is_checksum_equal(downloaded_file_binary: bytes, md5_checksum: Optional[st
     return md5_checksum == md5_checksum_download
 
 
-def _send_request(request_method, url, data, files=None, md5_checksum=None):
+def _send_request(
+    request_method: str,
+    url: str,
+    data: DATA_TYPE,
+    files: Optional[FILE_ELEMENTS_TYPE] = None,
+    md5_checksum: Optional[str] = None,
+) -> requests.Response:
     n_retries = max(1, config.connection_n_retries)
 
-    response = None
+    response: requests.Response
     with requests.Session() as session:
         # Start at one to have a non-zero multiplier for the sleep
         for retry_counter in range(1, n_retries + 1):
@@ -326,7 +345,6 @@ def _send_request(request_method, url, data, files=None, md5_checksum=None):
                 if request_method == "get" and not __is_checksum_equal(
                     response.text.encode("utf-8"), md5_checksum
                 ):
-
                     # -- Check if encoding is not UTF-8 perhaps
                     if __is_checksum_equal(response.content, md5_checksum):
                         raise OpenMLHashException(
@@ -381,12 +399,12 @@ def _send_request(request_method, url, data, files=None, md5_checksum=None):
 
                     delay = {"human": human, "robot": robot}[config.retry_policy](retry_counter)
                     time.sleep(delay)
-    if response is None:
-        raise ValueError("This should never happen!")
     return response
 
 
-def __check_response(response, url, file_elements):
+def __check_response(
+    response: requests.Response, url: str, file_elements: Optional[FILE_ELEMENTS_TYPE]
+) -> None:
     if response.status_code != 200:
         raise __parse_server_exception(response, url, file_elements=file_elements)
     elif (
@@ -398,7 +416,7 @@ def __check_response(response, url, file_elements):
 def __parse_server_exception(
     response: requests.Response,
     url: str,
-    file_elements: Dict,
+    file_elements: Optional[FILE_ELEMENTS_TYPE],
 ) -> OpenMLServerError:
     if response.status_code == 414:
         raise OpenMLServerError("URI too long! ({})".format(url))

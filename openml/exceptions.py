@@ -1,5 +1,7 @@
 # License: BSD 3-Clause
 
+from typing import Optional
+
 
 class PyOpenMLError(Exception):
     def __init__(self, message: str):
@@ -20,7 +22,7 @@ class OpenMLServerException(OpenMLServerError):
 
     # Code needs to be optional to allow the exception to be picklable:
     # https://stackoverflow.com/questions/16244923/how-to-make-a-custom-exception-class-with-multiple-init-args-pickleable  # noqa: E501
-    def __init__(self, message: str, code: int = None, url: str = None):
+    def __init__(self, message: str, code: Optional[int] = None, url: Optional[str] = None):
         self.message = message
         self.code = code
         self.url = url

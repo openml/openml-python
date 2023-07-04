@@ -1,11 +1,11 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 22.6.0
+    rev: 23.3.0
     hooks:
       - id: black
         args: [--line-length=100]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.961
+    rev: v1.4.1
     hooks:
       - id: mypy
         name: mypy openml
@@ -19,8 +19,16 @@ repos:
         additional_dependencies:
           - types-requests
           - types-python-dateutil
+      - id: mypy
+        name: mypy top-level-functions
+        files: openml/_api_calls.py
+        additional_dependencies:
+          - types-requests
+          - types-python-dateutil
+        args: [ --disallow-untyped-defs, --disallow-any-generics,
+                --disallow-any-explicit, --implicit-optional ]
   - repo: https://github.com/pycqa/flake8
-    rev: 4.0.1
+    rev: 6.0.0
     hooks:
       - id: flake8
         name: flake8 openml

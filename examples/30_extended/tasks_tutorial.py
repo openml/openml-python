@@ -29,27 +29,18 @@ import pandas as pd
 # Listing tasks
 # ^^^^^^^^^^^^^
 #
-# We will start by simply listing only *supervised classification* tasks:
-
-tasks = openml.tasks.list_tasks(task_type=TaskType.SUPERVISED_CLASSIFICATION)
-
-############################################################################
-# **openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, which we convert
-# into a
+# We will start by simply listing only *supervised classification* tasks.
+# **openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, but we
+# request a
 # `pandas dataframe <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
-# to have better visualization capabilities and easier access:
+# instead to have better visualization capabilities and easier access:
 
-tasks = pd.DataFrame.from_dict(tasks, orient="index")
+tasks = openml.tasks.list_tasks(
+    task_type=TaskType.SUPERVISED_CLASSIFICATION, output_format="dataframe"
+)
 print(tasks.columns)
 print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
-
-# As conversion to a pandas dataframe is a common task, we have added this functionality to the
-# OpenML-Python library which can be used by passing ``output_format='dataframe'``:
-tasks_df = openml.tasks.list_tasks(
-    task_type=TaskType.SUPERVISED_CLASSIFICATION, output_format="dataframe"
-)
-print(tasks_df.head())
 
 ############################################################################
 # We can filter the list of tasks to only contain datasets with more than
