@@ -225,14 +225,6 @@ And we can use the task listing functionality to learn more about them:
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
                                         count          mean  ...       75%       max
     tid                                  72.0  41849.305556  ...  42707.50  167141.0
     did                                  72.0  10472.263889  ...  10594.25   41027.0
@@ -296,7 +288,7 @@ because we upload some random data.
 
     # We'll take a random subset of at least ten tasks of all available tasks on
     # the test server:
-    all_tasks = list(openml.tasks.list_tasks().keys())
+    all_tasks = list(openml.tasks.list_tasks(output_format="dataframe")["tid"])
     task_ids_for_suite = sorted(np.random.choice(all_tasks, replace=False, size=20))
 
     # The study needs a machine-readable and unique alias. To obtain this,
@@ -322,17 +314,21 @@ because we upload some random data.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:113: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:112: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
       warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:256: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:112: RuntimeWarning: Could not create task type id for 11 due to error 11 is not a valid TaskType
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:263: RuntimeWarning: Could not create task type id for 11 due to error 11 is not a valid TaskType
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:263: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
       warnings.warn(
     OpenML Benchmark Suite
     ======================
-    ID..............: 5353
+    ID..............: 782
     Name............: Test-Suite
     Status..........: None
     Main Entity Type: task
-    Study URL.......: https://test.openml.org/s/5353
+    Study URL.......: https://test.openml.org/s/782
     # of Tasks......: 20
 
 
@@ -353,7 +349,7 @@ because we upload some random data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  46.914 seconds)
+   **Total running time of the script:** ( 0 minutes  48.415 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_suites_tutorial.py:

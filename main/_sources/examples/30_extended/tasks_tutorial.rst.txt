@@ -55,50 +55,28 @@ Tasks are identified by IDs and can be accessed in two different ways:
    metric, the splits and an iterator which can be used to access the
    splits in a useful manner.
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-33
+.. GENERATED FROM PYTHON SOURCE LINES 29-37
 
 Listing tasks
 ^^^^^^^^^^^^^
 
-We will start by simply listing only *supervised classification* tasks:
-
-.. GENERATED FROM PYTHON SOURCE LINES 33-36
-
-.. code-block:: default
-
-
-    tasks = openml.tasks.list_tasks(task_type=TaskType.SUPERVISED_CLASSIFICATION)
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 37-41
-
-**openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, which we convert
-into a
+We will start by simply listing only *supervised classification* tasks.
+**openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, but we
+request a
 `pandas dataframe <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
-to have better visualization capabilities and easier access:
+instead to have better visualization capabilities and easier access:
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-54
+.. GENERATED FROM PYTHON SOURCE LINES 37-45
 
 .. code-block:: default
 
 
-    tasks = pd.DataFrame.from_dict(tasks, orient="index")
+    tasks = openml.tasks.list_tasks(
+        task_type=TaskType.SUPERVISED_CLASSIFICATION, output_format="dataframe"
+    )
     print(tasks.columns)
     print(f"First 5 of {len(tasks)} tasks:")
     print(tasks.head())
-
-    # As conversion to a pandas dataframe is a common task, we have added this functionality to the
-    # OpenML-Python library which can be used by passing ``output_format='dataframe'``:
-    tasks_df = openml.tasks.list_tasks(
-        task_type=TaskType.SUPERVISED_CLASSIFICATION, output_format="dataframe"
-    )
-    print(tasks_df.head())
 
 
 
@@ -116,7 +94,7 @@ to have better visualization capabilities and easier access:
            'NumberOfMissingValues', 'NumberOfNumericFeatures',
            'NumberOfSymbolicFeatures', 'cost_matrix'],
           dtype='object')
-    First 5 of 3962 tasks:
+    First 5 of 4235 tasks:
        tid  ... cost_matrix
     2    2  ...         NaN
     3    3  ...         NaN
@@ -125,24 +103,16 @@ to have better visualization capabilities and easier access:
     6    6  ...         NaN
 
     [5 rows x 21 columns]
-       tid  ... cost_matrix
-    2    2  ...         NaN
-    3    3  ...         NaN
-    4    4  ...         NaN
-    5    5  ...         NaN
-    6    6  ...         NaN
-
-    [5 rows x 21 columns]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-57
+.. GENERATED FROM PYTHON SOURCE LINES 46-48
 
 We can filter the list of tasks to only contain datasets with more than
 500 samples, but less than 1000 samples:
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-61
+.. GENERATED FROM PYTHON SOURCE LINES 48-52
 
 .. code-block:: default
 
@@ -158,12 +128,12 @@ We can filter the list of tasks to only contain datasets with more than
 
  .. code-block:: none
 
-    [2, 11, 15, 29, 37, 41, 49, 53, 232, 241, 245, 259, 267, 271, 279, 283, 1766, 1775, 1779, 1793, 1801, 1805, 1813, 1817, 1882, 1891, 1895, 1909, 1917, 1921, 1929, 1933, 1945, 1952, 1956, 1967, 1973, 1977, 1983, 1987, 2079, 2125, 2944, 3022, 3034, 3047, 3049, 3053, 3054, 3055, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 4189, 4191, 4197, 4198, 4199, 4217, 4223, 4225, 4226, 4234, 4240, 4254, 4265, 4266, 4288, 4328, 4341, 4345, 4365, 4395, 4396, 4397, 4409, 4411, 4423, 4499, 4508, 4515, 4517, 4518, 4519, 4522, 4538, 4557, 4558, 4562, 4565, 4572, 4582, 4584, 4591, 4618, 4676, 4684, 4697, 4704, 7286, 7307, 7543, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 12738, 12739, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146574, 146576, 146577, 146578, 146583, 146587, 146588, 146593, 146596, 146597, 146600, 146818, 146819, 166859, 166875, 166882, 166884, 166893, 166905, 166906, 166907, 166913, 166915, 166919, 166947, 166953, 166956, 166957, 166958, 166959, 166960, 166967, 166976, 166977, 166978, 166980, 166983, 166988, 166989, 166992, 167016, 167020, 167031, 167037, 167062, 167067, 167068, 167095, 167096, 167100, 167104, 167106, 167151, 167154, 167160, 167163, 167167, 167168, 167171, 167173, 167174, 167175, 167180, 167184, 167187, 167194, 167198, 168300, 168783, 168819, 168820, 168821, 168822, 168823, 168824, 168825, 168907, 189786, 189859, 189899, 189900, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233090, 233094, 233109, 233115, 233171, 233206, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964, 361107, 361109, 361146, 361147, 361148, 361149, 361150, 361151, 361152, 361153, 361154, 361155, 361156, 361157, 361158, 361159, 361160, 361161, 361163, 361164, 361165, 361166, 361167, 361168, 361169, 361170, 361171, 361172, 361173, 361174, 361175, 361176, 361183, 361185, 361190, 361305, 361338, 361340]
+    [2, 11, 15, 29, 37, 41, 49, 53, 232, 241, 245, 259, 267, 271, 279, 283, 1766, 1775, 1779, 1793, 1801, 1805, 1813, 1817, 1882, 1891, 1895, 1909, 1917, 1921, 1929, 1933, 1945, 1952, 1956, 1967, 1973, 1977, 1983, 1987, 2079, 2125, 2944, 3022, 3034, 3047, 3049, 3053, 3054, 3055, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 4189, 4191, 4197, 4198, 4199, 4217, 4223, 4225, 4226, 4234, 4240, 4254, 4265, 4266, 4288, 4328, 4341, 4345, 4365, 4395, 4396, 4397, 4409, 4411, 4423, 4499, 4508, 4515, 4517, 4518, 4519, 4522, 4538, 4557, 4558, 4562, 4565, 4572, 4582, 4584, 4591, 4618, 4676, 4684, 4697, 4704, 7286, 7307, 7543, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 12738, 12739, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146574, 146576, 146577, 146578, 146583, 146587, 146588, 146593, 146596, 146597, 146600, 146818, 146819, 166859, 166875, 166882, 166884, 166893, 166905, 166906, 166907, 166913, 166915, 166919, 166947, 166953, 166956, 166957, 166958, 166959, 166960, 166967, 166976, 166977, 166978, 166980, 166983, 166988, 166989, 166992, 167016, 167020, 167031, 167037, 167062, 167067, 167068, 167095, 167096, 167100, 167104, 167106, 167151, 167154, 167160, 167163, 167167, 167168, 167171, 167173, 167174, 167175, 167180, 167184, 167187, 167194, 167198, 168300, 168783, 168819, 168820, 168821, 168822, 168823, 168824, 168825, 168907, 189786, 189859, 189899, 189900, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233090, 233094, 233109, 233115, 233171, 233206, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964, 361107, 361109, 361146, 361147, 361148, 361149, 361150, 361151, 361152, 361153, 361154, 361155, 361156, 361157, 361158, 361159, 361160, 361161, 361163, 361164, 361165, 361166, 361167, 361168, 361169, 361170, 361171, 361172, 361173, 361174, 361175, 361176, 361183, 361185, 361190, 361305, 361338, 361340, 361412, 361415, 361424, 361426, 361432, 361433, 361434, 361436, 361437, 361440, 361442, 361443, 361457, 361463, 361483, 361486, 361492, 361495, 361498, 361499, 361502, 361504, 361506, 361507, 361512, 361517, 361522, 361529, 361531, 361540, 361557, 361572, 361624, 361650, 361660]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-66
+.. GENERATED FROM PYTHON SOURCE LINES 53-57
 
 .. code-block:: default
 
@@ -179,16 +149,16 @@ We can filter the list of tasks to only contain datasets with more than
 
  .. code-block:: none
 
-    333
+    368
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-68
+.. GENERATED FROM PYTHON SOURCE LINES 58-59
 
 Then, we can further restrict the tasks to all have the same resampling strategy:
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-72
+.. GENERATED FROM PYTHON SOURCE LINES 59-63
 
 .. code-block:: default
 
@@ -209,7 +179,7 @@ Then, we can further restrict the tasks to all have the same resampling strategy
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-77
+.. GENERATED FROM PYTHON SOURCE LINES 64-68
 
 .. code-block:: default
 
@@ -230,14 +200,14 @@ Then, we can further restrict the tasks to all have the same resampling strategy
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-82
+.. GENERATED FROM PYTHON SOURCE LINES 69-73
 
 Resampling strategies can be found on the
 `OpenML Website <https://www.openml.org/search?type=measure&q=estimation%20procedure>`_.
 
 Similar to listing tasks by task type, we can list tasks by tags:
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-87
+.. GENERATED FROM PYTHON SOURCE LINES 73-78
 
 .. code-block:: default
 
@@ -267,11 +237,11 @@ Similar to listing tasks by task type, we can list tasks by tags:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-89
+.. GENERATED FROM PYTHON SOURCE LINES 79-80
 
 Furthermore, we can list tasks based on the dataset id:
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-94
+.. GENERATED FROM PYTHON SOURCE LINES 80-85
 
 .. code-block:: default
 
@@ -288,7 +258,7 @@ Furthermore, we can list tasks based on the dataset id:
 
  .. code-block:: none
 
-    First 5 of 24 tasks:
+    First 5 of 25 tasks:
              tid  ... number_samples
     9983    9983  ...            NaN
     14951  14951  ...            NaN
@@ -301,11 +271,11 @@ Furthermore, we can list tasks based on the dataset id:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-96
+.. GENERATED FROM PYTHON SOURCE LINES 86-87
 
 In addition, a size limit and an offset can be applied both separately and simultaneously:
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-100
+.. GENERATED FROM PYTHON SOURCE LINES 87-91
 
 .. code-block:: default
 
@@ -338,7 +308,7 @@ In addition, a size limit and an offset can be applied both separately and simul
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-110
+.. GENERATED FROM PYTHON SOURCE LINES 92-101
 
 **OpenML 100**
 is a curated list of 100 tasks to start using OpenML. They are all
@@ -350,7 +320,7 @@ categorical features. You can find out more about the *OpenML 100* on
 
 Finally, it is also possible to list all tasks on OpenML with:
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-116
+.. GENERATED FROM PYTHON SOURCE LINES 104-107
 
 .. code-block:: default
 
@@ -365,27 +335,19 @@ Finally, it is also possible to list all tasks on OpenML with:
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    /home/runner/work/openml-python/openml-python/openml/utils.py:286: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
-      result = result.append(new_batch, ignore_index=True)
-    46802
+    47083
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-121
+.. GENERATED FROM PYTHON SOURCE LINES 108-112
 
 Exercise
 ########
 
 Search for the tasks on the 'eeg-eye-state' dataset.
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-124
+.. GENERATED FROM PYTHON SOURCE LINES 112-115
 
 .. code-block:: default
 
@@ -1193,6 +1155,37 @@ Search for the tasks on the 'eeg-eye-state' dataset.
           <td>NaN</td>
           <td>NaN</td>
         </tr>
+        <tr>
+          <th>46851</th>
+          <td>361459</td>
+          <td>TaskType.SUPERVISED_CLASSIFICATION</td>
+          <td>1471</td>
+          <td>eeg-eye-state</td>
+          <td>Supervised Classification</td>
+          <td>active</td>
+          <td>5 times 2-fold Crossvalidation</td>
+          <td>NaN</td>
+          <td>1471</td>
+          <td>Class</td>
+          <td>8257.0</td>
+          <td>2.0</td>
+          <td>6723.0</td>
+          <td>2.0</td>
+          <td>15.0</td>
+          <td>14980.0</td>
+          <td>0.0</td>
+          <td>0.0</td>
+          <td>14.0</td>
+          <td>1.0</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+          <td>NaN</td>
+        </tr>
       </tbody>
     </table>
     </div>
@@ -1200,7 +1193,7 @@ Search for the tasks on the 'eeg-eye-state' dataset.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-131
+.. GENERATED FROM PYTHON SOURCE LINES 116-122
 
 Downloading tasks
 ^^^^^^^^^^^^^^^^^
@@ -1209,7 +1202,7 @@ We provide two functions to download tasks, one which downloads only a
 single task by its ID, and one which takes a list of IDs and downloads
 all of these tasks:
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-135
+.. GENERATED FROM PYTHON SOURCE LINES 122-126
 
 .. code-block:: default
 
@@ -1221,14 +1214,23 @@ all of these tasks:
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-137
+
+.. GENERATED FROM PYTHON SOURCE LINES 127-128
 
 Properties of the task are stored as member variables:
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-140
+.. GENERATED FROM PYTHON SOURCE LINES 128-131
 
 .. code-block:: default
 
@@ -1256,11 +1258,11 @@ Properties of the task are stored as member variables:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-142
+.. GENERATED FROM PYTHON SOURCE LINES 132-133
 
 And:
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-147
+.. GENERATED FROM PYTHON SOURCE LINES 133-138
 
 .. code-block:: default
 
@@ -1291,7 +1293,7 @@ And:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-174
+.. GENERATED FROM PYTHON SOURCE LINES 139-165
 
 Creating tasks
 ^^^^^^^^^^^^^^
@@ -1320,14 +1322,14 @@ or sort results on your favourite measure afterwards. Only add an evaluation mea
 necessary (e.g. when other measure make no sense), since it will create a new task, which
 scatters results across tasks.
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-180
+.. GENERATED FROM PYTHON SOURCE LINES 167-171
 
 We'll use the test server for the rest of this tutorial.
 
 .. warning::
    .. include:: ../../test_server_usage_warning.txt
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-182
+.. GENERATED FROM PYTHON SOURCE LINES 171-173
 
 .. code-block:: default
 
@@ -1347,7 +1349,7 @@ We'll use the test server for the rest of this tutorial.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-192
+.. GENERATED FROM PYTHON SOURCE LINES 174-183
 
 Example
 #######
@@ -1359,7 +1361,7 @@ If a task with these parameters exists, we will get an appropriate exception.
 If such a task doesn't exist, a task will be created and the corresponding task_id
 will be returned.
 
-.. GENERATED FROM PYTHON SOURCE LINES 192-220
+.. GENERATED FROM PYTHON SOURCE LINES 183-211
 
 .. code-block:: default
 
@@ -1399,16 +1401,18 @@ will be returned.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:113: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:112: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
       warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:256: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:112: RuntimeWarning: Could not create task type id for 11 due to error 11 is not a valid TaskType
       warnings.warn(
-    Task already exists. Task ID is 3496
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:263: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+      warnings.warn(
+    Task already exists. Task ID is 1305
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 221-225
+.. GENERATED FROM PYTHON SOURCE LINES 212-216
 
 * `Complete list of task types <https://www.openml.org/search?type=task_type>`_.
 * `Complete list of model estimation procedures <https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure>`_.
@@ -1418,7 +1422,7 @@ will be returned.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  44.722 seconds)
+   **Total running time of the script:** ( 0 minutes  54.544 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_tasks_tutorial.py:

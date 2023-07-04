@@ -91,7 +91,7 @@ We shall cover these 5 representative scenarios for:
 Preparing tasks and scikit-learn models
 ***************************************
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-93
+.. GENERATED FROM PYTHON SOURCE LINES 65-94
 
 .. code-block:: default
 
@@ -112,6 +112,7 @@ Preparing tasks and scikit-learn models
         )
     )
 
+
     # Creating utility function
     def print_compare_runtimes(measures):
         for repeat, val1 in measures["usercpu_time_millis_training"].items():
@@ -131,6 +132,10 @@ Preparing tasks and scikit-learn models
 
  .. code-block:: none
 
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
     OpenML Classification Task
     ==========================
     Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
@@ -145,7 +150,7 @@ Preparing tasks and scikit-learn models
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-99
+.. GENERATED FROM PYTHON SOURCE LINES 95-100
 
 Case 1: Running a Random Forest model on an OpenML task
 *******************************************************
@@ -153,7 +158,7 @@ We'll run a Random Forest model and obtain an OpenML run object. We can
 see the evaluations recorded per fold for the dataset and the information
 available for this run.
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-124
+.. GENERATED FROM PYTHON SOURCE LINES 100-125
 
 .. code-block:: default
 
@@ -190,6 +195,44 @@ available for this run.
 
  .. code-block:: none
 
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
     The timing and performance metrics available: 
     usercpu_time_millis_training
     wall_clock_time_millis_training
@@ -200,22 +243,22 @@ available for this run.
     predictive_accuracy
 
     The performance metric is recorded under `predictive_accuracy` per fold and can be retrieved as: 
-    Repeat #0-Fold #0: 0.7791
-    Repeat #0-Fold #1: 0.7715
-    Repeat #0-Fold #2: 0.7818
-    Repeat #0-Fold #3: 0.7840
-    Repeat #0-Fold #4: 0.7816
-    Repeat #0-Fold #5: 0.7865
-    Repeat #0-Fold #6: 0.7711
-    Repeat #0-Fold #7: 0.7762
-    Repeat #0-Fold #8: 0.7840
-    Repeat #0-Fold #9: 0.7797
+    Repeat #0-Fold #0: 0.7807
+    Repeat #0-Fold #1: 0.7753
+    Repeat #0-Fold #2: 0.7738
+    Repeat #0-Fold #3: 0.7856
+    Repeat #0-Fold #4: 0.7776
+    Repeat #0-Fold #5: 0.7856
+    Repeat #0-Fold #6: 0.7702
+    Repeat #0-Fold #7: 0.7789
+    Repeat #0-Fold #8: 0.7905
+    Repeat #0-Fold #9: 0.7742
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-138
+.. GENERATED FROM PYTHON SOURCE LINES 126-139
 
 The remaining entries recorded in `measures` are the runtime records
 related as:
@@ -231,7 +274,7 @@ is converted to `milliseconds` and stored. Similarly, `time.time()` is used
 to record the time entry for `wall_clock_time_*`. The `*_millis_testing` entry
 follows the same procedure but for time taken for the `.predict()` procedure.
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-142
+.. GENERATED FROM PYTHON SOURCE LINES 139-143
 
 .. code-block:: default
 
@@ -247,27 +290,27 @@ follows the same procedure but for time taken for the `.predict()` procedure.
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-265.181 vs Wall-265.193
-    Repeat #0-Fold #1: CPU-263.933 vs Wall-263.948
-    Repeat #0-Fold #2: CPU-269.653 vs Wall-269.675
-    Repeat #0-Fold #3: CPU-265.657 vs Wall-265.621
-    Repeat #0-Fold #4: CPU-265.194 vs Wall-265.300
-    Repeat #0-Fold #5: CPU-267.133 vs Wall-267.170
-    Repeat #0-Fold #6: CPU-266.978 vs Wall-266.816
-    Repeat #0-Fold #7: CPU-266.207 vs Wall-266.237
-    Repeat #0-Fold #8: CPU-268.601 vs Wall-268.634
-    Repeat #0-Fold #9: CPU-268.425 vs Wall-268.447
+    Repeat #0-Fold #0: CPU-288.333 vs Wall-288.360
+    Repeat #0-Fold #1: CPU-289.139 vs Wall-289.270
+    Repeat #0-Fold #2: CPU-291.050 vs Wall-291.743
+    Repeat #0-Fold #3: CPU-287.405 vs Wall-287.396
+    Repeat #0-Fold #4: CPU-288.410 vs Wall-288.727
+    Repeat #0-Fold #5: CPU-288.055 vs Wall-288.221
+    Repeat #0-Fold #6: CPU-289.241 vs Wall-289.007
+    Repeat #0-Fold #7: CPU-291.851 vs Wall-292.065
+    Repeat #0-Fold #8: CPU-286.910 vs Wall-287.147
+    Repeat #0-Fold #9: CPU-289.618 vs Wall-289.324
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-146
+.. GENERATED FROM PYTHON SOURCE LINES 144-147
 
 Case 2: Running Scikit-learn model on an OpenML task in parallel
 ****************************************************************
 Redefining the model to allow parallelism with `n_jobs=2` (2 cores)
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-156
+.. GENERATED FROM PYTHON SOURCE LINES 147-157
 
 .. code-block:: default
 
@@ -289,25 +332,65 @@ Redefining the model to allow parallelism with `n_jobs=2` (2 cores)
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-104.003 vs Wall-856.122
-    Repeat #0-Fold #1: CPU-63.705 vs Wall-195.477
-    Repeat #0-Fold #2: CPU-67.706 vs Wall-188.565
-    Repeat #0-Fold #3: CPU-67.949 vs Wall-184.132
-    Repeat #0-Fold #4: CPU-67.723 vs Wall-186.367
-    Repeat #0-Fold #5: CPU-84.685 vs Wall-225.908
-    Repeat #0-Fold #6: CPU-83.423 vs Wall-212.919
-    Repeat #0-Fold #7: CPU-58.135 vs Wall-179.261
-    Repeat #0-Fold #8: CPU-61.224 vs Wall-183.944
-    Repeat #0-Fold #9: CPU-58.998 vs Wall-177.485
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    Repeat #0-Fold #0: CPU-306.806 vs Wall-194.031
+    Repeat #0-Fold #1: CPU-296.096 vs Wall-181.512
+    Repeat #0-Fold #2: CPU-295.410 vs Wall-181.478
+    Repeat #0-Fold #3: CPU-291.399 vs Wall-170.707
+    Repeat #0-Fold #4: CPU-294.480 vs Wall-172.345
+    Repeat #0-Fold #5: CPU-295.477 vs Wall-181.004
+    Repeat #0-Fold #6: CPU-290.682 vs Wall-171.689
+    Repeat #0-Fold #7: CPU-290.447 vs Wall-171.016
+    Repeat #0-Fold #8: CPU-291.884 vs Wall-171.107
+    Repeat #0-Fold #9: CPU-297.576 vs Wall-181.046
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 157-158
+.. GENERATED FROM PYTHON SOURCE LINES 158-159
 
 Running a Random Forest model on an OpenML task in parallel (all cores available):
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-171
+.. GENERATED FROM PYTHON SOURCE LINES 159-172
 
 .. code-block:: default
 
@@ -332,21 +415,61 @@ Running a Random Forest model on an OpenML task in parallel (all cores available
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-65.959 vs Wall-183.866
-    Repeat #0-Fold #1: CPU-60.521 vs Wall-178.637
-    Repeat #0-Fold #2: CPU-65.660 vs Wall-182.104
-    Repeat #0-Fold #3: CPU-67.240 vs Wall-184.748
-    Repeat #0-Fold #4: CPU-65.644 vs Wall-185.457
-    Repeat #0-Fold #5: CPU-65.680 vs Wall-184.815
-    Repeat #0-Fold #6: CPU-64.321 vs Wall-180.577
-    Repeat #0-Fold #7: CPU-58.117 vs Wall-177.394
-    Repeat #0-Fold #8: CPU-62.959 vs Wall-187.774
-    Repeat #0-Fold #9: CPU-60.496 vs Wall-181.962
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    Repeat #0-Fold #0: CPU-292.476 vs Wall-171.932
+    Repeat #0-Fold #1: CPU-293.014 vs Wall-171.431
+    Repeat #0-Fold #2: CPU-297.935 vs Wall-182.506
+    Repeat #0-Fold #3: CPU-293.766 vs Wall-171.562
+    Repeat #0-Fold #4: CPU-290.925 vs Wall-171.329
+    Repeat #0-Fold #5: CPU-290.895 vs Wall-171.632
+    Repeat #0-Fold #6: CPU-296.856 vs Wall-172.516
+    Repeat #0-Fold #7: CPU-295.448 vs Wall-181.802
+    Repeat #0-Fold #8: CPU-292.749 vs Wall-171.288
+    Repeat #0-Fold #9: CPU-295.082 vs Wall-181.511
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-177
+.. GENERATED FROM PYTHON SOURCE LINES 173-178
 
 We can now observe that the ratio of CPU time to wallclock time is lower
 than in case 1. This happens because joblib by default spawns subprocesses
@@ -354,14 +477,14 @@ for the workloads for which CPU time cannot be tracked. Therefore, interpreting
 the reported CPU and wallclock time requires knowledge of the parallelization
 applied at runtime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-183
+.. GENERATED FROM PYTHON SOURCE LINES 180-184
 
 Running the same task with a different parallel backend. Joblib provides multiple
 backends: {`loky` (default), `multiprocessing`, `dask`, `threading`, `sequential`}.
 The backend can be explicitly set using a joblib context manager. The behaviour of
 the job distribution can change and therefore the scale of runtimes recorded too.
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-191
+.. GENERATED FROM PYTHON SOURCE LINES 184-192
 
 .. code-block:: default
 
@@ -381,21 +504,61 @@ the job distribution can change and therefore the scale of runtimes recorded too
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-283.389 vs Wall-262.198
-    Repeat #0-Fold #1: CPU-285.832 vs Wall-306.320
-    Repeat #0-Fold #2: CPU-272.970 vs Wall-274.854
-    Repeat #0-Fold #3: CPU-280.322 vs Wall-273.983
-    Repeat #0-Fold #4: CPU-273.681 vs Wall-274.838
-    Repeat #0-Fold #5: CPU-269.230 vs Wall-265.381
-    Repeat #0-Fold #6: CPU-273.617 vs Wall-273.789
-    Repeat #0-Fold #7: CPU-273.332 vs Wall-274.416
-    Repeat #0-Fold #8: CPU-270.424 vs Wall-270.581
-    Repeat #0-Fold #9: CPU-269.956 vs Wall-271.577
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    Repeat #0-Fold #0: CPU-255.782 vs Wall-470.741
+    Repeat #0-Fold #1: CPU-264.383 vs Wall-416.852
+    Repeat #0-Fold #2: CPU-278.771 vs Wall-423.397
+    Repeat #0-Fold #3: CPU-265.814 vs Wall-417.818
+    Repeat #0-Fold #4: CPU-269.247 vs Wall-420.137
+    Repeat #0-Fold #5: CPU-281.520 vs Wall-431.122
+    Repeat #0-Fold #6: CPU-291.086 vs Wall-424.849
+    Repeat #0-Fold #7: CPU-269.182 vs Wall-409.226
+    Repeat #0-Fold #8: CPU-264.737 vs Wall-409.686
+    Repeat #0-Fold #9: CPU-281.757 vs Wall-413.080
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 192-199
+.. GENERATED FROM PYTHON SOURCE LINES 193-200
 
 The CPU time interpretation becomes ambiguous when jobs are distributed over an
 unknown number of cores or when subprocesses are spawned for which the CPU time
@@ -405,7 +568,7 @@ utilisation and whether workloads are executed in subprocesses, for various
 cases that can arise as demonstrated in the rest of the example. Therefore,
 the final interpretation of the runtimes is left to the `user`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-209
+.. GENERATED FROM PYTHON SOURCE LINES 202-210
 
 Case 3: Running and benchmarking HPO algorithms with their runtimes
 *******************************************************************
@@ -416,7 +579,7 @@ RandomForest model's hyperparameter `n_estimators`. Scikit-learn also provides a
 and evaluating the model on the best found parameter setting. This is
 included in the `wall_clock_time_millis_training` measure recorded.
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-230
+.. GENERATED FROM PYTHON SOURCE LINES 210-231
 
 .. code-block:: default
 
@@ -449,21 +612,23 @@ included in the `wall_clock_time_millis_training` measure recorded.
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-5346.390 vs Wall-5357.451
-    Repeat #0-Fold #1: CPU-5337.086 vs Wall-5371.588
-    Repeat #0-Fold #2: CPU-5589.212 vs Wall-5603.500
-    Repeat #0-Fold #3: CPU-5620.176 vs Wall-5637.044
-    Repeat #0-Fold #4: CPU-5588.432 vs Wall-5609.198
-    Repeat #0-Fold #5: CPU-5600.316 vs Wall-5634.064
-    Repeat #0-Fold #6: CPU-5296.639 vs Wall-5299.391
-    Repeat #0-Fold #7: CPU-5271.301 vs Wall-5299.289
-    Repeat #0-Fold #8: CPU-5297.311 vs Wall-5324.057
-    Repeat #0-Fold #9: CPU-5279.608 vs Wall-5296.258
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    Repeat #0-Fold #0: CPU-5733.540 vs Wall-5758.961
+    Repeat #0-Fold #1: CPU-6082.370 vs Wall-6045.117
+    Repeat #0-Fold #2: CPU-6065.960 vs Wall-5974.083
+    Repeat #0-Fold #3: CPU-5420.337 vs Wall-5585.567
+    Repeat #0-Fold #4: CPU-5380.516 vs Wall-5424.959
+    Repeat #0-Fold #5: CPU-5432.581 vs Wall-5443.869
+    Repeat #0-Fold #6: CPU-5370.366 vs Wall-5330.300
+    Repeat #0-Fold #7: CPU-5402.496 vs Wall-5435.381
+    Repeat #0-Fold #8: CPU-5385.692 vs Wall-5345.598
+    Repeat #0-Fold #9: CPU-5410.332 vs Wall-5368.339
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 231-242
+.. GENERATED FROM PYTHON SOURCE LINES 232-243
 
 Like any optimisation problem, scikit-learn's HPO estimators also generate
 a sequence of configurations which are evaluated, using which the best found
@@ -477,7 +642,7 @@ parameterized by the `cv` parameter. Since `GridSearchCV` in this example perfor
 is for the entire `fit()` procedure of GridSearchCV thus subsuming the runtimes of
 the 2-fold (inner) CV search performed.
 
-.. GENERATED FROM PYTHON SOURCE LINES 242-249
+.. GENERATED FROM PYTHON SOURCE LINES 243-250
 
 .. code-block:: default
 
@@ -498,18 +663,18 @@ the 2-fold (inner) CV search performed.
 
     # repeats: 1
     # folds: 10
-    5357.450723648071
+    5758.96143913269
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 250-253
+.. GENERATED FROM PYTHON SOURCE LINES 251-254
 
 To extract the training runtime of the 1-st repeat, 4-th (outer) fold and also
 to fetch the parameters and performance of the evaluations made during
 the 1-st repeat, 4-th fold evaluation by the Grid Search model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 253-270
+.. GENERATED FROM PYTHON SOURCE LINES 254-271
 
 .. code-block:: default
 
@@ -538,17 +703,17 @@ the 1-st repeat, 4-th fold evaluation by the Grid Search model.
 
  .. code-block:: none
 
-    Total runtime for repeat 0's fold 3: 5637.044191 ms
-    n_estimators:  1 - score: 0.766
-    n_estimators: 13 - score: 0.799
-    n_estimators: 25 - score: 0.802
-    n_estimators: 37 - score: 0.802
+    Total runtime for repeat 0's fold 3: 5585.567474 ms
+    n_estimators:  1 - score: 0.752
+    n_estimators: 13 - score: 0.801
+    n_estimators: 25 - score: 0.804
+    n_estimators: 37 - score: 0.803
     n_estimators: 50 - score: 0.804
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 271-283
+.. GENERATED FROM PYTHON SOURCE LINES 272-284
 
 Scikit-learn's HPO estimators also come with an argument `refit=True` as a default.
 In our previous model definition it was set to True by default, which meant that the best
@@ -563,7 +728,7 @@ For HPO estimators, `wall_clock_time_millis = wall_clock_time_millis_training + 
 
 This refit time can therefore be explicitly extracted in this manner:
 
-.. GENERATED FROM PYTHON SOURCE LINES 283-302
+.. GENERATED FROM PYTHON SOURCE LINES 284-303
 
 .. code-block:: default
 
@@ -594,28 +759,28 @@ This refit time can therefore be explicitly extracted in this manner:
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: 908.8624
-    Repeat #0-Fold #1: 920.6614
-    Repeat #0-Fold #2: 1216.3568
-    Repeat #0-Fold #3: 1231.0901
-    Repeat #0-Fold #4: 1215.1463
-    Repeat #0-Fold #5: 1215.3540
-    Repeat #0-Fold #6: 881.0747
-    Repeat #0-Fold #7: 894.5136
-    Repeat #0-Fold #8: 902.0541
-    Repeat #0-Fold #9: 902.6642
+    Repeat #0-Fold #0: 995.9676
+    Repeat #0-Fold #1: 1273.9782
+    Repeat #0-Fold #2: 1286.5019
+    Repeat #0-Fold #3: 752.9042
+    Repeat #0-Fold #4: 674.6945
+    Repeat #0-Fold #5: 659.2512
+    Repeat #0-Fold #6: 623.6873
+    Repeat #0-Fold #7: 713.7017
+    Repeat #0-Fold #8: 673.3279
+    Repeat #0-Fold #9: 579.7045
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 303-307
+.. GENERATED FROM PYTHON SOURCE LINES 304-308
 
 Along with the GridSearchCV already used above, we demonstrate how such
 optimisation traces can be retrieved by showing an application of these
 traces - comparing the speed of finding the best configuration using
 RandomizedSearchCV and GridSearchCV available with scikit-learn.
 
-.. GENERATED FROM PYTHON SOURCE LINES 307-322
+.. GENERATED FROM PYTHON SOURCE LINES 308-323
 
 .. code-block:: default
 
@@ -638,10 +803,17 @@ RandomizedSearchCV and GridSearchCV available with scikit-learn.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 323-334
+
+.. GENERATED FROM PYTHON SOURCE LINES 324-335
 
 Since for the call to ``openml.runs.run_model_on_task`` the parameter
 ``n_jobs`` is set to its default ``None``, the evaluations across the OpenML folds
@@ -655,7 +827,7 @@ fold by the HPO model and the corresponding time taken for search across
 that fold. Moreover, since ``n_jobs=None`` for ``openml.runs.run_model_on_task``
 the runtimes per fold can be cumulatively added to plot the trace against time.
 
-.. GENERATED FROM PYTHON SOURCE LINES 334-378
+.. GENERATED FROM PYTHON SOURCE LINES 335-379
 
 .. code-block:: default
 
@@ -715,7 +887,7 @@ the runtimes per fold can be cumulatively added to plot the trace against time.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 379-387
+.. GENERATED FROM PYTHON SOURCE LINES 380-388
 
 Case 4: Running models that scikit-learn doesn't parallelize
 *************************************************************
@@ -726,7 +898,7 @@ depend on joblib for its parallelism. 2 such cases are illustrated below.
 Running a Decision Tree model that doesn't support parallelism implicitly, but
 using OpenML to parallelize evaluations for the outer-cross validation folds.
 
-.. GENERATED FROM PYTHON SOURCE LINES 387-396
+.. GENERATED FROM PYTHON SOURCE LINES 388-397
 
 .. code-block:: default
 
@@ -747,27 +919,29 @@ using OpenML to parallelize evaluations for the outer-cross validation folds.
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-93.357 vs Wall-96.935
-    Repeat #0-Fold #1: CPU-92.061 vs Wall-92.062
-    Repeat #0-Fold #2: CPU-92.463 vs Wall-92.492
-    Repeat #0-Fold #3: CPU-92.644 vs Wall-93.006
-    Repeat #0-Fold #4: CPU-92.270 vs Wall-92.293
-    Repeat #0-Fold #5: CPU-91.745 vs Wall-91.751
-    Repeat #0-Fold #6: CPU-94.061 vs Wall-94.211
-    Repeat #0-Fold #7: CPU-92.919 vs Wall-93.004
-    Repeat #0-Fold #8: CPU-91.793 vs Wall-91.842
-    Repeat #0-Fold #9: CPU-92.441 vs Wall-93.999
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    Repeat #0-Fold #0: CPU-96.015 vs Wall-96.356
+    Repeat #0-Fold #1: CPU-96.084 vs Wall-96.262
+    Repeat #0-Fold #2: CPU-97.272 vs Wall-97.529
+    Repeat #0-Fold #3: CPU-96.636 vs Wall-96.660
+    Repeat #0-Fold #4: CPU-96.145 vs Wall-96.311
+    Repeat #0-Fold #5: CPU-96.972 vs Wall-97.471
+    Repeat #0-Fold #6: CPU-96.698 vs Wall-96.712
+    Repeat #0-Fold #7: CPU-96.170 vs Wall-96.179
+    Repeat #0-Fold #8: CPU-96.513 vs Wall-96.514
+    Repeat #0-Fold #9: CPU-96.579 vs Wall-96.836
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 397-400
+.. GENERATED FROM PYTHON SOURCE LINES 398-401
 
 Although the decision tree does not run in parallel, it can release the
 `Python GIL <https://docs.python.org/dev/glossary.html#term-global-interpreter-lock>`_.
 This can result in surprising runtime measures as demonstrated below:
 
-.. GENERATED FROM PYTHON SOURCE LINES 400-408
+.. GENERATED FROM PYTHON SOURCE LINES 401-409
 
 .. code-block:: default
 
@@ -787,27 +961,67 @@ This can result in surprising runtime measures as demonstrated below:
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-185.616 vs Wall-128.906
-    Repeat #0-Fold #1: CPU-186.713 vs Wall-128.838
-    Repeat #0-Fold #2: CPU-173.254 vs Wall-118.258
-    Repeat #0-Fold #3: CPU-162.074 vs Wall-93.636
-    Repeat #0-Fold #4: CPU-182.340 vs Wall-126.062
-    Repeat #0-Fold #5: CPU-156.035 vs Wall-93.435
-    Repeat #0-Fold #6: CPU-181.189 vs Wall-125.952
-    Repeat #0-Fold #7: CPU-157.183 vs Wall-92.842
-    Repeat #0-Fold #8: CPU-181.239 vs Wall-126.351
-    Repeat #0-Fold #9: CPU-148.843 vs Wall-92.746
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    Repeat #0-Fold #0: CPU-97.178 vs Wall-98.504
+    Repeat #0-Fold #1: CPU-95.604 vs Wall-95.673
+    Repeat #0-Fold #2: CPU-95.636 vs Wall-95.657
+    Repeat #0-Fold #3: CPU-95.290 vs Wall-95.613
+    Repeat #0-Fold #4: CPU-95.158 vs Wall-95.162
+    Repeat #0-Fold #5: CPU-96.185 vs Wall-96.331
+    Repeat #0-Fold #6: CPU-95.676 vs Wall-95.840
+    Repeat #0-Fold #7: CPU-95.781 vs Wall-95.784
+    Repeat #0-Fold #8: CPU-95.333 vs Wall-95.711
+    Repeat #0-Fold #9: CPU-95.437 vs Wall-95.441
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 409-412
+.. GENERATED FROM PYTHON SOURCE LINES 410-413
 
 Running a Neural Network from scikit-learn that uses scikit-learn independent
 parallelism using libraries such as `MKL, OpenBLAS or BLIS
 <https://scikit-learn.org/stable/computing/parallelism.html#parallel-numpy-and-scipy-routines-from-numerical-libraries>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 412-421
+.. GENERATED FROM PYTHON SOURCE LINES 413-422
 
 .. code-block:: default
 
@@ -828,41 +1042,81 @@ parallelism using libraries such as `MKL, OpenBLAS or BLIS
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:686: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:686: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:686: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:686: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:686: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:686: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:686: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:686: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:686: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:686: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       warnings.warn(
-    Repeat #0-Fold #0: CPU-988.306 vs Wall-988.678
-    Repeat #0-Fold #1: CPU-1072.621 vs Wall-987.685
-    Repeat #0-Fold #2: CPU-1048.145 vs Wall-983.872
-    Repeat #0-Fold #3: CPU-1068.351 vs Wall-983.786
-    Repeat #0-Fold #4: CPU-1061.154 vs Wall-976.481
-    Repeat #0-Fold #5: CPU-1076.973 vs Wall-992.176
-    Repeat #0-Fold #6: CPU-1062.741 vs Wall-978.510
-    Repeat #0-Fold #7: CPU-1061.076 vs Wall-977.186
-    Repeat #0-Fold #8: CPU-1067.376 vs Wall-982.517
-    Repeat #0-Fold #9: CPU-1063.630 vs Wall-979.387
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
+      warnings.warn(
+    Repeat #0-Fold #0: CPU-1062.560 vs Wall-1063.574
+    Repeat #0-Fold #1: CPU-1138.824 vs Wall-1054.546
+    Repeat #0-Fold #2: CPU-1154.673 vs Wall-1069.870
+    Repeat #0-Fold #3: CPU-1156.049 vs Wall-1071.478
+    Repeat #0-Fold #4: CPU-1133.853 vs Wall-1049.909
+    Repeat #0-Fold #5: CPU-1138.934 vs Wall-1054.906
+    Repeat #0-Fold #6: CPU-1129.991 vs Wall-1045.645
+    Repeat #0-Fold #7: CPU-1133.199 vs Wall-1049.114
+    Repeat #0-Fold #8: CPU-1143.581 vs Wall-1059.399
+    Repeat #0-Fold #9: CPU-1129.400 vs Wall-1044.940
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 422-429
+.. GENERATED FROM PYTHON SOURCE LINES 423-430
 
 Case 5: Running Scikit-learn models that don't release GIL
 **********************************************************
@@ -872,7 +1126,7 @@ are also not executed in parallel via a BLAS library. In such cases, the
 CPU times and wallclock times are most likely trustworthy. Note however
 that only very few models such as naive Bayes models are of this kind.
 
-.. GENERATED FROM PYTHON SOURCE LINES 429-439
+.. GENERATED FROM PYTHON SOURCE LINES 430-440
 
 .. code-block:: default
 
@@ -894,21 +1148,61 @@ that only very few models such as naive Bayes models are of this kind.
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-44.661 vs Wall-44.912
-    Repeat #0-Fold #1: CPU-45.044 vs Wall-45.054
-    Repeat #0-Fold #2: CPU-43.007 vs Wall-43.137
-    Repeat #0-Fold #3: CPU-43.126 vs Wall-43.138
-    Repeat #0-Fold #4: CPU-42.774 vs Wall-42.846
-    Repeat #0-Fold #5: CPU-42.262 vs Wall-42.268
-    Repeat #0-Fold #6: CPU-42.658 vs Wall-42.667
-    Repeat #0-Fold #7: CPU-43.053 vs Wall-43.061
-    Repeat #0-Fold #8: CPU-42.955 vs Wall-43.009
-    Repeat #0-Fold #9: CPU-42.672 vs Wall-43.142
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      warnings.warn(
+    Repeat #0-Fold #0: CPU-42.371 vs Wall-42.382
+    Repeat #0-Fold #1: CPU-42.151 vs Wall-42.162
+    Repeat #0-Fold #2: CPU-41.756 vs Wall-41.757
+    Repeat #0-Fold #3: CPU-42.523 vs Wall-42.526
+    Repeat #0-Fold #4: CPU-42.062 vs Wall-42.063
+    Repeat #0-Fold #5: CPU-42.313 vs Wall-42.314
+    Repeat #0-Fold #6: CPU-42.265 vs Wall-42.267
+    Repeat #0-Fold #7: CPU-42.316 vs Wall-42.318
+    Repeat #0-Fold #8: CPU-41.854 vs Wall-41.857
+    Repeat #0-Fold #9: CPU-42.287 vs Wall-42.288
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 440-486
+.. GENERATED FROM PYTHON SOURCE LINES 441-487
 
 Summmary
 *********
@@ -960,7 +1254,7 @@ when reporting runtimes for scikit-learn models measured with OpenML-Python!
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  59.112 seconds)
+   **Total running time of the script:** ( 2 minutes  9.963 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_fetch_runtimes_tutorial.py:

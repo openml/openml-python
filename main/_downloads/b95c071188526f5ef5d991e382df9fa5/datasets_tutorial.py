@@ -21,10 +21,9 @@ from openml.datasets import edit_dataset, fork_dataset, get_dataset
 #   * Use the output_format parameter to select output type
 #   * Default gives 'dict' (other option: 'dataframe', see below)
 #
-openml_list = openml.datasets.list_datasets()  # returns a dict
-
-# Show a nice table with some key data properties
-datalist = pd.DataFrame.from_dict(openml_list, orient="index")
+# Note: list_datasets will return a pandas dataframe by default from 0.15. When using
+# openml-python 0.14, `list_datasets` will warn you to use output_format='dataframe'.
+datalist = openml.datasets.list_datasets(output_format="dataframe")
 datalist = datalist[["did", "name", "NumberOfInstances", "NumberOfFeatures", "NumberOfClasses"]]
 
 print(f"First 10 of {len(datalist)} datasets...")
@@ -65,23 +64,16 @@ print(dataset.description[:500])
 ############################################################################
 # Get the actual data.
 #
-# The dataset can be returned in 3 possible formats: as a NumPy array, a SciPy
-# sparse matrix, or as a Pandas DataFrame. The format is
-# controlled with the parameter ``dataset_format`` which can be either 'array'
-# (default) or 'dataframe'. Let's first build our dataset from a NumPy array
-# and manually create a dataframe.
-X, y, categorical_indicator, attribute_names = dataset.get_data(
-    dataset_format="array", target=dataset.default_target_attribute
-)
-eeg = pd.DataFrame(X, columns=attribute_names)
-eeg["class"] = y
-print(eeg[:10])
+# openml-python returns data as pandas dataframes (stored in the `eeg` variable below),
+# and also some additional metadata that we don't care about right now.
+eeg, *_ = dataset.get_data()
 
 ############################################################################
-# Instead of manually creating the dataframe, you can already request a
-# dataframe with the correct dtypes.
+# You can optionally choose to have openml separate out a column from the
+# dataset. In particular, many datasets for supervised problems have a set
+# `default_target_attribute` which may help identify the target variable.
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    target=dataset.default_target_attribute, dataset_format="dataframe"
+    target=dataset.default_target_attribute
 )
 print(X.head())
 print(X.info())
@@ -92,6 +84,9 @@ print(X.info())
 # data file. The dataset object can be used as normal.
 # Whenever you use any functionality that requires the data,
 # such as `get_data`, the data will be downloaded.
+# Starting from 0.15, not downloading data will be the default behavior instead.
+# The data will be downloading automatically when you try to access it through
+# openml objects, e.g., using `dataset.features`.
 dataset = openml.datasets.get_dataset(1471, download_data=False)
 
 ############################################################################
@@ -100,8 +95,8 @@ dataset = openml.datasets.get_dataset(1471, download_data=False)
 # * Explore the data visually.
 eegs = eeg.sample(n=1000)
 _ = pd.plotting.scatter_matrix(
-    eegs.iloc[:100, :4],
-    c=eegs[:100]["class"],
+    X.iloc[:100, :4],
+    c=y[:100],
     figsize=(10, 10),
     marker="o",
     hist_kwds={"bins": 20},
