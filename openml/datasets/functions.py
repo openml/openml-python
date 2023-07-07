@@ -822,7 +822,7 @@ def edit_dataset(
     collection_date: Optional[str] = None,
     language: Optional[str] = None,
     default_target_attribute: Optional[str] = None,
-    ignore_attribute: Optional[Union[str, list[str]]] = None,
+    ignore_attribute: Optional[Union[str, List[str]]] = None,
     citation: Optional[str] = None,
     row_id_attribute: Optional[str] = None,
     original_data_url: Optional[str] = None,
