@@ -24,6 +24,7 @@ import pandas as pd
 import scipy.sparse
 import typing
 import xmltodict
+import warnings
 
 from openml.base import OpenMLBase
 from .data_feature import OpenMLDataFeature
@@ -831,9 +832,10 @@ class OpenMLDataset(OpenMLBase):
         -------
         list
         """
-        for feature in self.features.values():
-            if (feature.name == target_name) and (feature.data_type == "nominal"):
-                return feature.nominal_values
+        if self.features:
+            for feature in self.features.values():
+                if (feature.name == target_name) and (feature.data_type == "nominal"):
+                    return feature.nominal_values
         return None
 
     def get_features_by_type(

@@ -1219,7 +1219,6 @@ def _get_qualities_xml(dataset_id: int) -> str:
 def _get_dataset_qualities_file(
     did_cache_dir: Union[str, None], dataset_id: int
 ) -> Union[str, None]:
-def _get_dataset_qualities_file(did_cache_dir: str, dataset_id: int) -> str:
     """API call to load dataset qualities. Loads from cache or downloads them.
 
     Features are metafeatures (number of features, number of classes, ...)
