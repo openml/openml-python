@@ -12,8 +12,6 @@ def mocked_perform_api_call(call, request_method):
 
 
 class OpenMLTaskTest(TestBase):
-    _multiprocess_can_split_ = True
-
     def test_list_all(self):
         openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
         openml.utils._list_all(
