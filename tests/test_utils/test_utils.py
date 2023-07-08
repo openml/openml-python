@@ -5,19 +5,38 @@ import unittest.mock
 import openml
 from openml.testing import TestBase
 
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def as_robot():
+    policy = openml.config.retry_policy
+    n_retries = openml.config.connection_n_retries
+    openml.config.set_retry_policy("robot", n_retries=20)
+    yield
+    openml.config.set_retry_policy(policy, n_retries)
+
+
+@pytest.fixture(autouse=True)
+def with_test_server():
+    openml.config.start_using_configuration_for_example()
+    yield
+    openml.config.stop_using_configuration_for_example()
+
 
 def mocked_perform_api_call(call, request_method):
     url = openml.config.server + "/" + call
     return openml._api_calls._download_text_file(url)
 
 
-class OpenMLTaskTest(TestBase):
-    def test_list_all(self):
-        openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
-        openml.utils._list_all(
-            listing_call=openml.tasks.functions._list_tasks, output_format="dataframe"
-        )
+def test_list_all(as_robot, with_test_server):
+    openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
+    openml.utils._list_all(
+        listing_call=openml.tasks.functions._list_tasks, output_format="dataframe"
+    )
 
+
+class OpenMLTaskTest(TestBase):
     def test_list_all_with_multiple_batches(self):
         res = openml.utils._list_all(
             listing_call=openml.tasks.functions._list_tasks, output_format="dict", batch_size=1050
