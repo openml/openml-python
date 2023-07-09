@@ -24,16 +24,26 @@ def with_test_server():
     openml.config.stop_using_configuration_for_example()
 
 
-def mocked_perform_api_call(call, request_method):
+def _mocked_perform_api_call(call, request_method):
     url = openml.config.server + "/" + call
     return openml._api_calls._download_text_file(url)
 
 
-def test_list_all(as_robot, with_test_server):
+@pytest.mark.server
+def test_list_all():
     openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
     openml.utils._list_all(
         listing_call=openml.tasks.functions._list_tasks, output_format="dataframe"
     )
+
+
+@pytest.mark.server
+def test_list_all_for_tasks():
+    n_tasks_on_test_after_reset = 1068
+    tasks = openml.tasks.list_tasks(
+        batch_size=1000, size=n_tasks_on_test_after_reset, output_format="dataframe"
+    )
+    assert n_tasks_on_test_after_reset == len(tasks)
 
 
 class OpenMLTaskTest(TestBase):
@@ -56,7 +66,9 @@ class OpenMLTaskTest(TestBase):
         # parallel might be adding or removing tasks!
         # assert len(res) <= len(res2)
 
-    @unittest.mock.patch("openml._api_calls._perform_api_call", side_effect=mocked_perform_api_call)
+    @unittest.mock.patch(
+        "openml._api_calls._perform_api_call", side_effect=_mocked_perform_api_call
+    )
     def test_list_all_few_results_available(self, _perform_api_call):
         # we want to make sure that the number of api calls is only 1.
         # Although we have multiple versions of the iris dataset, there is only
@@ -77,13 +89,6 @@ class OpenMLTaskTest(TestBase):
         self.assertEqual(len(datasets), required_size)
         for dataset in datasets.to_dict(orient="index").values():
             self._check_dataset(dataset)
-
-    def test_list_all_for_tasks(self):
-        required_size = 1068  # default test server reset value
-        tasks = openml.tasks.list_tasks(
-            batch_size=1000, size=required_size, output_format="dataframe"
-        )
-        self.assertEqual(len(tasks), required_size)
 
     def test_list_all_for_flows(self):
         required_size = 15  # default test server reset value
