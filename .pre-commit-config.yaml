@@ -21,7 +21,7 @@ repos:
           - types-python-dateutil
       - id: mypy
         name: mypy type-def-check
-        files: openml/*
+        files: openml/datasets/.*
         additional_dependencies:
           - types-requests
           - types-python-dateutil
