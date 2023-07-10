@@ -889,7 +889,7 @@ def edit_dataset(
         raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
 
     # compose data edit parameters as xml
-    form_data = {"data_id": data_id}
+    form_data: Optional[Dict[str, Union[str, int]]] = {"data_id": data_id}
     xml: OrderedDict[str, OrderedDict[str, Union[str, List[str], None]]]
     xml = OrderedDict()
     xml["oml:data_edit_parameters"] = OrderedDict()
