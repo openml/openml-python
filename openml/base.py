@@ -46,7 +46,7 @@ class OpenMLBase(ABC):
         return cls.__name__.lower()[len("OpenML") :][0]
 
     @abstractmethod
-    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str], None]]]:
         """Collect all information to display in the __repr__ body.
 
         Returns

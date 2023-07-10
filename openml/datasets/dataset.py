@@ -272,7 +272,7 @@ class OpenMLDataset(OpenMLBase):
     def id(self) -> Optional[int]:
         return self.dataset_id
 
-    def _get_repr_body_fields(self) -> List[tuple[str, str | int | None]]:
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str], None]]]:
         """Collect all information to display in the __repr__ body."""
 
         # Obtain number of features in accordance with lazy loading.
