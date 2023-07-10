@@ -173,7 +173,7 @@ class OpenMLFlow(OpenMLBase):
                 "No extension could be found for flow {}: {}".format(self.flow_id, self.name)
             )
 
-    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str], None]]]:
         """Collect all information to display in the __repr__ body."""
         fields = {
             "Flow Name": self.name,

@@ -97,7 +97,7 @@ class BaseStudy(OpenMLBase):
     def id(self) -> Optional[int]:
         return self.study_id
 
-    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str], None]]]:
         """Collect all information to display in the __repr__ body."""
         fields: Dict[str, Any] = {
             "Name": self.name,
