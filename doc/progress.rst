@@ -11,10 +11,6 @@ Changelog
 
  * FIX: Fallback on downloading ARFF when failing to download parquet from MinIO due to a ServerError.
 
-=========
-Changelog
-=========
-
 0.14.0
 ~~~~~~
 
