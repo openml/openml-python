@@ -7,6 +7,7 @@ from pyexpat import ExpatError
 from typing import List, Dict, Optional, Union, cast
 import warnings
 
+import minio.error
 import numpy as np
 import arff
 import pandas as pd
@@ -499,6 +500,8 @@ def get_dataset(
                 )
             except urllib3.exceptions.MaxRetryError:
                 parquet_file = None
+            if parquet_file is None and arff_file:
+                logger.warning("Failed to download parquet, fallback on ARFF.")
         else:
             parquet_file = None
         remove_dataset_cache = False
@@ -1095,7 +1098,7 @@ def _get_dataset_parquet(
             openml._api_calls._download_minio_file(
                 source=cast(str, url), destination=output_file_path
             )
-        except (FileNotFoundError, urllib3.exceptions.MaxRetryError) as e:
+        except (FileNotFoundError, urllib3.exceptions.MaxRetryError, minio.error.ServerError) as e:
             logger.warning("Could not download file from %s: %s" % (cast(str, url), e))
             return None
     return output_file_path
