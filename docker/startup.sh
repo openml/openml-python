@@ -14,7 +14,7 @@
 #        The test or doc build is executed on this branch.
 
 if [[ ! ( $1 = "doc" || $1 = "test" ) ]]; then
-  source /omlp/venv/bin/activate
+  source /openml/venv/bin/activate
   python "$@"
   exit 0
 fi
@@ -35,8 +35,8 @@ if [ "$1" == "doc" ]  && [ -n "$2" ] && ! [ -d "/output" ]; then
 fi
 
 if [ -n "$2" ]; then
-  # if a branch is provided, we will pull it into the `omlp` local repository that was created with the image.
-  cd omlp
+  # if a branch is provided, we will pull it into the `openml` local repository that was created with the image.
+  cd openml
   if [[ $2 == *#* ]]; then
     # If a branch is specified on a fork (with NAME#BRANCH format), we have to construct the url before pulling
     # We add a trailing '#' delimiter so the second element doesn't get the trailing newline from <<<
@@ -55,12 +55,12 @@ if [ -n "$2" ]; then
     exit 1
   fi
   git pull
-  code_dir="/omlp"
+  code_dir="/openml"
 else
   code_dir="/code"
 fi
 
-source /omlp/venv/bin/activate
+source /openml/venv/bin/activate
 cd $code_dir
 # The most recent ``main`` is already installed, but we want to update any outdated dependencies
 pip install -e .[test,examples,docs,examples_unix]
@@ -74,6 +74,6 @@ if [ "$1" == "doc" ]; then
   make html
   make linkcheck
   if [ -d "/output" ]; then
-    cp -r /omlp/doc/build /output
+    cp -r /openml/doc/build /output
   fi
 fi

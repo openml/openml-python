@@ -2,8 +2,8 @@
 # Useful building docs or running unix tests from a Windows host.
 FROM python:3.10
 
-RUN git clone  https://github.com/openml/openml-python.git omlp
-WORKDIR omlp
+RUN git clone  https://github.com/openml/openml-python.git openml
+WORKDIR openml
 RUN python -m venv venv
 RUN venv/bin/pip install wheel setuptools
 RUN venv/bin/pip install -e .[test,examples,docs,examples_unix]
