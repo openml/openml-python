@@ -1,3 +1,6 @@
+# Entry script to switch between the different Docker functionalities.
+# By default, execute Python with OpenML pre-installed
+#
 # Entry script to allow docker to be ran for bash, tests and docs.
 # The script assumes a code repository can be mounted to ``/code`` and an output directory to ``/output``.
 # Executes ``mode`` on ``branch`` or the provided ``code`` directory.
@@ -10,10 +13,10 @@
 #        Can be a branch on a Github fork, specified with the USERNAME#BRANCH format.
 #        The test or doc build is executed on this branch.
 
-if [ -z "$1" ]; then
-  echo "Executing in BASH mode."
-  bash
-  exit
+if [[ ! ( $1 = "doc" || $1 = "test" ) ]]; then
+  source /omlp/venv/bin/activate
+  python "$@"
+  exit 0
 fi
 
 # doc and test modes require mounted directories and/or specified branches
