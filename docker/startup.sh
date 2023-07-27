@@ -14,7 +14,8 @@
 #        The test or doc build is executed on this branch.
 
 if [[ ! ( $1 = "doc" || $1 = "test" ) ]]; then
-  source /openml/venv/bin/activate
+  cd openml
+  source venv/bin/activate
   python "$@"
   exit 0
 fi
