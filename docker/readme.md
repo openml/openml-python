@@ -10,6 +10,9 @@ This document contains information about:
  3. [Versions](#versions) help you identify which image to use.
  4. [Developer](#for-developers) information about the Docker image.
 
+*note:* each docker image is shipped with a readme, which you can read with:
+`docker run --entrypoint=/bin/cat openml/openml-python:TAG readme.md`
+
 ## Usage
 
 There are three main ways to use the image: running a pre-installed Python environment,

@@ -11,6 +11,8 @@ RUN venv/bin/pip install -e .[test,examples,docs,examples_unix]
 WORKDIR /
 RUN mkdir scripts
 ADD startup.sh scripts/
+ADD readme.md /
+
 # Due to the nature of the Docker container it might often be built from Windows.
 # It is typical to have the files with \r\n line-ending, we want to remove it for the unix image.
 RUN sed -i 's/\r//g' scripts/startup.sh
