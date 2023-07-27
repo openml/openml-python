@@ -38,28 +38,31 @@ docker run -v PATH/TO/FILE:/openml/MY_SCRIPT.py openml/openml-python MY_SCRIPT.p
 
 ### Running unit tests
 
-You can run the unit tests by passing `test` as the first argument:
+You can run the unit tests by passing `test` as the first argument.
+It also requires a local or remote repository to be specified, which is explained 
+[below]((#using-local-or-remote-code). For this example, we specify to test the
+`develop` branch:
 
 ```text
-docker run openml/openml-python test
+docker run openml/openml-python test develop
 ```
-
-see [the section below]((#using-local-or-remote-code) for running against local changes
-or a remote branch.
 
 ### Building documentation
 
 You can build the documentation by passing `doc` as the first argument, 
 you should [mount]((https://docs.docker.com/storage/bind-mounts/#start-a-container-with-a-bind-mount)) 
-an output directory in which the docs will be stored, on Windows:
+an output directory in which the docs will be stored. You also need to provide a remote
+or local repository as explained in [the section below]((#using-local-or-remote-code).
+In this example, we build documentation for the `develop` branch.
+On Windows:
 
 ```text
-    docker run --mount type=bind,source="E:\\files/output",destination="/output" openml/openml-python doc
+    docker run --mount type=bind,source="E:\\files/output",destination="/output" openml/openml-python doc develop
 ```
 
 on Linux:
 ```text
-    docker run --mount type=bind,source="./output",destination="/output" openml/openml-python doc
+    docker run --mount type=bind,source="./output",destination="/output" openml/openml-python doc develop
 ```
     
 see [the section below]((#using-local-or-remote-code) for running against local changes
@@ -83,13 +86,13 @@ To use a local directory, mount it in the `/code` directory,  on Windows:
 
 on Linux:
 ```text
-    docker run --mount type=bind,source="~/repositories/openml-python",destination="/code" openml/openml-python test
+    docker run --mount type=bind,source="/Users/pietergijsbers/repositories/openml-python",destination="/code" openml/openml-python test
 ```
 
 when building docs, you also need to mount an output directory as shown above, so add both:
 
 ```text
-docker run --mount type=bind,source="./output",destination="/output" --mount type=bind,source="~/repositories/openml-python",destination="/code" openml/openml-python doc
+docker run --mount type=bind,source="./output",destination="/output" --mount type=bind,source="/Users/pietergijsbers/repositories/openml-python",destination="/code" openml/openml-python doc
 ```
 
 ### Using a Github repository
