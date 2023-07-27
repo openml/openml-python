@@ -44,6 +44,15 @@ jobs:
           tags: ${{ steps.meta_dockerhub.outputs.tags }}
           labels: ${{ steps.meta_dockerhub.outputs.labels }}
           platforms: linux/amd64,linux/arm64
+
+      - name: Update repo description
+        uses: peter-evans/dockerhub-description@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: openml/openml-python
+          short-description: "pre-installed openml-python environment"
+          readme-filepath: ./docker/readme.md
           
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
