@@ -1139,7 +1139,7 @@ def __list_runs(api_call, output_format="dict"):
             '"http://openml.org/openml": %s' % str(runs_dict)
         )
 
-    assert type(runs_dict["oml:runs"]["oml:run"]) == list, type(runs_dict["oml:runs"])
+    assert isinstance(runs_dict["oml:runs"]["oml:run"], list), type(runs_dict["oml:runs"])
 
     runs = OrderedDict()
     for run_ in runs_dict["oml:runs"]["oml:run"]:

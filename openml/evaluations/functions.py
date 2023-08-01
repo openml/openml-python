@@ -197,7 +197,7 @@ def __list_evaluations(api_call, output_format="object"):
             "Error in return XML, does not contain " '"oml:evaluations": %s' % str(evals_dict)
         )
 
-    assert type(evals_dict["oml:evaluations"]["oml:evaluation"]) == list, type(
+    assert isinstance(evals_dict["oml:evaluations"]["oml:evaluation"], list), type(
         evals_dict["oml:evaluations"]
     )
 

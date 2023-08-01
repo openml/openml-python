@@ -341,7 +341,7 @@ def __list_flows(api_call: str, output_format: str = "dict") -> Union[Dict, pd.D
     flows_dict = xmltodict.parse(xml_string, force_list=("oml:flow",))
 
     # Minimalistic check if the XML is useful
-    assert type(flows_dict["oml:flows"]["oml:flow"]) == list, type(flows_dict["oml:flows"])
+    assert isinstance(flows_dict["oml:flows"]["oml:flow"], list), type(flows_dict["oml:flows"])
     assert flows_dict["oml:flows"]["@xmlns:oml"] == "http://openml.org/openml", flows_dict[
         "oml:flows"
     ]["@xmlns:oml"]

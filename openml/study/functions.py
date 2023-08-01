@@ -595,7 +595,7 @@ def __list_studies(api_call, output_format="object") -> Union[Dict, pd.DataFrame
     study_dict = xmltodict.parse(xml_string, force_list=("oml:study",))
 
     # Minimalistic check if the XML is useful
-    assert type(study_dict["oml:study_list"]["oml:study"]) == list, type(
+    assert isinstance(study_dict["oml:study_list"]["oml:study"], list), type(
         study_dict["oml:study_list"]
     )
     assert study_dict["oml:study_list"]["@xmlns:oml"] == "http://openml.org/openml", study_dict[
