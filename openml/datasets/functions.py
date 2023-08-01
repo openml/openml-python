@@ -192,7 +192,9 @@ def __list_datasets(api_call, output_format="dict"):
     datasets_dict = xmltodict.parse(xml_string, force_list=("oml:dataset",))
 
     # Minimalistic check if the XML is useful
-    assert type(datasets_dict["oml:data"]["oml:dataset"]) == list, type(datasets_dict["oml:data"])
+    assert isinstance(datasets_dict["oml:data"]["oml:dataset"], list), type(
+        datasets_dict["oml:data"]
+    )
     assert datasets_dict["oml:data"]["@xmlns:oml"] == "http://openml.org/openml", datasets_dict[
         "oml:data"
     ]["@xmlns:oml"]

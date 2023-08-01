@@ -220,7 +220,7 @@ def __list_setups(api_call, output_format="object"):
             '"%s": %s' % (openml_uri, str(setups_dict))
         )
 
-    assert type(setups_dict["oml:setups"]["oml:setup"]) == list, type(setups_dict["oml:setups"])
+    assert isinstance(setups_dict["oml:setups"]["oml:setup"], list), type(setups_dict["oml:setups"])
 
     setups = dict()
     for setup_ in setups_dict["oml:setups"]["oml:setup"]:
