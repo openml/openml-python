@@ -43,7 +43,7 @@ class OpenMLSplit(object):
 
     def __eq__(self, other):
         if (
-            type(self) != type(other)
+            (not isinstance(self, type(other)))
             or self.name != other.name
             or self.description != other.description
             or self.split.keys() != other.split.keys()

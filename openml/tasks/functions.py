@@ -246,7 +246,7 @@ def __list_tasks(api_call, output_format="dict"):
             '"http://openml.org/openml": %s' % str(tasks_dict)
         )
 
-    assert type(tasks_dict["oml:tasks"]["oml:task"]) == list, type(tasks_dict["oml:tasks"])
+    assert isinstance(tasks_dict["oml:tasks"]["oml:task"], list), type(tasks_dict["oml:tasks"])
 
     tasks = dict()
     procs = _get_estimation_procedure_list()
