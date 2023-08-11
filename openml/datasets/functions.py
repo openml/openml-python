@@ -1051,7 +1051,7 @@ def _get_dataset_parquet(
     This function is NOT thread/multiprocessing safe.
     Unlike the ARFF equivalent, checksums are not available/used (for now).
 
-    Parametersparquet_url
+    Parameters
     ----------
     description : dictionary or OpenMLDataset
         Either a dataset description as dict or OpenMLDataset.
@@ -1062,7 +1062,7 @@ def _get_dataset_parquet(
 
     download_all_files: bool, optional (default=False)
         If `True`, download all data found in the bucket to which the description's
-        ```` points, only download the parquet file otherwise.
+        ``parquet_url`` points, only download the parquet file otherwise.
 
     Returns
     -------

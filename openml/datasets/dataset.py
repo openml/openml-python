@@ -97,7 +97,7 @@ class OpenMLDataset(OpenMLBase):
     dataset: string, optional
         Serialized arff dataset string.
     parquet_url: string, optional
-        URL to the Parquet bucket with dataset files
+        URL to the MinIO bucket with dataset files
     parquet_file: string, optional
         Path to the local parquet file.
     """
