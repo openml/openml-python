@@ -97,9 +97,11 @@ class OpenMLDataset(OpenMLBase):
     dataset: string, optional
         Serialized arff dataset string.
     parquet_url: string, optional
-        URL to the MinIO bucket with dataset files
+        This is the URL to the storage location where the dataset files are hosted. 
+        This can be a MinIO bucket URL. If specified, the data will be accessed 
+        from this URL when reading the files.
     parquet_file: string, optional
-        Path to the local parquet file.
+        Path to the local file.
     """
 
     def __init__(
