@@ -5,10 +5,10 @@ It can also be used by developers to run unit tests or build the docs in
 a fresh and/or isolated unix environment. 
 This document contains information about:
 
- 1. [Usage](#usage) take you over 
- 2. [Using local or remote code](#using-local-or-remote-code) is useful when testing your own latest changes
- 3. [Versions](#versions) help you identify which image to use.
- 4. [Developer](#for-developers) information about the Docker image.
+ 1. [Usage](#usage): how to use the image and its main modes.
+ 2. [Using local or remote code](#using-local-or-remote-code): useful when testing your own latest changes.
+ 3. [Versions](#versions): identify which image to use.
+ 4. [Development](#for-developers): information about the Docker image for developers.
 
 *note:* each docker image is shipped with a readme, which you can read with:
 `docker run --entrypoint=/bin/cat openml/openml-python:TAG readme.md`
