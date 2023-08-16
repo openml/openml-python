@@ -36,6 +36,8 @@ class OpenMLTask(OpenMLBase):
 
     Parameters
     ----------
+    task_id : Union[int, None]
+        Refers to the unique identifier of a task.
     task_type_id : TaskType
         Refers to the type of task.
     task_type : str
@@ -44,6 +46,14 @@ class OpenMLTask(OpenMLBase):
         Refers to the data.
     estimation_procedure_id: int
         Refers to the type of estimates used.
+    estimation_procedure_type : Optional[str] 
+        Refers to the type of estimation procedure used for the task.
+    estimation_parameters : Optional[Dict[str, str]]
+        Estimation parameters used for the task.
+    evaluation_measure : Optional[str]
+        Refers to the evaluation measure.
+    data_splits_url : Optional[str]
+        Refers to the URL of the data splits used for the task.
     """
 
     def __init__(
