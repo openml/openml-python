@@ -6,6 +6,11 @@
 Changelog
 =========
 
+next
+~~~~~~
+
+ * MAINT #1280: Use the server-provided ``parquet_url`` instead of ``minio_url`` to determine the location of the parquet file.
+
 0.14.1
 ~~~~~~
 
