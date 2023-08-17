@@ -96,10 +96,12 @@ class OpenMLDataset(OpenMLBase):
         which maps a quality name to a quality value.
     dataset: string, optional
         Serialized arff dataset string.
-    minio_url: string, optional
-        URL to the MinIO bucket with dataset files
+    parquet_url: string, optional
+        This is the URL to the storage location where the dataset files are hosted.
+        This can be a MinIO bucket URL. If specified, the data will be accessed
+        from this URL when reading the files.
     parquet_file: string, optional
-        Path to the local parquet file.
+        Path to the local file.
     """
 
     def __init__(
@@ -132,7 +134,7 @@ class OpenMLDataset(OpenMLBase):
         features_file: Optional[str] = None,
         qualities_file: Optional[str] = None,
         dataset=None,
-        minio_url: Optional[str] = None,
+        parquet_url: Optional[str] = None,
         parquet_file: Optional[str] = None,
     ):
         def find_invalid_characters(string, pattern):
@@ -210,7 +212,7 @@ class OpenMLDataset(OpenMLBase):
         self.data_file = data_file
         self.parquet_file = parquet_file
         self._dataset = dataset
-        self._minio_url = minio_url
+        self._parquet_url = parquet_url
 
         self._features = None  # type: Optional[Dict[int, OpenMLDataFeature]]
         self._qualities = None  # type: Optional[Dict[str, float]]
@@ -329,7 +331,7 @@ class OpenMLDataset(OpenMLBase):
         from .functions import _get_dataset_arff, _get_dataset_parquet
 
         self.data_file = _get_dataset_arff(self)
-        if self._minio_url is not None:
+        if self._parquet_url is not None:
             self.parquet_file = _get_dataset_parquet(self)
 
     def _get_arff(self, format: str) -> Dict:
