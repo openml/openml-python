@@ -495,7 +495,7 @@ def get_dataset(
             qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
 
         arff_file = _get_dataset_arff(description) if download_data else None
-        if "oml:minio_url" in description and download_data:
+        if "oml:parquet_url" in description and download_data:
             try:
                 parquet_file = _get_dataset_parquet(
                     description, download_all_files=download_all_files
@@ -1062,7 +1062,7 @@ def _get_dataset_parquet(
 
     download_all_files: bool, optional (default=False)
         If `True`, download all data found in the bucket to which the description's
-        ``minio_url`` points, only download the parquet file otherwise.
+        ``parquet_url`` points, only download the parquet file otherwise.
 
     Returns
     -------
@@ -1070,10 +1070,10 @@ def _get_dataset_parquet(
         Location of the Parquet file if successfully downloaded, None otherwise.
     """
     if isinstance(description, dict):
-        url = cast(str, description.get("oml:minio_url"))
+        url = cast(str, description.get("oml:parquet_url"))
         did = description.get("oml:id")
     elif isinstance(description, OpenMLDataset):
-        url = cast(str, description._minio_url)
+        url = cast(str, description._parquet_url)
         did = description.dataset_id
     else:
         raise TypeError("`description` should be either OpenMLDataset or Dict.")
@@ -1316,7 +1316,7 @@ def _create_dataset_from_description(
         cache_format=cache_format,
         features_file=features_file,
         qualities_file=qualities_file,
-        minio_url=description.get("oml:minio_url"),
+        parquet_url=description.get("oml:parquet_url"),
         parquet_file=parquet_file,
     )
 
