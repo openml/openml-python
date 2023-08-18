@@ -545,7 +545,7 @@ def _copy_server_fields(source_flow, target_flow):
 
 
 def _add_if_nonempty(dic, key, value):
-    """ Adds a key-value pair to a dictionary if the value is not None.
+    """Adds a key-value pair to a dictionary if the value is not None.
      
     Parameters
     ----------
