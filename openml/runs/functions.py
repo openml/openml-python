@@ -670,7 +670,7 @@ def _run_task_get_arffcontent_parallel_helper(
     Optional[OpenMLRunTrace],
     "OrderedDict[str, float]",
 ]:
-    """ Helper function that runs a single model on a single task fold sample.
+    """Helper function that runs a single model on a single task fold sample.
     
     Parameters
     ----------
