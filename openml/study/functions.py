@@ -107,7 +107,7 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
             tags.append(current_tag)
 
     def get_nested_ids_from_result_dict(key: str, subkey: str) -> Optional[List]:
-        """ Extracts a list of nested IDs from a result dictionary.
+        """Extracts a list of nested IDs from a result dictionary.
         
         Parameters
         ----------
