@@ -157,7 +157,7 @@ class OpenMLSplit(object):
         raise NotImplementedError()
 
     def get(self, repeat=0, fold=0, sample=0):
-        """ Returns the specified data split from the CrossValidationSplit object.
+        """Returns the specified data split from the CrossValidationSplit object.
         
         Parameters
         ----------
