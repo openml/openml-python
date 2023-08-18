@@ -237,7 +237,7 @@ class OpenMLRunTrace(object):
 
     @classmethod
     def _trace_from_arff_struct(cls, attributes, content, error_message):
-        """ Generate a trace dictionary from ARFF structure.
+        """Generate a trace dictionary from ARFF structure.
         
         Parameters
         ----------
