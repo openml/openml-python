@@ -34,8 +34,7 @@ class OpenMLRunTrace(object):
     """
 
     def __init__(self, run_id: int, trace_iterations: List[List]):
-        """
-        Object to hold the trace content of a run.
+        """Object to hold the trace content of a run.
         
         Parameters
         ----------
