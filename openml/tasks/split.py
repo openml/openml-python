@@ -136,7 +136,7 @@ class OpenMLSplit(object):
         return cls(name, "", repetitions)
 
     def from_dataset(self, X, Y, folds, repeats):
-        """ Generates a new OpenML dataset object from input data and cross-validation settings.
+        """Generates a new OpenML dataset object from input data and cross-validation settings.
         
         Parameters
         ----------
