@@ -463,7 +463,8 @@ def _run_task_get_arffcontent(
     "OrderedDict[str, OrderedDict]",
     "OrderedDict[str, OrderedDict]",
 ]:
-    """ Runs the hyperparameter optimization on the given task and returns the arfftrace content.
+    """Runs the hyperparameter optimization on the given task and returns the arfftrace content.
+    
     Parameters
     ----------
     model : Any
