@@ -605,7 +605,7 @@ def _list_studies(output_format="dict", **kwargs) -> Union[Dict, pd.DataFrame]:
 
 
 def __list_studies(api_call, output_format="object") -> Union[Dict, pd.DataFrame]:
-    """ Retrieves the list of OpenML studies and returns it in a dictionary or a Pandas DataFrame.
+    """Retrieves the list of OpenML studies and returns it in a dictionary or a Pandas DataFrame.
     
     Parameters
     ----------
