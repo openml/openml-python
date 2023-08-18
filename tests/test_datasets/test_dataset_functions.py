@@ -439,7 +439,7 @@ class TestOpenMLDataset(TestBase):
 
     def test__get_dataset_parquet_not_cached(self):
         description = {
-            "oml:minio_url": "http://openml1.win.tue.nl/dataset20/dataset_20.pq",
+            "oml:parquet_url": "http://openml1.win.tue.nl/dataset20/dataset_20.pq",
             "oml:id": "20",
         }
         path = _get_dataset_parquet(description, cache_directory=self.workdir)
@@ -450,10 +450,10 @@ class TestOpenMLDataset(TestBase):
     def test__get_dataset_parquet_is_cached(self, patch):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         patch.side_effect = RuntimeError(
-            "_download_minio_file should not be called when loading from cache"
+            "_download_parquet_url should not be called when loading from cache"
         )
         description = {
-            "oml:minio_url": "http://openml1.win.tue.nl/dataset30/dataset_30.pq",
+            "oml:parquet_url": "http://openml1.win.tue.nl/dataset30/dataset_30.pq",
             "oml:id": "30",
         }
         path = _get_dataset_parquet(description, cache_directory=None)
@@ -462,7 +462,7 @@ class TestOpenMLDataset(TestBase):
 
     def test__get_dataset_parquet_file_does_not_exist(self):
         description = {
-            "oml:minio_url": "http://openml1.win.tue.nl/dataset20/does_not_exist.pq",
+            "oml:parquet_url": "http://openml1.win.tue.nl/dataset20/does_not_exist.pq",
             "oml:id": "20",
         }
         path = _get_dataset_parquet(description, cache_directory=self.workdir)
@@ -1416,7 +1416,7 @@ class TestOpenMLDataset(TestBase):
         # The parquet file on minio with ID 128 is not the iris dataset from the test server.
         dataset = openml.datasets.get_dataset(128, cache_format="feather")
         # Workaround
-        dataset._minio_url = None
+        dataset._parquet_url = None
         dataset.parquet_file = None
         dataset.get_data()
 
@@ -1561,7 +1561,7 @@ class TestOpenMLDataset(TestBase):
         # There is no parquet-copy of the test server yet.
         openml.config.server = self.production_server
         dataset = openml.datasets.get_dataset(61)
-        self.assertIsNotNone(dataset._minio_url)
+        self.assertIsNotNone(dataset._parquet_url)
         self.assertIsNotNone(dataset.parquet_file)
         self.assertTrue(os.path.isfile(dataset.parquet_file))
 
