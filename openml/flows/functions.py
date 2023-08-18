@@ -346,6 +346,7 @@ def __list_flows(api_call: str, output_format: str = "dict") -> Union[Dict, pd.D
     output_format: str in {"dict", "dataframe"}
         The output format.
     Returns
+    
     -------
         The flows information in the specified output format.
     """
