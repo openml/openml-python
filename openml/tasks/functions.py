@@ -230,7 +230,7 @@ def _list_tasks(task_type=None, output_format="dict", **kwargs):
 
 
 def __list_tasks(api_call, output_format="dict"):
-    """ Returns a dictionary or a Pandas DataFrame with information about OpenML tasks.
+    """Returns a dictionary or a Pandas DataFrame with information about OpenML tasks.
     
     Parameters
     ----------
