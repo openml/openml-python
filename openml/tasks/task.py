@@ -551,8 +551,8 @@ class OpenMLClusteringTask(OpenMLTask):
 
 
 class OpenMLLearningCurveTask(OpenMLClassificationTask):
-     """OpenML Learning Curve object.
-     
+    """OpenML Learning Curve object.
+
     Parameters
     ----------
     task_type_id : TaskType
