@@ -35,7 +35,7 @@ class OpenMLRunTrace(object):
 
     def __init__(self, run_id: int, trace_iterations: List[List]):
         """Object to hold the trace content of a run.
-        
+
         Parameters
         ----------
         run_id : int
@@ -238,7 +238,7 @@ class OpenMLRunTrace(object):
     @classmethod
     def _trace_from_arff_struct(cls, attributes, content, error_message):
         """Generate a trace dictionary from ARFF structure.
-        
+
         Parameters
         ----------
         cls : type
@@ -249,7 +249,7 @@ class OpenMLRunTrace(object):
             List of instances.
         error_message : str
             Error message to raise if `setup_string` is in `attributes`.
-            
+
         Returns
         -------
         OrderedDict
@@ -373,19 +373,19 @@ class OpenMLRunTrace(object):
     @classmethod
     def merge_traces(cls, traces: List["OpenMLRunTrace"]) -> "OpenMLRunTrace":
         """Merge multiple traces into a single trace.
-        
+
         Parameters
         ----------
         cls : type
             Type of the trace object to be created.
         traces : List[OpenMLRunTrace]
             List of traces to merge.
-            
+
         Returns
         -------
         OpenMLRunTrace
             A trace object representing the merged traces.
-            
+
         Raises
         ------
         ValueError

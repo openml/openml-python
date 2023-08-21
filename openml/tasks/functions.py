@@ -231,19 +231,19 @@ def _list_tasks(task_type=None, output_format="dict", **kwargs):
 
 def __list_tasks(api_call, output_format="dict"):
     """Returns a dictionary or a Pandas DataFrame with information about OpenML tasks.
-    
+
     Parameters
     ----------
     api_call : str
         The API call specifying which tasks to return.
     output_format : str in {"dict", "dataframe"}
         Output format for the returned object.
-        
+
     Returns
     -------
     Union[Dict, pd.DataFrame]
         A dictionary or a Pandas DataFrame with information about OpenML tasks.
-        
+
     Raises
     ------
     ValueError

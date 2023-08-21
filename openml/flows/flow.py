@@ -524,7 +524,7 @@ class OpenMLFlow(OpenMLBase):
 
 def _copy_server_fields(source_flow, target_flow):
     """Recursively copies the fields added by the server from the `source_flow` to the `target_flow`.
-    
+
     Parameters
     ----------
     source_flow : OpenMLFlow
@@ -546,7 +546,7 @@ def _copy_server_fields(source_flow, target_flow):
 
 def _add_if_nonempty(dic, key, value):
     """Adds a key-value pair to a dictionary if the value is not None.
-     
+
     Parameters
     ----------
     dic: dict

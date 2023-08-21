@@ -2102,7 +2102,7 @@ class SklearnExtension(Extension):
 
     def _extract_trace_data(self, model, rep_no, fold_no):
         """Extracts data from a machine learning model's cross-validation results and creates an ARFF (Attribute-Relation File Format) trace.
-        
+
         Parameters
         ----------
         model : Any

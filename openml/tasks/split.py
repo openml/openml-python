@@ -137,7 +137,7 @@ class OpenMLSplit(object):
 
     def from_dataset(self, X, Y, folds, repeats):
         """Generates a new OpenML dataset object from input data and cross-validation settings.
-        
+
         Parameters
         ----------
         X : array-like or sparse matrix
@@ -148,7 +148,7 @@ class OpenMLSplit(object):
             Number of cross-validation folds to generate.
         repeats : int
             Number of times to repeat the cross-validation process.
-            
+
         Raises
         ------
         NotImplementedError
@@ -158,7 +158,7 @@ class OpenMLSplit(object):
 
     def get(self, repeat=0, fold=0, sample=0):
         """Returns the specified data split from the CrossValidationSplit object.
-        
+
         Parameters
         ----------
         repeat : int
@@ -167,12 +167,12 @@ class OpenMLSplit(object):
             Index of the fold to retrieve.
         sample : int
             Index of the sample to retrieve.
-            
+
         Returns
         -------
         numpy.ndarray
             The data split for the specified repeat, fold, and sample.
-            
+
         Raises
         ------
         ValueError

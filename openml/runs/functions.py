@@ -129,12 +129,12 @@ def run_model_on_task(
 
     def get_task_and_type_conversion(task: Union[int, str, OpenMLTask]) -> OpenMLTask:
         """Retrieve an OpenMLTask object from either an integer or string ID, or directly from an OpenMLTask object.
-        
+
         Parameters
         ----------
         task : Union[int, str, OpenMLTask]
             The task ID or the OpenMLTask object.
-        
+
         Returns
         -------
         OpenMLTask
@@ -464,7 +464,7 @@ def _run_task_get_arffcontent(
     "OrderedDict[str, OrderedDict]",
 ]:
     """Runs the hyperparameter optimization on the given task and returns the arfftrace content.
-    
+
     Parameters
     ----------
     model : Any
@@ -479,7 +479,7 @@ def _run_task_get_arffcontent(
         The format in which to download the dataset.
     n_jobs : int
         Number of jobs to run in parallel. If None, use 1 core by default. If -1, use all available cores.
-        
+
     Returns
     -------
     Tuple[List[List], Optional[OpenMLRunTrace], OrderedDict[str, OrderedDict], OrderedDict[str, OrderedDict]]
@@ -671,7 +671,7 @@ def _run_task_get_arffcontent_parallel_helper(
     "OrderedDict[str, float]",
 ]:
     """Helper function that runs a single model on a single task fold sample.
-    
+
     Parameters
     ----------
     extension : Extension
@@ -690,13 +690,13 @@ def _run_task_get_arffcontent_parallel_helper(
         The dataset format to be used.
     configuration : Dict
         Hyperparameters to configure the model.
-        
+
     Returns
     -------
     Tuple[np.ndarray, Optional[pd.DataFrame], np.ndarray, Optional[pd.DataFrame],
            Optional[OpenMLRunTrace], OrderedDict[str, float]]
-    A tuple containing the predictions, probability estimates (if applicable), 
-    actual target values, actual target value probabilities (if applicable), 
+    A tuple containing the predictions, probability estimates (if applicable),
+    actual target values, actual target value probabilities (if applicable),
     the trace object of the OpenML run (if applicable), and a dictionary of local measures for this particular fold.
     """
     # Sets up the OpenML instantiated in the child process to match that of the parent's
