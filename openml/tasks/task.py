@@ -46,7 +46,7 @@ class OpenMLTask(OpenMLBase):
         Refers to the data.
     estimation_procedure_id: int
         Refers to the type of estimates used.
-    estimation_procedure_type: str, default=None 
+    estimation_procedure_type: str, default=None
         Refers to the type of estimation procedure used for the OpenML task.
     estimation_parameters: [Dict[str, str]], default=None
         Estimation parameters used for the OpenML task.
@@ -399,7 +399,7 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
 
 class OpenMLRegressionTask(OpenMLSupervisedTask):
     """OpenML Regression object.
-    
+
     Parameters
     ----------
     task_type_id : TaskType
