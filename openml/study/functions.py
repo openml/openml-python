@@ -605,19 +605,22 @@ def _list_studies(output_format="dict", **kwargs) -> Union[Dict, pd.DataFrame]:
 
 
 def __list_studies(api_call, output_format="object") -> Union[Dict, pd.DataFrame]:
-    """Retrieves the list of OpenML studies and returns it in a dictionary or a Pandas DataFrame.
+    """Retrieves the list of OpenML studies and 
+    returns it in a dictionary or a Pandas DataFrame.
 
     Parameters
     ----------
     api_call : str
         The API call for retrieving the list of OpenML studies.
     output_format : str in {"object", "dataframe"}
-        Format of the output, either 'object' for a dictionary or 'dataframe' for a Pandas DataFrame.
+        Format of the output, either 'object' for a dictionary
+        or 'dataframe' for a Pandas DataFrame.
 
     Returns
     -------
     Union[Dict, pd.DataFrame]
-        A dictionary or Pandas DataFrame of OpenML studies, depending on the value of 'output_format'.
+        A dictionary or Pandas DataFrame of OpenML studies, 
+        depending on the value of 'output_format'.
     """
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     study_dict = xmltodict.parse(xml_string, force_list=("oml:study",))
