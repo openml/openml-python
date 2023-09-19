@@ -485,7 +485,7 @@ def _run_task_get_arffcontent(
 
     Returns
     -------
-    Tuple[List[List], Optional[OpenMLRunTrace], 
+    Tuple[List[List], Optional[OpenMLRunTrace],
         OrderedDict[str, OrderedDict], OrderedDict[str, OrderedDict]]
     A tuple containing the arfftrace content,
     the OpenML run trace, the global and local evaluation measures.
