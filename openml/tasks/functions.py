@@ -247,8 +247,8 @@ def __list_tasks(api_call, output_format="dict"):
     Raises
     ------
     ValueError
-        If the XML returned by the OpenML API does not contain 'oml:tasks', '@xmlns:oml', or has an incorrect value for
-        '@xmlns:oml'.
+        If the XML returned by the OpenML API does not contain 'oml:tasks', '@xmlns:oml',
+        or has an incorrect value for '@xmlns:oml'.
     KeyError
         If an invalid key is found in the XML for a task.
     """
