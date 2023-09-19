@@ -464,7 +464,8 @@ def _run_task_get_arffcontent(
     "OrderedDict[str, OrderedDict]",
     "OrderedDict[str, OrderedDict]",
 ]:
-    """Runs the hyperparameter optimization on the given task and returns the arfftrace content.
+    """Runs the hyperparameter optimization on the given task
+    and returns the arfftrace content.
 
     Parameters
     ----------
@@ -479,12 +480,15 @@ def _run_task_get_arffcontent(
     dataset_format : str
         The format in which to download the dataset.
     n_jobs : int
-        Number of jobs to run in parallel. If None, use 1 core by default. If -1, use all available cores.
+        Number of jobs to run in parallel.
+        If None, use 1 core by default. If -1, use all available cores.
 
     Returns
     -------
-    Tuple[List[List], Optional[OpenMLRunTrace], OrderedDict[str, OrderedDict], OrderedDict[str, OrderedDict]]
-        A tuple containing the arfftrace content, the OpenML run trace, the global and local evaluation measures.
+    Tuple[List[List], Optional[OpenMLRunTrace], 
+        OrderedDict[str, OrderedDict], OrderedDict[str, OrderedDict]]
+    A tuple containing the arfftrace content,
+    the OpenML run trace, the global and local evaluation measures.
     """
     arff_datacontent = []  # type: List[List]
     traces = []  # type: List[OpenMLRunTrace]
@@ -698,7 +702,8 @@ def _run_task_get_arffcontent_parallel_helper(
            Optional[OpenMLRunTrace], OrderedDict[str, float]]
     A tuple containing the predictions, probability estimates (if applicable),
     actual target values, actual target value probabilities (if applicable),
-    the trace object of the OpenML run (if applicable), and a dictionary of local measures for this particular fold.
+    the trace object of the OpenML run (if applicable),
+    and a dictionary of local measures for this particular fold.
     """
     # Sets up the OpenML instantiated in the child process to match that of the parent's
     # if configuration=None, loads the default
