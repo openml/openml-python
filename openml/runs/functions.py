@@ -128,7 +128,8 @@ def run_model_on_task(
     flow = extension.model_to_flow(model)
 
     def get_task_and_type_conversion(task: Union[int, str, OpenMLTask]) -> OpenMLTask:
-        """Retrieve an OpenMLTask object from either an integer or string ID, or directly from an OpenMLTask object.
+        """Retrieve an OpenMLTask object from either an integer or string ID,
+        or directly from an OpenMLTask object.
 
         Parameters
         ----------
