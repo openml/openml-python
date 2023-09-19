@@ -337,7 +337,8 @@ def get_flow_id(
 
 
 def __list_flows(api_call: str, output_format: str = "dict") -> Union[Dict, pd.DataFrame]:
-    """Retrieve information about flows from OpenML API and parse it to a dictionary or a Pandas DataFrame.
+    """Retrieve information about flows from OpenML API 
+    and parse it to a dictionary or a Pandas DataFrame.
 
     Parameters
     ----------
