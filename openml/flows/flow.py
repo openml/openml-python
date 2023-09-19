@@ -523,7 +523,8 @@ class OpenMLFlow(OpenMLBase):
 
 
 def _copy_server_fields(source_flow, target_flow):
-    """Recursively copies the fields added by the server from the `source_flow` to the `target_flow`.
+    """Recursively copies the fields added by the server 
+    from the `source_flow` to the `target_flow`.
 
     Parameters
     ----------
