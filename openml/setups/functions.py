@@ -288,7 +288,7 @@ def initialize_model(setup_id: int) -> Any:
 
 
 def _to_dict(flow_id: int, openml_parameter_settings):
-    """Convert a flow ID and a list of OpenML parameter settings to 
+    """Convert a flow ID and a list of OpenML parameter settings to
     a dictionary representation that can be serialized to XML.
 
     Parameters
