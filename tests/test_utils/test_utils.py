@@ -1,118 +1,167 @@
 import os
-import tempfile
 import unittest.mock
 
 import openml
-from openml.testing import TestBase
+from openml.testing import _check_dataset
+
+import pytest
 
 
-class OpenMLTaskTest(TestBase):
-    _multiprocess_can_split_ = True
+@pytest.fixture(autouse=True)
+def as_robot():
+    policy = openml.config.retry_policy
+    n_retries = openml.config.connection_n_retries
+    openml.config.set_retry_policy("robot", n_retries=20)
+    yield
+    openml.config.set_retry_policy(policy, n_retries)
 
-    def mocked_perform_api_call(call, request_method):
-        # TODO: JvR: Why is this not a staticmethod?
-        url = openml.config.server + "/" + call
-        return openml._api_calls._download_text_file(url)
 
-    def test_list_all(self):
-        openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
-        openml.utils._list_all(
-            listing_call=openml.tasks.functions._list_tasks, output_format="dataframe"
-        )
+@pytest.fixture(autouse=True)
+def with_test_server():
+    openml.config.start_using_configuration_for_example()
+    yield
+    openml.config.stop_using_configuration_for_example()
 
-    def test_list_all_with_multiple_batches(self):
-        res = openml.utils._list_all(
-            listing_call=openml.tasks.functions._list_tasks, output_format="dict", batch_size=1050
-        )
-        # Verify that test server state is still valid for this test to work as intended
-        #  -> If the number of results is less than 1050, the test can not test the
-        #  batching operation. By having more than 1050 results we know that batching
-        # was triggered. 1050 appears to be a number of tasks that is available on a fresh
-        # test server.
-        assert len(res) > 1050
-        openml.utils._list_all(
-            listing_call=openml.tasks.functions._list_tasks,
-            output_format="dataframe",
-            batch_size=1050,
-        )
-        # Comparing the number of tasks is not possible as other unit tests running in
-        # parallel might be adding or removing tasks!
-        # assert len(res) <= len(res2)
 
-    @unittest.mock.patch("openml._api_calls._perform_api_call", side_effect=mocked_perform_api_call)
-    def test_list_all_few_results_available(self, _perform_api_call):
-        # we want to make sure that the number of api calls is only 1.
-        # Although we have multiple versions of the iris dataset, there is only
-        # one with this name/version combination
+@pytest.fixture
+def min_number_tasks_on_test_server() -> int:
+    """After a reset at least 1068 tasks are on the test server"""
+    return 1068
 
-        datasets = openml.datasets.list_datasets(
-            size=1000, data_name="iris", data_version=1, output_format="dataframe"
-        )
-        self.assertEqual(len(datasets), 1)
-        self.assertEqual(_perform_api_call.call_count, 1)
 
-    def test_list_all_for_datasets(self):
-        required_size = 127  # default test server reset value
-        datasets = openml.datasets.list_datasets(
-            batch_size=100, size=required_size, output_format="dataframe"
-        )
+@pytest.fixture
+def min_number_datasets_on_test_server() -> int:
+    """After a reset at least 127 datasets are on the test server"""
+    return 127
 
-        self.assertEqual(len(datasets), required_size)
-        for dataset in datasets.to_dict(orient="index").values():
-            self._check_dataset(dataset)
 
-    def test_list_all_for_tasks(self):
-        required_size = 1068  # default test server reset value
-        tasks = openml.tasks.list_tasks(
-            batch_size=1000, size=required_size, output_format="dataframe"
-        )
-        self.assertEqual(len(tasks), required_size)
+@pytest.fixture
+def min_number_flows_on_test_server() -> int:
+    """After a reset at least 127 flows are on the test server"""
+    return 15
 
-    def test_list_all_for_flows(self):
-        required_size = 15  # default test server reset value
-        flows = openml.flows.list_flows(
-            batch_size=25, size=required_size, output_format="dataframe"
-        )
-        self.assertEqual(len(flows), required_size)
 
-    def test_list_all_for_setups(self):
-        required_size = 50
-        # TODO apparently list_setups function does not support kwargs
-        setups = openml.setups.list_setups(size=required_size)
+@pytest.fixture
+def min_number_setups_on_test_server() -> int:
+    """After a reset at least 50 setups are on the test server"""
+    return 50
 
-        # might not be on test server after reset, please rerun test at least once if fails
-        self.assertEqual(len(setups), required_size)
 
-    def test_list_all_for_runs(self):
-        required_size = 21
-        runs = openml.runs.list_runs(batch_size=25, size=required_size)
+@pytest.fixture
+def min_number_runs_on_test_server() -> int:
+    """After a reset at least 50 runs are on the test server"""
+    return 21
 
-        # might not be on test server after reset, please rerun test at least once if fails
-        self.assertEqual(len(runs), required_size)
 
-    def test_list_all_for_evaluations(self):
-        required_size = 22
-        # TODO apparently list_evaluations function does not support kwargs
-        evaluations = openml.evaluations.list_evaluations(
-            function="predictive_accuracy", size=required_size
-        )
+@pytest.fixture
+def min_number_evaluations_on_test_server() -> int:
+    """After a reset at least 22 evaluations are on the test server"""
+    return 22
 
-        # might not be on test server after reset, please rerun test at least once if fails
-        self.assertEqual(len(evaluations), required_size)
 
-    @unittest.mock.patch("openml.config.get_cache_directory")
-    @unittest.skipIf(os.name == "nt", "https://github.com/openml/openml-python/issues/1033")
-    def test__create_cache_directory(self, config_mock):
-        with tempfile.TemporaryDirectory(dir=self.workdir) as td:
-            config_mock.return_value = td
-            openml.utils._create_cache_directory("abc")
-            self.assertTrue(os.path.exists(os.path.join(td, "abc")))
-            subdir = os.path.join(td, "def")
-            os.mkdir(subdir)
-            os.chmod(subdir, 0o444)
-            config_mock.return_value = subdir
-            with self.assertRaisesRegex(
-                openml.exceptions.OpenMLCacheException,
-                r"Cannot create cache directory",
-            ):
-                openml.utils._create_cache_directory("ghi")
+def _mocked_perform_api_call(call, request_method):
+    url = openml.config.server + "/" + call
+    return openml._api_calls._download_text_file(url)
+
+
+@pytest.mark.server
+def test_list_all():
+    openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
+    openml.utils._list_all(
+        listing_call=openml.tasks.functions._list_tasks, output_format="dataframe"
+    )
+
+
+@pytest.mark.server
+def test_list_all_for_tasks(min_number_tasks_on_test_server):
+    tasks = openml.tasks.list_tasks(
+        batch_size=1000,
+        size=min_number_tasks_on_test_server,
+        output_format="dataframe",
+    )
+    assert min_number_tasks_on_test_server == len(tasks)
+
+
+@pytest.mark.server
+def test_list_all_with_multiple_batches(min_number_tasks_on_test_server):
+    # By setting the batch size one lower than the minimum we guarantee at least two
+    # batches and at the same time do as few batches (roundtrips) as possible.
+    batch_size = min_number_tasks_on_test_server - 1
+    res = openml.utils._list_all(
+        listing_call=openml.tasks.functions._list_tasks,
+        output_format="dataframe",
+        batch_size=batch_size,
+    )
+    assert min_number_tasks_on_test_server <= len(res)
+
+
+@pytest.mark.server
+def test_list_all_for_datasets(min_number_datasets_on_test_server):
+    datasets = openml.datasets.list_datasets(
+        batch_size=100, size=min_number_datasets_on_test_server, output_format="dataframe"
+    )
+
+    assert min_number_datasets_on_test_server == len(datasets)
+    for dataset in datasets.to_dict(orient="index").values():
+        _check_dataset(dataset)
+
+
+@pytest.mark.server
+def test_list_all_for_flows(min_number_flows_on_test_server):
+    flows = openml.flows.list_flows(
+        batch_size=25, size=min_number_flows_on_test_server, output_format="dataframe"
+    )
+    assert min_number_flows_on_test_server == len(flows)
+
+
+@pytest.mark.server
+@pytest.mark.flaky  # Other tests might need to upload runs first
+def test_list_all_for_setups(min_number_setups_on_test_server):
+    # TODO apparently list_setups function does not support kwargs
+    setups = openml.setups.list_setups(size=min_number_setups_on_test_server)
+    assert min_number_setups_on_test_server == len(setups)
+
+
+@pytest.mark.server
+@pytest.mark.flaky  # Other tests might need to upload runs first
+def test_list_all_for_runs(min_number_runs_on_test_server):
+    runs = openml.runs.list_runs(batch_size=25, size=min_number_runs_on_test_server)
+    assert min_number_runs_on_test_server == len(runs)
+
+
+@pytest.mark.server
+@pytest.mark.flaky  # Other tests might need to upload runs first
+def test_list_all_for_evaluations(min_number_evaluations_on_test_server):
+    # TODO apparently list_evaluations function does not support kwargs
+    evaluations = openml.evaluations.list_evaluations(
+        function="predictive_accuracy", size=min_number_evaluations_on_test_server
+    )
+    assert min_number_evaluations_on_test_server == len(evaluations)
+
+
+@pytest.mark.server
+@unittest.mock.patch("openml._api_calls._perform_api_call", side_effect=_mocked_perform_api_call)
+def test_list_all_few_results_available(_perform_api_call):
+    datasets = openml.datasets.list_datasets(
+        size=1000, data_name="iris", data_version=1, output_format="dataframe"
+    )
+    assert 1 == len(datasets), "only one iris dataset version 1 should be present"
+    assert 1 == _perform_api_call.call_count, "expect just one call to get one dataset"
+
+
+@unittest.skipIf(os.name == "nt", "https://github.com/openml/openml-python/issues/1033")
+@unittest.mock.patch("openml.config.get_cache_directory")
+def test__create_cache_directory(config_mock, tmp_path):
+    config_mock.return_value = tmp_path
+    openml.utils._create_cache_directory("abc")
+    assert (tmp_path / "abc").exists()
+
+    subdir = tmp_path / "def"
+    subdir.mkdir()
+    subdir.chmod(0o444)
+    config_mock.return_value = subdir
+    with pytest.raises(
+        openml.exceptions.OpenMLCacheException,
+        match="Cannot create cache directory",
+    ):
+        openml.utils._create_cache_directory("ghi")

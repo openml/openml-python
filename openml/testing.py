@@ -19,6 +19,15 @@ from openml.exceptions import OpenMLServerException
 import logging
 
 
+def _check_dataset(dataset):
+    assert isinstance(dataset, dict)
+    assert 2 <= len(dataset)
+    assert "did" in dataset
+    assert isinstance(dataset["did"], int)
+    assert "status" in dataset
+    assert dataset["status"] in ["in_preparation", "active", "deactivated"]
+
+
 class TestBase(unittest.TestCase):
     """Base class for tests
 
@@ -177,6 +186,7 @@ class TestBase(unittest.TestCase):
         return flow, sentinel
 
     def _check_dataset(self, dataset):
+        _check_dataset(dataset)
         self.assertEqual(type(dataset), dict)
         self.assertGreaterEqual(len(dataset), 2)
         self.assertIn("did", dataset)
