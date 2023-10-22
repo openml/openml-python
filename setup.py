@@ -83,6 +83,7 @@ setuptools.setup(
             "ipython",
             "ipykernel",
             "seaborn",
+            "bayesian-optimization",
         ],
         "examples_unix": ["fanova"],
         "docs": [
