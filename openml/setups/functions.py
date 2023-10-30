@@ -287,7 +287,7 @@ def initialize_model(setup_id: int) -> Any:
     return model
 
 
-def _to_dict(flow_id: int, openml_parameter_settings):
+def _to_dict(flow_id: int, openml_parameter_settings) -> OrderedDict:
     """Convert a flow ID and a list of OpenML parameter settings to
     a dictionary representation that can be serialized to XML.
 
@@ -304,7 +304,7 @@ def _to_dict(flow_id: int, openml_parameter_settings):
         A dictionary representation of the flow ID and parameter settings.
     """
     # for convenience, this function (ab)uses the run object.
-    xml = OrderedDict()
+    xml: OrderedDict = OrderedDict()
     xml["oml:run"] = OrderedDict()
     xml["oml:run"]["@xmlns:oml"] = "http://openml.org/openml"
     xml["oml:run"]["oml:flow_id"] = flow_id
