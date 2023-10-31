@@ -128,6 +128,19 @@ def run_model_on_task(
     flow = extension.model_to_flow(model)
 
     def get_task_and_type_conversion(task: Union[int, str, OpenMLTask]) -> OpenMLTask:
+        """Retrieve an OpenMLTask object from either an integer or string ID,
+        or directly from an OpenMLTask object.
+
+        Parameters
+        ----------
+        task : Union[int, str, OpenMLTask]
+            The task ID or the OpenMLTask object.
+
+        Returns
+        -------
+        OpenMLTask
+            The OpenMLTask object.
+        """
         if isinstance(task, (int, str)):
             return get_task(int(task))
         else:
@@ -451,6 +464,32 @@ def _run_task_get_arffcontent(
     "OrderedDict[str, OrderedDict]",
     "OrderedDict[str, OrderedDict]",
 ]:
+    """Runs the hyperparameter optimization on the given task
+    and returns the arfftrace content.
+
+    Parameters
+    ----------
+    model : Any
+        The model that is to be evalauted.
+    task : OpenMLTask
+        The OpenMLTask to evaluate.
+    extension : Extension
+        The OpenML extension object.
+    add_local_measures : bool
+        Whether to compute additional local evaluation measures.
+    dataset_format : str
+        The format in which to download the dataset.
+    n_jobs : int
+        Number of jobs to run in parallel.
+        If None, use 1 core by default. If -1, use all available cores.
+
+    Returns
+    -------
+    Tuple[List[List], Optional[OpenMLRunTrace],
+        OrderedDict[str, OrderedDict], OrderedDict[str, OrderedDict]]
+    A tuple containing the arfftrace content,
+    the OpenML run trace, the global and local evaluation measures.
+    """
     arff_datacontent = []  # type: List[List]
     traces = []  # type: List[OpenMLRunTrace]
     # stores fold-based evaluation measures. In case of a sample based task,
@@ -636,6 +675,36 @@ def _run_task_get_arffcontent_parallel_helper(
     Optional[OpenMLRunTrace],
     "OrderedDict[str, float]",
 ]:
+    """Helper function that runs a single model on a single task fold sample.
+
+    Parameters
+    ----------
+    extension : Extension
+        An OpenML extension instance.
+    fold_no : int
+        The fold number to be run.
+    model : Any
+        The model that is to be evaluated.
+    rep_no : int
+        Repetition number to be run.
+    sample_no : int
+        Sample number to be run.
+    task : OpenMLTask
+        The task object from OpenML.
+    dataset_format : str
+        The dataset format to be used.
+    configuration : Dict
+        Hyperparameters to configure the model.
+
+    Returns
+    -------
+    Tuple[np.ndarray, Optional[pd.DataFrame], np.ndarray, Optional[pd.DataFrame],
+           Optional[OpenMLRunTrace], OrderedDict[str, float]]
+    A tuple containing the predictions, probability estimates (if applicable),
+    actual target values, actual target value probabilities (if applicable),
+    the trace object of the OpenML run (if applicable),
+    and a dictionary of local measures for this particular fold.
+    """
     # Sets up the OpenML instantiated in the child process to match that of the parent's
     # if configuration=None, loads the default
     config._setup(configuration)
