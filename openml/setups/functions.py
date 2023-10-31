@@ -60,8 +60,24 @@ def setup_exists(flow) -> int:
     return setup_id if setup_id > 0 else False
 
 
-def _get_cached_setup(setup_id):
-    """Load a run from the cache."""
+def _get_cached_setup(setup_id: int):
+    """Load a run from the cache.
+
+    Parameters
+    ----------
+    setup_id : int
+        ID of the setup to be loaded.
+
+    Returns
+    -------
+    OpenMLSetup
+        The loaded setup object.
+
+    Raises
+    ------
+    OpenMLCacheException
+        If the setup file for the given setup ID is not cached.
+    """
     cache_dir = config.get_cache_directory()
     setup_cache_dir = os.path.join(cache_dir, "setups", str(setup_id))
     try:
@@ -271,9 +287,24 @@ def initialize_model(setup_id: int) -> Any:
     return model
 
 
-def _to_dict(flow_id, openml_parameter_settings):
+def _to_dict(flow_id: int, openml_parameter_settings) -> OrderedDict:
+    """Convert a flow ID and a list of OpenML parameter settings to
+    a dictionary representation that can be serialized to XML.
+
+    Parameters
+    ----------
+    flow_id : int
+        ID of the flow.
+    openml_parameter_settings : List[OpenMLParameter]
+        A list of OpenML parameter settings.
+
+    Returns
+    -------
+    OrderedDict
+        A dictionary representation of the flow ID and parameter settings.
+    """
     # for convenience, this function (ab)uses the run object.
-    xml = OrderedDict()
+    xml: OrderedDict = OrderedDict()
     xml["oml:run"] = OrderedDict()
     xml["oml:run"]["@xmlns:oml"] = "http://openml.org/openml"
     xml["oml:run"]["oml:flow_id"] = flow_id
@@ -319,6 +350,9 @@ def _create_setup_from_xml(result_dict, output_format="object"):
 
 
 def _create_setup_parameter_from_xml(result_dict, output_format="object"):
+    """
+    Create an OpenMLParameter object or a dictionary from an API xml result.
+    """
     if output_format == "object":
         return OpenMLParameter(
             input_id=int(result_dict["oml:id"]),

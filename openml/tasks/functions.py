@@ -230,6 +230,28 @@ def _list_tasks(task_type=None, output_format="dict", **kwargs):
 
 
 def __list_tasks(api_call, output_format="dict"):
+    """Returns a dictionary or a Pandas DataFrame with information about OpenML tasks.
+
+    Parameters
+    ----------
+    api_call : str
+        The API call specifying which tasks to return.
+    output_format : str in {"dict", "dataframe"}
+        Output format for the returned object.
+
+    Returns
+    -------
+    Union[Dict, pd.DataFrame]
+        A dictionary or a Pandas DataFrame with information about OpenML tasks.
+
+    Raises
+    ------
+    ValueError
+        If the XML returned by the OpenML API does not contain 'oml:tasks', '@xmlns:oml',
+        or has an incorrect value for '@xmlns:oml'.
+    KeyError
+        If an invalid key is found in the XML for a task.
+    """
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     tasks_dict = xmltodict.parse(xml_string, force_list=("oml:task", "oml:input"))
     # Minimalistic check if the XML is useful

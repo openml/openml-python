@@ -107,6 +107,20 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
             tags.append(current_tag)
 
     def get_nested_ids_from_result_dict(key: str, subkey: str) -> Optional[List]:
+        """Extracts a list of nested IDs from a result dictionary.
+
+        Parameters
+        ----------
+        key : str
+            Nested OpenML IDs.
+        subkey : str
+            The subkey contains the nested OpenML IDs.
+
+        Returns
+        -------
+        Optional[List]
+            A list of nested OpenML IDs, or None if the key is not present in the dictionary.
+        """
         if result_dict.get(key) is not None:
             return [int(oml_id) for oml_id in result_dict[key][subkey]]
         return None
@@ -591,6 +605,23 @@ def _list_studies(output_format="dict", **kwargs) -> Union[Dict, pd.DataFrame]:
 
 
 def __list_studies(api_call, output_format="object") -> Union[Dict, pd.DataFrame]:
+    """Retrieves the list of OpenML studies and
+    returns it in a dictionary or a Pandas DataFrame.
+
+    Parameters
+    ----------
+    api_call : str
+        The API call for retrieving the list of OpenML studies.
+    output_format : str in {"object", "dataframe"}
+        Format of the output, either 'object' for a dictionary
+        or 'dataframe' for a Pandas DataFrame.
+
+    Returns
+    -------
+    Union[Dict, pd.DataFrame]
+        A dictionary or Pandas DataFrame of OpenML studies,
+        depending on the value of 'output_format'.
+    """
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     study_dict = xmltodict.parse(xml_string, force_list=("oml:study",))
 

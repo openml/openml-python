@@ -4,7 +4,7 @@ from collections import OrderedDict
 from dataclasses import dataclass
 import json
 import os
-from typing import List, Tuple, Optional  # noqa F401
+from typing import List, Tuple, Optional, Dict, Union  # noqa F401
 
 import arff
 import xmltodict
@@ -17,6 +17,82 @@ REQUIRED_ATTRIBUTES = [
     "evaluation",
     "selected",
 ]
+
+
+@dataclass
+class OpenMLTraceIteration:
+    """
+    OpenML Trace Iteration: parsed output from Run Trace call
+    Exactly one of `setup_string` or `parameters` must be provided.
+
+    Parameters
+    ----------
+    repeat : int
+        repeat number (in case of no repeats: 0)
+
+    fold : int
+        fold number (in case of no folds: 0)
+
+    iteration : int
+        iteration number of optimization procedure
+
+    setup_string : str, optional
+        json string representing the parameters
+        If not provided, ``parameters`` should be set.
+
+    evaluation : double
+        The evaluation that was awarded to this trace iteration.
+        Measure is defined by the task
+
+    selected : bool
+        Whether this was the best of all iterations, and hence
+        selected for making predictions. Per fold/repeat there
+        should be only one iteration selected
+
+    parameters : OrderedDict, optional
+        Dictionary specifying parameter names and their values.
+        If not provided, ``setup_string`` should be set.
+    """
+
+    repeat: int
+    fold: int
+    iteration: int
+
+    evaluation: float
+    selected: bool
+
+    setup_string: Optional[str] = None
+    parameters: Optional[OrderedDict] = None
+
+    def __post_init__(self):
+        # TODO: refactor into one argument of type <str | OrderedDict>
+        if self.setup_string and self.parameters:
+            raise ValueError(
+                "Can only be instantiated with either `setup_string` or `parameters` argument."
+            )
+        elif not (self.setup_string or self.parameters):
+            raise ValueError(
+                "Either `setup_string` or `parameters` needs to be passed as argument."
+            )
+        if self.parameters is not None and not isinstance(self.parameters, OrderedDict):
+            raise TypeError(
+                "argument parameters is not an instance of OrderedDict, but %s"
+                % str(type(self.parameters))
+            )
+
+    def get_parameters(self):
+        result = {}
+        # parameters have prefix 'parameter_'
+
+        if self.setup_string:
+            for param in self.setup_string:
+                key = param[len(PREFIX) :]
+                value = self.setup_string[param]
+                result[key] = json.loads(value)
+        else:
+            for param, value in self.parameters.items():
+                result[param[len(PREFIX) :]] = value
+        return result
 
 
 class OpenMLRunTrace(object):
@@ -33,7 +109,20 @@ class OpenMLRunTrace(object):
 
     """
 
-    def __init__(self, run_id, trace_iterations):
+    def __init__(
+        self,
+        run_id: Union[int, None],
+        trace_iterations: Dict[Tuple[int, int, int], OpenMLTraceIteration],
+    ):
+        """Object to hold the trace content of a run.
+
+        Parameters
+        ----------
+        run_id : int
+            Id for which the trace content is to be stored.
+        trace_iterations : List[List]
+            The trace content obtained by running a flow on a task.
+        """
         self.run_id = run_id
         self.trace_iterations = trace_iterations
 
@@ -228,6 +317,24 @@ class OpenMLRunTrace(object):
 
     @classmethod
     def _trace_from_arff_struct(cls, attributes, content, error_message):
+        """Generate a trace dictionary from ARFF structure.
+
+        Parameters
+        ----------
+        cls : type
+            The trace object to be created.
+        attributes : List[Tuple[str, str]]
+            Attribute descriptions.
+        content : List[List[Union[int, float, str]]]
+            List of instances.
+        error_message : str
+            Error message to raise if `setup_string` is in `attributes`.
+
+        Returns
+        -------
+        OrderedDict
+            A dictionary representing the trace.
+        """
         trace = OrderedDict()
         attribute_idx = {att[0]: idx for idx, att in enumerate(attributes)}
 
@@ -345,6 +452,26 @@ class OpenMLRunTrace(object):
 
     @classmethod
     def merge_traces(cls, traces: List["OpenMLRunTrace"]) -> "OpenMLRunTrace":
+        """Merge multiple traces into a single trace.
+
+        Parameters
+        ----------
+        cls : type
+            Type of the trace object to be created.
+        traces : List[OpenMLRunTrace]
+            List of traces to merge.
+
+        Returns
+        -------
+        OpenMLRunTrace
+            A trace object representing the merged traces.
+
+        Raises
+        ------
+        ValueError
+            If the parameters in the iterations of the traces being merged are not equal.
+            If a key (repeat, fold, iteration) is encountered twice while merging the traces.
+        """
         merged_trace = (
             OrderedDict()
         )  # type: OrderedDict[Tuple[int, int, int], OpenMLTraceIteration]  # noqa E501
@@ -384,79 +511,3 @@ class OpenMLRunTrace(object):
     def __iter__(self):
         for val in self.trace_iterations.values():
             yield val
-
-
-@dataclass
-class OpenMLTraceIteration:
-    """
-    OpenML Trace Iteration: parsed output from Run Trace call
-    Exactly one of `setup_string` or `parameters` must be provided.
-
-    Parameters
-    ----------
-    repeat : int
-        repeat number (in case of no repeats: 0)
-
-    fold : int
-        fold number (in case of no folds: 0)
-
-    iteration : int
-        iteration number of optimization procedure
-
-    setup_string : str, optional
-        json string representing the parameters
-        If not provided, ``parameters`` should be set.
-
-    evaluation : double
-        The evaluation that was awarded to this trace iteration.
-        Measure is defined by the task
-
-    selected : bool
-        Whether this was the best of all iterations, and hence
-        selected for making predictions. Per fold/repeat there
-        should be only one iteration selected
-
-    parameters : OrderedDict, optional
-        Dictionary specifying parameter names and their values.
-        If not provided, ``setup_string`` should be set.
-    """
-
-    repeat: int
-    fold: int
-    iteration: int
-
-    evaluation: float
-    selected: bool
-
-    setup_string: Optional[str] = None
-    parameters: Optional[OrderedDict] = None
-
-    def __post_init__(self):
-        # TODO: refactor into one argument of type <str | OrderedDict>
-        if self.setup_string and self.parameters:
-            raise ValueError(
-                "Can only be instantiated with either `setup_string` or `parameters` argument."
-            )
-        elif not (self.setup_string or self.parameters):
-            raise ValueError(
-                "Either `setup_string` or `parameters` needs to be passed as argument."
-            )
-        if self.parameters is not None and not isinstance(self.parameters, OrderedDict):
-            raise TypeError(
-                "argument parameters is not an instance of OrderedDict, but %s"
-                % str(type(self.parameters))
-            )
-
-    def get_parameters(self):
-        result = {}
-        # parameters have prefix 'parameter_'
-
-        if self.setup_string:
-            for param in self.setup_string:
-                key = param[len(PREFIX) :]
-                value = self.setup_string[param]
-                result[key] = json.loads(value)
-        else:
-            for param, value in self.parameters.items():
-                result[param[len(PREFIX) :]] = value
-        return result
