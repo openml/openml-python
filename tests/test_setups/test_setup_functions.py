@@ -44,7 +44,7 @@ class TestSetupFunctions(TestBase):
         flow = self.extension.model_to_flow(dectree)
         flow.name = "TEST%s%s" % (sentinel, flow.name)
         flow.publish()
-        TestBase._mark_entity_for_removal("flow", (flow.flow_id, flow.name))
+        TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
 
         # although the flow exists (created as of previous statement),
@@ -57,7 +57,7 @@ class TestSetupFunctions(TestBase):
         flow = self.extension.model_to_flow(classif)
         flow.name = "TEST%s%s" % (get_sentinel(), flow.name)
         flow.publish()
-        TestBase._mark_entity_for_removal("flow", (flow.flow_id, flow.name))
+        TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
 
         # although the flow exists, we can be sure there are no

@@ -11,6 +11,7 @@ next
 
  * MAINT #1280: Use the server-provided ``parquet_url`` instead of ``minio_url`` to determine the location of the parquet file.
  * ADD #716: add documentation for remaining attributes of classes and functions.
+ * ADD #1261: more annotations for type hints.
 
 0.14.1
 ~~~~~~
