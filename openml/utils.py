@@ -91,7 +91,7 @@ def _tag_openml_base(oml_object: "OpenMLBase", tag: str, untag: bool = False):
     _tag_entity(api_type_alias, oml_object.id, tag, untag)
 
 
-def _tag_entity(entity_type, entity_id, tag, untag=False):
+def _tag_entity(entity_type, entity_id, tag, untag=False) -> List[str]:
     """
     Function that tags or untags a given entity on OpenML. As the OpenML
     API tag functions all consist of the same format, this function covers

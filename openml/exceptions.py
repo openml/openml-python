@@ -1,6 +1,6 @@
 # License: BSD 3-Clause
 
-from typing import Optional
+from typing import Optional, Set
 
 
 class PyOpenMLError(Exception):
@@ -28,7 +28,7 @@ class OpenMLServerException(OpenMLServerError):
         self.url = url
         super().__init__(message)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.url} returned code {self.code}: {self.message}"
 
 
@@ -59,7 +59,7 @@ class OpenMLPrivateDatasetError(PyOpenMLError):
 class OpenMLRunsExistError(PyOpenMLError):
     """Indicates run(s) already exists on the server when they should not be duplicated."""
 
-    def __init__(self, run_ids: set, message: str):
+    def __init__(self, run_ids: Set[int], message: str) -> None:
         if len(run_ids) < 1:
             raise ValueError("Set of run ids must be non-empty.")
         self.run_ids = run_ids

@@ -74,7 +74,7 @@ def compare_delete_files(old_list: List[pathlib.Path], new_list: List[pathlib.Pa
         logger.info("Deleted from local: {}".format(file))
 
 
-def delete_remote_files(tracker) -> None:
+def delete_remote_files(tracker, flow_names) -> None:
     """Function that deletes the entities passed as input, from the OpenML test server
 
     The TestBase class in openml/testing.py has an attribute called publish_tracker.
@@ -94,11 +94,11 @@ def delete_remote_files(tracker) -> None:
     # reordering to delete sub flows at the end of flows
     # sub-flows have shorter names, hence, sorting by descending order of flow name length
     if "flow" in tracker:
+        to_sort = list(zip(tracker["flow"], flow_names))
         flow_deletion_order = [
-            entity_id
-            for entity_id, _ in sorted(tracker["flow"], key=lambda x: len(x[1]), reverse=True)
+            entity_id for entity_id, _ in sorted(to_sort, key=lambda x: len(x[1]), reverse=True)
         ]
-        tracker["flow"] = flow_deletion_order
+        tracker["flow"] = [flow_deletion_order[1] for flow_id, _ in flow_deletion_order]
 
     # deleting all collected entities published to test server
     # 'run's are deleted first to prevent dependency issue of entities on deletion
@@ -158,7 +158,7 @@ def pytest_sessionfinish() -> None:
 
     # Test file deletion
     logger.info("Deleting files uploaded to test server for worker {}".format(worker))
-    delete_remote_files(TestBase.publish_tracker)
+    delete_remote_files(TestBase.publish_tracker, TestBase.flow_name_tracker)
 
     if worker == "master":
         # Local file deletion
