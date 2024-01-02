@@ -18,6 +18,7 @@ class OpenMLDataFeature(object):
     nominal_values : list(str)
         list of the possible values, in case of nominal attribute
     number_missing_values : int
+        Number of rows that have a missing value for this feature.
     """
 
     LEGAL_DATA_TYPES = ["nominal", "numeric", "string", "date"]
@@ -30,8 +31,8 @@ class OpenMLDataFeature(object):
         nominal_values: List[str],
         number_missing_values: int,
     ):
-        if type(index) != int:
-            raise ValueError("Index is of wrong datatype")
+        if not isinstance(index, int):
+            raise TypeError(f"Index must be `int` but is {type(index)}")
         if data_type not in self.LEGAL_DATA_TYPES:
             raise ValueError(
                 "data type should be in %s, found: %s" % (str(self.LEGAL_DATA_TYPES), data_type)
@@ -50,8 +51,9 @@ class OpenMLDataFeature(object):
         else:
             if nominal_values is not None:
                 raise TypeError("Argument `nominal_values` must be None for non-nominal feature.")
-        if type(number_missing_values) != int:
-            raise ValueError("number_missing_values is of wrong datatype")
+        if not isinstance(number_missing_values, int):
+            msg = f"number_missing_values must be int but is {type(number_missing_values)}"
+            raise TypeError(msg)
 
         self.index = index
         self.name = str(name)

@@ -1,11 +1,11 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 23.3.0
+    rev: 23.12.1
     hooks:
       - id: black
         args: [--line-length=100]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.4.1
+    rev: v1.8.0
     hooks:
       - id: mypy
         name: mypy openml
@@ -28,7 +28,7 @@ repos:
         args: [ --disallow-untyped-defs, --disallow-any-generics,
                 --disallow-any-explicit, --implicit-optional ]
   - repo: https://github.com/pycqa/flake8
-    rev: 6.0.0
+    rev: 6.1.0
     hooks:
       - id: flake8
         name: flake8 openml

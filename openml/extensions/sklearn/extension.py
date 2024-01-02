@@ -2101,6 +2101,21 @@ class SklearnExtension(Extension):
         return base_estimator
 
     def _extract_trace_data(self, model, rep_no, fold_no):
+        """Extracts data from a machine learning model's cross-validation results
+        and creates an ARFF (Attribute-Relation File Format) trace.
+
+        Parameters
+        ----------
+        model : Any
+            A fitted hyperparameter optimization model.
+        rep_no : int
+            The repetition number.
+        fold_no : int
+            The fold number.
+        Returns
+        -------
+        A list of ARFF tracecontent.
+        """
         arff_tracecontent = []
         for itt_no in range(0, len(model.cv_results_["mean_test_score"])):
             # we use the string values for True and False, as it is defined in

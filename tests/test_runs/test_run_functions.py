@@ -150,7 +150,7 @@ class TestRun(TestBase):
             for col_idx in compare_slice:
                 val_1 = predictions["data"][idx][col_idx]
                 val_2 = predictions_prime["data"][idx][col_idx]
-                if type(val_1) == float or type(val_2) == float:
+                if isinstance(val_1, float) or isinstance(val_2, float):
                     self.assertAlmostEqual(
                         float(val_1),
                         float(val_2),

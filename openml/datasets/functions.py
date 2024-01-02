@@ -7,6 +7,7 @@ from pyexpat import ExpatError
 from typing import List, Dict, Optional, Union, cast
 import warnings
 
+import minio.error
 import numpy as np
 import arff
 import pandas as pd
@@ -191,7 +192,9 @@ def __list_datasets(api_call, output_format="dict"):
     datasets_dict = xmltodict.parse(xml_string, force_list=("oml:dataset",))
 
     # Minimalistic check if the XML is useful
-    assert type(datasets_dict["oml:data"]["oml:dataset"]) == list, type(datasets_dict["oml:data"])
+    assert isinstance(datasets_dict["oml:data"]["oml:dataset"], list), type(
+        datasets_dict["oml:data"]
+    )
     assert datasets_dict["oml:data"]["@xmlns:oml"] == "http://openml.org/openml", datasets_dict[
         "oml:data"
     ]["@xmlns:oml"]
@@ -492,13 +495,15 @@ def get_dataset(
             qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
 
         arff_file = _get_dataset_arff(description) if download_data else None
-        if "oml:minio_url" in description and download_data:
+        if "oml:parquet_url" in description and download_data:
             try:
                 parquet_file = _get_dataset_parquet(
                     description, download_all_files=download_all_files
                 )
             except urllib3.exceptions.MaxRetryError:
                 parquet_file = None
+            if parquet_file is None and arff_file:
+                logger.warning("Failed to download parquet, fallback on ARFF.")
         else:
             parquet_file = None
         remove_dataset_cache = False
@@ -1057,7 +1062,7 @@ def _get_dataset_parquet(
 
     download_all_files: bool, optional (default=False)
         If `True`, download all data found in the bucket to which the description's
-        ``minio_url`` points, only download the parquet file otherwise.
+        ``parquet_url`` points, only download the parquet file otherwise.
 
     Returns
     -------
@@ -1065,10 +1070,10 @@ def _get_dataset_parquet(
         Location of the Parquet file if successfully downloaded, None otherwise.
     """
     if isinstance(description, dict):
-        url = cast(str, description.get("oml:minio_url"))
+        url = cast(str, description.get("oml:parquet_url"))
         did = description.get("oml:id")
     elif isinstance(description, OpenMLDataset):
-        url = cast(str, description._minio_url)
+        url = cast(str, description._parquet_url)
         did = description.dataset_id
     else:
         raise TypeError("`description` should be either OpenMLDataset or Dict.")
@@ -1095,7 +1100,7 @@ def _get_dataset_parquet(
             openml._api_calls._download_minio_file(
                 source=cast(str, url), destination=output_file_path
             )
-        except (FileNotFoundError, urllib3.exceptions.MaxRetryError) as e:
+        except (FileNotFoundError, urllib3.exceptions.MaxRetryError, minio.error.ServerError) as e:
             logger.warning("Could not download file from %s: %s" % (cast(str, url), e))
             return None
     return output_file_path
@@ -1311,7 +1316,7 @@ def _create_dataset_from_description(
         cache_format=cache_format,
         features_file=features_file,
         qualities_file=qualities_file,
-        minio_url=description.get("oml:minio_url"),
+        parquet_url=description.get("oml:parquet_url"),
         parquet_file=parquet_file,
     )
 

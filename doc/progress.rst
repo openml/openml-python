@@ -6,6 +6,17 @@
 Changelog
 =========
 
+next
+~~~~~~
+
+ * MAINT #1280: Use the server-provided ``parquet_url`` instead of ``minio_url`` to determine the location of the parquet file.
+ * ADD #716: add documentation for remaining attributes of classes and functions.
+
+0.14.1
+~~~~~~
+
+ * FIX: Fallback on downloading ARFF when failing to download parquet from MinIO due to a ServerError.
+
 0.14.0
 ~~~~~~
 
