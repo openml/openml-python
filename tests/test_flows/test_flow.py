@@ -102,7 +102,7 @@ class TestFlow(TestBase):
         flows = openml.flows.list_flows(size=1, output_format="dataframe")
         flow_id = flows["id"].iloc[0]
         flow = openml.flows.get_flow(flow_id)
-        tag = "testing_tag_{}_{}".format(self.id(), time.time())
+        tag = "test_tag_TestFlow_{}".format(time.time())
         flows = openml.flows.list_flows(tag=tag, output_format="dataframe")
         self.assertEqual(len(flows), 0)
         flow.push_tag(tag)
