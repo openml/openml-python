@@ -16,7 +16,7 @@ class OpenMLTaskMethodsTest(TestBase):
 
     def test_tagging(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
-        tag = "testing_tag_{}_{}".format(self.id(), time())
+        tag = "test_tag_OpenMLTaskMethodsTest_{}".format(time())
         tasks = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
         self.assertEqual(len(tasks), 0)
         task.push_tag(tag)

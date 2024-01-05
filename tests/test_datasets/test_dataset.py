@@ -301,7 +301,7 @@ class OpenMLDatasetTestOnTestServer(TestBase):
         self.dataset = openml.datasets.get_dataset(125, download_data=False)
 
     def test_tagging(self):
-        tag = "testing_tag_{}_{}".format(self.id(), time())
+        tag = "test_tag_OpenMLDatasetTestOnTestServer_{}".format(time())
         datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
         self.assertTrue(datasets.empty)
         self.dataset.push_tag(tag)
