@@ -444,9 +444,7 @@ class OpenMLDataset(OpenMLBase):
                 if len(type_) == 2:
                     type_norm = [cat.lower().capitalize() for cat in type_]
                     if {"True", "False"} == set(type_norm):
-                        categories_names[name] = [
-                            cat == "True" for cat in type_norm
-                        ]
+                        categories_names[name] = [cat == "True" for cat in type_norm]
                         attribute_dtype[name] = "boolean"
                     else:
                         attribute_dtype[name] = "categorical"

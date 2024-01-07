@@ -71,7 +71,9 @@ class TestInit(openml.testing.TestBase):
         register_extension(DummyExtension2)
         assert isinstance(get_extension_by_flow(DummyFlow()), DummyExtension1)
         register_extension(DummyExtension1)
-        with pytest.raises(ValueError, match="Multiple extensions registered which can handle flow:"):
+        with pytest.raises(
+            ValueError, match="Multiple extensions registered which can handle flow:"
+        ):
             get_extension_by_flow(DummyFlow())
 
     def test_get_extension_by_model(self):
@@ -83,5 +85,7 @@ class TestInit(openml.testing.TestBase):
         register_extension(DummyExtension2)
         assert isinstance(get_extension_by_model(DummyModel()), DummyExtension1)
         register_extension(DummyExtension1)
-        with pytest.raises(ValueError, match="Multiple extensions registered which can handle model:"):
+        with pytest.raises(
+            ValueError, match="Multiple extensions registered which can handle model:"
+        ):
             get_extension_by_model(DummyModel())

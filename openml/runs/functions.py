@@ -822,7 +822,6 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:
     return _create_run_from_xml(run_xml)
 
 
-
 def _create_run_from_xml(xml, from_server=True):
     """Create a run object from xml returned from server.
 

@@ -149,22 +149,36 @@ class TestTask(TestBase):
     def test_get_task(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
-        assert os.path.exists(os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "task.xml"))
-        assert os.path.exists(os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "datasplits.arff"))
-        assert os.path.exists(os.path.join(self.workdir, "org", "openml", "test", "datasets", "1", "dataset.arff"))
+        assert os.path.exists(
+            os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "task.xml")
+        )
+        assert os.path.exists(
+            os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "datasplits.arff")
+        )
+        assert os.path.exists(
+            os.path.join(self.workdir, "org", "openml", "test", "datasets", "1", "dataset.arff")
+        )
 
     def test_get_task_lazy(self):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
-        assert os.path.exists(os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "task.xml"))
+        assert os.path.exists(
+            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "task.xml")
+        )
         assert task.class_labels == ["1", "2", "3", "4", "5", "U"]
 
-        assert not os.path.exists(os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff"))
+        assert not os.path.exists(
+            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff")
+        )
         # Since the download_data=False is propagated to get_dataset
-        assert not os.path.exists(os.path.join(self.workdir, "org", "openml", "test", "datasets", "2", "dataset.arff"))
+        assert not os.path.exists(
+            os.path.join(self.workdir, "org", "openml", "test", "datasets", "2", "dataset.arff")
+        )
 
         task.download_split()
-        assert os.path.exists(os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff"))
+        assert os.path.exists(
+            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff")
+        )
 
     @mock.patch("openml.tasks.functions.get_dataset")
     def test_removal_upon_download_failure(self, get_dataset):
@@ -202,7 +216,9 @@ class TestTask(TestBase):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         split = task.download_split()
         assert type(split) == OpenMLSplit
-        assert os.path.exists(os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "datasplits.arff"))
+        assert os.path.exists(
+            os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "datasplits.arff")
+        )
 
     def test_deletion_of_cache_dir(self):
         # Simple removal

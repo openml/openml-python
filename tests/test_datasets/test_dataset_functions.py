@@ -160,9 +160,21 @@ class TestOpenMLDataset(TestBase):
             - absence of data arff if metadata_only, else it must be present too.
         """
         for did in dids:
-            assert os.path.exists(os.path.join(openml.config.get_cache_directory(), "datasets", str(did), "description.xml"))
-            assert os.path.exists(os.path.join(openml.config.get_cache_directory(), "datasets", str(did), "qualities.xml"))
-            assert os.path.exists(os.path.join(openml.config.get_cache_directory(), "datasets", str(did), "features.xml"))
+            assert os.path.exists(
+                os.path.join(
+                    openml.config.get_cache_directory(), "datasets", str(did), "description.xml"
+                )
+            )
+            assert os.path.exists(
+                os.path.join(
+                    openml.config.get_cache_directory(), "datasets", str(did), "qualities.xml"
+                )
+            )
+            assert os.path.exists(
+                os.path.join(
+                    openml.config.get_cache_directory(), "datasets", str(did), "features.xml"
+                )
+            )
 
             data_assert = self.assertFalse if metadata_only else self.assertTrue
             data_assert(
@@ -318,7 +330,9 @@ class TestOpenMLDataset(TestBase):
         # We only tests functions as general integrity is tested by test_get_dataset_lazy
 
         def ensure_absence_of_real_data():
-            assert not os.path.exists(os.path.join(openml.config.get_cache_directory(), "datasets", "1", "dataset.arff"))
+            assert not os.path.exists(
+                os.path.join(openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")
+            )
 
         tag = "test_lazy_tag_%d" % random.randint(1, 1000000)
         dataset.push_tag(tag)
@@ -379,7 +393,9 @@ class TestOpenMLDataset(TestBase):
             destination=self.workdir,
             exists_ok=True,
         )
-        assert os.path.isfile(os.path.join(self.workdir, "dataset_20.pq")), "_download_minio_file can save to a folder by copying the object name"
+        assert os.path.isfile(
+            os.path.join(self.workdir, "dataset_20.pq")
+        ), "_download_minio_file can save to a folder by copying the object name"
 
     def test__download_minio_file_to_path(self):
         file_destination = os.path.join(self.workdir, "custom.pq")
@@ -388,7 +404,9 @@ class TestOpenMLDataset(TestBase):
             destination=file_destination,
             exists_ok=True,
         )
-        assert os.path.isfile(file_destination), "_download_minio_file can save to a folder by copying the object name"
+        assert os.path.isfile(
+            file_destination
+        ), "_download_minio_file can save to a folder by copying the object name"
 
     def test__download_minio_file_raises_FileExists_if_destination_in_use(self):
         file_destination = pathlib.Path(self.workdir, "custom.pq")
@@ -409,7 +427,9 @@ class TestOpenMLDataset(TestBase):
             destination=file_destination,
             exists_ok=True,
         )
-        assert os.path.isfile(file_destination), "_download_minio_file can download from subdirectories"
+        assert os.path.isfile(
+            file_destination
+        ), "_download_minio_file can download from subdirectories"
 
     def test__get_dataset_parquet_not_cached(self):
         description = {
@@ -653,7 +673,13 @@ class TestOpenMLDataset(TestBase):
         )
         df["category"] = df["category"].astype("category")
         attributes = attributes_arff_from_df(df)
-        assert attributes == [("integer", "INTEGER"), ("floating", "REAL"), ("string", "STRING"), ("category", ["A", "B"]), ("boolean", ["True", "False"])]
+        assert attributes == [
+            ("integer", "INTEGER"),
+            ("floating", "REAL"),
+            ("string", "STRING"),
+            ("category", ["A", "B"]),
+            ("boolean", ["True", "False"]),
+        ]
         # DataFrame with Sparse columns case
         df = pd.DataFrame(
             {
@@ -724,7 +750,9 @@ class TestOpenMLDataset(TestBase):
         TestBase._mark_entity_for_removal("data", dataset.id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
 
-        assert _get_online_dataset_arff(dataset.id) == dataset._dataset, "Uploaded arff does not match original one"
+        assert (
+            _get_online_dataset_arff(dataset.id) == dataset._dataset
+        ), "Uploaded arff does not match original one"
         assert _get_online_dataset_format(dataset.id) == "arff", "Wrong format for dataset"
 
     def test_create_dataset_list(self):
@@ -776,7 +804,9 @@ class TestOpenMLDataset(TestBase):
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
-        assert _get_online_dataset_arff(dataset.id) == dataset._dataset, "Uploaded ARFF does not match original one"
+        assert (
+            _get_online_dataset_arff(dataset.id) == dataset._dataset
+        ), "Uploaded ARFF does not match original one"
         assert _get_online_dataset_format(dataset.id) == "arff", "Wrong format for dataset"
 
     def test_create_dataset_sparse(self):
@@ -813,8 +843,12 @@ class TestOpenMLDataset(TestBase):
         TestBase.logger.info(
             "collected from {}: {}".format(__file__.split("/")[-1], xor_dataset.id),
         )
-        assert _get_online_dataset_arff(xor_dataset.id) == xor_dataset._dataset, "Uploaded ARFF does not match original one"
-        assert _get_online_dataset_format(xor_dataset.id) == "sparse_arff", "Wrong format for dataset"
+        assert (
+            _get_online_dataset_arff(xor_dataset.id) == xor_dataset._dataset
+        ), "Uploaded ARFF does not match original one"
+        assert (
+            _get_online_dataset_format(xor_dataset.id) == "sparse_arff"
+        ), "Wrong format for dataset"
 
         # test the list of dicts sparse representation
         sparse_data = [{0: 0.0}, {1: 1.0, 2: 1.0}, {0: 1.0, 2: 1.0}, {0: 1.0, 1: 1.0}]
@@ -841,8 +875,12 @@ class TestOpenMLDataset(TestBase):
         TestBase.logger.info(
             "collected from {}: {}".format(__file__.split("/")[-1], xor_dataset.id),
         )
-        assert _get_online_dataset_arff(xor_dataset.id) == xor_dataset._dataset, "Uploaded ARFF does not match original one"
-        assert _get_online_dataset_format(xor_dataset.id) == "sparse_arff", "Wrong format for dataset"
+        assert (
+            _get_online_dataset_arff(xor_dataset.id) == xor_dataset._dataset
+        ), "Uploaded ARFF does not match original one"
+        assert (
+            _get_online_dataset_format(xor_dataset.id) == "sparse_arff"
+        ), "Wrong format for dataset"
 
     def test_create_invalid_dataset(self):
         data = [
@@ -879,7 +917,11 @@ class TestOpenMLDataset(TestBase):
         # the same as the arff from _get_arff function
         d_format = (dataset.format).lower()
 
-        assert dataset._get_arff(d_format) == decoder.decode(_get_online_dataset_arff(dataset_id), encode_nominal=True, return_type=arff.DENSE if d_format == "arff" else arff.COO), "ARFF files are not equal"
+        assert dataset._get_arff(d_format) == decoder.decode(
+            _get_online_dataset_arff(dataset_id),
+            encode_nominal=True,
+            return_type=arff.DENSE if d_format == "arff" else arff.COO,
+        ), "ARFF files are not equal"
 
     def test_topic_api_error(self):
         # Check server exception when non-admin accessses apis
@@ -904,7 +946,9 @@ class TestOpenMLDataset(TestBase):
         dataset_id = 77
         dataset = openml.datasets.get_dataset(dataset_id, download_data=False)
 
-        assert dataset.format.lower() == _get_online_dataset_format(dataset_id), "The format of the ARFF files is different"
+        assert dataset.format.lower() == _get_online_dataset_format(
+            dataset_id
+        ), "The format of the ARFF files is different"
 
     def test_create_dataset_pandas(self):
         data = [
@@ -951,7 +995,9 @@ class TestOpenMLDataset(TestBase):
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
-        assert _get_online_dataset_arff(dataset.id) == dataset._dataset, "Uploaded ARFF does not match original one"
+        assert (
+            _get_online_dataset_arff(dataset.id) == dataset._dataset
+        ), "Uploaded ARFF does not match original one"
 
         # Check that DataFrame with Sparse columns are supported properly
         sparse_data = scipy.sparse.coo_matrix(
@@ -982,7 +1028,9 @@ class TestOpenMLDataset(TestBase):
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
-        assert _get_online_dataset_arff(dataset.id) == dataset._dataset, "Uploaded ARFF does not match original one"
+        assert (
+            _get_online_dataset_arff(dataset.id) == dataset._dataset
+        ), "Uploaded ARFF does not match original one"
         assert _get_online_dataset_format(dataset.id) == "sparse_arff", "Wrong format for dataset"
 
         # Check that we can overwrite the attributes

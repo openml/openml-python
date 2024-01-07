@@ -351,7 +351,9 @@ class SklearnExtension(Extension):
         mixed
         """
         logger.info(
-            "-{} flow_to_sklearn START o={}, components={}, init_defaults={}".format("-" * recursion_depth, o, components, initialize_with_defaults),
+            "-{} flow_to_sklearn START o={}, components={}, init_defaults={}".format(
+                "-" * recursion_depth, o, components, initialize_with_defaults
+            ),
         )
         depth_pp = recursion_depth + 1  # shortcut var, depth plus plus
 
@@ -462,7 +464,9 @@ class SklearnExtension(Extension):
             )
         else:
             raise TypeError(o)
-        logger.info("-{} flow_to_sklearn END   o={}, rval={}".format("-" * recursion_depth, o, rval))
+        logger.info(
+            "-{} flow_to_sklearn END   o={}, rval={}".format("-" * recursion_depth, o, rval)
+        )
         return rval
 
     def model_to_flow(self, model: Any) -> OpenMLFlow:
@@ -829,7 +833,6 @@ class SklearnExtension(Extension):
             dependencies=dependencies,
         )
 
-
     def _get_dependencies(self) -> str:
         return self._min_dependency_str(sklearn.__version__)
 
@@ -958,7 +961,7 @@ class SklearnExtension(Extension):
                 and all(isinstance(el, SIMPLE_TYPES) for el in flatten_all(rval))
                 and all(
                     len(rv) in (2, 3) and rv[1] not in SKLEARN_PIPELINE_STRING_COMPONENTS
-                        for rv in rval
+                    for rv in rval
                 )
             )
 
@@ -1154,7 +1157,9 @@ class SklearnExtension(Extension):
 
         for name in parameters:
             value = parameters.get(name)
-            logger.info("--{} flow_parameter={}, value={}".format("-" * recursion_depth, name, value))
+            logger.info(
+                "--{} flow_parameter={}, value={}".format("-" * recursion_depth, name, value)
+            )
             rval = self._deserialize_sklearn(
                 value,
                 components=components_,
@@ -1170,7 +1175,9 @@ class SklearnExtension(Extension):
             if name not in components_:
                 continue
             value = components[name]
-            logger.info("--{} flow_component={}, value={}".format("-" * recursion_depth, name, value))
+            logger.info(
+                "--{} flow_component={}, value={}".format("-" * recursion_depth, name, value)
+            )
             rval = self._deserialize_sklearn(
                 value,
                 recursion_depth=recursion_depth + 1,
@@ -1918,8 +1925,9 @@ class SklearnExtension(Extension):
                 _ = set(component_model.get_params(deep=False))
                 model_components = {
                     mp
-                        for mp in component_model.get_params(deep=True)
-                        if "__" not in mp and mp not in _}
+                    for mp in component_model.get_params(deep=True)
+                    if "__" not in mp and mp not in _
+                }
             if len(exp_components.symmetric_difference(model_components)) != 0:
                 is_problem = True
                 if len(exp_components - model_components) > 0:
@@ -2031,7 +2039,6 @@ class SklearnExtension(Extension):
         flow_dict = get_flow_dict(flow)
         model = model if model is not None else flow.model
         return extract_parameters(flow, flow_dict, model, True, flow.flow_id)
-
 
     def _openml_param_name_to_sklearn(
         self,

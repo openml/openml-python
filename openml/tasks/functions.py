@@ -548,7 +548,9 @@ def create_task(
     target_name: str | None = None,
     evaluation_measure: str | None = None,
     **kwargs,
-) -> OpenMLClassificationTask | OpenMLRegressionTask | OpenMLLearningCurveTask | OpenMLClusteringTask:
+) -> (
+    OpenMLClassificationTask | OpenMLRegressionTask | OpenMLLearningCurveTask | OpenMLClusteringTask
+):
     """Create a task based on different given attributes.
 
     Builds a task object with the function arguments as

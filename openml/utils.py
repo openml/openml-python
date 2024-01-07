@@ -376,8 +376,7 @@ def _remove_cache_dir_for_id(key, cache_dir):
         shutil.rmtree(cache_dir)
     except OSError:
         raise ValueError(
-            f"Cannot remove faulty {key} cache directory {cache_dir}."
-            "Please do this manually!",
+            f"Cannot remove faulty {key} cache directory {cache_dir}." "Please do this manually!",
         )
 
 

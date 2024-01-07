@@ -27,7 +27,9 @@ class TestTrace(TestBase):
         trace = OpenMLRunTrace(-1, trace_iterations=trace_iterations)
         # This next one should simply not fail
         assert trace.get_selected_iteration(2, 2) == 2
-        with pytest.raises(ValueError, match="Could not find the selected iteration for rep/fold 3/3"):
+        with pytest.raises(
+            ValueError, match="Could not find the selected iteration for rep/fold 3/3"
+        ):
             trace.get_selected_iteration(3, 3)
 
     def test_initialization(self):
@@ -53,7 +55,10 @@ class TestTrace(TestBase):
             ("repeat", "NUMERICAL"),
         ]
         trace_content = [[0, 0, 0, 0.5, "true", 1], [0, 0, 0, 0.9, "false", 2]]
-        with pytest.raises(ValueError, match="Either `setup_string` or `parameters` needs to be passed as argument."):
+        with pytest.raises(
+            ValueError,
+            match="Either `setup_string` or `parameters` needs to be passed as argument.",
+        ):
             OpenMLRunTrace.generate(trace_attributes, trace_content)
 
         trace_attributes = [
@@ -65,5 +70,9 @@ class TestTrace(TestBase):
             ("sunshine", "NUMERICAL"),
         ]
         trace_content = [[0, 0, 0, 0.5, "true", 1], [0, 0, 0, 0.9, "false", 2]]
-        with pytest.raises(ValueError, match="Encountered unknown attribute sunshine that does not start with " "prefix parameter_"):
+        with pytest.raises(
+            ValueError,
+            match="Encountered unknown attribute sunshine that does not start with "
+            "prefix parameter_",
+        ):
             OpenMLRunTrace.generate(trace_attributes, trace_content)

@@ -119,8 +119,7 @@ class OpenMLFlow(OpenMLBase):
         ]:
             if not isinstance(variable, OrderedDict):
                 raise TypeError(
-                    f"{variable_name} must be of type OrderedDict, "
-                    f"but is {type(variable)}.",
+                    f"{variable_name} must be of type OrderedDict, " f"but is {type(variable)}.",
                 )
 
         self.components = components
@@ -383,7 +382,6 @@ class OpenMLFlow(OpenMLBase):
         arguments["model"] = None
         return cls(**arguments)
 
-
     def to_filesystem(self, output_directory: str) -> None:
         os.makedirs(output_directory, exist_ok=True)
         if "flow.xml" in os.listdir(output_directory):
@@ -511,8 +509,7 @@ class OpenMLFlow(OpenMLBase):
         sub_identifier = structure[0]
         if sub_identifier not in self.components:
             raise ValueError(
-                f"Flow {self.name} does not contain component with "
-                f"identifier {sub_identifier}",
+                f"Flow {self.name} does not contain component with " f"identifier {sub_identifier}",
             )
         if len(structure) == 1:
             return self.components[sub_identifier]

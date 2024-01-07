@@ -525,9 +525,7 @@ class OpenMLRun(OpenMLBase):
         fold_idx = attribute_dict["fold"]
         predicted_idx = attribute_dict["prediction"]  # Assume supervised task
 
-        if (
-            task.task_type_id in (TaskType.SUPERVISED_CLASSIFICATION, TaskType.LEARNING_CURVE)
-        ):
+        if task.task_type_id in (TaskType.SUPERVISED_CLASSIFICATION, TaskType.LEARNING_CURVE):
             correct_idx = attribute_dict["correct"]
         elif task.task_type_id == TaskType.SUPERVISED_REGRESSION:
             correct_idx = attribute_dict["truth"]
@@ -543,8 +541,7 @@ class OpenMLRun(OpenMLBase):
             pred = predictions_arff["attributes"][predicted_idx][1]
             corr = predictions_arff["attributes"][correct_idx][1]
             raise ValueError(
-                "Predicted and Correct do not have equal values:"
-                f" {pred!s} Vs. {corr!s}",
+                "Predicted and Correct do not have equal values:" f" {pred!s} Vs. {corr!s}",
             )
 
         # TODO: these could be cached

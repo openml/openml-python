@@ -404,7 +404,9 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(task_id)
         # internally dataframe is loaded and targets are categorical
         # which LinearRegression() cannot handle
-        with pytest.raises(AttributeError, match="'LinearRegression' object has no attribute 'classes_'"):
+        with pytest.raises(
+            AttributeError, match="'LinearRegression' object has no attribute 'classes_'"
+        ):
             openml.runs.run_model_on_task(
                 model=clf,
                 task=task,
@@ -1667,7 +1669,9 @@ class TestRun(TestBase):
         openml.config.server = self.production_server
         clustering = openml.tasks.get_task(126033, download_data=False)
         ignored_input = [0] * 5
-        with pytest.raises(NotImplementedError, match=r"Formatting for <class '[\w.]+'> is not supported."):
+        with pytest.raises(
+            NotImplementedError, match=r"Formatting for <class '[\w.]+'> is not supported."
+        ):
             format_prediction(clustering, *ignored_input)
 
     def test_format_prediction_classification_no_probabilities(self):

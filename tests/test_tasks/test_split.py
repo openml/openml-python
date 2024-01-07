@@ -73,7 +73,9 @@ class OpenMLSplitTest(TestBase):
             for j in range(10):
                 assert split.split[i][j][0].train.shape[0] >= 808
                 assert split.split[i][j][0].test.shape[0] >= 89
-                assert split.split[i][j][0].train.shape[0] + split.split[i][j][0].test.shape[0] == 898
+                assert (
+                    split.split[i][j][0].train.shape[0] + split.split[i][j][0].test.shape[0] == 898
+                )
 
     def test_get_split(self):
         split = OpenMLSplit._from_arff_file(self.arff_filename)

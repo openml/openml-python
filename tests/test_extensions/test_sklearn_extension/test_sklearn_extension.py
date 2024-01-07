@@ -133,7 +133,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             new_model = self.extension.flow_to_model(serialization)
             # compares string representations of the dict, as it potentially
             # contains complex objects that can not be compared with == op
-            assert re.sub(pattern, str(model.get_params()), "") == re.sub(pattern, str(new_model.get_params()), "")
+            assert re.sub(pattern, str(model.get_params()), "") == re.sub(
+                pattern, str(new_model.get_params()), ""
+            )
 
             assert type(new_model) == type(model)
             assert new_model is not model
@@ -145,7 +147,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
             xml = serialization._to_dict()
             new_model2 = self.extension.flow_to_model(OpenMLFlow._from_dict(xml))
-            assert re.sub(pattern, str(model.get_params()), "") == re.sub(pattern, str(new_model2.get_params()), "")
+            assert re.sub(pattern, str(model.get_params()), "") == re.sub(
+                pattern, str(new_model2.get_params()), ""
+            )
 
             assert type(new_model2) == type(model)
             assert new_model2 is not model
@@ -160,8 +164,13 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     new_model_params = nm.get_params()
                     model_params = model.get_params()
                     for subcomponent_parameter in subcomponent_parameters:
-                        assert type(new_model_params[subcomponent_parameter]) == type(model_params[subcomponent_parameter])
-                        assert new_model_params[subcomponent_parameter] is not model_params[subcomponent_parameter]
+                        assert type(new_model_params[subcomponent_parameter]) == type(
+                            model_params[subcomponent_parameter]
+                        )
+                        assert (
+                            new_model_params[subcomponent_parameter]
+                            is not model_params[subcomponent_parameter]
+                        )
                         del new_model_params[subcomponent_parameter]
                         del model_params[subcomponent_parameter]
                     assert new_model_params == model_params
@@ -424,8 +433,13 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         assert serialization.parameters["learning_rate"] == "1.0"
         assert serialization.parameters["n_estimators"] == "100"
         assert serialization.components["base_estimator"].name == fixture_subcomponent_name
-        assert serialization.components["base_estimator"].class_name == fixture_subcomponent_class_name
-        assert serialization.components["base_estimator"].description == fixture_subcomponent_description
+        assert (
+            serialization.components["base_estimator"].class_name == fixture_subcomponent_class_name
+        )
+        assert (
+            serialization.components["base_estimator"].description
+            == fixture_subcomponent_description
+        )
         self.assertDictEqual(structure, fixture_structure)
 
     @pytest.mark.sklearn()
@@ -475,7 +489,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
-        assert json.loads(serialization.parameters["steps"]) == [{"oml-python:serialized_object": "component_reference", "value": {"key": "scaler", "step_name": "scaler"}}, {"oml-python:serialized_object": "component_reference", "value": {"key": "dummy", "step_name": "dummy"}}]
+        assert json.loads(serialization.parameters["steps"]) == [
+            {
+                "oml-python:serialized_object": "component_reference",
+                "value": {"key": "scaler", "step_name": "scaler"},
+            },
+            {
+                "oml-python:serialized_object": "component_reference",
+                "value": {"key": "dummy", "step_name": "dummy"},
+            },
+        ]
 
         # Checking the sub-component
         assert len(serialization.components) == 2
@@ -532,7 +555,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             assert len(serialization.parameters) == 3
         # Hard to compare two representations of a dict due to possibly
         # different sorting. Making a json makes it easier
-        assert json.loads(serialization.parameters["steps"]) == [{"oml-python:serialized_object": "component_reference", "value": {"key": "scaler", "step_name": "scaler"}}, {"oml-python:serialized_object": "component_reference", "value": {"key": "clusterer", "step_name": "clusterer"}}]
+        assert json.loads(serialization.parameters["steps"]) == [
+            {
+                "oml-python:serialized_object": "component_reference",
+                "value": {"key": "scaler", "step_name": "scaler"},
+            },
+            {
+                "oml-python:serialized_object": "component_reference",
+                "value": {"key": "clusterer", "step_name": "clusterer"},
+            },
+        ]
 
         # Checking the sub-component
         assert len(serialization.components) == 2
@@ -706,11 +738,17 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         assert serialization.name == fixture_name
         self.assertDictEqual(structure, fixture_structure)
         assert new_model.transformer_list[0][0] == fu.transformer_list[0][0]
-        assert new_model.transformer_list[0][1].get_params() == fu.transformer_list[0][1].get_params()
+        assert (
+            new_model.transformer_list[0][1].get_params() == fu.transformer_list[0][1].get_params()
+        )
         assert new_model.transformer_list[1][0] == fu.transformer_list[1][0]
-        assert new_model.transformer_list[1][1].get_params() == fu.transformer_list[1][1].get_params()
+        assert (
+            new_model.transformer_list[1][1].get_params() == fu.transformer_list[1][1].get_params()
+        )
 
-        assert [step[0] for step in new_model.transformer_list] == [step[0] for step in fu.transformer_list]
+        assert [step[0] for step in new_model.transformer_list] == [
+            step[0] for step in fu.transformer_list
+        ]
         assert new_model.transformer_list[0][1] is not fu.transformer_list[0][1]
         assert new_model.transformer_list[1][1] is not fu.transformer_list[1][1]
 
@@ -722,7 +760,11 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             subcomponent_parameters=("ohe", "transformer_list"),
             dependencies_mock_call_count=(3, 6),
         )
-        assert serialization.name == "sklearn.pipeline.FeatureUnion(" f"ohe=sklearn.preprocessing.{module_name_encoder}.OneHotEncoder," "scaler=drop)"
+        assert (
+            serialization.name == "sklearn.pipeline.FeatureUnion("
+            f"ohe=sklearn.preprocessing.{module_name_encoder}.OneHotEncoder,"
+            "scaler=drop)"
+        )
         assert new_model.transformer_list[1][1] == "drop"
 
     @pytest.mark.sklearn()
@@ -751,8 +793,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = "_encoders" if LooseVersion(sklearn.__version__) >= "0.20" else "data"
         scaler_name = "data" if LooseVersion(sklearn.__version__) < "0.22" else "_data"
-        assert fu1_serialization.name == "sklearn.pipeline.FeatureUnion(" f"ohe=sklearn.preprocessing.{module_name_encoder}.OneHotEncoder," f"scaler=sklearn.preprocessing.{scaler_name}.StandardScaler)"
-        assert fu2_serialization.name == "sklearn.pipeline.FeatureUnion(" f"scaler=sklearn.preprocessing.{module_name_encoder}.OneHotEncoder," f"ohe=sklearn.preprocessing.{scaler_name}.StandardScaler)"
+        assert (
+            fu1_serialization.name == "sklearn.pipeline.FeatureUnion("
+            f"ohe=sklearn.preprocessing.{module_name_encoder}.OneHotEncoder,"
+            f"scaler=sklearn.preprocessing.{scaler_name}.StandardScaler)"
+        )
+        assert (
+            fu2_serialization.name == "sklearn.pipeline.FeatureUnion("
+            f"scaler=sklearn.preprocessing.{module_name_encoder}.OneHotEncoder,"
+            f"ohe=sklearn.preprocessing.{scaler_name}.StandardScaler)"
+        )
 
     @pytest.mark.sklearn()
     def test_serialize_complex_flow(self):
@@ -1087,13 +1137,19 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         serialized = self.extension.model_to_flow(grid)
         deserialized = self.extension.flow_to_model(serialized)
 
-        assert grid[0]["reduce_dim"][0].get_params() == deserialized[0]["reduce_dim"][0].get_params()
+        assert (
+            grid[0]["reduce_dim"][0].get_params() == deserialized[0]["reduce_dim"][0].get_params()
+        )
         assert grid[0]["reduce_dim"][0] is not deserialized[0]["reduce_dim"][0]
-        assert grid[0]["reduce_dim"][1].get_params() == deserialized[0]["reduce_dim"][1].get_params()
+        assert (
+            grid[0]["reduce_dim"][1].get_params() == deserialized[0]["reduce_dim"][1].get_params()
+        )
         assert grid[0]["reduce_dim"][1] is not deserialized[0]["reduce_dim"][1]
         assert grid[0]["reduce_dim__n_components"] == deserialized[0]["reduce_dim__n_components"]
         assert grid[0]["classify__C"] == deserialized[0]["classify__C"]
-        assert grid[1]["reduce_dim"][0].get_params() == deserialized[1]["reduce_dim"][0].get_params()
+        assert (
+            grid[1]["reduce_dim"][0].get_params() == deserialized[1]["reduce_dim"][0].get_params()
+        )
         assert grid[1]["reduce_dim"][0] is not deserialized[1]["reduce_dim"][0]
         assert grid[1]["reduce_dim__k"] == deserialized[1]["reduce_dim__k"]
         assert grid[1]["classify__C"] == deserialized[1]["classify__C"]
@@ -1113,7 +1169,10 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             sklearn.ensemble.BaggingClassifier(),
             param_grid=param_grid,
         )
-        with pytest.raises(TypeError, match=re.compile(r".*OpenML.*Flow.*is not JSON serializable", flags=re.DOTALL)):
+        with pytest.raises(
+            TypeError,
+            match=re.compile(r".*OpenML.*Flow.*is not JSON serializable", flags=re.DOTALL),
+        ):
             self.extension.model_to_flow(clf)
 
     @pytest.mark.sklearn()
@@ -1144,7 +1203,10 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         opt = scipy.optimize.fmin_l_bfgs_b
         kernel = sklearn.gaussian_process.kernels.Matern()
         gp = sklearn.gaussian_process.GaussianProcessClassifier(kernel=kernel, optimizer=opt)
-        with pytest.raises(TypeError, match=r"Matern\(length_scale=1, nu=1.5\), <class 'sklearn.gaussian_process.kernels.Matern'>"):
+        with pytest.raises(
+            TypeError,
+            match=r"Matern\(length_scale=1, nu=1.5\), <class 'sklearn.gaussian_process.kernels.Matern'>",
+        ):
             self.extension.model_to_flow(gp)
 
     @pytest.mark.sklearn()
@@ -1187,7 +1249,11 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # I put the alternative travis-ci answer here as well. While it has a
         # different value, it is still correct as it is a propagation of the
         # subclasses' module name
-        assert flow.external_version == "{},{},{}".format(self.extension._format_external_version("openml", openml.__version__), self.extension._format_external_version("sklearn", sklearn.__version__), self.extension._format_external_version("tests", "0.1"))
+        assert flow.external_version == "{},{},{}".format(
+            self.extension._format_external_version("openml", openml.__version__),
+            self.extension._format_external_version("sklearn", sklearn.__version__),
+            self.extension._format_external_version("tests", "0.1"),
+        )
 
     @pytest.mark.sklearn()
     @mock.patch("warnings.warn")
@@ -1865,11 +1931,15 @@ class TestSklearnExtensionRunFunctions(TestBase):
             np.testing.assert_array_equal(pred_1, pred_2)
             np.testing.assert_array_almost_equal(np.sum(proba_1, axis=1), np.ones(X_test.shape[0]))
             # Test that there are predictions other than ones and zeros
-            assert np.sum(proba_1.to_numpy() == 0) + np.sum(proba_1.to_numpy() == 1) < X_test.shape[0] * len(task.class_labels)
+            assert np.sum(proba_1.to_numpy() == 0) + np.sum(proba_1.to_numpy() == 1) < X_test.shape[
+                0
+            ] * len(task.class_labels)
 
             np.testing.assert_array_almost_equal(np.sum(proba_2, axis=1), np.ones(X_test.shape[0]))
             # Test that there are only ones and zeros predicted
-            assert np.sum(proba_2.to_numpy() == 0) + np.sum(proba_2.to_numpy() == 1) == X_test.shape[0] * len(task.class_labels)
+            assert np.sum(proba_2.to_numpy() == 0) + np.sum(
+                proba_2.to_numpy() == 1
+            ) == X_test.shape[0] * len(task.class_labels)
 
     @pytest.mark.sklearn()
     def test_run_model_on_fold_regression(self):
@@ -2141,8 +2211,12 @@ class TestSklearnExtensionRunFunctions(TestBase):
         assert isinstance(flow.components["prep"], OpenMLFlow)
         assert flow.components["prep"].class_name == "sklearn.pipeline.Pipeline"
         assert isinstance(flow.components["prep"].components["columntransformer"], OpenMLFlow)
-        assert isinstance(flow.components["prep"].components["columntransformer"].components["cat"], OpenMLFlow)
-        assert flow.components["prep"].components["columntransformer"].components["cat"].name == "drop"
+        assert isinstance(
+            flow.components["prep"].components["columntransformer"].components["cat"], OpenMLFlow
+        )
+        assert (
+            flow.components["prep"].components["columntransformer"].components["cat"].name == "drop"
+        )
 
         # de-serializing flow to a model with non-actionable step
         model = self.extension.flow_to_model(flow)

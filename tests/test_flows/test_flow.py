@@ -222,7 +222,12 @@ class TestFlow(TestBase):
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
         # For a flow where both components are published together, the upload
         # date should be equal
-        assert flow.upload_date == flow.components["lr"].upload_date, (flow.name, flow.flow_id, flow.components["lr"].name, flow.components["lr"].flow_id)
+        assert flow.upload_date == flow.components["lr"].upload_date, (
+            flow.name,
+            flow.flow_id,
+            flow.components["lr"].name,
+            flow.components["lr"].flow_id,
+        )
 
         clf1 = sklearn.tree.DecisionTreeClassifier(max_depth=2)
         flow1 = self.extension.model_to_flow(clf1)

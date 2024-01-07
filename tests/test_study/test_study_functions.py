@@ -44,7 +44,9 @@ class TestStudyFunctions(TestBase):
     def test_get_study_error(self):
         openml.config.server = self.production_server
 
-        with pytest.raises(ValueError, match="Unexpected entity type 'task' reported by the server, expected 'run'"):
+        with pytest.raises(
+            ValueError, match="Unexpected entity type 'task' reported by the server, expected 'run'"
+        ):
             openml.study.get_study(99)
 
     def test_get_suite(self):
@@ -60,7 +62,9 @@ class TestStudyFunctions(TestBase):
     def test_get_suite_error(self):
         openml.config.server = self.production_server
 
-        with pytest.raises(ValueError, match="Unexpected entity type 'run' reported by the server, expected 'task'"):
+        with pytest.raises(
+            ValueError, match="Unexpected entity type 'run' reported by the server, expected 'task'"
+        ):
             openml.study.get_suite(123)
 
     def test_publish_benchmark_suite(self):
@@ -224,11 +228,15 @@ class TestStudyFunctions(TestBase):
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], study.id))
         study_original = openml.study.get_study(study.id)
 
-        with pytest.raises(openml.exceptions.OpenMLServerException, match="Problem attaching entities."):
+        with pytest.raises(
+            openml.exceptions.OpenMLServerException, match="Problem attaching entities."
+        ):
             # run id does not exists
             openml.study.attach_to_study(study.id, [0])
 
-        with pytest.raises(openml.exceptions.OpenMLServerException, match="Problem attaching entities."):
+        with pytest.raises(
+            openml.exceptions.OpenMLServerException, match="Problem attaching entities."
+        ):
             # some runs already attached
             openml.study.attach_to_study(study.id, list(run_list_more.keys()))
         study_downloaded = openml.study.get_study(study.id)
