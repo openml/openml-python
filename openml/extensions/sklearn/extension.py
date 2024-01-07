@@ -159,6 +159,7 @@ class SklearnExtension(Extension):
         # the example below, we want to trim `sklearn.tree.tree.DecisionTreeClassifier`, and
         # keep it in the final trimmed flow name:
         # sklearn.pipeline.Pipeline(Imputer=sklearn.preprocessing.imputation.Imputer,
+        # VarianceThreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,  # noqa: ERA001, E501
         # Estimator=sklearn.model_selection._search.RandomizedSearchCV(estimator=
         # sklearn.tree.tree.DecisionTreeClassifier))
         if "sklearn.model_selection" in long_name:
@@ -1273,8 +1274,8 @@ class SklearnExtension(Extension):
             "np.int64": np.int64,
         }
         if LooseVersion(np.__version__) < "1.24":
-            mapping["np.float"] = float
-            mapping["np.int"] = int
+            mapping["np.float"] = np.float  # noqa: NPY001
+            mapping["np.int"] = np.int  # noqa: NPY001
 
         return mapping[o]
 

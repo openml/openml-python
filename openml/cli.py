@@ -1,4 +1,4 @@
-"""" Command Line Interface for `openml` to configure its settings. """
+""""Command Line Interface for `openml` to configure its settings."""
 from __future__ import annotations
 
 import argparse
@@ -52,21 +52,24 @@ def wait_until_valid_input(
             response = sanitize(response)
         error_message = check(response)
         if error_message:
-            pass
+            print(error_message, end="\n\n")
         else:
             return response
 
 
 def print_configuration() -> None:
-    config.determine_config_file_path()
+    file = config.determine_config_file_path()
+    header = f"File '{file}' contains (or defaults to):"
+    print(header)
 
-    max(map(len, config.get_config_as_dict()))
-    for _field, _value in config.get_config_as_dict().items():
-        pass
+    max_key_length = max(map(len, config.get_config_as_dict()))
+    for field, value in config.get_config_as_dict().items():
+        print(f"{field.ljust(max_key_length)}: {value}")
 
 
 def verbose_set(field: str, value: str) -> None:
     config.set_field_in_config_file(field, value)
+    print(f"{field} set to '{value}'.")
 
 
 def configure_apikey(value: str) -> None:
@@ -281,8 +284,10 @@ def configure_field(
             value = sanitize(value)
         malformed_input = check_with_message(value)
         if malformed_input:
+            print(malformed_input)
             sys.exit()
     else:
+        print(intro_message)
         value = wait_until_valid_input(
             prompt=input_message,
             check=check_with_message,
@@ -304,12 +309,13 @@ def configure(args: argparse.Namespace) -> None:
     }
 
     def not_supported_yet(_: str) -> None:
-        pass
+        print(f"Setting '{args.field}' is not supported yet.")
 
     if args.field not in ["all", "none"]:
         set_functions.get(args.field, not_supported_yet)(args.value)
     else:
         if args.value is not None:
+            print(f"Can not set value ('{args.value}') when field is specified as '{args.field}'.")
             sys.exit()
         print_configuration()
 

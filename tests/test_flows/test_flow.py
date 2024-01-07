@@ -201,14 +201,13 @@ class TestFlow(TestBase):
         flow = self.extension.model_to_flow(clf)
         flow_exists_mock.return_value = 1
 
-        with pytest.raises(openml.exceptions.PyOpenMLError) as context_manager:
+        with pytest.raises(openml.exceptions.PyOpenMLError, match="OpenMLFlow already exists"):
             flow.publish(raise_error_if_exists=True)
-            TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-            TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id),
-            )
 
-        assert "OpenMLFlow already exists" in context_manager.exception.message
+        TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
+        TestBase.logger.info(
+            "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id),
+        )
 
     @pytest.mark.sklearn()
     def test_publish_flow_with_similar_components(self):
@@ -302,13 +301,6 @@ class TestFlow(TestBase):
         get_flow_mock.return_value = flow_copy
         flow_exists_mock.return_value = 1
 
-        with pytest.raises(ValueError) as context_manager:
-            flow.publish()
-            TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-            TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id),
-            )
-
         if LooseVersion(sklearn.__version__) < "0.22":
             fixture = (
                 "The flow on the server is inconsistent with the local flow. "
@@ -330,8 +322,14 @@ class TestFlow(TestBase):
                 "'sklearn.ensemble._forest.RandomForestClassifier'"
                 "\nvs\n'sklearn.ensemble._forest.RandomForestClassifie'.'"
             )
+        with pytest.raises(ValueError, match=fixture):
+            flow.publish()
 
-        assert context_manager.exception.args[0] == fixture
+        TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
+        TestBase.logger.info(
+            "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id),
+        )
+
         assert get_flow_mock.call_count == 2
 
     @pytest.mark.sklearn()
