@@ -159,7 +159,6 @@ class SklearnExtension(Extension):
         # the example below, we want to trim `sklearn.tree.tree.DecisionTreeClassifier`, and
         # keep it in the final trimmed flow name:
         # sklearn.pipeline.Pipeline(Imputer=sklearn.preprocessing.imputation.Imputer,
-        # VarianceThreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,
         # Estimator=sklearn.model_selection._search.RandomizedSearchCV(estimator=
         # sklearn.tree.tree.DecisionTreeClassifier))
         if "sklearn.model_selection" in long_name:

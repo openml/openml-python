@@ -893,9 +893,8 @@ class OpenMLDataset(OpenMLBase):
         """
         if data_type not in OpenMLDataFeature.LEGAL_DATA_TYPES:
             raise TypeError("Illegal feature type requested")
-        if self.ignore_attribute is not None:
-            if not isinstance(self.ignore_attribute, list):
-                raise TypeError("ignore_attribute should be a list")
+        if self.ignore_attribute is not None and not isinstance(self.ignore_attribute, list):
+            raise TypeError("ignore_attribute should be a list")
         if self.row_id_attribute is not None and not isinstance(self.row_id_attribute, str):
             raise TypeError("row id attribute should be a str")
         if exclude is not None and not isinstance(exclude, list):

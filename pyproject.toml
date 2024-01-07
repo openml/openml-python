@@ -231,30 +231,37 @@ exclude = [
 # Exclude a variety of commonly ignored directories.
 [tool.ruff.per-file-ignores]
 "tests/*.py" = [
-  "S101",
-  "D103",
-  "ANN001",
-  "ANN201",
-  "FBT001",
-  "D100",
-  "PLR2004",
-  "PD901",   #  X is a bad variable name. (pandas)
-  "TCH",
-  "N803",
+  "D100",   # Undocumented public module
+  "D101",   # Missing docstring in public class
+  "D102",   # Missing docstring in public method
+  "D103",   # Missing docstring in public function
+  "S101",   # Use of assert
+  "ANN201", # Missing return type annotation for public function
+  "FBT001", # Positional boolean argument
+  "PLR2004",# No use of magic numbers
+  "PD901",  #  X is a bad variable name. (pandas)
+  "TCH",    # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tch
+  "N803",   # Argument name {name} should be lowercase
 ]
-"openml/__version__.py" = ["D100"]
-"__init__.py" = ["I002"]
-"examples/*" = [
-  "INP001",
-  "I002",
-  "E741",
-  "D101",
-  "D103",
-  "T20",
-  "D415",
-  "ERA001",
-  "E402",
-  "E501",
+"openml/__version__.py" = [
+  "D100",   # Undocumented public module
+]
+"__init__.py" = [
+  "I002",   # Missing required import (i.e. from __future__ import annotations)
+]
+"examples/*.py" = [
+  "D101",   # Missing docstring in public class
+  "D102",   # Missing docstring in public method
+  "D103",   # Missing docstring in public function
+  "D415",   # First line should end with a . or ? or !
+  "INP001", # File is part of an implicit namespace package, add an __init__.py
+  "I002",   # Missing required import (i.e. from __future__ import annotations) 
+  "E741",   # Ambigiuous variable name
+  "T201",   # print found
+  "T203",   # pprint found
+  "ERA001", # found commeneted out code
+  "E402",   # Module level import not at top of cell
+  "E501",   # Line too long
 ]
 
 

@@ -223,13 +223,11 @@ class OpenMLRun(OpenMLBase):
             # -- Add locally computed summary values if possible
             if "predictive_accuracy" in self.fold_evaluations:
                 # OpenMLClassificationTask; OpenMLLearningCurveTask
-                # default: predictive_accuracy
                 result_field = "Local Result - Accuracy (+- STD)"
                 fields[result_field] = self._evaluation_summary("predictive_accuracy")
                 order.append(result_field)
             elif "mean_absolute_error" in self.fold_evaluations:
                 # OpenMLRegressionTask
-                # default: mean_absolute_error
                 result_field = "Local Result - MAE (+- STD)"
                 fields[result_field] = self._evaluation_summary("mean_absolute_error")
                 order.append(result_field)
