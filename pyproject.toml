@@ -71,6 +71,7 @@ test=[
     "pytest-cov",
     "pytest-rerunfailures",
     "mypy",
+    "ruff",
 ]
 examples=[
     "matplotlib",
