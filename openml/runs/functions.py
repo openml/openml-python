@@ -900,7 +900,7 @@ def _create_run_from_xml(xml, from_server=True):
         t = openml.tasks.get_task(task_id, download_data=False)
         if not hasattr(t, "dataset_id"):
             raise ValueError(
-                f"Unable to fetch dataset_id from the task({task_id}) " f"linked to run({run_id})",
+                f"Unable to fetch dataset_id from the task({task_id}) linked to run({run_id})",
             )
         dataset_id = t.dataset_id
 
