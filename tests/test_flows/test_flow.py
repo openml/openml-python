@@ -1,14 +1,15 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 import collections
 import copy
-from distutils.version import LooseVersion
 import hashlib
 import re
 import time
+from distutils.version import LooseVersion
 from unittest import mock
-import pytest
 
+import pytest
 import scipy.stats
 import sklearn
 import sklearn.datasets
@@ -17,19 +18,18 @@ import sklearn.dummy
 import sklearn.ensemble
 import sklearn.feature_selection
 import sklearn.model_selection
+import sklearn.naive_bayes
 import sklearn.pipeline
 import sklearn.preprocessing
-import sklearn.naive_bayes
 import sklearn.tree
-
 import xmltodict
 
 import openml
-from openml._api_calls import _perform_api_call
 import openml.exceptions
 import openml.extensions.sklearn
-from openml.testing import TestBase, SimpleImputer
 import openml.utils
+from openml._api_calls import _perform_api_call
+from openml.testing import SimpleImputer, TestBase
 
 
 class TestFlow(TestBase):
@@ -48,31 +48,31 @@ class TestFlow(TestBase):
         openml.config.server = self.production_server
 
         flow = openml.flows.get_flow(4024)
-        self.assertIsInstance(flow, openml.OpenMLFlow)
-        self.assertEqual(flow.flow_id, 4024)
-        self.assertEqual(len(flow.parameters), 24)
-        self.assertEqual(len(flow.components), 1)
+        assert isinstance(flow, openml.OpenMLFlow)
+        assert flow.flow_id == 4024
+        assert len(flow.parameters) == 24
+        assert len(flow.components) == 1
 
-        subflow_1 = list(flow.components.values())[0]
-        self.assertIsInstance(subflow_1, openml.OpenMLFlow)
-        self.assertEqual(subflow_1.flow_id, 4025)
-        self.assertEqual(len(subflow_1.parameters), 14)
-        self.assertEqual(subflow_1.parameters["E"], "CC")
-        self.assertEqual(len(subflow_1.components), 1)
+        subflow_1 = next(iter(flow.components.values()))
+        assert isinstance(subflow_1, openml.OpenMLFlow)
+        assert subflow_1.flow_id == 4025
+        assert len(subflow_1.parameters) == 14
+        assert subflow_1.parameters["E"] == "CC"
+        assert len(subflow_1.components) == 1
 
-        subflow_2 = list(subflow_1.components.values())[0]
-        self.assertIsInstance(subflow_2, openml.OpenMLFlow)
-        self.assertEqual(subflow_2.flow_id, 4026)
-        self.assertEqual(len(subflow_2.parameters), 13)
-        self.assertEqual(subflow_2.parameters["I"], "10")
-        self.assertEqual(len(subflow_2.components), 1)
+        subflow_2 = next(iter(subflow_1.components.values()))
+        assert isinstance(subflow_2, openml.OpenMLFlow)
+        assert subflow_2.flow_id == 4026
+        assert len(subflow_2.parameters) == 13
+        assert subflow_2.parameters["I"] == "10"
+        assert len(subflow_2.components) == 1
 
-        subflow_3 = list(subflow_2.components.values())[0]
-        self.assertIsInstance(subflow_3, openml.OpenMLFlow)
-        self.assertEqual(subflow_3.flow_id, 1724)
-        self.assertEqual(len(subflow_3.parameters), 11)
-        self.assertEqual(subflow_3.parameters["L"], "-1")
-        self.assertEqual(len(subflow_3.components), 0)
+        subflow_3 = next(iter(subflow_2.components.values()))
+        assert isinstance(subflow_3, openml.OpenMLFlow)
+        assert subflow_3.flow_id == 1724
+        assert len(subflow_3.parameters) == 11
+        assert subflow_3.parameters["L"] == "-1"
+        assert len(subflow_3.components) == 0
 
     def test_get_structure(self):
         # also responsible for testing: flow.get_subflow
@@ -85,33 +85,33 @@ class TestFlow(TestBase):
         flow_structure_id = flow.get_structure("flow_id")
         # components: root (filteredclassifier), multisearch, loginboost,
         # reptree
-        self.assertEqual(len(flow_structure_name), 4)
-        self.assertEqual(len(flow_structure_id), 4)
+        assert len(flow_structure_name) == 4
+        assert len(flow_structure_id) == 4
 
         for sub_flow_name, structure in flow_structure_name.items():
             if len(structure) > 0:  # skip root element
                 subflow = flow.get_subflow(structure)
-                self.assertEqual(subflow.name, sub_flow_name)
+                assert subflow.name == sub_flow_name
 
         for sub_flow_id, structure in flow_structure_id.items():
             if len(structure) > 0:  # skip root element
                 subflow = flow.get_subflow(structure)
-                self.assertEqual(subflow.flow_id, sub_flow_id)
+                assert subflow.flow_id == sub_flow_id
 
     def test_tagging(self):
         flows = openml.flows.list_flows(size=1, output_format="dataframe")
         flow_id = flows["id"].iloc[0]
         flow = openml.flows.get_flow(flow_id)
-        tag = "test_tag_TestFlow_{}".format(time.time())
+        tag = f"test_tag_TestFlow_{time.time()}"
         flows = openml.flows.list_flows(tag=tag, output_format="dataframe")
-        self.assertEqual(len(flows), 0)
+        assert len(flows) == 0
         flow.push_tag(tag)
         flows = openml.flows.list_flows(tag=tag, output_format="dataframe")
-        self.assertEqual(len(flows), 1)
-        self.assertIn(flow_id, flows["id"])
+        assert len(flows) == 1
+        assert flow_id in flows["id"]
         flow.remove_tag(tag)
         flows = openml.flows.list_flows(tag=tag, output_format="dataframe")
-        self.assertEqual(len(flows), 0)
+        assert len(flows) == 0
 
     def test_from_xml_to_xml(self):
         # Get the raw xml thing
@@ -147,13 +147,13 @@ class TestFlow(TestBase):
             )
             new_xml = re.sub(r"^$", "", new_xml)
 
-            self.assertEqual(new_xml, flow_xml)
+            assert new_xml == flow_xml
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     def test_to_xml_from_xml(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         boosting = sklearn.ensemble.AdaBoostClassifier(
-            base_estimator=sklearn.tree.DecisionTreeClassifier()
+            base_estimator=sklearn.tree.DecisionTreeClassifier(),
         )
         model = sklearn.pipeline.Pipeline(steps=(("scaler", scaler), ("boosting", boosting)))
         flow = self.extension.model_to_flow(model)
@@ -166,9 +166,9 @@ class TestFlow(TestBase):
 
         # Would raise exception if they are not legal
         openml.flows.functions.assert_flows_equal(new_flow, flow)
-        self.assertIsNot(new_flow, flow)
+        assert new_flow is not flow
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     def test_publish_flow(self):
         flow = openml.OpenMLFlow(
             name="sklearn.dummy.DummyClassifier",
@@ -192,28 +192,28 @@ class TestFlow(TestBase):
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
-        self.assertIsInstance(flow.flow_id, int)
+        assert isinstance(flow.flow_id, int)
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     @mock.patch("openml.flows.functions.flow_exists")
     def test_publish_existing_flow(self, flow_exists_mock):
         clf = sklearn.tree.DecisionTreeClassifier(max_depth=2)
         flow = self.extension.model_to_flow(clf)
         flow_exists_mock.return_value = 1
 
-        with self.assertRaises(openml.exceptions.PyOpenMLError) as context_manager:
+        with pytest.raises(openml.exceptions.PyOpenMLError) as context_manager:
             flow.publish(raise_error_if_exists=True)
             TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
             TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id)
+                "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id),
             )
 
-        self.assertTrue("OpenMLFlow already exists" in context_manager.exception.message)
+        assert "OpenMLFlow already exists" in context_manager.exception.message
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     def test_publish_flow_with_similar_components(self):
         clf = sklearn.ensemble.VotingClassifier(
-            [("lr", sklearn.linear_model.LogisticRegression(solver="lbfgs"))]
+            [("lr", sklearn.linear_model.LogisticRegression(solver="lbfgs"))],
         )
         flow = self.extension.model_to_flow(clf)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
@@ -222,16 +222,7 @@ class TestFlow(TestBase):
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
         # For a flow where both components are published together, the upload
         # date should be equal
-        self.assertEqual(
-            flow.upload_date,
-            flow.components["lr"].upload_date,
-            msg=(
-                flow.name,
-                flow.flow_id,
-                flow.components["lr"].name,
-                flow.components["lr"].flow_id,
-            ),
-        )
+        assert flow.upload_date == flow.components["lr"].upload_date, (flow.name, flow.flow_id, flow.components["lr"].name, flow.components["lr"].flow_id)
 
         clf1 = sklearn.tree.DecisionTreeClassifier(max_depth=2)
         flow1 = self.extension.model_to_flow(clf1)
@@ -244,7 +235,7 @@ class TestFlow(TestBase):
         time.sleep(1)
 
         clf2 = sklearn.ensemble.VotingClassifier(
-            [("dt", sklearn.tree.DecisionTreeClassifier(max_depth=2))]
+            [("dt", sklearn.tree.DecisionTreeClassifier(max_depth=2))],
         )
         flow2 = self.extension.model_to_flow(clf2)
         flow2, _ = self._add_sentinel_to_flow_name(flow2, sentinel)
@@ -253,7 +244,7 @@ class TestFlow(TestBase):
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow2.flow_id))
         # If one component was published before the other, the components in
         # the flow should have different upload dates
-        self.assertNotEqual(flow2.upload_date, flow2.components["dt"].upload_date)
+        assert flow2.upload_date != flow2.components["dt"].upload_date
 
         clf3 = sklearn.ensemble.AdaBoostClassifier(sklearn.tree.DecisionTreeClassifier(max_depth=3))
         flow3 = self.extension.model_to_flow(clf3)
@@ -264,15 +255,15 @@ class TestFlow(TestBase):
         TestBase._mark_entity_for_removal("flow", flow3.flow_id, flow3.name)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow3.flow_id))
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     def test_semi_legal_flow(self):
         # TODO: Test if parameters are set correctly!
         # should not throw error as it contains two differentiable forms of
         # Bagging i.e., Bagging(Bagging(J48)) and Bagging(J48)
         semi_legal = sklearn.ensemble.BaggingClassifier(
             base_estimator=sklearn.ensemble.BaggingClassifier(
-                base_estimator=sklearn.tree.DecisionTreeClassifier()
-            )
+                base_estimator=sklearn.tree.DecisionTreeClassifier(),
+            ),
         )
         flow = self.extension.model_to_flow(semi_legal)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
@@ -281,7 +272,7 @@ class TestFlow(TestBase):
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     @mock.patch("openml.flows.functions.get_flow")
     @mock.patch("openml.flows.functions.flow_exists")
     @mock.patch("openml._api_calls._perform_api_call")
@@ -297,20 +288,20 @@ class TestFlow(TestBase):
         flow.publish()
         # Not collecting flow_id for deletion since this is a test for failed upload
 
-        self.assertEqual(api_call_mock.call_count, 1)
-        self.assertEqual(get_flow_mock.call_count, 1)
-        self.assertEqual(flow_exists_mock.call_count, 1)
+        assert api_call_mock.call_count == 1
+        assert get_flow_mock.call_count == 1
+        assert flow_exists_mock.call_count == 1
 
         flow_copy = copy.deepcopy(flow)
         flow_copy.name = flow_copy.name[:-1]
         get_flow_mock.return_value = flow_copy
         flow_exists_mock.return_value = 1
 
-        with self.assertRaises(ValueError) as context_manager:
+        with pytest.raises(ValueError) as context_manager:
             flow.publish()
             TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
             TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id)
+                "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id),
             )
 
         if LooseVersion(sklearn.__version__) < "0.22":
@@ -335,10 +326,10 @@ class TestFlow(TestBase):
                 "\nvs\n'sklearn.ensemble._forest.RandomForestClassifie'.'"
             )
 
-        self.assertEqual(context_manager.exception.args[0], fixture)
-        self.assertEqual(get_flow_mock.call_count, 2)
+        assert context_manager.exception.args[0] == fixture
+        assert get_flow_mock.call_count == 2
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     def test_illegal_flow(self):
         # should throw error as it contains two imputers
         illegal = sklearn.pipeline.Pipeline(
@@ -346,7 +337,7 @@ class TestFlow(TestBase):
                 ("imputer1", SimpleImputer()),
                 ("imputer2", SimpleImputer()),
                 ("classif", sklearn.tree.DecisionTreeClassifier()),
-            ]
+            ],
         )
         self.assertRaises(ValueError, self.extension.model_to_flow, illegal)
 
@@ -358,16 +349,15 @@ class TestFlow(TestBase):
             md5 = hashlib.md5()
             md5.update(str(time.time()).encode("utf-8"))
             sentinel = md5.hexdigest()[:10]
-            sentinel = "TEST%s" % sentinel
-            return sentinel
+            return "TEST%s" % sentinel
 
         name = get_sentinel() + get_sentinel()
         version = get_sentinel()
 
         flow_id = openml.flows.flow_exists(name, version)
-        self.assertFalse(flow_id)
+        assert not flow_id
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     def test_existing_flow_exists(self):
         # create a flow
         nb = sklearn.naive_bayes.GaussianNB()
@@ -393,7 +383,7 @@ class TestFlow(TestBase):
             flow = flow.publish()
             TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
             TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id)
+                "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id),
             )
             # redownload the flow
             flow = openml.flows.get_flow(flow.flow_id)
@@ -404,9 +394,9 @@ class TestFlow(TestBase):
                 flow.name,
                 flow.external_version,
             )
-            self.assertEqual(downloaded_flow_id, flow.flow_id)
+            assert downloaded_flow_id == flow.flow_id
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     def test_sklearn_to_upload_to_flow(self):
         iris = sklearn.datasets.load_iris()
         X = iris.data
@@ -420,14 +410,15 @@ class TestFlow(TestBase):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         pca = sklearn.decomposition.TruncatedSVD()
         fs = sklearn.feature_selection.SelectPercentile(
-            score_func=sklearn.feature_selection.f_classif, percentile=30
+            score_func=sklearn.feature_selection.f_classif,
+            percentile=30,
         )
         fu = sklearn.pipeline.FeatureUnion(transformer_list=[("pca", pca), ("fs", fs)])
         boosting = sklearn.ensemble.AdaBoostClassifier(
-            base_estimator=sklearn.tree.DecisionTreeClassifier()
+            base_estimator=sklearn.tree.DecisionTreeClassifier(),
         )
         model = sklearn.pipeline.Pipeline(
-            steps=[("ohe", ohe), ("scaler", scaler), ("fu", fu), ("boosting", boosting)]
+            steps=[("ohe", ohe), ("scaler", scaler), ("fu", fu), ("boosting", boosting)],
         )
         parameter_grid = {
             "boosting__n_estimators": [1, 5, 10, 100],
@@ -436,7 +427,9 @@ class TestFlow(TestBase):
         }
         cv = sklearn.model_selection.StratifiedKFold(n_splits=5, shuffle=True)
         rs = sklearn.model_selection.RandomizedSearchCV(
-            estimator=model, param_distributions=parameter_grid, cv=cv
+            estimator=model,
+            param_distributions=parameter_grid,
+            cv=cv,
         )
         rs.fit(X, y)
         flow = self.extension.model_to_flow(rs)
@@ -453,7 +446,7 @@ class TestFlow(TestBase):
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
-        self.assertIsInstance(flow.flow_id, int)
+        assert isinstance(flow.flow_id, int)
 
         # Check whether we can load the flow again
         # Remove the sentinel from the name again so that we can reinstantiate
@@ -463,7 +456,7 @@ class TestFlow(TestBase):
         local_xml = flow._to_xml()
         server_xml = new_flow._to_xml()
 
-        for i in range(10):
+        for _i in range(10):
             # Make sure that we replace all occurences of two newlines
             local_xml = local_xml.replace(sentinel, "")
             local_xml = (
@@ -484,19 +477,19 @@ class TestFlow(TestBase):
             )
             server_xml = re.sub(r"^$", "", server_xml)
 
-        self.assertEqual(server_xml, local_xml)
+        assert server_xml == local_xml
 
         # Would raise exception if they are not equal!
         openml.flows.functions.assert_flows_equal(new_flow, flow)
-        self.assertIsNot(new_flow, flow)
+        assert new_flow is not flow
 
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = "_encoders" if LooseVersion(sklearn.__version__) >= "0.20" else "data"
         if LooseVersion(sklearn.__version__) < "0.22":
             fixture_name = (
-                "%ssklearn.model_selection._search.RandomizedSearchCV("
+                f"{sentinel}sklearn.model_selection._search.RandomizedSearchCV("
                 "estimator=sklearn.pipeline.Pipeline("
-                "ohe=sklearn.preprocessing.%s.OneHotEncoder,"
+                f"ohe=sklearn.preprocessing.{module_name_encoder}.OneHotEncoder,"
                 "scaler=sklearn.preprocessing.data.StandardScaler,"
                 "fu=sklearn.pipeline.FeatureUnion("
                 "pca=sklearn.decomposition.truncated_svd.TruncatedSVD,"
@@ -504,7 +497,6 @@ class TestFlow(TestBase):
                 "sklearn.feature_selection.univariate_selection.SelectPercentile),"
                 "boosting=sklearn.ensemble.weight_boosting.AdaBoostClassifier("
                 "base_estimator=sklearn.tree.tree.DecisionTreeClassifier)))"
-                % (sentinel, module_name_encoder)
             )
         else:
             # sklearn.sklearn.preprocessing.data -> sklearn.sklearn.preprocessing._data
@@ -514,9 +506,9 @@ class TestFlow(TestBase):
             # sklearn.ensemble.weight_boosting -> sklearn.ensemble._weight_boosting
             # sklearn.tree.tree.DecisionTree... -> sklearn.tree._classes.DecisionTree...
             fixture_name = (
-                "%ssklearn.model_selection._search.RandomizedSearchCV("
+                f"{sentinel}sklearn.model_selection._search.RandomizedSearchCV("
                 "estimator=sklearn.pipeline.Pipeline("
-                "ohe=sklearn.preprocessing.%s.OneHotEncoder,"
+                f"ohe=sklearn.preprocessing.{module_name_encoder}.OneHotEncoder,"
                 "scaler=sklearn.preprocessing._data.StandardScaler,"
                 "fu=sklearn.pipeline.FeatureUnion("
                 "pca=sklearn.decomposition._truncated_svd.TruncatedSVD,"
@@ -524,44 +516,43 @@ class TestFlow(TestBase):
                 "sklearn.feature_selection._univariate_selection.SelectPercentile),"
                 "boosting=sklearn.ensemble._weight_boosting.AdaBoostClassifier("
                 "base_estimator=sklearn.tree._classes.DecisionTreeClassifier)))"
-                % (sentinel, module_name_encoder)
             )
-        self.assertEqual(new_flow.name, fixture_name)
+        assert new_flow.name == fixture_name
         new_flow.model.fit(X, y)
 
     def test_extract_tags(self):
         flow_xml = "<oml:tag>study_14</oml:tag>"
         flow_dict = xmltodict.parse(flow_xml)
         tags = openml.utils.extract_xml_tags("oml:tag", flow_dict)
-        self.assertEqual(tags, ["study_14"])
+        assert tags == ["study_14"]
 
         flow_xml = "<oml:flow><oml:tag>OpenmlWeka</oml:tag>\n" "<oml:tag>weka</oml:tag></oml:flow>"
         flow_dict = xmltodict.parse(flow_xml)
         tags = openml.utils.extract_xml_tags("oml:tag", flow_dict["oml:flow"])
-        self.assertEqual(tags, ["OpenmlWeka", "weka"])
+        assert tags == ["OpenmlWeka", "weka"]
 
     def test_download_non_scikit_learn_flows(self):
         openml.config.server = self.production_server
 
         flow = openml.flows.get_flow(6742)
-        self.assertIsInstance(flow, openml.OpenMLFlow)
-        self.assertEqual(flow.flow_id, 6742)
-        self.assertEqual(len(flow.parameters), 19)
-        self.assertEqual(len(flow.components), 1)
-        self.assertIsNone(flow.model)
+        assert isinstance(flow, openml.OpenMLFlow)
+        assert flow.flow_id == 6742
+        assert len(flow.parameters) == 19
+        assert len(flow.components) == 1
+        assert flow.model is None
 
-        subflow_1 = list(flow.components.values())[0]
-        self.assertIsInstance(subflow_1, openml.OpenMLFlow)
-        self.assertEqual(subflow_1.flow_id, 6743)
-        self.assertEqual(len(subflow_1.parameters), 8)
-        self.assertEqual(subflow_1.parameters["U"], "0")
-        self.assertEqual(len(subflow_1.components), 1)
-        self.assertIsNone(subflow_1.model)
+        subflow_1 = next(iter(flow.components.values()))
+        assert isinstance(subflow_1, openml.OpenMLFlow)
+        assert subflow_1.flow_id == 6743
+        assert len(subflow_1.parameters) == 8
+        assert subflow_1.parameters["U"] == "0"
+        assert len(subflow_1.components) == 1
+        assert subflow_1.model is None
 
-        subflow_2 = list(subflow_1.components.values())[0]
-        self.assertIsInstance(subflow_2, openml.OpenMLFlow)
-        self.assertEqual(subflow_2.flow_id, 5888)
-        self.assertEqual(len(subflow_2.parameters), 4)
-        self.assertIsNone(subflow_2.parameters["batch-size"])
-        self.assertEqual(len(subflow_2.components), 0)
-        self.assertIsNone(subflow_2.model)
+        subflow_2 = next(iter(subflow_1.components.values()))
+        assert isinstance(subflow_2, openml.OpenMLFlow)
+        assert subflow_2.flow_id == 5888
+        assert len(subflow_2.parameters) == 4
+        assert subflow_2.parameters["batch-size"] is None
+        assert len(subflow_2.components) == 0
+        assert subflow_2.model is None

@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import os
 import unittest.mock
 
+import pytest
+
 import openml
 from openml.testing import _check_dataset
-
-import pytest
 
 
 @pytest.fixture(autouse=True)
@@ -23,37 +25,37 @@ def with_test_server():
     openml.config.stop_using_configuration_for_example()
 
 
-@pytest.fixture
+@pytest.fixture()
 def min_number_tasks_on_test_server() -> int:
     """After a reset at least 1068 tasks are on the test server"""
     return 1068
 
 
-@pytest.fixture
+@pytest.fixture()
 def min_number_datasets_on_test_server() -> int:
     """After a reset at least 127 datasets are on the test server"""
     return 127
 
 
-@pytest.fixture
+@pytest.fixture()
 def min_number_flows_on_test_server() -> int:
     """After a reset at least 127 flows are on the test server"""
     return 15
 
 
-@pytest.fixture
+@pytest.fixture()
 def min_number_setups_on_test_server() -> int:
     """After a reset at least 50 setups are on the test server"""
     return 50
 
 
-@pytest.fixture
+@pytest.fixture()
 def min_number_runs_on_test_server() -> int:
     """After a reset at least 50 runs are on the test server"""
     return 21
 
 
-@pytest.fixture
+@pytest.fixture()
 def min_number_evaluations_on_test_server() -> int:
     """After a reset at least 22 evaluations are on the test server"""
     return 22
@@ -64,15 +66,16 @@ def _mocked_perform_api_call(call, request_method):
     return openml._api_calls._download_text_file(url)
 
 
-@pytest.mark.server
+@pytest.mark.server()
 def test_list_all():
     openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
     openml.utils._list_all(
-        listing_call=openml.tasks.functions._list_tasks, output_format="dataframe"
+        listing_call=openml.tasks.functions._list_tasks,
+        output_format="dataframe",
     )
 
 
-@pytest.mark.server
+@pytest.mark.server()
 def test_list_all_for_tasks(min_number_tasks_on_test_server):
     tasks = openml.tasks.list_tasks(
         batch_size=1000,
@@ -82,7 +85,7 @@ def test_list_all_for_tasks(min_number_tasks_on_test_server):
     assert min_number_tasks_on_test_server == len(tasks)
 
 
-@pytest.mark.server
+@pytest.mark.server()
 def test_list_all_with_multiple_batches(min_number_tasks_on_test_server):
     # By setting the batch size one lower than the minimum we guarantee at least two
     # batches and at the same time do as few batches (roundtrips) as possible.
@@ -95,10 +98,12 @@ def test_list_all_with_multiple_batches(min_number_tasks_on_test_server):
     assert min_number_tasks_on_test_server <= len(res)
 
 
-@pytest.mark.server
+@pytest.mark.server()
 def test_list_all_for_datasets(min_number_datasets_on_test_server):
     datasets = openml.datasets.list_datasets(
-        batch_size=100, size=min_number_datasets_on_test_server, output_format="dataframe"
+        batch_size=100,
+        size=min_number_datasets_on_test_server,
+        output_format="dataframe",
     )
 
     assert min_number_datasets_on_test_server == len(datasets)
@@ -106,47 +111,53 @@ def test_list_all_for_datasets(min_number_datasets_on_test_server):
         _check_dataset(dataset)
 
 
-@pytest.mark.server
+@pytest.mark.server()
 def test_list_all_for_flows(min_number_flows_on_test_server):
     flows = openml.flows.list_flows(
-        batch_size=25, size=min_number_flows_on_test_server, output_format="dataframe"
+        batch_size=25,
+        size=min_number_flows_on_test_server,
+        output_format="dataframe",
     )
     assert min_number_flows_on_test_server == len(flows)
 
 
-@pytest.mark.server
-@pytest.mark.flaky  # Other tests might need to upload runs first
+@pytest.mark.server()
+@pytest.mark.flaky()  # Other tests might need to upload runs first
 def test_list_all_for_setups(min_number_setups_on_test_server):
     # TODO apparently list_setups function does not support kwargs
     setups = openml.setups.list_setups(size=min_number_setups_on_test_server)
     assert min_number_setups_on_test_server == len(setups)
 
 
-@pytest.mark.server
-@pytest.mark.flaky  # Other tests might need to upload runs first
+@pytest.mark.server()
+@pytest.mark.flaky()  # Other tests might need to upload runs first
 def test_list_all_for_runs(min_number_runs_on_test_server):
     runs = openml.runs.list_runs(batch_size=25, size=min_number_runs_on_test_server)
     assert min_number_runs_on_test_server == len(runs)
 
 
-@pytest.mark.server
-@pytest.mark.flaky  # Other tests might need to upload runs first
+@pytest.mark.server()
+@pytest.mark.flaky()  # Other tests might need to upload runs first
 def test_list_all_for_evaluations(min_number_evaluations_on_test_server):
     # TODO apparently list_evaluations function does not support kwargs
     evaluations = openml.evaluations.list_evaluations(
-        function="predictive_accuracy", size=min_number_evaluations_on_test_server
+        function="predictive_accuracy",
+        size=min_number_evaluations_on_test_server,
     )
     assert min_number_evaluations_on_test_server == len(evaluations)
 
 
-@pytest.mark.server
+@pytest.mark.server()
 @unittest.mock.patch("openml._api_calls._perform_api_call", side_effect=_mocked_perform_api_call)
 def test_list_all_few_results_available(_perform_api_call):
     datasets = openml.datasets.list_datasets(
-        size=1000, data_name="iris", data_version=1, output_format="dataframe"
+        size=1000,
+        data_name="iris",
+        data_version=1,
+        output_format="dataframe",
     )
-    assert 1 == len(datasets), "only one iris dataset version 1 should be present"
-    assert 1 == _perform_api_call.call_count, "expect just one call to get one dataset"
+    assert len(datasets) == 1, "only one iris dataset version 1 should be present"
+    assert _perform_api_call.call_count == 1, "expect just one call to get one dataset"
 
 
 @unittest.skipIf(os.name == "nt", "https://github.com/openml/openml-python/issues/1033")

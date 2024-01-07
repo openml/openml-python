@@ -1,7 +1,8 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 
-class DummyRegressor(object):
+class DummyRegressor:
     def fit(self, X, y):
         return self
 

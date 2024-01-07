@@ -1,8 +1,10 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 import numpy as np
 
 from openml.tasks import TaskType, get_task
+
 from .test_supervised_task import OpenMLSupervisedTaskTest
 
 
@@ -10,25 +12,25 @@ class OpenMLLearningCurveTaskTest(OpenMLSupervisedTaskTest):
     __test__ = True
 
     def setUp(self, n_levels: int = 1):
-        super(OpenMLLearningCurveTaskTest, self).setUp()
+        super().setUp()
         self.task_id = 801  # diabetes
         self.task_type = TaskType.LEARNING_CURVE
         self.estimation_procedure = 13
 
     def test_get_X_and_Y(self):
-        X, Y = super(OpenMLLearningCurveTaskTest, self).test_get_X_and_Y()
-        self.assertEqual((768, 8), X.shape)
-        self.assertIsInstance(X, np.ndarray)
-        self.assertEqual((768,), Y.shape)
-        self.assertIsInstance(Y, np.ndarray)
-        self.assertEqual(Y.dtype, int)
+        X, Y = super().test_get_X_and_Y()
+        assert X.shape == (768, 8)
+        assert isinstance(X, np.ndarray)
+        assert Y.shape == (768,)
+        assert isinstance(Y, np.ndarray)
+        assert Y.dtype == int
 
     def test_download_task(self):
-        task = super(OpenMLLearningCurveTaskTest, self).test_download_task()
-        self.assertEqual(task.task_id, self.task_id)
-        self.assertEqual(task.task_type_id, TaskType.LEARNING_CURVE)
-        self.assertEqual(task.dataset_id, 20)
+        task = super().test_download_task()
+        assert task.task_id == self.task_id
+        assert task.task_type_id == TaskType.LEARNING_CURVE
+        assert task.dataset_id == 20
 
     def test_class_labels(self):
         task = get_task(self.task_id)
-        self.assertEqual(task.class_labels, ["tested_negative", "tested_positive"])
+        assert task.class_labels == ["tested_negative", "tested_positive"]

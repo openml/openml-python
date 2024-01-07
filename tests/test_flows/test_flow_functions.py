@@ -1,24 +1,24 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from collections import OrderedDict
 import copy
 import functools
 import unittest
+from collections import OrderedDict
+from distutils.version import LooseVersion
 from unittest import mock
 from unittest.mock import patch
 
-from distutils.version import LooseVersion
-
+import pandas as pd
+import pytest
 import requests
 import sklearn
 from sklearn import ensemble
-import pandas as pd
-import pytest
 
 import openml
+import openml.extensions.sklearn
 from openml.exceptions import OpenMLNotAuthorizedError, OpenMLServerException
 from openml.testing import TestBase, create_request_response
-import openml.extensions.sklearn
 
 
 @pytest.mark.usefixtures("long_version")
@@ -26,23 +26,23 @@ class TestFlowFunctions(TestBase):
     _multiprocess_can_split_ = True
 
     def setUp(self):
-        super(TestFlowFunctions, self).setUp()
+        super().setUp()
 
     def tearDown(self):
-        super(TestFlowFunctions, self).tearDown()
+        super().tearDown()
 
     def _check_flow(self, flow):
-        self.assertEqual(type(flow), dict)
-        self.assertEqual(len(flow), 6)
-        self.assertIsInstance(flow["id"], int)
-        self.assertIsInstance(flow["name"], str)
-        self.assertIsInstance(flow["full_name"], str)
-        self.assertIsInstance(flow["version"], str)
+        assert type(flow) == dict
+        assert len(flow) == 6
+        assert isinstance(flow["id"], int)
+        assert isinstance(flow["name"], str)
+        assert isinstance(flow["full_name"], str)
+        assert isinstance(flow["version"], str)
         # There are some runs on openml.org that can have an empty external version
         ext_version_str_or_none = (
             isinstance(flow["external_version"], str) or flow["external_version"] is None
         )
-        self.assertTrue(ext_version_str_or_none)
+        assert ext_version_str_or_none
 
     def test_list_flows(self):
         openml.config.server = self.production_server
@@ -50,7 +50,7 @@ class TestFlowFunctions(TestBase):
         # data from the internet...
         flows = openml.flows.list_flows(output_format="dataframe")
         # 3000 as the number of flows on openml.org
-        self.assertGreaterEqual(len(flows), 1500)
+        assert len(flows) >= 1500
         for flow in flows.to_dict(orient="index").values():
             self._check_flow(flow)
 
@@ -59,8 +59,8 @@ class TestFlowFunctions(TestBase):
         # We can only perform a smoke test here because we test on dynamic
         # data from the internet...
         flows = openml.flows.list_flows(output_format="dataframe")
-        self.assertIsInstance(flows, pd.DataFrame)
-        self.assertGreaterEqual(len(flows), 1500)
+        assert isinstance(flows, pd.DataFrame)
+        assert len(flows) >= 1500
 
     def test_list_flows_empty(self):
         openml.config.server = self.production_server
@@ -70,7 +70,7 @@ class TestFlowFunctions(TestBase):
     def test_list_flows_by_tag(self):
         openml.config.server = self.production_server
         flows = openml.flows.list_flows(tag="weka", output_format="dataframe")
-        self.assertGreaterEqual(len(flows), 5)
+        assert len(flows) >= 5
         for flow in flows.to_dict(orient="index").values():
             self._check_flow(flow)
 
@@ -80,7 +80,7 @@ class TestFlowFunctions(TestBase):
         maximum = 100
         for i in range(0, maximum, size):
             flows = openml.flows.list_flows(offset=i, size=size, output_format="dataframe")
-            self.assertGreaterEqual(size, len(flows))
+            assert size >= len(flows)
             for flow in flows.to_dict(orient="index").values():
                 self._check_flow(flow)
 
@@ -112,10 +112,7 @@ class TestFlowFunctions(TestBase):
         ]:
             new_flow = copy.deepcopy(flow)
             setattr(new_flow, attribute, new_value)
-            self.assertNotEqual(
-                getattr(flow, attribute),
-                getattr(new_flow, attribute),
-            )
+            assert getattr(flow, attribute) != getattr(new_flow, attribute)
             self.assertRaises(
                 ValueError,
                 openml.flows.functions.assert_flows_equal,
@@ -138,10 +135,7 @@ class TestFlowFunctions(TestBase):
         ]:
             new_flow = copy.deepcopy(flow)
             setattr(new_flow, attribute, new_value)
-            self.assertNotEqual(
-                getattr(flow, attribute),
-                getattr(new_flow, attribute),
-            )
+            assert getattr(flow, attribute) != getattr(new_flow, attribute)
             openml.flows.functions.assert_flows_equal(flow, new_flow)
 
         # Now test for parameters
@@ -158,12 +152,18 @@ class TestFlowFunctions(TestBase):
         parent_flow.components["subflow"] = subflow
         openml.flows.functions.assert_flows_equal(parent_flow, parent_flow)
         self.assertRaises(
-            ValueError, openml.flows.functions.assert_flows_equal, parent_flow, subflow
+            ValueError,
+            openml.flows.functions.assert_flows_equal,
+            parent_flow,
+            subflow,
         )
         new_flow = copy.deepcopy(parent_flow)
         new_flow.components["subflow"].name = "Subflow name"
         self.assertRaises(
-            ValueError, openml.flows.functions.assert_flows_equal, parent_flow, new_flow
+            ValueError,
+            openml.flows.functions.assert_flows_equal,
+            parent_flow,
+            new_flow,
         )
 
     def test_are_flows_equal_ignore_parameter_values(self):
@@ -272,7 +272,7 @@ class TestFlowFunctions(TestBase):
         )
         assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=None)
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "0.20",
         reason="OrdinalEncoder introduced in 0.20. "
@@ -294,17 +294,17 @@ class TestFlowFunctions(TestBase):
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
         # Test deserialization works
         server_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
-        self.assertEqual(server_flow.parameters["categories"], "[[0, 1], [0, 1]]")
-        self.assertEqual(server_flow.model.categories, flow.model.categories)
+        assert server_flow.parameters["categories"] == "[[0, 1], [0, 1]]"
+        assert server_flow.model.categories == flow.model.categories
 
     def test_get_flow1(self):
         # Regression test for issue #305
         # Basically, this checks that a flow without an external version can be loaded
         openml.config.server = self.production_server
         flow = openml.flows.get_flow(1)
-        self.assertIsNone(flow.external_version)
+        assert flow.external_version is None
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     def test_get_flow_reinstantiate_model(self):
         model = ensemble.RandomForestClassifier(n_estimators=33)
         extension = openml.extensions.get_extension_by_model(model)
@@ -314,7 +314,7 @@ class TestFlowFunctions(TestBase):
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
-        self.assertIsInstance(downloaded_flow.model, sklearn.ensemble.RandomForestClassifier)
+        assert isinstance(downloaded_flow.model, sklearn.ensemble.RandomForestClassifier)
 
     def test_get_flow_reinstantiate_model_no_extension(self):
         # Flow 10 is a WEKA flow
@@ -326,7 +326,7 @@ class TestFlowFunctions(TestBase):
             reinstantiate=True,
         )
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) == "0.19.1",
         reason="Requires scikit-learn!=0.19.1, because target flow is from that version.",
@@ -344,10 +344,10 @@ class TestFlowFunctions(TestBase):
             strict_version=True,
         )
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     @unittest.skipIf(
         LooseVersion(sklearn.__version__) < "1" and LooseVersion(sklearn.__version__) != "1.0.0",
-        reason="Requires scikit-learn < 1.0.1."
+        reason="Requires scikit-learn < 1.0.1.",
         # Because scikit-learn dropped min_impurity_split hyperparameter in 1.0,
         # and the requested flow is from 1.0.0 exactly.
     )
@@ -357,11 +357,11 @@ class TestFlowFunctions(TestBase):
         assert flow.flow_id is None
         assert "sklearn==1.0.0" not in flow.dependencies
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     @unittest.skipIf(
         (LooseVersion(sklearn.__version__) < "0.23.2")
-        or ("1.0" < LooseVersion(sklearn.__version__)),
-        reason="Requires scikit-learn 0.23.2 or ~0.24."
+        or (LooseVersion(sklearn.__version__) > "1.0"),
+        reason="Requires scikit-learn 0.23.2 or ~0.24.",
         # Because these still have min_impurity_split, but with new scikit-learn module structure."
     )
     def test_get_flow_reinstantiate_flow_not_strict_023_and_024(self):
@@ -370,9 +370,9 @@ class TestFlowFunctions(TestBase):
         assert flow.flow_id is None
         assert "sklearn==0.23.1" not in flow.dependencies
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     @unittest.skipIf(
-        "0.23" < LooseVersion(sklearn.__version__),
+        LooseVersion(sklearn.__version__) > "0.23",
         reason="Requires scikit-learn<=0.23, because the scikit-learn module structure changed.",
     )
     def test_get_flow_reinstantiate_flow_not_strict_pre_023(self):
@@ -381,7 +381,7 @@ class TestFlowFunctions(TestBase):
         assert flow.flow_id is None
         assert "sklearn==0.19.1" not in flow.dependencies
 
-    @pytest.mark.sklearn
+    @pytest.mark.sklearn()
     def test_get_flow_id(self):
         if self.long_version:
             list_all = openml.utils._list_all
@@ -392,25 +392,26 @@ class TestFlowFunctions(TestBase):
             flow = openml.extensions.get_extension_by_model(clf).model_to_flow(clf).publish()
             TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
             TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id)
+                "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id),
             )
 
-            self.assertEqual(openml.flows.get_flow_id(model=clf, exact_version=True), flow.flow_id)
+            assert openml.flows.get_flow_id(model=clf, exact_version=True) == flow.flow_id
             flow_ids = openml.flows.get_flow_id(model=clf, exact_version=False)
-            self.assertIn(flow.flow_id, flow_ids)
-            self.assertGreater(len(flow_ids), 0)
+            assert flow.flow_id in flow_ids
+            assert len(flow_ids) > 0
 
             # Check that the output of get_flow_id is identical if only the name is given, no matter
             # whether exact_version is set to True or False.
             flow_ids_exact_version_True = openml.flows.get_flow_id(
-                name=flow.name, exact_version=True
+                name=flow.name,
+                exact_version=True,
             )
             flow_ids_exact_version_False = openml.flows.get_flow_id(
                 name=flow.name,
                 exact_version=False,
             )
-            self.assertEqual(flow_ids_exact_version_True, flow_ids_exact_version_False)
-            self.assertIn(flow.flow_id, flow_ids_exact_version_True)
+            assert flow_ids_exact_version_True == flow_ids_exact_version_False
+            assert flow.flow_id in flow_ids_exact_version_True
 
     def test_delete_flow(self):
         flow = openml.OpenMLFlow(
@@ -431,7 +432,7 @@ class TestFlowFunctions(TestBase):
 
         flow.publish()
         _flow_id = flow.flow_id
-        self.assertTrue(openml.flows.delete_flow(_flow_id))
+        assert openml.flows.delete_flow(_flow_id)
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -439,7 +440,8 @@ def test_delete_flow_not_owned(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_owned.xml"
     mock_delete.return_value = create_request_response(
-        status_code=412, content_filepath=content_file
+        status_code=412,
+        content_filepath=content_file,
     )
 
     with pytest.raises(
@@ -460,7 +462,8 @@ def test_delete_flow_with_run(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_has_runs.xml"
     mock_delete.return_value = create_request_response(
-        status_code=412, content_filepath=content_file
+        status_code=412,
+        content_filepath=content_file,
     )
 
     with pytest.raises(
@@ -481,7 +484,8 @@ def test_delete_subflow(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_is_subflow.xml"
     mock_delete.return_value = create_request_response(
-        status_code=412, content_filepath=content_file
+        status_code=412,
+        content_filepath=content_file,
     )
 
     with pytest.raises(
@@ -502,7 +506,8 @@ def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_successful.xml"
     mock_delete.return_value = create_request_response(
-        status_code=200, content_filepath=content_file
+        status_code=200,
+        content_filepath=content_file,
     )
 
     success = openml.flows.delete_flow(33364)
@@ -520,7 +525,8 @@ def test_delete_unknown_flow(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_exist.xml"
     mock_delete.return_value = create_request_response(
-        status_code=412, content_filepath=content_file
+        status_code=412,
+        content_filepath=content_file,
     )
 
     with pytest.raises(

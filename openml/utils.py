@@ -1,17 +1,21 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-import os
-import xmltodict
-import shutil
-from typing import TYPE_CHECKING, List, Tuple, Union, Type
-import warnings
-import pandas as pd
-from functools import wraps
 import collections
+import contextlib
+import os
+import shutil
+import warnings
+from functools import wraps
+from typing import TYPE_CHECKING
+
+import pandas as pd
+import xmltodict
 
 import openml
 import openml._api_calls
 import openml.exceptions
+
 from . import config
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
@@ -66,32 +70,32 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
         if allow_none:
             return None
         else:
-            raise ValueError("Could not find tag '%s' in node '%s'" % (xml_tag_name, str(node)))
+            raise ValueError(f"Could not find tag '{xml_tag_name}' in node '{node!s}'")
 
 
-def _get_rest_api_type_alias(oml_object: "OpenMLBase") -> str:
+def _get_rest_api_type_alias(oml_object: OpenMLBase) -> str:
     """Return the alias of the openml entity as it is defined for the REST API."""
-    rest_api_mapping: List[Tuple[Union[Type, Tuple], str]] = [
+    rest_api_mapping: list[tuple[type | tuple, str]] = [
         (openml.datasets.OpenMLDataset, "data"),
         (openml.flows.OpenMLFlow, "flow"),
         (openml.tasks.OpenMLTask, "task"),
         (openml.runs.OpenMLRun, "run"),
         ((openml.study.OpenMLStudy, openml.study.OpenMLBenchmarkSuite), "study"),
     ]
-    _, api_type_alias = [
+    _, api_type_alias = next(
         (python_type, api_alias)
         for (python_type, api_alias) in rest_api_mapping
         if isinstance(oml_object, python_type)
-    ][0]
+    )
     return api_type_alias
 
 
-def _tag_openml_base(oml_object: "OpenMLBase", tag: str, untag: bool = False):
+def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool = False):
     api_type_alias = _get_rest_api_type_alias(oml_object)
     _tag_entity(api_type_alias, oml_object.id, tag, untag)
 
 
-def _tag_entity(entity_type, entity_id, tag, untag=False) -> List[str]:
+def _tag_entity(entity_type, entity_id, tag, untag=False) -> list[str]:
     """
     Function that tags or untags a given entity on OpenML. As the OpenML
     API tag functions all consist of the same format, this function covers
@@ -197,7 +201,7 @@ def _delete_entity(entity_type, entity_id):
                 message=(
                     f"The {entity_type} can not be deleted because "
                     f"it still has associated entities: {e.message}"
-                )
+                ),
             ) from e
         if e.code in unknown_reason:
             raise openml.exceptions.OpenMLServerError(
@@ -230,11 +234,11 @@ def _list_all(listing_call, output_format="dict", *args, **filters):
         Any filters that can be applied to the listing function.
         additionally, the batch_size can be specified. This is
         useful for testing purposes.
+
     Returns
     -------
     dict or dataframe
     """
-
     # eliminate filters that have a None value
     active_filters = {key: value for key, value in filters.items() if value is not None}
     page = 0
@@ -296,7 +300,7 @@ def _list_all(listing_call, output_format="dict", *args, **filters):
             if len(result) >= LIMIT:
                 break
             # check if there are enough results to fulfill a batch
-            if BATCH_SIZE_ORIG > LIMIT - len(result):
+            if LIMIT - len(result) < BATCH_SIZE_ORIG:
                 batch_size = LIMIT - len(result)
 
     return result
@@ -314,17 +318,14 @@ def _create_cache_directory(key):
         os.makedirs(cache_dir, exist_ok=True)
     except Exception as e:
         raise openml.exceptions.OpenMLCacheException(
-            f"Cannot create cache directory {cache_dir}."
+            f"Cannot create cache directory {cache_dir}.",
         ) from e
 
     return cache_dir
 
 
 def _get_cache_dir_for_id(key, id_, create=False):
-    if create:
-        cache_dir = _create_cache_directory(key)
-    else:
-        cache_dir = _get_cache_dir_for_key(key)
+    cache_dir = _create_cache_directory(key) if create else _get_cache_dir_for_key(key)
 
     return os.path.join(cache_dir, str(id_))
 
@@ -373,10 +374,10 @@ def _remove_cache_dir_for_id(key, cache_dir):
     """
     try:
         shutil.rmtree(cache_dir)
-    except (OSError, IOError):
+    except OSError:
         raise ValueError(
-            "Cannot remove faulty %s cache directory %s."
-            "Please do this manually!" % (key, cache_dir)
+            f"Cannot remove faulty {key} cache directory {cache_dir}."
+            "Please do this manually!",
         )
 
 
@@ -393,12 +394,10 @@ def thread_safe_if_oslo_installed(func):
                 id_ = args[0]
             else:
                 raise RuntimeError(
-                    "An id must be specified for {}, was passed: ({}, {}).".format(
-                        func.__name__, args, kwargs
-                    )
+                    f"An id must be specified for {func.__name__}, was passed: ({args}, {kwargs}).",
                 )
             # The [7:] gets rid of the 'openml.' prefix
-            lock_name = "{}.{}:{}".format(func.__module__[7:], func.__name__, id_)
+            lock_name = f"{func.__module__[7:]}.{func.__name__}:{id_}"
             with lockutils.external_lock(name=lock_name, lock_path=_create_lockfiles_dir()):
                 return func(*args, **kwargs)
 
@@ -409,8 +408,6 @@ def thread_safe_if_oslo_installed(func):
 
 def _create_lockfiles_dir():
     dir = os.path.join(config.get_cache_directory(), "locks")
-    try:
+    with contextlib.suppress(OSError):
         os.makedirs(dir)
-    except OSError:
-        pass
     return dir

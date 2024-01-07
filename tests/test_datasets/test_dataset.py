@@ -1,8 +1,9 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 import os
-from time import time
 import unittest.mock
+from time import time
 
 import numpy as np
 import pandas as pd
@@ -10,16 +11,16 @@ import pytest
 from scipy import sparse
 
 import openml
-from openml.testing import TestBase
+from openml.datasets import OpenMLDataFeature, OpenMLDataset
 from openml.exceptions import PyOpenMLError
-from openml.datasets import OpenMLDataset, OpenMLDataFeature
+from openml.testing import TestBase
 
 
 class OpenMLDatasetTest(TestBase):
     _multiprocess_can_split_ = True
 
     def setUp(self):
-        super(OpenMLDatasetTest, self).setUp()
+        super().setUp()
         openml.config.server = self.production_server
 
         # Load dataset id 2 - dataset 2 is interesting because it contains
@@ -77,7 +78,9 @@ class OpenMLDatasetTest(TestBase):
 
         with pytest.raises(ValueError, match="Invalid symbols 'ü' in citation"):
             openml.datasets.OpenMLDataset(
-                name="somename", description="a description", citation="Something by Müller"
+                name="somename",
+                description="a description",
+                citation="Something by Müller",
             )
 
     def test__unpack_categories_with_nan_likes(self):
@@ -94,14 +97,14 @@ class OpenMLDatasetTest(TestBase):
     def test_get_data_array(self):
         # Basic usage
         rval, _, categorical, attribute_names = self.dataset.get_data(dataset_format="array")
-        self.assertIsInstance(rval, np.ndarray)
-        self.assertEqual(rval.dtype, np.float32)
-        self.assertEqual((898, 39), rval.shape)
-        self.assertEqual(len(categorical), 39)
-        self.assertTrue(all([isinstance(cat, bool) for cat in categorical]))
-        self.assertEqual(len(attribute_names), 39)
-        self.assertTrue(all([isinstance(att, str) for att in attribute_names]))
-        self.assertIsNone(_)
+        assert isinstance(rval, np.ndarray)
+        assert rval.dtype == np.float32
+        assert rval.shape == (898, 39)
+        assert len(categorical) == 39
+        assert all(isinstance(cat, bool) for cat in categorical)
+        assert len(attribute_names) == 39
+        assert all(isinstance(att, str) for att in attribute_names)
+        assert _ is None
 
         # check that an error is raised when the dataset contains string
         err_msg = "PyOpenML cannot handle string when returning numpy arrays"
@@ -110,9 +113,9 @@ class OpenMLDatasetTest(TestBase):
 
     def test_get_data_pandas(self):
         data, _, _, _ = self.titanic.get_data(dataset_format="dataframe")
-        self.assertTrue(isinstance(data, pd.DataFrame))
-        self.assertEqual(data.shape[1], len(self.titanic.features))
-        self.assertEqual(data.shape[0], 1309)
+        assert isinstance(data, pd.DataFrame)
+        assert data.shape[1] == len(self.titanic.features)
+        assert data.shape[0] == 1309
         col_dtype = {
             "pclass": "uint8",
             "survived": "category",
@@ -130,30 +133,31 @@ class OpenMLDatasetTest(TestBase):
             "home.dest": "object",
         }
         for col_name in data.columns:
-            self.assertTrue(data[col_name].dtype.name == col_dtype[col_name])
+            assert data[col_name].dtype.name == col_dtype[col_name]
 
         X, y, _, _ = self.titanic.get_data(
-            dataset_format="dataframe", target=self.titanic.default_target_attribute
+            dataset_format="dataframe",
+            target=self.titanic.default_target_attribute,
         )
-        self.assertTrue(isinstance(X, pd.DataFrame))
-        self.assertTrue(isinstance(y, pd.Series))
-        self.assertEqual(X.shape, (1309, 13))
-        self.assertEqual(y.shape, (1309,))
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.Series)
+        assert X.shape == (1309, 13)
+        assert y.shape == (1309,)
         for col_name in X.columns:
-            self.assertTrue(X[col_name].dtype.name == col_dtype[col_name])
-        self.assertTrue(y.dtype.name == col_dtype["survived"])
+            assert X[col_name].dtype.name == col_dtype[col_name]
+        assert y.dtype.name == col_dtype["survived"]
 
     @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
     def test_get_data_boolean_pandas(self):
         # test to check that we are converting properly True and False even
         # with some inconsistency when dumping the data on openml
         data, _, _, _ = self.jm1.get_data()
-        self.assertTrue(data["defects"].dtype.name == "category")
-        self.assertTrue(set(data["defects"].cat.categories) == {True, False})
+        assert data["defects"].dtype.name == "category"
+        assert set(data["defects"].cat.categories) == {True, False}
 
         data, _, _, _ = self.pc4.get_data()
-        self.assertTrue(data["c"].dtype.name == "category")
-        self.assertTrue(set(data["c"].cat.categories) == {True, False})
+        assert data["c"].dtype.name == "category"
+        assert set(data["c"].cat.categories) == {True, False}
 
     def test_get_data_no_str_data_for_nparrays(self):
         # check that an error is raised when the dataset contains string
@@ -169,59 +173,59 @@ class OpenMLDatasetTest(TestBase):
         else:
             expected_type = "float64"
 
-        self.assertEqual(dtype.name, expected_type)
+        assert dtype.name == expected_type
 
     @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
     def test_get_data_with_rowid(self):
         self.dataset.row_id_attribute = "condition"
         rval, _, categorical, _ = self.dataset.get_data(include_row_id=True)
-        self.assertIsInstance(rval, pd.DataFrame)
+        assert isinstance(rval, pd.DataFrame)
         for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
             self._check_expected_type(dtype, is_cat, rval[col])
-        self.assertEqual(rval.shape, (898, 39))
-        self.assertEqual(len(categorical), 39)
+        assert rval.shape == (898, 39)
+        assert len(categorical) == 39
 
         rval, _, categorical, _ = self.dataset.get_data()
-        self.assertIsInstance(rval, pd.DataFrame)
+        assert isinstance(rval, pd.DataFrame)
         for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
             self._check_expected_type(dtype, is_cat, rval[col])
-        self.assertEqual(rval.shape, (898, 38))
-        self.assertEqual(len(categorical), 38)
+        assert rval.shape == (898, 38)
+        assert len(categorical) == 38
 
     def test_get_data_with_target_array(self):
         X, y, _, attribute_names = self.dataset.get_data(dataset_format="array", target="class")
-        self.assertIsInstance(X, np.ndarray)
-        self.assertEqual(X.dtype, np.float32)
-        self.assertEqual(X.shape, (898, 38))
-        self.assertIn(y.dtype, [np.int32, np.int64])
-        self.assertEqual(y.shape, (898,))
-        self.assertEqual(len(attribute_names), 38)
-        self.assertNotIn("class", attribute_names)
+        assert isinstance(X, np.ndarray)
+        assert X.dtype == np.float32
+        assert X.shape == (898, 38)
+        assert y.dtype in [np.int32, np.int64]
+        assert y.shape == (898,)
+        assert len(attribute_names) == 38
+        assert "class" not in attribute_names
 
     @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
     def test_get_data_with_target_pandas(self):
         X, y, categorical, attribute_names = self.dataset.get_data(target="class")
-        self.assertIsInstance(X, pd.DataFrame)
+        assert isinstance(X, pd.DataFrame)
         for dtype, is_cat, col in zip(X.dtypes, categorical, X):
             self._check_expected_type(dtype, is_cat, X[col])
-        self.assertIsInstance(y, pd.Series)
-        self.assertEqual(y.dtype.name, "category")
+        assert isinstance(y, pd.Series)
+        assert y.dtype.name == "category"
 
-        self.assertEqual(X.shape, (898, 38))
-        self.assertEqual(len(attribute_names), 38)
-        self.assertEqual(y.shape, (898,))
+        assert X.shape == (898, 38)
+        assert len(attribute_names) == 38
+        assert y.shape == (898,)
 
-        self.assertNotIn("class", attribute_names)
+        assert "class" not in attribute_names
 
     def test_get_data_rowid_and_ignore_and_target(self):
         self.dataset.ignore_attribute = ["condition"]
         self.dataset.row_id_attribute = ["hardness"]
         X, y, categorical, names = self.dataset.get_data(target="class")
-        self.assertEqual(X.shape, (898, 36))
-        self.assertEqual(len(categorical), 36)
+        assert X.shape == (898, 36)
+        assert len(categorical) == 36
         cats = [True] * 3 + [False, True, True, False] + [True] * 23 + [False] * 3 + [True] * 3
         self.assertListEqual(categorical, cats)
-        self.assertEqual(y.shape, (898,))
+        assert y.shape == (898,)
 
     @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
     def test_get_data_with_ignore_attributes(self):
@@ -229,26 +233,26 @@ class OpenMLDatasetTest(TestBase):
         rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=True)
         for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
             self._check_expected_type(dtype, is_cat, rval[col])
-        self.assertEqual(rval.shape, (898, 39))
-        self.assertEqual(len(categorical), 39)
+        assert rval.shape == (898, 39)
+        assert len(categorical) == 39
 
         rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=False)
         for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
             self._check_expected_type(dtype, is_cat, rval[col])
-        self.assertEqual(rval.shape, (898, 38))
-        self.assertEqual(len(categorical), 38)
+        assert rval.shape == (898, 38)
+        assert len(categorical) == 38
 
     def test_get_data_with_nonexisting_class(self):
         # This class is using the anneal dataset with labels [1, 2, 3, 4, 5, 'U']. However,
         # label 4 does not exist and we test that the features 5 and 'U' are correctly mapped to
         # indices 4 and 5, and that nothing is mapped to index 3.
         _, y, _, _ = self.dataset.get_data("class", dataset_format="dataframe")
-        self.assertEqual(list(y.dtype.categories), ["1", "2", "3", "4", "5", "U"])
+        assert list(y.dtype.categories) == ["1", "2", "3", "4", "5", "U"]
         _, y, _, _ = self.dataset.get_data("class", dataset_format="array")
-        self.assertEqual(np.min(y), 0)
-        self.assertEqual(np.max(y), 5)
+        assert np.min(y) == 0
+        assert np.max(y) == 5
         # Check that no label is mapped to 3, since it is reserved for label '4'.
-        self.assertEqual(np.sum(y == 3), 0)
+        assert np.sum(y == 3) == 0
 
     def test_get_data_corrupt_pickle(self):
         # Lazy loaded dataset, populate cache.
@@ -259,155 +263,173 @@ class OpenMLDatasetTest(TestBase):
         # Despite the corrupt file, the data should be loaded from the ARFF file.
         # A warning message is written to the python logger.
         xy, _, _, _ = self.iris.get_data()
-        self.assertIsInstance(xy, pd.DataFrame)
-        self.assertEqual(xy.shape, (150, 5))
+        assert isinstance(xy, pd.DataFrame)
+        assert xy.shape == (150, 5)
 
     def test_lazy_loading_metadata(self):
         # Initial Setup
         did_cache_dir = openml.utils._create_cache_directory_for_id(
-            openml.datasets.functions.DATASETS_CACHE_DIR_NAME, 2
+            openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
+            2,
         )
         _compare_dataset = openml.datasets.get_dataset(
-            2, download_data=False, download_features_meta_data=True, download_qualities=True
+            2,
+            download_data=False,
+            download_features_meta_data=True,
+            download_qualities=True,
         )
         change_time = os.stat(did_cache_dir).st_mtime
 
         # Test with cache
         _dataset = openml.datasets.get_dataset(
-            2, download_data=False, download_features_meta_data=False, download_qualities=False
+            2,
+            download_data=False,
+            download_features_meta_data=False,
+            download_qualities=False,
         )
-        self.assertEqual(change_time, os.stat(did_cache_dir).st_mtime)
-        self.assertEqual(_dataset.features, _compare_dataset.features)
-        self.assertEqual(_dataset.qualities, _compare_dataset.qualities)
+        assert change_time == os.stat(did_cache_dir).st_mtime
+        assert _dataset.features == _compare_dataset.features
+        assert _dataset.qualities == _compare_dataset.qualities
 
         # -- Test without cache
         openml.utils._remove_cache_dir_for_id(
-            openml.datasets.functions.DATASETS_CACHE_DIR_NAME, did_cache_dir
+            openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
+            did_cache_dir,
         )
 
         _dataset = openml.datasets.get_dataset(
-            2, download_data=False, download_features_meta_data=False, download_qualities=False
+            2,
+            download_data=False,
+            download_features_meta_data=False,
+            download_qualities=False,
         )
-        self.assertEqual(["description.xml"], os.listdir(did_cache_dir))
-        self.assertNotEqual(change_time, os.stat(did_cache_dir).st_mtime)
-        self.assertEqual(_dataset.features, _compare_dataset.features)
-        self.assertEqual(_dataset.qualities, _compare_dataset.qualities)
+        assert ["description.xml"] == os.listdir(did_cache_dir)
+        assert change_time != os.stat(did_cache_dir).st_mtime
+        assert _dataset.features == _compare_dataset.features
+        assert _dataset.qualities == _compare_dataset.qualities
 
 
 class OpenMLDatasetTestOnTestServer(TestBase):
     def setUp(self):
-        super(OpenMLDatasetTestOnTestServer, self).setUp()
+        super().setUp()
         # longley, really small dataset
         self.dataset = openml.datasets.get_dataset(125, download_data=False)
 
     def test_tagging(self):
-        tag = "test_tag_OpenMLDatasetTestOnTestServer_{}".format(time())
+        tag = f"test_tag_OpenMLDatasetTestOnTestServer_{time()}"
         datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
-        self.assertTrue(datasets.empty)
+        assert datasets.empty
         self.dataset.push_tag(tag)
         datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
-        self.assertEqual(len(datasets), 1)
-        self.assertIn(125, datasets["did"])
+        assert len(datasets) == 1
+        assert 125 in datasets["did"]
         self.dataset.remove_tag(tag)
         datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
-        self.assertTrue(datasets.empty)
+        assert datasets.empty
 
 
 class OpenMLDatasetTestSparse(TestBase):
     _multiprocess_can_split_ = True
 
     def setUp(self):
-        super(OpenMLDatasetTestSparse, self).setUp()
+        super().setUp()
         openml.config.server = self.production_server
 
         self.sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
 
     def test_get_sparse_dataset_array_with_target(self):
         X, y, _, attribute_names = self.sparse_dataset.get_data(
-            dataset_format="array", target="class"
+            dataset_format="array",
+            target="class",
         )
 
-        self.assertTrue(sparse.issparse(X))
-        self.assertEqual(X.dtype, np.float32)
-        self.assertEqual(X.shape, (600, 20000))
+        assert sparse.issparse(X)
+        assert X.dtype == np.float32
+        assert X.shape == (600, 20000)
 
-        self.assertIsInstance(y, np.ndarray)
-        self.assertIn(y.dtype, [np.int32, np.int64])
-        self.assertEqual(y.shape, (600,))
+        assert isinstance(y, np.ndarray)
+        assert y.dtype in [np.int32, np.int64]
+        assert y.shape == (600,)
 
-        self.assertEqual(len(attribute_names), 20000)
-        self.assertNotIn("class", attribute_names)
+        assert len(attribute_names) == 20000
+        assert "class" not in attribute_names
 
     def test_get_sparse_dataset_dataframe_with_target(self):
         X, y, _, attribute_names = self.sparse_dataset.get_data(
-            dataset_format="dataframe", target="class"
+            dataset_format="dataframe",
+            target="class",
         )
-        self.assertIsInstance(X, pd.DataFrame)
-        self.assertIsInstance(X.dtypes[0], pd.SparseDtype)
-        self.assertEqual(X.shape, (600, 20000))
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(X.dtypes[0], pd.SparseDtype)
+        assert X.shape == (600, 20000)
 
-        self.assertIsInstance(y, pd.Series)
-        self.assertIsInstance(y.dtypes, pd.SparseDtype)
-        self.assertEqual(y.shape, (600,))
+        assert isinstance(y, pd.Series)
+        assert isinstance(y.dtypes, pd.SparseDtype)
+        assert y.shape == (600,)
 
-        self.assertEqual(len(attribute_names), 20000)
-        self.assertNotIn("class", attribute_names)
+        assert len(attribute_names) == 20000
+        assert "class" not in attribute_names
 
     def test_get_sparse_dataset_array(self):
         rval, _, categorical, attribute_names = self.sparse_dataset.get_data(dataset_format="array")
-        self.assertTrue(sparse.issparse(rval))
-        self.assertEqual(rval.dtype, np.float32)
-        self.assertEqual((600, 20001), rval.shape)
+        assert sparse.issparse(rval)
+        assert rval.dtype == np.float32
+        assert rval.shape == (600, 20001)
 
-        self.assertEqual(len(categorical), 20001)
-        self.assertTrue(all([isinstance(cat, bool) for cat in categorical]))
+        assert len(categorical) == 20001
+        assert all(isinstance(cat, bool) for cat in categorical)
 
-        self.assertEqual(len(attribute_names), 20001)
-        self.assertTrue(all([isinstance(att, str) for att in attribute_names]))
+        assert len(attribute_names) == 20001
+        assert all(isinstance(att, str) for att in attribute_names)
 
     def test_get_sparse_dataset_dataframe(self):
         rval, *_ = self.sparse_dataset.get_data()
-        self.assertIsInstance(rval, pd.DataFrame)
+        assert isinstance(rval, pd.DataFrame)
         np.testing.assert_array_equal(
-            [pd.SparseDtype(np.float32, fill_value=0.0)] * len(rval.dtypes), rval.dtypes
+            [pd.SparseDtype(np.float32, fill_value=0.0)] * len(rval.dtypes),
+            rval.dtypes,
         )
-        self.assertEqual((600, 20001), rval.shape)
+        assert rval.shape == (600, 20001)
 
     def test_get_sparse_dataset_with_rowid(self):
         self.sparse_dataset.row_id_attribute = ["V256"]
         rval, _, categorical, _ = self.sparse_dataset.get_data(
-            dataset_format="array", include_row_id=True
+            dataset_format="array",
+            include_row_id=True,
         )
-        self.assertTrue(sparse.issparse(rval))
-        self.assertEqual(rval.dtype, np.float32)
-        self.assertEqual(rval.shape, (600, 20001))
-        self.assertEqual(len(categorical), 20001)
+        assert sparse.issparse(rval)
+        assert rval.dtype == np.float32
+        assert rval.shape == (600, 20001)
+        assert len(categorical) == 20001
 
         rval, _, categorical, _ = self.sparse_dataset.get_data(
-            dataset_format="array", include_row_id=False
+            dataset_format="array",
+            include_row_id=False,
         )
-        self.assertTrue(sparse.issparse(rval))
-        self.assertEqual(rval.dtype, np.float32)
-        self.assertEqual(rval.shape, (600, 20000))
-        self.assertEqual(len(categorical), 20000)
+        assert sparse.issparse(rval)
+        assert rval.dtype == np.float32
+        assert rval.shape == (600, 20000)
+        assert len(categorical) == 20000
 
     def test_get_sparse_dataset_with_ignore_attributes(self):
         self.sparse_dataset.ignore_attribute = ["V256"]
         rval, _, categorical, _ = self.sparse_dataset.get_data(
-            dataset_format="array", include_ignore_attribute=True
+            dataset_format="array",
+            include_ignore_attribute=True,
         )
-        self.assertTrue(sparse.issparse(rval))
-        self.assertEqual(rval.dtype, np.float32)
-        self.assertEqual(rval.shape, (600, 20001))
+        assert sparse.issparse(rval)
+        assert rval.dtype == np.float32
+        assert rval.shape == (600, 20001)
 
-        self.assertEqual(len(categorical), 20001)
+        assert len(categorical) == 20001
         rval, _, categorical, _ = self.sparse_dataset.get_data(
-            dataset_format="array", include_ignore_attribute=False
+            dataset_format="array",
+            include_ignore_attribute=False,
         )
-        self.assertTrue(sparse.issparse(rval))
-        self.assertEqual(rval.dtype, np.float32)
-        self.assertEqual(rval.shape, (600, 20000))
-        self.assertEqual(len(categorical), 20000)
+        assert sparse.issparse(rval)
+        assert rval.dtype == np.float32
+        assert rval.shape == (600, 20000)
+        assert len(categorical) == 20000
 
     def test_get_sparse_dataset_rowid_and_ignore_and_target(self):
         # TODO: re-add row_id and ignore attributes
@@ -419,24 +441,24 @@ class OpenMLDatasetTestSparse(TestBase):
             include_row_id=False,
             include_ignore_attribute=False,
         )
-        self.assertTrue(sparse.issparse(X))
-        self.assertEqual(X.dtype, np.float32)
-        self.assertIn(y.dtype, [np.int32, np.int64])
-        self.assertEqual(X.shape, (600, 19998))
+        assert sparse.issparse(X)
+        assert X.dtype == np.float32
+        assert y.dtype in [np.int32, np.int64]
+        assert X.shape == (600, 19998)
 
-        self.assertEqual(len(categorical), 19998)
+        assert len(categorical) == 19998
         self.assertListEqual(categorical, [False] * 19998)
-        self.assertEqual(y.shape, (600,))
+        assert y.shape == (600,)
 
     def test_get_sparse_categorical_data_id_395(self):
         dataset = openml.datasets.get_dataset(395, download_data=True)
         feature = dataset.features[3758]
-        self.assertTrue(isinstance(dataset, OpenMLDataset))
-        self.assertTrue(isinstance(feature, OpenMLDataFeature))
-        self.assertEqual(dataset.name, "re1.wc")
-        self.assertEqual(feature.name, "CLASS_LABEL")
-        self.assertEqual(feature.data_type, "nominal")
-        self.assertEqual(len(feature.nominal_values), 25)
+        assert isinstance(dataset, OpenMLDataset)
+        assert isinstance(feature, OpenMLDataFeature)
+        assert dataset.name == "re1.wc"
+        assert feature.name == "CLASS_LABEL"
+        assert feature.data_type == "nominal"
+        assert len(feature.nominal_values) == 25
 
 
 class OpenMLDatasetFunctionTest(TestBase):
@@ -445,51 +467,65 @@ class OpenMLDatasetFunctionTest(TestBase):
     def test__read_features(self, filename_mock, pickle_mock):
         """Test we read the features from the xml if no cache pickle is available.
 
-        This test also does some simple checks to verify that the features are read correctly"""
+        This test also does some simple checks to verify that the features are read correctly
+        """
         filename_mock.return_value = os.path.join(self.workdir, "features.xml.pkl")
         pickle_mock.load.side_effect = FileNotFoundError
         features = openml.datasets.dataset._read_features(
             os.path.join(
-                self.static_cache_dir, "org", "openml", "test", "datasets", "2", "features.xml"
-            )
+                self.static_cache_dir,
+                "org",
+                "openml",
+                "test",
+                "datasets",
+                "2",
+                "features.xml",
+            ),
         )
-        self.assertIsInstance(features, dict)
-        self.assertEqual(len(features), 39)
-        self.assertIsInstance(features[0], OpenMLDataFeature)
-        self.assertEqual(features[0].name, "family")
-        self.assertEqual(len(features[0].nominal_values), 9)
+        assert isinstance(features, dict)
+        assert len(features) == 39
+        assert isinstance(features[0], OpenMLDataFeature)
+        assert features[0].name == "family"
+        assert len(features[0].nominal_values) == 9
         # pickle.load is never called because the features pickle file didn't exist
-        self.assertEqual(pickle_mock.load.call_count, 0)
-        self.assertEqual(pickle_mock.dump.call_count, 1)
+        assert pickle_mock.load.call_count == 0
+        assert pickle_mock.dump.call_count == 1
 
     @unittest.mock.patch("openml.datasets.dataset.pickle")
     @unittest.mock.patch("openml.datasets.dataset._get_qualities_pickle_file")
     def test__read_qualities(self, filename_mock, pickle_mock):
         """Test we read the qualities from the xml if no cache pickle is available.
 
-        This test also does some minor checks to ensure that the qualities are read correctly."""
+        This test also does some minor checks to ensure that the qualities are read correctly.
+        """
         filename_mock.return_value = os.path.join(self.workdir, "qualities.xml.pkl")
         pickle_mock.load.side_effect = FileNotFoundError
         qualities = openml.datasets.dataset._read_qualities(
             os.path.join(
-                self.static_cache_dir, "org", "openml", "test", "datasets", "2", "qualities.xml"
-            )
+                self.static_cache_dir,
+                "org",
+                "openml",
+                "test",
+                "datasets",
+                "2",
+                "qualities.xml",
+            ),
         )
-        self.assertIsInstance(qualities, dict)
-        self.assertEqual(len(qualities), 106)
+        assert isinstance(qualities, dict)
+        assert len(qualities) == 106
         # pickle.load is never called because the qualities pickle file didn't exist
-        self.assertEqual(pickle_mock.load.call_count, 0)
-        self.assertEqual(pickle_mock.dump.call_count, 1)
+        assert pickle_mock.load.call_count == 0
+        assert pickle_mock.dump.call_count == 1
 
     def test__check_qualities(self):
         qualities = [{"oml:name": "a", "oml:value": "0.5"}]
         qualities = openml.datasets.dataset._check_qualities(qualities)
-        self.assertEqual(qualities["a"], 0.5)
+        assert qualities["a"] == 0.5
 
         qualities = [{"oml:name": "a", "oml:value": "null"}]
         qualities = openml.datasets.dataset._check_qualities(qualities)
-        self.assertNotEqual(qualities["a"], qualities["a"])
+        assert qualities["a"] != qualities["a"]
 
         qualities = [{"oml:name": "a", "oml:value": None}]
         qualities = openml.datasets.dataset._check_qualities(qualities)
-        self.assertNotEqual(qualities["a"], qualities["a"])
+        assert qualities["a"] != qualities["a"]

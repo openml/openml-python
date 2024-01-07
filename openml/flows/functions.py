@@ -1,20 +1,21 @@
 # License: BSD 3-Clause
+from __future__ import annotations
+
+import os
+import re
 import warnings
+from collections import OrderedDict
+from typing import Any, Dict
 
 import dateutil.parser
-from collections import OrderedDict
-import os
-import io
-import re
-import xmltodict
 import pandas as pd
-from typing import Any, Union, Dict, Optional, List
+import xmltodict
 
-from ..exceptions import OpenMLCacheException
 import openml._api_calls
-from . import OpenMLFlow
 import openml.utils
+from openml.exceptions import OpenMLCacheException
 
+from . import OpenMLFlow
 
 FLOWS_CACHE_DIR_NAME = "flows"
 
@@ -57,14 +58,13 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
     -------
     OpenMLFlow.
     """
-
     fid_cache_dir = openml.utils._create_cache_directory_for_id(FLOWS_CACHE_DIR_NAME, fid)
     flow_file = os.path.join(fid_cache_dir, "flow.xml")
 
     try:
-        with io.open(flow_file, encoding="utf8") as fh:
+        with open(flow_file, encoding="utf8") as fh:
             return _create_flow_from_xml(fh.read())
-    except (OSError, IOError):
+    except OSError:
         openml.utils._remove_cache_dir_for_id(FLOWS_CACHE_DIR_NAME, fid_cache_dir)
         raise OpenMLCacheException("Flow file for fid %d not " "cached" % fid)
 
@@ -127,19 +127,19 @@ def _get_flow_description(flow_id: int) -> OpenMLFlow:
         )
 
         flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id, request_method="get")
-        with io.open(xml_file, "w", encoding="utf8") as fh:
+        with open(xml_file, "w", encoding="utf8") as fh:
             fh.write(flow_xml)
 
         return _create_flow_from_xml(flow_xml)
 
 
 def list_flows(
-    offset: Optional[int] = None,
-    size: Optional[int] = None,
-    tag: Optional[str] = None,
+    offset: int | None = None,
+    size: int | None = None,
+    tag: str | None = None,
     output_format: str = "dict",
-    **kwargs
-) -> Union[Dict, pd.DataFrame]:
+    **kwargs,
+) -> dict | pd.DataFrame:
     """
     Return a list of all flows which are on OpenML.
     (Supports large amount of results)
@@ -186,7 +186,7 @@ def list_flows(
     """
     if output_format not in ["dataframe", "dict"]:
         raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
+            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable.",
         )
 
     # TODO: [0.15]
@@ -204,11 +204,11 @@ def list_flows(
         offset=offset,
         size=size,
         tag=tag,
-        **kwargs
+        **kwargs,
     )
 
 
-def _list_flows(output_format="dict", **kwargs) -> Union[Dict, pd.DataFrame]:
+def _list_flows(output_format="dict", **kwargs) -> dict | pd.DataFrame:
     """
     Perform the api call that return a list of all flows.
 
@@ -230,12 +230,12 @@ def _list_flows(output_format="dict", **kwargs) -> Union[Dict, pd.DataFrame]:
 
     if kwargs is not None:
         for operator, value in kwargs.items():
-            api_call += "/%s/%s" % (operator, value)
+            api_call += f"/{operator}/{value}"
 
     return __list_flows(api_call=api_call, output_format=output_format)
 
 
-def flow_exists(name: str, external_version: str) -> Union[int, bool]:
+def flow_exists(name: str, external_version: str) -> int | bool:
     """Retrieves the flow id.
 
     A flow is uniquely identified by name + external_version.
@@ -273,10 +273,10 @@ def flow_exists(name: str, external_version: str) -> Union[int, bool]:
 
 
 def get_flow_id(
-    model: Optional[Any] = None,
-    name: Optional[str] = None,
+    model: Any | None = None,
+    name: str | None = None,
     exact_version=True,
-) -> Union[int, bool, List[int]]:
+) -> int | bool | list[int]:
     """Retrieves the flow id for a model or a flow name.
 
     Provide either a model or a name to this function. Depending on the input, it does
@@ -309,7 +309,7 @@ def get_flow_id(
     """
     if model is None and name is None:
         raise ValueError(
-            "Need to provide either argument `model` or argument `name`, but both are `None`."
+            "Need to provide either argument `model` or argument `name`, but both are `None`.",
         )
     elif model is not None and name is not None:
         raise ValueError("Must provide either argument `model` or argument `name`, but not both.")
@@ -332,11 +332,11 @@ def get_flow_id(
     else:
         flows = list_flows(output_format="dataframe")
         assert isinstance(flows, pd.DataFrame)  # Make mypy happy
-        flows = flows.query('name == "{}"'.format(flow_name))
+        flows = flows.query(f'name == "{flow_name}"')
         return flows["id"].to_list()
 
 
-def __list_flows(api_call: str, output_format: str = "dict") -> Union[Dict, pd.DataFrame]:
+def __list_flows(api_call: str, output_format: str = "dict") -> dict | pd.DataFrame:
     """Retrieve information about flows from OpenML API
     and parse it to a dictionary or a Pandas DataFrame.
 
@@ -346,8 +346,8 @@ def __list_flows(api_call: str, output_format: str = "dict") -> Union[Dict, pd.D
         Retrieves the information about flows.
     output_format: str in {"dict", "dataframe"}
         The output format.
-    Returns
 
+    Returns
     -------
         The flows information in the specified output format.
     """
@@ -360,7 +360,7 @@ def __list_flows(api_call: str, output_format: str = "dict") -> Union[Dict, pd.D
         "oml:flows"
     ]["@xmlns:oml"]
 
-    flows = dict()
+    flows = {}
     for flow_ in flows_dict["oml:flows"]["oml:flow"]:
         fid = int(flow_["oml:id"])
         flow = {
@@ -381,10 +381,9 @@ def __list_flows(api_call: str, output_format: str = "dict") -> Union[Dict, pd.D
 
 def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
     """Raises a ValueError if the flow or any of its subflows has no flow id."""
-
     # Depth-first search to check if all components were uploaded to the
     # server before parsing the parameters
-    stack = list()
+    stack = []
     stack.append(flow)
     while len(stack) > 0:
         current = stack.pop()
@@ -398,7 +397,7 @@ def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
 def assert_flows_equal(
     flow1: OpenMLFlow,
     flow2: OpenMLFlow,
-    ignore_parameter_values_on_older_children: Optional[str] = None,
+    ignore_parameter_values_on_older_children: str | None = None,
     ignore_parameter_values: bool = False,
     ignore_custom_name_if_none: bool = False,
     check_description: bool = True,
@@ -458,11 +457,11 @@ def assert_flows_equal(
             for name in set(attr1.keys()).union(attr2.keys()):
                 if name not in attr1:
                     raise ValueError(
-                        "Component %s only available in " "argument2, but not in argument1." % name
+                        "Component %s only available in " "argument2, but not in argument1." % name,
                     )
                 if name not in attr2:
                     raise ValueError(
-                        "Component %s only available in " "argument2, but not in argument1." % name
+                        "Component %s only available in " "argument2, but not in argument1." % name,
                     )
                 assert_flows_equal(
                     attr1[name],
@@ -487,13 +486,13 @@ def assert_flows_equal(
                         raise ValueError(
                             "Flow %s: parameter set of flow "
                             "differs from the parameters stored "
-                            "on the server." % flow1.name
+                            "on the server." % flow1.name,
                         )
 
                 if ignore_parameter_values_on_older_children:
                     upload_date_current_flow = dateutil.parser.parse(flow1.upload_date)
                     upload_date_parent_flow = dateutil.parser.parse(
-                        ignore_parameter_values_on_older_children
+                        ignore_parameter_values_on_older_children,
                     )
                     if upload_date_current_flow < upload_date_parent_flow:
                         continue
@@ -520,7 +519,7 @@ def assert_flows_equal(
                 params2 = set(flow2.parameters_meta_info)
                 if params1 != params2:
                     raise ValueError(
-                        "Parameter list in meta info for parameters differ " "in the two flows."
+                        "Parameter list in meta info for parameters differ " "in the two flows.",
                     )
                 # iterating over the parameter's meta info list
                 for param in params1:
@@ -539,16 +538,16 @@ def assert_flows_equal(
                         continue
                     elif value1 != value2:
                         raise ValueError(
-                            "Flow {}: data type for parameter {} in {} differ "
-                            "as {}\nvs\n{}".format(flow1.name, param, key, value1, value2)
+                            f"Flow {flow1.name}: data type for parameter {param} in {key} differ "
+                            f"as {value1}\nvs\n{value2}",
                         )
                 # the continue is to avoid the 'attr != attr2' check at end of function
                 continue
 
             if attr1 != attr2:
                 raise ValueError(
-                    "Flow %s: values for attribute '%s' differ: "
-                    "'%s'\nvs\n'%s'." % (str(flow1.name), str(key), str(attr1), str(attr2))
+                    f"Flow {flow1.name!s}: values for attribute '{key!s}' differ: "
+                    f"'{attr1!s}'\nvs\n'{attr2!s}'.",
                 )
 
 
@@ -563,7 +562,6 @@ def _create_flow_from_xml(flow_xml: str) -> OpenMLFlow:
     -------
     OpenMLFlow
     """
-
     return OpenMLFlow._from_dict(xmltodict.parse(flow_xml))
 
 
