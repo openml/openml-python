@@ -245,6 +245,10 @@ exclude = [
   "TCH",    # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tch
   "N803",   # Argument name {name} should be lowercase
 ]
+"openml/cli.py" = [
+  "T201",   # print found
+  "T203",   # pprint found
+]
 "openml/__version__.py" = [
   "D100",   # Undocumented public module
 ]
