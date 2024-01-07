@@ -96,14 +96,16 @@ home="https://openml.org/"
 documentation = "https://openml.github.io/openml-python/"
 source = "https://github.com/openml/openml-python"
 
-[tool.setuptools]
-packages = ["openml*"]
+[tool.setuptools.packages.find]
+where = [""]
+include = ["openml*"]
+namespaces = false
 
 [tool.setuptools.package-data]
 openml = ["*.txt", "*.md", "py.typed"]
 
 [tool.setuptools.dynamic]
-version = {attr = "openml.__version__"}
+version = {attr = "openml.__version__.__version__"}
 
 # https://docs.pytest.org/en/7.2.x/reference/reference.html#ini-options-ref
 [tool.pytest.ini_options]
