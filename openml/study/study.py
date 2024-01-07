@@ -4,8 +4,8 @@ from __future__ import annotations
 from collections import OrderedDict
 from typing import Any
 
-import openml
 from openml.base import OpenMLBase
+from openml.config import get_server_base_url
 
 
 class BaseStudy(OpenMLBase):
@@ -109,7 +109,7 @@ class BaseStudy(OpenMLBase):
             fields["ID"] = self.study_id
             fields["Study URL"] = self.openml_url
         if self.creator is not None:
-            fields["Creator"] = f"{openml.config.get_server_base_url()}/u/{self.creator}"
+            fields["Creator"] = f"{get_server_base_url()}/u/{self.creator}"
         if self.creation_date is not None:
             fields["Upload Time"] = self.creation_date.replace("T", " ")
         if self.data is not None:

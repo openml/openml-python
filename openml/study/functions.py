@@ -8,7 +8,7 @@ import pandas as pd
 import xmltodict
 
 import openml._api_calls
-from openml.study import OpenMLBenchmarkSuite, OpenMLStudy
+from openml.study.study import OpenMLBenchmarkSuite, OpenMLStudy
 
 if TYPE_CHECKING:
     from openml.study.study import BaseStudy
