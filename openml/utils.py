@@ -339,7 +339,7 @@ def _create_cache_directory(key):
     return cache_dir
 
 
-def _get_cache_dir_for_id(key: str, id_: int, *, create: bool = False) -> Path:
+def _get_cache_dir_for_id(key: str, id_: int, create: bool = False) -> Path:  # noqa: FBT
     cache_dir = _create_cache_directory(key) if create else _get_cache_dir_for_key(key)
     return Path(cache_dir) / str(id_)
 
