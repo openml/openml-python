@@ -6,6 +6,7 @@ import os
 import warnings
 from collections import OrderedDict
 from typing import cast
+from typing_extensions import Literal
 
 import arff
 import minio.error
@@ -1224,8 +1225,8 @@ def _get_dataset_features_file(did_cache_dir: str | None, dataset_id: int) -> st
     return features_file
 
 
-def _get_qualities_xml(dataset_id):
-    url_extension = f"data/qualities/{dataset_id}"
+def _get_qualities_xml(dataset_id: int) -> str:
+    url_extension = f"data/qualities/{dataset_id!s}"
     return openml._api_calls._perform_api_call(url_extension, "get")
 
 
@@ -1233,8 +1234,9 @@ def _get_dataset_qualities_file(
     did_cache_dir: str | None,
     dataset_id: int,
 ) -> str | None:
-    """API call to load dataset qualities. Loads from cache or downloads them.
+    """Get the path for the dataset qualities file, or None if no qualities exist.
 
+    Loads from cache or downloads them.
     Features are metafeatures (number of features, number of classes, ...)
 
     This function is NOT thread/multiprocessing safe.
@@ -1247,48 +1249,45 @@ def _get_dataset_qualities_file(
     dataset_id : int
         Dataset ID
 
-    download_qualities : bool
-        wheather to download/use cahsed version or not.
-
     Returns
     -------
     str
         Path of the cached qualities file
     """
-    if did_cache_dir is None:
-        did_cache_dir = _create_cache_directory_for_id(
-            DATASETS_CACHE_DIR_NAME,
-            dataset_id,
-        )
+    save_did_cache_dir = (
+        _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset_id)
+        if did_cache_dir is None
+        else did_cache_dir
+    )
 
     # Dataset qualities are subject to change and must be fetched every time
-    qualities_file = os.path.join(did_cache_dir, "qualities.xml")
+    qualities_file = save_did_cache_dir / "qualities.xml"  # type: ignore
     try:
-        with open(qualities_file, encoding="utf8") as fh:
+        with qualities_file.open(encoding="utf8") as fh:
             qualities_xml = fh.read()
     except OSError:
         try:
             qualities_xml = _get_qualities_xml(dataset_id)
-            with open(qualities_file, "w", encoding="utf8") as fh:
+            with qualities_file.open("w", encoding="utf8") as fh:
                 fh.write(qualities_xml)
         except OpenMLServerException as e:
             if e.code == 362 and str(e) == "No qualities found - None":
                 # quality file stays as None
                 logger.warning(f"No qualities found for dataset {dataset_id}")
                 return None
-            else:
-                raise
 
-    return qualities_file
+            raise e
+
+    return str(qualities_file)
 
 
-def _create_dataset_from_description(
+def _create_dataset_from_description(  # noqa: PLR0913
     description: dict[str, str],
     features_file: str | None = None,
     qualities_file: str | None = None,
     arff_file: str | None = None,
     parquet_file: str | None = None,
-    cache_format: str = "pickle",
+    cache_format: Literal["pickle", "feather"] = "pickle",
 ) -> OpenMLDataset:
     """Create a dataset object from a description dict.
 
@@ -1296,9 +1295,9 @@ def _create_dataset_from_description(
     ----------
     description : dict
         Description of a dataset in xml dict.
-    featuresfile : str
+    features_file : str
         Path of the dataset features as xml file.
-    qualities : list
+    qualities_file : list
         Path of the dataset qualities as xml file.
     arff_file : string, optional
         Path of dataset ARFF file.
@@ -1315,9 +1314,9 @@ def _create_dataset_from_description(
     return OpenMLDataset(
         description["oml:name"],
         description.get("oml:description"),
-        data_format=description["oml:format"],
-        dataset_id=description["oml:id"],
-        version=description["oml:version"],
+        data_format=description["oml:format"],  # type: ignore
+        dataset_id=int(description["oml:id"]),
+        version=int(description["oml:version"]),
         creator=description.get("oml:creator"),
         contributor=description.get("oml:contributor"),
         collection_date=description.get("oml:collection_date"),
@@ -1345,7 +1344,7 @@ def _create_dataset_from_description(
     )
 
 
-def _get_online_dataset_arff(dataset_id):
+def _get_online_dataset_arff(dataset_id: int) -> str | None:
     """Download the ARFF file for a given dataset id
     from the OpenML website.
 
@@ -1356,8 +1355,8 @@ def _get_online_dataset_arff(dataset_id):
 
     Returns
     -------
-    str
-        A string representation of an ARFF file.
+    str or None
+        A string representation of an ARFF file. Or None if file already exists.
     """
     dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id, "get")
     # build a dict from the xml.
@@ -1367,7 +1366,7 @@ def _get_online_dataset_arff(dataset_id):
     )
 
 
-def _get_online_dataset_format(dataset_id):
+def _get_online_dataset_format(dataset_id: int) -> str:
     """Get the dataset format for a given dataset id
     from the OpenML website.
 
@@ -1383,7 +1382,7 @@ def _get_online_dataset_format(dataset_id):
     """
     dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id, "get")
     # build a dict from the xml and get the format from the dataset description
-    return xmltodict.parse(dataset_xml)["oml:data_set_description"]["oml:format"].lower()
+    return xmltodict.parse(dataset_xml)["oml:data_set_description"]["oml:format"].lower()  # type: ignore
 
 
 def delete_dataset(dataset_id: int) -> bool:

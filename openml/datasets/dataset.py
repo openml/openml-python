@@ -9,6 +9,7 @@ import re
 import warnings
 from collections import OrderedDict
 from typing import Iterable
+from typing_extensions import Literal
 
 import arff
 import numpy as np
@@ -90,10 +91,10 @@ class OpenMLDataset(OpenMLBase):
         MD5 checksum to check if the dataset is downloaded without corruption.
     data_file : str, optional
         Path to where the dataset is located.
-    features : dict, optional
+    features_file : dict, optional
         A dictionary of dataset features,
         which maps a feature index to a OpenMLDataFeature.
-    qualities : dict, optional
+    qualities_file : dict, optional
         A dictionary of dataset qualities,
         which maps a quality name to a quality value.
     dataset: string, optional
@@ -106,36 +107,36 @@ class OpenMLDataset(OpenMLBase):
         Path to the local file.
     """
 
-    def __init__(
+    def __init__(  # noqa: C901, PLR0912, PLR0913, PLR0915
         self,
-        name,
-        description,
-        data_format="arff",
-        cache_format="pickle",
-        dataset_id=None,
-        version=None,
-        creator=None,
-        contributor=None,
-        collection_date=None,
-        upload_date=None,
-        language=None,
-        licence=None,
-        url=None,
-        default_target_attribute=None,
-        row_id_attribute=None,
-        ignore_attribute=None,
-        version_label=None,
-        citation=None,
-        tag=None,
-        visibility=None,
-        original_data_url=None,
-        paper_url=None,
-        update_comment=None,
-        md5_checksum=None,
-        data_file=None,
+        name: str,
+        description: str | None,
+        data_format: Literal["arff", "sparse_arff"] = "arff",
+        cache_format: Literal["feather", "pickle"] = "pickle",
+        dataset_id: int | None = None,
+        version: int | None = None,
+        creator: str | None = None,
+        contributor: str | None = None,
+        collection_date: str | None = None,
+        upload_date: str | None = None,
+        language: str | None = None,
+        licence: str | None = None,
+        url: str | None = None,
+        default_target_attribute: str | None = None,
+        row_id_attribute: str | None = None,
+        ignore_attribute: str | list[str] | None = None,
+        version_label: str | None = None,
+        citation: str | None = None,
+        tag: str | None = None,
+        visibility: str | None = None,
+        original_data_url: str | None = None,
+        paper_url: str | None = None,
+        update_comment: str | None = None,
+        md5_checksum: str | None = None,
+        data_file: str | None = None,
         features_file: str | None = None,
         qualities_file: str | None = None,
-        dataset=None,
+        dataset: str | None = None,
         parquet_url: str | None = None,
         parquet_file: str | None = None,
     ):
