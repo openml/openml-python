@@ -1,14 +1,20 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import os
 import pickle
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
+from pathlib import Path
+from typing_extensions import NamedTuple
 
 import arff
 import numpy as np
 
-Split = namedtuple("Split", ["train", "test"])
+
+class Split(NamedTuple):
+    """A single split of a dataset."""
+
+    train: np.ndarray
+    test: np.ndarray
 
 
 class OpenMLSplit:
@@ -21,7 +27,12 @@ class OpenMLSplit:
     split : dict
     """
 
-    def __init__(self, name, description, split):
+    def __init__(
+        self,
+        name: int | str,
+        description: str,
+        split: dict[int, dict[int, dict[int, np.ndarray]]],
+    ):
         self.description = description
         self.name = name
         self.split = {}
@@ -36,8 +47,11 @@ class OpenMLSplit:
                     self.split[repetition][fold][sample] = split[repetition][fold][sample]
 
         self.repeats = len(self.split)
+
+        # TODO(eddiebergman): Better error message
         if any(len(self.split[0]) != len(self.split[i]) for i in range(self.repeats)):
             raise ValueError("")
+
         self.folds = len(self.split[0])
         self.samples = len(self.split[0][0])
 
@@ -69,22 +83,25 @@ class OpenMLSplit:
         return True
 
     @classmethod
-    def _from_arff_file(cls, filename: str) -> OpenMLSplit:
+    def _from_arff_file(cls, filename: Path) -> OpenMLSplit:  # noqa: C901, PLR0912
         repetitions = None
+        name = None
 
-        pkl_filename = filename.replace(".arff", ".pkl.py3")
+        pkl_filename = filename.with_suffix(".pkl.py3")
 
-        if os.path.exists(pkl_filename):
-            with open(pkl_filename, "rb") as fh:
-                _ = pickle.load(fh)
-            repetitions = _["repetitions"]
-            name = _["name"]
+        if pkl_filename.exists():
+            with pkl_filename.open("rb") as fh:
+                # TODO(eddiebergman): Would be good to figure out what _split is and assert it is
+                _split = pickle.load(fh)  # noqa: S301
+            repetitions = _split["repetitions"]
+            name = _split["name"]
 
         # Cache miss
         if repetitions is None:
             # Faster than liac-arff and sufficient in this situation!
-            if not os.path.exists(filename):
-                raise FileNotFoundError("Split arff %s does not exist!" % filename)
+            if not filename.exists():
+                raise FileNotFoundError(f"Split arff {filename} does not exist!")
+
             file_data = arff.load(open(filename), return_type=arff.DENSE_GEN)
             splits = file_data["data"]
             name = file_data["relation"]
@@ -130,12 +147,13 @@ class OpenMLSplit:
                             np.array(repetitions[repetition][fold][sample][1], dtype=np.int32),
                         )
 
-            with open(pkl_filename, "wb") as fh:
+            with pkl_filename.open("wb") as fh:
                 pickle.dump({"name": name, "repetitions": repetitions}, fh, protocol=2)
 
+        assert name is not None
         return cls(name, "", repetitions)
 
-    def from_dataset(self, X, Y, folds, repeats):
+    def from_dataset(self, X, Y, folds: int, repeats: int):
         """Generates a new OpenML dataset object from input data and cross-validation settings.
 
         Parameters
@@ -156,7 +174,7 @@ class OpenMLSplit:
         """
         raise NotImplementedError()
 
-    def get(self, repeat=0, fold=0, sample=0):
+    def get(self, repeat: int = 0, fold: int = 0, sample: int = 0) -> np.ndarray:
         """Returns the specified data split from the CrossValidationSplit object.
 
         Parameters

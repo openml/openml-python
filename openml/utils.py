@@ -1,13 +1,14 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import collections
 import contextlib
-import os
 import shutil
 import warnings
+from collections import OrderedDict
 from functools import wraps
-from typing import TYPE_CHECKING
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Callable, Mapping, TypeVar
+from typing_extensions import Literal, ParamSpec
 
 import pandas as pd
 import xmltodict
@@ -22,6 +23,9 @@ from . import config
 if TYPE_CHECKING:
     from openml.base import OpenMLBase
 
+    P = ParamSpec("P")
+    R = TypeVar("R")
+
 oslo_installed = False
 try:
     # Currently, importing oslo raises a lot of warning that it will stop working
@@ -35,7 +39,12 @@ except ImportError:
     pass
 
 
-def extract_xml_tags(xml_tag_name, node, allow_none=True):
+def extract_xml_tags(
+    xml_tag_name: str,
+    node: Mapping[str, Any],
+    *,
+    allow_none: bool = True,
+) -> Any | None:
     """Helper to extract xml tags from xmltodict.
 
     Parameters
@@ -43,7 +52,7 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
     xml_tag_name : str
         Name of the xml tag to extract from the node.
 
-    node : object
+    node : Mapping[str, Any]
         Node object returned by ``xmltodict`` from which ``xml_tag_name``
         should be extracted.
 
@@ -56,21 +65,17 @@ def extract_xml_tags(xml_tag_name, node, allow_none=True):
     object
     """
     if xml_tag_name in node and node[xml_tag_name] is not None:
-        if isinstance(node[xml_tag_name], dict):
-            rval = [node[xml_tag_name]]
-        elif isinstance(node[xml_tag_name], str):
-            rval = [node[xml_tag_name]]
-        elif isinstance(node[xml_tag_name], list):
-            rval = node[xml_tag_name]
-        else:
-            raise ValueError("Received not string and non list as tag item")
+        if isinstance(node[xml_tag_name], (dict, str)):
+            return [node[xml_tag_name]]
+        if isinstance(node[xml_tag_name], list):
+            return node[xml_tag_name]
 
-        return rval
-    else:
-        if allow_none:
-            return None
-        else:
-            raise ValueError(f"Could not find tag '{xml_tag_name}' in node '{node!s}'")
+        raise ValueError("Received not string and non list as tag item")
+
+    if allow_none:
+        return None
+
+    raise ValueError(f"Could not find tag '{xml_tag_name}' in node '{node!s}'")
 
 
 def _get_rest_api_type_alias(oml_object: OpenMLBase) -> str:
@@ -90,12 +95,12 @@ def _get_rest_api_type_alias(oml_object: OpenMLBase) -> str:
     return api_type_alias
 
 
-def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool = False):
+def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool = False) -> None:  # noqa: FBT
     api_type_alias = _get_rest_api_type_alias(oml_object)
-    _tag_entity(api_type_alias, oml_object.id, tag, untag)
+    _tag_entity(api_type_alias, oml_object.id, tag, untag=untag)
 
 
-def _tag_entity(entity_type, entity_id, tag, untag=False) -> list[str]:
+def _tag_entity(entity_type, entity_id, tag, *, untag: bool = False) -> list[str]:
     """
     Function that tags or untags a given entity on OpenML. As the OpenML
     API tag functions all consist of the same format, this function covers
@@ -138,12 +143,13 @@ def _tag_entity(entity_type, entity_id, tag, untag=False) -> list[str]:
 
     if "oml:tag" in result:
         return result["oml:tag"]
-    else:
-        # no tags, return empty list
-        return []
+
+    # no tags, return empty list
+    return []
 
 
-def _delete_entity(entity_type, entity_id):
+# TODO(eddiebergman): Maybe this can be made more specific with a Literal
+def _delete_entity(entity_type: str, entity_id: int) -> bool:
     """
     Function that deletes a given entity on OpenML. As the OpenML
     API tag functions all consist of the same format, this function covers
@@ -213,7 +219,17 @@ def _delete_entity(entity_type, entity_id):
         raise
 
 
-def _list_all(listing_call, output_format="dict", *args, **filters):
+# TODO(eddiebergman): Add `@overload` typing for output_format
+# NOTE: Impossible to type `listing_call` properly on the account of the output format,
+# might be better to use an iterator here instead and concatenate at the use point
+# NOTE: The obect output_format, the return type of `listing_call` is expected to be `Sized`
+# to have `len()` be callable on it.
+def _list_all(  # noqa: C901, PLR0912
+    listing_call: Callable[P, Any],
+    output_format: Literal["dict", "dataframe", "object"] = "dict",
+    *args: P.args,
+    **filters: P.kwargs,
+) -> OrderedDict | pd.DataFrame:
     """Helper to handle paged listing requests.
 
     Example usage:
@@ -242,31 +258,28 @@ def _list_all(listing_call, output_format="dict", *args, **filters):
     # eliminate filters that have a None value
     active_filters = {key: value for key, value in filters.items() if value is not None}
     page = 0
-    result = collections.OrderedDict()
+    result = OrderedDict()
     if output_format == "dataframe":
         result = pd.DataFrame()
 
     # Default batch size per paging.
     # This one can be set in filters (batch_size), but should not be
     # changed afterwards. The derived batch_size can be changed.
-    BATCH_SIZE_ORIG = 10000
-    if "batch_size" in active_filters:
-        BATCH_SIZE_ORIG = active_filters["batch_size"]
-        del active_filters["batch_size"]
+    BATCH_SIZE_ORIG = active_filters.pop("batch_size", 10000)
+    if not isinstance(BATCH_SIZE_ORIG, int):
+        raise ValueError(f"'batch_size' should be an integer but got {BATCH_SIZE_ORIG}")
 
     # max number of results to be shown
-    LIMIT = None
-    offset = 0
-    if "size" in active_filters:
-        LIMIT = active_filters["size"]
-        del active_filters["size"]
+    LIMIT = active_filters.pop("size", None)
+    if LIMIT is not None and not isinstance(LIMIT, int):
+        raise ValueError(f"'limit' should be an integer but got {LIMIT}")
 
     if LIMIT is not None and BATCH_SIZE_ORIG > LIMIT:
         BATCH_SIZE_ORIG = LIMIT
 
-    if "offset" in active_filters:
-        offset = active_filters["offset"]
-        del active_filters["offset"]
+    offset = active_filters.pop("offset", 0)
+    if not isinstance(offset, int):
+        raise ValueError(f"'offset' should be an integer but got {offset}")
 
     batch_size = BATCH_SIZE_ORIG
     while True:
@@ -274,14 +287,14 @@ def _list_all(listing_call, output_format="dict", *args, **filters):
             current_offset = offset + BATCH_SIZE_ORIG * page
             new_batch = listing_call(
                 *args,
-                limit=batch_size,
-                offset=current_offset,
-                output_format=output_format,
-                **active_filters,
+                output_format=output_format,  # type: ignore
+                **{**active_filters, "limit": batch_size, "offset": current_offset},
             )
         except openml.exceptions.OpenMLServerNoResult:
             # we want to return an empty dict in this case
+            # NOTE: This may not actually happen, but we could just return here to enforce it...
             break
+
         if output_format == "dataframe":
             if len(result) == 0:
                 result = new_batch
@@ -290,8 +303,10 @@ def _list_all(listing_call, output_format="dict", *args, **filters):
         else:
             # For output_format = 'dict' or 'object'
             result.update(new_batch)
+
         if len(new_batch) < batch_size:
             break
+
         page += 1
         if LIMIT is not None:
             # check if the number of required results has been achieved
@@ -299,6 +314,7 @@ def _list_all(listing_call, output_format="dict", *args, **filters):
             # in case of bugs to prevent infinite loops
             if len(result) >= LIMIT:
                 break
+
             # check if there are enough results to fulfill a batch
             if LIMIT - len(result) < BATCH_SIZE_ORIG:
                 batch_size = LIMIT - len(result)
@@ -306,31 +322,29 @@ def _list_all(listing_call, output_format="dict", *args, **filters):
     return result
 
 
-def _get_cache_dir_for_key(key):
-    cache = config.get_cache_directory()
-    return os.path.join(cache, key)
+def _get_cache_dir_for_key(key: str) -> Path:
+    return Path(config.get_cache_directory()) / key
 
 
 def _create_cache_directory(key):
     cache_dir = _get_cache_dir_for_key(key)
 
     try:
-        os.makedirs(cache_dir, exist_ok=True)
-    except Exception as e:
+        cache_dir.mkdir(exist_ok=True, parents=True)
+    except Exception as e:  # noqa: BLE001
         raise openml.exceptions.OpenMLCacheException(
-            f"Cannot create cache directory {cache_dir}.",
+            f"Cannot create cache directory {cache_dir}."
         ) from e
 
     return cache_dir
 
 
-def _get_cache_dir_for_id(key, id_, create=False):
+def _get_cache_dir_for_id(key: str, id_: int, create: bool = False) -> Path:  # noqa: FBT
     cache_dir = _create_cache_directory(key) if create else _get_cache_dir_for_key(key)
+    return Path(cache_dir) / str(id_)
 
-    return os.path.join(cache_dir, str(id_))
 
-
-def _create_cache_directory_for_id(key, id_):
+def _create_cache_directory_for_id(key: str, id_: int) -> Path:
     """Create the cache directory for a specific ID
 
     In order to have a clearer cache structure and because every task
@@ -348,20 +362,18 @@ def _create_cache_directory_for_id(key, id_):
 
     Returns
     -------
-    str
+    cache_dir : Path
         Path of the created dataset cache directory.
     """
     cache_dir = _get_cache_dir_for_id(key, id_, create=True)
-    if os.path.isdir(cache_dir):
-        pass
-    elif os.path.exists(cache_dir):
+    if cache_dir.exists() and not cache_dir.is_dir():
         raise ValueError("%s cache dir exists but is not a directory!" % key)
-    else:
-        os.makedirs(cache_dir)
+
+    cache_dir.mkdir(exist_ok=True, parents=True)
     return cache_dir
 
 
-def _remove_cache_dir_for_id(key, cache_dir):
+def _remove_cache_dir_for_id(key: str, cache_dir: Path) -> None:
     """Remove the task cache directory
 
     This function is NOT thread/multiprocessing safe.
@@ -374,10 +386,10 @@ def _remove_cache_dir_for_id(key, cache_dir):
     """
     try:
         shutil.rmtree(cache_dir)
-    except OSError:
+    except OSError as e:
         raise ValueError(
-            f"Cannot remove faulty {key} cache directory {cache_dir}." "Please do this manually!",
-        )
+            f"Cannot remove faulty {key} cache directory {cache_dir}. Please do this manually!",
+        ) from e
 
 
 def thread_safe_if_oslo_installed(func):
@@ -401,12 +413,13 @@ def thread_safe_if_oslo_installed(func):
                 return func(*args, **kwargs)
 
         return safe_func
-    else:
-        return func
+
+    return func
 
 
-def _create_lockfiles_dir():
-    dir = os.path.join(config.get_cache_directory(), "locks")
+def _create_lockfiles_dir() -> Path:
+    path = Path(config.get_cache_directory()) / "locks"
+    # TODO(eddiebergman): Not sure why this is allowed to error and ignore???
     with contextlib.suppress(OSError):
-        os.makedirs(dir)
-    return dir
+        path.mkdir(exist_ok=True, parents=True)
+    return path

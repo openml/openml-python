@@ -9,7 +9,8 @@ import pathlib
 import shutil
 import time
 import unittest
-from typing import Dict, List, Optional, Tuple, Union, cast  # noqa: F401
+from pathlib import Path
+from typing import ClassVar
 
 import pandas as pd
 import requests
@@ -37,15 +38,16 @@ class TestBase(unittest.TestCase):
     Hopefully soon allows using a test server, not the production server.
     """
 
-    publish_tracker = {
+    # TODO: This could be made more explcit with a TypedDict instead of list[str | int]
+    publish_tracker: ClassVar[dict[str, list[str | int]]] = {
         "run": [],
         "data": [],
         "flow": [],
         "task": [],
         "study": [],
         "user": [],
-    }  # type: Dict[str, List[int]]
-    flow_name_tracker = []  # type: List[str]
+    }
+    flow_name_tracker: ClassVar[list[str]] = []
     test_server = "https://test.openml.org/api/v1/xml"
     # amueller's read/write key that he will throw away later
     apikey = "610344db6388d9ba34f6db45a3cf71de"
@@ -75,26 +77,26 @@ class TestBase(unittest.TestCase):
         # cache
         self.maxDiff = None
         self.static_cache_dir = None
-        abspath_this_file = os.path.abspath(inspect.getfile(self.__class__))
-        static_cache_dir = os.path.dirname(abspath_this_file)
+        abspath_this_file = Path(inspect.getfile(self.__class__)).absolute()
+        static_cache_dir = abspath_this_file.parent
         for _ in range(n_levels):
-            static_cache_dir = os.path.abspath(os.path.join(static_cache_dir, ".."))
+            static_cache_dir = static_cache_dir.parent.absolute()
         content = os.listdir(static_cache_dir)
         if "files" in content:
-            self.static_cache_dir = os.path.join(static_cache_dir, "files")
+            self.static_cache_dir = static_cache_dir / "files"
 
         if self.static_cache_dir is None:
             raise ValueError(
                 f"Cannot find test cache dir, expected it to be {static_cache_dir}!",
             )
 
-        self.cwd = os.getcwd()
-        workdir = os.path.dirname(os.path.abspath(__file__))
+        self.cwd = Path.cwd()
+        workdir = Path(__file__).parent.absolute()
         tmp_dir_name = self.id()
-        self.workdir = os.path.join(workdir, tmp_dir_name)
+        self.workdir = workdir / tmp_dir_name
         shutil.rmtree(self.workdir, ignore_errors=True)
 
-        os.mkdir(self.workdir)
+        self.workdir.mkdir(exist_ok=True)
         os.chdir(self.workdir)
 
         self.cached = True
@@ -102,7 +104,7 @@ class TestBase(unittest.TestCase):
         self.production_server = "https://openml.org/api/v1/xml"
         openml.config.server = TestBase.test_server
         openml.config.avoid_duplicate_runs = False
-        openml.config.set_root_cache_directory(self.workdir)
+        openml.config.set_root_cache_directory(str(self.workdir))
 
         # Increase the number of retries to avoid spurious server failures
         self.retry_policy = openml.config.retry_policy
@@ -110,22 +112,22 @@ class TestBase(unittest.TestCase):
         openml.config.set_retry_policy("robot", n_retries=20)
 
     def tearDown(self) -> None:
+        """Tear down the test"""
         os.chdir(self.cwd)
         try:
             shutil.rmtree(self.workdir)
-        except PermissionError:
-            if os.name == "nt":
+        except PermissionError as e:
+            if os.name != "nt":
                 # one of the files may still be used by another process
-                pass
-            else:
-                raise
+                raise e
+
         openml.config.server = self.production_server
         openml.config.connection_n_retries = self.connection_n_retries
         openml.config.retry_policy = self.retry_policy
 
     @classmethod
     def _mark_entity_for_removal(
-        self,
+        cls,
         entity_type: str,
         entity_id: int,
         entity_name: str | None = None,
@@ -143,10 +145,10 @@ class TestBase(unittest.TestCase):
             TestBase.publish_tracker[entity_type].append(entity_id)
         if isinstance(entity_type, openml.flows.OpenMLFlow):
             assert entity_name is not None
-            self.flow_name_tracker.append(entity_name)
+            cls.flow_name_tracker.append(entity_name)
 
     @classmethod
-    def _delete_entity_from_tracker(self, entity_type: str, entity: int) -> None:
+    def _delete_entity_from_tracker(cls, entity_type: str, entity: int) -> None:
         """Deletes entity records from the static file_tracker
 
         Given an entity type and corresponding ID, deletes all entries, including
@@ -176,7 +178,7 @@ class TestBase(unittest.TestCase):
             # Create a unique prefix for the flow. Necessary because the flow
             # is identified by its name and external version online. Having a
             # unique name allows us to publish the same flow in each test run.
-            md5 = hashlib.md5()
+            md5 = hashlib.md5()  # noqa: S324
             md5.update(str(time.time()).encode("utf-8"))
             md5.update(str(os.getpid()).encode("utf-8"))
             sentinel = md5.hexdigest()[:10]
@@ -201,7 +203,7 @@ class TestBase(unittest.TestCase):
 
     def _check_dataset(self, dataset: dict[str, str | int]) -> None:
         _check_dataset(dataset)
-        assert type(dataset) == dict
+        assert isinstance(dataset, dict)
         assert len(dataset) >= 2
         assert "did" in dataset
         assert isinstance(dataset["did"], int)
@@ -209,11 +211,12 @@ class TestBase(unittest.TestCase):
         assert isinstance(dataset["status"], str)
         assert dataset["status"] in ["in_preparation", "active", "deactivated"]
 
-    def _check_fold_timing_evaluations(
+    def _check_fold_timing_evaluations(  # noqa: PLR0913
         self,
         fold_evaluations: dict[str, dict[int, dict[int, float]]],
         num_repeats: int,
         num_folds: int,
+        *,
         max_time_allowed: float = 60000.0,
         task_type: TaskType = TaskType.SUPERVISED_CLASSIFICATION,
         check_scores: bool = True,
@@ -284,9 +287,10 @@ def check_task_existence(
     """
     return_val = None
     tasks = openml.tasks.list_tasks(task_type=task_type, output_format="dataframe")
+    assert isinstance(tasks, pd.DataFrame)
     if len(tasks) == 0:
         return None
-    tasks = cast(pd.DataFrame, tasks).loc[tasks["did"] == dataset_id]
+    tasks = tasks.loc[tasks["did"] == dataset_id]
     if len(tasks) == 0:
         return None
     tasks = tasks.loc[tasks["target_feature"] == target_name]
@@ -334,7 +338,7 @@ def create_request_response(
     status_code: int,
     content_filepath: pathlib.Path,
 ) -> requests.Response:
-    with open(content_filepath) as xml_response:
+    with content_filepath.open("r") as xml_response:
         response_body = xml_response.read()
 
     response = requests.Response()
