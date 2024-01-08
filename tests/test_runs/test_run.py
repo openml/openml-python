@@ -30,7 +30,9 @@ class TestRun(TestBase):
         assert not runs.empty, "Test server state is incorrect"
         run_id = runs["run_id"].iloc[0]
         run = openml.runs.get_run(run_id)
-        tag = f"test_tag_TestRun_{time()}"
+        # tags can be at most 64 alphanumeric (+ underscore) chars
+        unique_indicator = time().replace('.', '')
+        tag = f"test_tag_TestRun_{unique_indicator}"
         runs = openml.runs.list_runs(tag=tag, output_format="dataframe")
         assert len(runs) == 0
         run.push_tag(tag)

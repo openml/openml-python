@@ -102,7 +102,9 @@ class TestFlow(TestBase):
         flows = openml.flows.list_flows(size=1, output_format="dataframe")
         flow_id = flows["id"].iloc[0]
         flow = openml.flows.get_flow(flow_id)
-        tag = f"test_tag_TestFlow_{time.time()}"
+        # tags can be at most 64 alphanumeric (+ underscore) chars
+        unique_indicator = time().replace('.', '')
+        tag = f"test_tag_TestFlow_{unique_indicator}"
         flows = openml.flows.list_flows(tag=tag, output_format="dataframe")
         assert len(flows) == 0
         flow.push_tag(tag)
