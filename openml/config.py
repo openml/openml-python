@@ -236,7 +236,7 @@ def _setup(config: dict[str, str | int | bool] | None = None) -> None:
     # read config file, create directory for config file
     if not config_dir.exists():
         try:
-            config_dir.mkdir(exist_ok=True)
+            config_dir.mkdir(exist_ok=True, parents=True)
             cache_exists = True
         except PermissionError:
             cache_exists = False
