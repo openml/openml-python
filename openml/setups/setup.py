@@ -1,7 +1,10 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from typing import Any
+
 import openml.config
+import openml.flows
 
 
 class OpenMLSetup:
@@ -17,11 +20,13 @@ class OpenMLSetup:
         The setting of the parameters
     """
 
-    def __init__(self, setup_id, flow_id, parameters):
+    def __init__(self, setup_id: int, flow_id: int, parameters: dict[str, Any]):
         if not isinstance(setup_id, int):
             raise ValueError("setup id should be int")
+
         if not isinstance(flow_id, int):
             raise ValueError("flow id should be int")
+
         if parameters is not None and not isinstance(parameters, dict):
             raise ValueError("parameters should be dict")
 
@@ -29,7 +34,7 @@ class OpenMLSetup:
         self.flow_id = flow_id
         self.parameters = parameters
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         header = "OpenML Setup"
         header = "{}\n{}\n".format(header, "=" * len(header))
 
@@ -44,7 +49,7 @@ class OpenMLSetup:
         order = ["Setup ID", "Flow ID", "Flow URL", "# of Parameters"]
         fields = [(key, fields[key]) for key in order if key in fields]
 
-        longest_field_name_length = max(len(name) for name, value in fields)
+        longest_field_name_length = max(len(name) for name, _ in fields)
         field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
         body = "\n".join(field_line_format.format(name, value) for name, value in fields)
         return header + body
@@ -75,7 +80,7 @@ class OpenMLParameter:
         If the parameter was set, the value that it was set to.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         input_id,
         flow_id,
@@ -130,7 +135,7 @@ class OpenMLParameter:
         ]
         fields = [(key, fields[key]) for key in order if key in fields]
 
-        longest_field_name_length = max(len(name) for name, value in fields)
+        longest_field_name_length = max(len(name) for name, _ in fields)
         field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
         body = "\n".join(field_line_format.format(name, value) for name, value in fields)
         return header + body
