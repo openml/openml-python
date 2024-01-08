@@ -225,9 +225,8 @@ def _list_tasks(task_type=None, output_format="dict", **kwargs):
     if kwargs is not None:
         for operator, value in kwargs.items():
             if operator == "task_id":
-                api_call += ",".join([str(int(i)) for i in value])
-            else:
-                api_call += f"/{operator}/{value}"
+                 value = ",".join([str(int(i)) for i in value])
+            api_call += f"/{operator}/{value}"
 
     return __list_tasks(api_call=api_call, output_format=output_format)
 
