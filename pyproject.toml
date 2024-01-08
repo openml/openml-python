@@ -129,6 +129,7 @@ target-version = "py37"
 line-length = 100
 show-source = true
 src = ["openml", "tests", "examples"]
+unsafe-fixes = true
 
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
@@ -192,6 +193,7 @@ ignore = [
   "PLC1901", # "" can be simplified to be falsey
   "TCH003",  # Move stdlib import into TYPE_CHECKING
   "COM812",  # Trailing comma missing (handled by linter, ruff recommend disabling if using formatter)
+  "N803",    # Argument should be lowercase (but we accept things like `X`)
 
   # TODO(@eddibergman): These should be enabled
   "D100",    # Missing docstring in public module
@@ -209,6 +211,9 @@ ignore = [
 ]
 
 exclude = [
+  # TODO(eddiebergman): Tests should be re-enabled after the refactor
+  "tests",
+  #
   ".bzr",
   ".direnv",
   ".eggs",
@@ -306,7 +311,10 @@ warn_return_any = true
 
 [[tool.mypy.overrides]]
 module = ["tests.*"]
-disallow_untyped_defs = false          # Sometimes we just want to ignore verbose types
-disallow_untyped_decorators = false    # Test decorators are not properly typed
-disallow_incomplete_defs = false       # Sometimes we just want to ignore verbose types
-disable_error_code = ["var-annotated"]
+
+# TODO(eddiebergman): This should be re-enabled after tests get refactored
+ignore_errors = true
+#disallow_untyped_defs = false          # Sometimes we just want to ignore verbose types
+#disallow_untyped_decorators = false    # Test decorators are not properly typed
+#disallow_incomplete_defs = false       # Sometimes we just want to ignore verbose types
+#disable_error_code = ["var-annotated"]

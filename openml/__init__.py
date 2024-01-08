@@ -117,4 +117,5 @@ __all__ = [
 ]
 
 # Load the scikit-learn extension by default
-import openml.extensions.sklearn  # noqa: F401
+# TODO(eddiebergman): Not sure why this is at the bottom of the file
+import openml.extensions.sklearn  # noqa: E402, F401
