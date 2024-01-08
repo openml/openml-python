@@ -369,7 +369,7 @@ def _create_cache_directory_for_id(key: str, id_: int) -> Path:
     if cache_dir.exists() and not cache_dir.is_dir():
         raise ValueError("%s cache dir exists but is not a directory!" % key)
 
-    cache_dir.mkdir(exist_ok=True)
+    cache_dir.mkdir(exist_ok=True, parents=True)
     return cache_dir
 
 
