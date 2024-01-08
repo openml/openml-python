@@ -59,3 +59,7 @@ class OpenMLRunsExistError(PyOpenMLError):
 
 class OpenMLNotAuthorizedError(OpenMLServerError):
     """Indicates an authenticated user is not authorized to execute the requested action."""
+
+
+class ObjectNotPublishedError(PyOpenMLError):
+    """Indicates an object has not been published yet."""
