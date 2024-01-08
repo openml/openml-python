@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Mapping, TypeVar
 from typing_extensions import Literal, ParamSpec
 
+import numpy as np
 import pandas as pd
-import numpy as np 
 import xmltodict
 
 import openml
@@ -123,16 +123,20 @@ def _tag_entity(entity_type: str, entity_id: int, tag: str, *, untag: bool = Fal
     """
     legal_entities = {"data", "task", "flow", "setup", "run"}
     if entity_type not in legal_entities:
-        raise ValueError("Can't tag a %s" % entity_type)
+        raise ValueError(f"Can't tag a {entity_type}")
 
-    uri = "%s/tag" % entity_type
-    main_tag = "oml:%s_tag" % entity_type
     if untag:
-        uri = "%s/untag" % entity_type
-        main_tag = "oml:%s_untag" % entity_type
+        uri = f"{entity_type}/untag"
+        main_tag = f"oml:{entity_type}_untag"
+    else:
+        uri = f"{entity_type}/tag"
+        main_tag = f"oml:{entity_type}_tag"
 
-    post_variables = {"%s_id" % entity_type: entity_id, "tag": tag}
-    result_xml = openml._api_calls._perform_api_call(uri, "post", post_variables)
+    result_xml = openml._api_calls._perform_api_call(
+        uri,
+        "post",
+        {f"{entity_type}_id": entity_id, "tag": tag},
+    )
 
     result = xmltodict.parse(result_xml, force_list={"oml:tag"})[main_tag]
 
@@ -387,7 +391,7 @@ def _remove_cache_dir_for_id(key: str, cache_dir: Path) -> None:
         ) from e
 
 
-def thread_safe_if_oslo_installed(func):
+def thread_safe_if_oslo_installed(func: Callable[P, R]) -> Callable[P, R]:
     try:
         # Currently, importing oslo raises a lot of warning that it will stop working
         # under python3.8; remove this once they disappear
@@ -396,7 +400,7 @@ def thread_safe_if_oslo_installed(func):
             from oslo_concurrency import lockutils
 
         @wraps(func)
-        def safe_func(*args, **kwargs):
+        def safe_func(*args: P.args, **kwargs: P.kwargs) -> R:
             # Lock directories use the id that is passed as either positional or keyword argument.
             id_parameters = [parameter_name for parameter_name in kwargs if "_id" in parameter_name]
             if len(id_parameters) == 1:
