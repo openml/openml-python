@@ -35,7 +35,7 @@ class OpenMLSplit:
     ):
         self.description = description
         self.name = name
-        self.split = split
+        self.split = {int(k): val for k, val in split.items()}
         self.repeats = len(self.split)
 
         # TODO(eddiebergman): Better error message
