@@ -35,7 +35,17 @@ class OpenMLSplit:
     ):
         self.description = description
         self.name = name
-        self.split = {int(k): val for k, val in split.items()}
+        self.split = {}
+
+        # Add splits according to repetition
+        for repetition in split:
+            repetition = int(repetition)
+            self.split[repetition] = OrderedDict()
+            for fold in split[repetition]:
+                self.split[repetition][fold] = OrderedDict()
+                for sample in split[repetition][fold]:
+                    self.split[repetition][fold][sample] = split[repetition][fold][sample]
+
         self.repeats = len(self.split)
 
         # TODO(eddiebergman): Better error message
@@ -92,9 +102,7 @@ class OpenMLSplit:
             if not filename.exists():
                 raise FileNotFoundError(f"Split arff {filename} does not exist!")
 
-            with filename.open("r") as fh:
-                file_data = arff.load(fh, return_type=arff.DENSE_GEN)
-
+            file_data = arff.load(open(filename),return_type=arff.DENSE_GEN)
             splits = file_data["data"]
             name = file_data["relation"]
             attrnames = [attr[0] for attr in file_data["attributes"]]
