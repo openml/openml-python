@@ -552,7 +552,12 @@ class TestRun(TestBase):
             )
 
         # todo: check if runtime is present
-        self._check_fold_timing_evaluations(run.fold_evaluations, 1, num_folds, task_type=task_type)
+        self._check_fold_timing_evaluations(
+            fold_evaluations=run.fold_evaluations,
+            num_repeats=1,
+            num_folds=num_folds,
+            task_type=task_type
+        )
 
         # Check if run string and print representation do not run into an error
         #   The above check already verifies that all columns needed for supported
@@ -1353,9 +1358,9 @@ class TestRun(TestBase):
 
         task_type = TaskType.SUPERVISED_CLASSIFICATION
         self._check_fold_timing_evaluations(
-            fold_evaluations,
-            num_repeats,
-            num_folds,
+            fold_evaluations=fold_evaluations,
+            num_repeats=num_repeats,
+            num_folds=num_folds,
             task_type=task_type,
         )
 

@@ -6,7 +6,8 @@ import os
 import time
 import warnings
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Any, cast  # F401
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pandas as pd
@@ -49,6 +50,7 @@ if TYPE_CHECKING:
 # get_dict is in run.py to avoid circular imports
 
 RUNS_CACHE_DIR_NAME = "runs"
+ERROR_CODE = 512
 
 
 def run_model_on_task(
@@ -444,18 +446,18 @@ def run_exists(task_id: int, setup_id: int) -> set[int]:
         return set()
 
     try:
-        result = cast(
-            pd.DataFrame,
-            list_runs(task=[task_id], setup=[setup_id], output_format="dataframe"),
-        )
+        result = list_runs(task=[task_id], setup=[setup_id], output_format="dataframe")
+        assert isinstance(result, pd.DataFrame)  # TODO(eddiebergman): Remove once #1299
         return set() if result.empty else set(result["run_id"])
     except OpenMLServerException as exception:
-        # error code 512 implies no results. The run does not exist yet
-        assert exception.code == 512
+        # error code implies no results. The run does not exist yet
+        if exception.code != ERROR_CODE:
+            raise exception
         return set()
 
 
-def _run_task_get_arffcontent(
+def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, PLR0913, C901
+    *,
     model: Any,
     task: OpenMLTask,
     extension: Extension,
@@ -494,8 +496,8 @@ def _run_task_get_arffcontent(
     A tuple containing the arfftrace content,
     the OpenML run trace, the global and local evaluation measures.
     """
-    arff_datacontent = []  # type: List[List]
-    traces = []  # type: List[OpenMLRunTrace]
+    arff_datacontent = []  # type: list[list]
+    traces = []  # type: list[OpenMLRunTrace]
     # stores fold-based evaluation measures. In case of a sample based task,
     # this information is multiple times overwritten, but due to the ordering
     # of tne loops, eventually it contains the information based on the full
@@ -527,7 +529,18 @@ def _run_task_get_arffcontent(
     # Execute runs in parallel
     # assuming the same number of tasks as workers (n_jobs), the total compute time for this
     # statement will be similar to the slowest run
-    job_rvals = Parallel(verbose=0, n_jobs=n_jobs)(
+    # TODO(eddiebergman): Simplify this
+    job_rvals: list[
+        tuple[
+            np.ndarray,
+            pd.DataFrame | None,
+            np.ndarray,
+            pd.DataFrame | None,
+            OpenMLRunTrace | None,
+            OrderedDict[str, float],
+        ],
+    ]
+    job_rvals = Parallel(verbose=0, n_jobs=n_jobs)(  # type: ignore
         delayed(_run_task_get_arffcontent_parallel_helper)(
             extension=extension,
             fold_no=fold_no,
@@ -538,7 +551,7 @@ def _run_task_get_arffcontent(
             dataset_format=dataset_format,
             configuration=_config,
         )
-        for n_fit, rep_no, fold_no, sample_no in jobs
+        for _n_fit, rep_no, fold_no, sample_no in jobs
     )  # job_rvals contain the output of all the runs with one-to-one correspondence with `jobs`
 
     for n_fit, rep_no, fold_no, sample_no in jobs:
@@ -550,7 +563,13 @@ def _run_task_get_arffcontent(
 
         # add client-side calculated metrics. These is used on the server as
         # consistency check, only useful for supervised tasks
-        def _calculate_local_measure(sklearn_fn, openml_name):
+        def _calculate_local_measure(
+            sklearn_fn,
+            openml_name,
+            test_y=test_y,
+            pred_y=pred_y,
+            user_defined_measures_fold=user_defined_measures_fold,
+        ):
             user_defined_measures_fold[openml_name] = sklearn_fn(test_y, pred_y)
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
@@ -644,15 +663,14 @@ def _run_task_get_arffcontent(
                 sample_no
             ] = user_defined_measures_fold[measure]
 
+    trace: OpenMLRunTrace | None = None
     if len(traces) > 0:
-        if len(traces) != n_fit:
+        if len(traces) != len(jobs):
             raise ValueError(
-                f"Did not find enough traces (expected {n_fit}, found {len(traces)})",
+                f"Did not find enough traces (expected {len(jobs)}, found {len(traces)})",
             )
-        else:
-            trace = OpenMLRunTrace.merge_traces(traces)
-    else:
-        trace = None
+
+        trace = OpenMLRunTrace.merge_traces(traces)
 
     return (
         arff_datacontent,
@@ -662,7 +680,7 @@ def _run_task_get_arffcontent(
     )
 
 
-def _run_task_get_arffcontent_parallel_helper(
+def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
     extension: Extension,
     fold_no: int,
     model: Any,
@@ -721,24 +739,28 @@ def _run_task_get_arffcontent_parallel_helper(
 
     if isinstance(task, OpenMLSupervisedTask):
         x, y = task.get_X_and_y(dataset_format=dataset_format)
-        if dataset_format == "dataframe":
+        if isinstance(x, pd.DataFrame):
+            assert isinstance(y, (pd.Series, pd.DataFrame))
             train_x = x.iloc[train_indices]
             train_y = y.iloc[train_indices]
             test_x = x.iloc[test_indices]
             test_y = y.iloc[test_indices]
         else:
+            # TODO(eddiebergman): Complains spmatrix doesn't support __getitem__ for typing
             train_x = x[train_indices]
             train_y = y[train_indices]
             test_x = x[test_indices]
             test_y = y[test_indices]
     elif isinstance(task, OpenMLClusteringTask):
         x = task.get_X(dataset_format=dataset_format)
-        train_x = x.iloc[train_indices] if dataset_format == "dataframe" else x[train_indices]
+        # TODO(eddiebergman): Complains spmatrix doesn't support __getitem__ for typing
+        train_x = x.iloc[train_indices] if isinstance(x, pd.DataFrame) else x[train_indices]
         train_y = None
         test_x = None
         test_y = None
     else:
         raise NotImplementedError(task.task_type)
+
     config.logger.info(
         "Going to run model {} on dataset {} for repeat {} fold {} sample {}".format(
             str(model),
@@ -784,7 +806,7 @@ def get_runs(run_ids):
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:
+def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT002, FBT001
     """Gets run corresponding to run_id.
 
     Parameters
@@ -802,27 +824,26 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    run_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id)
-    run_file = os.path.join(run_dir, "description.xml")
+    run_dir = Path(openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id))
+    run_file = run_dir / "description.xml"
 
-    if not os.path.exists(run_dir):
-        os.makedirs(run_dir)
+    run_dir.mkdir(parents=True, exist_ok=True)
 
     try:
         if not ignore_cache:
             return _get_cached_run(run_id)
-        else:
-            raise OpenMLCacheException(message="dummy")
+
+        raise OpenMLCacheException(message="dummy")
 
     except OpenMLCacheException:
         run_xml = openml._api_calls._perform_api_call("run/%d" % run_id, "get")
-        with open(run_file, "w", encoding="utf8") as fh:
+        with run_file.open("w", encoding="utf8") as fh:
             fh.write(run_xml)
 
     return _create_run_from_xml(run_xml)
 
 
-def _create_run_from_xml(xml, from_server=True):
+def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT
     """Create a run object from xml returned from server.
 
     Parameters
@@ -840,6 +861,7 @@ def _create_run_from_xml(xml, from_server=True):
         New run object representing run_xml.
     """
 
+    # TODO(eddiebergman): type this
     def obtain_field(xml_obj, fieldname, from_server, cast=None):
         # this function can be used to check whether a field is present in an
         # object. if it is not present, either returns None or throws an error
@@ -848,10 +870,11 @@ def _create_run_from_xml(xml, from_server=True):
             if cast is not None:
                 return cast(xml_obj[fieldname])
             return xml_obj[fieldname]
-        elif not from_server:
+
+        if not from_server:
             return None
-        else:
-            raise AttributeError("Run XML does not contain required (server) " "field: ", fieldname)
+
+        raise AttributeError("Run XML does not contain required (server) " "field: ", fieldname)
 
     run = xmltodict.parse(xml, force_list=["oml:file", "oml:evaluation", "oml:parameter_setting"])[
         "oml:run"
@@ -968,12 +991,12 @@ def _create_run_from_xml(xml, from_server=True):
         task = openml.tasks.get_task(task_id)
         if task.task_type_id == TaskType.SUBGROUP_DISCOVERY:
             raise NotImplementedError("Subgroup discovery tasks are not yet supported.")
-        else:
-            # JvR: actually, I am not sure whether this error should be raised.
-            # a run can consist without predictions. But for now let's keep it
-            # Matthias: yes, it should stay as long as we do not really handle
-            # this stuff
-            raise ValueError("No prediction files for run %d in run " "description XML" % run_id)
+
+        # JvR: actually, I am not sure whether this error should be raised.
+        # a run can consist without predictions. But for now let's keep it
+        # Matthias: yes, it should stay as long as we do not really handle
+        # this stuff
+        raise ValueError("No prediction files for run %d in run description XML" % run_id)
 
     tags = openml.utils.extract_xml_tags("oml:tag", run)
 

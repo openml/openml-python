@@ -1728,7 +1728,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             assert np.any(y_hat_proba.iloc[:, i].to_numpy() != np.zeros(y_test.shape))
 
         # check user defined measures
-        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        fold_evaluations: dict[str, dict[int, dict[int, float]]] = collections.defaultdict(lambda: collections.defaultdict(dict))
         for measure in user_defined_measures:
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
@@ -1801,7 +1801,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             assert np.any(y_hat_proba.iloc[:, i].to_numpy() != np.zeros(y_test.shape))
 
         # check user defined measures
-        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        fold_evaluations: dict[str, dict[int, dict[int, float]]]  = collections.defaultdict(lambda: collections.defaultdict(dict))
         for measure in user_defined_measures:
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
@@ -1854,7 +1854,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             assert np.any(y_hat_proba.to_numpy()[:, i] != np.zeros(y_test.shape))
 
         # check user defined measures
-        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        fold_evaluations: dict[str, dict[int, dict[int, float]]] = collections.defaultdict(lambda: collections.defaultdict(dict))
         for measure in user_defined_measures:
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
@@ -1976,7 +1976,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         assert y_hat_proba is None
 
         # check user defined measures
-        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        fold_evaluations: dict[str, dict[int, dict[int, float]]]  = collections.defaultdict(lambda: collections.defaultdict(dict))
         for measure in user_defined_measures:
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
@@ -2019,7 +2019,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         assert y_hat_proba is None
 
         # check user defined measures
-        fold_evaluations = collections.defaultdict(lambda: collections.defaultdict(dict))
+        fold_evaluations: dict[str, dict[int, dict[int, float]]]  = collections.defaultdict(lambda: collections.defaultdict(dict))
         for measure in user_defined_measures:
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 

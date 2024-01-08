@@ -1,15 +1,17 @@
 # License: BSD 3-Clause
+# TODO(eddbergman): Seems like a lot of the subclasses could just get away with setting
+# a `ClassVar` for whatever changes as their `__init__` defaults, less duplicated code.
 from __future__ import annotations
 
-import os
 import warnings
 from abc import ABC
 from collections import OrderedDict
 from enum import Enum
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
-from warnings import warn
 
 import openml._api_calls
+import openml.config
 from openml import datasets
 from openml.base import OpenMLBase
 from openml.utils import _create_cache_directory_for_id
@@ -22,7 +24,11 @@ if TYPE_CHECKING:
     import scipy.sparse
 
 
+# TODO(eddiebergman): Should use `auto()` but might be too late if these numbers are used
+# and stored on server.
 class TaskType(Enum):
+    """Possible task types as defined in OpenML."""
+
     SUPERVISED_CLASSIFICATION = 1
     SUPERVISED_REGRESSION = 2
     LEARNING_CURVE = 3
@@ -59,7 +65,7 @@ class OpenMLTask(OpenMLBase):
         Refers to the URL of the data splits used for the OpenML task.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         task_id: int | None,
         task_type_id: TaskType,
@@ -76,25 +82,27 @@ class OpenMLTask(OpenMLBase):
         self.task_type = task_type
         self.dataset_id = int(data_set_id)
         self.evaluation_measure = evaluation_measure
-        self.estimation_procedure = {}  # type: Dict[str, Optional[Union[str, Dict]]] # E501
+        self.estimation_procedure: dict[str, str | dict | None] = {}
         self.estimation_procedure["type"] = estimation_procedure_type
         self.estimation_procedure["parameters"] = estimation_parameters
         self.estimation_procedure["data_splits_url"] = data_splits_url
         self.estimation_procedure_id = estimation_procedure_id
-        self.split = None  # type: Optional[OpenMLSplit]
+        self.split: OpenMLSplit | None = None
 
     @classmethod
     def _entity_letter(cls) -> str:
         return "t"
 
     @property
-    def id(self) -> int | None:
+    def id(self) -> int | None:  # noqa: A003
+        """Return the OpenML ID of this task."""
         return self.task_id
 
     def _get_repr_body_fields(self) -> list[tuple[str, str | int | list[str]]]:
         """Collect all information to display in the __repr__ body."""
+        base_server_url = openml.config.get_server_base_url()
         fields: dict[str, Any] = {
-            "Task Type Description": f"{openml.config.get_server_base_url()}/tt/{self.task_type_id}",
+            "Task Type Description": f"{base_server_url}/tt/{self.task_type_id}"
         }
         if self.task_id is not None:
             fields["Task ID"] = self.task_id
@@ -103,10 +111,17 @@ class OpenMLTask(OpenMLBase):
             fields["Evaluation Measure"] = self.evaluation_measure
         if self.estimation_procedure is not None:
             fields["Estimation Procedure"] = self.estimation_procedure["type"]
-        if getattr(self, "target_name", None) is not None:
-            fields["Target Feature"] = self.target_name
-            if hasattr(self, "class_labels") and self.class_labels is not None:
-                fields["# of Classes"] = len(self.class_labels)
+
+        # TODO(eddiebergman): Subclasses could advertise/provide this, instead of having to
+        # have the base class know about it's subclasses.
+        target_name = getattr(self, "target_name", None)
+        if target_name is not None:
+            fields["Target Feature"] = target_name
+
+            class_labels = getattr(self, "class_labels", None)
+            if class_labels is not None:
+                fields["# of Classes"] = len(class_labels)
+
             if hasattr(self, "cost_matrix"):
                 fields["Cost Matrix"] = "Available"
 
@@ -124,7 +139,7 @@ class OpenMLTask(OpenMLBase):
         return [(key, fields[key]) for key in order if key in fields]
 
     def get_dataset(self) -> datasets.OpenMLDataset:
-        """Download dataset associated with task"""
+        """Download dataset associated with task."""
         return datasets.get_dataset(self.dataset_id)
 
     def get_train_test_split_indices(
@@ -133,34 +148,31 @@ class OpenMLTask(OpenMLBase):
         repeat: int = 0,
         sample: int = 0,
     ) -> tuple[np.ndarray, np.ndarray]:
+        """Get the indices of the train and test splits for a given task."""
         # Replace with retrieve from cache
         if self.split is None:
             self.split = self.download_split()
 
-        train_indices, test_indices = self.split.get(
-            repeat=repeat,
-            fold=fold,
-            sample=sample,
-        )
-        return train_indices, test_indices
+        return self.split.get(repeat=repeat, fold=fold, sample=sample)
 
-    def _download_split(self, cache_file: str):
+    def _download_split(self, cache_file: Path) -> None:
+        # TODO(eddiebergman): Not sure about this try to read and error approach
         try:
-            with open(cache_file, encoding="utf8"):
+            with cache_file.open(encoding="utf8"):
                 pass
         except OSError:
             split_url = self.estimation_procedure["data_splits_url"]
             openml._api_calls._download_text_file(
                 source=str(split_url),
-                output_path=cache_file,
+                output_path=str(cache_file),
             )
 
     def download_split(self) -> OpenMLSplit:
         """Download the OpenML split for a given task."""
-        cached_split_file = os.path.join(
-            _create_cache_directory_for_id("tasks", self.task_id),
-            "datasplits.arff",
-        )
+        # TODO(eddiebergman): Can this every be `None`?
+        assert self.task_id is not None
+        cache_dir = _create_cache_directory_for_id("tasks", self.task_id)
+        cached_split_file = cache_dir / "datasplits.arff"
 
         try:
             split = OpenMLSplit._from_arff_file(cached_split_file)
@@ -172,6 +184,7 @@ class OpenMLTask(OpenMLBase):
         return split
 
     def get_split_dimensions(self) -> tuple[int, int, int]:
+        """Get the (repeats, folds, samples) of the split for a given task."""
         if self.split is None:
             self.split = self.download_split()
 
@@ -180,21 +193,21 @@ class OpenMLTask(OpenMLBase):
     def _to_dict(self) -> OrderedDict[str, OrderedDict]:
         """Creates a dictionary representation of self."""
         task_container = OrderedDict()  # type: OrderedDict[str, OrderedDict]
-        task_dict = OrderedDict(
+        task_dict: OrderedDict[str, list | str | int] = OrderedDict(
             [("@xmlns:oml", "http://openml.org/openml")],
-        )  # type: OrderedDict[str, Union[List, str, int]]
+        )
 
         task_container["oml:task_inputs"] = task_dict
         task_dict["oml:task_type_id"] = self.task_type_id.value
 
         # having task_inputs and adding a type annotation
         # solves wrong warnings
-        task_inputs = [
+        task_inputs: list[OrderedDict] = [
             OrderedDict([("@name", "source_data"), ("#text", str(self.dataset_id))]),
             OrderedDict(
                 [("@name", "estimation_procedure"), ("#text", str(self.estimation_procedure_id))],
             ),
-        ]  # type: List[OrderedDict]
+        ]
 
         if self.evaluation_measure is not None:
             task_inputs.append(
@@ -237,7 +250,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         Refers to the unique identifier of task.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         task_type_id: TaskType,
         task_type: str,
@@ -264,6 +277,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
         self.target_name = target_name
 
+    # TODO(eddiebergman): type with overload?
     def get_X_and_y(
         self,
         dataset_format: str = "array",
@@ -319,11 +333,13 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
     @property
     def estimation_parameters(self):
-        warn(
+        """Return the estimation parameters for the task."""
+        warnings.warn(
             "The estimation_parameters attribute will be "
             "deprecated in the future, please use "
             "estimation_procedure['parameters'] instead",
             PendingDeprecationWarning,
+            stacklevel=2,
         )
         return self.estimation_procedure["parameters"]
 
@@ -363,7 +379,7 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
         A cost matrix (for classification tasks).
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         task_type_id: TaskType,
         task_type: str,
@@ -424,7 +440,7 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
         Evaluation measure used in the Regression task.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         task_type_id: TaskType,
         task_type: str,
@@ -479,7 +495,7 @@ class OpenMLClusteringTask(OpenMLTask):
         feature set for the clustering task.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         task_type_id: TaskType,
         task_type: str,
@@ -581,7 +597,7 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
         Cost matrix for Learning Curve tasks.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         task_type_id: TaskType,
         task_type: str,
