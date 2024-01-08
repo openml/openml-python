@@ -95,7 +95,7 @@ def _get_rest_api_type_alias(oml_object: OpenMLBase) -> str:
     return api_type_alias
 
 
-def _tag_openml_base(oml_object: OpenMLBase, tag: str, *, untag: bool = False) -> None:
+def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool = False) -> None:  # noqa: FBT
     api_type_alias = _get_rest_api_type_alias(oml_object)
     _tag_entity(api_type_alias, oml_object.id, tag, untag=untag)
 
