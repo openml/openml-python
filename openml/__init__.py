@@ -17,36 +17,36 @@ In particular, this module implements a python interface for the
 
 # License: BSD 3-Clause
 
-from . import _api_calls
-from . import config
-from .datasets import OpenMLDataset, OpenMLDataFeature
-from . import datasets
-from . import evaluations
+from . import (
+    _api_calls,
+    config,
+    datasets,
+    evaluations,
+    exceptions,
+    extensions,
+    flows,
+    runs,
+    setups,
+    study,
+    tasks,
+    utils,
+)
+from .__version__ import __version__
+from .datasets import OpenMLDataFeature, OpenMLDataset
 from .evaluations import OpenMLEvaluation
-from . import extensions
-from . import exceptions
-from . import tasks
+from .flows import OpenMLFlow
+from .runs import OpenMLRun
+from .setups import OpenMLParameter, OpenMLSetup
+from .study import OpenMLBenchmarkSuite, OpenMLStudy
 from .tasks import (
-    OpenMLTask,
-    OpenMLSplit,
-    OpenMLSupervisedTask,
     OpenMLClassificationTask,
-    OpenMLRegressionTask,
     OpenMLClusteringTask,
     OpenMLLearningCurveTask,
+    OpenMLRegressionTask,
+    OpenMLSplit,
+    OpenMLSupervisedTask,
+    OpenMLTask,
 )
-from . import runs
-from .runs import OpenMLRun
-from . import flows
-from .flows import OpenMLFlow
-from . import study
-from .study import OpenMLStudy, OpenMLBenchmarkSuite
-from . import utils
-from . import setups
-from .setups import OpenMLSetup, OpenMLParameter
-
-
-from .__version__ import __version__  # noqa: F401
 
 
 def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None, run_ids=None):

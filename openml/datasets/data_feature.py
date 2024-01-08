@@ -1,9 +1,8 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from typing import List
 
-
-class OpenMLDataFeature(object):
+class OpenMLDataFeature:
     """
     Data Feature (a.k.a. Attribute) object.
 
@@ -28,25 +27,25 @@ class OpenMLDataFeature(object):
         index: int,
         name: str,
         data_type: str,
-        nominal_values: List[str],
+        nominal_values: list[str],
         number_missing_values: int,
     ):
         if not isinstance(index, int):
             raise TypeError(f"Index must be `int` but is {type(index)}")
         if data_type not in self.LEGAL_DATA_TYPES:
             raise ValueError(
-                "data type should be in %s, found: %s" % (str(self.LEGAL_DATA_TYPES), data_type)
+                f"data type should be in {self.LEGAL_DATA_TYPES!s}, found: {data_type}",
             )
         if data_type == "nominal":
             if nominal_values is None:
                 raise TypeError(
                     "Dataset features require attribute `nominal_values` for nominal "
-                    "feature type."
+                    "feature type.",
                 )
             elif not isinstance(nominal_values, list):
                 raise TypeError(
                     "Argument `nominal_values` is of wrong datatype, should be list, "
-                    "but is {}".format(type(nominal_values))
+                    f"but is {type(nominal_values)}",
                 )
         else:
             if nominal_values is not None:

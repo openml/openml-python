@@ -1,19 +1,17 @@
-"""
-Store module level information like the API key, cache directory and the server
-"""
+"""Store module level information like the API key, cache directory and the server"""
 
 # License: BSD 3-Clause
+from __future__ import annotations
 
+import configparser
 import logging
 import logging.handlers
 import os
-from pathlib import Path
 import platform
-from typing import Dict, Optional, Tuple, Union, cast
 import warnings
-
 from io import StringIO
-import configparser
+from pathlib import Path
+from typing import Dict, Union, cast
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
@@ -39,12 +37,15 @@ def _create_log_handlers(create_file_handler: bool = True) -> None:
         one_mb = 2**20
         log_path = os.path.join(_root_cache_directory, "openml_python.log")
         file_handler = logging.handlers.RotatingFileHandler(
-            log_path, maxBytes=one_mb, backupCount=1, delay=True
+            log_path,
+            maxBytes=one_mb,
+            backupCount=1,
+            delay=True,
         )
         file_handler.setFormatter(output_formatter)
 
 
-def _convert_log_levels(log_level: int) -> Tuple[int, int]:
+def _convert_log_levels(log_level: int) -> tuple[int, int]:
     """Converts a log level that's either defined by OpenML/Python to both specifications."""
     # OpenML verbosity level don't match Python values directly:
     openml_to_python = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
@@ -117,7 +118,7 @@ def get_server_base_url() -> str:
     Turns ``"https://www.openml.org/api/v1/xml"`` in ``"https://www.openml.org/"``
 
     Returns
-    =======
+    -------
     str
     """
     return server.split("/api")[0]
@@ -126,21 +127,21 @@ def get_server_base_url() -> str:
 apikey = _defaults["apikey"]
 # The current cache directory (without the server name)
 _root_cache_directory = str(_defaults["cachedir"])  # so mypy knows it is a string
-avoid_duplicate_runs = True if _defaults["avoid_duplicate_runs"] == "True" else False
+avoid_duplicate_runs = _defaults["avoid_duplicate_runs"] == "True"
 
 retry_policy = _defaults["retry_policy"]
 connection_n_retries = int(_defaults["connection_n_retries"])
 
 
-def set_retry_policy(value: str, n_retries: Optional[int] = None) -> None:
+def set_retry_policy(value: str, n_retries: int | None = None) -> None:
     global retry_policy
     global connection_n_retries
-    default_retries_by_policy = dict(human=5, robot=50)
+    default_retries_by_policy = {"human": 5, "robot": 50}
 
     if value not in default_retries_by_policy:
         raise ValueError(
             f"Detected retry_policy '{value}' but must be one of "
-            f"{list(default_retries_by_policy.keys())}"
+            f"{list(default_retries_by_policy.keys())}",
         )
     if n_retries is not None and not isinstance(n_retries, int):
         raise TypeError(f"`n_retries` must be of type `int` or `None` but is `{type(n_retries)}`.")
@@ -183,8 +184,8 @@ class ConfigurationForExamples:
         server = cls._test_server
         apikey = cls._test_apikey
         warnings.warn(
-            "Switching to the test server {} to not upload results to the live server. "
-            "Using the test server may result in reduced performance of the API!".format(server)
+            f"Switching to the test server {server} to not upload results to the live server. "
+            "Using the test server may result in reduced performance of the API!",
         )
 
     @classmethod
@@ -195,7 +196,7 @@ class ConfigurationForExamples:
             # `apikey` variables being set to None.
             raise RuntimeError(
                 "`stop_use_example_configuration` called without a saved config."
-                "`start_use_example_configuration` must be called first."
+                "`start_use_example_configuration` must be called first.",
             )
 
         global server
@@ -216,7 +217,7 @@ def determine_config_file_path() -> Path:
     return config_dir / "config"
 
 
-def _setup(config: Optional[Dict[str, Union[str, int, bool]]] = None) -> None:
+def _setup(config: dict[str, str | int | bool] | None = None) -> None:
     """Setup openml package. Called on first import.
 
     Reads the config file and sets up apikey, server, cache appropriately.
@@ -254,10 +255,7 @@ def _setup(config: Optional[Dict[str, Union[str, int, bool]]] = None) -> None:
     short_cache_dir = cast(str, config["cachedir"])
 
     tmp_n_retries = config["connection_n_retries"]
-    if tmp_n_retries is not None:
-        n_retries = int(tmp_n_retries)
-    else:
-        n_retries = None
+    n_retries = int(tmp_n_retries) if tmp_n_retries is not None else None
 
     set_retry_policy(cast(str, config["retry_policy"]), n_retries)
 
@@ -269,7 +267,7 @@ def _setup(config: Optional[Dict[str, Union[str, int, bool]]] = None) -> None:
         except PermissionError:
             openml_logger.warning(
                 "No permission to create openml cache directory at %s! This can result in "
-                "OpenML-Python not working properly." % _root_cache_directory
+                "OpenML-Python not working properly." % _root_cache_directory,
             )
 
     if cache_exists:
@@ -278,7 +276,7 @@ def _setup(config: Optional[Dict[str, Union[str, int, bool]]] = None) -> None:
         _create_log_handlers(create_file_handler=False)
         openml_logger.warning(
             "No permission to create OpenML directory at %s! This can result in OpenML-Python "
-            "not working properly." % config_dir
+            "not working properly." % config_dir,
         )
 
 
@@ -291,7 +289,7 @@ def set_field_in_config_file(field: str, value: str) -> None:
     config_file = determine_config_file_path()
     config = _parse_config(str(config_file))
     with open(config_file, "w") as fh:
-        for f in _defaults.keys():
+        for f in _defaults:
             # We can't blindly set all values based on globals() because when the user
             # sets it through config.FIELD it should not be stored to file.
             # There doesn't seem to be a way to avoid writing defaults to file with configparser,
@@ -303,7 +301,7 @@ def set_field_in_config_file(field: str, value: str) -> None:
             fh.write(f"{f} = {value}\n")
 
 
-def _parse_config(config_file: Union[str, Path]) -> Dict[str, str]:
+def _parse_config(config_file: str | Path) -> dict[str, str]:
     """Parse the config file, set up defaults."""
     config = configparser.RawConfigParser(defaults=_defaults)
 
@@ -321,12 +319,11 @@ def _parse_config(config_file: Union[str, Path]) -> Dict[str, str]:
         logger.info("Error opening file %s: %s", config_file, e.args[0])
     config_file_.seek(0)
     config.read_file(config_file_)
-    config_as_dict = {key: value for key, value in config.items("FAKE_SECTION")}
-    return config_as_dict
+    return dict(config.items("FAKE_SECTION"))
 
 
-def get_config_as_dict() -> Dict[str, Union[str, int, bool]]:
-    config = dict()  # type: Dict[str, Union[str, int, bool]]
+def get_config_as_dict() -> dict[str, str | int | bool]:
+    config = {}  # type: Dict[str, Union[str, int, bool]]
     config["apikey"] = apikey
     config["server"] = server
     config["cachedir"] = _root_cache_directory
@@ -358,8 +355,7 @@ def get_cache_directory() -> str:
     """
     url_suffix = urlparse(server).netloc
     reversed_url_suffix = os.sep.join(url_suffix.split(".")[::-1])
-    _cachedir = os.path.join(_root_cache_directory, reversed_url_suffix)
-    return _cachedir
+    return os.path.join(_root_cache_directory, reversed_url_suffix)
 
 
 def set_root_cache_directory(root_cache_directory: str) -> None:
@@ -377,11 +373,10 @@ def set_root_cache_directory(root_cache_directory: str) -> None:
     root_cache_directory : string
          Path to use as cache directory.
 
-    See also
+    See Also
     --------
     get_cache_directory
     """
-
     global _root_cache_directory
     _root_cache_directory = root_cache_directory
 

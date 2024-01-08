@@ -1,35 +1,35 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
+import collections
 import json
 import warnings
 
-import xmltodict
-import pandas as pd
 import numpy as np
-from typing import Union, List, Optional, Dict
-import collections
+import pandas as pd
+import xmltodict
 
-import openml.utils
-import openml._api_calls
-from ..evaluations import OpenMLEvaluation
 import openml
+import openml._api_calls
+import openml.utils
+from openml.evaluations import OpenMLEvaluation
 
 
 def list_evaluations(
     function: str,
-    offset: Optional[int] = None,
-    size: Optional[int] = 10000,
-    tasks: Optional[List[Union[str, int]]] = None,
-    setups: Optional[List[Union[str, int]]] = None,
-    flows: Optional[List[Union[str, int]]] = None,
-    runs: Optional[List[Union[str, int]]] = None,
-    uploaders: Optional[List[Union[str, int]]] = None,
-    tag: Optional[str] = None,
-    study: Optional[int] = None,
-    per_fold: Optional[bool] = None,
-    sort_order: Optional[str] = None,
+    offset: int | None = None,
+    size: int | None = 10000,
+    tasks: list[str | int] | None = None,
+    setups: list[str | int] | None = None,
+    flows: list[str | int] | None = None,
+    runs: list[str | int] | None = None,
+    uploaders: list[str | int] | None = None,
+    tag: str | None = None,
+    study: int | None = None,
+    per_fold: bool | None = None,
+    sort_order: str | None = None,
     output_format: str = "object",
-) -> Union[Dict, pd.DataFrame]:
+) -> dict | pd.DataFrame:
     """
     List all run-evaluation pairs matching all of the given filters.
     (Supports large amount of results)
@@ -76,7 +76,7 @@ def list_evaluations(
     """
     if output_format not in ["dataframe", "dict", "object"]:
         raise ValueError(
-            "Invalid output format selected. " "Only 'object', 'dataframe', or 'dict' applicable."
+            "Invalid output format selected. " "Only 'object', 'dataframe', or 'dict' applicable.",
         )
 
     # TODO: [0.15]
@@ -112,16 +112,16 @@ def list_evaluations(
 
 def _list_evaluations(
     function: str,
-    tasks: Optional[List] = None,
-    setups: Optional[List] = None,
-    flows: Optional[List] = None,
-    runs: Optional[List] = None,
-    uploaders: Optional[List] = None,
-    study: Optional[int] = None,
-    sort_order: Optional[str] = None,
+    tasks: list | None = None,
+    setups: list | None = None,
+    flows: list | None = None,
+    runs: list | None = None,
+    uploaders: list | None = None,
+    study: int | None = None,
+    sort_order: str | None = None,
     output_format: str = "object",
-    **kwargs
-) -> Union[Dict, pd.DataFrame]:
+    **kwargs,
+) -> dict | pd.DataFrame:
     """
     Perform API call ``/evaluation/function{function}/{filters}``
 
@@ -164,11 +164,10 @@ def _list_evaluations(
     -------
     dict of objects, or dataframe
     """
-
     api_call = "evaluation/list/function/%s" % function
     if kwargs is not None:
         for operator, value in kwargs.items():
-            api_call += "/%s/%s" % (operator, value)
+            api_call += f"/{operator}/{value}"
     if tasks is not None:
         api_call += "/task/%s" % ",".join([str(int(i)) for i in tasks])
     if setups is not None:
@@ -194,16 +193,16 @@ def __list_evaluations(api_call, output_format="object"):
     # Minimalistic check if the XML is useful
     if "oml:evaluations" not in evals_dict:
         raise ValueError(
-            "Error in return XML, does not contain " '"oml:evaluations": %s' % str(evals_dict)
+            "Error in return XML, does not contain " '"oml:evaluations": %s' % str(evals_dict),
         )
 
     assert isinstance(evals_dict["oml:evaluations"]["oml:evaluation"], list), type(
-        evals_dict["oml:evaluations"]
+        evals_dict["oml:evaluations"],
     )
 
     evals = collections.OrderedDict()
     uploader_ids = list(
-        set([eval_["oml:uploader"] for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]])
+        {eval_["oml:uploader"] for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]},
     )
     api_users = "user/list/user_id/" + ",".join(uploader_ids)
     xml_string_user = openml._api_calls._perform_api_call(api_users, "get")
@@ -263,7 +262,7 @@ def __list_evaluations(api_call, output_format="object"):
     return evals
 
 
-def list_evaluation_measures() -> List[str]:
+def list_evaluation_measures() -> list[str]:
     """Return list of evaluation measures available.
 
     The function performs an API call to retrieve the entire list of
@@ -282,11 +281,10 @@ def list_evaluation_measures() -> List[str]:
         raise ValueError("Error in return XML, does not contain " '"oml:evaluation_measures"')
     if not isinstance(qualities["oml:evaluation_measures"]["oml:measures"][0]["oml:measure"], list):
         raise TypeError("Error in return XML, does not contain " '"oml:measure" as a list')
-    qualities = qualities["oml:evaluation_measures"]["oml:measures"][0]["oml:measure"]
-    return qualities
+    return qualities["oml:evaluation_measures"]["oml:measures"][0]["oml:measure"]
 
 
-def list_estimation_procedures() -> List[str]:
+def list_estimation_procedures() -> list[str]:
     """Return list of evaluation procedures available.
 
     The function performs an API call to retrieve the entire list of
@@ -296,7 +294,6 @@ def list_estimation_procedures() -> List[str]:
     -------
     list
     """
-
     api_call = "estimationprocedure/list"
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     api_results = xmltodict.parse(xml_string)
@@ -309,31 +306,30 @@ def list_estimation_procedures() -> List[str]:
 
     if not isinstance(api_results["oml:estimationprocedures"]["oml:estimationprocedure"], list):
         raise TypeError(
-            "Error in return XML, does not contain " '"oml:estimationprocedure" as a list'
+            "Error in return XML, does not contain " '"oml:estimationprocedure" as a list',
         )
 
-    prods = [
+    return [
         prod["oml:name"]
         for prod in api_results["oml:estimationprocedures"]["oml:estimationprocedure"]
     ]
-    return prods
 
 
 def list_evaluations_setups(
     function: str,
-    offset: Optional[int] = None,
-    size: Optional[int] = None,
-    tasks: Optional[List] = None,
-    setups: Optional[List] = None,
-    flows: Optional[List] = None,
-    runs: Optional[List] = None,
-    uploaders: Optional[List] = None,
-    tag: Optional[str] = None,
-    per_fold: Optional[bool] = None,
-    sort_order: Optional[str] = None,
+    offset: int | None = None,
+    size: int | None = None,
+    tasks: list | None = None,
+    setups: list | None = None,
+    flows: list | None = None,
+    runs: list | None = None,
+    uploaders: list | None = None,
+    tag: str | None = None,
+    per_fold: bool | None = None,
+    sort_order: str | None = None,
     output_format: str = "dataframe",
     parameters_in_separate_columns: bool = False,
-) -> Union[Dict, pd.DataFrame]:
+) -> dict | pd.DataFrame:
     """
     List all run-evaluation pairs matching all of the given filters
     and their hyperparameter settings.
@@ -376,7 +372,7 @@ def list_evaluations_setups(
     """
     if parameters_in_separate_columns and (flows is None or len(flows) != 1):
         raise ValueError(
-            "Can set parameters_in_separate_columns to true " "only for single flow_id"
+            "Can set parameters_in_separate_columns to true " "only for single flow_id",
         )
 
     # List evaluations
@@ -404,14 +400,15 @@ def list_evaluations_setups(
         # array_split - allows indices_or_sections to not equally divide the array
         # array_split -length % N sub-arrays of size length//N + 1 and the rest of size length//N.
         setup_chunks = np.array_split(
-            ary=evals["setup_id"].unique(), indices_or_sections=((length - 1) // N) + 1
+            ary=evals["setup_id"].unique(),
+            indices_or_sections=((length - 1) // N) + 1,
         )
         setup_data = pd.DataFrame()
         for setups in setup_chunks:
             result = pd.DataFrame(
-                openml.setups.list_setups(setup=setups, output_format="dataframe")
+                openml.setups.list_setups(setup=setups, output_format="dataframe"),
             )
-            result.drop("flow_id", axis=1, inplace=True)
+            result = result.drop("flow_id", axis=1)
             # concat resulting setup chunks into single datframe
             setup_data = pd.concat([setup_data, result], ignore_index=True)
         parameters = []
@@ -419,7 +416,7 @@ def list_evaluations_setups(
         for parameter_dict in setup_data["parameters"]:
             if parameter_dict is not None:
                 parameters.append(
-                    {param["full_name"]: param["value"] for param in parameter_dict.values()}
+                    {param["full_name"]: param["value"] for param in parameter_dict.values()},
                 )
             else:
                 parameters.append({})

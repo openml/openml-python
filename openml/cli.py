@@ -1,12 +1,13 @@
-"""" Command Line Interface for `openml` to configure its settings. """
+""""Command Line Interface for `openml` to configure its settings."""
+from __future__ import annotations
 
 import argparse
 import os
 import pathlib
 import string
-from typing import Union, Callable
+import sys
+from typing import Callable
 from urllib.parse import urlparse
-
 
 from openml import config
 
@@ -24,7 +25,9 @@ def looks_like_url(url: str) -> bool:
 
 
 def wait_until_valid_input(
-    prompt: str, check: Callable[[str], str], sanitize: Union[Callable[[str], str], None]
+    prompt: str,
+    check: Callable[[str], str],
+    sanitize: Callable[[str], str] | None,
 ) -> str:
     """Asks `prompt` until an input is received which returns True for `check`.
 
@@ -43,7 +46,6 @@ def wait_until_valid_input(
     valid input
 
     """
-
     while True:
         response = input(prompt)
         if sanitize:
@@ -143,7 +145,6 @@ def configure_cachedir(value: str) -> None:
         intro_message="Configuring the cache directory. It can not be a relative path.",
         input_message="Specify the directory to use (or create) as cache directory: ",
     )
-    print("NOTE: Data from your old cache directory is not moved over.")
 
 
 def configure_connection_n_retries(value: str) -> None:
@@ -246,11 +247,11 @@ def configure_retry_policy(value: str) -> None:
 
 def configure_field(
     field: str,
-    value: Union[None, str],
+    value: None | str,
     check_with_message: Callable[[str], str],
     intro_message: str,
     input_message: str,
-    sanitize: Union[Callable[[str], str], None] = None,
+    sanitize: Callable[[str], str] | None = None,
 ) -> None:
     """Configure `field` with `value`. If `value` is None ask the user for input.
 
@@ -284,7 +285,7 @@ def configure_field(
         malformed_input = check_with_message(value)
         if malformed_input:
             print(malformed_input)
-            quit()
+            sys.exit()
     else:
         print(intro_message)
         value = wait_until_valid_input(
@@ -315,12 +316,11 @@ def configure(args: argparse.Namespace) -> None:
     else:
         if args.value is not None:
             print(f"Can not set value ('{args.value}') when field is specified as '{args.field}'.")
-            quit()
+            sys.exit()
         print_configuration()
 
     if args.field == "all":
         for set_field_function in set_functions.values():
-            print()  # Visually separating the output by field.
             set_field_function(args.value)
 
 

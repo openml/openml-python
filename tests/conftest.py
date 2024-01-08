@@ -21,11 +21,12 @@ Possible Future: class TestBase from openml/testing.py can be included
 """
 
 # License: BSD 3-Clause
+from __future__ import annotations
 
-import os
 import logging
+import os
 import pathlib
-from typing import List
+
 import pytest
 
 import openml
@@ -52,7 +53,7 @@ def worker_id() -> str:
         return "master"
 
 
-def read_file_list() -> List[pathlib.Path]:
+def read_file_list() -> list[pathlib.Path]:
     """Returns a list of paths to all files that currently exist in 'openml/tests/files/'
 
     :return: List[pathlib.Path]
@@ -61,7 +62,7 @@ def read_file_list() -> List[pathlib.Path]:
     return [f for f in test_files_dir.rglob("*") if f.is_file()]
 
 
-def compare_delete_files(old_list: List[pathlib.Path], new_list: List[pathlib.Path]) -> None:
+def compare_delete_files(old_list: list[pathlib.Path], new_list: list[pathlib.Path]) -> None:
     """Deletes files that are there in the new_list but not in the old_list
 
     :param old_list: List[pathlib.Path]
@@ -71,7 +72,7 @@ def compare_delete_files(old_list: List[pathlib.Path], new_list: List[pathlib.Pa
     file_list = list(set(new_list) - set(old_list))
     for file in file_list:
         os.remove(file)
-        logger.info("Deleted from local: {}".format(file))
+        logger.info(f"Deleted from local: {file}")
 
 
 def delete_remote_files(tracker, flow_names) -> None:
@@ -104,17 +105,17 @@ def delete_remote_files(tracker, flow_names) -> None:
     # 'run's are deleted first to prevent dependency issue of entities on deletion
     logger.info("Entity Types: {}".format(["run", "data", "flow", "task", "study"]))
     for entity_type in ["run", "data", "flow", "task", "study"]:
-        logger.info("Deleting {}s...".format(entity_type))
-        for i, entity in enumerate(tracker[entity_type]):
+        logger.info(f"Deleting {entity_type}s...")
+        for _i, entity in enumerate(tracker[entity_type]):
             try:
                 openml.utils._delete_entity(entity_type, entity)
-                logger.info("Deleted ({}, {})".format(entity_type, entity))
+                logger.info(f"Deleted ({entity_type}, {entity})")
             except Exception as e:
-                logger.warning("Cannot delete ({},{}): {}".format(entity_type, entity, e))
+                logger.warning(f"Cannot delete ({entity_type},{entity}): {e}")
 
 
 def pytest_sessionstart() -> None:
-    """pytest hook that is executed before any unit test starts
+    """Pytest hook that is executed before any unit test starts
 
     This function will be called by each of the worker processes, along with the master process
     when they are spawned. This happens even before the collection of unit tests.
@@ -136,7 +137,7 @@ def pytest_sessionstart() -> None:
 
 
 def pytest_sessionfinish() -> None:
-    """pytest hook that is executed after all unit tests of a worker ends
+    """Pytest hook that is executed after all unit tests of a worker ends
 
     This function will be called by each of the worker processes, along with the master process
     when they are done with the unit tests allocated to them.
@@ -154,10 +155,10 @@ def pytest_sessionfinish() -> None:
     # allows access to the file_list read in the set up phase
     global file_list
     worker = worker_id()
-    logger.info("Finishing worker {}".format(worker))
+    logger.info(f"Finishing worker {worker}")
 
     # Test file deletion
-    logger.info("Deleting files uploaded to test server for worker {}".format(worker))
+    logger.info(f"Deleting files uploaded to test server for worker {worker}")
     delete_remote_files(TestBase.publish_tracker, TestBase.flow_name_tracker)
 
     if worker == "master":
@@ -166,7 +167,7 @@ def pytest_sessionfinish() -> None:
         compare_delete_files(file_list, new_file_list)
         logger.info("Local files deleted")
 
-    logger.info("{} is killed".format(worker))
+    logger.info(f"{worker} is killed")
 
 
 def pytest_configure(config):
@@ -187,7 +188,7 @@ def long_version(request):
     request.cls.long_version = request.config.getoption("--long")
 
 
-@pytest.fixture
+@pytest.fixture()
 def test_files_directory() -> pathlib.Path:
     return pathlib.Path(__file__).parent / "files"
 

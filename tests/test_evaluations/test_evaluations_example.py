@@ -1,4 +1,5 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 import unittest
 
@@ -8,9 +9,10 @@ class TestEvaluationsExample(unittest.TestCase):
         # Example script which will appear in the upcoming OpenML-Python paper
         # This test ensures that the example will keep running!
 
-        import openml
-        import numpy as np
         import matplotlib.pyplot as plt
+        import numpy as np
+
+        import openml
 
         df = openml.evaluations.list_evaluations_setups(
             "predictive_accuracy",
