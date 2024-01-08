@@ -4,9 +4,10 @@ from __future__ import annotations
 import pickle
 from collections import OrderedDict
 from pathlib import Path
+from typing import Any
 from typing_extensions import NamedTuple
 
-import arff
+import arff  # type: ignore
 import numpy as np
 
 
@@ -55,7 +56,7 @@ class OpenMLSplit:
         self.folds = len(self.split[0])
         self.samples = len(self.split[0][0])
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if (
             (not isinstance(self, type(other)))
             or self.name != other.name
