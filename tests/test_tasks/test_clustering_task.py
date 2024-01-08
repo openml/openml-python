@@ -1,17 +1,19 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 import openml
+from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType
 from openml.testing import TestBase
+
 from .test_task import OpenMLTaskTest
-from openml.exceptions import OpenMLServerException
 
 
 class OpenMLClusteringTaskTest(OpenMLTaskTest):
     __test__ = True
 
     def setUp(self, n_levels: int = 1):
-        super(OpenMLClusteringTaskTest, self).setUp()
+        super().setUp()
         self.task_id = 146714
         self.task_type = TaskType.CLUSTERING
         self.estimation_procedure = 17
@@ -25,10 +27,10 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
     def test_download_task(self):
         # no clustering tasks on test server
         openml.config.server = self.production_server
-        task = super(OpenMLClusteringTaskTest, self).test_download_task()
-        self.assertEqual(task.task_id, self.task_id)
-        self.assertEqual(task.task_type_id, TaskType.CLUSTERING)
-        self.assertEqual(task.dataset_id, 36)
+        task = super().test_download_task()
+        assert task.task_id == self.task_id
+        assert task.task_type_id == TaskType.CLUSTERING
+        assert task.dataset_id == 36
 
     def test_upload_task(self):
         compatible_datasets = self._get_compatible_rand_dataset()
@@ -44,7 +46,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
                 task = task.publish()
                 TestBase._mark_entity_for_removal("task", task.id)
                 TestBase.logger.info(
-                    "collected from {}: {}".format(__file__.split("/")[-1], task.id)
+                    "collected from {}: {}".format(__file__.split("/")[-1], task.id),
                 )
                 # success
                 break
@@ -58,5 +60,5 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
                     raise e
         else:
             raise ValueError(
-                "Could not create a valid task for task type ID {}".format(self.task_type)
+                f"Could not create a valid task for task type ID {self.task_type}",
             )

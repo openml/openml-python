@@ -1,27 +1,27 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 import hashlib
 import inspect
+import logging
 import os
 import pathlib
 import shutil
-import sys
 import time
-from typing import Dict, List, Optional, Tuple, Union, cast  # noqa: F401
 import unittest
+from typing import Dict, List, Optional, Tuple, Union, cast  # noqa: F401
+
 import pandas as pd
 import requests
 
 import openml
-from openml.tasks import TaskType
 from openml.exceptions import OpenMLServerException
-
-import logging
+from openml.tasks import TaskType
 
 
 def _check_dataset(dataset):
     assert isinstance(dataset, dict)
-    assert 2 <= len(dataset)
+    assert len(dataset) >= 2
     assert "did" in dataset
     assert isinstance(dataset["did"], int)
     assert "status" in dataset
@@ -71,7 +71,6 @@ class TestBase(unittest.TestCase):
             Number of nested directories the test is in. Necessary to resolve the path to the
             ``files`` directory, which is located directly under the ``tests`` directory.
         """
-
         # This cache directory is checked in to git to simulate a populated
         # cache
         self.maxDiff = None
@@ -86,7 +85,7 @@ class TestBase(unittest.TestCase):
 
         if self.static_cache_dir is None:
             raise ValueError(
-                "Cannot find test cache dir, expected it to be {}!".format(static_cache_dir)
+                f"Cannot find test cache dir, expected it to be {static_cache_dir}!",
             )
 
         self.cwd = os.getcwd()
@@ -126,7 +125,10 @@ class TestBase(unittest.TestCase):
 
     @classmethod
     def _mark_entity_for_removal(
-        self, entity_type: str, entity_id: int, entity_name: Optional[str] = None
+        self,
+        entity_type: str,
+        entity_id: int,
+        entity_name: str | None = None,
     ) -> None:
         """Static record of entities uploaded to test server
 
@@ -154,22 +156,22 @@ class TestBase(unittest.TestCase):
             # removes duplicate entries
             TestBase.publish_tracker[entity_type] = list(set(TestBase.publish_tracker[entity_type]))
             if entity_type == "flow":
-                delete_index = [
+                delete_index = next(
                     i
                     for i, (id_, _) in enumerate(
-                        zip(TestBase.publish_tracker[entity_type], TestBase.flow_name_tracker)
+                        zip(TestBase.publish_tracker[entity_type], TestBase.flow_name_tracker),
                     )
                     if id_ == entity
-                ][0]
+                )
             else:
-                delete_index = [
+                delete_index = next(
                     i
                     for i, id_ in enumerate(TestBase.publish_tracker[entity_type])
                     if id_ == entity
-                ][0]
+                )
             TestBase.publish_tracker[entity_type].pop(delete_index)
 
-    def _get_sentinel(self, sentinel: Optional[str] = None) -> str:
+    def _get_sentinel(self, sentinel: str | None = None) -> str:
         if sentinel is None:
             # Create a unique prefix for the flow. Necessary because the flow
             # is identified by its name and external version online. Having a
@@ -182,32 +184,34 @@ class TestBase(unittest.TestCase):
         return sentinel
 
     def _add_sentinel_to_flow_name(
-        self, flow: openml.flows.OpenMLFlow, sentinel: Optional[str] = None
-    ) -> Tuple[openml.flows.OpenMLFlow, str]:
+        self,
+        flow: openml.flows.OpenMLFlow,
+        sentinel: str | None = None,
+    ) -> tuple[openml.flows.OpenMLFlow, str]:
         sentinel = self._get_sentinel(sentinel=sentinel)
-        flows_to_visit = list()
+        flows_to_visit = []
         flows_to_visit.append(flow)
         while len(flows_to_visit) > 0:
             current_flow = flows_to_visit.pop()
-            current_flow.name = "%s%s" % (sentinel, current_flow.name)
+            current_flow.name = f"{sentinel}{current_flow.name}"
             for subflow in current_flow.components.values():
                 flows_to_visit.append(subflow)
 
         return flow, sentinel
 
-    def _check_dataset(self, dataset: Dict[str, Union[str, int]]) -> None:
+    def _check_dataset(self, dataset: dict[str, str | int]) -> None:
         _check_dataset(dataset)
-        self.assertEqual(type(dataset), dict)
-        self.assertGreaterEqual(len(dataset), 2)
-        self.assertIn("did", dataset)
-        self.assertIsInstance(dataset["did"], int)
-        self.assertIn("status", dataset)
-        self.assertIsInstance(dataset["status"], str)
-        self.assertIn(dataset["status"], ["in_preparation", "active", "deactivated"])
+        assert type(dataset) == dict
+        assert len(dataset) >= 2
+        assert "did" in dataset
+        assert isinstance(dataset["did"], int)
+        assert "status" in dataset
+        assert isinstance(dataset["status"], str)
+        assert dataset["status"] in ["in_preparation", "active", "deactivated"]
 
     def _check_fold_timing_evaluations(
         self,
-        fold_evaluations: Dict[str, Dict[int, Dict[int, float]]],
+        fold_evaluations: dict[str, dict[int, dict[int, float]]],
         num_repeats: int,
         num_folds: int,
         max_time_allowed: float = 60000.0,
@@ -223,7 +227,6 @@ class TestBase(unittest.TestCase):
         default max_time_allowed (per fold, in milli seconds) = 1 minute,
         quite pessimistic
         """
-
         # a dict mapping from openml measure to a tuple with the minimum and
         # maximum allowed value
         check_measures = {
@@ -242,34 +245,31 @@ class TestBase(unittest.TestCase):
             elif task_type == TaskType.SUPERVISED_REGRESSION:
                 check_measures["mean_absolute_error"] = (0, float("inf"))
 
-        self.assertIsInstance(fold_evaluations, dict)
-        if sys.version_info[:2] >= (3, 3):
-            # this only holds if we are allowed to record time (otherwise some
-            # are missing)
-            self.assertEqual(set(fold_evaluations.keys()), set(check_measures.keys()))
+        assert isinstance(fold_evaluations, dict)
+        assert set(fold_evaluations.keys()) == set(check_measures.keys())
 
-        for measure in check_measures.keys():
+        for measure in check_measures:
             if measure in fold_evaluations:
                 num_rep_entrees = len(fold_evaluations[measure])
-                self.assertEqual(num_rep_entrees, num_repeats)
+                assert num_rep_entrees == num_repeats
                 min_val = check_measures[measure][0]
                 max_val = check_measures[measure][1]
                 for rep in range(num_rep_entrees):
                     num_fold_entrees = len(fold_evaluations[measure][rep])
-                    self.assertEqual(num_fold_entrees, num_folds)
+                    assert num_fold_entrees == num_folds
                     for fold in range(num_fold_entrees):
                         evaluation = fold_evaluations[measure][rep][fold]
-                        self.assertIsInstance(evaluation, float)
-                        self.assertGreaterEqual(evaluation, min_val)
-                        self.assertLessEqual(evaluation, max_val)
+                        assert isinstance(evaluation, float)
+                        assert evaluation >= min_val
+                        assert evaluation <= max_val
 
 
 def check_task_existence(
     task_type: TaskType,
     dataset_id: int,
     target_name: str,
-    **kwargs: Dict[str, Union[str, int, Dict[str, Union[str, int, openml.tasks.TaskType]]]]
-) -> Union[int, None]:
+    **kwargs: dict[str, str | int | dict[str, str | int | openml.tasks.TaskType]],
+) -> int | None:
     """Checks if any task with exists on test server that matches the meta data.
 
     Parameter
@@ -328,13 +328,13 @@ class CustomImputer(SimpleImputer):
     Helps bypass the sklearn extension duplicate operation check
     """
 
-    pass
-
 
 def create_request_response(
-    *, status_code: int, content_filepath: pathlib.Path
+    *,
+    status_code: int,
+    content_filepath: pathlib.Path,
 ) -> requests.Response:
-    with open(content_filepath, "r") as xml_response:
+    with open(content_filepath) as xml_response:
         response_body = xml_response.read()
 
     response = requests.Response()

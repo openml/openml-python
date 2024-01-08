@@ -1,42 +1,48 @@
+default_language_version:
+  python: python3
+files: |
+  (?x)^(
+    openml|
+    tests
+  )/.*\.py$
 repos:
-  - repo: https://github.com/psf/black
-    rev: 23.12.1
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.1.5
     hooks:
-      - id: black
-        args: [--line-length=100]
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix, --no-cache]
+      - id: ruff-format
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.8.0
     hooks:
       - id: mypy
-        name: mypy openml
-        files: openml/.*
         additional_dependencies:
           - types-requests
           - types-python-dateutil
-      - id: mypy
-        name: mypy tests
-        files: tests/.*
-        additional_dependencies:
-          - types-requests
-          - types-python-dateutil
-      - id: mypy
-        name: mypy top-level-functions
-        files: openml/_api_calls.py
-        additional_dependencies:
-          - types-requests
-          - types-python-dateutil
-        args: [ --disallow-untyped-defs, --disallow-any-generics,
-                --disallow-any-explicit, --implicit-optional ]
-  - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.27.1
     hooks:
-      - id: flake8
-        name: flake8 openml
-        files: openml/.*
-        additional_dependencies:
-          - flake8-print==5.0.0
-      - id: flake8
-        name: flake8 tests
-        files: tests/.*
-        additional_dependencies:
-          - flake8-print==5.0.0
+      - id: check-github-workflows
+        files: '^github/workflows/.*\.ya?ml$'
+        types: ["yaml"]
+      - id: check-dependabot
+        files: '^\.github/dependabot\.ya?ml$'
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-added-large-files
+        files: ".*"
+      - id: check-case-conflict
+        files: ".*"
+      - id: check-merge-conflict
+        files: ".*"
+      - id: check-yaml
+        files: ".*"
+      - id: end-of-file-fixer
+        files: ".*"
+        types: ["yaml"]
+      - id: check-toml
+        files: ".*"
+        types: ["toml"]
+      - id: debug-statements
+        files: '^src/.*\.py$'

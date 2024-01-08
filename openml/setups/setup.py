@@ -1,9 +1,10 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 import openml.config
 
 
-class OpenMLSetup(object):
+class OpenMLSetup:
     """Setup object (a.k.a. Configuration).
 
     Parameters
@@ -21,9 +22,8 @@ class OpenMLSetup(object):
             raise ValueError("setup id should be int")
         if not isinstance(flow_id, int):
             raise ValueError("flow id should be int")
-        if parameters is not None:
-            if not isinstance(parameters, dict):
-                raise ValueError("parameters should be dict")
+        if parameters is not None and not isinstance(parameters, dict):
+            raise ValueError("parameters should be dict")
 
         self.setup_id = setup_id
         self.flow_id = flow_id
@@ -45,12 +45,12 @@ class OpenMLSetup(object):
         fields = [(key, fields[key]) for key in order if key in fields]
 
         longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
         body = "\n".join(field_line_format.format(name, value) for name, value in fields)
         return header + body
 
 
-class OpenMLParameter(object):
+class OpenMLParameter:
     """Parameter object (used in setup).
 
     Parameters
@@ -110,11 +110,11 @@ class OpenMLParameter(object):
         # indented prints for parameter attributes
         # indention = 2 spaces + 1 | + 2 underscores
         indent = "{}|{}".format(" " * 2, "_" * 2)
-        parameter_data_type = "{}Data Type".format(indent)
+        parameter_data_type = f"{indent}Data Type"
         fields[parameter_data_type] = self.data_type
-        parameter_default = "{}Default".format(indent)
+        parameter_default = f"{indent}Default"
         fields[parameter_default] = self.default_value
-        parameter_value = "{}Value".format(indent)
+        parameter_value = f"{indent}Value"
         fields[parameter_value] = self.value
 
         # determines the order in which the information will be printed
@@ -131,6 +131,6 @@ class OpenMLParameter(object):
         fields = [(key, fields[key]) for key in order if key in fields]
 
         longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
         body = "\n".join(field_line_format.format(name, value) for name, value in fields)
         return header + body

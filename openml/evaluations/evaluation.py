@@ -1,9 +1,10 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 import openml.config
 
 
-class OpenMLEvaluation(object):
+class OpenMLEvaluation:
     """
     Contains all meta-information about a run / evaluation combination,
     according to the evaluation/list function
@@ -110,6 +111,6 @@ class OpenMLEvaluation(object):
         fields = [(key, fields[key]) for key in order if key in fields]
 
         longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
+        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
         body = "\n".join(field_line_format.format(name, value) for name, value in fields)
         return header + body

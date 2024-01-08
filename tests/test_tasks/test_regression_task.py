@@ -1,13 +1,15 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 import ast
+
 import numpy as np
 
 import openml
-from openml.tasks import TaskType
-from openml.testing import TestBase
-from openml.testing import check_task_existence
 from openml.exceptions import OpenMLServerException
+from openml.tasks import TaskType
+from openml.testing import TestBase, check_task_existence
+
 from .test_supervised_task import OpenMLSupervisedTaskTest
 
 
@@ -15,7 +17,7 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
     __test__ = True
 
     def setUp(self, n_levels: int = 1):
-        super(OpenMLRegressionTaskTest, self).setUp()
+        super().setUp()
 
         task_meta_data = {
             "task_type": TaskType.SUPERVISED_REGRESSION,
@@ -34,7 +36,7 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
                 task_id = new_task.task_id
                 # mark to remove the uploaded task
                 TestBase._mark_entity_for_removal("task", task_id)
-                TestBase.logger.info("collected from test_run_functions: {}".format(task_id))
+                TestBase.logger.info(f"collected from test_run_functions: {task_id}")
             except OpenMLServerException as e:
                 if e.code == 614:  # Task already exists
                     # the exception message contains the task_id that was matched in the format
@@ -47,15 +49,15 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
         self.estimation_procedure = 7
 
     def test_get_X_and_Y(self):
-        X, Y = super(OpenMLRegressionTaskTest, self).test_get_X_and_Y()
-        self.assertEqual((194, 32), X.shape)
-        self.assertIsInstance(X, np.ndarray)
-        self.assertEqual((194,), Y.shape)
-        self.assertIsInstance(Y, np.ndarray)
-        self.assertEqual(Y.dtype, float)
+        X, Y = super().test_get_X_and_Y()
+        assert X.shape == (194, 32)
+        assert isinstance(X, np.ndarray)
+        assert Y.shape == (194,)
+        assert isinstance(Y, np.ndarray)
+        assert Y.dtype == float
 
     def test_download_task(self):
-        task = super(OpenMLRegressionTaskTest, self).test_download_task()
-        self.assertEqual(task.task_id, self.task_id)
-        self.assertEqual(task.task_type_id, TaskType.SUPERVISED_REGRESSION)
-        self.assertEqual(task.dataset_id, 105)
+        task = super().test_download_task()
+        assert task.task_id == self.task_id
+        assert task.task_type_id == TaskType.SUPERVISED_REGRESSION
+        assert task.dataset_id == 105

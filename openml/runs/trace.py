@@ -1,10 +1,10 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from collections import OrderedDict
-from dataclasses import dataclass
 import json
 import os
-from typing import List, Tuple, Optional, Dict, Union  # noqa F401
+from collections import OrderedDict
+from dataclasses import dataclass
 
 import arff
 import xmltodict
@@ -61,23 +61,23 @@ class OpenMLTraceIteration:
     evaluation: float
     selected: bool
 
-    setup_string: Optional[str] = None
-    parameters: Optional[OrderedDict] = None
+    setup_string: str | None = None
+    parameters: OrderedDict | None = None
 
     def __post_init__(self):
         # TODO: refactor into one argument of type <str | OrderedDict>
         if self.setup_string and self.parameters:
             raise ValueError(
-                "Can only be instantiated with either `setup_string` or `parameters` argument."
+                "Can only be instantiated with either `setup_string` or `parameters` argument.",
             )
         elif not (self.setup_string or self.parameters):
             raise ValueError(
-                "Either `setup_string` or `parameters` needs to be passed as argument."
+                "Either `setup_string` or `parameters` needs to be passed as argument.",
             )
         if self.parameters is not None and not isinstance(self.parameters, OrderedDict):
             raise TypeError(
                 "argument parameters is not an instance of OrderedDict, but %s"
-                % str(type(self.parameters))
+                % str(type(self.parameters)),
             )
 
     def get_parameters(self):
@@ -95,7 +95,7 @@ class OpenMLTraceIteration:
         return result
 
 
-class OpenMLRunTrace(object):
+class OpenMLRunTrace:
     """OpenML Run Trace: parsed output from Run Trace call
 
     Parameters
@@ -111,8 +111,8 @@ class OpenMLRunTrace(object):
 
     def __init__(
         self,
-        run_id: Union[int, None],
-        trace_iterations: Dict[Tuple[int, int, int], OpenMLTraceIteration],
+        run_id: int | None,
+        trace_iterations: dict[tuple[int, int, int], OpenMLTraceIteration],
     ):
         """Object to hold the trace content of a run.
 
@@ -139,7 +139,7 @@ class OpenMLRunTrace(object):
         repeat: int
 
         Returns
-        ----------
+        -------
         int
             The trace iteration from the given fold and repeat that was
             selected as the best iteration by the search procedure
@@ -148,7 +148,7 @@ class OpenMLRunTrace(object):
             if r == repeat and f == fold and self.trace_iterations[(r, f, i)].selected is True:
                 return i
         raise ValueError(
-            "Could not find the selected iteration for rep/fold %d/%d" % (repeat, fold)
+            "Could not find the selected iteration for rep/fold %d/%d" % (repeat, fold),
         )
 
     @classmethod
@@ -160,7 +160,6 @@ class OpenMLRunTrace(object):
 
         Parameters
         ----------
-
         attributes : list
             List of tuples describing the arff attributes.
 
@@ -172,7 +171,6 @@ class OpenMLRunTrace(object):
         -------
         OpenMLRunTrace
         """
-
         if content is None:
             raise ValueError("Trace content not available.")
         elif attributes is None:
@@ -182,7 +180,7 @@ class OpenMLRunTrace(object):
         elif len(attributes) != len(content[0]):
             raise ValueError(
                 "Trace_attributes and trace_content not compatible:"
-                " %s vs %s" % (attributes, content[0])
+                f" {attributes} vs {content[0]}",
             )
 
         return cls._trace_from_arff_struct(
@@ -193,7 +191,7 @@ class OpenMLRunTrace(object):
         )
 
     @classmethod
-    def _from_filesystem(cls, file_path: str) -> "OpenMLRunTrace":
+    def _from_filesystem(cls, file_path: str) -> OpenMLRunTrace:
         """
         Logic to deserialize the trace from the filesystem.
 
@@ -203,13 +201,13 @@ class OpenMLRunTrace(object):
             File path where the trace arff is stored.
 
         Returns
-        ----------
+        -------
         OpenMLRunTrace
         """
         if not os.path.isfile(file_path):
             raise ValueError("Trace file doesn't exist")
 
-        with open(file_path, "r") as fp:
+        with open(file_path) as fp:
             trace_arff = arff.load(fp)
 
         for trace_idx in range(len(trace_arff["data"])):
@@ -217,7 +215,7 @@ class OpenMLRunTrace(object):
             # (fold, repeat, trace_iteration) these should be int
             for line_idx in range(3):
                 trace_arff["data"][trace_idx][line_idx] = int(
-                    trace_arff["data"][trace_idx][line_idx]
+                    trace_arff["data"][trace_idx][line_idx],
                 )
 
         return cls.trace_from_arff(trace_arff)
@@ -232,7 +230,6 @@ class OpenMLRunTrace(object):
         file_path: str
             File path where the trace arff will be stored.
         """
-
         trace_arff = arff.dumps(self.trace_to_arff())
         with open(os.path.join(file_path, "trace.arff"), "w") as f:
             f.write(trace_arff)
@@ -263,7 +260,7 @@ class OpenMLRunTrace(object):
             [
                 (PREFIX + parameter, "STRING")
                 for parameter in next(iter(self.trace_iterations.values())).get_parameters()
-            ]
+            ],
         )
 
         arff_dict = OrderedDict()
@@ -354,8 +351,8 @@ class OpenMLRunTrace(object):
                 continue
             elif not attribute.startswith(PREFIX):
                 raise ValueError(
-                    "Encountered unknown attribute %s that does not start "
-                    "with prefix %s" % (attribute, PREFIX)
+                    f"Encountered unknown attribute {attribute} that does not start "
+                    f"with prefix {PREFIX}",
                 )
             else:
                 parameter_attributes.append(attribute)
@@ -373,11 +370,11 @@ class OpenMLRunTrace(object):
             else:
                 raise ValueError(
                     'expected {"true", "false"} value for selected field, '
-                    "received: %s" % selected_value
+                    "received: %s" % selected_value,
                 )
 
             parameters = OrderedDict(
-                [(attribute, itt[attribute_idx[attribute]]) for attribute in parameter_attributes]
+                [(attribute, itt[attribute_idx[attribute]]) for attribute in parameter_attributes],
             )
 
             current = OpenMLTraceIteration(
@@ -435,7 +432,7 @@ class OpenMLRunTrace(object):
             else:
                 raise ValueError(
                     'expected {"true", "false"} value for '
-                    "selected field, received: %s" % selected_value
+                    "selected field, received: %s" % selected_value,
                 )
 
             current = OpenMLTraceIteration(
@@ -451,7 +448,7 @@ class OpenMLRunTrace(object):
         return cls(run_id, trace)
 
     @classmethod
-    def merge_traces(cls, traces: List["OpenMLRunTrace"]) -> "OpenMLRunTrace":
+    def merge_traces(cls, traces: list[OpenMLRunTrace]) -> OpenMLRunTrace:
         """Merge multiple traces into a single trace.
 
         Parameters
@@ -472,9 +469,7 @@ class OpenMLRunTrace(object):
             If the parameters in the iterations of the traces being merged are not equal.
             If a key (repeat, fold, iteration) is encountered twice while merging the traces.
         """
-        merged_trace = (
-            OrderedDict()
-        )  # type: OrderedDict[Tuple[int, int, int], OpenMLTraceIteration]  # noqa E501
+        merged_trace = OrderedDict()  # type: OrderedDict[Tuple[int, int, int], OpenMLTraceIteration]  # E501
 
         previous_iteration = None
         for trace in traces:
@@ -482,19 +477,19 @@ class OpenMLRunTrace(object):
                 key = (iteration.repeat, iteration.fold, iteration.iteration)
                 if previous_iteration is not None:
                     if list(merged_trace[previous_iteration].parameters.keys()) != list(
-                        iteration.parameters.keys()
+                        iteration.parameters.keys(),
                     ):
                         raise ValueError(
                             "Cannot merge traces because the parameters are not equal: "
                             "{} vs {}".format(
                                 list(merged_trace[previous_iteration].parameters.keys()),
                                 list(iteration.parameters.keys()),
-                            )
+                            ),
                         )
 
                 if key in merged_trace:
                     raise ValueError(
-                        "Cannot merge traces because key '{}' was encountered twice".format(key)
+                        f"Cannot merge traces because key '{key}' was encountered twice",
                     )
 
                 merged_trace[key] = iteration
@@ -509,5 +504,4 @@ class OpenMLRunTrace(object):
         )
 
     def __iter__(self):
-        for val in self.trace_iterations.values():
-            yield val
+        yield from self.trace_iterations.values()

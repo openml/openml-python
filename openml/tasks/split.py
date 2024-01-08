@@ -1,17 +1,17 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from collections import namedtuple, OrderedDict
 import os
 import pickle
+from collections import OrderedDict, namedtuple
 
-import numpy as np
 import arff
-
+import numpy as np
 
 Split = namedtuple("Split", ["train", "test"])
 
 
-class OpenMLSplit(object):
+class OpenMLSplit:
     """OpenML Split object.
 
     Parameters
@@ -24,7 +24,7 @@ class OpenMLSplit(object):
     def __init__(self, name, description, split):
         self.description = description
         self.name = name
-        self.split = dict()
+        self.split = {}
 
         # Add splits according to repetition
         for repetition in split:
@@ -36,7 +36,7 @@ class OpenMLSplit(object):
                     self.split[repetition][fold][sample] = split[repetition][fold][sample]
 
         self.repeats = len(self.split)
-        if any([len(self.split[0]) != len(self.split[i]) for i in range(self.repeats)]):
+        if any(len(self.split[0]) != len(self.split[i]) for i in range(self.repeats)):
             raise ValueError("")
         self.folds = len(self.split[0])
         self.samples = len(self.split[0][0])
@@ -69,7 +69,7 @@ class OpenMLSplit(object):
         return True
 
     @classmethod
-    def _from_arff_file(cls, filename: str) -> "OpenMLSplit":
+    def _from_arff_file(cls, filename: str) -> OpenMLSplit:
         repetitions = None
 
         pkl_filename = filename.replace(".arff", ".pkl.py3")

@@ -1,17 +1,20 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from typing import cast, Dict, List, Optional, Union
 import warnings
+from typing import TYPE_CHECKING, List, cast
 
-import xmltodict
 import pandas as pd
+import xmltodict
 
-from openml.study import OpenMLStudy, OpenMLBenchmarkSuite
-from openml.study.study import BaseStudy
 import openml._api_calls
+from openml.study.study import OpenMLBenchmarkSuite, OpenMLStudy
+
+if TYPE_CHECKING:
+    from openml.study.study import BaseStudy
 
 
-def get_suite(suite_id: Union[int, str]) -> OpenMLBenchmarkSuite:
+def get_suite(suite_id: int | str) -> OpenMLBenchmarkSuite:
     """
     Retrieves all relevant information of an OpenML benchmarking suite from the server.
 
@@ -25,14 +28,13 @@ def get_suite(suite_id: Union[int, str]) -> OpenMLBenchmarkSuite:
     OpenMLSuite
         The OpenML suite object
     """
-    suite = cast(OpenMLBenchmarkSuite, _get_study(suite_id, entity_type="task"))
-    return suite
+    return cast(OpenMLBenchmarkSuite, _get_study(suite_id, entity_type="task"))
 
 
 def get_study(
-    study_id: Union[int, str],
-    arg_for_backwards_compat: Optional[str] = None,
-) -> OpenMLStudy:  # noqa F401
+    study_id: int | str,
+    arg_for_backwards_compat: str | None = None,
+) -> OpenMLStudy:  # F401
     """
     Retrieves all relevant information of an OpenML study from the server.
 
@@ -62,12 +64,11 @@ def get_study(
         study = _get_study(study_id, entity_type="task")
         return cast(OpenMLBenchmarkSuite, study)  # type: ignore
     else:
-        study = cast(OpenMLStudy, _get_study(study_id, entity_type="run"))
-        return study
+        return cast(OpenMLStudy, _get_study(study_id, entity_type="run"))
 
 
-def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
-    call_suffix = "study/{}".format(str(id_))
+def _get_study(id_: int | str, entity_type) -> BaseStudy:
+    call_suffix = f"study/{id_!s}"
     xml_string = openml._api_calls._perform_api_call(call_suffix, "get")
     force_list_tags = (
         "oml:data_id",
@@ -86,7 +87,7 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
             "Unexpected entity type '{}' reported by the server, expected '{}'".format(
                 main_entity_type,
                 entity_type,
-            )
+            ),
         )
     benchmark_suite = (
         result_dict["oml:benchmark_suite"] if "oml:benchmark_suite" in result_dict else None
@@ -106,7 +107,7 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
                 current_tag["window_start"] = tag["oml:window_start"]
             tags.append(current_tag)
 
-    def get_nested_ids_from_result_dict(key: str, subkey: str) -> Optional[List]:
+    def get_nested_ids_from_result_dict(key: str, subkey: str) -> list | None:
         """Extracts a list of nested IDs from a result dictionary.
 
         Parameters
@@ -166,7 +167,7 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
         )
 
     else:
-        raise ValueError("Unknown entity type {}".format(main_entity_type))
+        raise ValueError(f"Unknown entity type {main_entity_type}")
 
     return study
 
@@ -174,9 +175,9 @@ def _get_study(id_: Union[int, str], entity_type) -> BaseStudy:
 def create_study(
     name: str,
     description: str,
-    run_ids: Optional[List[int]] = None,
-    alias: Optional[str] = None,
-    benchmark_suite: Optional[int] = None,
+    run_ids: list[int] | None = None,
+    alias: str | None = None,
+    benchmark_suite: int | None = None,
 ) -> OpenMLStudy:
     """
     Creates an OpenML study (collection of data, tasks, flows, setups and run),
@@ -225,8 +226,8 @@ def create_study(
 def create_benchmark_suite(
     name: str,
     description: str,
-    task_ids: List[int],
-    alias: Optional[str] = None,
+    task_ids: list[int],
+    alias: str | None = None,
 ) -> OpenMLBenchmarkSuite:
     """
     Creates an OpenML benchmark suite (collection of entity types, where
@@ -333,7 +334,7 @@ def delete_study(study_id: int) -> bool:
     return openml.utils._delete_entity("study", study_id)
 
 
-def attach_to_suite(suite_id: int, task_ids: List[int]) -> int:
+def attach_to_suite(suite_id: int, task_ids: list[int]) -> int:
     """Attaches a set of tasks to a benchmarking suite.
 
     Parameters
@@ -352,7 +353,7 @@ def attach_to_suite(suite_id: int, task_ids: List[int]) -> int:
     return attach_to_study(suite_id, task_ids)
 
 
-def attach_to_study(study_id: int, run_ids: List[int]) -> int:
+def attach_to_study(study_id: int, run_ids: list[int]) -> int:
     """Attaches a set of runs to a study.
 
     Parameters
@@ -368,18 +369,19 @@ def attach_to_study(study_id: int, run_ids: List[int]) -> int:
     int
         new size of the study (in terms of explicitly linked entities)
     """
-
     # Interestingly, there's no need to tell the server about the entity type, it knows by itself
     uri = "study/%d/attach" % study_id
     post_variables = {"ids": ",".join(str(x) for x in run_ids)}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call(
-        call=uri, request_method="post", data=post_variables
+        call=uri,
+        request_method="post",
+        data=post_variables,
     )
     result = xmltodict.parse(result_xml)["oml:study_attach"]
     return int(result["oml:linked_entities"])
 
 
-def detach_from_suite(suite_id: int, task_ids: List[int]) -> int:
+def detach_from_suite(suite_id: int, task_ids: list[int]) -> int:
     """Detaches a set of task ids from a suite.
 
     Parameters
@@ -393,11 +395,12 @@ def detach_from_suite(suite_id: int, task_ids: List[int]) -> int:
     Returns
     -------
     int
-        new size of the study (in terms of explicitly linked entities)"""
+    new size of the study (in terms of explicitly linked entities)
+    """
     return detach_from_study(suite_id, task_ids)
 
 
-def detach_from_study(study_id: int, run_ids: List[int]) -> int:
+def detach_from_study(study_id: int, run_ids: list[int]) -> int:
     """Detaches a set of run ids from a study.
 
     Parameters
@@ -413,24 +416,25 @@ def detach_from_study(study_id: int, run_ids: List[int]) -> int:
     int
         new size of the study (in terms of explicitly linked entities)
     """
-
     # Interestingly, there's no need to tell the server about the entity type, it knows by itself
     uri = "study/%d/detach" % study_id
     post_variables = {"ids": ",".join(str(x) for x in run_ids)}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call(
-        call=uri, request_method="post", data=post_variables
+        call=uri,
+        request_method="post",
+        data=post_variables,
     )
     result = xmltodict.parse(result_xml)["oml:study_detach"]
     return int(result["oml:linked_entities"])
 
 
 def list_suites(
-    offset: Optional[int] = None,
-    size: Optional[int] = None,
-    status: Optional[str] = None,
-    uploader: Optional[List[int]] = None,
+    offset: int | None = None,
+    size: int | None = None,
+    status: str | None = None,
+    uploader: list[int] | None = None,
     output_format: str = "dict",
-) -> Union[Dict, pd.DataFrame]:
+) -> dict | pd.DataFrame:
     """
     Return a list of all suites which are on OpenML.
 
@@ -475,7 +479,7 @@ def list_suites(
     """
     if output_format not in ["dataframe", "dict"]:
         raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
+            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable.",
         )
     # TODO: [0.15]
     if output_format == "dict":
@@ -498,13 +502,13 @@ def list_suites(
 
 
 def list_studies(
-    offset: Optional[int] = None,
-    size: Optional[int] = None,
-    status: Optional[str] = None,
-    uploader: Optional[List[str]] = None,
-    benchmark_suite: Optional[int] = None,
+    offset: int | None = None,
+    size: int | None = None,
+    status: str | None = None,
+    uploader: list[str] | None = None,
+    benchmark_suite: int | None = None,
     output_format: str = "dict",
-) -> Union[Dict, pd.DataFrame]:
+) -> dict | pd.DataFrame:
     """
     Return a list of all studies which are on OpenML.
 
@@ -556,7 +560,7 @@ def list_studies(
     """
     if output_format not in ["dataframe", "dict"]:
         raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
+            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable.",
         )
     # TODO: [0.15]
     if output_format == "dict":
@@ -579,7 +583,7 @@ def list_studies(
     )
 
 
-def _list_studies(output_format="dict", **kwargs) -> Union[Dict, pd.DataFrame]:
+def _list_studies(output_format="dict", **kwargs) -> dict | pd.DataFrame:
     """
     Perform api call to return a list of studies.
 
@@ -600,11 +604,11 @@ def _list_studies(output_format="dict", **kwargs) -> Union[Dict, pd.DataFrame]:
     api_call = "study/list"
     if kwargs is not None:
         for operator, value in kwargs.items():
-            api_call += "/%s/%s" % (operator, value)
+            api_call += f"/{operator}/{value}"
     return __list_studies(api_call=api_call, output_format=output_format)
 
 
-def __list_studies(api_call, output_format="object") -> Union[Dict, pd.DataFrame]:
+def __list_studies(api_call, output_format="object") -> dict | pd.DataFrame:
     """Retrieves the list of OpenML studies and
     returns it in a dictionary or a Pandas DataFrame.
 
@@ -627,13 +631,13 @@ def __list_studies(api_call, output_format="object") -> Union[Dict, pd.DataFrame
 
     # Minimalistic check if the XML is useful
     assert isinstance(study_dict["oml:study_list"]["oml:study"], list), type(
-        study_dict["oml:study_list"]
+        study_dict["oml:study_list"],
     )
     assert study_dict["oml:study_list"]["@xmlns:oml"] == "http://openml.org/openml", study_dict[
         "oml:study_list"
     ]["@xmlns:oml"]
 
-    studies = dict()
+    studies = {}
     for study_ in study_dict["oml:study_list"]["oml:study"]:
         # maps from xml name to a tuple of (dict name, casting fn)
         expected_fields = {
@@ -647,7 +651,7 @@ def __list_studies(api_call, output_format="object") -> Union[Dict, pd.DataFrame
             "oml:creator": ("creator", int),
         }
         study_id = int(study_["oml:id"])
-        current_study = dict()
+        current_study = {}
         for oml_field_name, (real_field_name, cast_fn) in expected_fields.items():
             if oml_field_name in study_:
                 current_study[real_field_name] = cast_fn(study_[oml_field_name])

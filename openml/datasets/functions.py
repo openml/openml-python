@@ -1,32 +1,36 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-import io
 import logging
 import os
-from pyexpat import ExpatError
-from typing import List, Dict, Optional, Union, cast
 import warnings
+from collections import OrderedDict
+from typing import cast
 
+import arff
 import minio.error
 import numpy as np
-import arff
 import pandas as pd
 import urllib3
-
 import xmltodict
+from pyexpat import ExpatError
 from scipy.sparse import coo_matrix
-from collections import OrderedDict
 
-import openml.utils
 import openml._api_calls
-from .dataset import OpenMLDataset
-from ..exceptions import (
+import openml.utils
+from openml.exceptions import (
     OpenMLHashException,
+    OpenMLPrivateDatasetError,
     OpenMLServerError,
     OpenMLServerException,
-    OpenMLPrivateDatasetError,
 )
-from ..utils import _remove_cache_dir_for_id, _create_cache_directory_for_id, _get_cache_dir_for_id
+from openml.utils import (
+    _create_cache_directory_for_id,
+    _get_cache_dir_for_id,
+    _remove_cache_dir_for_id,
+)
+
+from .dataset import OpenMLDataset
 
 DATASETS_CACHE_DIR_NAME = "datasets"
 logger = logging.getLogger(__name__)
@@ -41,7 +45,7 @@ def _get_cache_directory(dataset: OpenMLDataset) -> str:
     return _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset.dataset_id)
 
 
-def list_qualities() -> List[str]:
+def list_qualities() -> list[str]:
     """Return list of data qualities available.
 
     The function performs an API call to retrieve the entire list of
@@ -59,19 +63,18 @@ def list_qualities() -> List[str]:
         raise ValueError("Error in return XML, does not contain " '"oml:data_qualities_list"')
     if not isinstance(qualities["oml:data_qualities_list"]["oml:quality"], list):
         raise TypeError("Error in return XML, does not contain " '"oml:quality" as a list')
-    qualities = qualities["oml:data_qualities_list"]["oml:quality"]
-    return qualities
+    return qualities["oml:data_qualities_list"]["oml:quality"]
 
 
 def list_datasets(
-    data_id: Optional[List[int]] = None,
-    offset: Optional[int] = None,
-    size: Optional[int] = None,
-    status: Optional[str] = None,
-    tag: Optional[str] = None,
+    data_id: list[int] | None = None,
+    offset: int | None = None,
+    size: int | None = None,
+    status: str | None = None,
+    tag: str | None = None,
     output_format: str = "dict",
     **kwargs,
-) -> Union[Dict, pd.DataFrame]:
+) -> dict | pd.DataFrame:
     """
     Return a list of all dataset which are on OpenML.
     Supports large amount of results.
@@ -126,7 +129,7 @@ def list_datasets(
     """
     if output_format not in ["dataframe", "dict"]:
         raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
+            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable.",
         )
 
     # TODO: [0.15]
@@ -150,7 +153,7 @@ def list_datasets(
     )
 
 
-def _list_datasets(data_id: Optional[List] = None, output_format="dict", **kwargs):
+def _list_datasets(data_id: list | None = None, output_format="dict", **kwargs):
     """
     Perform api call to return a list of all datasets.
 
@@ -176,12 +179,11 @@ def _list_datasets(data_id: Optional[List] = None, output_format="dict", **kwarg
     -------
     datasets : dict of dicts, or dataframe
     """
-
     api_call = "data/list"
 
     if kwargs is not None:
         for operator, value in kwargs.items():
-            api_call += "/%s/%s" % (operator, value)
+            api_call += f"/{operator}/{value}"
     if data_id is not None:
         api_call += "/data_id/%s" % ",".join([str(int(i)) for i in data_id])
     return __list_datasets(api_call=api_call, output_format=output_format)
@@ -193,13 +195,13 @@ def __list_datasets(api_call, output_format="dict"):
 
     # Minimalistic check if the XML is useful
     assert isinstance(datasets_dict["oml:data"]["oml:dataset"], list), type(
-        datasets_dict["oml:data"]
+        datasets_dict["oml:data"],
     )
     assert datasets_dict["oml:data"]["@xmlns:oml"] == "http://openml.org/openml", datasets_dict[
         "oml:data"
     ]["@xmlns:oml"]
 
-    datasets = dict()
+    datasets = {}
     for dataset_ in datasets_dict["oml:data"]["oml:dataset"]:
         ignore_attribute = ["oml:file_id", "oml:quality"]
         dataset = {
@@ -209,7 +211,7 @@ def __list_datasets(api_call, output_format="dict"):
         dataset["version"] = int(dataset["version"])
 
         # The number of qualities can range from 0 to infinity
-        for quality in dataset_.get("oml:quality", list()):
+        for quality in dataset_.get("oml:quality", []):
             try:
                 dataset[quality["@name"]] = int(quality["#text"])
             except ValueError:
@@ -222,7 +224,7 @@ def __list_datasets(api_call, output_format="dict"):
     return datasets
 
 
-def _expand_parameter(parameter: Union[str, List[str]]) -> List[str]:
+def _expand_parameter(parameter: str | list[str]) -> list[str]:
     expanded_parameter = []
     if isinstance(parameter, str):
         expanded_parameter = [x.strip() for x in parameter.split(",")]
@@ -232,23 +234,23 @@ def _expand_parameter(parameter: Union[str, List[str]]) -> List[str]:
 
 
 def _validated_data_attributes(
-    attributes: List[str], data_attributes: List[str], parameter_name: str
+    attributes: list[str],
+    data_attributes: list[str],
+    parameter_name: str,
 ) -> None:
     for attribute_ in attributes:
-        is_attribute_a_data_attribute = any([attr[0] == attribute_ for attr in data_attributes])
+        is_attribute_a_data_attribute = any(attr[0] == attribute_ for attr in data_attributes)
         if not is_attribute_a_data_attribute:
             raise ValueError(
-                "all attribute of '{}' should be one of the data attribute. "
-                " Got '{}' while candidates are {}.".format(
-                    parameter_name, attribute_, [attr[0] for attr in data_attributes]
-                )
+                f"all attribute of '{parameter_name}' should be one of the data attribute. "
+                f" Got '{attribute_}' while candidates are {[attr[0] for attr in data_attributes]}.",
             )
 
 
 def check_datasets_active(
-    dataset_ids: List[int],
+    dataset_ids: list[int],
     raise_error_if_not_exist: bool = True,
-) -> Dict[int, bool]:
+) -> dict[int, bool]:
     """
     Check if the dataset ids provided are active.
 
@@ -278,7 +280,9 @@ def check_datasets_active(
 
 
 def _name_to_id(
-    dataset_name: str, version: Optional[int] = None, error_if_multiple: bool = False
+    dataset_name: str,
+    version: int | None = None,
+    error_if_multiple: bool = False,
 ) -> int:
     """Attempt to find the dataset id of the dataset with the given name.
 
@@ -309,7 +313,10 @@ def _name_to_id(
     candidates = cast(
         pd.DataFrame,
         list_datasets(
-            data_name=dataset_name, status=status, data_version=version, output_format="dataframe"
+            data_name=dataset_name,
+            status=status,
+            data_version=version,
+            output_format="dataframe",
         ),
     )
     if error_if_multiple and len(candidates) > 1:
@@ -325,8 +332,10 @@ def _name_to_id(
 
 
 def get_datasets(
-    dataset_ids: List[Union[str, int]], download_data: bool = True, download_qualities: bool = True
-) -> List[OpenMLDataset]:
+    dataset_ids: list[str | int],
+    download_data: bool = True,
+    download_qualities: bool = True,
+) -> list[OpenMLDataset]:
     """Download datasets.
 
     This function iterates :meth:`openml.datasets.get_dataset`.
@@ -352,20 +361,20 @@ def get_datasets(
     datasets = []
     for dataset_id in dataset_ids:
         datasets.append(
-            get_dataset(dataset_id, download_data, download_qualities=download_qualities)
+            get_dataset(dataset_id, download_data, download_qualities=download_qualities),
         )
     return datasets
 
 
 @openml.utils.thread_safe_if_oslo_installed
 def get_dataset(
-    dataset_id: Union[int, str],
-    download_data: Optional[bool] = None,  # Optional for deprecation warning; later again only bool
-    version: Optional[int] = None,
+    dataset_id: int | str,
+    download_data: bool | None = None,  # Optional for deprecation warning; later again only bool
+    version: int | None = None,
     error_if_multiple: bool = False,
     cache_format: str = "pickle",
-    download_qualities: Optional[bool] = None,  # Same as above
-    download_features_meta_data: Optional[bool] = None,  # Same as above
+    download_qualities: bool | None = None,  # Same as above
+    download_features_meta_data: bool | None = None,  # Same as above
     download_all_files: bool = False,
     force_refresh_cache: bool = False,
 ) -> OpenMLDataset:
@@ -454,13 +463,13 @@ def get_dataset(
 
     if download_all_files:
         warnings.warn(
-            "``download_all_files`` is experimental and is likely to break with new releases."
+            "``download_all_files`` is experimental and is likely to break with new releases.",
         )
 
     if cache_format not in ["feather", "pickle"]:
         raise ValueError(
             "cache_format must be one of 'feather' or 'pickle. "
-            "Invalid format specified: {}".format(cache_format)
+            f"Invalid format specified: {cache_format}",
         )
 
     if isinstance(dataset_id, str):
@@ -470,7 +479,7 @@ def get_dataset(
             dataset_id = _name_to_id(dataset_id, version, error_if_multiple)  # type: ignore
     elif not isinstance(dataset_id, int):
         raise TypeError(
-            "`dataset_id` must be one of `str` or `int`, not {}.".format(type(dataset_id))
+            f"`dataset_id` must be one of `str` or `int`, not {type(dataset_id)}.",
         )
 
     if force_refresh_cache:
@@ -498,7 +507,8 @@ def get_dataset(
         if "oml:parquet_url" in description and download_data:
             try:
                 parquet_file = _get_dataset_parquet(
-                    description, download_all_files=download_all_files
+                    description,
+                    download_all_files=download_all_files,
                 )
             except urllib3.exceptions.MaxRetryError:
                 parquet_file = None
@@ -518,10 +528,14 @@ def get_dataset(
         if remove_dataset_cache:
             _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, did_cache_dir)
 
-    dataset = _create_dataset_from_description(
-        description, features_file, qualities_file, arff_file, parquet_file, cache_format
+    return _create_dataset_from_description(
+        description,
+        features_file,
+        qualities_file,
+        arff_file,
+        parquet_file,
+        cache_format,
     )
-    return dataset
 
 
 def attributes_arff_from_df(df):
@@ -540,7 +554,7 @@ def attributes_arff_from_df(df):
     PD_DTYPES_TO_ARFF_DTYPE = {"integer": "INTEGER", "floating": "REAL", "string": "STRING"}
     attributes_arff = []
 
-    if not all([isinstance(column_name, str) for column_name in df.columns]):
+    if not all(isinstance(column_name, str) for column_name in df.columns):
         logger.warning("Converting non-str column names to str.")
         df.columns = [str(column_name) for column_name in df.columns]
 
@@ -557,24 +571,24 @@ def attributes_arff_from_df(df):
             categories_dtype = pd.api.types.infer_dtype(categories)
             if categories_dtype not in ("string", "unicode"):
                 raise ValueError(
-                    "The column '{}' of the dataframe is of "
+                    f"The column '{column_name}' of the dataframe is of "
                     "'category' dtype. Therefore, all values in "
                     "this columns should be string. Please "
                     "convert the entries which are not string. "
-                    "Got {} dtype in this column.".format(column_name, categories_dtype)
+                    f"Got {categories_dtype} dtype in this column.",
                 )
             attributes_arff.append((column_name, categories.tolist()))
         elif column_dtype == "boolean":
             # boolean are encoded as categorical.
             attributes_arff.append((column_name, ["True", "False"]))
-        elif column_dtype in PD_DTYPES_TO_ARFF_DTYPE.keys():
+        elif column_dtype in PD_DTYPES_TO_ARFF_DTYPE:
             attributes_arff.append((column_name, PD_DTYPES_TO_ARFF_DTYPE[column_dtype]))
         else:
             raise ValueError(
-                "The dtype '{}' of the column '{}' is not "
+                f"The dtype '{column_dtype}' of the column '{column_name}' is not "
                 "currently supported by liac-arff. Supported "
                 "dtypes are categorical, string, integer, "
-                "floating, and boolean.".format(column_dtype, column_name)
+                "floating, and boolean.",
             )
     return attributes_arff
 
@@ -663,8 +677,8 @@ def create_dataset(
     Returns
     -------
     class:`openml.OpenMLDataset`
-        Dataset description."""
-
+    Dataset description.
+    """
     if isinstance(data, pd.DataFrame):
         # infer the row id from the index of the dataset
         if row_id_attribute is None:
@@ -678,7 +692,7 @@ def create_dataset(
         if not hasattr(data, "columns"):
             raise ValueError(
                 "Automatically inferring attributes requires "
-                "a pandas DataFrame. A {!r} was given instead.".format(data)
+                f"a pandas DataFrame. A {data!r} was given instead.",
             )
         # infer the type of data for each column of the DataFrame
         attributes_ = attributes_arff_from_df(data)
@@ -686,7 +700,7 @@ def create_dataset(
             # override the attributes which was specified by the user
             for attr_idx in range(len(attributes_)):
                 attr_name = attributes_[attr_idx][0]
-                if attr_name in attributes.keys():
+                if attr_name in attributes:
                     attributes_[attr_idx] = (attr_name, attributes[attr_name])
     else:
         attributes_ = attributes
@@ -697,13 +711,14 @@ def create_dataset(
     _validated_data_attributes(default_target_attributes, attributes_, "default_target_attribute")
 
     if row_id_attribute is not None:
-        is_row_id_an_attribute = any([attr[0] == row_id_attribute for attr in attributes_])
+        is_row_id_an_attribute = any(attr[0] == row_id_attribute for attr in attributes_)
         if not is_row_id_an_attribute:
             raise ValueError(
                 "'row_id_attribute' should be one of the data attribute. "
                 " Got '{}' while candidates are {}.".format(
-                    row_id_attribute, [attr[0] for attr in attributes_]
-                )
+                    row_id_attribute,
+                    [attr[0] for attr in attributes_],
+                ),
             )
 
     if hasattr(data, "columns"):
@@ -727,7 +742,7 @@ def create_dataset(
                 "When giving a list or a numpy.ndarray, "
                 "they should contain a list/ numpy.ndarray "
                 "for dense data or a dictionary for sparse "
-                "data. Got {!r} instead.".format(data[0])
+                f"data. Got {data[0]!r} instead.",
             )
     elif isinstance(data, coo_matrix):
         data_format = "sparse_arff"
@@ -736,7 +751,7 @@ def create_dataset(
             "When giving a list or a numpy.ndarray, "
             "they should contain a list/ numpy.ndarray "
             "for dense data or a dictionary for sparse "
-            "data. Got {!r} instead.".format(data[0])
+            f"data. Got {data[0]!r} instead.",
         )
 
     arff_object = {
@@ -756,7 +771,7 @@ def create_dataset(
     except arff.ArffException:
         raise ValueError(
             "The arguments you have provided \
-                             do not construct a valid ARFF file"
+                             do not construct a valid ARFF file",
         )
 
     return OpenMLDataset(
@@ -879,7 +894,7 @@ def edit_dataset(
     Dataset id
     """
     if not isinstance(data_id, int):
-        raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
+        raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
 
     # compose data edit parameters as xml
     form_data = {"data_id": data_id}  # type: openml._api_calls.DATA_TYPE
@@ -904,10 +919,13 @@ def edit_dataset(
             del xml["oml:data_edit_parameters"][k]
 
     file_elements = {
-        "edit_parameters": ("description.xml", xmltodict.unparse(xml))
+        "edit_parameters": ("description.xml", xmltodict.unparse(xml)),
     }  # type: openml._api_calls.FILE_ELEMENTS_TYPE
     result_xml = openml._api_calls._perform_api_call(
-        "data/edit", "post", data=form_data, file_elements=file_elements
+        "data/edit",
+        "post",
+        data=form_data,
+        file_elements=file_elements,
     )
     result = xmltodict.parse(result_xml)
     data_id = result["oml:data_edit"]["oml:id"]
@@ -944,7 +962,7 @@ def fork_dataset(data_id: int) -> int:
 
     """
     if not isinstance(data_id, int):
-        raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
+        raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
     # compose data fork parameters
     form_data = {"data_id": data_id}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call("data/fork", "post", data=form_data)
@@ -957,6 +975,7 @@ def _topic_add_dataset(data_id: int, topic: str):
     """
     Adds a topic for a dataset.
     This API is not available for all OpenML users and is accessible only by admins.
+
     Parameters
     ----------
     data_id : int
@@ -965,7 +984,7 @@ def _topic_add_dataset(data_id: int, topic: str):
         Topic to be added for the dataset
     """
     if not isinstance(data_id, int):
-        raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
+        raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
     form_data = {"data_id": data_id, "topic": topic}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call("data/topicadd", "post", data=form_data)
     result = xmltodict.parse(result_xml)
@@ -977,6 +996,7 @@ def _topic_delete_dataset(data_id: int, topic: str):
     """
     Removes a topic from a dataset.
     This API is not available for all OpenML users and is accessible only by admins.
+
     Parameters
     ----------
     data_id : int
@@ -986,7 +1006,7 @@ def _topic_delete_dataset(data_id: int, topic: str):
 
     """
     if not isinstance(data_id, int):
-        raise TypeError("`data_id` must be of type `int`, not {}.".format(type(data_id)))
+        raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
     form_data = {"data_id": data_id, "topic": topic}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call("data/topicdelete", "post", data=form_data)
     result = xmltodict.parse(result_xml)
@@ -1013,35 +1033,34 @@ def _get_dataset_description(did_cache_dir, dataset_id):
         XML Dataset description parsed to a dict.
 
     """
-
     # TODO implement a cache for this that invalidates itself after some time
     # This can be saved on disk, but cannot be cached properly, because
     # it contains the information on whether a dataset is active.
     description_file = os.path.join(did_cache_dir, "description.xml")
 
     try:
-        with io.open(description_file, encoding="utf8") as fh:
+        with open(description_file, encoding="utf8") as fh:
             dataset_xml = fh.read()
         description = xmltodict.parse(dataset_xml)["oml:data_set_description"]
     except Exception:
-        url_extension = "data/{}".format(dataset_id)
+        url_extension = f"data/{dataset_id}"
         dataset_xml = openml._api_calls._perform_api_call(url_extension, "get")
         try:
             description = xmltodict.parse(dataset_xml)["oml:data_set_description"]
         except ExpatError as e:
             url = openml._api_calls._create_url_from_endpoint(url_extension)
             raise OpenMLServerError(f"Dataset description XML at '{url}' is malformed.") from e
-        with io.open(description_file, "w", encoding="utf8") as fh:
+        with open(description_file, "w", encoding="utf8") as fh:
             fh.write(dataset_xml)
 
     return description
 
 
 def _get_dataset_parquet(
-    description: Union[Dict, OpenMLDataset],
-    cache_directory: Optional[str] = None,
+    description: dict | OpenMLDataset,
+    cache_directory: str | None = None,
     download_all_files: bool = False,
-) -> Optional[str]:
+) -> str | None:
     """Return the path to the local parquet file of the dataset. If is not cached, it is downloaded.
 
     Checks if the file is in the cache, if yes, return the path to the file.
@@ -1098,16 +1117,18 @@ def _get_dataset_parquet(
     if not os.path.isfile(output_file_path):
         try:
             openml._api_calls._download_minio_file(
-                source=cast(str, url), destination=output_file_path
+                source=cast(str, url),
+                destination=output_file_path,
             )
         except (FileNotFoundError, urllib3.exceptions.MaxRetryError, minio.error.ServerError) as e:
-            logger.warning("Could not download file from %s: %s" % (cast(str, url), e))
+            logger.warning(f"Could not download file from {cast(str, url)}: {e}")
             return None
     return output_file_path
 
 
 def _get_dataset_arff(
-    description: Union[Dict, OpenMLDataset], cache_directory: Optional[str] = None
+    description: dict | OpenMLDataset,
+    cache_directory: str | None = None,
 ) -> str:
     """Return the path to the local arff file of the dataset. If is not cached, it is downloaded.
 
@@ -1148,10 +1169,12 @@ def _get_dataset_arff(
 
     try:
         openml._api_calls._download_text_file(
-            source=url, output_path=output_file_path, md5_checksum=md5_checksum_fixture
+            source=url,
+            output_path=output_file_path,
+            md5_checksum=md5_checksum_fixture,
         )
     except OpenMLHashException as e:
-        additional_info = " Raised when downloading dataset {}.".format(did)
+        additional_info = f" Raised when downloading dataset {did}."
         e.args = (e.args[0] + additional_info,)
         raise
 
@@ -1163,7 +1186,7 @@ def _get_features_xml(dataset_id):
     return openml._api_calls._perform_api_call(url_extension, "get")
 
 
-def _get_dataset_features_file(did_cache_dir: Union[str, None], dataset_id: int) -> str:
+def _get_dataset_features_file(did_cache_dir: str | None, dataset_id: int) -> str:
     """API call to load dataset features. Loads from cache or downloads them.
 
     Features are feature descriptions for each column.
@@ -1184,7 +1207,6 @@ def _get_dataset_features_file(did_cache_dir: Union[str, None], dataset_id: int)
     str
         Path of the cached dataset feature file
     """
-
     if did_cache_dir is None:
         did_cache_dir = _create_cache_directory_for_id(
             DATASETS_CACHE_DIR_NAME,
@@ -1196,7 +1218,7 @@ def _get_dataset_features_file(did_cache_dir: Union[str, None], dataset_id: int)
     # Dataset features aren't subject to change...
     if not os.path.isfile(features_file):
         features_xml = _get_features_xml(dataset_id)
-        with io.open(features_file, "w", encoding="utf8") as fh:
+        with open(features_file, "w", encoding="utf8") as fh:
             fh.write(features_xml)
 
     return features_file
@@ -1208,8 +1230,9 @@ def _get_qualities_xml(dataset_id):
 
 
 def _get_dataset_qualities_file(
-    did_cache_dir: Union[str, None], dataset_id: int
-) -> Union[str, None]:
+    did_cache_dir: str | None,
+    dataset_id: int,
+) -> str | None:
     """API call to load dataset qualities. Loads from cache or downloads them.
 
     Features are metafeatures (number of features, number of classes, ...)
@@ -1226,6 +1249,7 @@ def _get_dataset_qualities_file(
 
     download_qualities : bool
         wheather to download/use cahsed version or not.
+
     Returns
     -------
     str
@@ -1240,17 +1264,17 @@ def _get_dataset_qualities_file(
     # Dataset qualities are subject to change and must be fetched every time
     qualities_file = os.path.join(did_cache_dir, "qualities.xml")
     try:
-        with io.open(qualities_file, encoding="utf8") as fh:
+        with open(qualities_file, encoding="utf8") as fh:
             qualities_xml = fh.read()
-    except (OSError, IOError):
+    except OSError:
         try:
             qualities_xml = _get_qualities_xml(dataset_id)
-            with io.open(qualities_file, "w", encoding="utf8") as fh:
+            with open(qualities_file, "w", encoding="utf8") as fh:
                 fh.write(qualities_xml)
         except OpenMLServerException as e:
             if e.code == 362 and str(e) == "No qualities found - None":
                 # quality file stays as None
-                logger.warning("No qualities found for dataset {}".format(dataset_id))
+                logger.warning(f"No qualities found for dataset {dataset_id}")
                 return None
             else:
                 raise
@@ -1259,11 +1283,11 @@ def _get_dataset_qualities_file(
 
 
 def _create_dataset_from_description(
-    description: Dict[str, str],
-    features_file: Optional[str] = None,
-    qualities_file: Optional[str] = None,
-    arff_file: Optional[str] = None,
-    parquet_file: Optional[str] = None,
+    description: dict[str, str],
+    features_file: str | None = None,
+    qualities_file: str | None = None,
+    arff_file: str | None = None,
+    parquet_file: str | None = None,
     cache_format: str = "pickle",
 ) -> OpenMLDataset:
     """Create a dataset object from a description dict.
