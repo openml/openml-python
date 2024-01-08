@@ -193,17 +193,18 @@ def _download_minio_bucket(source: str, destination: str | Path) -> None:
     parsed_url = urllib.parse.urlparse(source)
 
     # expect path format: /BUCKET/path/to/file.ext
-    bucket = parsed_url.path[1:]
+    _, bucket, *prefixes, _file = parsed_url.path.split("/")
+    prefix = "/".join(prefixes)
 
     client = minio.Minio(endpoint=parsed_url.netloc, secure=False)
 
-    for file_object in client.list_objects(bucket, recursive=True):
+    for file_object in client.list_objects(bucket, prefix=prefix, recursive=True):
         if file_object.object_name is None:
             raise ValueError("Object name is None.")
 
         _download_minio_file(
-            source=source + "/" + file_object.object_name,
-            destination=Path(destination, file_object.object_name),
+            source=source.rsplit("/", 1)[0] + "/" + file_object.object_name.rsplit("/", 1)[1],
+            destination=Path(destination, file_object.object_name.rsplit("/", 1)[1]),
             exists_ok=True,
         )
 

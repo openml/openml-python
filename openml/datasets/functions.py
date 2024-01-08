@@ -1211,9 +1211,6 @@ def _get_dataset_parquet(
     # For now, it would be the only way for the user to fetch the additional
     # files in the bucket (no function exists on an OpenMLDataset to do this).
     if download_all_files:
-        if url.endswith(".pq"):
-            url, _ = url.rsplit("/", maxsplit=1)
-
         openml._api_calls._download_minio_bucket(source=url, destination=cache_directory)
 
     if not output_file_path.is_file():
