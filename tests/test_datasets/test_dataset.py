@@ -317,7 +317,7 @@ class OpenMLDatasetTestOnTestServer(TestBase):
 
     def test_tagging(self):
         # tags can be at most 64 alphanumeric (+ underscore) chars
-        unique_indicator = time().replace('.', '')
+        unique_indicator = str(time()).replace('.', '')
         tag = f"test_tag_OpenMLDatasetTestOnTestServer_{unique_indicator}"
         datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
         assert datasets.empty
@@ -328,23 +328,6 @@ class OpenMLDatasetTestOnTestServer(TestBase):
         self.dataset.remove_tag(tag)
         datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
         assert datasets.empty
-
-    def test_illegal_character_tag(self):
-        tag = "illegal_tag&"
-        try:
-            self.dataset.push_tag(tag)
-            assert False
-        except openml.exceptions.OpenMLServerException as e:
-            assert e.code == 477
-
-    def test_illegal_length_tag(self):
-        tag = "a" * 65
-        try:
-            self.dataset.push_tag(tag)
-            assert False
-        except openml.exceptions.OpenMLServerException as e:
-            assert e.code == 477
-
 
 class OpenMLDatasetTestSparse(TestBase):
     _multiprocess_can_split_ = True

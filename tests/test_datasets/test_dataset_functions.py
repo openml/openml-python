@@ -150,6 +150,25 @@ class TestOpenMLDataset(TestBase):
         )
         openml.config.server = self.test_server
 
+
+    def test_illegal_character_tag(self):
+        dataset = openml.datasets.get_dataset(1)
+        tag = "illegal_tag&"
+        try:
+            self.dataset.push_tag(tag)
+            assert False
+        except openml.exceptions.OpenMLServerException as e:
+            assert e.code == 477
+
+    def test_illegal_length_tag(self):
+        dataset = openml.datasets.get_dataset(1)
+        tag = "a" * 65
+        try:
+            self.dataset.push_tag(tag)
+            assert False
+        except openml.exceptions.OpenMLServerException as e:
+            assert e.code == 477
+
     def _datasets_retrieved_successfully(self, dids, metadata_only=True):
         """Checks that all files for the given dids have been downloaded.
 
