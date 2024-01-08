@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any, Callable, Mapping, TypeVar
 from typing_extensions import Literal, ParamSpec
 
 import pandas as pd
+import numpy as np 
 import xmltodict
 
 import openml
@@ -25,18 +26,6 @@ if TYPE_CHECKING:
 
     P = ParamSpec("P")
     R = TypeVar("R")
-
-oslo_installed = False
-try:
-    # Currently, importing oslo raises a lot of warning that it will stop working
-    # under python3.8; remove this once they disappear
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        from oslo_concurrency import lockutils
-
-        oslo_installed = True
-except ImportError:
-    pass
 
 
 def extract_xml_tags(
@@ -97,10 +86,16 @@ def _get_rest_api_type_alias(oml_object: OpenMLBase) -> str:
 
 def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool = False) -> None:  # noqa: FBT001, FBT002
     api_type_alias = _get_rest_api_type_alias(oml_object)
-    _tag_entity(api_type_alias, oml_object.id, tag, untag=untag)
+    if oml_object.id is None:
+        raise openml.exceptions.ObjectNotPublishedError(
+            f"Cannot tag an {api_type_alias} that has not been published yet."
+            "Please publish the object first before being able to tag it."
+            f"\n{oml_object}",
+        )
+    _tag_entity(entity_type=api_type_alias, entity_id=oml_object.id, tag=tag, untag=untag)
 
 
-def _tag_entity(entity_type, entity_id, tag, *, untag: bool = False) -> list[str]:
+def _tag_entity(entity_type: str, entity_id: int, tag: str, *, untag: bool = False) -> list[str]:
     """
     Function that tags or untags a given entity on OpenML. As the OpenML
     API tag functions all consist of the same format, this function covers
@@ -142,7 +137,7 @@ def _tag_entity(entity_type, entity_id, tag, *, untag: bool = False) -> list[str
     result = xmltodict.parse(result_xml, force_list={"oml:tag"})[main_tag]
 
     if "oml:tag" in result:
-        return result["oml:tag"]
+        return result["oml:tag"]  # type: ignore
 
     # no tags, return empty list
     return []
@@ -271,8 +266,8 @@ def _list_all(  # noqa: C901, PLR0912
 
     # max number of results to be shown
     LIMIT = active_filters.pop("size", None)
-    if LIMIT is not None and not isinstance(LIMIT, int):
-        raise ValueError(f"'limit' should be an integer but got {LIMIT}")
+    if LIMIT is None or not isinstance(LIMIT, int) or not np.isinf(LIMIT):
+        raise ValueError(f"'limit' should be an integer or inf but got {LIMIT}")
 
     if LIMIT is not None and BATCH_SIZE_ORIG > LIMIT:
         BATCH_SIZE_ORIG = LIMIT
@@ -288,7 +283,7 @@ def _list_all(  # noqa: C901, PLR0912
             new_batch = listing_call(
                 *args,
                 output_format=output_format,  # type: ignore
-                **{**active_filters, "limit": batch_size, "offset": current_offset},
+                **{**active_filters, "limit": batch_size, "offset": current_offset},  # type: ignore
             )
         except openml.exceptions.OpenMLServerNoResult:
             # we want to return an empty dict in this case
@@ -326,7 +321,7 @@ def _get_cache_dir_for_key(key: str) -> Path:
     return Path(config.get_cache_directory()) / key
 
 
-def _create_cache_directory(key):
+def _create_cache_directory(key: str) -> Path:
     cache_dir = _get_cache_dir_for_key(key)
 
     try:
@@ -393,7 +388,12 @@ def _remove_cache_dir_for_id(key: str, cache_dir: Path) -> None:
 
 
 def thread_safe_if_oslo_installed(func):
-    if oslo_installed:
+    try:
+        # Currently, importing oslo raises a lot of warning that it will stop working
+        # under python3.8; remove this once they disappear
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            from oslo_concurrency import lockutils
 
         @wraps(func)
         def safe_func(*args, **kwargs):
@@ -413,8 +413,8 @@ def thread_safe_if_oslo_installed(func):
                 return func(*args, **kwargs)
 
         return safe_func
-
-    return func
+    except ImportError:
+        return func
 
 
 def _create_lockfiles_dir() -> Path:
