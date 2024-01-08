@@ -27,7 +27,7 @@ class _Config(TypedDict):
     cachedir: Path
     avoid_duplicate_runs: bool
     retry_policy: Literal["human", "robot"]
-    connection_n_retries: int | None
+    connection_n_retries: int
 
 
 def _create_log_handlers(create_file_handler: bool = True) -> None:  # noqa: FBT001, FBT002
