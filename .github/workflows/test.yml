@@ -8,43 +8,43 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.7, 3.8]
-        scikit-learn: [0.21.2, 0.22.2, 0.23.1, 0.24]
+        python-version: ["3.7", "3.8"]
+        scikit-learn: ["0.21.2", "0.22.2", "0.23.1", "0.24"]
         os: [ubuntu-latest]
         sklearn-only: ['true']
         exclude:  # no scikit-learn 0.21.2 release for Python 3.8
           - python-version: 3.8
             scikit-learn: 0.21.2
         include:
-          - python-version: 3.6
-            scikit-learn: 0.18.2
-            scipy: 1.2.0
-            os: ubuntu-20.04 
-            sklearn-only: 'true'
-          - python-version: 3.6
-            scikit-learn: 0.19.2
-            os: ubuntu-20.04 
-            sklearn-only: 'true'
-          - python-version: 3.6
-            scikit-learn: 0.20.2
-            os: ubuntu-20.04 
-            sklearn-only: 'true'
-          - python-version: 3.6
-            scikit-learn: 0.21.2
-            os: ubuntu-20.04 
-            sklearn-only: 'true'
-          - python-version: 3.6
-            scikit-learn: 0.22.2
-            os: ubuntu-20.04 
-            sklearn-only: 'true'
-          - python-version: 3.6
-            scikit-learn: 0.23.1
-            os: ubuntu-20.04 
-            sklearn-only: 'true'
-          - python-version: 3.6
-            scikit-learn: 0.24
-            os: ubuntu-20.04 
-            sklearn-only: 'true'
+          #- python-version: 3.6
+            #scikit-learn: 0.18.2
+            #scipy: 1.2.0
+            #os: ubuntu-20.04 
+            #sklearn-only: 'true'
+          #- python-version: 3.6
+            #scikit-learn: 0.19.2
+            #os: ubuntu-20.04 
+            #sklearn-only: 'true'
+          #- python-version: 3.6
+            #scikit-learn: 0.20.2
+            #os: ubuntu-20.04 
+            #sklearn-only: 'true'
+          #- python-version: 3.6
+            #scikit-learn: 0.21.2
+            #os: ubuntu-20.04 
+            #sklearn-only: 'true'
+          #- python-version: 3.6
+            #scikit-learn: 0.22.2
+            #os: ubuntu-20.04 
+            #sklearn-only: 'true'
+          #- python-version: 3.6
+            #scikit-learn: 0.23.1
+            #os: ubuntu-20.04 
+            #sklearn-only: 'true'
+          #- python-version: 3.6
+            #scikit-learn: 0.24
+            #os: ubuntu-20.04 
+            #sklearn-only: 'true'
           - python-version: 3.8
             scikit-learn: 0.23.1
             code-cov: true
