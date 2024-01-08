@@ -150,12 +150,11 @@ class TestOpenMLDataset(TestBase):
         )
         openml.config.server = self.test_server
 
-
     def test_illegal_character_tag(self):
         dataset = openml.datasets.get_dataset(1)
         tag = "illegal_tag&"
         try:
-            self.dataset.push_tag(tag)
+            dataset.push_tag(tag)
             assert False
         except openml.exceptions.OpenMLServerException as e:
             assert e.code == 477
@@ -164,7 +163,7 @@ class TestOpenMLDataset(TestBase):
         dataset = openml.datasets.get_dataset(1)
         tag = "a" * 65
         try:
-            self.dataset.push_tag(tag)
+            dataset.push_tag(tag)
             assert False
         except openml.exceptions.OpenMLServerException as e:
             assert e.code == 477
