@@ -21,7 +21,7 @@ console_handler: logging.StreamHandler | None = None
 file_handler: logging.handlers.RotatingFileHandler | None = None
 
 
-def _create_log_handlers(*, create_file_handler: bool = True) -> None:
+def _create_log_handlers(create_file_handler: bool = True) -> None:  # noqa: FBT
     """Creates but does not attach the log handlers."""
     global console_handler, file_handler  # noqa: PLW0603
     if console_handler is not None or file_handler is not None:
