@@ -96,7 +96,7 @@ class TestBase(unittest.TestCase):
         self.workdir = workdir / tmp_dir_name
         shutil.rmtree(self.workdir, ignore_errors=True)
 
-        self.workdir.mkdir(parents=True, exist_ok=True)
+        self.workdir.mkdir(exist_ok=True)
         os.chdir(self.workdir)
 
         self.cached = True
