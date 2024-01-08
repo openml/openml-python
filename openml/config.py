@@ -262,7 +262,7 @@ def _setup(config: dict[str, str | int | bool] | None = None) -> None:
     # create the cache subdirectory
     if not _root_cache_directory.exists():
         try:
-            _root_cache_directory.mkdir(exist_ok=True)
+            _root_cache_directory.mkdir(exist_ok=True, parents=True)
         except PermissionError:
             openml_logger.warning(
                 "No permission to create openml cache directory at %s! This can result in "
