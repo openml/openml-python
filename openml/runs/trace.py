@@ -5,7 +5,7 @@ import json
 from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import IO, Any, Iterator
 from typing_extensions import Self
 
 import arff
@@ -63,7 +63,7 @@ class OpenMLTraceIteration:
     evaluation: float
     selected: bool
 
-    setup_string: str | None = None
+    setup_string: dict[str, str] | None = None
     parameters: dict[str, str | int | float] | None = None
 
     def __post_init__(self) -> None:
@@ -86,22 +86,15 @@ class OpenMLTraceIteration:
 
     def get_parameters(self) -> dict[str, Any]:
         """Get the parameters of this trace iteration."""
-        result = {}
         # parameters have prefix 'parameter_'
-
         if self.setup_string:
-            for param in self.setup_string:
-                key = param[len(PREFIX) :]
-                # TODO(eddiebergman): I have no idea how this is working
-                # or if it even does.
-                # Remove the type ignore below
-                value = self.setup_string[param]  # type: ignore
-                result[key] = json.loads(value)
-        else:
-            assert self.parameters is not None
-            for param, value in self.parameters.items():
-                result[param[len(PREFIX) :]] = value
-        return result
+            return {
+                param[len(PREFIX) :]: json.loads(value)
+                for param, value in self.setup_string.items()
+            }
+
+        assert self.parameters is not None
+        return {param[len(PREFIX) :]: value for param, value in self.parameters.items()}
 
 
 class OpenMLRunTrace:
@@ -280,7 +273,7 @@ class OpenMLRunTrace:
             ],
         )
 
-        arff_dict = OrderedDict()
+        arff_dict: dict[str, Any] = {}
         data = []
         for trace_iteration in self.trace_iterations.values():
             tmp_list = []
@@ -341,9 +334,9 @@ class OpenMLRunTrace:
         ----------
         cls : type
             The trace object to be created.
-        attributes : List[Tuple[str, str]]
+        attributes : list[tuple[str, str]]
             Attribute descriptions.
-        content : List[List[Union[int, float, str]]]
+        content : list[list[int | float | str]]]
             List of instances.
         error_message : str
             Error message to raise if `setup_string` is in `attributes`.
@@ -411,7 +404,7 @@ class OpenMLRunTrace:
         return cls(None, trace)
 
     @classmethod
-    def trace_from_xml(cls, xml: str | Path) -> OpenMLRunTrace:
+    def trace_from_xml(cls, xml: str | Path | IO) -> OpenMLRunTrace:
         """Generate trace from xml.
 
         Creates a trace file from the xml description.
@@ -428,6 +421,9 @@ class OpenMLRunTrace:
             Object containing the run id and a dict containing the trace
             iterations.
         """
+        if isinstance(xml, Path):
+            xml = str(xml.absolute())
+
         result_dict = xmltodict.parse(xml, force_list=("oml:trace_iteration",))["oml:trace"]
 
         run_id = result_dict["oml:run_id"]
@@ -489,20 +485,27 @@ class OpenMLRunTrace:
             If the parameters in the iterations of the traces being merged are not equal.
             If a key (repeat, fold, iteration) is encountered twice while merging the traces.
         """
-        merged_trace = OrderedDict()  # type: OrderedDict[Tuple[int, int, int], OpenMLTraceIteration]  # E501
+        merged_trace: dict[tuple[int, int, int], OpenMLTraceIteration] = {}
 
         previous_iteration = None
         for trace in traces:
             for iteration in trace:
                 key = (iteration.repeat, iteration.fold, iteration.iteration)
+
+                assert iteration.parameters is not None
+                param_keys = iteration.parameters.keys()
+
                 if previous_iteration is not None:
-                    if list(merged_trace[previous_iteration].parameters.keys()) != list(
-                        iteration.parameters.keys(),
-                    ):
+                    trace_itr = merged_trace[previous_iteration]
+
+                    assert trace_itr.parameters is not None
+                    trace_itr_keys = trace_itr.parameters.keys()
+
+                    if list(param_keys) != list(trace_itr_keys):
                         raise ValueError(
                             "Cannot merge traces because the parameters are not equal: "
                             "{} vs {}".format(
-                                list(merged_trace[previous_iteration].parameters.keys()),
+                                list(trace_itr.parameters.keys()),
                                 list(iteration.parameters.keys()),
                             ),
                         )
@@ -517,11 +520,11 @@ class OpenMLRunTrace:
 
         return cls(None, merged_trace)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "[Run id: {}, {} trace iterations]".format(
             -1 if self.run_id is None else self.run_id,
             len(self.trace_iterations),
         )
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[OpenMLTraceIteration]:
         yield from self.trace_iterations.values()
