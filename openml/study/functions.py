@@ -33,7 +33,7 @@ def get_suite(suite_id: int | str) -> OpenMLBenchmarkSuite:
 
 def get_study(
     study_id: int | str,
-    arg_for_backwards_compat: str | None = None,
+    arg_for_backwards_compat: str | None = None,  # noqa: ARG001
 ) -> OpenMLStudy:  # F401
     """
     Retrieves all relevant information of an OpenML study from the server.
@@ -59,12 +59,12 @@ def get_study(
             "It looks like you are running code from the OpenML100 paper. It still works, but lots "
             "of things have changed since then. Please use `get_suite('OpenML100')` instead."
         )
-        warnings.warn(message, DeprecationWarning)
+        warnings.warn(message, DeprecationWarning, stacklevel=2)
         openml.config.logger.warning(message)
         study = _get_study(study_id, entity_type="task")
         return cast(OpenMLBenchmarkSuite, study)  # type: ignore
-    else:
-        return cast(OpenMLStudy, _get_study(study_id, entity_type="run"))
+
+    return cast(OpenMLStudy, _get_study(study_id, entity_type="run"))
 
 
 def _get_study(id_: int | str, entity_type) -> BaseStudy:
@@ -501,7 +501,7 @@ def list_suites(
     )
 
 
-def list_studies(
+def list_studies(  # noqa: PLR0913
     offset: int | None = None,
     size: int | None = None,
     status: str | None = None,

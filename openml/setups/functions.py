@@ -128,7 +128,7 @@ def get_setup(setup_id):
     return _create_setup_from_xml(result_dict, output_format="object")
 
 
-def list_setups(
+def list_setups(  # noqa: PLR0913
     offset: int | None = None,
     size: int | None = None,
     flow: int | None = None,
@@ -226,12 +226,14 @@ def __list_setups(api_call, output_format="object"):
         raise ValueError(
             'Error in return XML, does not contain "oml:setups":' " %s" % str(setups_dict),
         )
-    elif "@xmlns:oml" not in setups_dict["oml:setups"]:
+
+    if "@xmlns:oml" not in setups_dict["oml:setups"]:
         raise ValueError(
             "Error in return XML, does not contain "
             '"oml:setups"/@xmlns:oml: %s' % str(setups_dict),
         )
-    elif setups_dict["oml:setups"]["@xmlns:oml"] != openml_uri:
+
+    if setups_dict["oml:setups"]["@xmlns:oml"] != openml_uri:
         raise ValueError(
             "Error in return XML, value of  "
             '"oml:seyups"/@xmlns:oml is not '
@@ -326,15 +328,15 @@ def _create_setup_from_xml(result_dict, output_format="object"):
         # basically all others
         xml_parameters = result_dict["oml:setup_parameters"]["oml:parameter"]
         if isinstance(xml_parameters, dict):
-            id = int(xml_parameters["oml:id"])
-            parameters[id] = _create_setup_parameter_from_xml(
+            oml_id = int(xml_parameters["oml:id"])
+            parameters[oml_id] = _create_setup_parameter_from_xml(
                 result_dict=xml_parameters,
                 output_format=output_format,
             )
         elif isinstance(xml_parameters, list):
             for xml_parameter in xml_parameters:
-                id = int(xml_parameter["oml:id"])
-                parameters[id] = _create_setup_parameter_from_xml(
+                oml_id = int(xml_parameter["oml:id"])
+                parameters[oml_id] = _create_setup_parameter_from_xml(
                     result_dict=xml_parameter,
                     output_format=output_format,
                 )
@@ -364,14 +366,14 @@ def _create_setup_parameter_from_xml(result_dict, output_format="object"):
             default_value=result_dict["oml:default_value"],
             value=result_dict["oml:value"],
         )
-    else:
-        return {
-            "input_id": int(result_dict["oml:id"]),
-            "flow_id": int(result_dict["oml:flow_id"]),
-            "flow_name": result_dict["oml:flow_name"],
-            "full_name": result_dict["oml:full_name"],
-            "parameter_name": result_dict["oml:parameter_name"],
-            "data_type": result_dict["oml:data_type"],
-            "default_value": result_dict["oml:default_value"],
-            "value": result_dict["oml:value"],
-        }
+
+    return {
+        "input_id": int(result_dict["oml:id"]),
+        "flow_id": int(result_dict["oml:flow_id"]),
+        "flow_name": result_dict["oml:flow_name"],
+        "full_name": result_dict["oml:full_name"],
+        "parameter_name": result_dict["oml:parameter_name"],
+        "data_type": result_dict["oml:data_type"],
+        "default_value": result_dict["oml:default_value"],
+        "value": result_dict["oml:value"],
+    }

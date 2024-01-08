@@ -95,7 +95,7 @@ def _get_rest_api_type_alias(oml_object: OpenMLBase) -> str:
     return api_type_alias
 
 
-def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool = False) -> None:  # noqa: FBT
+def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool = False) -> None:  # noqa: FBT001, FBT002
     api_type_alias = _get_rest_api_type_alias(oml_object)
     _tag_entity(api_type_alias, oml_object.id, tag, untag=untag)
 
@@ -339,7 +339,7 @@ def _create_cache_directory(key):
     return cache_dir
 
 
-def _get_cache_dir_for_id(key: str, id_: int, create: bool = False) -> Path:  # noqa: FBT
+def _get_cache_dir_for_id(key: str, id_: int, create: bool = False) -> Path:  # noqa: FBT001, FBT002
     cache_dir = _create_cache_directory(key) if create else _get_cache_dir_for_key(key)
     return Path(cache_dir) / str(id_)
 

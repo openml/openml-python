@@ -56,7 +56,7 @@ class BaseStudy(OpenMLBase):
         a list of setup ids associated with this study
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         study_id: int | None,
         alias: str | None,
@@ -95,7 +95,8 @@ class BaseStudy(OpenMLBase):
         return "s"
 
     @property
-    def id(self) -> int | None:
+    def id(self) -> int | None:  # noqa: A003
+        """Return the id of the study."""
         return self.study_id
 
     def _get_repr_body_fields(self) -> list[tuple[str, str | int | list[str]]]:
@@ -170,9 +171,11 @@ class BaseStudy(OpenMLBase):
         return study_container
 
     def push_tag(self, tag: str):
+        """Add a tag to the study."""
         raise NotImplementedError("Tags for studies is not (yet) supported.")
 
     def remove_tag(self, tag: str):
+        """Remove a tag from the study."""
         raise NotImplementedError("Tags for studies is not (yet) supported.")
 
 
@@ -220,7 +223,7 @@ class OpenMLStudy(BaseStudy):
         a list of setup ids associated with this study
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         study_id: int | None,
         alias: str | None,
@@ -294,7 +297,7 @@ class OpenMLBenchmarkSuite(BaseStudy):
         a list of task ids associated with this study
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         suite_id: int | None,
         alias: str | None,

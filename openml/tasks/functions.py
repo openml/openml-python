@@ -71,7 +71,7 @@ def _get_cached_task(tid: int) -> OpenMLTask:
         openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
 
 
-def _get_estimation_procedure_list():
+def _get_estimation_procedure_list() -> list[dict[str, Any]]:
     """Return a list of all estimation procedures which are on OpenML.
 
     Returns
@@ -131,8 +131,8 @@ def list_tasks(
     offset: int | None = None,
     size: int | None = None,
     tag: str | None = None,
-    output_format: str = "dict",
-    **kwargs,
+    output_format: Literal["dict", "dataframe"] = "dict",
+    **kwargs: Any,
 ) -> dict | pd.DataFrame:
     """
     Return a number of tasks having the given tag and task_type
@@ -195,7 +195,7 @@ def list_tasks(
     )
 
 
-def _list_tasks(task_type=None, output_format="dict", **kwargs):
+def _list_tasks(task_type=None, output_format="dict", **kwargs) -> dict | pd.DataFrame:
     """
     Perform the api call to return a number of tasks having the given filters.
 
@@ -225,14 +225,14 @@ def _list_tasks(task_type=None, output_format="dict", **kwargs):
     if kwargs is not None:
         for operator, value in kwargs.items():
             if operator == "task_id":
-                value = ",".join([str(int(i)) for i in value])
+                value = ",".join([str(int(i)) for i in value])  # noqa: PLW2901
             api_call += f"/{operator}/{value}"
 
     return __list_tasks(api_call=api_call, output_format=output_format)
 
 
 # TODO(eddiebergman): overload todefine type returned
-def __list_tasks(
+def __list_tasks(  # noqa: PLR0912, C901
     api_call: str,
     output_format: Literal["dict", "dataframe"] = "dict",
 ) -> dict | pd.DataFrame:
@@ -375,7 +375,7 @@ def get_task(
     task_id: int,
     *dataset_args,
     download_splits: bool | None = None,
-    **get_dataset_kwargs,
+    **get_dataset_kwargs: Any,
 ) -> OpenMLTask:
     """Download OpenML task for a given task ID.
 
@@ -453,7 +453,7 @@ def get_task(
     return task
 
 
-def _get_task_description(task_id: int):
+def _get_task_description(task_id: int) -> OpenMLTask:
     try:
         return _get_cached_task(task_id)
     except OpenMLCacheException:
@@ -539,7 +539,7 @@ def _create_task_from_xml(xml: str) -> OpenMLTask:
     }.get(task_type)
     if cls is None:
         raise NotImplementedError("Task type %s not supported." % common_kwargs["task_type"])
-    return cls(**common_kwargs)
+    return cls(**common_kwargs)  # type: ignore
 
 
 # TODO(eddiebergman): overload on `task_type`
@@ -549,7 +549,7 @@ def create_task(
     estimation_procedure_id: int,
     target_name: str | None = None,
     evaluation_measure: str | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> (
     OpenMLClassificationTask | OpenMLRegressionTask | OpenMLLearningCurveTask | OpenMLClusteringTask
 ):
@@ -585,19 +585,20 @@ def create_task(
     OpenMLClassificationTask, OpenMLRegressionTask,
     OpenMLLearningCurveTask, OpenMLClusteringTask
     """
-    task_cls = {
-        TaskType.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
-        TaskType.SUPERVISED_REGRESSION: OpenMLRegressionTask,
-        TaskType.CLUSTERING: OpenMLClusteringTask,
-        TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
-    }.get(task_type)
-
-    if task_cls is None:
+    if task_type == TaskType.CLUSTERING:
+        task_cls = OpenMLClusteringTask
+    elif task_type == TaskType.LEARNING_CURVE:
+        task_cls = OpenMLLearningCurveTask  # type: ignore
+    elif task_type == TaskType.SUPERVISED_CLASSIFICATION:
+        task_cls = OpenMLClassificationTask  # type: ignore
+    elif task_type == TaskType.SUPERVISED_REGRESSION:
+        task_cls = OpenMLRegressionTask  # type: ignore
+    else:
         raise NotImplementedError(f"Task type {task_type:d} not supported.")
 
     return task_cls(
         task_type_id=task_type,
-        task_type=None,
+        task_type="None",  # TODO: refactor to get task type string from ID.
         data_set_id=dataset_id,
         target_name=target_name,
         estimation_procedure_id=estimation_procedure_id,

@@ -46,6 +46,7 @@ from .trace import OpenMLRunTrace
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
+    from openml.config import _Config
     from openml.extensions.extension_interface import Extension
 
 # get_dict is in run.py to avoid circular imports
@@ -694,7 +695,7 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
     sample_no: int,
     task: OpenMLTask,
     dataset_format: str,
-    configuration: dict | None = None,
+    configuration: _Config | None = None,
 ) -> tuple[
     np.ndarray,
     pd.DataFrame | None,
@@ -721,7 +722,7 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
         The task object from OpenML.
     dataset_format : str
         The dataset format to be used.
-    configuration : Dict
+    configuration : _Config
         Hyperparameters to configure the model.
 
     Returns

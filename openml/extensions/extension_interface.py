@@ -165,7 +165,7 @@ class Extension(ABC):
         fold_no: int,
         y_train: np.ndarray | None = None,
         X_test: np.ndarray | scipy.sparse.spmatrix | None = None,
-    ) -> tuple[np.ndarray, np.ndarray, OrderedDict[str, float], OpenMLRunTrace | None]:
+    ) -> tuple[np.ndarray, np.ndarray | None, OrderedDict[str, float], OpenMLRunTrace | None]:
         """Run a model on a repeat, fold, subsample triplet of the task.
 
         Returns the data that is necessary to construct the OpenML Run object. Is used by
