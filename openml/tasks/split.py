@@ -4,9 +4,10 @@ from __future__ import annotations
 import pickle
 from collections import OrderedDict
 from pathlib import Path
+from typing import Any
 from typing_extensions import NamedTuple
 
-import arff
+import arff  # type: ignore
 import numpy as np
 
 
@@ -35,16 +36,16 @@ class OpenMLSplit:
     ):
         self.description = description
         self.name = name
-        self.split = {}
+        self.split: dict[int, dict[int, dict[int, np.ndarray]]] = {}
 
         # Add splits according to repetition
         for repetition in split:
-            repetition = int(repetition)
-            self.split[repetition] = OrderedDict()
-            for fold in split[repetition]:
-                self.split[repetition][fold] = OrderedDict()
-                for sample in split[repetition][fold]:
-                    self.split[repetition][fold][sample] = split[repetition][fold][sample]
+            _rep = int(repetition)
+            self.split[_rep] = OrderedDict()
+            for fold in split[_rep]:
+                self.split[_rep][fold] = OrderedDict()
+                for sample in split[_rep][fold]:
+                    self.split[_rep][fold][sample] = split[_rep][fold][sample]
 
         self.repeats = len(self.split)
 
@@ -55,7 +56,7 @@ class OpenMLSplit:
         self.folds = len(self.split[0])
         self.samples = len(self.split[0][0])
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if (
             (not isinstance(self, type(other)))
             or self.name != other.name
@@ -102,7 +103,7 @@ class OpenMLSplit:
             if not filename.exists():
                 raise FileNotFoundError(f"Split arff {filename} does not exist!")
 
-            file_data = arff.load(open(filename), return_type=arff.DENSE_GEN)
+            file_data = arff.load(filename.open("r"), return_type=arff.DENSE_GEN)
             splits = file_data["data"]
             name = file_data["relation"]
             attrnames = [attr[0] for attr in file_data["attributes"]]
@@ -152,27 +153,6 @@ class OpenMLSplit:
 
         assert name is not None
         return cls(name, "", repetitions)
-
-    def from_dataset(self, X, Y, folds: int, repeats: int):
-        """Generates a new OpenML dataset object from input data and cross-validation settings.
-
-        Parameters
-        ----------
-        X : array-like or sparse matrix
-            The input feature matrix.
-        Y : array-like, shape
-            The target variable values.
-        folds : int
-            Number of cross-validation folds to generate.
-        repeats : int
-            Number of times to repeat the cross-validation process.
-
-        Raises
-        ------
-        NotImplementedError
-            This method is not implemented yet.
-        """
-        raise NotImplementedError()
 
     def get(self, repeat: int = 0, fold: int = 0, sample: int = 0) -> np.ndarray:
         """Returns the specified data split from the CrossValidationSplit object.
