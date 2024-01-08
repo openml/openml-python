@@ -5,7 +5,18 @@ import os
 import pickle
 import time
 from collections import OrderedDict
-from typing import IO, Any, Dict, List, Optional, TextIO, Tuple, Union  # noqa F401
+from typing import (  # noqa F401
+    IO,
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    TextIO,
+    Tuple,
+    Union,
+)
 
 import arff
 import numpy as np
@@ -15,15 +26,19 @@ import openml
 import openml._api_calls
 from openml.base import OpenMLBase
 from openml.exceptions import PyOpenMLError
-from openml.flows import get_flow
+from openml.flows import OpenMLFlow, get_flow
 from openml.tasks import (
     OpenMLClassificationTask,
     OpenMLClusteringTask,
     OpenMLLearningCurveTask,
     OpenMLRegressionTask,
+    OpenMLTask,
     TaskType,
     get_task,
 )
+
+if TYPE_CHECKING:
+    from openml.runs.trace import OpenMLRunTrace
 
 
 class OpenMLRun(OpenMLBase):
@@ -39,7 +54,7 @@ class OpenMLRun(OpenMLBase):
         The ID of the OpenML dataset used for the run.
     setup_string: str
         The setup string of the run.
-    output_files: Dict[str, str]
+    output_files: Dict[str, int]
         Specifies where each related file can be found.
     setup_id: int
         An integer representing the ID of the setup used for the run.
@@ -67,7 +82,7 @@ class OpenMLRun(OpenMLBase):
         The evaluation measure used for the task.
     flow_name: str
         The name of the OpenML flow associated with the run.
-    parameter_settings: List[OrderedDict]
+    parameter_settings: list[OrderedDict]
         Representing the parameter settings used for the run.
     predictions_url: str
         The URL of the predictions file.
@@ -88,31 +103,31 @@ class OpenMLRun(OpenMLBase):
 
     def __init__(
         self,
-        task_id,
-        flow_id,
-        dataset_id,
-        setup_string=None,
-        output_files=None,
-        setup_id=None,
-        tags=None,
-        uploader=None,
-        uploader_name=None,
-        evaluations=None,
-        fold_evaluations=None,
-        sample_evaluations=None,
-        data_content=None,
-        trace=None,
-        model=None,
-        task_type=None,
-        task_evaluation_measure=None,
-        flow_name=None,
-        parameter_settings=None,
-        predictions_url=None,
-        task=None,
-        flow=None,
-        run_id=None,
-        description_text=None,
-        run_details=None,
+        task_id: int,
+        flow_id: int | None,
+        dataset_id: int | None,
+        setup_string: str | None = None,
+        output_files: dict[str, int] | None = None,
+        setup_id: int | None = None,
+        tags: list[str] | None = None,
+        uploader: int | None = None,
+        uploader_name: str | None = None,
+        evaluations: dict | None = None,
+        fold_evaluations: dict | None = None,
+        sample_evaluations: dict | None = None,
+        data_content: list[list] | None = None,
+        trace: OpenMLRunTrace | None = None,
+        model: object | None = None,
+        task_type: str | None = None,
+        task_evaluation_measure: str | None = None,
+        flow_name: str | None = None,
+        parameter_settings: list[dict[str, Any]] | None = None,
+        predictions_url: str | None = None,
+        task: OpenMLTask | None = None,
+        flow: OpenMLFlow | None = None,
+        run_id: int | None = None,
+        description_text: str | None = None,
+        run_details: str | None = None,
     ):
         self.uploader = uploader
         self.uploader_name = uploader_name
@@ -183,6 +198,8 @@ class OpenMLRun(OpenMLBase):
             A formatted string that displays the metric's evaluation summary.
             The summary consists of the mean and std.
         """
+        if self.fold_evaluations is None:
+            raise ValueError("No fold evaluations available.")
         fold_score_lists = self.fold_evaluations[metric].values()
 
         # Get the mean and std over all repetitions
@@ -203,11 +220,19 @@ class OpenMLRun(OpenMLBase):
             "Task URL": openml.tasks.OpenMLTask.url_for_id(self.task_id),
             "Flow ID": self.flow_id,
             "Flow Name": self.flow_name,
-            "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
+            "Flow URL": (
+                openml.flows.OpenMLFlow.url_for_id(self.flow_id)
+                if self.flow_id is not None
+                else None
+            ),
             "Setup ID": self.setup_id,
             "Setup String": self.setup_string,
             "Dataset ID": self.dataset_id,
-            "Dataset URL": openml.datasets.OpenMLDataset.url_for_id(self.dataset_id),
+            "Dataset URL": (
+                openml.datasets.OpenMLDataset.url_for_id(self.dataset_id)
+                if self.dataset_id is not None
+                else None
+            ),
         }
 
         # determines the order of the initial fields in which the information will be printed
@@ -253,10 +278,14 @@ class OpenMLRun(OpenMLBase):
             "Dataset ID",
             "Dataset URL",
         ]
-        return [(key, fields[key]) for key in order if key in fields]
+        return [
+            (key, "None" if fields[key] is None else fields[key])  # type: ignore
+            for key in order
+            if key in fields
+        ]
 
     @classmethod
-    def from_filesystem(cls, directory: str, expect_model: bool = True) -> OpenMLRun:
+    def from_filesystem(cls, directory: str, expect_model: bool = True) -> OpenMLRun:  # noqa: FBT
         """
         The inverse of the to_filesystem method. Instantiates an OpenMLRun
         object based on files stored on the file system.
@@ -360,7 +389,7 @@ class OpenMLRun(OpenMLBase):
             with open(os.path.join(directory, "model.pkl"), "wb") as fh_b:  # type: IO[bytes]
                 pickle.dump(self.model, fh_b)
 
-        if self.flow_id is None:
+        if self.flow_id is None and self.flow is not None:
             self.flow.to_filesystem(directory)
 
         if self.trace is not None:
@@ -459,7 +488,7 @@ class OpenMLRun(OpenMLBase):
 
         return arff_dict
 
-    def get_metric_fn(self, sklearn_fn, kwargs=None):
+    def get_metric_fn(self, sklearn_fn: Callable, kwargs: dict | None = None) -> np.ndarray:
         """Calculates metric scores based on predicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
         it assumes that the 'correct' or 'truth' attribute is specified in
@@ -471,16 +500,18 @@ class OpenMLRun(OpenMLBase):
         sklearn_fn : function
             a function pointer to a sklearn function that
             accepts ``y_true``, ``y_pred`` and ``**kwargs``
+        kwargs : dict
+            kwargs for the function
 
         Returns
         -------
-        scores : list
-            a list of floats, of length num_folds * num_repeats
+        scores : ndarray of scores of length num_folds * num_repeats
+            metric results
         """
         kwargs = kwargs if kwargs else {}
         if self.data_content is not None and self.task_id is not None:
             predictions_arff = self._generate_arff_dict()
-        elif "predictions" in self.output_files:
+        elif (self.output_files is not None) and ("predictions" in self.output_files):
             predictions_file_url = openml._api_calls._file_id_to_url(
                 self.output_files["predictions"],
                 "predictions.arff",
@@ -507,7 +538,7 @@ class OpenMLRun(OpenMLBase):
         if task.task_type_id != TaskType.CLUSTERING and "prediction" not in attribute_names:
             raise ValueError('Attribute "predict" should be set for ' "supervised task runs")
 
-        def _attribute_list_to_dict(attribute_list):
+        def _attribute_list_to_dict(attribute_list):  # type: ignore
             # convenience function: Creates a mapping to map from the name of
             # attributes present in the arff prediction file to their index.
             # This is necessary because the number of classes can be different
@@ -543,8 +574,8 @@ class OpenMLRun(OpenMLBase):
             )
 
         # TODO: these could be cached
-        values_predict = {}
-        values_correct = {}
+        values_predict: dict[int, dict[int, dict[int, list[float]]]] = {}
+        values_correct: dict[int, dict[int, dict[int, list[float]]]] = {}
         for _line_idx, line in enumerate(predictions_arff["data"]):
             rep = line[repeat_idx]
             fold = line[fold_idx]
@@ -586,7 +617,7 @@ class OpenMLRun(OpenMLBase):
                 scores.append(sklearn_fn(y_true, y_pred, **kwargs))
         return np.array(scores)
 
-    def _parse_publish_response(self, xml_response: dict):
+    def _parse_publish_response(self, xml_response: dict) -> None:
         """Parse the id from the xml_response and assign it to self."""
         self.run_id = int(xml_response["oml:upload_run"]["oml:run_id"])
 

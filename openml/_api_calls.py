@@ -262,13 +262,13 @@ def _download_text_file(
         return None
 
 
-def _file_id_to_url(file_id: str, filename: str | None = None) -> str:
+def _file_id_to_url(file_id: int, filename: str | None = None) -> str:
     """
     Presents the URL how to download a given file id
     filename is optional
     """
     openml_url = config.server.split("/api/")
-    url = openml_url[0] + "/data/download/%s" % file_id
+    url = openml_url[0] + f"/data/download/{file_id!s}"
     if filename is not None:
         url += "/" + filename
     return url

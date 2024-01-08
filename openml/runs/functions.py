@@ -905,9 +905,10 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
         if "oml:parameter_setting" in run:
             obtained_parameter_settings = run["oml:parameter_setting"]
             for parameter_dict in obtained_parameter_settings:
-                current_parameter = OrderedDict()
-                current_parameter["oml:name"] = parameter_dict["oml:name"]
-                current_parameter["oml:value"] = parameter_dict["oml:value"]
+                current_parameter = {
+                    "oml:name": parameter_dict["oml:name"],
+                    "oml:value": parameter_dict["oml:value"],
+                }
                 if "oml:component" in parameter_dict:
                     current_parameter["oml:component"] = parameter_dict["oml:component"]
                 parameters.append(current_parameter)
@@ -932,10 +933,10 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
             )
         dataset_id = t.dataset_id
 
-    files: dict[str, int] = OrderedDict()
-    evaluations: dict[str, float | Any] = OrderedDict()
-    fold_evaluations: dict[str, dict[int, dict[int, float | Any]]] = OrderedDict()
-    sample_evaluations: dict[str, dict[int, dict[int, dict[int, float | Any]]]] = OrderedDict()
+    files: dict[str, int] = {}
+    evaluations: dict[str, float | Any] = {}
+    fold_evaluations: dict[str, dict[int, dict[int, float | Any]]] = {}
+    sample_evaluations: dict[str, dict[int, dict[int, dict[int, float | Any]]]] = {}
     if "oml:output_data" not in run:
         if from_server:
             raise ValueError("Run does not contain output_data " "(OpenML server error?)")
@@ -972,19 +973,19 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
                     fold = int(evaluation_dict["@fold"])
                     sample = int(evaluation_dict["@sample"])
                     if key not in sample_evaluations:
-                        sample_evaluations[key] = OrderedDict()
+                        sample_evaluations[key] = {}
                     if repeat not in sample_evaluations[key]:
-                        sample_evaluations[key][repeat] = OrderedDict()
+                        sample_evaluations[key][repeat] = {}
                     if fold not in sample_evaluations[key][repeat]:
-                        sample_evaluations[key][repeat][fold] = OrderedDict()
+                        sample_evaluations[key][repeat][fold] = {}
                     sample_evaluations[key][repeat][fold][sample] = value
                 elif "@repeat" in evaluation_dict and "@fold" in evaluation_dict:
                     repeat = int(evaluation_dict["@repeat"])
                     fold = int(evaluation_dict["@fold"])
                     if key not in fold_evaluations:
-                        fold_evaluations[key] = OrderedDict()
+                        fold_evaluations[key] = {}
                     if repeat not in fold_evaluations[key]:
-                        fold_evaluations[key][repeat] = OrderedDict()
+                        fold_evaluations[key][repeat] = {}
                     fold_evaluations[key][repeat][fold] = value
                 else:
                     evaluations[key] = value
