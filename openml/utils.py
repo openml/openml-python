@@ -362,7 +362,7 @@ def _create_cache_directory_for_id(key: str, id_: int) -> Path:
 
     Returns
     -------
-    str
+    cache_dir : Path
         Path of the created dataset cache directory.
     """
     cache_dir = _get_cache_dir_for_id(key, id_, create=True)
