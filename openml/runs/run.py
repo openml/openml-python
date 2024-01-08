@@ -488,7 +488,7 @@ class OpenMLRun(OpenMLBase):
 
         return arff_dict
 
-    def get_metric_fn(self, sklearn_fn: Callable, kwargs: dict | None = None) -> np.ndarray:
+    def get_metric_fn(self, sklearn_fn: Callable, kwargs: dict | None = None) -> np.ndarray:  # noqa: PLR0915, PLR0912, C901
         """Calculates metric scores based on predicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
         it assumes that the 'correct' or 'truth' attribute is specified in
@@ -637,10 +637,10 @@ class OpenMLRun(OpenMLBase):
                     "OpenMLRun object does not contain a flow id or reference to OpenMLFlow "
                     "(these should have been added while executing the task). ",
                 )
-            else:
-                # publish the linked Flow before publishing the run.
-                self.flow.publish()
-                self.flow_id = self.flow.flow_id
+
+            # publish the linked Flow before publishing the run.
+            self.flow.publish()
+            self.flow_id = self.flow.flow_id
 
         if self.parameter_settings is None:
             if self.flow is None:
@@ -661,7 +661,7 @@ class OpenMLRun(OpenMLBase):
             file_elements["trace"] = ("trace.arff", trace_arff)
         return file_elements
 
-    def _to_dict(self) -> OrderedDict[str, OrderedDict]:
+    def _to_dict(self) -> OrderedDict[str, OrderedDict]:  # noqa: PLR0912, C901
         """Creates a dictionary representation of self."""
         description = OrderedDict()  # type: 'OrderedDict'
         description["oml:run"] = OrderedDict()

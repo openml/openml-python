@@ -2038,7 +2038,7 @@ class SklearnExtension(Extension):
 
         flow_dict = get_flow_dict(flow)
         model = model if model is not None else flow.model
-        return extract_parameters(flow, flow_dict, model, True, flow.flow_id)
+        return extract_parameters(flow, flow_dict, model, _main_call=True, main_id=flow.flow_id)
 
     def _openml_param_name_to_sklearn(
         self,

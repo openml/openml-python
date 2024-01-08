@@ -20,7 +20,7 @@ class OpenMLSetup:
         The setting of the parameters
     """
 
-    def __init__(self, setup_id: int, flow_id: int, parameters: dict[str, Any]):
+    def __init__(self, setup_id: int, flow_id: int, parameters: dict[int, Any] | None):
         if not isinstance(setup_id, int):
             raise ValueError("setup id should be int")
 
@@ -42,7 +42,9 @@ class OpenMLSetup:
             "Setup ID": self.setup_id,
             "Flow ID": self.flow_id,
             "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
-            "# of Parameters": len(self.parameters),
+            "# of Parameters": (
+                len(self.parameters) if self.parameters is not None else float("nan")
+            ),
         }
 
         # determines the order in which the information will be printed

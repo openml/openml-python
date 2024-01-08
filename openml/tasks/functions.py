@@ -195,7 +195,11 @@ def list_tasks(
     )
 
 
-def _list_tasks(task_type=None, output_format="dict", **kwargs) -> dict | pd.DataFrame:
+def _list_tasks(
+    task_type: TaskType | None = None,
+    output_format: Literal["dict", "dataframe"] = "dict",
+    **kwargs: Any,
+) -> dict | pd.DataFrame:
     """
     Perform the api call to return a number of tasks having the given filters.
 
