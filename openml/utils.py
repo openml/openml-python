@@ -330,7 +330,7 @@ def _create_cache_directory(key):
     cache_dir = _get_cache_dir_for_key(key)
 
     try:
-        cache_dir.mkdir(exist_ok=True)
+        cache_dir.mkdir(exist_ok=True, parents=True)
     except Exception as e:  # noqa: BLE001
         raise openml.exceptions.OpenMLCacheException(
             f"Cannot create cache directory {cache_dir}."
