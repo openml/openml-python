@@ -8,6 +8,7 @@ import warnings
 from collections import OrderedDict
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
+from typing_extensions import Literal
 
 import numpy as np
 import pandas as pd
@@ -135,13 +136,13 @@ def run_model_on_task(
 
     flow = extension.model_to_flow(model)
 
-    def get_task_and_type_conversion(task: int | str | OpenMLTask) -> OpenMLTask:
+    def get_task_and_type_conversion(_task: int | str | OpenMLTask) -> OpenMLTask:
         """Retrieve an OpenMLTask object from either an integer or string ID,
         or directly from an OpenMLTask object.
 
         Parameters
         ----------
-        task : Union[int, str, OpenMLTask]
+        _task : Union[int, str, OpenMLTask]
             The task ID or the OpenMLTask object.
 
         Returns
@@ -149,10 +150,10 @@ def run_model_on_task(
         OpenMLTask
             The OpenMLTask object.
         """
-        if isinstance(task, (int, str)):
-            return get_task(int(task))
-        else:
-            return task
+        if isinstance(_task, (int, str)):
+            return get_task(int(_task))  # type: ignore
+
+        return _task
 
     task = get_task_and_type_conversion(task)
 
@@ -555,24 +556,28 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, PLR0913, C901
     )  # job_rvals contain the output of all the runs with one-to-one correspondence with `jobs`
 
     for n_fit, rep_no, fold_no, sample_no in jobs:
-        pred_y, proba_y, test_indices, test_y, trace, user_defined_measures_fold = job_rvals[
+        pred_y, proba_y, test_indices, test_y, inner_trace, user_defined_measures_fold = job_rvals[
             n_fit - 1
         ]
-        if trace is not None:
-            traces.append(trace)
+
+        if inner_trace is not None:
+            traces.append(inner_trace)
 
         # add client-side calculated metrics. These is used on the server as
         # consistency check, only useful for supervised tasks
-        def _calculate_local_measure(
+        def _calculate_local_measure(  # type: ignore
             sklearn_fn,
             openml_name,
-            test_y=test_y,
-            pred_y=pred_y,
-            user_defined_measures_fold=user_defined_measures_fold,
+            _test_y=test_y,
+            _pred_y=pred_y,
+            _user_defined_measures_fold=user_defined_measures_fold,
         ):
-            user_defined_measures_fold[openml_name] = sklearn_fn(test_y, pred_y)
+            _user_defined_measures_fold[openml_name] = sklearn_fn(_test_y, _pred_y)
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
+            assert test_y is not None
+            assert proba_y is not None
+
             for i, tst_idx in enumerate(test_indices):
                 if task.class_labels is not None:
                     prediction = (
@@ -616,6 +621,7 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, PLR0913, C901
                 )
 
         elif isinstance(task, OpenMLRegressionTask):
+            assert test_y is not None
             for i, _ in enumerate(test_indices):
                 truth = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
                 arff_line = format_prediction(
@@ -787,7 +793,7 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
     return pred_y, proba_y, test_indices, test_y, trace, user_defined_measures_fold
 
 
-def get_runs(run_ids):
+def get_runs(run_ids: list[int]) -> list[OpenMLRun]:
     """Gets all runs in run_ids list.
 
     Parameters
@@ -805,7 +811,7 @@ def get_runs(run_ids):
     return runs
 
 
-@openml.utils.thread_safe_if_oslo_installed
+@openml.utils.thread_safe_if_oslo_installed  # type: ignore
 def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT002, FBT001
     """Gets run corresponding to run_id.
 
@@ -861,8 +867,7 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
         New run object representing run_xml.
     """
 
-    # TODO(eddiebergman): type this
-    def obtain_field(xml_obj, fieldname, from_server, cast=None):
+    def obtain_field(xml_obj, fieldname, from_server, cast=None):  # type: ignore
         # this function can be used to check whether a field is present in an
         # object. if it is not present, either returns None or throws an error
         # (this is usually done if the xml comes from the server)
@@ -927,10 +932,10 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
             )
         dataset_id = t.dataset_id
 
-    files = OrderedDict()
-    evaluations = OrderedDict()
-    fold_evaluations = OrderedDict()
-    sample_evaluations = OrderedDict()
+    files: dict[str, int] = OrderedDict()
+    evaluations: dict[str, float | Any] = OrderedDict()
+    fold_evaluations: dict[str, dict[int, dict[int, float | Any]]] = OrderedDict()
+    sample_evaluations: dict[str, dict[int, dict[int, dict[int, float | Any]]]] = OrderedDict()
     if "oml:output_data" not in run:
         if from_server:
             raise ValueError("Run does not contain output_data " "(OpenML server error?)")
@@ -1024,7 +1029,7 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
     )
 
 
-def _get_cached_run(run_id):
+def _get_cached_run(run_id: int) -> OpenMLRun:
     """Load a run from the cache."""
     run_cache_dir = openml.utils._create_cache_directory_for_id(
         RUNS_CACHE_DIR_NAME,
@@ -1050,8 +1055,8 @@ def list_runs(
     tag: str | None = None,
     study: int | None = None,
     display_errors: bool = False,
-    output_format: str = "dict",
-    **kwargs,
+    output_format: Literal["dict", "dataframe"] = "dict",
+    **kwargs: Any,
 ) -> dict | pd.DataFrame:
     """
     List all runs matching all of the given filters.
@@ -1143,8 +1148,8 @@ def _list_runs(
     uploader: list | None = None,
     study: int | None = None,
     display_errors: bool = False,
-    output_format: str = "dict",
-    **kwargs,
+    output_format: Literal["dict", "dataframe"] = "dict",
+    **kwargs: Any,
 ) -> dict | pd.DataFrame:
     """
     Perform API call `/run/list/{filters}'
@@ -1207,7 +1212,9 @@ def _list_runs(
     return __list_runs(api_call=api_call, output_format=output_format)
 
 
-def __list_runs(api_call, output_format="dict"):
+def __list_runs(
+    api_call: str, output_format: Literal["dict", "dataframe"] = "dict"
+) -> dict | pd.DataFrame:
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     runs_dict = xmltodict.parse(xml_string, force_list=("oml:run",))

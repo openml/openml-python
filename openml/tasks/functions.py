@@ -370,7 +370,7 @@ def get_tasks(
     return tasks
 
 
-@openml.utils.thread_safe_if_oslo_installed
+@openml.utils.thread_safe_if_oslo_installed  # type: ignore
 def get_task(
     task_id: int,
     *dataset_args,

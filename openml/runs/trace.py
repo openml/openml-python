@@ -391,7 +391,7 @@ class OpenMLRunTrace:
         return cls(None, trace)
 
     @classmethod
-    def trace_from_xml(cls, xml):
+    def trace_from_xml(cls, xml) -> OpenMLRunTrace:
         """Generate trace from xml.
 
         Creates a trace file from the xml description.
