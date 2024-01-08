@@ -417,9 +417,9 @@ def thread_safe_if_oslo_installed(func):
     return func
 
 
-def _create_lockfiles_dir():
+def _create_lockfiles_dir() -> Path:
     path = Path(config.get_cache_directory()) / "locks"
     # TODO(eddiebergman): Not sure why this is allowed to error and ignore???
     with contextlib.suppress(OSError):
         path.mkdir(exist_ok=True)
-    return dir
+    return path
