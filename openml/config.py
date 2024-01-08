@@ -11,7 +11,7 @@ import platform
 import warnings
 from io import StringIO
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 from typing_extensions import Literal, TypedDict
 from urllib.parse import urlparse
 
@@ -284,10 +284,7 @@ def _setup(config: _Config | None = None) -> None:
         )
 
 
-def set_field_in_config_file(
-    field: str,
-    value: str,
-) -> None:
+def set_field_in_config_file(field: str, value: Any) -> None:
     """Overwrites the `field` in the configuration file with the new `value`."""
     if field not in _defaults:
         raise ValueError(f"Field '{field}' is not valid and must be one of '{_defaults.keys()}'.")
@@ -303,7 +300,7 @@ def set_field_in_config_file(
             # There doesn't seem to be a way to avoid writing defaults to file with configparser,
             # because it is impossible to distinguish from an explicitly set value that matches
             # the default value, to one that was set to its default because it was omitted.
-            value = config.get("FAKE_SECTION", f)
+            value = config.get("FAKE_SECTION", f)  # type: ignore
             if f == field:
                 value = globals()[f]
             fh.write(f"{f} = {value}\n")
