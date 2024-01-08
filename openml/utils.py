@@ -421,5 +421,5 @@ def _create_lockfiles_dir() -> Path:
     path = Path(config.get_cache_directory()) / "locks"
     # TODO(eddiebergman): Not sure why this is allowed to error and ignore???
     with contextlib.suppress(OSError):
-        path.mkdir(exist_ok=True)
+        path.mkdir(exist_ok=True, parents=True)
     return path
