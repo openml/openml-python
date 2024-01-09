@@ -6,7 +6,7 @@ import os
 import warnings
 from collections import OrderedDict
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 from typing_extensions import Literal, overload
 
 import arff
