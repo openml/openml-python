@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING
-from typing_extensions import Literal, overload
+from typing import TYPE_CHECKING, Any, overload
+from typing_extensions import Literal
 
 import pandas as pd
 import xmltodict
@@ -635,7 +635,19 @@ def list_studies(  # noqa: PLR0913
     )
 
 
-def _list_studies(output_format="dict", **kwargs) -> dict | pd.DataFrame:
+@overload
+def _list_studies(output_format: Literal["dict"] = "dict", **kwargs: Any) -> dict:
+    ...
+
+
+@overload
+def _list_studies(output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame:
+    ...
+
+
+def _list_studies(
+    output_format: Literal["dict", "dataframe"] = "dict", **kwargs: Any
+) -> dict | pd.DataFrame:
     """
     Perform api call to return a list of studies.
 
@@ -660,7 +672,19 @@ def _list_studies(output_format="dict", **kwargs) -> dict | pd.DataFrame:
     return __list_studies(api_call=api_call, output_format=output_format)
 
 
-def __list_studies(api_call, output_format="object") -> dict | pd.DataFrame:
+@overload
+def __list_studies(api_call: str, output_format: Literal["dict"] = "dict") -> dict:
+    ...
+
+
+@overload
+def __list_studies(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame:
+    ...
+
+
+def __list_studies(
+    api_call: str, output_format: Literal["dict", "dataframe"] = "dict"
+) -> dict | pd.DataFrame:
     """Retrieves the list of OpenML studies and
     returns it in a dictionary or a Pandas DataFrame.
 
@@ -668,7 +692,7 @@ def __list_studies(api_call, output_format="object") -> dict | pd.DataFrame:
     ----------
     api_call : str
         The API call for retrieving the list of OpenML studies.
-    output_format : str in {"object", "dataframe"}
+    output_format : str in {"dict", "dataframe"}
         Format of the output, either 'object' for a dictionary
         or 'dataframe' for a Pandas DataFrame.
 

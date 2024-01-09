@@ -6,8 +6,8 @@ import shutil
 import warnings
 from functools import wraps
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Mapping, TypeVar
-from typing_extensions import Literal, ParamSpec, overload
+from typing import TYPE_CHECKING, Any, Callable, Mapping, TypeVar, overload
+from typing_extensions import Literal, ParamSpec
 
 import numpy as np
 import pandas as pd
@@ -25,6 +25,26 @@ if TYPE_CHECKING:
 
     P = ParamSpec("P")
     R = TypeVar("R")
+
+
+@overload
+def extract_xml_tags(
+    xml_tag_name: str,
+    node: Mapping[str, Any],
+    *,
+    allow_none: Literal[True] = ...,
+) -> Any | None:
+    ...
+
+
+@overload
+def extract_xml_tags(
+    xml_tag_name: str,
+    node: Mapping[str, Any],
+    *,
+    allow_none: Literal[False],
+) -> Any:
+    ...
 
 
 def extract_xml_tags(
@@ -220,7 +240,7 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
 @overload
 def _list_all(
     listing_call: Callable[P, Any],
-    output_format: Literal["dict"] = "dict",
+    list_output_format: Literal["dict"] = "dict",
     *args: P.args,
     **filters: P.kwargs,
 ) -> dict:
@@ -230,7 +250,7 @@ def _list_all(
 @overload
 def _list_all(
     listing_call: Callable[P, Any],
-    output_format: Literal["dataframe"],
+    list_output_format: Literal["dataframe"],
     *args: P.args,
     **filters: P.kwargs,
 ) -> pd.DataFrame:

@@ -71,7 +71,7 @@ def get_extension_by_flow(
 
 def get_extension_by_model(
     model: Any,
-    raise_if_no_extension: bool = False,
+    raise_if_no_extension: bool = False,  # noqa: FBT001, FBT002
 ) -> Extension | None:
     """Get an extension which can handle the given flow.
 
