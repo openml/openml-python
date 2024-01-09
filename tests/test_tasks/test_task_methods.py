@@ -17,7 +17,9 @@ class OpenMLTaskMethodsTest(TestBase):
 
     def test_tagging(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
-        tag = f"test_tag_OpenMLTaskMethodsTest_{time()}"
+        # tags can be at most 64 alphanumeric (+ underscore) chars
+        unique_indicator = str(time()).replace('.', '')
+        tag = f"test_tag_OpenMLTaskMethodsTest_{unique_indicator}"
         tasks = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
         assert len(tasks) == 0
         task.push_tag(tag)

@@ -316,7 +316,9 @@ class OpenMLDatasetTestOnTestServer(TestBase):
         self.dataset = openml.datasets.get_dataset(125, download_data=False)
 
     def test_tagging(self):
-        tag = f"test_tag_OpenMLDatasetTestOnTestServer_{time()}"
+        # tags can be at most 64 alphanumeric (+ underscore) chars
+        unique_indicator = str(time()).replace('.', '')
+        tag = f"test_tag_OpenMLDatasetTestOnTestServer_{unique_indicator}"
         datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
         assert datasets.empty
         self.dataset.push_tag(tag)
@@ -326,7 +328,6 @@ class OpenMLDatasetTestOnTestServer(TestBase):
         self.dataset.remove_tag(tag)
         datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
         assert datasets.empty
-
 
 class OpenMLDatasetTestSparse(TestBase):
     _multiprocess_can_split_ = True
