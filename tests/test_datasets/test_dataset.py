@@ -330,6 +330,15 @@ class OpenMLDatasetTestOnTestServer(TestBase):
         datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
         assert datasets.empty
 
+    def test_get_feature_with_ontology_data_id_11(self):
+        # test on car dataset, which has built-in ontology references
+        dataset = openml.datasets.get_dataset(11)
+        assert len(dataset.features) == 7
+        assert len(dataset.features[1].ontologies) >= 2
+        assert len(dataset.features[2].ontologies) >= 1
+        assert len(dataset.features[3].ontologies) >= 1
+
+
 @pytest.mark.production()
 class OpenMLDatasetTestSparse(TestBase):
     _multiprocess_can_split_ = True

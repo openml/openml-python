@@ -23,6 +23,8 @@ class OpenMLDataFeature:
         list of the possible values, in case of nominal attribute
     number_missing_values : int
         Number of rows that have a missing value for this feature.
+    ontologies : list(str)
+        list of ontologies attached to this feature
     """
 
     LEGAL_DATA_TYPES: ClassVar[Sequence[str]] = ["nominal", "numeric", "string", "date"]
@@ -34,6 +36,7 @@ class OpenMLDataFeature:
         data_type: str,
         nominal_values: list[str],
         number_missing_values: int,
+        ontologies: list[str]
     ):
         if not isinstance(index, int):
             raise TypeError(f"Index must be `int` but is {type(index)}")
@@ -65,6 +68,7 @@ class OpenMLDataFeature:
         self.index = index
         self.name = str(name)
         self.data_type = str(data_type)
+        self.ontologies = ontologies
         self.nominal_values = nominal_values
         self.number_missing_values = number_missing_values
 
