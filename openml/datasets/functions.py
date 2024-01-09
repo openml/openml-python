@@ -6,7 +6,7 @@ import os
 import warnings
 from collections import OrderedDict
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 from typing_extensions import Literal, overload
 
 import arff
@@ -1258,7 +1258,7 @@ def _get_dataset_features_file(did_cache_dir: str | Path | None, dataset_id: int
         with features_file.open("w", encoding="utf8") as fh:
             fh.write(features_xml)
 
-    return str(features_file)
+    return features_file
 
 
 def _get_qualities_xml(dataset_id: int) -> str:
@@ -1267,9 +1267,9 @@ def _get_qualities_xml(dataset_id: int) -> str:
 
 
 def _get_dataset_qualities_file(
-    did_cache_dir: str | None,
+    did_cache_dir: str | Path | None,
     dataset_id: int,
-) -> str | None:
+) -> Path | None:
     """Get the path for the dataset qualities file, or None if no qualities exist.
 
     Loads from cache or downloads them.
@@ -1297,7 +1297,7 @@ def _get_dataset_qualities_file(
     )
 
     # Dataset qualities are subject to change and must be fetched every time
-    qualities_file = save_did_cache_dir / "qualities.xml"  # type: ignore
+    qualities_file = save_did_cache_dir / "qualities.xml"
     try:
         with qualities_file.open(encoding="utf8") as fh:
             qualities_xml = fh.read()
@@ -1314,7 +1314,7 @@ def _get_dataset_qualities_file(
 
             raise e
 
-    return str(qualities_file)
+    return qualities_file
 
 
 def _create_dataset_from_description(  # noqa: PLR0913
