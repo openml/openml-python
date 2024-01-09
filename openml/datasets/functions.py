@@ -75,25 +75,39 @@ def list_qualities() -> list[str]:
 
 
 @overload
-def list_datasets(
-    data_id: list[int] | None = None,
-    offset: int | None = None,
-    size: int | None = None,
-    status: str | None = None,
-    tag: str | None = None,
-    output_format: Literal["dataframe"] = "dataframe",
+def list_datasets(  # noqa: PLR0913
+    data_id: list[int] | None = ...,
+    offset: int | None = ...,
+    size: int | None = ...,
+    status: str | None = ...,
+    tag: str | None = ...,
+    *,
+    output_format: Literal["dataframe"],
     **kwargs: Any,
 ) -> pd.DataFrame:
     ...
 
 
 @overload
-def list_datasets(
-    data_id: list[int] | None = None,
-    offset: int | None = None,
-    size: int | None = None,
-    status: str | None = None,
-    tag: str | None = None,
+def list_datasets(  # noqa: PLR0913
+    data_id: list[int] | None,
+    offset: int | None,
+    size: int | None,
+    status: str | None,
+    tag: str | None,
+    output_format: Literal["dataframe"],
+    **kwargs: Any,
+) -> pd.DataFrame:
+    ...
+
+
+@overload
+def list_datasets(  # noqa: PLR0913
+    data_id: list[int] | None = ...,
+    offset: int | None = ...,
+    size: int | None = ...,
+    status: str | None = ...,
+    tag: str | None = ...,
     output_format: Literal["dict"] = "dict",
     **kwargs: Any,
 ) -> pd.DataFrame:

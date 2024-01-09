@@ -63,8 +63,8 @@ class Extension(ABC):
     def flow_to_model(
         self,
         flow: OpenMLFlow,
-        initialize_with_defaults: bool = False,
-        strict_version: bool = True,
+        initialize_with_defaults: bool = False,  # noqa: FBT001, FBT002
+        strict_version: bool = True,  # noqa: FBT002, FBT001
     ) -> Any:
         """Instantiate a model from the flow representation.
 
@@ -156,7 +156,7 @@ class Extension(ABC):
         """
 
     @abstractmethod
-    def _run_model_on_fold(
+    def _run_model_on_fold(  # noqa: PLR0913
         self,
         model: Any,
         task: OpenMLTask,

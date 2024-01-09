@@ -2,10 +2,9 @@
 from __future__ import annotations
 
 import argparse
-import os
-import pathlib
 import string
 import sys
+from pathlib import Path
 from typing import Callable
 from urllib.parse import urlparse
 
@@ -20,7 +19,7 @@ def looks_like_url(url: str) -> bool:
     # There's no thorough url parser, but we only seem to use netloc.
     try:
         return bool(urlparse(url).netloc)
-    except Exception:
+    except Exception:  # noqa: BLE001
         return False
 
 
@@ -125,17 +124,20 @@ def configure_server(value: str) -> None:
 
 def configure_cachedir(value: str) -> None:
     def check_cache_dir(path: str) -> str:
-        p = pathlib.Path(path)
-        if p.is_file():
-            return f"'{path}' is a file, not a directory."
-        expanded = p.expanduser()
+        _path = Path(path)
+        if _path.is_file():
+            return f"'{_path}' is a file, not a directory."
+
+        expanded = _path.expanduser()
         if not expanded.is_absolute():
-            return f"'{path}' is not absolute (even after expanding '~')."
+            return f"'{_path}' is not absolute (even after expanding '~')."
+
         if not expanded.exists():
             try:
-                os.mkdir(expanded)
+                expanded.mkdir()
             except PermissionError:
                 return f"'{path}' does not exist and there are not enough permissions to create it."
+
         return ""
 
     configure_field(
@@ -245,7 +247,7 @@ def configure_retry_policy(value: str) -> None:
     )
 
 
-def configure_field(
+def configure_field(  # noqa: PLR0913
     field: str,
     value: None | str,
     check_with_message: Callable[[str], str],

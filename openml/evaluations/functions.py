@@ -17,7 +17,7 @@ from openml.evaluations import OpenMLEvaluation
 
 
 @overload
-def list_evaluations(
+def list_evaluations(  # noqa: PLR0913
     function: str,
     offset: int | None = ...,
     size: int | None = ...,
@@ -36,7 +36,7 @@ def list_evaluations(
 
 
 @overload
-def list_evaluations(
+def list_evaluations(  # noqa: PLR0913
     function: str,
     offset: int | None = ...,
     size: int | None = ...,

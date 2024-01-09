@@ -530,7 +530,7 @@ def list_suites(
 
 
 @overload
-def list_studies(
+def list_studies(  # noqa: PLR0913
     offset: int | None = ...,
     size: int | None = ...,
     status: str | None = ...,
@@ -542,7 +542,7 @@ def list_studies(
 
 
 @overload
-def list_studies(
+def list_studies(  # noqa: PLR0913
     offset: int | None = ...,
     size: int | None = ...,
     status: str | None = ...,
