@@ -6,8 +6,8 @@ files: |
     tests
   )/.*\.py$
 repos:
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.1.5
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.11
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix, --no-cache]
@@ -20,7 +20,7 @@ repos:
           - types-requests
           - types-python-dateutil
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.27.1
+    rev: 0.27.3
     hooks:
       - id: check-github-workflows
         files: '^github/workflows/.*\.ya?ml$'
