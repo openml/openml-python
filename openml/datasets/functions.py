@@ -75,7 +75,7 @@ def list_qualities() -> list[str]:
 
 
 @overload
-def list_datasets(  # noqa: PLR0913
+def list_datasets(
     data_id: list[int] | None = ...,
     offset: int | None = ...,
     size: int | None = ...,
@@ -89,7 +89,7 @@ def list_datasets(  # noqa: PLR0913
 
 
 @overload
-def list_datasets(  # noqa: PLR0913
+def list_datasets(
     data_id: list[int] | None,
     offset: int | None,
     size: int | None,
@@ -102,7 +102,7 @@ def list_datasets(  # noqa: PLR0913
 
 
 @overload
-def list_datasets(  # noqa: PLR0913
+def list_datasets(
     data_id: list[int] | None = ...,
     offset: int | None = ...,
     size: int | None = ...,
