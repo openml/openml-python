@@ -184,7 +184,7 @@ class SklearnExtension(Extension):
                 if closing_parenthesis_expected == 0:
                     break
 
-            _end: int = estimator_start + len(long_name[estimator_start:])
+            _end: int = estimator_start + len(long_name[estimator_start:]) - 1
             model_select_pipeline = long_name[estimator_start:_end]
 
             trimmed_pipeline = cls.trim_flow_name(model_select_pipeline, _outer=False)
