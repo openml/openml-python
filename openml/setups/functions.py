@@ -1,9 +1,9 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import os
 import warnings
 from collections import OrderedDict
+from pathlib import Path
 from typing import Any, Iterable
 from typing_extensions import Literal
 
@@ -83,11 +83,11 @@ def _get_cached_setup(setup_id: int) -> OpenMLSetup:
     OpenMLCacheException
         If the setup file for the given setup ID is not cached.
     """
-    cache_dir = config.get_cache_directory()
-    setup_cache_dir = os.path.join(cache_dir, "setups", str(setup_id))
+    cache_dir = Path(config.get_cache_directory())
+    setup_cache_dir = cache_dir / "setups" / str(setup_id)
     try:
-        setup_file = os.path.join(setup_cache_dir, "description.xml")
-        with open(setup_file, encoding="utf8") as fh:
+        setup_file = setup_cache_dir / "description.xml"
+        with setup_file.open(encoding="utf8") as fh:
             setup_xml = xmltodict.parse(fh.read())
             return _create_setup_from_xml(setup_xml, output_format="object")  # type: ignore
 
@@ -111,18 +111,17 @@ def get_setup(setup_id: int) -> OpenMLSetup:
     -------
     OpenMLSetup (an initialized openml setup object)
     """
-    setup_dir = os.path.join(config.get_cache_directory(), "setups", str(setup_id))
-    setup_file = os.path.join(setup_dir, "description.xml")
+    setup_dir = Path(config.get_cache_directory()) / "setups" / str(setup_id)
+    setup_dir.mkdir(exist_ok=True, parents=True)
 
-    if not os.path.exists(setup_dir):
-        os.makedirs(setup_dir)
+    setup_file = setup_dir / "description.xml"
 
     try:
         return _get_cached_setup(setup_id)
     except openml.exceptions.OpenMLCacheException:
         url_suffix = "/setup/%d" % setup_id
         setup_xml = openml._api_calls._perform_api_call(url_suffix, "get")
-        with open(setup_file, "w", encoding="utf8") as fh:
+        with setup_file.open("w", encoding="utf8") as fh:
             fh.write(setup_xml)
 
     result_dict = xmltodict.parse(setup_xml)

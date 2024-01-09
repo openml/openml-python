@@ -1,22 +1,15 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import os
 import pickle
 import time
 from collections import OrderedDict
-from typing import (  # noqa F401
-    IO,
+from pathlib import Path
+from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
-    List,
-    Optional,
     Sequence,
-    TextIO,
-    Tuple,
-    Union,
 )
 
 import arff
@@ -102,7 +95,7 @@ class OpenMLRun(OpenMLBase):
         Description of the run stored in the run meta-data.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         task_id: int,
         flow_id: int | None,
@@ -287,7 +280,7 @@ class OpenMLRun(OpenMLBase):
         ]
 
     @classmethod
-    def from_filesystem(cls, directory: str, expect_model: bool = True) -> OpenMLRun:  # noqa: FBT
+    def from_filesystem(cls, directory: str | Path, expect_model: bool = True) -> OpenMLRun:  # noqa: FBT001, FBT002
         """
         The inverse of the to_filesystem method. Instantiates an OpenMLRun
         object based on files stored on the file system.
@@ -311,22 +304,23 @@ class OpenMLRun(OpenMLBase):
         # Avoiding cyclic imports
         import openml.runs.functions
 
-        if not os.path.isdir(directory):
+        directory = Path(directory)
+        if not directory.is_dir():
             raise ValueError("Could not find folder")
 
-        description_path = os.path.join(directory, "description.xml")
-        predictions_path = os.path.join(directory, "predictions.arff")
-        trace_path = os.path.join(directory, "trace.arff")
-        model_path = os.path.join(directory, "model.pkl")
+        description_path = directory / "description.xml"
+        predictions_path = directory / "predictions.arff"
+        trace_path = directory / "trace.arff"
+        model_path = directory / "model.pkl"
 
-        if not os.path.isfile(description_path):
+        if not description_path.is_file():
             raise ValueError("Could not find description.xml")
-        if not os.path.isfile(predictions_path):
+        if not predictions_path.is_file():
             raise ValueError("Could not find predictions.arff")
-        if not os.path.isfile(model_path) and expect_model:
+        if (not model_path.is_file()) and expect_model:
             raise ValueError("Could not find model.pkl")
 
-        with open(description_path) as fht:
+        with description_path.open() as fht:
             xml_string = fht.read()
         run = openml.runs.functions._create_run_from_xml(xml_string, from_server=False)
 
@@ -335,25 +329,25 @@ class OpenMLRun(OpenMLBase):
             run.flow = flow
             run.flow_name = flow.name
 
-        with open(predictions_path) as fht:
+        with predictions_path.open() as fht:
             predictions = arff.load(fht)
             run.data_content = predictions["data"]
 
-        if os.path.isfile(model_path):
+        if model_path.is_file():
             # note that it will load the model if the file exists, even if
             # expect_model is False
-            with open(model_path, "rb") as fhb:
-                run.model = pickle.load(fhb)
+            with model_path.open("rb") as fhb:
+                run.model = pickle.load(fhb)  # noqa: S301
 
-        if os.path.isfile(trace_path):
+        if trace_path.is_file():
             run.trace = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
 
         return run
 
     def to_filesystem(
         self,
-        directory: str,
-        store_model: bool = True,
+        directory: str | Path,
+        store_model: bool = True,  # noqa: FBT001, FBT002
     ) -> None:
         """
         The inverse of the from_filesystem method. Serializes a run
@@ -372,23 +366,24 @@ class OpenMLRun(OpenMLBase):
         """
         if self.data_content is None or self.model is None:
             raise ValueError("Run should have been executed (and contain " "model / predictions)")
+        directory = Path(directory)
+        directory.mkdir(exist_ok=True, parents=True)
 
-        os.makedirs(directory, exist_ok=True)
-        if not os.listdir(directory) == []:
+        if not any(directory.iterdir()):
             raise ValueError(
-                f"Output directory {os.path.abspath(directory)} should be empty",
+                f"Output directory {directory.expanduser().resolve()} should be empty",
             )
 
         run_xml = self._to_xml()
         predictions_arff = arff.dumps(self._generate_arff_dict())
 
         # It seems like typing does not allow to define the same variable multiple times
-        with open(os.path.join(directory, "description.xml"), "w") as fh:  # type: TextIO
+        with (directory / "description.xml").open("w") as fh:
             fh.write(run_xml)
-        with open(os.path.join(directory, "predictions.arff"), "w") as fh:
+        with (directory / "predictions.arff").open("w") as fh:
             fh.write(predictions_arff)
         if store_model:
-            with open(os.path.join(directory, "model.pkl"), "wb") as fh_b:  # type: IO[bytes]
+            with (directory / "model.pkl").open("wb") as fh_b:
                 pickle.dump(self.model, fh_b)
 
         if self.flow_id is None and self.flow is not None:
@@ -582,10 +577,7 @@ class OpenMLRun(OpenMLBase):
         for _line_idx, line in enumerate(predictions_arff["data"]):
             rep = line[repeat_idx]
             fold = line[fold_idx]
-            if has_samples:
-                samp = line[sample_idx]
-            else:
-                samp = 0  # No learning curve sample, always 0
+            samp = line[sample_idx] if has_samples else 0
 
             if task.task_type_id in [
                 TaskType.SUPERVISED_CLASSIFICATION,
