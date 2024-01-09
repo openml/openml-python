@@ -518,8 +518,8 @@ def list_suites(
         )
         warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
-    return openml.utils._list_all(
-        list_output_format=output_format,
+    return openml.utils._list_all(  # type: ignore
+        list_output_format=output_format,  # type: ignore
         listing_call=_list_studies,
         offset=offset,
         size=size,
@@ -623,8 +623,8 @@ def list_studies(  # noqa: PLR0913
         )
         warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
-    return openml.utils._list_all(
-        list_output_format=output_format,
+    return openml.utils._list_all(  # type: ignore
+        list_output_format=output_format,  # type: ignore
         listing_call=_list_studies,
         offset=offset,
         size=size,

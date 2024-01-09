@@ -184,8 +184,8 @@ def list_tasks(
             "will continue to work, use `output_format`='dataframe'."
         )
         warnings.warn(msg, category=FutureWarning, stacklevel=2)
-    return openml.utils._list_all(
-        list_output_format=output_format,
+    return openml.utils._list_all(  # type: ignore
+        list_output_format=output_format,  # type: ignore
         listing_call=_list_tasks,
         task_type=task_type,
         offset=offset,

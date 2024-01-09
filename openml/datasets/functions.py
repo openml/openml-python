@@ -175,9 +175,9 @@ def list_datasets(  # noqa: PLR0913
         )
         warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
-    return openml.utils._list_all(
+    return openml.utils._list_all(  # type: ignore
         data_id=data_id,
-        list_output_format=output_format,
+        list_output_format=output_format,  # type: ignore
         listing_call=_list_datasets,
         offset=offset,
         size=size,

@@ -1137,8 +1137,8 @@ def list_runs(  # noqa: PLR0913
     if uploader is not None and (not isinstance(uploader, list)):
         raise TypeError("uploader must be of type list.")
 
-    return openml.utils._list_all(
-        list_output_format=output_format,
+    return openml.utils._list_all(  # type: ignore
+        list_output_format=output_format,  # type: ignore
         listing_call=_list_runs,
         offset=offset,
         size=size,

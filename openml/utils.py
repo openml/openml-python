@@ -240,7 +240,17 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
 @overload
 def _list_all(
     listing_call: Callable[P, Any],
-    list_output_format: Literal["dict"] = "dict",
+    list_output_format: Literal["dict"] = ...,
+    *args: P.args,
+    **filters: P.kwargs,
+) -> dict:
+    ...
+
+
+@overload
+def _list_all(
+    listing_call: Callable[P, Any],
+    list_output_format: Literal["object"],
     *args: P.args,
     **filters: P.kwargs,
 ) -> dict:
@@ -259,7 +269,7 @@ def _list_all(
 
 def _list_all(  # noqa: C901, PLR0912
     listing_call: Callable[P, Any],
-    list_output_format: Literal["dict", "dataframe"] = "dict",
+    list_output_format: Literal["dict", "dataframe", "object"] = "dict",
     *args: P.args,
     **filters: P.kwargs,
 ) -> dict | pd.DataFrame:
@@ -277,6 +287,7 @@ def _list_all(  # noqa: C901, PLR0912
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
+        - If 'object' the output is a dict of objects (only for some `listing_call`)
     *args : Variable length argument list
         Any required arguments for the listing call.
     **filters : Arbitrary keyword arguments

@@ -647,6 +647,7 @@ class OpenMLRun(OpenMLBase):
 
         if self.parameter_settings is None:
             if self.flow is None:
+                assert self.flow_id is not None  # for mypy
                 self.flow = openml.flows.get_flow(self.flow_id)
             self.parameter_settings = self.flow.extension.obtain_parameter_values(
                 self.flow,

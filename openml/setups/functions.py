@@ -149,7 +149,6 @@ def list_setups(  # noqa: PLR0913
     setup : Iterable[int], optional
     output_format: str, optional (default='object')
         The parameter decides the format of the output.
-        - If 'object' the output is a dict of OpenMLSetup objects
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
 
@@ -172,8 +171,8 @@ def list_setups(  # noqa: PLR0913
         warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
     batch_size = 1000  # batch size for setups is lower
-    return openml.utils._list_all(
-        list_output_format=output_format,
+    return openml.utils._list_all(  # type: ignore
+        list_output_format=output_format,  # type: ignore
         listing_call=_list_setups,
         offset=offset,
         size=size,
@@ -300,7 +299,9 @@ def initialize_model(setup_id: int) -> Any:
     return flow.extension.flow_to_model(flow)
 
 
-def _to_dict(flow_id: int, openml_parameter_settings: list[OpenMLParameter]) -> OrderedDict:
+def _to_dict(
+    flow_id: int, openml_parameter_settings: list[OpenMLParameter] | list[dict[str, Any]]
+) -> OrderedDict:
     """Convert a flow ID and a list of OpenML parameter settings to
     a dictionary representation that can be serialized to XML.
 

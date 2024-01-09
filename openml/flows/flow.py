@@ -525,10 +525,10 @@ class OpenMLFlow(OpenMLBase):
                 f"Flow {self.name} does not contain component with " f"identifier {sub_identifier}",
             )
         if len(structure) == 1:
-            return self.components[sub_identifier]
+            return self.components[sub_identifier]  # type: ignore
 
         structure.pop(0)
-        return self.components[sub_identifier].get_subflow(structure)
+        return self.components[sub_identifier].get_subflow(structure)  # type: ignore
 
 
 def _copy_server_fields(source_flow: OpenMLFlow, target_flow: OpenMLFlow) -> None:
