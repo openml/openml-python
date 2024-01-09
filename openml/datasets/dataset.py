@@ -221,7 +221,7 @@ class OpenMLDataset(OpenMLBase):
         self._no_qualities_found = False
 
         if features_file is not None:
-            self._features = _read_features(features_file)
+            self._features = _read_features(Path(features_file))
 
         # "" was the old default value by `get_dataset` and maybe still used by some
         if qualities_file == "":
@@ -233,13 +233,14 @@ class OpenMLDataset(OpenMLBase):
                 FutureWarning,
                 stacklevel=2,
             )
+            qualities_file = None
 
-        if qualities_file:
-            self._qualities = _read_qualities(qualities_file)
+        if qualities_file is not None:
+            self._qualities = _read_qualities(Path(qualities_file))
 
         if data_file is not None:
             data_pickle, data_feather, feather_attribute = self._compressed_cache_file_paths(
-                data_file
+                Path(data_file)
             )
             self.data_pickle_file = data_pickle if Path(data_pickle).exists() else None
             self.data_feather_file = data_feather if Path(data_feather).exists() else None
@@ -290,8 +291,10 @@ class OpenMLDataset(OpenMLBase):
             "Format": self.format,
             "Licence": self.licence,
             "Download URL": self.url,
-            "Data file": self.data_file,
-            "Pickle file": self.data_pickle_file,
+            "Data file": str(self.data_file) if self.data_file is not None else None,
+            "Pickle file": (
+                str(self.data_pickle_file) if self.data_pickle_file is not None else None
+            ),
             "# of features": n_features,
         }
         if self.upload_date is not None:
@@ -342,9 +345,9 @@ class OpenMLDataset(OpenMLBase):
         # import required here to avoid circular import.
         from .functions import _get_dataset_arff, _get_dataset_parquet
 
-        self.data_file = _get_dataset_arff(self)
+        self.data_file = str(_get_dataset_arff(self))
         if self._parquet_url is not None:
-            self.parquet_file = _get_dataset_parquet(self)
+            self.parquet_file = str(_get_dataset_parquet(self))
 
     def _get_arff(self, format: str) -> dict:  # noqa: A002
         """Read ARFF file and return decoded arff.
@@ -407,7 +410,7 @@ class OpenMLDataset(OpenMLBase):
 
     def _parse_data_from_arff(  # noqa: C901, PLR0912, PLR0915
         self,
-        arff_file_path: str,
+        arff_file_path: Path,
     ) -> tuple[pd.DataFrame | scipy.sparse.csr_matrix, list[bool], list[str]]:
         """Parse all required data from arff file.
 
@@ -488,7 +491,7 @@ class OpenMLDataset(OpenMLBase):
             for column_name in X.columns:
                 if attribute_dtype[column_name] in ("categorical", "boolean"):
                     categories = self._unpack_categories(
-                        X[column_name],
+                        X[column_name],  # type: ignore
                         categories_names[column_name],
                     )
                     col.append(categories)
@@ -511,16 +514,15 @@ class OpenMLDataset(OpenMLBase):
 
         return X, categorical, attribute_names  # type: ignore
 
-    def _compressed_cache_file_paths(self, data_file: str) -> tuple[str, str, str]:
-        ext = f".{data_file.split('.')[-1]}"
-        data_pickle_file = data_file.replace(ext, ".pkl.py3")
-        data_feather_file = data_file.replace(ext, ".feather")
-        feather_attribute_file = data_file.replace(ext, ".feather.attributes.pkl.py3")
+    def _compressed_cache_file_paths(self, data_file: Path) -> tuple[Path, Path, Path]:
+        data_pickle_file = data_file.with_suffix(".pkl.py3")
+        data_feather_file = data_file.with_suffix(".feather")
+        feather_attribute_file = data_file.with_suffix(".feather.attributes.pkl.py3")
         return data_pickle_file, data_feather_file, feather_attribute_file
 
     def _cache_compressed_file_from_file(
         self,
-        data_file: str,
+        data_file: Path,
     ) -> tuple[pd.DataFrame | scipy.sparse.csr_matrix, list[bool], list[str]]:
         """Store data from the local file in compressed format.
 
@@ -533,9 +535,9 @@ class OpenMLDataset(OpenMLBase):
             feather_attribute_file,
         ) = self._compressed_cache_file_paths(data_file)
 
-        if data_file.endswith(".arff"):
+        if data_file.suffix == ".arff":
             data, categorical, attribute_names = self._parse_data_from_arff(data_file)
-        elif data_file.endswith(".pq"):
+        elif data_file.suffix == ".pq":
             try:
                 data = pd.read_parquet(data_file)
             except Exception as e:  # noqa: BLE001
@@ -581,7 +583,7 @@ class OpenMLDataset(OpenMLBase):
 
             file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
             assert file_to_load is not None
-            return self._cache_compressed_file_from_file(file_to_load)
+            return self._cache_compressed_file_from_file(Path(file_to_load))
 
         # helper variable to help identify where errors occur
         fpath = self.data_feather_file if self.cache_format == "feather" else self.data_pickle_file
@@ -635,7 +637,7 @@ class OpenMLDataset(OpenMLBase):
                 "to attempt to reconstruct it.",
             )
             assert self.data_file is not None
-            data, categorical, attribute_names = self._parse_data_from_arff(self.data_file)
+            data, categorical, attribute_names = self._parse_data_from_arff(Path(self.data_file))
 
         data_up_to_date = isinstance(data, pd.DataFrame) or scipy.sparse.issparse(data)
         if self.cache_format == "pickle" and not data_up_to_date:
@@ -643,7 +645,7 @@ class OpenMLDataset(OpenMLBase):
             file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
             assert file_to_load is not None
 
-            return self._cache_compressed_file_from_file(file_to_load)
+            return self._cache_compressed_file_from_file(Path(file_to_load))
         return data, categorical, attribute_names
 
     # TODO(eddiebergman): Can type this better with overload
@@ -737,7 +739,7 @@ class OpenMLDataset(OpenMLBase):
         raw_cat = pd.Categorical(col, ordered=True, categories=filtered_categories)
         return pd.Series(raw_cat, index=series.index, name=series.name)
 
-    def get_data(  # noqa: C901, PLR0912
+    def get_data(  # noqa: C901, PLR0912, PLR0915
         self,
         target: list[str] | str | None = None,
         include_row_id: bool = False,  # noqa: FBT001, FBT002
@@ -813,13 +815,13 @@ class OpenMLDataset(OpenMLBase):
             attribute_names = [att for att, k in zip(attribute_names, keep) if k]
 
         if target is None:
-            data = self._convert_array_format(data, dataset_format, attribute_names)
+            data = self._convert_array_format(data, dataset_format, attribute_names)  # type: ignore
             targets = None
         else:
             if isinstance(target, str):
                 target = target.split(",") if "," in target else [target]
             targets = np.array([column in target for column in attribute_names])
-            target_names = np.array([column for column in attribute_names if column in target])
+            target_names = [column for column in attribute_names if column in target]
             if np.sum(targets) > 1:
                 raise NotImplementedError(
                     "Number of requested targets %d is not implemented." % np.sum(targets),
@@ -839,7 +841,7 @@ class OpenMLDataset(OpenMLBase):
             categorical = [cat for cat, t in zip(categorical, targets) if not t]
             attribute_names = [att for att, k in zip(attribute_names, targets) if not k]
 
-            x = self._convert_array_format(x, dataset_format, attribute_names)
+            x = self._convert_array_format(x, dataset_format, attribute_names)  # type: ignore
             if dataset_format == "array" and scipy.sparse.issparse(y):
                 # scikit-learn requires dense representation of targets
                 y = np.asarray(y.todense()).astype(target_dtype)
@@ -847,13 +849,14 @@ class OpenMLDataset(OpenMLBase):
                 # need to flatten it to a 1-d array for _convert_array_format()
                 y = y.squeeze()
             y = self._convert_array_format(y, dataset_format, target_names)
-            y = y.astype(target_dtype) if dataset_format == "array" else y
+            y = y.astype(target_dtype) if isinstance(y, np.ndarray) else y
             if len(y.shape) > 1 and y.shape[1] == 1:
                 # single column targets should be 1-d for both `array` and `dataframe` formats
+                assert isinstance(y, (np.ndarray, pd.DataFrame, pd.Series))
                 y = y.squeeze()
             data, targets = x, y
 
-        return data, targets, categorical, attribute_names
+        return data, targets, categorical, attribute_names  # type: ignore
 
     def _load_features(self) -> None:
         """Load the features metadata from the server and store it in the dataset object."""
@@ -1036,8 +1039,8 @@ class OpenMLDataset(OpenMLBase):
         }
 
 
-def _read_features(features_file: str) -> dict[int, OpenMLDataFeature]:
-    features_pickle_file = Path(_get_features_pickle_file(features_file))
+def _read_features(features_file: Path) -> dict[int, OpenMLDataFeature]:
+    features_pickle_file = Path(_get_features_pickle_file(str(features_file)))
     try:
         with features_pickle_file.open("rb") as fh_binary:
             return pickle.load(fh_binary)  # type: ignore  # noqa: S301
@@ -1075,18 +1078,25 @@ def _parse_features_xml(features_xml_string: str) -> dict[int, OpenMLDataFeature
     return features
 
 
+# TODO(eddiebergman): Should this really exist?
 def _get_features_pickle_file(features_file: str) -> str:
     """Exists so it can be mocked during unit testing"""
     return features_file + ".pkl"
 
 
-def _read_qualities(qualities_file: str) -> dict[str, float]:
-    qualities_pickle_file = Path(_get_qualities_pickle_file(qualities_file))
+# TODO(eddiebergman): Should this really exist?
+def _get_qualities_pickle_file(qualities_file: str) -> str:
+    """Exists so it can be mocked during unit testing."""
+    return qualities_file + ".pkl"
+
+
+def _read_qualities(qualities_file: Path) -> dict[str, float]:
+    qualities_pickle_file = Path(_get_qualities_pickle_file(str(qualities_file)))
     try:
         with qualities_pickle_file.open("rb") as fh_binary:
             return pickle.load(fh_binary)  # type: ignore  # noqa: S301
     except:  # noqa: E722
-        with Path(qualities_file).open(encoding="utf8") as fh:
+        with qualities_file.open(encoding="utf8") as fh:
             qualities_xml = fh.read()
 
         qualities = _parse_qualities_xml(qualities_xml)
@@ -1112,8 +1122,3 @@ def _parse_qualities_xml(qualities_xml: str) -> dict[str, float]:
     xml_as_dict = xmltodict.parse(qualities_xml, force_list=("oml:quality",))
     qualities = xml_as_dict["oml:data_qualities"]["oml:quality"]
     return _check_qualities(qualities)
-
-
-def _get_qualities_pickle_file(qualities_file: str) -> str:
-    """Exists so it can be mocked during unit testing."""
-    return qualities_file + ".pkl"
