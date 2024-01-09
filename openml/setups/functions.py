@@ -173,7 +173,7 @@ def list_setups(  # noqa: PLR0913
 
     batch_size = 1000  # batch size for setups is lower
     return openml.utils._list_all(
-        output_format=output_format,
+        list_output_format=output_format,
         listing_call=_list_setups,
         offset=offset,
         size=size,

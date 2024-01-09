@@ -71,7 +71,7 @@ def test_list_all():
     openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
     openml.utils._list_all(
         listing_call=openml.tasks.functions._list_tasks,
-        output_format="dataframe",
+        list_output_format="dataframe",
     )
 
 
@@ -92,7 +92,7 @@ def test_list_all_with_multiple_batches(min_number_tasks_on_test_server):
     batch_size = min_number_tasks_on_test_server - 1
     res = openml.utils._list_all(
         listing_call=openml.tasks.functions._list_tasks,
-        output_format="dataframe",
+        list_output_format="dataframe",
         batch_size=batch_size,
     )
     assert min_number_tasks_on_test_server <= len(res)

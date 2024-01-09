@@ -414,6 +414,7 @@ class OpenMLRun(OpenMLBase):
         if self.data_content is None:
             raise ValueError("Run has not been executed.")
         if self.flow is None:
+            assert self.flow_id is not None, "Run has no associated flow id!"
             self.flow = get_flow(self.flow_id)
 
         if self.description_text is None:
@@ -663,7 +664,7 @@ class OpenMLRun(OpenMLBase):
             file_elements["trace"] = ("trace.arff", trace_arff)
         return file_elements
 
-    def _to_dict(self) -> OrderedDict[str, OrderedDict]:  # noqa: PLR0912, C901
+    def _to_dict(self) -> dict[str, dict]:  # noqa: PLR0912, C901
         """Creates a dictionary representation of self."""
         description = OrderedDict()  # type: 'OrderedDict'
         description["oml:run"] = OrderedDict()

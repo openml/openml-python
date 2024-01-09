@@ -220,7 +220,7 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
 @overload
 def _list_all(
     listing_call: Callable[P, Any],
-    output_format: Literal["dict", "object"] = "dict",
+    output_format: Literal["dict"] = "dict",
     *args: P.args,
     **filters: P.kwargs,
 ) -> dict:
@@ -239,7 +239,7 @@ def _list_all(
 
 def _list_all(  # noqa: C901, PLR0912
     listing_call: Callable[P, Any],
-    output_format: Literal["dict", "dataframe", "object"] = "dict",
+    list_output_format: Literal["dict", "dataframe"] = "dict",
     *args: P.args,
     **filters: P.kwargs,
 ) -> dict | pd.DataFrame:
@@ -253,7 +253,7 @@ def _list_all(  # noqa: C901, PLR0912
     ----------
     listing_call : callable
         Call listing, e.g. list_evaluations.
-    output_format : str, optional (default='dict')
+    list_output_format : str, optional (default='dict')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
@@ -271,7 +271,7 @@ def _list_all(  # noqa: C901, PLR0912
     # eliminate filters that have a None value
     active_filters = {key: value for key, value in filters.items() if value is not None}
     page = 0
-    result = pd.DataFrame() if output_format == "dataframe" else {}
+    result = pd.DataFrame() if list_output_format == "dataframe" else {}
 
     # Default batch size per paging.
     # This one can be set in filters (batch_size), but should not be
@@ -298,7 +298,7 @@ def _list_all(  # noqa: C901, PLR0912
             current_offset = offset + BATCH_SIZE_ORIG * page
             new_batch = listing_call(
                 *args,
-                output_format=output_format,  # type: ignore
+                output_format=list_output_format,  # type: ignore
                 **{**active_filters, "limit": batch_size, "offset": current_offset},  # type: ignore
             )
         except openml.exceptions.OpenMLServerNoResult:
@@ -307,13 +307,13 @@ def _list_all(  # noqa: C901, PLR0912
             # to enforce it...
             break
 
-        if output_format == "dataframe":
+        if list_output_format == "dataframe":
             if len(result) == 0:
                 result = new_batch
             else:
                 result = pd.concat([result, new_batch], ignore_index=True)
         else:
-            # For output_format = 'dict' or 'object'
+            # For output_format = 'dict' (or catch all)
             result.update(new_batch)
 
         if len(new_batch) < batch_size:

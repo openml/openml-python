@@ -2,7 +2,7 @@
 # TODO(eddiebergman): Begging for dataclassses to shorten this all
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Sequence
 
 from openml.base import OpenMLBase
 from openml.config import get_server_base_url
@@ -311,7 +311,7 @@ class OpenMLBenchmarkSuite(BaseStudy):
         creator: int | None,
         tags: list[dict] | None,
         data: list[int] | None,
-        tasks: list[int],
+        tasks: list[int] | None,
     ):
         super().__init__(
             study_id=suite_id,
