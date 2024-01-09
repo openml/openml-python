@@ -32,11 +32,11 @@ class OpenMLSplit:
         self,
         name: int | str,
         description: str,
-        split: dict[int, dict[int, dict[int, np.ndarray]]],
+        split: dict[int, dict[int, dict[int, tuple[np.ndarray, np.ndarray]]]],
     ):
         self.description = description
         self.name = name
-        self.split: dict[int, dict[int, dict[int, np.ndarray]]] = {}
+        self.split: dict[int, dict[int, dict[int, tuple[np.ndarray, np.ndarray]]]] = {}
 
         # Add splits according to repetition
         for repetition in split:
@@ -154,7 +154,7 @@ class OpenMLSplit:
         assert name is not None
         return cls(name, "", repetitions)
 
-    def get(self, repeat: int = 0, fold: int = 0, sample: int = 0) -> np.ndarray:
+    def get(self, repeat: int = 0, fold: int = 0, sample: int = 0) -> tuple[np.ndarray, np.ndarray]:
         """Returns the specified data split from the CrossValidationSplit object.
 
         Parameters

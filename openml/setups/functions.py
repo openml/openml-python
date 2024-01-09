@@ -4,7 +4,7 @@ from __future__ import annotations
 import os
 import warnings
 from collections import OrderedDict
-from typing import Any
+from typing import Any, Iterable
 from typing_extensions import Literal
 
 import pandas as pd
@@ -134,7 +134,7 @@ def list_setups(  # noqa: PLR0913
     size: int | None = None,
     flow: int | None = None,
     tag: str | None = None,
-    setup: list | None = None,
+    setup: Iterable[int] | None = None,
     output_format: Literal["object", "dict", "dataframe"] = "object",
 ) -> dict | pd.DataFrame:
     """
@@ -146,7 +146,7 @@ def list_setups(  # noqa: PLR0913
     size : int, optional
     flow : int, optional
     tag : str, optional
-    setup : list(int), optional
+    setup : Iterable[int], optional
     output_format: str, optional (default='object')
         The parameter decides the format of the output.
         - If 'object' the output is a dict of OpenMLSetup objects
@@ -185,7 +185,7 @@ def list_setups(  # noqa: PLR0913
 
 
 def _list_setups(
-    setup: list[int] | None = None,
+    setup: Iterable[int] | None = None,
     output_format: Literal["dict", "dataframe", "object"] = "object",
     **kwargs: Any,
 ) -> dict[int, dict] | pd.DataFrame | dict[int, OpenMLSetup]:

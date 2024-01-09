@@ -5,10 +5,10 @@ from __future__ import annotations
 
 import warnings
 from abc import ABC
-from collections import OrderedDict
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
+from typing_extensions import Literal, TypedDict, overload
 
 import openml._api_calls
 import openml.config
@@ -38,6 +38,12 @@ class TaskType(Enum):
     SURVIVAL_ANALYSIS = 7
     SUBGROUP_DISCOVERY = 8
     MULTITASK_REGRESSION = 9
+
+
+class _EstimationProcedure(TypedDict):
+    type: str | None
+    parameters: dict[str, str] | None
+    data_splits_url: str | None
 
 
 class OpenMLTask(OpenMLBase):
@@ -82,10 +88,11 @@ class OpenMLTask(OpenMLBase):
         self.task_type = task_type
         self.dataset_id = int(data_set_id)
         self.evaluation_measure = evaluation_measure
-        self.estimation_procedure: dict[str, str | dict | None] = {}
-        self.estimation_procedure["type"] = estimation_procedure_type
-        self.estimation_procedure["parameters"] = estimation_parameters
-        self.estimation_procedure["data_splits_url"] = data_splits_url
+        self.estimation_procedure: _EstimationProcedure = {
+            "type": estimation_procedure_type,
+            "parameters": estimation_parameters,
+            "data_splits_url": data_splits_url,
+        }
         self.estimation_procedure_id = estimation_procedure_id
         self.split: OpenMLSplit | None = None
 
@@ -190,35 +197,25 @@ class OpenMLTask(OpenMLBase):
 
         return self.split.repeats, self.split.folds, self.split.samples
 
-    def _to_dict(self) -> OrderedDict[str, OrderedDict]:
+    # TODO(eddiebergman): Really need some better typing on all this
+    def _to_dict(self) -> dict[str, dict[str, int | str | list[dict[str, Any]]]]:
         """Creates a dictionary representation of self."""
-        task_container = OrderedDict()  # type: OrderedDict[str, OrderedDict]
-        task_dict: OrderedDict[str, list | str | int] = OrderedDict(
-            [("@xmlns:oml", "http://openml.org/openml")],
-        )
-
-        task_container["oml:task_inputs"] = task_dict
-        task_dict["oml:task_type_id"] = self.task_type_id.value
-
-        # having task_inputs and adding a type annotation
-        # solves wrong warnings
-        task_inputs: list[OrderedDict] = [
-            OrderedDict([("@name", "source_data"), ("#text", str(self.dataset_id))]),
-            OrderedDict(
-                [("@name", "estimation_procedure"), ("#text", str(self.estimation_procedure_id))],
-            ),
+        oml_input = [
+            {"@name": "source_data", "#text": self.dataset_id},
+            {"@name": "estimation_procedure", "#text": self.estimation_procedure_id},
         ]
+        if self.evaluation_measure is not None:  #
+            oml_input.append({"@name": "evaluation_measures", "#text": self.evaluation_measure})
 
-        if self.evaluation_measure is not None:
-            task_inputs.append(
-                OrderedDict([("@name", "evaluation_measures"), ("#text", self.evaluation_measure)]),
-            )
+        return {
+            "oml:task_inputs": {
+                "@xmlns:oml": "http://openml.org/openml",
+                "oml:task_type_id": self.task_type_id.value,
+                "oml:input": oml_input,
+            }
+        }
 
-        task_dict["oml:input"] = task_inputs
-
-        return task_container
-
-    def _parse_publish_response(self, xml_response: dict):
+    def _parse_publish_response(self, xml_response: dict) -> None:
         """Parse the id from the xml_response and assign it to self."""
         self.task_id = int(xml_response["oml:upload_task"]["oml:id"])
 
@@ -277,13 +274,30 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
         self.target_name = target_name
 
-    # TODO(eddiebergman): type with overload?
+    @overload
     def get_X_and_y(
-        self,
-        dataset_format: str = "array",
+        self, dataset_format: Literal["array"] = "array"
+    ) -> tuple[
+        np.ndarray | scipy.sparse.spmatrix,
+        np.ndarray | None,
+    ]:
+        ...
+
+    @overload
+    def get_X_and_y(
+        self, dataset_format: Literal["dataframe"]
+    ) -> tuple[
+        pd.DataFrame,
+        pd.Series | pd.DataFrame | None,
+    ]:
+        ...
+
+    # TODO(eddiebergman): Do all OpenMLSupervisedTask have a `y`?
+    def get_X_and_y(
+        self, dataset_format: Literal["dataframe", "array"] = "array"
     ) -> tuple[
         np.ndarray | pd.DataFrame | scipy.sparse.spmatrix,
-        np.ndarray | pd.Series,
+        np.ndarray | pd.Series | pd.DataFrame | None,
     ]:
         """Get data associated with the current task.
 
@@ -315,24 +329,24 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
             TaskType.LEARNING_CURVE,
         ):
             raise NotImplementedError(self.task_type)
+
         X, y, _, _ = dataset.get_data(
             dataset_format=dataset_format,
             target=self.target_name,
         )
         return X, y
 
-    def _to_dict(self) -> OrderedDict[str, OrderedDict]:
+    def _to_dict(self) -> dict[str, dict]:
         task_container = super()._to_dict()
         task_dict = task_container["oml:task_inputs"]
+        oml_input = task_dict["oml:task_inputs"]["oml:input"]  # type: ignore
+        assert isinstance(oml_input, list)
 
-        task_dict["oml:input"].append(
-            OrderedDict([("@name", "target_feature"), ("#text", self.target_name)]),
-        )
-
+        oml_input.append({"@name": "target_feature", "#text": self.target_name})
         return task_container
 
     @property
-    def estimation_parameters(self):
+    def estimation_parameters(self) -> dict[str, str] | None:
         """Return the estimation parameters for the task."""
         warnings.warn(
             "The estimation_parameters attribute will be "
@@ -344,7 +358,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         return self.estimation_procedure["parameters"]
 
     @estimation_parameters.setter
-    def estimation_parameters(self, est_parameters):
+    def estimation_parameters(self, est_parameters: dict[str, str] | None) -> None:
         self.estimation_procedure["parameters"] = est_parameters
 
 
@@ -522,9 +536,20 @@ class OpenMLClusteringTask(OpenMLTask):
 
         self.target_name = target_name
 
+    @overload
     def get_X(
         self,
-        dataset_format: str = "array",
+        dataset_format: Literal["array"] = "array",
+    ) -> np.ndarray | scipy.sparse.spmatrix:
+        ...
+
+    @overload
+    def get_X(self, dataset_format: Literal["dataframe"]) -> pd.DataFrame:
+        ...
+
+    def get_X(
+        self,
+        dataset_format: Literal["array", "dataframe"] = "array",
     ) -> np.ndarray | pd.DataFrame | scipy.sparse.spmatrix:
         """Get data associated with the current task.
 
@@ -540,15 +565,10 @@ class OpenMLClusteringTask(OpenMLTask):
 
         """
         dataset = self.get_dataset()
-        data, *_ = dataset.get_data(
-            dataset_format=dataset_format,
-            target=None,
-        )
+        data, *_ = dataset.get_data(dataset_format=dataset_format, target=None)
         return data
 
-    def _to_dict(self) -> OrderedDict[str, OrderedDict]:
-        task_container = super()._to_dict()
-
+    def _to_dict(self) -> dict[str, dict[str, int | str | list[dict[str, Any]]]]:
         # Right now, it is not supported as a feature.
         # Uncomment if it is supported on the server
         # in the future.
@@ -563,7 +583,7 @@ class OpenMLClusteringTask(OpenMLTask):
                 ])
             )
         """
-        return task_container
+        return super()._to_dict()
 
 
 class OpenMLLearningCurveTask(OpenMLClassificationTask):

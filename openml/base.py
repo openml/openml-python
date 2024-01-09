@@ -4,10 +4,10 @@ from __future__ import annotations
 import re
 import webbrowser
 from abc import ABC, abstractmethod
-from collections import OrderedDict
 
 import xmltodict
 
+import openml._api_calls
 import openml.config
 
 from .utils import _get_rest_api_type_alias, _tag_openml_base
@@ -22,7 +22,7 @@ class OpenMLBase(ABC):
 
     @property
     @abstractmethod
-    def id(self) -> int | None:
+    def id(self) -> int | None:  # noqa: A003
         """The id of the entity, it is unique for its entity type."""
 
     @property
@@ -78,25 +78,22 @@ class OpenMLBase(ABC):
         header_text = f"OpenML {name_with_spaces}"
         header = "{}\n{}\n".format(header_text, "=" * len(header_text))
 
-        longest_field_name_length = max(len(name) for name, value in body_fields)
+        longest_field_name_length = max(len(name) for name, _ in body_fields)
         field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
         body = "\n".join(field_line_format.format(name, value) for name, value in body_fields)
         return header + body
 
     @abstractmethod
-    def _to_dict(self) -> OrderedDict[str, OrderedDict[str, str]]:
+    def _to_dict(self) -> dict[str, dict]:
         """Creates a dictionary representation of self.
 
-        Uses OrderedDict to ensure consistent ordering when converting to xml.
-        The return value (OrderedDict) will be used to create the upload xml file.
+        The return value will be used to create the upload xml file.
         The xml file must have the tags in exactly the order of the object's xsd.
         (see https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/).
 
         Returns
         -------
-        OrderedDict
-            Flow represented as OrderedDict.
-
+            Thing represented as dict.
         """
         # Should be implemented in the base class.
 
@@ -107,8 +104,8 @@ class OpenMLBase(ABC):
 
         # A task may not be uploaded with the xml encoding specification:
         # <?xml version="1.0" encoding="utf-8"?>
-        encoding_specification, xml_body = xml_representation.split("\n", 1)
-        return xml_body
+        _encoding_specification, xml_body = xml_representation.split("\n", 1)
+        return str(xml_body)
 
     def _get_file_elements(self) -> openml._api_calls.FILE_ELEMENTS_TYPE:
         """Get file_elements to upload to the server, called during Publish.
@@ -123,6 +120,7 @@ class OpenMLBase(ABC):
         """Parse the id from the xml_response and assign it to self."""
 
     def publish(self) -> OpenMLBase:
+        """Publish the object on the OpenML server."""
         file_elements = self._get_file_elements()
 
         if "description" not in file_elements:
@@ -145,8 +143,8 @@ class OpenMLBase(ABC):
             raise ValueError(
                 "Cannot open element on OpenML.org when attribute `openml_url` is `None`",
             )
-        else:
-            webbrowser.open(self.openml_url)
+
+        webbrowser.open(self.openml_url)
 
     def push_tag(self, tag: str) -> None:
         """Annotates this entity with a tag on the server.

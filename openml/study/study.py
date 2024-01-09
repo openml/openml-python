@@ -1,7 +1,7 @@
 # License: BSD 3-Clause
+# TODO(eddiebergman): Begging for dataclassses to shorten this all
 from __future__ import annotations
 
-from collections import OrderedDict
 from typing import Any
 
 from openml.base import OpenMLBase
@@ -142,39 +142,42 @@ class BaseStudy(OpenMLBase):
         """Parse the id from the xml_response and assign it to self."""
         self.study_id = int(xml_response["oml:study_upload"]["oml:id"])
 
-    def _to_dict(self) -> OrderedDict[str, OrderedDict]:
+    def _to_dict(self) -> dict[str, dict]:
         """Creates a dictionary representation of self."""
         # some can not be uploaded, e.g., id, creator, creation_date
         simple_props = ["alias", "main_entity_type", "name", "description"]
-        # maps from attribute name (which is used as outer tag name) to immer
-        # tag name (e.g., self.tasks -> <oml:tasks><oml:task_id>1987
-        # </oml:task_id></oml:tasks>)
-        complex_props = {
-            "tasks": "task_id",
-            "runs": "run_id",
-        }
 
-        study_container = OrderedDict()  # type: 'OrderedDict'
-        namespace_list = [("@xmlns:oml", "http://openml.org/openml")]
-        study_dict = OrderedDict(namespace_list)  # type: 'OrderedDict'
-        study_container["oml:study"] = study_dict
-
+        # TODO(eddiebergman): Begging for a walrus if we can drop 3.7
+        simple_prop_values = {}
         for prop_name in simple_props:
             content = getattr(self, prop_name, None)
             if content is not None:
-                study_dict["oml:" + prop_name] = content
+                simple_prop_values["oml:" + prop_name] = content
+
+        # maps from attribute name (which is used as outer tag name) to immer
+        # tag name e.g., self.tasks -> <oml:tasks><oml:task_id>1987</oml:task_id></oml:tasks>
+        complex_props = {"tasks": "task_id", "runs": "run_id"}
+
+        # TODO(eddiebergman): Begging for a walrus if we can drop 3.7
+        complex_prop_values = {}
         for prop_name, inner_name in complex_props.items():
             content = getattr(self, prop_name, None)
             if content is not None:
-                sub_dict = {"oml:" + inner_name: content}
-                study_dict["oml:" + prop_name] = sub_dict
-        return study_container
+                complex_prop_values["oml:" + prop_name] = {"oml:" + inner_name: content}
 
-    def push_tag(self, tag: str):
+        return {
+            "oml:study": {
+                "@xmlns:oml": "http://openml.org/openml",
+                **simple_prop_values,
+                **complex_prop_values,
+            }
+        }
+
+    def push_tag(self, tag: str) -> None:
         """Add a tag to the study."""
         raise NotImplementedError("Tags for studies is not (yet) supported.")
 
-    def remove_tag(self, tag: str):
+    def remove_tag(self, tag: str) -> None:
         """Remove a tag from the study."""
         raise NotImplementedError("Tags for studies is not (yet) supported.")
 

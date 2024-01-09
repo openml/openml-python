@@ -59,8 +59,8 @@ class OpenMLEvaluation:
         upload_time: str,
         uploader: int,
         uploader_name: str,
-        value: float,
-        values: list[float],
+        value: float | None,
+        values: list[float] | None,
         array_data: str | None = None,
     ):
         self.run_id = run_id

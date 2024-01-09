@@ -4,11 +4,10 @@ from __future__ import annotations
 import contextlib
 import shutil
 import warnings
-from collections import OrderedDict
 from functools import wraps
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Mapping, TypeVar
-from typing_extensions import Literal, ParamSpec
+from typing_extensions import Literal, ParamSpec, overload
 
 import numpy as np
 import pandas as pd
@@ -218,17 +217,32 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
         raise
 
 
-# TODO(eddiebergman): Add `@overload` typing for output_format
-# NOTE: Impossible to type `listing_call` properly on the account of the output format,
-# might be better to use an iterator here instead and concatenate at the use point
-# NOTE: The obect output_format, the return type of `listing_call` is expected to be `Sized`
-# to have `len()` be callable on it.
+@overload
+def _list_all(
+    listing_call: Callable[P, Any],
+    output_format: Literal["dict", "object"] = "dict",
+    *args: P.args,
+    **filters: P.kwargs,
+) -> dict:
+    ...
+
+
+@overload
+def _list_all(
+    listing_call: Callable[P, Any],
+    output_format: Literal["dataframe"],
+    *args: P.args,
+    **filters: P.kwargs,
+) -> pd.DataFrame:
+    ...
+
+
 def _list_all(  # noqa: C901, PLR0912
     listing_call: Callable[P, Any],
     output_format: Literal["dict", "dataframe", "object"] = "dict",
     *args: P.args,
     **filters: P.kwargs,
-) -> OrderedDict | pd.DataFrame:
+) -> dict | pd.DataFrame:
     """Helper to handle paged listing requests.
 
     Example usage:
@@ -257,9 +271,7 @@ def _list_all(  # noqa: C901, PLR0912
     # eliminate filters that have a None value
     active_filters = {key: value for key, value in filters.items() if value is not None}
     page = 0
-    result = OrderedDict()
-    if output_format == "dataframe":
-        result = pd.DataFrame()
+    result = pd.DataFrame() if output_format == "dataframe" else {}
 
     # Default batch size per paging.
     # This one can be set in filters (batch_size), but should not be
@@ -291,7 +303,8 @@ def _list_all(  # noqa: C901, PLR0912
             )
         except openml.exceptions.OpenMLServerNoResult:
             # we want to return an empty dict in this case
-            # NOTE: This may not actually happen, but we could just return here to enforce it...
+            # NOTE: This above statement may not actually happen, but we could just return here
+            # to enforce it...
             break
 
         if output_format == "dataframe":

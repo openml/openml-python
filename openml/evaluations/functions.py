@@ -1,9 +1,10 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import collections
 import json
 import warnings
+from typing import Any
+from typing_extensions import Literal, overload
 
 import numpy as np
 import pandas as pd
@@ -15,7 +16,45 @@ import openml.utils
 from openml.evaluations import OpenMLEvaluation
 
 
+@overload
 def list_evaluations(
+    function: str,
+    offset: int | None = ...,
+    size: int | None = ...,
+    tasks: list[str | int] | None = ...,
+    setups: list[str | int] | None = ...,
+    flows: list[str | int] | None = ...,
+    runs: list[str | int] | None = ...,
+    uploaders: list[str | int] | None = ...,
+    tag: str | None = ...,
+    study: int | None = ...,
+    per_fold: bool | None = ...,
+    sort_order: str | None = ...,
+    output_format: Literal["dict", "object"] = "dict",
+) -> dict:
+    ...
+
+
+@overload
+def list_evaluations(
+    function: str,
+    offset: int | None = ...,
+    size: int | None = ...,
+    tasks: list[str | int] | None = ...,
+    setups: list[str | int] | None = ...,
+    flows: list[str | int] | None = ...,
+    runs: list[str | int] | None = ...,
+    uploaders: list[str | int] | None = ...,
+    tag: str | None = ...,
+    study: int | None = ...,
+    per_fold: bool | None = ...,
+    sort_order: str | None = ...,
+    output_format: Literal["dataframe"] = ...,
+) -> pd.DataFrame:
+    ...
+
+
+def list_evaluations(  # noqa: PLR0913
     function: str,
     offset: int | None = None,
     size: int | None = 10000,
@@ -28,7 +67,7 @@ def list_evaluations(
     study: int | None = None,
     per_fold: bool | None = None,
     sort_order: str | None = None,
-    output_format: str = "object",
+    output_format: Literal["object", "dict", "dataframe"] = "object",
 ) -> dict | pd.DataFrame:
     """
     List all run-evaluation pairs matching all of the given filters.
@@ -76,7 +115,7 @@ def list_evaluations(
     """
     if output_format not in ["dataframe", "dict", "object"]:
         raise ValueError(
-            "Invalid output format selected. " "Only 'object', 'dataframe', or 'dict' applicable.",
+            "Invalid output format selected. Only 'object', 'dataframe', or 'dict' applicable.",
         )
 
     # TODO: [0.15]
@@ -92,8 +131,8 @@ def list_evaluations(
     if per_fold is not None:
         per_fold_str = str(per_fold).lower()
 
-    return openml.utils._list_all(
-        output_format=output_format,
+    return openml.utils._list_all(  # type: ignore
+        output_format=output_format,  # type: ignore
         listing_call=_list_evaluations,
         function=function,
         offset=offset,
@@ -110,7 +149,7 @@ def list_evaluations(
     )
 
 
-def _list_evaluations(
+def _list_evaluations(  # noqa: PLR0913
     function: str,
     tasks: list | None = None,
     setups: list | None = None,
@@ -119,8 +158,8 @@ def _list_evaluations(
     uploaders: list | None = None,
     study: int | None = None,
     sort_order: str | None = None,
-    output_format: str = "object",
-    **kwargs,
+    output_format: Literal["object", "dict", "dataframe"] = "object",
+    **kwargs: Any,
 ) -> dict | pd.DataFrame:
     """
     Perform API call ``/evaluation/function{function}/{filters}``
@@ -186,7 +225,10 @@ def _list_evaluations(
     return __list_evaluations(api_call, output_format=output_format)
 
 
-def __list_evaluations(api_call, output_format="object"):
+def __list_evaluations(
+    api_call: str,
+    output_format: Literal["object", "dict", "dataframe"] = "object",
+) -> dict | pd.DataFrame:
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     evals_dict = xmltodict.parse(xml_string, force_list=("oml:evaluation",))
@@ -200,7 +242,7 @@ def __list_evaluations(api_call, output_format="object"):
         evals_dict["oml:evaluations"],
     )
 
-    evals = collections.OrderedDict()
+    evals: dict[int, dict | OpenMLEvaluation] = {}
     uploader_ids = list(
         {eval_["oml:uploader"] for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]},
     )
@@ -210,32 +252,33 @@ def __list_evaluations(api_call, output_format="object"):
     user_dict = {user["oml:id"]: user["oml:username"] for user in users["oml:users"]["oml:user"]}
     for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]:
         run_id = int(eval_["oml:run_id"])
+
         value = None
-        values = None
-        array_data = None
         if "oml:value" in eval_:
             value = float(eval_["oml:value"])
+
+        values = None
         if "oml:values" in eval_:
             values = json.loads(eval_["oml:values"])
-        if "oml:array_data" in eval_:
-            array_data = eval_["oml:array_data"]
+
+        array_data = eval_.get("oml:array_data")
 
         if output_format == "object":
             evals[run_id] = OpenMLEvaluation(
-                int(eval_["oml:run_id"]),
-                int(eval_["oml:task_id"]),
-                int(eval_["oml:setup_id"]),
-                int(eval_["oml:flow_id"]),
-                eval_["oml:flow_name"],
-                int(eval_["oml:data_id"]),
-                eval_["oml:data_name"],
-                eval_["oml:function"],
-                eval_["oml:upload_time"],
-                int(eval_["oml:uploader"]),
-                user_dict[eval_["oml:uploader"]],
-                value,
-                values,
-                array_data,
+                run_id=run_id,
+                task_id=int(eval_["oml:task_id"]),
+                setup_id=int(eval_["oml:setup_id"]),
+                flow_id=int(eval_["oml:flow_id"]),
+                flow_name=eval_["oml:flow_name"],
+                data_id=int(eval_["oml:data_id"]),
+                data_name=eval_["oml:data_name"],
+                function=eval_["oml:function"],
+                upload_time=eval_["oml:upload_time"],
+                uploader=int(eval_["oml:uploader"]),
+                uploader_name=user_dict[eval_["oml:uploader"]],
+                value=value,
+                values=values,
+                array_data=array_data,
             )
         else:
             # for output_format in ['dict', 'dataframe']
@@ -257,8 +300,9 @@ def __list_evaluations(api_call, output_format="object"):
             }
 
     if output_format == "dataframe":
-        rows = [value for key, value in evals.items()]
-        evals = pd.DataFrame.from_records(rows, columns=rows[0].keys())
+        rows = list(evals.values())
+        return pd.DataFrame.from_records(rows, columns=rows[0].keys())  # type: ignore
+
     return evals
 
 
@@ -315,7 +359,7 @@ def list_estimation_procedures() -> list[str]:
     ]
 
 
-def list_evaluations_setups(
+def list_evaluations_setups(  # noqa: PLR0913
     function: str,
     offset: int | None = None,
     size: int | None = None,
@@ -328,7 +372,7 @@ def list_evaluations_setups(
     per_fold: bool | None = None,
     sort_order: str | None = None,
     output_format: str = "dataframe",
-    parameters_in_separate_columns: bool = False,
+    parameters_in_separate_columns: bool = False,  # noqa: FBT001, FBT002
 ) -> dict | pd.DataFrame:
     """
     List all run-evaluation pairs matching all of the given filters
@@ -393,24 +437,22 @@ def list_evaluations_setups(
     # List setups
     # list_setups by setup id does not support large sizes (exceeds URL length limit)
     # Hence we split the list of unique setup ids returned by list_evaluations into chunks of size N
-    df = pd.DataFrame()
+    _df = pd.DataFrame()
     if len(evals) != 0:
         N = 100  # size of section
         length = len(evals["setup_id"].unique())  # length of the array we want to split
         # array_split - allows indices_or_sections to not equally divide the array
         # array_split -length % N sub-arrays of size length//N + 1 and the rest of size length//N.
-        setup_chunks = np.array_split(
-            ary=evals["setup_id"].unique(),
-            indices_or_sections=((length - 1) // N) + 1,
-        )
+        uniq = np.asarray(evals["setup_id"].unique())
+        setup_chunks = np.array_split(uniq, ((length - 1) // N) + 1)
         setup_data = pd.DataFrame()
-        for setups in setup_chunks:
-            result = pd.DataFrame(
-                openml.setups.list_setups(setup=setups, output_format="dataframe"),
-            )
+        for _setups in setup_chunks:
+            result = openml.setups.list_setups(setup=_setups, output_format="dataframe")
+            assert isinstance(result, pd.DataFrame)
             result = result.drop("flow_id", axis=1)
             # concat resulting setup chunks into single datframe
             setup_data = pd.concat([setup_data, result], ignore_index=True)
+
         parameters = []
         # Convert parameters of setup into list of tuples of (hyperparameter, value)
         for parameter_dict in setup_data["parameters"]:
@@ -422,12 +464,15 @@ def list_evaluations_setups(
                 parameters.append({})
         setup_data["parameters"] = parameters
         # Merge setups with evaluations
-        df = pd.merge(evals, setup_data, on="setup_id", how="left")
+        _df = evals.merge(setup_data, on="setup_id", how="left")
 
     if parameters_in_separate_columns:
-        df = pd.concat([df.drop("parameters", axis=1), df["parameters"].apply(pd.Series)], axis=1)
+        _df = pd.concat(
+            [_df.drop("parameters", axis=1), _df["parameters"].apply(pd.Series)],
+            axis=1,
+        )
 
     if output_format == "dataframe":
-        return df
-    else:
-        return df.to_dict(orient="index")
+        return _df
+
+    return _df.to_dict(orient="index")
