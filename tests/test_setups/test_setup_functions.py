@@ -171,11 +171,7 @@ class TestSetupFunctions(TestBase):
         assert isinstance(setups[next(iter(setups.keys()))], Dict)
         assert len(setups) == 10
 
-    @pytest.mark.production()
     def test_setuplist_offset(self):
-        # TODO: remove after pull on live for better testing
-        # openml.config.server = self.production_server
-
         size = 10
         setups = openml.setups.list_setups(offset=0, size=size)
         assert len(setups) == size

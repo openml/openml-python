@@ -338,8 +338,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
     def _to_dict(self) -> dict[str, dict]:
         task_container = super()._to_dict()
-        task_dict = task_container["oml:task_inputs"]
-        oml_input = task_dict["oml:task_inputs"]["oml:input"]  # type: ignore
+        oml_input = task_container["oml:task_inputs"]["oml:input"]  # type: ignore
         assert isinstance(oml_input, list)
 
         oml_input.append({"@name": "target_feature", "#text": self.target_name})
