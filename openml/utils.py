@@ -4,12 +4,12 @@ from __future__ import annotations
 import contextlib
 import shutil
 import warnings
-from collections import OrderedDict
 from functools import wraps
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Mapping, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Mapping, TypeVar, overload
 from typing_extensions import Literal, ParamSpec
 
+import numpy as np
 import pandas as pd
 import xmltodict
 
@@ -26,17 +26,25 @@ if TYPE_CHECKING:
     P = ParamSpec("P")
     R = TypeVar("R")
 
-oslo_installed = False
-try:
-    # Currently, importing oslo raises a lot of warning that it will stop working
-    # under python3.8; remove this once they disappear
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        from oslo_concurrency import lockutils
 
-        oslo_installed = True
-except ImportError:
-    pass
+@overload
+def extract_xml_tags(
+    xml_tag_name: str,
+    node: Mapping[str, Any],
+    *,
+    allow_none: Literal[True] = ...,
+) -> Any | None:
+    ...
+
+
+@overload
+def extract_xml_tags(
+    xml_tag_name: str,
+    node: Mapping[str, Any],
+    *,
+    allow_none: Literal[False],
+) -> Any:
+    ...
 
 
 def extract_xml_tags(
@@ -95,12 +103,18 @@ def _get_rest_api_type_alias(oml_object: OpenMLBase) -> str:
     return api_type_alias
 
 
-def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool = False) -> None:  # noqa: FBT
+def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool = False) -> None:  # noqa: FBT001, FBT002
     api_type_alias = _get_rest_api_type_alias(oml_object)
-    _tag_entity(api_type_alias, oml_object.id, tag, untag=untag)
+    if oml_object.id is None:
+        raise openml.exceptions.ObjectNotPublishedError(
+            f"Cannot tag an {api_type_alias} that has not been published yet."
+            "Please publish the object first before being able to tag it."
+            f"\n{oml_object}",
+        )
+    _tag_entity(entity_type=api_type_alias, entity_id=oml_object.id, tag=tag, untag=untag)
 
 
-def _tag_entity(entity_type, entity_id, tag, *, untag: bool = False) -> list[str]:
+def _tag_entity(entity_type: str, entity_id: int, tag: str, *, untag: bool = False) -> list[str]:
     """
     Function that tags or untags a given entity on OpenML. As the OpenML
     API tag functions all consist of the same format, this function covers
@@ -128,21 +142,25 @@ def _tag_entity(entity_type, entity_id, tag, *, untag: bool = False) -> list[str
     """
     legal_entities = {"data", "task", "flow", "setup", "run"}
     if entity_type not in legal_entities:
-        raise ValueError("Can't tag a %s" % entity_type)
+        raise ValueError(f"Can't tag a {entity_type}")
 
-    uri = "%s/tag" % entity_type
-    main_tag = "oml:%s_tag" % entity_type
     if untag:
-        uri = "%s/untag" % entity_type
-        main_tag = "oml:%s_untag" % entity_type
+        uri = f"{entity_type}/untag"
+        main_tag = f"oml:{entity_type}_untag"
+    else:
+        uri = f"{entity_type}/tag"
+        main_tag = f"oml:{entity_type}_tag"
 
-    post_variables = {"%s_id" % entity_type: entity_id, "tag": tag}
-    result_xml = openml._api_calls._perform_api_call(uri, "post", post_variables)
+    result_xml = openml._api_calls._perform_api_call(
+        uri,
+        "post",
+        {f"{entity_type}_id": entity_id, "tag": tag},
+    )
 
     result = xmltodict.parse(result_xml, force_list={"oml:tag"})[main_tag]
 
     if "oml:tag" in result:
-        return result["oml:tag"]
+        return result["oml:tag"]  # type: ignore
 
     # no tags, return empty list
     return []
@@ -219,17 +237,42 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
         raise
 
 
-# TODO(eddiebergman): Add `@overload` typing for output_format
-# NOTE: Impossible to type `listing_call` properly on the account of the output format,
-# might be better to use an iterator here instead and concatenate at the use point
-# NOTE: The obect output_format, the return type of `listing_call` is expected to be `Sized`
-# to have `len()` be callable on it.
-def _list_all(  # noqa: C901, PLR0912
+@overload
+def _list_all(
     listing_call: Callable[P, Any],
-    output_format: Literal["dict", "dataframe", "object"] = "dict",
+    list_output_format: Literal["dict"] = ...,
     *args: P.args,
     **filters: P.kwargs,
-) -> OrderedDict | pd.DataFrame:
+) -> dict:
+    ...
+
+
+@overload
+def _list_all(
+    listing_call: Callable[P, Any],
+    list_output_format: Literal["object"],
+    *args: P.args,
+    **filters: P.kwargs,
+) -> dict:
+    ...
+
+
+@overload
+def _list_all(
+    listing_call: Callable[P, Any],
+    list_output_format: Literal["dataframe"],
+    *args: P.args,
+    **filters: P.kwargs,
+) -> pd.DataFrame:
+    ...
+
+
+def _list_all(  # noqa: C901, PLR0912
+    listing_call: Callable[P, Any],
+    list_output_format: Literal["dict", "dataframe", "object"] = "dict",
+    *args: P.args,
+    **filters: P.kwargs,
+) -> dict | pd.DataFrame:
     """Helper to handle paged listing requests.
 
     Example usage:
@@ -240,10 +283,11 @@ def _list_all(  # noqa: C901, PLR0912
     ----------
     listing_call : callable
         Call listing, e.g. list_evaluations.
-    output_format : str, optional (default='dict')
+    list_output_format : str, optional (default='dict')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
+        - If 'object' the output is a dict of objects (only for some `listing_call`)
     *args : Variable length argument list
         Any required arguments for the listing call.
     **filters : Arbitrary keyword arguments
@@ -258,9 +302,7 @@ def _list_all(  # noqa: C901, PLR0912
     # eliminate filters that have a None value
     active_filters = {key: value for key, value in filters.items() if value is not None}
     page = 0
-    result = OrderedDict()
-    if output_format == "dataframe":
-        result = pd.DataFrame()
+    result = pd.DataFrame() if list_output_format == "dataframe" else {}
 
     # Default batch size per paging.
     # This one can be set in filters (batch_size), but should not be
@@ -271,8 +313,8 @@ def _list_all(  # noqa: C901, PLR0912
 
     # max number of results to be shown
     LIMIT = active_filters.pop("size", None)
-    if LIMIT is not None and not isinstance(LIMIT, int):
-        raise ValueError(f"'limit' should be an integer but got {LIMIT}")
+    if LIMIT is None or not isinstance(LIMIT, int) or not np.isinf(LIMIT):
+        raise ValueError(f"'limit' should be an integer or inf but got {LIMIT}")
 
     if LIMIT is not None and BATCH_SIZE_ORIG > LIMIT:
         BATCH_SIZE_ORIG = LIMIT
@@ -287,21 +329,22 @@ def _list_all(  # noqa: C901, PLR0912
             current_offset = offset + BATCH_SIZE_ORIG * page
             new_batch = listing_call(
                 *args,
-                output_format=output_format,  # type: ignore
-                **{**active_filters, "limit": batch_size, "offset": current_offset},
+                output_format=list_output_format,  # type: ignore
+                **{**active_filters, "limit": batch_size, "offset": current_offset},  # type: ignore
             )
         except openml.exceptions.OpenMLServerNoResult:
             # we want to return an empty dict in this case
-            # NOTE: This may not actually happen, but we could just return here to enforce it...
+            # NOTE: This above statement may not actually happen, but we could just return here
+            # to enforce it...
             break
 
-        if output_format == "dataframe":
+        if list_output_format == "dataframe":
             if len(result) == 0:
                 result = new_batch
             else:
                 result = pd.concat([result, new_batch], ignore_index=True)
         else:
-            # For output_format = 'dict' or 'object'
+            # For output_format = 'dict' (or catch all)
             result.update(new_batch)
 
         if len(new_batch) < batch_size:
@@ -326,7 +369,7 @@ def _get_cache_dir_for_key(key: str) -> Path:
     return Path(config.get_cache_directory()) / key
 
 
-def _create_cache_directory(key):
+def _create_cache_directory(key: str) -> Path:
     cache_dir = _get_cache_dir_for_key(key)
 
     try:
@@ -339,7 +382,7 @@ def _create_cache_directory(key):
     return cache_dir
 
 
-def _get_cache_dir_for_id(key: str, id_: int, create: bool = False) -> Path:  # noqa: FBT
+def _get_cache_dir_for_id(key: str, id_: int, create: bool = False) -> Path:  # noqa: FBT001, FBT002
     cache_dir = _create_cache_directory(key) if create else _get_cache_dir_for_key(key)
     return Path(cache_dir) / str(id_)
 
@@ -392,11 +435,16 @@ def _remove_cache_dir_for_id(key: str, cache_dir: Path) -> None:
         ) from e
 
 
-def thread_safe_if_oslo_installed(func):
-    if oslo_installed:
+def thread_safe_if_oslo_installed(func: Callable[P, R]) -> Callable[P, R]:
+    try:
+        # Currently, importing oslo raises a lot of warning that it will stop working
+        # under python3.8; remove this once they disappear
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            from oslo_concurrency import lockutils
 
         @wraps(func)
-        def safe_func(*args, **kwargs):
+        def safe_func(*args: P.args, **kwargs: P.kwargs) -> R:
             # Lock directories use the id that is passed as either positional or keyword argument.
             id_parameters = [parameter_name for parameter_name in kwargs if "_id" in parameter_name]
             if len(id_parameters) == 1:
@@ -413,8 +461,8 @@ def thread_safe_if_oslo_installed(func):
                 return func(*args, **kwargs)
 
         return safe_func
-
-    return func
+    except ImportError:
+        return func
 
 
 def _create_lockfiles_dir() -> Path:
