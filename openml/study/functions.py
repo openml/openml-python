@@ -1,13 +1,17 @@
 # License: BSD 3-Clause
+# ruff: noqa: PLR0913
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, List, cast
+from typing import TYPE_CHECKING, Any, overload
+from typing_extensions import Literal
 
 import pandas as pd
 import xmltodict
 
 import openml._api_calls
+import openml.config
+import openml.utils
 from openml.study.study import OpenMLBenchmarkSuite, OpenMLStudy
 
 if TYPE_CHECKING:
@@ -28,12 +32,15 @@ def get_suite(suite_id: int | str) -> OpenMLBenchmarkSuite:
     OpenMLSuite
         The OpenML suite object
     """
-    return cast(OpenMLBenchmarkSuite, _get_study(suite_id, entity_type="task"))
+    study = _get_study(suite_id, entity_type="task")
+    assert isinstance(study, OpenMLBenchmarkSuite)
+
+    return study
 
 
 def get_study(
     study_id: int | str,
-    arg_for_backwards_compat: str | None = None,
+    arg_for_backwards_compat: str | None = None,  # noqa: ARG001
 ) -> OpenMLStudy:  # F401
     """
     Retrieves all relevant information of an OpenML study from the server.
@@ -59,17 +66,20 @@ def get_study(
             "It looks like you are running code from the OpenML100 paper. It still works, but lots "
             "of things have changed since then. Please use `get_suite('OpenML100')` instead."
         )
-        warnings.warn(message, DeprecationWarning)
+        warnings.warn(message, DeprecationWarning, stacklevel=2)
         openml.config.logger.warning(message)
         study = _get_study(study_id, entity_type="task")
-        return cast(OpenMLBenchmarkSuite, study)  # type: ignore
-    else:
-        return cast(OpenMLStudy, _get_study(study_id, entity_type="run"))
+        assert isinstance(study, OpenMLBenchmarkSuite)
+
+        return study  # type: ignore
+
+    study = _get_study(study_id, entity_type="run")
+    assert isinstance(study, OpenMLStudy)
+    return study
 
 
-def _get_study(id_: int | str, entity_type) -> BaseStudy:
-    call_suffix = f"study/{id_!s}"
-    xml_string = openml._api_calls._perform_api_call(call_suffix, "get")
+def _get_study(id_: int | str, entity_type: str) -> BaseStudy:
+    xml_string = openml._api_calls._perform_api_call(f"study/{id_}", "get")
     force_list_tags = (
         "oml:data_id",
         "oml:flow_id",
@@ -82,13 +92,13 @@ def _get_study(id_: int | str, entity_type) -> BaseStudy:
     study_id = int(result_dict["oml:id"])
     alias = result_dict["oml:alias"] if "oml:alias" in result_dict else None
     main_entity_type = result_dict["oml:main_entity_type"]
+
     if entity_type != main_entity_type:
         raise ValueError(
-            "Unexpected entity type '{}' reported by the server, expected '{}'".format(
-                main_entity_type,
-                entity_type,
-            ),
+            f"Unexpected entity type '{main_entity_type}' reported by the server"
+            f", expected '{entity_type}'"
         )
+
     benchmark_suite = (
         result_dict["oml:benchmark_suite"] if "oml:benchmark_suite" in result_dict else None
     )
@@ -107,7 +117,7 @@ def _get_study(id_: int | str, entity_type) -> BaseStudy:
                 current_tag["window_start"] = tag["oml:window_start"]
             tags.append(current_tag)
 
-    def get_nested_ids_from_result_dict(key: str, subkey: str) -> list | None:
+    def get_nested_ids_from_result_dict(key: str, subkey: str) -> list[int] | None:
         """Extracts a list of nested IDs from a result dictionary.
 
         Parameters
@@ -152,7 +162,6 @@ def _get_study(id_: int | str, entity_type) -> BaseStudy:
         )  # type: BaseStudy
 
     elif main_entity_type in ["tasks", "task"]:
-        tasks = cast("List[int]", tasks)
         study = OpenMLBenchmarkSuite(
             suite_id=study_id,
             alias=alias,
@@ -370,12 +379,10 @@ def attach_to_study(study_id: int, run_ids: list[int]) -> int:
         new size of the study (in terms of explicitly linked entities)
     """
     # Interestingly, there's no need to tell the server about the entity type, it knows by itself
-    uri = "study/%d/attach" % study_id
-    post_variables = {"ids": ",".join(str(x) for x in run_ids)}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call(
-        call=uri,
+        call=f"study/{study_id}/attach",
         request_method="post",
-        data=post_variables,
+        data={"ids": ",".join(str(x) for x in run_ids)},
     )
     result = xmltodict.parse(result_xml)["oml:study_attach"]
     return int(result["oml:linked_entities"])
@@ -428,12 +435,34 @@ def detach_from_study(study_id: int, run_ids: list[int]) -> int:
     return int(result["oml:linked_entities"])
 
 
+@overload
+def list_suites(
+    offset: int | None = ...,
+    size: int | None = ...,
+    status: str | None = ...,
+    uploader: list[int] | None = ...,
+    output_format: Literal["dict"] = "dict",
+) -> dict:
+    ...
+
+
+@overload
+def list_suites(
+    offset: int | None = ...,
+    size: int | None = ...,
+    status: str | None = ...,
+    uploader: list[int] | None = ...,
+    output_format: Literal["dataframe"] = "dataframe",
+) -> pd.DataFrame:
+    ...
+
+
 def list_suites(
     offset: int | None = None,
     size: int | None = None,
     status: str | None = None,
     uploader: list[int] | None = None,
-    output_format: str = "dict",
+    output_format: Literal["dict", "dataframe"] = "dict",
 ) -> dict | pd.DataFrame:
     """
     Return a list of all suites which are on OpenML.
@@ -490,8 +519,8 @@ def list_suites(
         )
         warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
-    return openml.utils._list_all(
-        output_format=output_format,
+    return openml.utils._list_all(  # type: ignore
+        list_output_format=output_format,  # type: ignore
         listing_call=_list_studies,
         offset=offset,
         size=size,
@@ -501,13 +530,37 @@ def list_suites(
     )
 
 
+@overload
+def list_studies(
+    offset: int | None = ...,
+    size: int | None = ...,
+    status: str | None = ...,
+    uploader: list[str] | None = ...,
+    benchmark_suite: int | None = ...,
+    output_format: Literal["dict"] = "dict",
+) -> dict:
+    ...
+
+
+@overload
+def list_studies(
+    offset: int | None = ...,
+    size: int | None = ...,
+    status: str | None = ...,
+    uploader: list[str] | None = ...,
+    benchmark_suite: int | None = ...,
+    output_format: Literal["dataframe"] = "dataframe",
+) -> pd.DataFrame:
+    ...
+
+
 def list_studies(
     offset: int | None = None,
     size: int | None = None,
     status: str | None = None,
     uploader: list[str] | None = None,
     benchmark_suite: int | None = None,
-    output_format: str = "dict",
+    output_format: Literal["dict", "dataframe"] = "dict",
 ) -> dict | pd.DataFrame:
     """
     Return a list of all studies which are on OpenML.
@@ -571,8 +624,8 @@ def list_studies(
         )
         warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
-    return openml.utils._list_all(
-        output_format=output_format,
+    return openml.utils._list_all(  # type: ignore
+        list_output_format=output_format,  # type: ignore
         listing_call=_list_studies,
         offset=offset,
         size=size,
@@ -583,7 +636,19 @@ def list_studies(
     )
 
 
-def _list_studies(output_format="dict", **kwargs) -> dict | pd.DataFrame:
+@overload
+def _list_studies(output_format: Literal["dict"] = "dict", **kwargs: Any) -> dict:
+    ...
+
+
+@overload
+def _list_studies(output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame:
+    ...
+
+
+def _list_studies(
+    output_format: Literal["dict", "dataframe"] = "dict", **kwargs: Any
+) -> dict | pd.DataFrame:
     """
     Perform api call to return a list of studies.
 
@@ -608,7 +673,19 @@ def _list_studies(output_format="dict", **kwargs) -> dict | pd.DataFrame:
     return __list_studies(api_call=api_call, output_format=output_format)
 
 
-def __list_studies(api_call, output_format="object") -> dict | pd.DataFrame:
+@overload
+def __list_studies(api_call: str, output_format: Literal["dict"] = "dict") -> dict:
+    ...
+
+
+@overload
+def __list_studies(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame:
+    ...
+
+
+def __list_studies(
+    api_call: str, output_format: Literal["dict", "dataframe"] = "dict"
+) -> dict | pd.DataFrame:
     """Retrieves the list of OpenML studies and
     returns it in a dictionary or a Pandas DataFrame.
 
@@ -616,7 +693,7 @@ def __list_studies(api_call, output_format="object") -> dict | pd.DataFrame:
     ----------
     api_call : str
         The API call for retrieving the list of OpenML studies.
-    output_format : str in {"object", "dataframe"}
+    output_format : str in {"dict", "dataframe"}
         Format of the output, either 'object' for a dictionary
         or 'dataframe' for a Pandas DataFrame.
 

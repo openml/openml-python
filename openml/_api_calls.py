@@ -4,16 +4,17 @@ from __future__ import annotations
 import hashlib
 import logging
 import math
-import pathlib
 import random
 import time
 import urllib.parse
 import xml
 import zipfile
+from pathlib import Path
 from typing import Dict, Tuple, Union
 
 import minio
 import requests
+import requests.utils
 import xmltodict
 from urllib3 import ProxyManager
 
@@ -27,6 +28,17 @@ from .exceptions import (
 
 DATA_TYPE = Dict[str, Union[str, int]]
 FILE_ELEMENTS_TYPE = Dict[str, Union[str, Tuple[str, str]]]
+DATABASE_CONNECTION_ERRCODE = 107
+
+
+def _robot_delay(n: int) -> float:
+    wait = (1 / (1 + math.exp(-(n * 0.5 - 4)))) * 60
+    variation = random.gauss(0, wait / 10)
+    return max(1.0, wait + variation)
+
+
+def _human_delay(n: int) -> float:
+    return max(1.0, n)
 
 
 def resolve_env_proxies(url: str) -> str | None:
@@ -46,7 +58,7 @@ def resolve_env_proxies(url: str) -> str | None:
         The proxy url if found, else None
     """
     resolved_proxies = requests.utils.get_environ_proxies(url)
-    return requests.utils.select_proxy(url, resolved_proxies)
+    return requests.utils.select_proxy(url, resolved_proxies)  # type: ignore
 
 
 def _create_url_from_endpoint(endpoint: str) -> str:
@@ -111,17 +123,17 @@ def _perform_api_call(
 
 def _download_minio_file(
     source: str,
-    destination: str | pathlib.Path,
-    exists_ok: bool = True,
+    destination: str | Path,
+    exists_ok: bool = True,  # noqa: FBT001, FBT002
     proxy: str | None = "auto",
 ) -> None:
     """Download file ``source`` from a MinIO Bucket and store it at ``destination``.
 
     Parameters
     ----------
-    source : Union[str, pathlib.Path]
+    source : str
         URL to a file in a MinIO bucket.
-    destination : str
+    destination : str | Path
         Path to store the file to, if a directory is provided the original filename is used.
     exists_ok : bool, optional (default=True)
         If False, raise FileExists if a file already exists in ``destination``.
@@ -130,13 +142,13 @@ def _download_minio_file(
         automatically find the proxy to use. Pass None or the environment variable
         ``no_proxy="*"`` to disable proxies.
     """
-    destination = pathlib.Path(destination)
+    destination = Path(destination)
     parsed_url = urllib.parse.urlparse(source)
 
     # expect path format: /BUCKET/path/to/file.ext
     bucket, object_name = parsed_url.path[1:].split("/", maxsplit=1)
     if destination.is_dir():
-        destination = pathlib.Path(destination, object_name)
+        destination = Path(destination, object_name)
     if destination.is_file() and not exists_ok:
         raise FileExistsError(f"File already exists in {destination}.")
 
@@ -158,30 +170,26 @@ def _download_minio_file(
                 zip_ref.extractall(destination.parent)
 
     except minio.error.S3Error as e:
-        if e.message.startswith("Object does not exist"):
+        if e.message is not None and e.message.startswith("Object does not exist"):
             raise FileNotFoundError(f"Object at '{source}' does not exist.") from e
         # e.g. permission error, or a bucket does not exist (which is also interpreted as a
         # permission error on minio level).
         raise FileNotFoundError("Bucket does not exist or is private.") from e
 
 
-def _download_minio_bucket(
-    source: str,
-    destination: str | pathlib.Path,
-    exists_ok: bool = True,
-) -> None:
+def _download_minio_bucket(source: str, destination: str | Path) -> None:
     """Download file ``source`` from a MinIO Bucket and store it at ``destination``.
 
     Parameters
     ----------
-    source : Union[str, pathlib.Path]
+    source : str
         URL to a MinIO bucket.
-    destination : str
+    destination : str | Path
         Path to a directory to store the bucket content in.
     exists_ok : bool, optional (default=True)
         If False, raise FileExists if a file already exists in ``destination``.
     """
-    destination = pathlib.Path(destination)
+    destination = Path(destination)
     parsed_url = urllib.parse.urlparse(source)
 
     # expect path format: /BUCKET/path/to/file.ext
@@ -190,18 +198,21 @@ def _download_minio_bucket(
     client = minio.Minio(endpoint=parsed_url.netloc, secure=False)
 
     for file_object in client.list_objects(bucket, recursive=True):
+        if file_object.object_name is None:
+            raise ValueError("Object name is None.")
+
         _download_minio_file(
             source=source + "/" + file_object.object_name,
-            destination=pathlib.Path(destination, file_object.object_name),
+            destination=Path(destination, file_object.object_name),
             exists_ok=True,
         )
 
 
 def _download_text_file(
     source: str,
-    output_path: str | None = None,
+    output_path: str | Path | None = None,
     md5_checksum: str | None = None,
-    exists_ok: bool = True,
+    exists_ok: bool = True,  # noqa: FBT001, FBT002
     encoding: str = "utf8",
 ) -> str | None:
     """Download the text file at `source` and store it in `output_path`.
@@ -213,7 +224,7 @@ def _download_text_file(
     ----------
     source : str
         url of the file to be downloaded
-    output_path : str, (optional)
+    output_path : str | Path | None (default=None)
         full path, including filename, of where the file should be stored. If ``None``,
         this function returns the downloaded file as string.
     md5_checksum : str, optional (default=None)
@@ -223,15 +234,14 @@ def _download_text_file(
     encoding : str, optional (default='utf8')
         The encoding with which the file should be stored.
     """
-    if output_path is not None:
-        try:
-            with open(output_path, encoding=encoding):
-                if exists_ok:
-                    return None
-                else:
-                    raise FileExistsError
-        except FileNotFoundError:
-            pass
+    if isinstance(output_path, str):
+        output_path = Path(output_path)
+
+    if output_path is not None and output_path.exists():
+        if not exists_ok:
+            raise FileExistsError
+
+        return None
 
     logging.info("Starting [%s] request for the URL %s", "get", source)
     start = time.time()
@@ -247,28 +257,25 @@ def _download_text_file(
         )
         return downloaded_file
 
-    else:
-        with open(output_path, "w", encoding=encoding) as fh:
-            fh.write(downloaded_file)
+    with output_path.open("w", encoding=encoding) as fh:
+        fh.write(downloaded_file)
 
-        logging.info(
-            "%.7fs taken for [%s] request for the URL %s",
-            time.time() - start,
-            "get",
-            source,
-        )
-
-        del downloaded_file
-        return None
+    logging.info(
+        "%.7fs taken for [%s] request for the URL %s",
+        time.time() - start,
+        "get",
+        source,
+    )
+    return None
 
 
-def _file_id_to_url(file_id: str, filename: str | None = None) -> str:
+def _file_id_to_url(file_id: int, filename: str | None = None) -> str:
     """
     Presents the URL how to download a given file id
     filename is optional
     """
     openml_url = config.server.split("/api/")
-    url = openml_url[0] + "/data/download/%s" % file_id
+    url = openml_url[0] + f"/data/download/{file_id!s}"
     if filename is not None:
         url += "/" + filename
     return url
@@ -316,13 +323,13 @@ def __read_url(
 def __is_checksum_equal(downloaded_file_binary: bytes, md5_checksum: str | None = None) -> bool:
     if md5_checksum is None:
         return True
-    md5 = hashlib.md5()
+    md5 = hashlib.md5()  # noqa: S324
     md5.update(downloaded_file_binary)
     md5_checksum_download = md5.hexdigest()
     return md5_checksum == md5_checksum_download
 
 
-def _send_request(
+def _send_request(  # noqa: C901
     request_method: str,
     url: str,
     data: DATA_TYPE,
@@ -331,7 +338,9 @@ def _send_request(
 ) -> requests.Response:
     n_retries = max(1, config.connection_n_retries)
 
-    response: requests.Response
+    response: requests.Response | None = None
+    delay_method = _human_delay if config.retry_policy == "human" else _robot_delay
+
     with requests.Session() as session:
         # Start at one to have a non-zero multiplier for the sleep
         for retry_counter in range(1, n_retries + 1):
@@ -344,10 +353,11 @@ def _send_request(
                     response = session.post(url, data=data, files=files)
                 else:
                     raise NotImplementedError()
+
                 __check_response(response=response, url=url, file_elements=files)
+
                 if request_method == "get" and not __is_checksum_equal(
-                    response.text.encode("utf-8"),
-                    md5_checksum,
+                    response.text.encode("utf-8"), md5_checksum
                 ):
                     # -- Check if encoding is not UTF-8 perhaps
                     if __is_checksum_equal(response.content, md5_checksum):
@@ -365,41 +375,44 @@ def _send_request(
                         "Checksum of downloaded file is unequal to the expected checksum {} "
                         "when downloading {}.".format(md5_checksum, url),
                     )
-                break
+
+                return response
+            except OpenMLServerException as e:
+                # Propagate all server errors to the calling functions, except
+                # for 107 which represents a database connection error.
+                # These are typically caused by high server load,
+                # which means trying again might resolve the issue.
+                if e.code != DATABASE_CONNECTION_ERRCODE:
+                    raise e
+
+                delay = delay_method(retry_counter)
+                time.sleep(delay)
+
+            except xml.parsers.expat.ExpatError as e:
+                if request_method != "get" or retry_counter >= n_retries:
+                    if response is not None:
+                        extra = f"Status code: {response.status_code}\n{response.text}"
+                    else:
+                        extra = "No response retrieved."
+
+                    raise OpenMLServerError(
+                        f"Unexpected server error when calling {url}. Please contact the "
+                        f"developers!\n{extra}"
+                    ) from e
+
+                delay = delay_method(retry_counter)
+                time.sleep(delay)
+
             except (
                 requests.exceptions.ChunkedEncodingError,
                 requests.exceptions.ConnectionError,
                 requests.exceptions.SSLError,
-                OpenMLServerException,
-                xml.parsers.expat.ExpatError,
                 OpenMLHashException,
-            ) as e:
-                if isinstance(e, OpenMLServerException) and e.code != 107:
-                    # Propagate all server errors to the calling functions, except
-                    # for 107 which represents a database connection error.
-                    # These are typically caused by high server load,
-                    # which means trying again might resolve the issue.
-                    raise
-                elif isinstance(e, xml.parsers.expat.ExpatError):
-                    if request_method != "get" or retry_counter >= n_retries:
-                        raise OpenMLServerError(
-                            f"Unexpected server error when calling {url}. Please contact the "
-                            f"developers!\nStatus code: {response.status_code}\n{response.text}",
-                        )
-                if retry_counter >= n_retries:
-                    raise
-                else:
+            ):
+                delay = delay_method(retry_counter)
+                time.sleep(delay)
 
-                    def robot(n: int) -> float:
-                        wait = (1 / (1 + math.exp(-(n * 0.5 - 4)))) * 60
-                        variation = random.gauss(0, wait / 10)
-                        return max(1.0, wait + variation)
-
-                    def human(n: int) -> float:
-                        return max(1.0, n)
-
-                    delay = {"human": human, "robot": robot}[config.retry_policy](retry_counter)
-                    time.sleep(delay)
+    assert response is not None
     return response
 
 
@@ -410,9 +423,7 @@ def __check_response(
 ) -> None:
     if response.status_code != 200:
         raise __parse_server_exception(response, url, file_elements=file_elements)
-    elif (
-        "Content-Encoding" not in response.headers or response.headers["Content-Encoding"] != "gzip"
-    ):
+    if "Content-Encoding" not in response.headers or response.headers["Content-Encoding"] != "gzip":
         logging.warning(f"Received uncompressed content from OpenML for {url}.")
 
 
@@ -423,17 +434,18 @@ def __parse_server_exception(
 ) -> OpenMLServerError:
     if response.status_code == 414:
         raise OpenMLServerError(f"URI too long! ({url})")
+
     try:
         server_exception = xmltodict.parse(response.text)
-    except xml.parsers.expat.ExpatError:
-        raise
-    except Exception:
+    except xml.parsers.expat.ExpatError as e:
+        raise e
+    except Exception as e:  # noqa: BLE001
         # OpenML has a sophisticated error system
         # where information about failures is provided. try to parse this
         raise OpenMLServerError(
             f"Unexpected server error when calling {url}. Please contact the developers!\n"
             f"Status code: {response.status_code}\n{response.text}",
-        )
+        ) from e
 
     server_error = server_exception["oml:error"]
     code = int(server_error["oml:code"])

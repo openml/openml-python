@@ -16,6 +16,7 @@ In particular, this module implements a python interface for the
 """
 
 # License: BSD 3-Clause
+from __future__ import annotations
 
 from . import (
     _api_calls,
@@ -49,7 +50,12 @@ from .tasks import (
 )
 
 
-def populate_cache(task_ids=None, dataset_ids=None, flow_ids=None, run_ids=None):
+def populate_cache(
+    task_ids: list[int] | None = None,
+    dataset_ids: list[int | str] | None = None,
+    flow_ids: list[int] | None = None,
+    run_ids: list[int] | None = None,
+) -> None:
     """
     Populate a cache for offline and parallel usage of the OpenML connector.
 

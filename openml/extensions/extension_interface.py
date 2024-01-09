@@ -63,8 +63,8 @@ class Extension(ABC):
     def flow_to_model(
         self,
         flow: OpenMLFlow,
-        initialize_with_defaults: bool = False,
-        strict_version: bool = True,
+        initialize_with_defaults: bool = False,  # noqa: FBT001, FBT002
+        strict_version: bool = True,  # noqa: FBT002, FBT001
     ) -> Any:
         """Instantiate a model from the flow representation.
 
@@ -156,7 +156,7 @@ class Extension(ABC):
         """
 
     @abstractmethod
-    def _run_model_on_fold(
+    def _run_model_on_fold(  # noqa: PLR0913
         self,
         model: Any,
         task: OpenMLTask,
@@ -165,7 +165,7 @@ class Extension(ABC):
         fold_no: int,
         y_train: np.ndarray | None = None,
         X_test: np.ndarray | scipy.sparse.spmatrix | None = None,
-    ) -> tuple[np.ndarray, np.ndarray, OrderedDict[str, float], OpenMLRunTrace | None]:
+    ) -> tuple[np.ndarray, np.ndarray | None, OrderedDict[str, float], OpenMLRunTrace | None]:
         """Run a model on a repeat, fold, subsample triplet of the task.
 
         Returns the data that is necessary to construct the OpenML Run object. Is used by

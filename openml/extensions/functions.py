@@ -33,7 +33,7 @@ def register_extension(extension: type[Extension]) -> None:
 
 def get_extension_by_flow(
     flow: OpenMLFlow,
-    raise_if_no_extension: bool = False,
+    raise_if_no_extension: bool = False,  # noqa: FBT001, FBT002
 ) -> Extension | None:
     """Get an extension which can handle the given flow.
 
@@ -58,20 +58,21 @@ def get_extension_by_flow(
     if len(candidates) == 0:
         if raise_if_no_extension:
             raise ValueError(f"No extension registered which can handle flow: {flow}")
-        else:
-            return None
-    elif len(candidates) == 1:
+
+        return None
+
+    if len(candidates) == 1:
         return candidates[0]
-    else:
-        raise ValueError(
-            f"Multiple extensions registered which can handle flow: {flow}, but only one "
-            f"is allowed ({candidates}).",
-        )
+
+    raise ValueError(
+        f"Multiple extensions registered which can handle flow: {flow}, but only one "
+        f"is allowed ({candidates}).",
+    )
 
 
 def get_extension_by_model(
     model: Any,
-    raise_if_no_extension: bool = False,
+    raise_if_no_extension: bool = False,  # noqa: FBT001, FBT002
 ) -> Extension | None:
     """Get an extension which can handle the given flow.
 
@@ -96,12 +97,13 @@ def get_extension_by_model(
     if len(candidates) == 0:
         if raise_if_no_extension:
             raise ValueError(f"No extension registered which can handle model: {model}")
-        else:
-            return None
-    elif len(candidates) == 1:
+
+        return None
+
+    if len(candidates) == 1:
         return candidates[0]
-    else:
-        raise ValueError(
-            f"Multiple extensions registered which can handle model: {model}, but only one "
-            f"is allowed ({candidates}).",
-        )
+
+    raise ValueError(
+        f"Multiple extensions registered which can handle model: {model}, but only one "
+        f"is allowed ({candidates}).",
+    )

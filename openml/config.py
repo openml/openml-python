@@ -11,8 +11,8 @@ import platform
 import warnings
 from io import StringIO
 from pathlib import Path
-from typing import Dict, Union, cast
-from typing_extensions import Literal
+from typing import Any, cast
+from typing_extensions import Literal, TypedDict
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
@@ -21,7 +21,16 @@ console_handler: logging.StreamHandler | None = None
 file_handler: logging.handlers.RotatingFileHandler | None = None
 
 
-def _create_log_handlers(create_file_handler: bool = True) -> None:  # noqa: FBT
+class _Config(TypedDict):
+    apikey: str
+    server: str
+    cachedir: Path
+    avoid_duplicate_runs: bool
+    retry_policy: Literal["human", "robot"]
+    connection_n_retries: int
+
+
+def _create_log_handlers(create_file_handler: bool = True) -> None:  # noqa: FBT001, FBT002
     """Creates but does not attach the log handlers."""
     global console_handler, file_handler  # noqa: PLW0603
     if console_handler is not None or file_handler is not None:
@@ -91,22 +100,22 @@ def set_file_log_level(file_output_level: int) -> None:
 
 # Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
 _user_path = Path("~").expanduser().absolute()
-_defaults = {
+_defaults: _Config = {
     "apikey": "",
     "server": "https://www.openml.org/api/v1/xml",
     "cachedir": (
-        os.environ.get("XDG_CACHE_HOME", _user_path / ".cache" / "openml")
+        Path(os.environ.get("XDG_CACHE_HOME", _user_path / ".cache" / "openml"))
         if platform.system() == "Linux"
         else _user_path / ".openml"
     ),
-    "avoid_duplicate_runs": "True",
+    "avoid_duplicate_runs": True,
     "retry_policy": "human",
-    "connection_n_retries": "5",
+    "connection_n_retries": 5,
 }
 
 # Default values are actually added here in the _setup() function which is
 # called at the end of this module
-server = str(_defaults["server"])  # so mypy knows it is a string
+server = _defaults["server"]
 
 
 def get_server_base_url() -> str:
@@ -124,10 +133,10 @@ def get_server_base_url() -> str:
 apikey: str = _defaults["apikey"]
 # The current cache directory (without the server name)
 _root_cache_directory = Path(_defaults["cachedir"])
-avoid_duplicate_runs: bool = _defaults["avoid_duplicate_runs"] == "True"
+avoid_duplicate_runs = _defaults["avoid_duplicate_runs"]
 
 retry_policy = _defaults["retry_policy"]
-connection_n_retries = int(_defaults["connection_n_retries"])
+connection_n_retries = _defaults["connection_n_retries"]
 
 
 def set_retry_policy(value: Literal["human", "robot"], n_retries: int | None = None) -> None:
@@ -216,7 +225,7 @@ def determine_config_file_path() -> Path:
     return config_dir / "config"
 
 
-def _setup(config: dict[str, str | int | bool] | None = None) -> None:
+def _setup(config: _Config | None = None) -> None:
     """Setup openml package. Called on first import.
 
     Reads the config file and sets up apikey, server, cache appropriately.
@@ -244,17 +253,13 @@ def _setup(config: dict[str, str | int | bool] | None = None) -> None:
         cache_exists = True
 
     if config is None:
-        config = cast(Dict[str, Union[str, int, bool]], _parse_config(config_file))
-    config = cast(Dict[str, Union[str, int, bool]], config)
+        config = _parse_config(config_file)
 
-    avoid_duplicate_runs = bool(config.get("avoid_duplicate_runs"))
-
-    apikey = str(config["apikey"])
-    server = str(config["server"])
-    short_cache_dir = Path(config["cachedir"])
-
-    tmp_n_retries = config["connection_n_retries"]
-    n_retries = int(tmp_n_retries) if tmp_n_retries is not None else None
+    avoid_duplicate_runs = config.get("avoid_duplicate_runs", False)
+    apikey = config["apikey"]
+    server = config["server"]
+    short_cache_dir = config["cachedir"]
+    n_retries = config["connection_n_retries"]
 
     set_retry_policy(config["retry_policy"], n_retries)
 
@@ -279,14 +284,15 @@ def _setup(config: dict[str, str | int | bool] | None = None) -> None:
         )
 
 
-def set_field_in_config_file(field: str, value: str) -> None:
+def set_field_in_config_file(field: str, value: Any) -> None:
     """Overwrites the `field` in the configuration file with the new `value`."""
     if field not in _defaults:
         raise ValueError(f"Field '{field}' is not valid and must be one of '{_defaults.keys()}'.")
 
+    # TODO(eddiebergman): This use of globals has gone too far
     globals()[field] = value
     config_file = determine_config_file_path()
-    config = _parse_config(str(config_file))
+    config = _parse_config(config_file)
     with config_file.open("w") as fh:
         for f in _defaults:
             # We can't blindly set all values based on globals() because when the user
@@ -294,16 +300,16 @@ def set_field_in_config_file(field: str, value: str) -> None:
             # There doesn't seem to be a way to avoid writing defaults to file with configparser,
             # because it is impossible to distinguish from an explicitly set value that matches
             # the default value, to one that was set to its default because it was omitted.
-            value = config.get("FAKE_SECTION", f)
+            value = config.get("FAKE_SECTION", f)  # type: ignore
             if f == field:
                 value = globals()[f]
             fh.write(f"{f} = {value}\n")
 
 
-def _parse_config(config_file: str | Path) -> dict[str, str]:
+def _parse_config(config_file: str | Path) -> _Config:
     """Parse the config file, set up defaults."""
     config_file = Path(config_file)
-    config = configparser.RawConfigParser(defaults=_defaults)
+    config = configparser.RawConfigParser(defaults=_defaults)  # type: ignore
 
     # The ConfigParser requires a [SECTION_HEADER], which we do not expect in our config file.
     # Cheat the ConfigParser module by adding a fake section header
@@ -319,18 +325,18 @@ def _parse_config(config_file: str | Path) -> dict[str, str]:
         logger.info("Error opening file %s: %s", config_file, e.args[0])
     config_file_.seek(0)
     config.read_file(config_file_)
-    return dict(config.items("FAKE_SECTION"))
+    return dict(config.items("FAKE_SECTION"))  # type: ignore
 
 
-def get_config_as_dict() -> dict[str, str | int | bool]:
-    config = {}  # type: Dict[str, Union[str, int, bool]]
-    config["apikey"] = apikey
-    config["server"] = server
-    config["cachedir"] = str(_root_cache_directory)
-    config["avoid_duplicate_runs"] = avoid_duplicate_runs
-    config["connection_n_retries"] = connection_n_retries
-    config["retry_policy"] = retry_policy
-    return config
+def get_config_as_dict() -> _Config:
+    return {
+        "apikey": apikey,
+        "server": server,
+        "cachedir": _root_cache_directory,
+        "avoid_duplicate_runs": avoid_duplicate_runs,
+        "connection_n_retries": connection_n_retries,
+        "retry_policy": retry_policy,
+    }
 
 
 # NOTE: For backwards compatibility, we keep the `str`

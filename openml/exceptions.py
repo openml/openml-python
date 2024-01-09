@@ -3,6 +3,8 @@ from __future__ import annotations
 
 
 class PyOpenMLError(Exception):
+    """Base class for all exceptions in OpenML-Python."""
+
     def __init__(self, message: str):
         self.message = message
         super().__init__(message)
@@ -14,7 +16,7 @@ class OpenMLServerError(PyOpenMLError):
     """
 
 
-class OpenMLServerException(OpenMLServerError):
+class OpenMLServerException(OpenMLServerError):  # noqa: N818
     """exception for when the result of the server was
     not 200 (e.g., listing call w/o results).
     """
@@ -35,11 +37,11 @@ class OpenMLServerNoResult(OpenMLServerException):
     """Exception for when the result of the server is empty."""
 
 
-class OpenMLCacheException(PyOpenMLError):
+class OpenMLCacheException(PyOpenMLError):  # noqa: N818
     """Dataset / task etc not found in cache"""
 
 
-class OpenMLHashException(PyOpenMLError):
+class OpenMLHashException(PyOpenMLError):  # noqa: N818
     """Locally computed hash is different than hash announced by the server."""
 
 
@@ -59,3 +61,7 @@ class OpenMLRunsExistError(PyOpenMLError):
 
 class OpenMLNotAuthorizedError(OpenMLServerError):
     """Indicates an authenticated user is not authorized to execute the requested action."""
+
+
+class ObjectNotPublishedError(PyOpenMLError):
+    """Indicates an object has not been published yet."""

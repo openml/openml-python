@@ -310,7 +310,7 @@ warn_return_any = true
 
 
 [[tool.mypy.overrides]]
-module = ["tests.*"]
+module = ["tests.*", "openml.extensions.sklearn.*"]
 
 # TODO(eddiebergman): This should be re-enabled after tests get refactored
 ignore_errors = true

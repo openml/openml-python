@@ -20,7 +20,7 @@ from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType
 
 
-def _check_dataset(dataset):
+def _check_dataset(dataset: dict) -> None:
     assert isinstance(dataset, dict)
     assert len(dataset) >= 2
     assert "did" in dataset

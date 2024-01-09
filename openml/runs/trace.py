@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import json
-import os
 from collections import OrderedDict
 from dataclasses import dataclass
+from pathlib import Path
+from typing import IO, Any, Iterator
+from typing_extensions import Self
 
 import arff
 import xmltodict
@@ -61,38 +63,38 @@ class OpenMLTraceIteration:
     evaluation: float
     selected: bool
 
-    setup_string: str | None = None
-    parameters: OrderedDict | None = None
+    setup_string: dict[str, str] | None = None
+    parameters: dict[str, str | int | float] | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         # TODO: refactor into one argument of type <str | OrderedDict>
         if self.setup_string and self.parameters:
             raise ValueError(
                 "Can only be instantiated with either `setup_string` or `parameters` argument.",
             )
-        elif not (self.setup_string or self.parameters):
+
+        if not (self.setup_string or self.parameters):
             raise ValueError(
                 "Either `setup_string` or `parameters` needs to be passed as argument.",
             )
-        if self.parameters is not None and not isinstance(self.parameters, OrderedDict):
+
+        if self.parameters is not None and not isinstance(self.parameters, dict):
             raise TypeError(
                 "argument parameters is not an instance of OrderedDict, but %s"
                 % str(type(self.parameters)),
             )
 
-    def get_parameters(self):
-        result = {}
+    def get_parameters(self) -> dict[str, Any]:
+        """Get the parameters of this trace iteration."""
         # parameters have prefix 'parameter_'
-
         if self.setup_string:
-            for param in self.setup_string:
-                key = param[len(PREFIX) :]
-                value = self.setup_string[param]
-                result[key] = json.loads(value)
-        else:
-            for param, value in self.parameters.items():
-                result[param[len(PREFIX) :]] = value
-        return result
+            return {
+                param[len(PREFIX) :]: json.loads(value)
+                for param, value in self.setup_string.items()
+            }
+
+        assert self.parameters is not None
+        return {param[len(PREFIX) :]: value for param, value in self.parameters.items()}
 
 
 class OpenMLRunTrace:
@@ -152,7 +154,11 @@ class OpenMLRunTrace:
         )
 
     @classmethod
-    def generate(cls, attributes, content):
+    def generate(
+        cls,
+        attributes: list[tuple[str, str]],
+        content: list[list[int | float | str]],
+    ) -> OpenMLRunTrace:
         """Generates an OpenMLRunTrace.
 
         Generates the trace object from the attributes and content extracted
@@ -173,11 +179,11 @@ class OpenMLRunTrace:
         """
         if content is None:
             raise ValueError("Trace content not available.")
-        elif attributes is None:
+        if attributes is None:
             raise ValueError("Trace attributes not available.")
-        elif len(content) == 0:
+        if len(content) == 0:
             raise ValueError("Trace content is empty.")
-        elif len(attributes) != len(content[0]):
+        if len(attributes) != len(content[0]):
             raise ValueError(
                 "Trace_attributes and trace_content not compatible:"
                 f" {attributes} vs {content[0]}",
@@ -191,23 +197,25 @@ class OpenMLRunTrace:
         )
 
     @classmethod
-    def _from_filesystem(cls, file_path: str) -> OpenMLRunTrace:
+    def _from_filesystem(cls, file_path: str | Path) -> OpenMLRunTrace:
         """
         Logic to deserialize the trace from the filesystem.
 
         Parameters
         ----------
-        file_path: str
+        file_path: str | Path
             File path where the trace arff is stored.
 
         Returns
         -------
         OpenMLRunTrace
         """
-        if not os.path.isfile(file_path):
+        file_path = Path(file_path)
+
+        if not file_path.exists():
             raise ValueError("Trace file doesn't exist")
 
-        with open(file_path) as fp:
+        with file_path.open("r") as fp:
             trace_arff = arff.load(fp)
 
         for trace_idx in range(len(trace_arff["data"])):
@@ -220,21 +228,23 @@ class OpenMLRunTrace:
 
         return cls.trace_from_arff(trace_arff)
 
-    def _to_filesystem(self, file_path):
+    def _to_filesystem(self, file_path: str | Path) -> None:
         """Serialize the trace object to the filesystem.
 
         Serialize the trace object as an arff.
 
         Parameters
         ----------
-        file_path: str
+        file_path: str | Path
             File path where the trace arff will be stored.
         """
+        trace_path = Path(file_path) / "trace.arff"
+
         trace_arff = arff.dumps(self.trace_to_arff())
-        with open(os.path.join(file_path, "trace.arff"), "w") as f:
+        with trace_path.open("w") as f:
             f.write(trace_arff)
 
-    def trace_to_arff(self):
+    def trace_to_arff(self) -> dict[str, Any]:
         """Generate the arff dictionary for uploading predictions to the server.
 
         Uses the trace object to generate an arff dictionary representation.
@@ -263,21 +273,20 @@ class OpenMLRunTrace:
             ],
         )
 
-        arff_dict = OrderedDict()
+        arff_dict: dict[str, Any] = {}
         data = []
         for trace_iteration in self.trace_iterations.values():
             tmp_list = []
-            for attr, _ in trace_attributes:
-                if attr.startswith(PREFIX):
-                    attr = attr[len(PREFIX) :]
+            for _attr, _ in trace_attributes:
+                if _attr.startswith(PREFIX):
+                    attr = _attr[len(PREFIX) :]
                     value = trace_iteration.get_parameters()[attr]
                 else:
+                    attr = _attr
                     value = getattr(trace_iteration, attr)
+
                 if attr == "selected":
-                    if value:
-                        tmp_list.append("true")
-                    else:
-                        tmp_list.append("false")
+                    tmp_list.append("true" if value else "false")
                 else:
                     tmp_list.append(value)
             data.append(tmp_list)
@@ -289,7 +298,7 @@ class OpenMLRunTrace:
         return arff_dict
 
     @classmethod
-    def trace_from_arff(cls, arff_obj):
+    def trace_from_arff(cls, arff_obj: dict[str, Any]) -> OpenMLRunTrace:
         """Generate trace from arff trace.
 
         Creates a trace file from arff object (for example, generated by a
@@ -313,16 +322,21 @@ class OpenMLRunTrace:
         )
 
     @classmethod
-    def _trace_from_arff_struct(cls, attributes, content, error_message):
+    def _trace_from_arff_struct(
+        cls,
+        attributes: list[tuple[str, str]],
+        content: list[list[int | float | str]],
+        error_message: str,
+    ) -> Self:
         """Generate a trace dictionary from ARFF structure.
 
         Parameters
         ----------
         cls : type
             The trace object to be created.
-        attributes : List[Tuple[str, str]]
+        attributes : list[tuple[str, str]]
             Attribute descriptions.
-        content : List[List[Union[int, float, str]]]
+        content : list[list[int | float | str]]]
             List of instances.
         error_message : str
             Error message to raise if `setup_string` is in `attributes`.
@@ -345,17 +359,16 @@ class OpenMLRunTrace:
         # they are not parameters
         parameter_attributes = []
         for attribute in attribute_idx:
-            if attribute in REQUIRED_ATTRIBUTES:
+            if attribute in REQUIRED_ATTRIBUTES or attribute == "setup_string":
                 continue
-            elif attribute == "setup_string":
-                continue
-            elif not attribute.startswith(PREFIX):
+
+            if not attribute.startswith(PREFIX):
                 raise ValueError(
                     f"Encountered unknown attribute {attribute} that does not start "
                     f"with prefix {PREFIX}",
                 )
-            else:
-                parameter_attributes.append(attribute)
+
+            parameter_attributes.append(attribute)
 
         for itt in content:
             repeat = int(itt[attribute_idx["repeat"]])
@@ -373,9 +386,9 @@ class OpenMLRunTrace:
                     "received: %s" % selected_value,
                 )
 
-            parameters = OrderedDict(
-                [(attribute, itt[attribute_idx[attribute]]) for attribute in parameter_attributes],
-            )
+            parameters = {
+                attribute: itt[attribute_idx[attribute]] for attribute in parameter_attributes
+            }
 
             current = OpenMLTraceIteration(
                 repeat=repeat,
@@ -391,7 +404,7 @@ class OpenMLRunTrace:
         return cls(None, trace)
 
     @classmethod
-    def trace_from_xml(cls, xml):
+    def trace_from_xml(cls, xml: str | Path | IO) -> OpenMLRunTrace:
         """Generate trace from xml.
 
         Creates a trace file from the xml description.
@@ -408,6 +421,9 @@ class OpenMLRunTrace:
             Object containing the run id and a dict containing the trace
             iterations.
         """
+        if isinstance(xml, Path):
+            xml = str(xml.absolute())
+
         result_dict = xmltodict.parse(xml, force_list=("oml:trace_iteration",))["oml:trace"]
 
         run_id = result_dict["oml:run_id"]
@@ -469,20 +485,27 @@ class OpenMLRunTrace:
             If the parameters in the iterations of the traces being merged are not equal.
             If a key (repeat, fold, iteration) is encountered twice while merging the traces.
         """
-        merged_trace = OrderedDict()  # type: OrderedDict[Tuple[int, int, int], OpenMLTraceIteration]  # E501
+        merged_trace: dict[tuple[int, int, int], OpenMLTraceIteration] = {}
 
         previous_iteration = None
         for trace in traces:
             for iteration in trace:
                 key = (iteration.repeat, iteration.fold, iteration.iteration)
+
+                assert iteration.parameters is not None
+                param_keys = iteration.parameters.keys()
+
                 if previous_iteration is not None:
-                    if list(merged_trace[previous_iteration].parameters.keys()) != list(
-                        iteration.parameters.keys(),
-                    ):
+                    trace_itr = merged_trace[previous_iteration]
+
+                    assert trace_itr.parameters is not None
+                    trace_itr_keys = trace_itr.parameters.keys()
+
+                    if list(param_keys) != list(trace_itr_keys):
                         raise ValueError(
                             "Cannot merge traces because the parameters are not equal: "
                             "{} vs {}".format(
-                                list(merged_trace[previous_iteration].parameters.keys()),
+                                list(trace_itr.parameters.keys()),
                                 list(iteration.parameters.keys()),
                             ),
                         )
@@ -497,11 +520,11 @@ class OpenMLRunTrace:
 
         return cls(None, merged_trace)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "[Run id: {}, {} trace iterations]".format(
             -1 if self.run_id is None else self.run_id,
             len(self.trace_iterations),
         )
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[OpenMLTraceIteration]:
         yield from self.trace_iterations.values()
