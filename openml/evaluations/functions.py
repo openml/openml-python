@@ -132,7 +132,7 @@ def list_evaluations(  # noqa: PLR0913
         per_fold_str = str(per_fold).lower()
 
     return openml.utils._list_all(  # type: ignore
-        output_format=output_format,  # type: ignore
+        list_output_format=output_format,  # type: ignore
         listing_call=_list_evaluations,
         function=function,
         offset=offset,

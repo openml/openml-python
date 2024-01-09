@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, List, cast
+from typing import TYPE_CHECKING
 from typing_extensions import Literal, overload
 
 import pandas as pd
@@ -116,7 +116,7 @@ def _get_study(id_: int | str, entity_type: str) -> BaseStudy:
                 current_tag["window_start"] = tag["oml:window_start"]
             tags.append(current_tag)
 
-    def get_nested_ids_from_result_dict(key: str, subkey: str) -> list | None:
+    def get_nested_ids_from_result_dict(key: str, subkey: str) -> list[int] | None:
         """Extracts a list of nested IDs from a result dictionary.
 
         Parameters
@@ -161,7 +161,6 @@ def _get_study(id_: int | str, entity_type: str) -> BaseStudy:
         )  # type: BaseStudy
 
     elif main_entity_type in ["tasks", "task"]:
-        tasks = cast("List[int]", tasks)
         study = OpenMLBenchmarkSuite(
             suite_id=study_id,
             alias=alias,
@@ -520,7 +519,7 @@ def list_suites(
         warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
     return openml.utils._list_all(
-        output_format=output_format,
+        list_output_format=output_format,
         listing_call=_list_studies,
         offset=offset,
         size=size,
@@ -625,7 +624,7 @@ def list_studies(  # noqa: PLR0913
         warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
     return openml.utils._list_all(
-        output_format=output_format,
+        list_output_format=output_format,
         listing_call=_list_studies,
         offset=offset,
         size=size,

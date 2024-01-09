@@ -174,7 +174,7 @@ def list_datasets(  # noqa: PLR0913
 
     return openml.utils._list_all(
         data_id=data_id,
-        output_format=output_format,
+        list_output_format=output_format,
         listing_call=_list_datasets,
         offset=offset,
         size=size,
@@ -1199,9 +1199,12 @@ def _get_dataset_arff(
     else:
         raise TypeError("`description` should be either OpenMLDataset or Dict.")
 
-    if cache_directory is None:
-        cache_directory = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, did)
-    output_file_path = os.path.join(cache_directory, "dataset.arff")
+    save_cache_directory = (
+        _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, did)
+        if cache_directory is None
+        else Path(cache_directory)
+    )
+    output_file_path = save_cache_directory / "dataset.arff"
 
     try:
         openml._api_calls._download_text_file(
@@ -1214,7 +1217,7 @@ def _get_dataset_arff(
         e.args = (e.args[0] + additional_info,)
         raise
 
-    return output_file_path
+    return str(output_file_path)
 
 
 def _get_features_xml(dataset_id: int) -> str:
@@ -1255,7 +1258,7 @@ def _get_dataset_features_file(did_cache_dir: str | Path | None, dataset_id: int
         with features_file.open("w", encoding="utf8") as fh:
             fh.write(features_xml)
 
-    return features_file
+    return str(features_file)
 
 
 def _get_qualities_xml(dataset_id: int) -> str:
@@ -1290,7 +1293,7 @@ def _get_dataset_qualities_file(
     save_did_cache_dir = (
         _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset_id)
         if did_cache_dir is None
-        else did_cache_dir
+        else Path(did_cache_dir)
     )
 
     # Dataset qualities are subject to change and must be fetched every time

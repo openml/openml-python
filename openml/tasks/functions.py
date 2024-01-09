@@ -185,7 +185,7 @@ def list_tasks(
         )
         warnings.warn(msg, category=FutureWarning, stacklevel=2)
     return openml.utils._list_all(
-        output_format=output_format,
+        list_output_format=output_format,
         listing_call=_list_tasks,
         task_type=task_type,
         offset=offset,
@@ -377,7 +377,7 @@ def get_tasks(
 @openml.utils.thread_safe_if_oslo_installed
 def get_task(
     task_id: int,
-    *dataset_args,
+    *dataset_args: Any,
     download_splits: bool | None = None,
     **get_dataset_kwargs: Any,
 ) -> OpenMLTask:

@@ -70,7 +70,7 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = True) -> OpenMLFlow:
+def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = True) -> OpenMLFlow:  # noqa: FBT001, FBT002
     """Download the OpenML flow for a given flow ID.
 
     Parameters
@@ -199,7 +199,7 @@ def list_flows(
         warnings.warn(msg, category=FutureWarning, stacklevel=2)
 
     return openml.utils._list_all(
-        output_format=output_format,
+        list_output_format=output_format,
         listing_call=_list_flows,
         offset=offset,
         size=size,
