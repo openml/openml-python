@@ -1,4 +1,5 @@
 # License: BSD 3-Clause
+# ruff: noqa: PLR0913
 from __future__ import annotations
 
 import logging
@@ -75,7 +76,7 @@ def list_qualities() -> list[str]:
 
 
 @overload
-def list_datasets(  # noqa: PLR0913
+def list_datasets(
     data_id: list[int] | None = ...,
     offset: int | None = ...,
     size: int | None = ...,
@@ -89,7 +90,7 @@ def list_datasets(  # noqa: PLR0913
 
 
 @overload
-def list_datasets(  # noqa: PLR0913
+def list_datasets(
     data_id: list[int] | None,
     offset: int | None,
     size: int | None,
@@ -102,7 +103,7 @@ def list_datasets(  # noqa: PLR0913
 
 
 @overload
-def list_datasets(  # noqa: PLR0913
+def list_datasets(
     data_id: list[int] | None = ...,
     offset: int | None = ...,
     size: int | None = ...,
@@ -114,7 +115,7 @@ def list_datasets(  # noqa: PLR0913
     ...
 
 
-def list_datasets(  # noqa: PLR0913
+def list_datasets(
     data_id: list[int] | None = None,
     offset: int | None = None,
     size: int | None = None,
@@ -449,7 +450,7 @@ def get_datasets(
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_dataset(  # noqa: C901, PLR0913, PLR0912
+def get_dataset(  # noqa: C901, PLR0912
     dataset_id: int | str,
     download_data: bool | None = None,  # Optional for deprecation warning; later again only bool
     version: int | None = None,
@@ -678,7 +679,7 @@ def attributes_arff_from_df(df: pd.DataFrame) -> list[tuple[str, list[str] | str
     return attributes_arff
 
 
-def create_dataset(  # noqa: C901, PLR0912, PLR0913, PLR0915
+def create_dataset(  # noqa: C901, PLR0912, PLR0915
     name: str,
     description: str | None,
     creator: str | None,
@@ -911,7 +912,7 @@ def status_update(data_id: int, status: Literal["active", "deactivated"]) -> Non
         raise ValueError("Data id/status does not collide")
 
 
-def edit_dataset(  # noqa: PLR0913
+def edit_dataset(
     data_id: int,
     description: str | None = None,
     creator: str | None = None,
@@ -1385,7 +1386,7 @@ def _get_dataset_qualities_file(
     return qualities_file
 
 
-def _create_dataset_from_description(  # noqa: PLR0913
+def _create_dataset_from_description(
     description: dict[str, str],
     features_file: Path | None = None,
     qualities_file: Path | None = None,

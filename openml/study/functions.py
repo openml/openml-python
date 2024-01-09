@@ -1,4 +1,5 @@
 # License: BSD 3-Clause
+# ruff: noqa: PLR0913
 from __future__ import annotations
 
 import warnings
@@ -530,7 +531,7 @@ def list_suites(
 
 
 @overload
-def list_studies(  # noqa: PLR0913
+def list_studies(
     offset: int | None = ...,
     size: int | None = ...,
     status: str | None = ...,
@@ -542,7 +543,7 @@ def list_studies(  # noqa: PLR0913
 
 
 @overload
-def list_studies(  # noqa: PLR0913
+def list_studies(
     offset: int | None = ...,
     size: int | None = ...,
     status: str | None = ...,
@@ -553,7 +554,7 @@ def list_studies(  # noqa: PLR0913
     ...
 
 
-def list_studies(  # noqa: PLR0913
+def list_studies(
     offset: int | None = None,
     size: int | None = None,
     status: str | None = None,

@@ -1,4 +1,5 @@
 # License: BSD 3-Clause
+# ruff: noqa: PLR0913
 from __future__ import annotations
 
 import json
@@ -17,7 +18,7 @@ from openml.evaluations import OpenMLEvaluation
 
 
 @overload
-def list_evaluations(  # noqa: PLR0913
+def list_evaluations(
     function: str,
     offset: int | None = ...,
     size: int | None = ...,
@@ -36,7 +37,7 @@ def list_evaluations(  # noqa: PLR0913
 
 
 @overload
-def list_evaluations(  # noqa: PLR0913
+def list_evaluations(
     function: str,
     offset: int | None = ...,
     size: int | None = ...,
@@ -54,7 +55,7 @@ def list_evaluations(  # noqa: PLR0913
     ...
 
 
-def list_evaluations(  # noqa: PLR0913
+def list_evaluations(
     function: str,
     offset: int | None = None,
     size: int | None = 10000,
@@ -149,7 +150,7 @@ def list_evaluations(  # noqa: PLR0913
     )
 
 
-def _list_evaluations(  # noqa: PLR0913
+def _list_evaluations(
     function: str,
     tasks: list | None = None,
     setups: list | None = None,
@@ -359,7 +360,7 @@ def list_estimation_procedures() -> list[str]:
     ]
 
 
-def list_evaluations_setups(  # noqa: PLR0913
+def list_evaluations_setups(
     function: str,
     offset: int | None = None,
     size: int | None = None,
