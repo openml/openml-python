@@ -1060,6 +1060,26 @@ def fork_dataset(data_id: int) -> int:
     data_id = result["oml:data_fork"]["oml:id"]
     return int(data_id)
 
+def data_feature_add_ontology(did, index, ontology):
+    upload_data = {
+        'data_id': did,
+        'index': index,
+        'ontology': ontology
+    }
+    print(upload_data)
+    result_xml = openml._api_calls._perform_api_call("data/feature/ontology/add", "post", data=upload_data)
+    print(result_xml)
+
+
+def data_feature_remove_ontology(did, index, ontology):
+    upload_data = {
+        'data_id': did,
+        'index': index,
+        'ontology': ontology
+    }
+    result_xml = openml._api_calls._perform_api_call("data/feature/ontology/remove", "post", data=upload_data)
+    print(result_xml)
+
 
 def _topic_add_dataset(data_id: int, topic: str) -> int:
     """

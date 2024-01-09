@@ -338,6 +338,13 @@ class OpenMLDatasetTestOnTestServer(TestBase):
         assert len(dataset.features[2].ontologies) >= 1
         assert len(dataset.features[3].ontologies) >= 1
 
+    def test_add_ontology_to_dataset(self):
+        did = 1
+        feature_index = 1
+        ontology = 'https://www.google.com/test9/'
+        openml.datasets.functions.data_feature_add_ontology(did, feature_index, ontology)
+        openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)
+
 
 @pytest.mark.production()
 class OpenMLDatasetTestSparse(TestBase):
