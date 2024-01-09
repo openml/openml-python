@@ -99,7 +99,7 @@ class BaseStudy(OpenMLBase):
         """Return the id of the study."""
         return self.study_id
 
-    def _get_repr_body_fields(self) -> list[tuple[str, str | int | list[str]]]:
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str]]]:
         """Collect all information to display in the __repr__ body."""
         fields: dict[str, Any] = {
             "Name": self.name,
@@ -138,7 +138,7 @@ class BaseStudy(OpenMLBase):
         ]
         return [(key, fields[key]) for key in order if key in fields]
 
-    def _parse_publish_response(self, xml_response: dict):
+    def _parse_publish_response(self, xml_response: dict) -> None:
         """Parse the id from the xml_response and assign it to self."""
         self.study_id = int(xml_response["oml:study_upload"]["oml:id"])
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 import re
 import webbrowser
 from abc import ABC, abstractmethod
+from typing import Iterable, Sequence
 
 import xmltodict
 
@@ -45,8 +46,9 @@ class OpenMLBase(ABC):
         # which holds for all entities except studies and tasks, which overwrite this method.
         return cls.__name__.lower()[len("OpenML") :][0]
 
+    # TODO(eddiebergman): This would be much cleaner as an iterator...
     @abstractmethod
-    def _get_repr_body_fields(self) -> list[tuple[str, str | int | list[str]]]:
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
         """Collect all information to display in the __repr__ body.
 
         Returns
@@ -60,7 +62,7 @@ class OpenMLBase(ABC):
 
     def _apply_repr_template(
         self,
-        body_fields: list[tuple[str, str | int | list[str]]],
+        body_fields: Iterable[tuple[str, str | int | list[str] | None]],
     ) -> str:
         """Generates the header and formats the body for string representation of the object.
 
@@ -78,9 +80,12 @@ class OpenMLBase(ABC):
         header_text = f"OpenML {name_with_spaces}"
         header = "{}\n{}\n".format(header_text, "=" * len(header_text))
 
-        longest_field_name_length = max(len(name) for name, _ in body_fields)
+        _body_fields: list[tuple[str, str | int | list[str]]] = [
+            (k, "None" if v is None else v) for k, v in body_fields
+        ]
+        longest_field_name_length = max(len(name) for name, _ in _body_fields)
         field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(field_line_format.format(name, value) for name, value in body_fields)
+        body = "\n".join(field_line_format.format(name, value) for name, value in _body_fields)
         return header + body
 
     @abstractmethod

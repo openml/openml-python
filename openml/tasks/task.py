@@ -7,7 +7,7 @@ import warnings
 from abc import ABC
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Sequence
 from typing_extensions import Literal, TypedDict, overload
 
 import openml._api_calls
@@ -105,7 +105,7 @@ class OpenMLTask(OpenMLBase):
         """Return the OpenML ID of this task."""
         return self.task_id
 
-    def _get_repr_body_fields(self) -> list[tuple[str, str | int | list[str]]]:
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str]]]:
         """Collect all information to display in the __repr__ body."""
         base_server_url = openml.config.get_server_base_url()
         fields: dict[str, Any] = {

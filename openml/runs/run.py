@@ -13,6 +13,7 @@ from typing import (  # noqa F401
     Dict,
     List,
     Optional,
+    Sequence,
     TextIO,
     Tuple,
     Union,
@@ -175,7 +176,8 @@ class OpenMLRun(OpenMLBase):
         return self._predictions
 
     @property
-    def id(self) -> int | None:
+    def id(self) -> int | None:  # noqa: A003
+        """The ID of the run, None if not uploaded to the server yet."""
         return self.run_id
 
     def _evaluation_summary(self, metric: str) -> str:
@@ -208,7 +210,7 @@ class OpenMLRun(OpenMLBase):
 
         return f"{np.mean(rep_means):.4f} +- {np.mean(rep_stds):.4f}"
 
-    def _get_repr_body_fields(self) -> list[tuple[str, str | int | list[str]]]:
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str]]]:
         """Collect all information to display in the __repr__ body."""
         # Set up fields
         fields = {
