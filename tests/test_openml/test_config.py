@@ -5,6 +5,8 @@ import os
 import tempfile
 import unittest.mock
 
+import pytest
+
 import openml.config
 import openml.testing
 
@@ -68,6 +70,7 @@ class TestConfig(openml.testing.TestBase):
 
 
 class TestConfigurationForExamples(openml.testing.TestBase):
+    @pytest.mark.production()
     def test_switch_to_example_configuration(self):
         """Verifies the test configuration is loaded properly."""
         # Below is the default test key which would be used anyway, but just for clarity:
@@ -79,6 +82,7 @@ class TestConfigurationForExamples(openml.testing.TestBase):
         assert openml.config.apikey == "c0c42819af31e706efe1f4b88c23c6c1"
         assert openml.config.server == self.test_server
 
+    @pytest.mark.production()
     def test_switch_from_example_configuration(self):
         """Verifies the previous configuration is loaded after stopping."""
         # Below is the default test key which would be used anyway, but just for clarity:
@@ -100,6 +104,7 @@ class TestConfigurationForExamples(openml.testing.TestBase):
             openml.config.stop_using_configuration_for_example,
         )
 
+    @pytest.mark.production()
     def test_example_configuration_start_twice(self):
         """Checks that the original config can be returned to if `start..` is called twice."""
         openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"

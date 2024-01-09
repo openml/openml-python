@@ -16,6 +16,7 @@ from openml.exceptions import PyOpenMLError
 from openml.testing import TestBase
 
 
+@pytest.mark.production()
 class OpenMLDatasetTest(TestBase):
     _multiprocess_can_split_ = True
 
@@ -317,7 +318,7 @@ class OpenMLDatasetTestOnTestServer(TestBase):
 
     def test_tagging(self):
         # tags can be at most 64 alphanumeric (+ underscore) chars
-        unique_indicator = str(time()).replace('.', '')
+        unique_indicator = str(time()).replace(".", "")
         tag = f"test_tag_OpenMLDatasetTestOnTestServer_{unique_indicator}"
         datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
         assert datasets.empty
@@ -329,6 +330,7 @@ class OpenMLDatasetTestOnTestServer(TestBase):
         datasets = openml.datasets.list_datasets(tag=tag, output_format="dataframe")
         assert datasets.empty
 
+@pytest.mark.production()
 class OpenMLDatasetTestSparse(TestBase):
     _multiprocess_can_split_ = True
 

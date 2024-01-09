@@ -1090,7 +1090,8 @@ def _get_qualities_pickle_file(qualities_file: str) -> str:
     return qualities_file + ".pkl"
 
 
-def _read_qualities(qualities_file: Path) -> dict[str, float]:
+def _read_qualities(qualities_file: str | Path) -> dict[str, float]:
+    qualities_file = Path(qualities_file)
     qualities_pickle_file = Path(_get_qualities_pickle_file(str(qualities_file)))
     try:
         with qualities_pickle_file.open("rb") as fh_binary:

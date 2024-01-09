@@ -132,6 +132,7 @@ class TestSetupFunctions(TestBase):
             else:
                 assert len(current.parameters) == num_params[idx]
 
+    @pytest.mark.production()
     def test_setup_list_filter_flow(self):
         openml.config.server = self.production_server
 
@@ -150,6 +151,7 @@ class TestSetupFunctions(TestBase):
 
         assert isinstance(setups, dict)
 
+    @pytest.mark.production()
     def test_list_setups_output_format(self):
         openml.config.server = self.production_server
         flow_id = 6794
@@ -169,6 +171,7 @@ class TestSetupFunctions(TestBase):
         assert isinstance(setups[next(iter(setups.keys()))], Dict)
         assert len(setups) == 10
 
+    @pytest.mark.production()
     def test_setuplist_offset(self):
         # TODO: remove after pull on live for better testing
         # openml.config.server = self.production_server

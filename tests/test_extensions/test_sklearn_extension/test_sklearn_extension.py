@@ -273,6 +273,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         self.assertDictEqual(structure, structure_fixture)
 
     @pytest.mark.sklearn()
+    @pytest.mark.production()
     def test_can_handle_flow(self):
         openml.config.server = self.production_server
 
@@ -1942,6 +1943,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             ) == X_test.shape[0] * len(task.class_labels)
 
     @pytest.mark.sklearn()
+    @pytest.mark.production()
     def test_run_model_on_fold_regression(self):
         # There aren't any regression tasks on the test server
         openml.config.server = self.production_server
@@ -1992,6 +1994,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         )
 
     @pytest.mark.sklearn()
+    @pytest.mark.production()
     def test_run_model_on_fold_clustering(self):
         # There aren't any regression tasks on the test server
         openml.config.server = self.production_server
