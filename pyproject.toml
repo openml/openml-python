@@ -20,7 +20,7 @@ dependencies = [
   "minio",
   "pyarrow",
 ]
-requires-python = ">=3.6"
+requires-python = ">=3.8"
 authors = [
   { name = "Matthias Feurer", email="feurerm@informatik.uni-freiburg.de" },
   { name = "Jan van Rijn" },
@@ -45,8 +45,6 @@ classifiers = [
   "Operating System :: Unix",
   "Operating System :: MacOS",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.6",
-  "Programming Language :: Python :: 3.7",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
