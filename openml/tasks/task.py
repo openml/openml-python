@@ -198,11 +198,11 @@ class OpenMLTask(OpenMLBase):
         return self.split.repeats, self.split.folds, self.split.samples
 
     # TODO(eddiebergman): Really need some better typing on all this
-    def _to_dict(self) -> dict[str, dict[str, int | str | list[dict[str, Any]]]]:
-        """Creates a dictionary representation of self."""
+    def _to_dict(self) -> dict[str, dict[str, str | list[dict[str, Any]]]]:
+        """Creates a dictionary representation of self in a string format (for XML parsing)."""
         oml_input = [
-            {"@name": "source_data", "#text": self.dataset_id},
-            {"@name": "estimation_procedure", "#text": self.estimation_procedure_id},
+            {"@name": "source_data", "#text": str(self.dataset_id)},
+            {"@name": "estimation_procedure", "#text": str(self.estimation_procedure_id)},
         ]
         if self.evaluation_measure is not None:  #
             oml_input.append({"@name": "evaluation_measures", "#text": self.evaluation_measure})
