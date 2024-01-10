@@ -4,6 +4,8 @@ from __future__ import annotations
 import os
 import tempfile
 import unittest.mock
+from copy import copy
+from pathlib import Path
 
 import pytest
 
@@ -12,22 +14,20 @@ import openml.testing
 
 
 class TestConfig(openml.testing.TestBase):
-    @unittest.mock.patch("os.path.expanduser")
     @unittest.mock.patch("openml.config.openml_logger.warning")
     @unittest.mock.patch("openml.config._create_log_handlers")
     @unittest.skipIf(os.name == "nt", "https://github.com/openml/openml-python/issues/1033")
-    def test_non_writable_home(self, log_handler_mock, warnings_mock, expanduser_mock):
+    def test_non_writable_home(self, log_handler_mock, warnings_mock):
         with tempfile.TemporaryDirectory(dir=self.workdir) as td:
-            expanduser_mock.side_effect = (
-                os.path.join(td, "openmldir"),
-                os.path.join(td, "cachedir"),
-            )
             os.chmod(td, 0o444)
-            openml.config._setup()
+            _dd = copy(openml.config._defaults)
+            _dd["cachedir"] = Path(td) / "something-else"
+            openml.config._setup(_dd)
 
         assert warnings_mock.call_count == 2
         assert log_handler_mock.call_count == 1
         assert not log_handler_mock.call_args_list[0][1]["create_file_handler"]
+        assert openml.config._root_cache_directory == Path(td) / "something-else"
 
     @unittest.mock.patch("os.path.expanduser")
     def test_XDG_directories_do_not_exist(self, expanduser_mock):
