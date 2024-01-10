@@ -36,7 +36,7 @@ class OpenMLDataFeature:
         data_type: str,
         nominal_values: list[str],
         number_missing_values: int,
-        ontologies: list[str]
+        ontologies: list[str],
     ):
         if not isinstance(index, int):
             raise TypeError(f"Index must be `int` but is {type(index)}")

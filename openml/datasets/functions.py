@@ -1081,11 +1081,7 @@ def data_feature_add_ontology(data_id, index, ontology):
     -------
     True or throws an OpenML server exception
     """
-    upload_data = {
-        'data_id': data_id,
-        'index': index,
-        'ontology': ontology
-    }
+    upload_data = {"data_id": data_id, "index": index, "ontology": ontology}
     openml._api_calls._perform_api_call("data/feature/ontology/add", "post", data=upload_data)
     # an error will be thrown in case the request was unsuccessful
     return True
@@ -1093,32 +1089,27 @@ def data_feature_add_ontology(data_id, index, ontology):
 
 def data_feature_remove_ontology(data_id, index, ontology):
     """
-        Removes an existing ontology (URL) to a given dataset feature (defined
-        by a dataset id and index). The dataset has to exists on OpenML and needs
-        to have been processed by the evaluation engine. Ontology needs to be
-        attached to the specific fearure.
+    Removes an existing ontology (URL) to a given dataset feature (defined
+    by a dataset id and index). The dataset has to exists on OpenML and needs
+    to have been processed by the evaluation engine. Ontology needs to be
+    attached to the specific fearure.
 
-        Parameters
-        ----------
-        data_id : int
-            id of the dataset to which the feature belongs
+    Parameters
+    ----------
+    data_id : int
+        id of the dataset to which the feature belongs
 
-        index : int
-            index of the feature in dataset (0-based)
+    index : int
+        index of the feature in dataset (0-based)
 
-        ontology : str
-            URL to ontology (max. 256 characters)
+    ontology : str
+        URL to ontology (max. 256 characters)
 
-        Returns
-        -------
-        True or throws an OpenML server exception
+    Returns
+    -------
+    True or throws an OpenML server exception
     """
-
-    upload_data = {
-        'data_id': data_id,
-        'index': index,
-        'ontology': ontology
-    }
+    upload_data = {"data_id": data_id, "index": index, "ontology": ontology}
     openml._api_calls._perform_api_call("data/feature/ontology/remove", "post", data=upload_data)
     # an error will be thrown in case the request was unsuccessful
     return True
