@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ["3.7", "3.8"]
+        python-version: ["3.8", "3.9"]
         scikit-learn: ["0.21.2", "0.22.2", "0.23.1", "0.24"]
         os: [ubuntu-latest]
         sklearn-only: ['true']
