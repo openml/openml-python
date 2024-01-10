@@ -338,13 +338,38 @@ class OpenMLDatasetTestOnTestServer(TestBase):
         assert len(dataset.features[2].ontologies) >= 1
         assert len(dataset.features[3].ontologies) >= 1
 
-    def test_add_ontology_to_dataset(self):
+    def test_add_remove_ontology_to_dataset(self):
         did = 1
         feature_index = 1
-        ontology = 'https://www.google.com/test9/'
+        ontology = 'https://www.openml.org/unittest/' + str(time())
         openml.datasets.functions.data_feature_add_ontology(did, feature_index, ontology)
         openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)
 
+    def test_add_same_ontology_multiple_features(self):
+        did = 1
+        ontology = 'https://www.openml.org/unittest/' + str(time())
+
+        for i in range(3):
+            openml.datasets.functions.data_feature_add_ontology(did, i, ontology)
+
+
+    def test_add_illegal_long_ontology(self):
+        did = 1
+        ontology = 'http://www.google.com/' + ('a' * 257)
+        try:
+            openml.datasets.functions.data_feature_add_ontology(did, 1, ontology)
+            assert False
+        except openml.exceptions.OpenMLServerException as e:
+            assert e.code == 1105
+
+    def test_add_illegal_url_ontology(self):
+        did = 1
+        ontology = 'not_a_url' + str(time())
+        try:
+            openml.datasets.functions.data_feature_add_ontology(did, 1, ontology)
+            assert False
+        except openml.exceptions.OpenMLServerException as e:
+            assert e.code == 1106
 
 @pytest.mark.production()
 class OpenMLDatasetTestSparse(TestBase):
