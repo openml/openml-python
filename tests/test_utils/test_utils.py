@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import os
 import unittest.mock
-
 import pytest
-
+import shutil
 import openml
 from openml.testing import _check_dataset
 
@@ -23,6 +22,20 @@ def with_test_server():
     openml.config.start_using_configuration_for_example()
     yield
     openml.config.stop_using_configuration_for_example()
+
+
+@pytest.fixture(autouse=True)
+def with_test_cache(test_files_directory, request):
+    if not test_files_directory.exists():
+        raise ValueError(
+            f"Cannot find test cache dir, expected it to be {test_files_directory!s}!",
+        )
+    _root_cache_directory = openml.config._root_cache_directory
+    tmp_cache = _root_cache_directory / request.node.name
+    openml.config.set_root_cache_directory(tmp_cache)
+    yield
+    openml.config.set_root_cache_directory(_root_cache_directory)
+    shutil.rmtree(tmp_cache)
 
 
 @pytest.fixture()
@@ -176,3 +189,16 @@ def test__create_cache_directory(config_mock, tmp_path):
         match="Cannot create cache directory",
     ):
         openml.utils._create_cache_directory("ghi")
+
+
+@pytest.mark.server()
+def test_correct_test_server_download_state():
+    """This test verifies that the test server downloads the data from the correct source.
+
+    If this tests fails, it is highly likely that the test server is not configured correctly.
+    Usually, this means that the test server is serving data from the task with the same ID from the production server.
+    That is, it serves parquet files wrongly associated with the test server's task.
+    """
+    task = openml.tasks.get_task(119)
+    dataset = task.get_dataset()
+    assert len(dataset.features) == dataset.get_data(dataset_format="dataframe")[0].shape[1]
