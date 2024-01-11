@@ -312,7 +312,7 @@ def _list_all(  # noqa: C901, PLR0912
         raise ValueError(f"'batch_size' should be an integer but got {BATCH_SIZE_ORIG}")
 
     # max number of results to be shown
-    LIMIT = active_filters.pop("size", None)
+    LIMIT: int | float | None = active_filters.pop("size", None)  # type: ignore
     if (LIMIT is not None) and (not isinstance(LIMIT, int)) and (not np.isinf(LIMIT)):
         raise ValueError(f"'limit' should be an integer or inf but got {LIMIT}")
 
