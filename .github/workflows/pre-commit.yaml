@@ -1,6 +1,19 @@
 name: pre-commit
 
-on: [push]
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - "v*.*.*"
+
+  pull_request:
+    branches:
+      - main
+      - develop
 
 jobs:
   run-all-files:
