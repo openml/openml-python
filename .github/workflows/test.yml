@@ -48,7 +48,6 @@ jobs:
             scipy: "1.10.0"  # not sure why the explicit scipy version?
             sklearn-only: 'false'
       fail-fast:  false
-      max-parallel: 4
 
     steps:
     - uses: actions/checkout@v4
