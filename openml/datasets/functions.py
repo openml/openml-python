@@ -1060,9 +1060,11 @@ def fork_dataset(data_id: int) -> int:
     data_id = result["oml:data_fork"]["oml:id"]
     return int(data_id)
 
-def data_feature_add_ontology(data_id, index, ontology):
+def data_feature_add_ontology(data_id: int, index: int, ontology: str) -> bool:
     """
-    Adds an ontology (URL) to a given dataset feature (defined by a dataset id
+    An ontology describes the concept that are described in a feature. An
+    ontology is defined by an URL where the information is provided. Adds
+    an ontology (URL) to a given dataset feature (defined by a dataset id
     and index). The dataset has to exists on OpenML and needs to have been
     processed by the evaluation engine.
 
@@ -1087,7 +1089,7 @@ def data_feature_add_ontology(data_id, index, ontology):
     return True
 
 
-def data_feature_remove_ontology(data_id, index, ontology):
+def data_feature_remove_ontology(data_id: int, index: int, ontology: str) -> bool:
     """
     Removes an existing ontology (URL) to a given dataset feature (defined
     by a dataset id and index). The dataset has to exists on OpenML and needs

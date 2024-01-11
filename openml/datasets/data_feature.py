@@ -24,7 +24,9 @@ class OpenMLDataFeature:
     number_missing_values : int
         Number of rows that have a missing value for this feature.
     ontologies : list(str)
-        list of ontologies attached to this feature
+        list of ontologies attached to this feature. An ontology describes the
+        concept that are described in a feature. An ontology is defined by an
+        URL where the information is provided.
     """
 
     LEGAL_DATA_TYPES: ClassVar[Sequence[str]] = ["nominal", "numeric", "string", "date"]
