@@ -1224,7 +1224,7 @@ class TestRun(TestBase):
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.flow_id = -1
         expected_message_regex = (
-            "Flow does not exist on the server, " "but 'flow.flow_id' is not None."
+            r"Flow does not exist on the server, but 'flow.flow_id' is not None."
         )
         with pytest.raises(openml.exceptions.PyOpenMLError, match=expected_message_regex):
             openml.runs.run_flow_on_task(
@@ -1258,7 +1258,7 @@ class TestRun(TestBase):
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 
         expected_message_regex = (
-            "Flow does not exist on the server, " "but 'flow.flow_id' is not None."
+            r"Flow does not exist on the server, but 'flow.flow_id' is not None."
         )
         with pytest.raises(openml.exceptions.PyOpenMLError, match=expected_message_regex):
             loaded_run.publish()
