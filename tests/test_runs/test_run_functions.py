@@ -1386,7 +1386,7 @@ class TestRun(TestBase):
             self.assertAlmostEqual(sum(arff_line[6:]), 1.0)
 
     def test__create_trace_from_arff(self):
-        with open(self.static_cache_dir + "/misc/trace.arff") as arff_file:
+        with open(self.static_cache_dir / "misc" / "trace.arff") as arff_file:
             trace_arff = arff.load(arff_file)
         OpenMLRunTrace.trace_from_arff(trace_arff)
 
