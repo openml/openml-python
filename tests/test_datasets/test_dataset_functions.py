@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import os
-import pathlib
+from pathlib import Path
 import random
 import shutil
 import time
@@ -132,6 +132,7 @@ class TestOpenMLDataset(TestBase):
         )
         assert datasets.empty
 
+    @pytest.mark.production()
     def test_check_datasets_active(self):
         # Have to test on live because there is no deactivated dataset on the test server.
         openml.config.server = self.production_server
@@ -155,7 +156,7 @@ class TestOpenMLDataset(TestBase):
         tag = "illegal_tag&"
         try:
             dataset.push_tag(tag)
-            assert False
+            raise AssertionError()
         except openml.exceptions.OpenMLServerException as e:
             assert e.code == 477
 
@@ -164,7 +165,7 @@ class TestOpenMLDataset(TestBase):
         tag = "a" * 65
         try:
             dataset.push_tag(tag)
-            assert False
+            raise AssertionError()
         except openml.exceptions.OpenMLServerException as e:
             assert e.code == 477
 
@@ -206,6 +207,7 @@ class TestOpenMLDataset(TestBase):
                 ),
             )
 
+    @pytest.mark.production()
     def test__name_to_id_with_deactivated(self):
         """Check that an activated dataset is returned if an earlier deactivated one exists."""
         openml.config.server = self.production_server
@@ -213,16 +215,19 @@ class TestOpenMLDataset(TestBase):
         assert openml.datasets.functions._name_to_id("anneal") == 2
         openml.config.server = self.test_server
 
+    @pytest.mark.production()
     def test__name_to_id_with_multiple_active(self):
         """With multiple active datasets, retrieve the least recent active."""
         openml.config.server = self.production_server
         assert openml.datasets.functions._name_to_id("iris") == 61
 
+    @pytest.mark.production()
     def test__name_to_id_with_version(self):
         """With multiple active datasets, retrieve the least recent active."""
         openml.config.server = self.production_server
         assert openml.datasets.functions._name_to_id("iris", version=3) == 969
 
+    @pytest.mark.production()
     def test__name_to_id_with_multiple_active_error(self):
         """With multiple active datasets, retrieve the least recent active."""
         openml.config.server = self.production_server
@@ -283,6 +288,7 @@ class TestOpenMLDataset(TestBase):
         datasets[1].get_data()
         self._datasets_retrieved_successfully([1, 2], metadata_only=False)
 
+    @pytest.mark.production()
     def test_get_dataset_by_name(self):
         dataset = openml.datasets.get_dataset("anneal")
         assert type(dataset) == OpenMLDataset
@@ -312,6 +318,7 @@ class TestOpenMLDataset(TestBase):
         df, _, _, _ = dataset.get_data()
         assert df["carbon"].dtype == "uint8"
 
+    @pytest.mark.production()
     def test_get_dataset(self):
         # This is the only non-lazy load to ensure default behaviour works.
         dataset = openml.datasets.get_dataset(1)
@@ -326,6 +333,7 @@ class TestOpenMLDataset(TestBase):
         openml.config.server = self.production_server
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
 
+    @pytest.mark.production()
     def test_get_dataset_lazy(self):
         dataset = openml.datasets.get_dataset(1, download_data=False)
         assert type(dataset) == OpenMLDataset
@@ -392,8 +400,8 @@ class TestOpenMLDataset(TestBase):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         description = _get_dataset_description(self.workdir, 2)
         arff_path = _get_dataset_arff(description, cache_directory=self.workdir)
-        assert isinstance(arff_path, str)
-        assert os.path.exists(arff_path)
+        assert isinstance(arff_path, Path)
+        assert arff_path.exists()
 
     def test__download_minio_file_object_does_not_exist(self):
         self.assertRaisesRegex(
@@ -427,7 +435,7 @@ class TestOpenMLDataset(TestBase):
         ), "_download_minio_file can save to a folder by copying the object name"
 
     def test__download_minio_file_raises_FileExists_if_destination_in_use(self):
-        file_destination = pathlib.Path(self.workdir, "custom.pq")
+        file_destination = Path(self.workdir, "custom.pq")
         file_destination.touch()
 
         self.assertRaises(
@@ -439,7 +447,7 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test__download_minio_file_works_with_bucket_subdirectory(self):
-        file_destination = pathlib.Path(self.workdir, "custom.pq")
+        file_destination = Path(self.workdir, "custom.pq")
         _download_minio_file(
             source="http://openml1.win.tue.nl/dataset61/dataset_61.pq",
             destination=file_destination,
@@ -455,8 +463,8 @@ class TestOpenMLDataset(TestBase):
             "oml:id": "20",
         }
         path = _get_dataset_parquet(description, cache_directory=self.workdir)
-        assert isinstance(path, str), "_get_dataset_parquet returns a path"
-        assert os.path.isfile(path), "_get_dataset_parquet returns path to real file"
+        assert isinstance(path, Path), "_get_dataset_parquet returns a path"
+        assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
     @mock.patch("openml._api_calls._download_minio_file")
     def test__get_dataset_parquet_is_cached(self, patch):
@@ -469,8 +477,8 @@ class TestOpenMLDataset(TestBase):
             "oml:id": "30",
         }
         path = _get_dataset_parquet(description, cache_directory=None)
-        assert isinstance(path, str), "_get_dataset_parquet returns a path"
-        assert os.path.isfile(path), "_get_dataset_parquet returns path to real file"
+        assert isinstance(path, Path), "_get_dataset_parquet returns a path"
+        assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
     def test__get_dataset_parquet_file_does_not_exist(self):
         description = {
@@ -501,15 +509,15 @@ class TestOpenMLDataset(TestBase):
 
     def test__get_dataset_features(self):
         features_file = _get_dataset_features_file(self.workdir, 2)
-        assert isinstance(features_file, str)
-        features_xml_path = os.path.join(self.workdir, "features.xml")
-        assert os.path.exists(features_xml_path)
+        assert isinstance(features_file, Path)
+        features_xml_path = self.workdir / "features.xml"
+        assert features_xml_path.exists()
 
     def test__get_dataset_qualities(self):
         qualities = _get_dataset_qualities_file(self.workdir, 2)
-        assert isinstance(qualities, str)
-        qualities_xml_path = os.path.join(self.workdir, "qualities.xml")
-        assert os.path.exists(qualities_xml_path)
+        assert isinstance(qualities, Path)
+        qualities_xml_path = self.workdir / "qualities.xml"
+        assert qualities_xml_path.exists()
 
     def test__get_dataset_skip_download(self):
         dataset = openml.datasets.get_dataset(
@@ -1550,6 +1558,7 @@ class TestOpenMLDataset(TestBase):
             data_id=999999,
         )
 
+    @pytest.mark.production()
     def test_get_dataset_parquet(self):
         # Parquet functionality is disabled on the test server
         # There is no parquet-copy of the test server yet.
@@ -1559,6 +1568,7 @@ class TestOpenMLDataset(TestBase):
         assert dataset.parquet_file is not None
         assert os.path.isfile(dataset.parquet_file)
 
+    @pytest.mark.production()
     def test_list_datasets_with_high_size_parameter(self):
         # Testing on prod since concurrent deletion of uploded datasets make the test fail
         openml.config.server = self.production_server

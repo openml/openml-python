@@ -199,10 +199,10 @@ class OpenMLTask(OpenMLBase):
 
     # TODO(eddiebergman): Really need some better typing on all this
     def _to_dict(self) -> dict[str, dict[str, int | str | list[dict[str, Any]]]]:
-        """Creates a dictionary representation of self."""
+        """Creates a dictionary representation of self in a string format (for XML parsing)."""
         oml_input = [
-            {"@name": "source_data", "#text": self.dataset_id},
-            {"@name": "estimation_procedure", "#text": self.estimation_procedure_id},
+            {"@name": "source_data", "#text": str(self.dataset_id)},
+            {"@name": "estimation_procedure", "#text": str(self.estimation_procedure_id)},
         ]
         if self.evaluation_measure is not None:  #
             oml_input.append({"@name": "evaluation_measures", "#text": self.evaluation_measure})
@@ -210,7 +210,7 @@ class OpenMLTask(OpenMLBase):
         return {
             "oml:task_inputs": {
                 "@xmlns:oml": "http://openml.org/openml",
-                "oml:task_type_id": self.task_type_id.value,
+                "oml:task_type_id": self.task_type_id.value,  # This is an int from the enum?
                 "oml:input": oml_input,
             }
         }
@@ -338,8 +338,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
     def _to_dict(self) -> dict[str, dict]:
         task_container = super()._to_dict()
-        task_dict = task_container["oml:task_inputs"]
-        oml_input = task_dict["oml:task_inputs"]["oml:input"]  # type: ignore
+        oml_input = task_container["oml:task_inputs"]["oml:input"]  # type: ignore
         assert isinstance(oml_input, list)
 
         oml_input.append({"@name": "target_feature", "#text": self.target_name})

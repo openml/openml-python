@@ -341,6 +341,9 @@ def _send_request(  # noqa: C901
     response: requests.Response | None = None
     delay_method = _human_delay if config.retry_policy == "human" else _robot_delay
 
+    # Error to raise in case of retrying too often. Will be set to the last observed exception.
+    retry_raise_e: Exception | None = None
+
     with requests.Session() as session:
         # Start at one to have a non-zero multiplier for the sleep
         for retry_counter in range(1, n_retries + 1):
@@ -384,10 +387,7 @@ def _send_request(  # noqa: C901
                 # which means trying again might resolve the issue.
                 if e.code != DATABASE_CONNECTION_ERRCODE:
                     raise e
-
-                delay = delay_method(retry_counter)
-                time.sleep(delay)
-
+                retry_raise_e = e
             except xml.parsers.expat.ExpatError as e:
                 if request_method != "get" or retry_counter >= n_retries:
                     if response is not None:
@@ -399,18 +399,21 @@ def _send_request(  # noqa: C901
                         f"Unexpected server error when calling {url}. Please contact the "
                         f"developers!\n{extra}"
                     ) from e
-
-                delay = delay_method(retry_counter)
-                time.sleep(delay)
-
+                retry_raise_e = e
             except (
                 requests.exceptions.ChunkedEncodingError,
                 requests.exceptions.ConnectionError,
                 requests.exceptions.SSLError,
                 OpenMLHashException,
-            ):
-                delay = delay_method(retry_counter)
-                time.sleep(delay)
+            ) as e:
+                retry_raise_e = e
+
+            # We can only be here if there was an exception
+            assert retry_raise_e is not None
+            if retry_counter >= n_retries:
+                raise retry_raise_e
+            delay = delay_method(retry_counter)
+            time.sleep(delay)
 
     assert response is not None
     return response

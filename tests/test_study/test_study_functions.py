@@ -12,6 +12,7 @@ from openml.testing import TestBase
 class TestStudyFunctions(TestBase):
     _multiprocess_can_split_ = True
 
+    @pytest.mark.production()
     def test_get_study_old(self):
         openml.config.server = self.production_server
 
@@ -22,6 +23,7 @@ class TestStudyFunctions(TestBase):
         assert len(study.setups) == 30
         assert study.runs is None
 
+    @pytest.mark.production()
     def test_get_study_new(self):
         openml.config.server = self.production_server
 
@@ -32,6 +34,7 @@ class TestStudyFunctions(TestBase):
         assert len(study.setups) == 1253
         assert len(study.runs) == 1693
 
+    @pytest.mark.production()
     def test_get_openml100(self):
         openml.config.server = self.production_server
 
@@ -41,6 +44,7 @@ class TestStudyFunctions(TestBase):
         assert isinstance(study_2, openml.study.OpenMLBenchmarkSuite)
         assert study.study_id == study_2.study_id
 
+    @pytest.mark.production()
     def test_get_study_error(self):
         openml.config.server = self.production_server
 
@@ -49,6 +53,7 @@ class TestStudyFunctions(TestBase):
         ):
             openml.study.get_study(99)
 
+    @pytest.mark.production()
     def test_get_suite(self):
         openml.config.server = self.production_server
 
@@ -59,6 +64,7 @@ class TestStudyFunctions(TestBase):
         assert study.runs is None
         assert study.setups is None
 
+    @pytest.mark.production()
     def test_get_suite_error(self):
         openml.config.server = self.production_server
 

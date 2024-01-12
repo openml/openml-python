@@ -119,7 +119,7 @@ pygments_style = "sphinx"
 #
 # currently disabled because without intersphinx we cannot link to numpy.ndarray
 # nitpicky = True
-
+linkcheck_ignore = [r"https://test.openml.org/t/.*"]  # FIXME: to avoid test server bugs avoiding docs building
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

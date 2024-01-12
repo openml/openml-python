@@ -31,7 +31,7 @@ class TestRun(TestBase):
         run_id = runs["run_id"].iloc[0]
         run = openml.runs.get_run(run_id)
         # tags can be at most 64 alphanumeric (+ underscore) chars
-        unique_indicator = str(time()).replace('.', '')
+        unique_indicator = str(time()).replace(".", "")
         tag = f"test_tag_TestRun_{unique_indicator}"
         runs = openml.runs.list_runs(tag=tag, output_format="dataframe")
         assert len(runs) == 0
