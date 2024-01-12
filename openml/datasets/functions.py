@@ -1060,6 +1060,7 @@ def fork_dataset(data_id: int) -> int:
     data_id = result["oml:data_fork"]["oml:id"]
     return int(data_id)
 
+
 def data_feature_add_ontology(data_id: int, index: int, ontology: str) -> bool:
     """
     An ontology describes the concept that are described in a feature. An
