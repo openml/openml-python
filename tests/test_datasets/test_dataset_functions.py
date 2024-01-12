@@ -626,10 +626,17 @@ class TestOpenMLDataset(TestBase):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels()
         assert labels == ["1", "2", "3", "4", "5", "U"]
+
         labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels(
             target_name="product-type",
         )
         assert labels == ["C", "H", "G"]
+
+        # Test workaround for string-typed class labels
+        custom_ds = openml.datasets.get_dataset(2, download_data=False)
+        custom_ds.features[31].data_type = "string"
+        labels = custom_ds.retrieve_class_labels(target_name=custom_ds.features[31].name)
+        assert labels == ["COIL", "SHEET"]
 
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
