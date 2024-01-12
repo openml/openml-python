@@ -66,9 +66,8 @@ def _get_cached_task(tid: int) -> OpenMLTask:
         with task_xml_path.open(encoding="utf8") as fh:
             return _create_task_from_xml(fh.read())
     except OSError as e:
-        raise OpenMLCacheException(f"Task file for tid {tid} not cached") from e
-    finally:
         openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
+        raise OpenMLCacheException(f"Task file for tid {tid} not cached") from e
 
 
 def _get_estimation_procedure_list() -> list[dict[str, Any]]:
