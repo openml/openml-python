@@ -1069,6 +1069,7 @@ def _parse_features_xml(features_xml_string: str) -> dict[int, OpenMLDataFeature
             xmlfeature["oml:data_type"],
             xmlfeature.get("oml:nominal_value"),
             int(nr_missing),
+            xmlfeature.get("oml:ontology"),
         )
         if idx != feature.index:
             raise ValueError("Data features not provided in right order")
