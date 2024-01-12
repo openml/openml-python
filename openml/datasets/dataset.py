@@ -908,8 +908,18 @@ class OpenMLDataset(OpenMLBase):
         list
         """
         for feature in self.features.values():
-            if (feature.name == target_name) and (feature.data_type == "nominal"):
-                return feature.nominal_values
+            if feature.name == target_name:
+                if feature.data_type == "nominal":
+                    return feature.nominal_values
+
+                if feature.data_type == "string":
+                    # Rel.: #1311
+                    # The target is invalid for a classification task if the feature type is string
+                    # and not nominal. For such miss-configured tasks, we silently fix it here as
+                    # we can safely interpreter string as nominal.
+                    df, *_ = self.get_data()
+                    return list(df.loc[feature.name].unique())
+
         return None
 
     def get_features_by_type(  # noqa: C901
