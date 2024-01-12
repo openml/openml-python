@@ -76,20 +76,20 @@ class TestBase(unittest.TestCase):
         # This cache directory is checked in to git to simulate a populated
         # cache
         self.maxDiff = None
-        self.static_cache_dir = None
         abspath_this_file = Path(inspect.getfile(self.__class__)).absolute()
         static_cache_dir = abspath_this_file.parent
         for _ in range(n_levels):
             static_cache_dir = static_cache_dir.parent.absolute()
+
         content = os.listdir(static_cache_dir)
         if "files" in content:
-            self.static_cache_dir = static_cache_dir / "files"
-
-        if self.static_cache_dir is None:
+            static_cache_dir = static_cache_dir / "files"
+        else:
             raise ValueError(
                 f"Cannot find test cache dir, expected it to be {static_cache_dir}!",
             )
 
+        self.static_cache_dir = static_cache_dir
         self.cwd = Path.cwd()
         workdir = Path(__file__).parent.absolute()
         tmp_dir_name = self.id()

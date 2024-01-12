@@ -1083,6 +1083,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.production()
     def test_online_run_metric_score(self):
         openml.config.server = self.production_server
 
@@ -1223,7 +1224,7 @@ class TestRun(TestBase):
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.flow_id = -1
         expected_message_regex = (
-            "Flow does not exist on the server, " "but 'flow.flow_id' is not None."
+            r"Flow does not exist on the server, but 'flow.flow_id' is not None."
         )
         with pytest.raises(openml.exceptions.PyOpenMLError, match=expected_message_regex):
             openml.runs.run_flow_on_task(
@@ -1257,7 +1258,7 @@ class TestRun(TestBase):
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 
         expected_message_regex = (
-            "Flow does not exist on the server, " "but 'flow.flow_id' is not None."
+            r"Flow does not exist on the server, but 'flow.flow_id' is not None."
         )
         with pytest.raises(openml.exceptions.PyOpenMLError, match=expected_message_regex):
             loaded_run.publish()
@@ -1385,10 +1386,11 @@ class TestRun(TestBase):
             self.assertAlmostEqual(sum(arff_line[6:]), 1.0)
 
     def test__create_trace_from_arff(self):
-        with open(self.static_cache_dir + "/misc/trace.arff") as arff_file:
+        with open(self.static_cache_dir / "misc" / "trace.arff") as arff_file:
             trace_arff = arff.load(arff_file)
         OpenMLRunTrace.trace_from_arff(trace_arff)
 
+    @pytest.mark.production()
     def test_get_run(self):
         # this run is not available on test
         openml.config.server = self.production_server
@@ -1424,6 +1426,7 @@ class TestRun(TestBase):
         assert isinstance(run, dict)
         assert len(run) == 8, str(run)
 
+    @pytest.mark.production()
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
@@ -1440,6 +1443,7 @@ class TestRun(TestBase):
         runs = openml.runs.list_runs(size=1000, output_format="dataframe")
         assert isinstance(runs, pd.DataFrame)
 
+    @pytest.mark.production()
     def test_get_runs_list_by_task(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
@@ -1458,6 +1462,7 @@ class TestRun(TestBase):
             assert run["task_id"] in task_ids
             self._check_run(run)
 
+    @pytest.mark.production()
     def test_get_runs_list_by_uploader(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
@@ -1479,6 +1484,7 @@ class TestRun(TestBase):
             assert run["uploader"] in uploader_ids
             self._check_run(run)
 
+    @pytest.mark.production()
     def test_get_runs_list_by_flow(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
@@ -1497,6 +1503,7 @@ class TestRun(TestBase):
             assert run["flow_id"] in flow_ids
             self._check_run(run)
 
+    @pytest.mark.production()
     def test_get_runs_pagination(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
@@ -1514,6 +1521,7 @@ class TestRun(TestBase):
             for run in runs.to_dict(orient="index").values():
                 assert run["uploader"] in uploader_ids
 
+    @pytest.mark.production()
     def test_get_runs_list_by_filters(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
@@ -1551,6 +1559,7 @@ class TestRun(TestBase):
         )
         assert len(runs) == 2
 
+    @pytest.mark.production()
     def test_get_runs_list_by_tag(self):
         # TODO: comes from live, no such lists on test
         # Unit test works on production server only
@@ -1669,6 +1678,7 @@ class TestRun(TestBase):
         TestBase._mark_entity_for_removal("run", run.run_id)
         TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], run.run_id))
 
+    @pytest.mark.production()
     def test_format_prediction_non_supervised(self):
         # non-supervised tasks don't exist on the test server
         openml.config.server = self.production_server

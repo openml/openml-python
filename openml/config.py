@@ -243,14 +243,11 @@ def _setup(config: _Config | None = None) -> None:
     config_dir = config_file.parent
 
     # read config file, create directory for config file
-    if not config_dir.exists():
-        try:
+    try:
+        if not config_dir.exists():
             config_dir.mkdir(exist_ok=True, parents=True)
-            cache_exists = True
-        except PermissionError:
-            cache_exists = False
-    else:
-        cache_exists = True
+    except PermissionError:
+        pass
 
     if config is None:
         config = _parse_config(config_file)
@@ -264,15 +261,21 @@ def _setup(config: _Config | None = None) -> None:
     set_retry_policy(config["retry_policy"], n_retries)
 
     _root_cache_directory = short_cache_dir.expanduser().resolve()
+
+    try:
+        cache_exists = _root_cache_directory.exists()
+    except PermissionError:
+        cache_exists = False
+
     # create the cache subdirectory
-    if not _root_cache_directory.exists():
-        try:
+    try:
+        if not _root_cache_directory.exists():
             _root_cache_directory.mkdir(exist_ok=True, parents=True)
-        except PermissionError:
-            openml_logger.warning(
-                "No permission to create openml cache directory at %s! This can result in "
-                "OpenML-Python not working properly." % _root_cache_directory,
-            )
+    except PermissionError:
+        openml_logger.warning(
+            "No permission to create openml cache directory at %s! This can result in "
+            "OpenML-Python not working properly." % _root_cache_directory,
+        )
 
     if cache_exists:
         _create_log_handlers()

@@ -53,6 +53,7 @@ class TestTask(TestBase):
         assert isinstance(estimation_procedures[0], dict)
         assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
 
+    @pytest.mark.production()
     def test_list_clustering_task(self):
         # as shown by #383, clustering tasks can give list/dict casting problems
         openml.config.server = self.production_server
@@ -140,6 +141,7 @@ class TestTask(TestBase):
     @unittest.skip(
         "Please await outcome of discussion: https://github.com/openml/OpenML/issues/776",
     )
+    @pytest.mark.production()
     def test__get_task_live(self):
         # Test the following task as it used to throw an Unicode Error.
         # https://github.com/openml/openml-python/issues/378
@@ -203,6 +205,7 @@ class TestTask(TestBase):
         task = openml.tasks.get_task(1)
         assert isinstance(task, OpenMLTask)
 
+    @pytest.mark.production()
     def test_get_task_different_types(self):
         openml.config.server = self.production_server
         # Regression task

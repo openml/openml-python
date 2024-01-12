@@ -589,7 +589,6 @@ class OpenMLDataset(OpenMLBase):
         fpath = self.data_feather_file if self.cache_format == "feather" else self.data_pickle_file
         logger.info(f"{self.cache_format} load data {self.name}")
         try:
-            assert self.data_pickle_file is not None
             if self.cache_format == "feather":
                 assert self.data_feather_file is not None
                 assert self.feather_attribute_file is not None
@@ -599,6 +598,7 @@ class OpenMLDataset(OpenMLBase):
                 with open(self.feather_attribute_file, "rb") as fh:  # noqa: PTH123
                     categorical, attribute_names = pickle.load(fh)  # noqa: S301
             else:
+                assert self.data_pickle_file is not None
                 with open(self.data_pickle_file, "rb") as fh:  # noqa: PTH123
                     data, categorical, attribute_names = pickle.load(fh)  # noqa: S301
         except FileNotFoundError as e:
@@ -681,14 +681,13 @@ class OpenMLDataset(OpenMLBase):
         if array_format == "array" and not isinstance(data, scipy.sparse.spmatrix):
             # We encode the categories such that they are integer to be able
             # to make a conversion to numeric for backward compatibility
-            def _encode_if_category(column: pd.Series) -> pd.Series:
+            def _encode_if_category(column: pd.Series | np.ndarray) -> pd.Series | np.ndarray:
                 if column.dtype.name == "category":
                     column = column.cat.codes.astype(np.float32)
                     mask_nan = column == -1
                     column[mask_nan] = np.nan
                 return column
 
-            assert isinstance(data, (pd.DataFrame, pd.Series))
             if isinstance(data, pd.DataFrame):
                 columns = {
                     column_name: _encode_if_category(data.loc[:, column_name])
@@ -1090,7 +1089,8 @@ def _get_qualities_pickle_file(qualities_file: str) -> str:
     return qualities_file + ".pkl"
 
 
-def _read_qualities(qualities_file: Path) -> dict[str, float]:
+def _read_qualities(qualities_file: str | Path) -> dict[str, float]:
+    qualities_file = Path(qualities_file)
     qualities_pickle_file = Path(_get_qualities_pickle_file(str(qualities_file)))
     try:
         with qualities_pickle_file.open("rb") as fh_binary:

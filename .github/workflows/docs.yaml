@@ -1,5 +1,22 @@
 name: Docs
-on: [pull_request, push]
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - "v*.*.*"
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:

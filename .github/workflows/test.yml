@@ -1,6 +1,19 @@
 name: Tests
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - "v*.*.*"
+
+  pull_request:
+    branches:
+      - main
+      - develop
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -12,25 +25,34 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ["3.8", "3.9"]
-        scikit-learn: ["0.21.2", "0.22.2", "0.23.1", "0.24"]
+        python-version: ["3.8"]
+        # TODO(eddiebergman): We should consider testing against newer version I guess...
+        # We probably consider just having a `"1"` version to always test against latest
+        scikit-learn: ["0.23.1", "0.24"]
         os: [ubuntu-latest]
-        sklearn-only: ['true']
-        exclude:  # no scikit-learn 0.21.2 release for Python 3.8
-          - python-version: 3.8
-            scikit-learn: 0.21.2
+        sklearn-only: ["true"]
+        exclude:  # no scikit-learn 0.23 release for Python 3.9
+          - python-version: "3.9"
+            scikit-learn: "0.23.1"
         include:
-          - python-version: 3.8
-            scikit-learn: 0.23.1
-            code-cov: true
-            sklearn-only: 'false'
+          - os: ubuntu-latest
+            python-version: "3.9"
+            scikit-learn: "0.24"
+            scipy: "1.10.0"
+            sklearn-only: "true"
+          # Include a code cov version
+          - code-cov: true
             os: ubuntu-latest
-          - os: windows-latest
+            python-version: "3.8"
+            scikit-learn: 0.23.1
             sklearn-only: 'false'
+          # Include a windows test, for some reason on a later version of scikit-learn
+          - os: windows-latest
+            python-version: "3.8"
             scikit-learn: 0.24.*
-            scipy: 1.10.0
+            scipy: "1.10.0"  # not sure why the explicit scipy version?
+            sklearn-only: 'false'
       fail-fast:  false
-      max-parallel: 4
 
     steps:
     - uses: actions/checkout@v4

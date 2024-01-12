@@ -1,6 +1,8 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import pytest
+
 import openml
 from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType
@@ -18,12 +20,14 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         self.task_type = TaskType.CLUSTERING
         self.estimation_procedure = 17
 
+    @pytest.mark.production()
     def test_get_dataset(self):
         # no clustering tasks on test server
         openml.config.server = self.production_server
         task = openml.tasks.get_task(self.task_id)
         task.get_dataset()
 
+    @pytest.mark.production()
     def test_download_task(self):
         # no clustering tasks on test server
         openml.config.server = self.production_server

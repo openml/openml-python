@@ -369,10 +369,8 @@ class OpenMLRun(OpenMLBase):
         directory = Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
-        if not any(directory.iterdir()):
-            raise ValueError(
-                f"Output directory {directory.expanduser().resolve()} should be empty",
-            )
+        if any(directory.iterdir()):
+            raise ValueError(f"Output directory {directory.expanduser().resolve()} should be empty")
 
         run_xml = self._to_xml()
         predictions_arff = arff.dumps(self._generate_arff_dict())

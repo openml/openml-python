@@ -771,7 +771,7 @@ def create_dataset(  # noqa: C901, PLR0912, PLR0915
     if isinstance(data, pd.DataFrame):
         # infer the row id from the index of the dataset
         if row_id_attribute is None:
-            row_id_attribute = str(data.index.name)
+            row_id_attribute = data.index.name
         # When calling data.values, the index will be skipped.
         # We need to reset the index such that it is part of the data.
         if data.index.name is not None:
@@ -1284,7 +1284,7 @@ def _get_dataset_arff(
     except OpenMLHashException as e:
         additional_info = f" Raised when downloading dataset {did}."
         e.args = (e.args[0] + additional_info,)
-        raise
+        raise e
 
     return output_file_path
 
