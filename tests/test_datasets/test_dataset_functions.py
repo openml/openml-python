@@ -631,6 +631,12 @@ class TestOpenMLDataset(TestBase):
         )
         assert labels == ["C", "H", "G"]
 
+        # Test workaround for string-typed class labels
+        custom_ds = openml.datasets.get_dataset(2, download_data=False)
+        custom_ds.features[31].data_type = "string"
+        labels = custom_ds.retrieve_class_labels(target_name=custom_ds.features[31].name)
+        assert labels == ["COIL", "SHEET"]
+
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
             "%s-UploadTestWithURL" % self._get_sentinel(),

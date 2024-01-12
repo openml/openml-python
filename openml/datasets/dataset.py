@@ -918,7 +918,7 @@ class OpenMLDataset(OpenMLBase):
                     # and not nominal. For such miss-configured tasks, we silently fix it here as
                     # we can safely interpreter string as nominal.
                     df, *_ = self.get_data()
-                    return list(df.loc[feature.name].unique())
+                    return list(df[feature.name].unique())
 
         return None
 
