@@ -183,7 +183,7 @@ def pytest_addoption(parser):
 
 
 def _expected_static_cache_state(root_dir: Path) -> list[Path]:
-    _c_root_dir = root_dir/"org"/"openml"/"test"
+    _c_root_dir = root_dir / "org" / "openml" / "test"
     res_paths = [root_dir, _c_root_dir]
     
     for _d in ["datasets", "tasks", "runs", "setups"]:
@@ -197,11 +197,12 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
             tmp_p / "qualities.xml",
             tmp_p / "description.xml",
         ])
+
     res_paths.append(_c_root_dir / "datasets" / "30" / "dataset_30.pq")
     res_paths.append(_c_root_dir / "runs" / "1" / "description.xml")
     res_paths.append(_c_root_dir / "setups" / "1" / "description.xml")
     
-    for _id in ["1","3", "1882"]:
+    for _id in ["1", "3", "1882"]:
         tmp_p = _c_root_dir / "tasks" / _id
         res_paths.extend([
             tmp_p / "datasplits.arff",
@@ -209,6 +210,7 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
         ])
     
     return res_paths
+
 
 def assert_static_test_cache_correct(root_dir: Path) -> None:
     for p in _expected_static_cache_state(root_dir):
