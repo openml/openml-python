@@ -25,8 +25,7 @@ from __future__ import annotations
 
 import logging
 import os
-import pathlib
-
+from pathlib import Path
 import pytest
 
 import openml
@@ -53,20 +52,20 @@ def worker_id() -> str:
         return "master"
 
 
-def read_file_list() -> list[pathlib.Path]:
+def read_file_list() -> list[Path]:
     """Returns a list of paths to all files that currently exist in 'openml/tests/files/'
 
-    :return: List[pathlib.Path]
+    :return: List[Path]
     """
-    test_files_dir = pathlib.Path(__file__).parent / "files"
+    test_files_dir = Path(__file__).parent / "files"
     return [f for f in test_files_dir.rglob("*") if f.is_file()]
 
 
-def compare_delete_files(old_list: list[pathlib.Path], new_list: list[pathlib.Path]) -> None:
+def compare_delete_files(old_list: list[Path], new_list: list[Path]) -> None:
     """Deletes files that are there in the new_list but not in the old_list
 
-    :param old_list: List[pathlib.Path]
-    :param new_list: List[pathlib.Path]
+    :param old_list: List[Path]
+    :param new_list: List[Path]
     :return: None
     """
     file_list = list(set(new_list) - set(old_list))
@@ -183,16 +182,56 @@ def pytest_addoption(parser):
     )
 
 
+def _expected_static_cache_state(root_dir: Path) -> list[Path]:
+    _c_root_dir = root_dir/"org"/"openml"/"test"
+    res_paths = [root_dir, _c_root_dir]
+    
+    for _d in ["datasets", "tasks", "runs", "setups"]:
+        res_paths.append(_c_root_dir / _d)
+
+    for _id in ["-1","2"]:
+        tmp_p = _c_root_dir / "datasets" / _id
+        res_paths.extend([
+            tmp_p / "dataset.arff",
+            tmp_p / "features.xml",
+            tmp_p / "qualities.xml",
+            tmp_p / "description.xml",
+        ])
+    res_paths.append(_c_root_dir / "datasets" / "30" / "dataset_30.pq")
+    res_paths.append(_c_root_dir / "runs" / "1" / "description.xml")
+    res_paths.append(_c_root_dir / "setups" / "1" / "description.xml")
+    
+    for _id in ["1","3", "1882"]:
+        tmp_p = _c_root_dir / "tasks" / _id
+        res_paths.extend([
+            tmp_p / "datasplits.arff",
+            tmp_p / "task.xml",
+        ])
+    
+    return res_paths
+
+def assert_static_test_cache_correct(root_dir: Path) -> None:
+    for p in _expected_static_cache_state(root_dir):
+        assert p.exists(), f"Expected path {p} does not exist"
+    
+
 @pytest.fixture(scope="class")
 def long_version(request):
     request.cls.long_version = request.config.getoption("--long")
 
 
 @pytest.fixture()
-def test_files_directory() -> pathlib.Path:
-    return pathlib.Path(__file__).parent / "files"
+def test_files_directory() -> Path:
+    return Path(__file__).parent / "files"
 
 
 @pytest.fixture()
 def test_api_key() -> str:
     return "c0c42819af31e706efe1f4b88c23c6c1"
+
+
+@pytest.fixture(autouse=True)
+def verify_cache_state(test_files_directory) -> None:
+    assert_static_test_cache_correct(test_files_directory)
+    yield
+    assert_static_test_cache_correct(test_files_directory)
