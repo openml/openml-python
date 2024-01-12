@@ -25,7 +25,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ["3.8", "3.9"]
+        python-version: ["3.8"]
         # TODO(eddiebergman): We should consider testing against newer version I guess...
         # We probably consider just having a `"1"` version to always test against latest
         scikit-learn: ["0.23.1", "0.24"]
@@ -35,6 +35,11 @@ jobs:
           - python-version: "3.9"
             scikit-learn: "0.23.1"
         include:
+          - os: ubuntu-latest
+            python-version: "3.9"
+            scikit-learn: "0.24"
+            scipy: "1.10.0"
+            sklearn-only: "true"
           # Include a code cov version
           - code-cov: true
             os: ubuntu-latest
