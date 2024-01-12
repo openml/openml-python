@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Perrone et al. (2018) &#8212; OpenML 0.14.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
+    <title>Perrone et al. (2018) &#8212; OpenML 0.14.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=421f3d0b"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.14.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -147,7 +147,7 @@ Hyperparameter Transfer Learning</em> by Perrone et al..</p>
 <li><p>Impute missing values and handle categorical data before building a Random Forest model that
 maps hyperparameter values to the area under curve score.</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
 
 <span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -165,7 +165,7 @@ maps hyperparameter values to the area under curve score.</p></li>
 </div>
 <p>The subsequent functions are defined to fetch tasks, flows, evaluations and preprocess them into
 a tabular format that can be used to build models.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fetch_evaluations</span><span class="p">(</span><span class="n">run_full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">flow_type</span><span class="o">=</span><span class="s2">&quot;svm&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;area_under_roc_curve&quot;</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fetch_evaluations</span><span class="p">(</span><span class="n">run_full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">flow_type</span><span class="o">=</span><span class="s2">&quot;svm&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;area_under_roc_curve&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fetch a list of evaluations based on the flows and tasks used in the experiments.</span>
 
@@ -280,23 +280,23 @@ a tabular format that can be used to build models.</p>
 <p>Now, we read all the tasks and evaluations for them and collate into a table.
 Here, we are reading all the tasks and evaluations for the SVM flow and
 pre-processing all retrieved evaluations.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eval_df</span><span class="p">,</span> <span class="n">task_ids</span><span class="p">,</span> <span class="n">flow_id</span> <span class="o">=</span> <span class="n">fetch_evaluations</span><span class="p">(</span><span class="n">run_full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">flow_type</span><span class="o">=</span><span class="n">flow_type</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">eval_df</span><span class="p">,</span> <span class="n">task_ids</span><span class="p">,</span> <span class="n">flow_id</span> <span class="o">=</span> <span class="n">fetch_evaluations</span><span class="p">(</span><span class="n">run_full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">flow_type</span><span class="o">=</span><span class="n">flow_type</span><span class="p">)</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">create_table_from_evaluations</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">flow_type</span><span class="o">=</span><span class="n">flow_type</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Y : &quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                    cost degree gamma      kernel
-815   0.0157077720884135    NaN   NaN  polynomial
-3223  0.0108402094954727    NaN   NaN      linear
-3251   0.223659768588385      5   NaN  polynomial
-5312   0.105142759020791      4   NaN  polynomial
-2260   0.132271192768185      2   NaN  polynomial
-Y :  815     0.877615
-3223    0.617111
-3251    0.504467
-5312    0.815337
-2260    0.530154
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>                     cost degree             gamma      kernel
+4580     2.85463708722855    NaN               NaN      linear
+2871     95.8859530483118    NaN  6.60002434975785         NaN
+2831    0.158661612275566      5               NaN  polynomial
+1424    0.911500854205004    NaN               NaN      linear
+1691  0.00208847289668438    NaN   717.96570238097         NaN
+Y :  4580    0.993037
+2871    0.699725
+2831    0.496681
+1424    0.900132
+1691    0.551819
 Name: value, dtype: float64
 </pre></div>
 </div>
@@ -306,7 +306,7 @@ Name: value, dtype: float64
 <p>The two primary tasks are to impute the missing values, that is, account for the hyperparameters
 that are not available with the runs from OpenML. And secondly, to handle categorical variables
 using One-hot encoding prior to modelling.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Separating data into categorical and non-categorical (numeric for this example) columns</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Separating data into categorical and non-categorical (numeric for this example) columns</span>
 <span class="n">cat_cols</span> <span class="o">=</span> <span class="n">list_categorical_attributes</span><span class="p">(</span><span class="n">flow_type</span><span class="o">=</span><span class="n">flow_type</span><span class="p">)</span>
 <span class="n">num_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">cat_cols</span><span class="p">))</span>
 
@@ -330,7 +330,7 @@ using One-hot encoding prior to modelling.</p>
 <p>The same set of functions can be used for a single task to retrieve a singular table which can
 be used for the surrogate model construction. We shall use the SVM flow here to keep execution
 time simple and quick.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Selecting a task for the surrogate</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Selecting a task for the surrogate</span>
 <span class="n">task_id</span> <span class="o">=</span> <span class="n">task_ids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Task ID : &quot;</span><span class="p">,</span> <span class="n">task_id</span><span class="p">)</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">create_table_from_evaluations</span><span class="p">(</span><span class="n">eval_df</span><span class="p">,</span> <span class="n">task_ids</span><span class="o">=</span><span class="p">[</span><span class="n">task_id</span><span class="p">],</span> <span class="n">flow_type</span><span class="o">=</span><span class="s2">&quot;svm&quot;</span><span class="p">)</span>
@@ -342,7 +342,7 @@ time simple and quick.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task ID :  145878
-Training RMSE : 1.9958e-05
+Training RMSE : 2.5982e-05
 </pre></div>
 </div>
 </section>
@@ -352,7 +352,7 @@ Training RMSE : 1.9958e-05
 trivial action here, where we shall randomly sample configurations and observe the trajectory
 of the area under curve (auc) we can obtain from the surrogate we’ve built.</p>
 <p>NOTE: This section is written exclusively for the SVM flow</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sampling random configurations</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sampling random configurations</span>
 <span class="k">def</span> <span class="nf">random_sample_configurations</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
     <span class="n">colnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;cost&quot;</span><span class="p">,</span> <span class="s2">&quot;degree&quot;</span><span class="p">,</span> <span class="s2">&quot;gamma&quot;</span><span class="p">,</span> <span class="s2">&quot;kernel&quot;</span><span class="p">]</span>
     <span class="n">ranges</span> <span class="o">=</span> <span class="p">[</span>
@@ -376,22 +376,22 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>           cost    degree       gamma      kernel
-0    901.246112  3.436646  320.128018      radial
-1    315.040000  2.653653  519.436735      linear
-2    897.315071  2.727070  419.756843     sigmoid
-3    368.170129  3.729839  140.007219      radial
-4    937.727057  2.282837  854.160144     sigmoid
+0    230.342485  3.315122  386.803839  polynomial
+1    613.191296  4.165381  266.690103  polynomial
+2     63.808588  3.951611  455.090096      radial
+3     87.459539  4.008973  630.296713  polynomial
+4    578.267575  3.161225  503.277015  polynomial
 ..          ...       ...         ...         ...
-995  756.653870  3.299464  666.760660  polynomial
-996  960.703376  3.265509  912.524215      linear
-997  778.582783  2.652488  408.755907     sigmoid
-998  458.941311  2.541196  335.235674  polynomial
-999  251.703986  4.551143  223.958666      linear
+995  971.264905  4.662747  456.216186      radial
+996  404.873706  3.255734  612.299660     sigmoid
+997  244.739242  3.429584  488.503091     sigmoid
+998   76.896491  3.520643   82.166247  polynomial
+999  102.550969  3.745548  582.993006  polynomial
 
 [1000 rows x 4 columns]
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">configs</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">configs</span><span class="p">)</span>
 
 <span class="c1"># tracking the maximum AUC obtained over the functions evaluations</span>
 <span class="n">preds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="o">.</span><span class="n">accumulate</span><span class="p">(</span><span class="n">preds</span><span class="p">)</span>
@@ -405,16 +405,16 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Regret&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" srcset="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" alt="AUC regret for Random Search on surrogate" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(42.722222222222214, 0.5, &#39;Regret&#39;)
+<img src="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" srcset="../../_images/sphx_glr_2018_neurips_perrone_example_001.png" alt="AUC regret for Random Search on surrogate" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(33.972222222222214, 0.5, &#39;Regret&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  34.706 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 36.765 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-neurips-perrone-example-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/42ecf9b9ca30a385452934aeb1a420d5/2018_neurips_perrone_example.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">2018_neurips_perrone_example.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/2fc23bfc18345b110ab68bc5f3939dc8/2018_neurips_perrone_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_neurips_perrone_example.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -434,8 +434,8 @@ of the area under curve (auc) we can obtain from the surrogate we’ve built.</p
       
     </p>
     <p>
-        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br/>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
     </p>
   </div>
 </footer>

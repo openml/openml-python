@@ -43,7 +43,7 @@ In the following section, we shall do the following:
 
 .. GENERATED FROM PYTHON SOURCE LINES 27-42
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # License: BSD 3-Clause
@@ -74,7 +74,7 @@ a tabular format that can be used to build models.
 
 .. GENERATED FROM PYTHON SOURCE LINES 45-157
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -205,7 +205,7 @@ pre-processing all retrieved evaluations.
 
 .. GENERATED FROM PYTHON SOURCE LINES 163-169
 
-.. code-block:: default
+.. code-block:: Python
 
 
     eval_df, task_ids, flow_id = fetch_evaluations(run_full=False, flow_type=flow_type)
@@ -221,17 +221,17 @@ pre-processing all retrieved evaluations.
 
  .. code-block:: none
 
-                        cost degree gamma      kernel
-    815   0.0157077720884135    NaN   NaN  polynomial
-    3223  0.0108402094954727    NaN   NaN      linear
-    3251   0.223659768588385      5   NaN  polynomial
-    5312   0.105142759020791      4   NaN  polynomial
-    2260   0.132271192768185      2   NaN  polynomial
-    Y :  815     0.877615
-    3223    0.617111
-    3251    0.504467
-    5312    0.815337
-    2260    0.530154
+                         cost degree             gamma      kernel
+    4580     2.85463708722855    NaN               NaN      linear
+    2871     95.8859530483118    NaN  6.60002434975785         NaN
+    2831    0.158661612275566      5               NaN  polynomial
+    1424    0.911500854205004    NaN               NaN      linear
+    1691  0.00208847289668438    NaN   717.96570238097         NaN
+    Y :  4580    0.993037
+    2871    0.699725
+    2831    0.496681
+    1424    0.900132
+    1691    0.551819
     Name: value, dtype: float64
 
 
@@ -247,7 +247,7 @@ using One-hot encoding prior to modelling.
 
 .. GENERATED FROM PYTHON SOURCE LINES 175-194
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Separating data into categorical and non-categorical (numeric for this example) columns
@@ -285,7 +285,7 @@ time simple and quick.
 
 .. GENERATED FROM PYTHON SOURCE LINES 200-212
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Selecting a task for the surrogate
@@ -308,7 +308,7 @@ time simple and quick.
  .. code-block:: none
 
     Task ID :  145878
-    Training RMSE : 1.9958e-05
+    Training RMSE : 2.5982e-05
 
 
 
@@ -325,7 +325,7 @@ NOTE: This section is written exclusively for the SVM flow
 
 .. GENERATED FROM PYTHON SOURCE LINES 220-244
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -360,17 +360,17 @@ NOTE: This section is written exclusively for the SVM flow
  .. code-block:: none
 
                cost    degree       gamma      kernel
-    0    901.246112  3.436646  320.128018      radial
-    1    315.040000  2.653653  519.436735      linear
-    2    897.315071  2.727070  419.756843     sigmoid
-    3    368.170129  3.729839  140.007219      radial
-    4    937.727057  2.282837  854.160144     sigmoid
+    0    230.342485  3.315122  386.803839  polynomial
+    1    613.191296  4.165381  266.690103  polynomial
+    2     63.808588  3.951611  455.090096      radial
+    3     87.459539  4.008973  630.296713  polynomial
+    4    578.267575  3.161225  503.277015  polynomial
     ..          ...       ...         ...         ...
-    995  756.653870  3.299464  666.760660  polynomial
-    996  960.703376  3.265509  912.524215      linear
-    997  778.582783  2.652488  408.755907     sigmoid
-    998  458.941311  2.541196  335.235674  polynomial
-    999  251.703986  4.551143  223.958666      linear
+    995  971.264905  4.662747  456.216186      radial
+    996  404.873706  3.255734  612.299660     sigmoid
+    997  244.739242  3.429584  488.503091     sigmoid
+    998   76.896491  3.520643   82.166247  polynomial
+    999  102.550969  3.745548  582.993006  polynomial
 
     [1000 rows x 4 columns]
 
@@ -379,7 +379,7 @@ NOTE: This section is written exclusively for the SVM flow
 
 .. GENERATED FROM PYTHON SOURCE LINES 245-257
 
-.. code-block:: default
+.. code-block:: Python
 
     preds = model.predict(configs)
 
@@ -407,14 +407,14 @@ NOTE: This section is written exclusively for the SVM flow
  .. code-block:: none
 
 
-    Text(42.722222222222214, 0.5, 'Regret')
+    Text(33.972222222222214, 0.5, 'Regret')
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  34.706 seconds)
+   **Total running time of the script:** (0 minutes 36.765 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_neurips_perrone_example.py:
@@ -423,16 +423,13 @@ NOTE: This section is written exclusively for the SVM flow
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: 2018_neurips_perrone_example.ipynb <2018_neurips_perrone_example.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: 2018_neurips_perrone_example.py <2018_neurips_perrone_example.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: 2018_neurips_perrone_example.ipynb <2018_neurips_perrone_example.ipynb>`
 
 
 .. only:: html

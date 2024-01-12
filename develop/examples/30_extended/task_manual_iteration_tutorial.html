@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Tasks: retrieving splits &#8212; OpenML 0.14.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
+    <title>Tasks: retrieving splits &#8212; OpenML 0.14.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=421f3d0b"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.14.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -126,7 +126,7 @@ However, sometimes it is necessary to manually split a dataset to perform experi
 the functions provided by OpenML. One such example is in the benchmark library
 <a class="reference external" href="https://github.com/automl/HPOBench">HPOBench</a> which extensively uses data from OpenML,
 but not OpenML’s functionality to conduct runs.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
 
 <span class="kn">import</span> <span class="nn">openml</span>
 </pre></div>
@@ -137,19 +137,19 @@ tasks with all important estimation procedures. It is small enough (less than 50
 efficiently use it in an example.</p>
 <p>We will first start with (<a class="reference external" href="https://www.openml.org/t/233">task 233</a>), which is a task with a
 holdout estimation procedure.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">233</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">233</span>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
-  warnings.warn(
-/home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-  warnings.warn(
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sphinx_gallery/gen_rst.py:722: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  exec(self.code, self.fake_main.__dict__)
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
 </pre></div>
 </div>
 <p>Now that we have a task object we can obtain the number of repetitions, folds and samples as
 defined by the task:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -161,7 +161,7 @@ defined by the task:</p>
 <a class="reference external" href="https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&amp;type=measure">here</a>.</p>
 <p>Task <code class="docutils literal notranslate"><span class="pre">233</span></code> is a simple task using the holdout estimation procedure and therefore has only a
 single repeat, a single fold and a single sample size:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span>
     <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">task_id</span><span class="p">,</span>
         <span class="n">n_repeats</span><span class="p">,</span>
@@ -177,7 +177,7 @@ single repeat, a single fold and a single sample size:</p>
 <p>We can now retrieve the train/test split for this combination of repeats, folds and number of
 samples (indexing is zero-based). Usually, one would loop over all repeats, folds and sample
 sizes, but we can neglect this here as there is only a single repetition.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
     <span class="n">repeat</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">fold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">sample</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -192,7 +192,7 @@ sizes, but we can neglect this here as there is only a single repetition.</p>
 </pre></div>
 </div>
 <p>And then split the data based on this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_X_and_y</span><span class="p">(</span><span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_X_and_y</span><span class="p">(</span><span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 <span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
 <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
 <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">test_indices</span><span class="p">]</span>
@@ -208,11 +208,13 @@ sizes, but we can neglect this here as there is only a single repetition.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>X_train.shape: (2142, 36), y_train.shape: (2142,), X_test.shape: (1054, 36), y_test.shape: (1054,)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+X_train.shape: (2142, 36), y_train.shape: (2142,), X_test.shape: (1054, 36), y_test.shape: (1054,)
 </pre></div>
 </div>
 <p>Obviously, we can also retrieve cross-validation versions of the dataset used in task <code class="docutils literal notranslate"><span class="pre">233</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">3</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_X_and_y</span><span class="p">(</span><span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
@@ -226,15 +228,17 @@ sizes, but we can neglect this here as there is only a single repetition.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
-  warnings.warn(
-/home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-  warnings.warn(
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sphinx_gallery/gen_rst.py:722: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  exec(self.code, self.fake_main.__dict__)
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
 Task 3: number of repeats: 1, number of folds: 10, number of samples 1.
 </pre></div>
 </div>
 <p>And then perform the aforementioned iteration over all splits:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">repeat_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">repeat_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">fold_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">sample_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
             <span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
@@ -274,7 +278,7 @@ Repeat #0, fold #9, samples 0: X_train.shape: (2877, 36), y_train.shape (2877,),
 </pre></div>
 </div>
 <p>And also versions with multiple repeats:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">1767</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">1767</span>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_X_and_y</span><span class="p">(</span><span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
@@ -288,15 +292,17 @@ Repeat #0, fold #9, samples 0: X_train.shape: (2877, 36), y_train.shape (2877,),
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
-  warnings.warn(
-/home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-  warnings.warn(
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sphinx_gallery/gen_rst.py:722: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  exec(self.code, self.fake_main.__dict__)
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
 Task 1767: number of repeats: 5, number of folds: 2, number of samples 1.
 </pre></div>
 </div>
 <p>And then again perform the aforementioned iteration over all splits:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">repeat_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">repeat_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">fold_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">sample_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
             <span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
@@ -336,7 +342,7 @@ Repeat #4, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,),
 </pre></div>
 </div>
 <p>And finally a task based on learning curves:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">1702</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">1702</span>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_X_and_y</span><span class="p">(</span><span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
@@ -350,15 +356,17 @@ Repeat #4, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,),
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
-  warnings.warn(
-/home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-  warnings.warn(
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sphinx_gallery/gen_rst.py:722: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  exec(self.code, self.fake_main.__dict__)
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
 Task 1702: number of repeats: 1, number of folds: 10, number of samples 12.
 </pre></div>
 </div>
 <p>And then again perform the aforementioned iteration over all splits:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">repeat_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">repeat_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">fold_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">sample_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
             <span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
@@ -507,13 +515,13 @@ Repeat #0, fold #9, samples 10: X_train.shape: (2048, 36), y_train.shape (2048,)
 Repeat #0, fold #9, samples 11: X_train.shape: (2877, 36), y_train.shape (2877,), X_test.shape (319, 36), y_test.shape (319,)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.101 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 20.428 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-task-manual-iteration-tutorial-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/c4948b7cf528f51a636efd320e0f6d57/task_manual_iteration_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">task_manual_iteration_tutorial.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7c9d63c8c818944ac2677942af934da6/task_manual_iteration_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">task_manual_iteration_tutorial.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/c4948b7cf528f51a636efd320e0f6d57/task_manual_iteration_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">task_manual_iteration_tutorial.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -531,8 +539,8 @@ Repeat #0, fold #9, samples 11: X_train.shape: (2877, 36), y_train.shape (2877,)
       
     </p>
     <p>
-        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br/>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
     </p>
   </div>
 </footer>

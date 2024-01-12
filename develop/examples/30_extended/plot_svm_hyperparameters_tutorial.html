@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Plotting hyperparameter surfaces &#8212; OpenML 0.14.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
+    <title>Plotting hyperparameter surfaces &#8212; OpenML 0.14.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=421f3d0b"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.14.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -125,7 +125,7 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="plotting-hyperparameter-surfaces">
 <span id="sphx-glr-examples-30-extended-plot-svm-hyperparameters-tutorial-py"></span><h1>Plotting hyperparameter surfaces<a class="headerlink" href="#plotting-hyperparameter-surfaces" title="Permalink to this heading">¶</a></h1>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
 
 <span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -138,7 +138,7 @@ not part of this tutorial, this could for example be done via the website.</p>
 <p>For this we use the function <code class="docutils literal notranslate"><span class="pre">list_evaluations_setup</span></code> which can automatically join
 evaluations conducted by the server with the hyperparameter settings extracted from the
 uploaded runs (called <em>setup</em>).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations_setups</span><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations_setups</span><span class="p">(</span>
     <span class="n">function</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">,</span>
     <span class="n">flows</span><span class="o">=</span><span class="p">[</span><span class="mi">8353</span><span class="p">],</span>
     <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span>
@@ -166,7 +166,7 @@ uploaded runs (called <em>setup</em>).</p>
 </pre></div>
 </div>
 <p>We can see all the hyperparameter names in the columns of the dataframe:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -220,14 +220,14 @@ sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImp
 </div>
 <p>Next, we cast and transform the hyperparameters of interest (<code class="docutils literal notranslate"><span class="pre">C</span></code> and <code class="docutils literal notranslate"><span class="pre">gamma</span></code>) so that we
 can nicely plot them.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hyperparameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sklearn.svm.classes.SVC(16)_C&quot;</span><span class="p">,</span> <span class="s2">&quot;sklearn.svm.classes.SVC(16)_gamma&quot;</span><span class="p">]</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">hyperparameters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sklearn.svm.classes.SVC(16)_C&quot;</span><span class="p">,</span> <span class="s2">&quot;sklearn.svm.classes.SVC(16)_gamma&quot;</span><span class="p">]</span>
 <span class="n">df</span><span class="p">[</span><span class="n">hyperparameters</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">hyperparameters</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="option-1-plotting-via-the-pandas-helper-functions">
 <h2>Option 1 - plotting via the pandas helper functions<a class="headerlink" href="#option-1-plotting-via-the-pandas-helper-functions" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">hexbin</span><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">hexbin</span><span class="p">(</span>
     <span class="n">x</span><span class="o">=</span><span class="s2">&quot;sklearn.svm.classes.SVC(16)_C&quot;</span><span class="p">,</span>
     <span class="n">y</span><span class="o">=</span><span class="s2">&quot;sklearn.svm.classes.SVC(16)_gamma&quot;</span><span class="p">,</span>
     <span class="n">C</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">,</span>
@@ -243,7 +243,7 @@ can nicely plot them.</p>
 </section>
 <section id="option-2-plotting-via-matplotlib">
 <h2>Option 2 - plotting via matplotlib<a class="headerlink" href="#option-2-plotting-via-matplotlib" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 
@@ -270,13 +270,13 @@ can nicely plot them.</p>
 <img src="../../_images/sphx_glr_plot_svm_hyperparameters_tutorial_002.png" srcset="../../_images/sphx_glr_plot_svm_hyperparameters_tutorial_002.png" alt="SVM performance landscape" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;SVM performance landscape&#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  11.370 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (2 minutes 59.985 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-plot-svm-hyperparameters-tutorial-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/cf8cbb59c00374b9cf27f6d0287267bd/plot_svm_hyperparameters_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_svm_hyperparameters_tutorial.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/4e36450a7c3d3fe8c9f4e71689c8e677/plot_svm_hyperparameters_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_svm_hyperparameters_tutorial.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/cf8cbb59c00374b9cf27f6d0287267bd/plot_svm_hyperparameters_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_svm_hyperparameters_tutorial.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -295,8 +295,8 @@ can nicely plot them.</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br/>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
     </p>
   </div>
 </footer>

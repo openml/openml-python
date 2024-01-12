@@ -42,7 +42,7 @@ When downloading a dataset from OpenML, a `DEBUG`-level message is written:
 
 .. GENERATED FROM PYTHON SOURCE LINES 22-55
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # License: BSD 3-Clause
@@ -79,27 +79,19 @@ When downloading a dataset from OpenML, a `DEBUG`-level message is written:
     # * 2: `logging.DEBUG` and up (i.e. all messages).
 
 
-.. rst-class:: sphx-glr-timing
-
-   **Total running time of the script:** ( 0 minutes  0.000 seconds)
-
-
 .. _sphx_glr_download_examples_30_extended_configure_logging.py:
 
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: configure_logging.ipynb <configure_logging.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: configure_logging.py <configure_logging.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: configure_logging.ipynb <configure_logging.ipynb>`
 
 
 .. only:: html

@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Obtaining Flow IDs &#8212; OpenML 0.14.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
+    <title>Obtaining Flow IDs &#8212; OpenML 0.14.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=421f3d0b"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.14.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -126,7 +126,7 @@ to download the full example code</p>
 <span id="sphx-glr-examples-30-extended-flow-id-tutorial-py"></span><h1>Obtaining Flow IDs<a class="headerlink" href="#obtaining-flow-ids" title="Permalink to this heading">¶</a></h1>
 <p>This tutorial discusses different ways to obtain the ID of a flow in order to perform further
 analysis.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
 
 <span class="kn">import</span> <span class="nn">sklearn.tree</span>
 
@@ -139,25 +139,25 @@ analysis.</p>
 This prevents the main server from crowding with example datasets, tasks, runs, and so on.
 The use of this test server can affect behaviour and performance of the OpenML-Python API.</p>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
-  warnings.warn(
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/examples/30_extended/flow_id_tutorial.py:22: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+  openml.config.start_using_configuration_for_example()
 </pre></div>
 </div>
 <p>Defining a classifier</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">()</span>
 </pre></div>
 </div>
 <section id="obtaining-a-flow-given-a-classifier">
 <h2>1. Obtaining a flow given a classifier<a class="headerlink" href="#obtaining-a-flow-given-a-classifier" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">flow</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">get_extension_by_model</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span><span class="o">.</span><span class="n">model_to_flow</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">flow</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">get_extension_by_model</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span><span class="o">.</span><span class="n">model_to_flow</span><span class="p">(</span><span class="n">clf</span><span class="p">)</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
 <span class="n">flow_id</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">flow_id</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">flow_id</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>29234
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>52
 </pre></div>
 </div>
 <p>This piece of code is rather involved. First, it retrieves a
@@ -168,11 +168,11 @@ the publish method checks whether the current flow is already present on OpenML.
 it uploads the flow, otherwise, it updates the current instance with all information computed
 by the server (which is obviously also done when uploading/publishing a flow).</p>
 <p>To simplify the usage we have created a helper function which automates all these steps:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">flow_id</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">get_flow_id</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">clf</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">flow_id</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">get_flow_id</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">clf</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">flow_id</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>29234
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>52
 </pre></div>
 </div>
 </section>
@@ -184,47 +184,47 @@ obvious why we need a name, the need for the additional external version informa
 be immediately clear. However, this information is very important as it allows to have multiple
 flows with the same name for different versions of a software. This might be necessary if an
 algorithm or implementation introduces, renames or drop hyperparameters over time.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">flow</span><span class="o">.</span><span class="n">external_version</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">flow</span><span class="o">.</span><span class="n">external_version</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sklearn.tree._classes.DecisionTreeClassifier openml==0.14.0,sklearn==1.3.0
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sklearn.tree._classes.DecisionTreeClassifier openml==0.14.1,sklearn==1.3.2
 </pre></div>
 </div>
 <p>The name and external version are automatically added to a flow when constructing it from a
 model. We can then use them to retrieve the flow id as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">flow_id</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">flow_exists</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">external_version</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">external_version</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">flow_id</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">flow_exists</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">external_version</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">external_version</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">flow_id</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>29234
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>52
 </pre></div>
 </div>
 <p>We can also retrieve all flows for a given name:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">flow_ids</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">get_flow_id</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">flow_ids</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">get_flow_id</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">flow</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">flow_ids</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[25, 29, 42, 352, 1112, 1792, 4222, 4226, 4230, 4412, 7542, 22212, 29234]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[52, 353, 356, 360, 2512, 11272]
 </pre></div>
 </div>
 <p>This also works with the actual model (generalizing the first part of this example):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">flow_ids</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">get_flow_id</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">clf</span><span class="p">,</span> <span class="n">exact_version</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">flow_ids</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">get_flow_id</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">clf</span><span class="p">,</span> <span class="n">exact_version</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">flow_ids</span><span class="p">)</span>
 
 <span class="c1"># Deactivating test server</span>
 <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[25, 29, 42, 352, 1112, 1792, 4222, 4226, 4230, 4412, 7542, 22212, 29234]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[52, 353, 356, 360, 2512, 11272]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.819 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.773 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flow-id-tutorial-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/7c31477f4d78d8be9026466b8e0bbbaf/flow_id_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flow_id_tutorial.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/a6bb62e32779272bda5770e2d0102148/flow_id_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">flow_id_tutorial.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/7c31477f4d78d8be9026466b8e0bbbaf/flow_id_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flow_id_tutorial.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -243,8 +243,8 @@ model. We can then use them to retrieve the flow id as follows:</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br/>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
     </p>
   </div>
 </footer>

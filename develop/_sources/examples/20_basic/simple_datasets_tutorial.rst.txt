@@ -33,7 +33,7 @@ the datasets directly.
 
 .. GENERATED FROM PYTHON SOURCE LINES 13-18
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # License: BSD 3-Clause
@@ -54,7 +54,7 @@ List datasets
 
 .. GENERATED FROM PYTHON SOURCE LINES 21-25
 
-.. code-block:: default
+.. code-block:: Python
 
 
     datasets_df = openml.datasets.list_datasets(output_format="dataframe")
@@ -92,7 +92,7 @@ Download a dataset
 
 .. GENERATED FROM PYTHON SOURCE LINES 28-40
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Iris dataset https://www.openml.org/d/61
@@ -114,8 +114,8 @@ Download a dataset
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      warnings.warn(
+    /home/runner/work/openml-python/openml-python/examples/20_basic/simple_datasets_tutorial.py:30: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      dataset = openml.datasets.get_dataset(61)
     This is dataset 'iris', the target feature is 'class'
     URL: https://api.openml.org/data/v1/download/61/iris.arff
     **Author**: R.A. Fisher  
@@ -135,7 +135,7 @@ Load a dataset
 
 .. GENERATED FROM PYTHON SOURCE LINES 43-53
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # X - An array/dataframe where each row represents one example with
@@ -161,7 +161,7 @@ Visualize the dataset
 
 .. GENERATED FROM PYTHON SOURCE LINES 56-74
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import pandas as pd
@@ -196,7 +196,7 @@ Visualize the dataset
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.653 seconds)
+   **Total running time of the script:** (1 minutes 27.494 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_datasets_tutorial.py:
@@ -205,16 +205,13 @@ Visualize the dataset
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: simple_datasets_tutorial.ipynb <simple_datasets_tutorial.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: simple_datasets_tutorial.py <simple_datasets_tutorial.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: simple_datasets_tutorial.ipynb <simple_datasets_tutorial.ipynb>`
 
 
 .. only:: html

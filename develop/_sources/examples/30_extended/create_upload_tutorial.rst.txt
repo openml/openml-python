@@ -25,7 +25,7 @@ A tutorial on how to create and upload a dataset to OpenML.
 
 .. GENERATED FROM PYTHON SOURCE LINES 7-18
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # License: BSD 3-Clause
@@ -52,7 +52,7 @@ A tutorial on how to create and upload a dataset to OpenML.
 
 .. GENERATED FROM PYTHON SOURCE LINES 21-23
 
-.. code-block:: default
+.. code-block:: Python
 
 
     openml.config.start_using_configuration_for_example()
@@ -64,8 +64,8 @@ A tutorial on how to create and upload a dataset to OpenML.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
-      warnings.warn(
+    /home/runner/work/openml-python/openml-python/examples/30_extended/create_upload_tutorial.py:22: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      openml.config.start_using_configuration_for_example()
 
 
 
@@ -94,7 +94,7 @@ via the API.
 
 .. GENERATED FROM PYTHON SOURCE LINES 44-52
 
-.. code-block:: default
+.. code-block:: Python
 
 
     diabetes = sklearn.datasets.load_diabetes()
@@ -121,7 +121,7 @@ that data).
 
 .. GENERATED FROM PYTHON SOURCE LINES 58-71
 
-.. code-block:: default
+.. code-block:: Python
 
 
     data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
@@ -154,7 +154,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
 .. GENERATED FROM PYTHON SOURCE LINES 78-116
 
-.. code-block:: default
+.. code-block:: Python
 
 
     diabetes_dataset = create_dataset(
@@ -203,7 +203,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
 .. GENERATED FROM PYTHON SOURCE LINES 117-121
 
-.. code-block:: default
+.. code-block:: Python
 
 
     diabetes_dataset.publish()
@@ -217,7 +217,7 @@ https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xs
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/2689
+    URL for dataset: https://test.openml.org/d/1790
 
 
 
@@ -234,7 +234,7 @@ https://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
 .. GENERATED FROM PYTHON SOURCE LINES 129-189
 
-.. code-block:: default
+.. code-block:: Python
 
 
     data = [
@@ -305,7 +305,7 @@ https://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
 .. GENERATED FROM PYTHON SOURCE LINES 190-194
 
-.. code-block:: default
+.. code-block:: Python
 
 
     weather_dataset.publish()
@@ -319,7 +319,7 @@ https://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/2690
+    URL for dataset: https://test.openml.org/d/1791
 
 
 
@@ -338,7 +338,7 @@ need to pass ``'auto'`` to the ``attributes`` parameter.
 
 .. GENERATED FROM PYTHON SOURCE LINES 204-212
 
-.. code-block:: default
+.. code-block:: Python
 
 
     df = pd.DataFrame(data, columns=[col_name for col_name, _ in attribute_names])
@@ -383,7 +383,7 @@ fixing the parameter ``attributes`` to ``'auto'``.
 
 .. GENERATED FROM PYTHON SOURCE LINES 218-236
 
-.. code-block:: default
+.. code-block:: Python
 
 
     weather_dataset = create_dataset(
@@ -412,7 +412,7 @@ fixing the parameter ``attributes`` to ``'auto'``.
 
 .. GENERATED FROM PYTHON SOURCE LINES 237-241
 
-.. code-block:: default
+.. code-block:: Python
 
 
     weather_dataset.publish()
@@ -426,7 +426,7 @@ fixing the parameter ``attributes`` to ``'auto'``.
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/2691
+    URL for dataset: https://test.openml.org/d/1792
 
 
 
@@ -438,7 +438,7 @@ Dataset is a sparse matrix
 
 .. GENERATED FROM PYTHON SOURCE LINES 244-272
 
-.. code-block:: default
+.. code-block:: Python
 
 
     sparse_data = coo_matrix(
@@ -477,7 +477,7 @@ Dataset is a sparse matrix
 
 .. GENERATED FROM PYTHON SOURCE LINES 273-278
 
-.. code-block:: default
+.. code-block:: Python
 
 
     xor_dataset.publish()
@@ -492,7 +492,7 @@ Dataset is a sparse matrix
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/2692
+    URL for dataset: https://test.openml.org/d/1793
 
 
 
@@ -504,7 +504,7 @@ Dataset is a pandas dataframe with sparse columns
 
 .. GENERATED FROM PYTHON SOURCE LINES 281-306
 
-.. code-block:: default
+.. code-block:: Python
 
 
     sparse_data = coo_matrix(
@@ -556,7 +556,7 @@ Dataset is a pandas dataframe with sparse columns
 
 .. GENERATED FROM PYTHON SOURCE LINES 307-312
 
-.. code-block:: default
+.. code-block:: Python
 
 
     xor_dataset.publish()
@@ -571,14 +571,14 @@ Dataset is a pandas dataframe with sparse columns
 
  .. code-block:: none
 
-    URL for dataset: https://test.openml.org/d/2693
+    URL for dataset: https://test.openml.org/d/1794
 
 
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 313-314
 
-.. code-block:: default
+.. code-block:: Python
 
     openml.config.stop_using_configuration_for_example()
 
@@ -591,7 +591,7 @@ Dataset is a pandas dataframe with sparse columns
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.085 seconds)
+   **Total running time of the script:** (0 minutes 3.475 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_create_upload_tutorial.py:
@@ -600,16 +600,13 @@ Dataset is a pandas dataframe with sparse columns
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: create_upload_tutorial.ipynb <create_upload_tutorial.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: create_upload_tutorial.py <create_upload_tutorial.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: create_upload_tutorial.ipynb <create_upload_tutorial.ipynb>`
 
 
 .. only:: html

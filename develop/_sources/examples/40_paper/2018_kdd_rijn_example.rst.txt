@@ -36,7 +36,7 @@ Publication
 
 .. GENERATED FROM PYTHON SOURCE LINES 18-38
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # License: BSD 3-Clause
@@ -100,7 +100,7 @@ https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdcc
 
 .. GENERATED FROM PYTHON SOURCE LINES 69-162
 
-.. code-block:: default
+.. code-block:: Python
 
 
     suite = openml.study.get_suite("OpenML100")
@@ -231,7 +231,7 @@ the reader is referred to the more elaborate script (referred to earlier)
 
 .. GENERATED FROM PYTHON SOURCE LINES 167-174
 
-.. code-block:: default
+.. code-block:: Python
 
     fig, ax = plt.subplots()
     sns.boxplot(x="hyperparameter", y="fanova", data=fanova_results, ax=ax)
@@ -249,13 +249,20 @@ the reader is referred to the more elaborate script (referred to earlier)
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /home/runner/work/openml-python/openml-python/examples/40_paper/2018_kdd_rijn_example.py:169: UserWarning: FixedFormatter should only be used together with FixedLocator
+      ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
+
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  23.409 seconds)
+   **Total running time of the script:** (11 minutes 2.784 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_kdd_rijn_example.py:
@@ -264,16 +271,13 @@ the reader is referred to the more elaborate script (referred to earlier)
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: 2018_kdd_rijn_example.ipynb <2018_kdd_rijn_example.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: 2018_kdd_rijn_example.py <2018_kdd_rijn_example.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: 2018_kdd_rijn_example.ipynb <2018_kdd_rijn_example.ipynb>`
 
 
 .. only:: html

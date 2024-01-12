@@ -30,7 +30,7 @@ brief introductory tutorial :ref:`sphx_glr_examples_20_basic_simple_suites_tutor
 
 .. GENERATED FROM PYTHON SOURCE LINES 13-23
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # License: BSD 3-Clause
@@ -60,7 +60,7 @@ Listing suites
 
 .. GENERATED FROM PYTHON SOURCE LINES 30-34
 
-.. code-block:: default
+.. code-block:: Python
 
 
     suites = openml.study.list_suites(output_format="dataframe", status="all")
@@ -102,7 +102,7 @@ This is done based on the dataset ID.
 
 .. GENERATED FROM PYTHON SOURCE LINES 40-43
 
-.. code-block:: default
+.. code-block:: Python
 
     suite = openml.study.get_suite(99)
     print(suite)
@@ -136,7 +136,7 @@ Suites also feature a description:
 
 .. GENERATED FROM PYTHON SOURCE LINES 45-47
 
-.. code-block:: default
+.. code-block:: Python
 
     print(suite.description)
 
@@ -184,7 +184,7 @@ Suites are a container for tasks:
 
 .. GENERATED FROM PYTHON SOURCE LINES 49-51
 
-.. code-block:: default
+.. code-block:: Python
 
     print(suite.tasks)
 
@@ -207,7 +207,7 @@ And we can use the task listing functionality to learn more about them:
 
 .. GENERATED FROM PYTHON SOURCE LINES 53-61
 
-.. code-block:: default
+.. code-block:: Python
 
     tasks = openml.tasks.list_tasks(output_format="dataframe")
 
@@ -254,7 +254,7 @@ We'll use the test server for the rest of this tutorial.
 
 .. GENERATED FROM PYTHON SOURCE LINES 66-68
 
-.. code-block:: default
+.. code-block:: Python
 
     openml.config.start_using_configuration_for_example()
 
@@ -266,8 +266,8 @@ We'll use the test server for the rest of this tutorial.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
-      warnings.warn(
+    /home/runner/work/openml-python/openml-python/examples/30_extended/suites_tutorial.py:66: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      openml.config.start_using_configuration_for_example()
 
 
 
@@ -283,7 +283,7 @@ because we upload some random data.
 
 .. GENERATED FROM PYTHON SOURCE LINES 75-96
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # We'll take a random subset of at least ten tasks of all available tasks on
@@ -314,21 +314,21 @@ because we upload some random data.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:112: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
-      warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:112: RuntimeWarning: Could not create task type id for 11 due to error 11 is not a valid TaskType
-      warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:263: RuntimeWarning: Could not create task type id for 11 due to error 11 is not a valid TaskType
-      warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:263: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
-      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:285: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+      procs = _get_estimation_procedure_list()
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:285: RuntimeWarning: Could not create task type id for 11 due to error 11 is not a valid TaskType
+      procs = _get_estimation_procedure_list()
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:234: RuntimeWarning: Could not create task type id for 11 due to error 11 is not a valid TaskType
+      return __list_tasks(api_call=api_call, output_format=output_format)
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:234: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+      return __list_tasks(api_call=api_call, output_format=output_format)
     OpenML Benchmark Suite
     ======================
-    ID..............: 759
+    ID..............: 275
     Name............: Test-Suite
     Status..........: None
     Main Entity Type: task
-    Study URL.......: https://test.openml.org/s/759
+    Study URL.......: https://test.openml.org/s/275
     # of Tasks......: 20
 
 
@@ -336,7 +336,7 @@ because we upload some random data.
 
 .. GENERATED FROM PYTHON SOURCE LINES 97-98
 
-.. code-block:: default
+.. code-block:: Python
 
     openml.config.stop_using_configuration_for_example()
 
@@ -349,7 +349,7 @@ because we upload some random data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  37.969 seconds)
+   **Total running time of the script:** (1 minutes 23.558 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_suites_tutorial.py:
@@ -358,16 +358,13 @@ because we upload some random data.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: suites_tutorial.ipynb <suites_tutorial.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: suites_tutorial.py <suites_tutorial.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: suites_tutorial.ipynb <suites_tutorial.ipynb>`
 
 
 .. only:: html

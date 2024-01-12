@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Datasets &#8212; OpenML 0.14.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
+    <title>Datasets &#8212; OpenML 0.14.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=421f3d0b"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.14.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -133,7 +133,7 @@ to download the full example code</p>
 <section class="sphx-glr-example-title" id="datasets">
 <span id="sphx-glr-examples-30-extended-datasets-tutorial-py"></span><h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this heading">¶</a></h1>
 <p>How to list and download datasets.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clauses</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clauses</span>
 
 <span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -152,7 +152,7 @@ to download the full example code</p>
 </ul>
 <p>Note: list_datasets will return a pandas dataframe by default from 0.15. When using
 openml-python 0.14, <cite>list_datasets</cite> will warn you to use output_format=’dataframe’.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list_datasets</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 <span class="n">datalist</span> <span class="o">=</span> <span class="n">datalist</span><span class="p">[[</span><span class="s2">&quot;did&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;NumberOfInstances&quot;</span><span class="p">,</span> <span class="s2">&quot;NumberOfFeatures&quot;</span><span class="p">,</span> <span class="s2">&quot;NumberOfClasses&quot;</span><span class="p">]]</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First 10 of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">datalist</span><span class="p">)</span><span class="si">}</span><span class="s2"> datasets...&quot;</span><span class="p">)</span>
@@ -163,7 +163,7 @@ openml-python 0.14, <cite>list_datasets</cite> will warn you to use output_forma
 <span class="n">openml_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 5301 datasets...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>First 10 of 5404 datasets...
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -407,7 +407,7 @@ openml-python 0.14, <cite>list_datasets</cite> will warn you to use output_forma
 <li><p>Find a dataset called ‘eeg_eye_state’.</p></li>
 <li><p>Find all datasets with more than 50 classes.</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="p">[</span><span class="n">datalist</span><span class="o">.</span><span class="n">NumberOfInstances</span> <span class="o">&gt;</span> <span class="mi">10000</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;NumberOfInstances&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">datalist</span><span class="p">[</span><span class="n">datalist</span><span class="o">.</span><span class="n">NumberOfInstances</span> <span class="o">&gt;</span> <span class="mi">10000</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;NumberOfInstances&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 <span class="s2">&quot;&quot;</span>
 <span class="n">datalist</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;name == &quot;eeg-eye-state&quot;&#39;</span><span class="p">)</span>
 <span class="s2">&quot;&quot;</span>
@@ -864,7 +864,7 @@ openml-python 0.14, <cite>list_datasets</cite> will warn you to use output_forma
 <br />
 <br /><section id="download-datasets">
 <h3>Download datasets<a class="headerlink" href="#download-datasets" title="Permalink to this heading">¶</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is done based on the dataset ID.</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is done based on the dataset ID.</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">)</span>
 
 <span class="c1"># Print a summary</span>
@@ -876,8 +876,8 @@ openml-python 0.14, <cite>list_datasets</cite> will warn you to use output_forma
 <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">description</span><span class="p">[:</span><span class="mi">500</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-  warnings.warn(
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/examples/30_extended/datasets_tutorial.py:54: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  dataset = openml.datasets.get_dataset(1471)
 This is dataset &#39;eeg-eye-state&#39;, the target feature is &#39;Class&#39;
 URL: https://api.openml.org/data/v1/download/1587924/eeg-eye-state.arff
 **Author**: Oliver Roesler
@@ -890,13 +890,13 @@ All data is from one continuous EEG measurement with the Emotiv EEG Neuroheadset
 <p>Get the actual data.</p>
 <p>openml-python returns data as pandas dataframes (stored in the <cite>eeg</cite> variable below),
 and also some additional metadata that we don’t care about right now.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eeg</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">eeg</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>You can optionally choose to have openml separate out a column from the
 dataset. In particular, many datasets for supervised problems have a set
 <cite>default_target_attribute</cite> which may help identify the target variable.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_indicator</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_indicator</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
     <span class="n">target</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_target_attribute</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
@@ -943,11 +943,11 @@ such as <cite>get_data</cite>, the data will be downloaded.
 Starting from 0.15, not downloading data will be the default behavior instead.
 The data will be downloading automatically when you try to access it through
 openml objects, e.g., using <cite>dataset.features</cite>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">,</span> <span class="n">download_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="mi">1471</span><span class="p">,</span> <span class="n">download_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-  warnings.warn(
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/examples/30_extended/datasets_tutorial.py:90: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  dataset = openml.datasets.get_dataset(1471, download_data=False)
 </pre></div>
 </div>
 </section>
@@ -957,7 +957,7 @@ openml objects, e.g., using <cite>dataset.features</cite>.</p>
 <ul class="simple">
 <li><p>Explore the data visually.</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eegs</span> <span class="o">=</span> <span class="n">eeg</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">eegs</span> <span class="o">=</span> <span class="n">eeg</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 <span class="n">_</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">(</span>
     <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">100</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">],</span>
     <span class="n">c</span><span class="o">=</span><span class="n">y</span><span class="p">[:</span><span class="mi">100</span><span class="p">],</span>
@@ -969,7 +969,7 @@ openml objects, e.g., using <cite>dataset.features</cite>.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_datasets_tutorial_001.png" srcset="../../_images/sphx_glr_datasets_tutorial_001.png" alt="datasets tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/pandas/plotting/_matplotlib/misc.py:97: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
+<img src="../../_images/sphx_glr_datasets_tutorial_001.png" srcset="../../_images/sphx_glr_datasets_tutorial_001.png" alt="datasets tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/pandas/plotting/_matplotlib/misc.py:97: UserWarning: No data for colormapping provided via &#39;c&#39;. Parameters &#39;cmap&#39; will be ignored
   ax.scatter(
 </pre></div>
 </div>
@@ -982,17 +982,17 @@ openml objects, e.g., using <cite>dataset.features</cite>.</p>
 This prevents the main server from crowding with example datasets, tasks, runs, and so on.
 The use of this test server can affect behaviour and performance of the OpenML-Python API.</p>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
-  warnings.warn(
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/examples/30_extended/datasets_tutorial.py:115: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+  openml.config.start_using_configuration_for_example()
 </pre></div>
 </div>
 <p>Edit non-critical fields, allowed for all authorized users:
 description, creator, contributor, collection_date, language, citation,
 original_data_url, paper_url</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">desc</span> <span class="o">=</span> <span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">desc</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s2">&quot;This data sets consists of 3 different types of irises&#39; &quot;</span>
     <span class="s2">&quot;(Setosa, Versicolour, and Virginica) petal and sepal length,&quot;</span>
     <span class="s2">&quot; stored in a 150x4 numpy.ndarray&quot;</span>
@@ -1010,7 +1010,9 @@ original_data_url, paper_url</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Edited dataset ID: </span><span class="si">{</span><span class="n">data_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Edited dataset ID: 128
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/examples/30_extended/datasets_tutorial.py:134: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  edited_dataset = get_dataset(data_id)
+Edited dataset ID: 128
 </pre></div>
 </div>
 <p>Editing critical fields (default_target_attribute, row_id_attribute, ignore_attribute) is allowed
@@ -1019,7 +1021,7 @@ tasks associated with it. To edit critical fields of a dataset (without tasks) o
 configure the API key:
 openml.config.apikey = ‘FILL_IN_OPENML_API_KEY’
 This example here only shows a failure when trying to work on a dataset not owned by you:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
     <span class="n">data_id</span> <span class="o">=</span> <span class="n">edit_dataset</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">default_target_attribute</span><span class="o">=</span><span class="s2">&quot;shape&quot;</span><span class="p">)</span>
 <span class="k">except</span> <span class="n">openml</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">OpenMLServerException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
@@ -1035,7 +1037,7 @@ This example here only shows a failure when trying to work on a dataset not owne
 Use this API only if you are unable to edit the critical fields (default_target_attribute,
 ignore_attribute, row_id_attribute) of a dataset through the edit_dataset API.
 After the dataset is forked, you can edit the new version of the dataset using edit_dataset.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_id</span> <span class="o">=</span> <span class="n">fork_dataset</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">data_id</span> <span class="o">=</span> <span class="n">fork_dataset</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data_id</span><span class="p">)</span>
 <span class="n">data_id</span> <span class="o">=</span> <span class="n">edit_dataset</span><span class="p">(</span><span class="n">data_id</span><span class="p">,</span> <span class="n">default_target_attribute</span><span class="o">=</span><span class="s2">&quot;shape&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Forked dataset ID: </span><span class="si">{</span><span class="n">data_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -1043,17 +1045,17 @@ After the dataset is forked, you can edit the new version of the dataset using e
 <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2683
-Forked dataset ID: 2683
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1764
+Forked dataset ID: 1764
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  10.871 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 10.602 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-datasets-tutorial-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/b95c071188526f5ef5d991e382df9fa5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ea59c0f4a0e0075b24ecbb3b84c5744d/datasets_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">datasets_tutorial.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/b95c071188526f5ef5d991e382df9fa5/datasets_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">datasets_tutorial.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -1073,8 +1075,8 @@ Forked dataset ID: 2683
       
     </p>
     <p>
-        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br/>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
     </p>
   </div>
 </footer>

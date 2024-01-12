@@ -1,12 +1,12 @@
 
 :orphan:
 
-.. _sphx_glr_examples_40_paper_sg_execution_times:
+.. _sphx_glr_examples_sg_execution_times:
 
 
 Computation times
 =================
-**12:05.294** total execution time for 4 files **from examples/40_paper**:
+**00:00.000** total execution time for 0 files **from examples**:
 
 .. container::
 
@@ -32,15 +32,6 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_examples_40_paper_2018_kdd_rijn_example.py` (``2018_kdd_rijn_example.py``)
-     - 11:02.784
-     - 0.0
-   * - :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py` (``2018_neurips_perrone_example.py``)
-     - 00:36.765
-     - 0.0
-   * - :ref:`sphx_glr_examples_40_paper_2015_neurips_feurer_example.py` (``2015_neurips_feurer_example.py``)
-     - 00:23.327
-     - 0.0
-   * - :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py` (``2018_ida_strang_example.py``)
-     - 00:02.418
-     - 0.0
+   * - N/A
+     - N/A
+     - N/A

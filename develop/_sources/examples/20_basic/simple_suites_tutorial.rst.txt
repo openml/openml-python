@@ -29,7 +29,7 @@ and simplify both the sharing of the setup and the results.
 
 .. GENERATED FROM PYTHON SOURCE LINES 11-16
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # License: BSD 3-Clause
@@ -73,7 +73,7 @@ Downloading benchmark suites
 
 .. GENERATED FROM PYTHON SOURCE LINES 41-45
 
-.. code-block:: default
+.. code-block:: Python
 
 
     suite = openml.study.get_suite(99)
@@ -111,7 +111,7 @@ Tasks can then be accessed via
 
 .. GENERATED FROM PYTHON SOURCE LINES 50-54
 
-.. code-block:: default
+.. code-block:: Python
 
 
     tasks = suite.tasks
@@ -136,7 +136,7 @@ and iterated over for benchmarking. For speed reasons we only iterate over the f
 
 .. GENERATED FROM PYTHON SOURCE LINES 56-61
 
-.. code-block:: default
+.. code-block:: Python
 
 
     for task_id in tasks[:3]:
@@ -151,10 +151,10 @@ and iterated over for benchmarking. For speed reasons we only iterate over the f
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
-      warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      warnings.warn(
+    /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sphinx_gallery/gen_rst.py:722: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+      exec(self.code, self.fake_main.__dict__)
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
     OpenML Classification Task
     ==========================
     Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
@@ -198,7 +198,7 @@ Further examples
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  19.793 seconds)
+   **Total running time of the script:** (1 minutes 19.952 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_suites_tutorial.py:
@@ -207,16 +207,13 @@ Further examples
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: simple_suites_tutorial.ipynb <simple_suites_tutorial.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: simple_suites_tutorial.py <simple_suites_tutorial.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: simple_suites_tutorial.ipynb <simple_suites_tutorial.ipynb>`
 
 
 .. only:: html

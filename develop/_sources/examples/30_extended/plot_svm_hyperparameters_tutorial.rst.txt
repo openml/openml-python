@@ -24,7 +24,7 @@ Plotting hyperparameter surfaces
 
 .. GENERATED FROM PYTHON SOURCE LINES 6-12
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # License: BSD 3-Clause
@@ -52,7 +52,7 @@ uploaded runs (called *setup*).
 
 .. GENERATED FROM PYTHON SOURCE LINES 21-32
 
-.. code-block:: default
+.. code-block:: Python
 
     df = openml.evaluations.list_evaluations_setups(
         function="predictive_accuracy",
@@ -96,7 +96,7 @@ We can see all the hyperparameter names in the columns of the dataframe:
 
 .. GENERATED FROM PYTHON SOURCE LINES 34-37
 
-.. code-block:: default
+.. code-block:: Python
 
     for name in df.columns:
         print(name)
@@ -166,7 +166,7 @@ can nicely plot them.
 
 .. GENERATED FROM PYTHON SOURCE LINES 40-43
 
-.. code-block:: default
+.. code-block:: Python
 
     hyperparameters = ["sklearn.svm.classes.SVC(16)_C", "sklearn.svm.classes.SVC(16)_gamma"]
     df[hyperparameters] = df[hyperparameters].astype(float).apply(np.log10)
@@ -186,7 +186,7 @@ Option 1 - plotting via the pandas helper functions
 
 .. GENERATED FROM PYTHON SOURCE LINES 47-56
 
-.. code-block:: default
+.. code-block:: Python
 
     df.plot.hexbin(
         x="sklearn.svm.classes.SVC(16)_C",
@@ -223,7 +223,7 @@ Option 2 - plotting via matplotlib
 
 .. GENERATED FROM PYTHON SOURCE LINES 60-82
 
-.. code-block:: default
+.. code-block:: Python
 
     import matplotlib.pyplot as plt
 
@@ -268,7 +268,7 @@ Option 2 - plotting via matplotlib
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.370 seconds)
+   **Total running time of the script:** (2 minutes 59.985 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_plot_svm_hyperparameters_tutorial.py:
@@ -277,16 +277,13 @@ Option 2 - plotting via matplotlib
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_svm_hyperparameters_tutorial.ipynb <plot_svm_hyperparameters_tutorial.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_svm_hyperparameters_tutorial.py <plot_svm_hyperparameters_tutorial.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_svm_hyperparameters_tutorial.ipynb <plot_svm_hyperparameters_tutorial.ipynb>`
 
 
 .. only:: html

@@ -34,7 +34,7 @@ Publication
 
 .. GENERATED FROM PYTHON SOURCE LINES 16-23
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # License: BSD 3-Clause
@@ -68,7 +68,7 @@ values.
 
 .. GENERATED FROM PYTHON SOURCE LINES 37-69
 
-.. code-block:: default
+.. code-block:: Python
 
 
     study_id = 123
@@ -115,7 +115,7 @@ makes the s-plot
 
 .. GENERATED FROM PYTHON SOURCE LINES 71-81
 
-.. code-block:: default
+.. code-block:: Python
 
 
     fig_splot, ax_splot = plt.subplots()
@@ -146,7 +146,7 @@ needed for the scatter plot
 
 .. GENERATED FROM PYTHON SOURCE LINES 84-112
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -195,7 +195,7 @@ two algorithms on various axis (not in the paper)
 
 .. GENERATED FROM PYTHON SOURCE LINES 115-125
 
-.. code-block:: default
+.. code-block:: Python
 
 
     fig_diagplot, ax_diagplot = plt.subplots()
@@ -222,7 +222,7 @@ two algorithms on various axis (not in the paper)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.505 seconds)
+   **Total running time of the script:** (0 minutes 2.418 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_ida_strang_example.py:
@@ -231,16 +231,13 @@ two algorithms on various axis (not in the paper)
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: 2018_ida_strang_example.ipynb <2018_ida_strang_example.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: 2018_ida_strang_example.py <2018_ida_strang_example.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: 2018_ida_strang_example.ipynb <2018_ida_strang_example.ipynb>`
 
 
 .. only:: html

@@ -46,7 +46,7 @@ In this tutorial we will
 
 .. GENERATED FROM PYTHON SOURCE LINES 28-42
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # License: BSD 3-Clause
@@ -76,7 +76,7 @@ In this tutorial we will
 
 .. GENERATED FROM PYTHON SOURCE LINES 45-47
 
-.. code-block:: default
+.. code-block:: Python
 
     openml.config.start_using_configuration_for_example()
 
@@ -88,8 +88,8 @@ In this tutorial we will
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
-      warnings.warn(
+    /home/runner/work/openml-python/openml-python/examples/30_extended/run_setup_tutorial.py:45: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      openml.config.start_using_configuration_for_example()
 
 
 
@@ -101,7 +101,7 @@ In this tutorial we will
 
 .. GENERATED FROM PYTHON SOURCE LINES 50-89
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # first, let's download the task that we are interested in
@@ -150,20 +150,22 @@ In this tutorial we will
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+    /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sphinx_gallery/gen_rst.py:722: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+      exec(self.code, self.fake_main.__dict__)
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+    /home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      return datasets.get_dataset(self.dataset_id)
+    /home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      openml.datasets.get_dataset(task.dataset_id).name,
+    /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:975: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
       warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:972: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
-      warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1785: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
-      warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      warnings.warn(
+    /home/runner/work/openml-python/openml-python/openml/runs/functions.py:800: UserWarning: Estimator only predicted for 5/6 classes!
+      ) = extension._run_model_on_fold(
+    /home/runner/work/openml-python/openml-python/openml/runs/run.py:650: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+      predictions = arff.dumps(self._generate_arff_dict())
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
 
 
 
@@ -175,7 +177,7 @@ In this tutorial we will
 
 .. GENERATED FROM PYTHON SOURCE LINES 92-106
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # obtain setup id (note that the setup id is assigned by the OpenML server -
@@ -199,12 +201,14 @@ In this tutorial we will
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+    /home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      return datasets.get_dataset(self.dataset_id)
+    /home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      openml.datasets.get_dataset(task.dataset_id).name,
+    /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:975: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
       warnings.warn(
-    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/sklearn/preprocessing/_encoders.py:972: FutureWarning: `sparse` was renamed to `sparse_output` in version 1.2 and will be removed in 1.4. `sparse_output` is ignored unless you leave `sparse` to its default value.
-      warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/extensions/sklearn/extension.py:1785: UserWarning: Estimator only predicted for 5/6 classes!
-      warnings.warn(message)
+    /home/runner/work/openml-python/openml-python/openml/runs/functions.py:800: UserWarning: Estimator only predicted for 5/6 classes!
+      ) = extension._run_model_on_fold(
 
 
 
@@ -216,7 +220,7 @@ In this tutorial we will
 
 .. GENERATED FROM PYTHON SOURCE LINES 109-113
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # the run has stored all predictions in the field data content
@@ -231,7 +235,7 @@ In this tutorial we will
 
 .. GENERATED FROM PYTHON SOURCE LINES 114-116
 
-.. code-block:: default
+.. code-block:: Python
 
 
     openml.config.stop_using_configuration_for_example()
@@ -245,7 +249,7 @@ In this tutorial we will
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.631 seconds)
+   **Total running time of the script:** (0 minutes 33.005 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_run_setup_tutorial.py:
@@ -254,16 +258,13 @@ In this tutorial we will
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: run_setup_tutorial.ipynb <run_setup_tutorial.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: run_setup_tutorial.py <run_setup_tutorial.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: run_setup_tutorial.ipynb <run_setup_tutorial.ipynb>`
 
 
 .. only:: html

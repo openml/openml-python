@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>openml.study.OpenMLBenchmarkSuite &#8212; OpenML 0.14.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <title>openml.study.OpenMLBenchmarkSuite &#8212; OpenML 0.14.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=421f3d0b"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.14.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -111,6 +111,7 @@
 <li><a class="reference internal" href="#openml.study.OpenMLBenchmarkSuite.id"><code class="docutils literal notranslate"><span class="pre">OpenMLBenchmarkSuite.id</span></code></a></li>
 <li><a class="reference internal" href="#openml.study.OpenMLBenchmarkSuite.open_in_browser"><code class="docutils literal notranslate"><span class="pre">OpenMLBenchmarkSuite.open_in_browser()</span></code></a></li>
 <li><a class="reference internal" href="#openml.study.OpenMLBenchmarkSuite.openml_url"><code class="docutils literal notranslate"><span class="pre">OpenMLBenchmarkSuite.openml_url</span></code></a></li>
+<li><a class="reference internal" href="#openml.study.OpenMLBenchmarkSuite.publish"><code class="docutils literal notranslate"><span class="pre">OpenMLBenchmarkSuite.publish()</span></code></a></li>
 <li><a class="reference internal" href="#openml.study.OpenMLBenchmarkSuite.push_tag"><code class="docutils literal notranslate"><span class="pre">OpenMLBenchmarkSuite.push_tag()</span></code></a></li>
 <li><a class="reference internal" href="#openml.study.OpenMLBenchmarkSuite.remove_tag"><code class="docutils literal notranslate"><span class="pre">OpenMLBenchmarkSuite.remove_tag()</span></code></a></li>
 <li><a class="reference internal" href="#openml.study.OpenMLBenchmarkSuite.url_for_id"><code class="docutils literal notranslate"><span class="pre">OpenMLBenchmarkSuite.url_for_id()</span></code></a></li>
@@ -128,7 +129,7 @@
 <h1><a class="reference internal" href="../api.html#module-openml.study" title="openml.study"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.study</span></code></a>.OpenMLBenchmarkSuite<a class="headerlink" href="#openml-study-openmlbenchmarksuite" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="openml.study.OpenMLBenchmarkSuite">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openml.study.</span></span><span class="sig-name descname"><span class="pre">OpenMLBenchmarkSuite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suite_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">creation_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">creator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.study.OpenMLBenchmarkSuite" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openml.study.</span></span><span class="sig-name descname"><span class="pre">OpenMLBenchmarkSuite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suite_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">creation_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">creator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.study.OpenMLBenchmarkSuite" title="Permalink to this definition">¶</a></dt>
 <dd><p>An OpenMLBenchmarkSuite represents the OpenML concept of a suite (a collection of tasks).</p>
 <p>It contains the following information: name, id, description, creation date,
 creator id and the task ids.</p>
@@ -167,12 +168,12 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="openml.study.OpenMLBenchmarkSuite.id">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#openml.study.OpenMLBenchmarkSuite.id" title="Permalink to this definition">¶</a></dt>
-<dd><p>The id of the entity, it is unique for its entity type.</p>
+<dd><p>Return the id of the study.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="openml.study.OpenMLBenchmarkSuite.open_in_browser">
-<span class="sig-name descname"><span class="pre">open_in_browser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#openml.study.OpenMLBenchmarkSuite.open_in_browser" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">open_in_browser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#openml.study.OpenMLBenchmarkSuite.open_in_browser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Opens the OpenML web page corresponding to this object in your default browser.</p>
 </dd></dl>
 
@@ -183,31 +184,21 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="openml.study.OpenMLBenchmarkSuite.publish">
+<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">OpenMLBase</span></span></span><a class="headerlink" href="#openml.study.OpenMLBenchmarkSuite.publish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Publish the object on the OpenML server.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="openml.study.OpenMLBenchmarkSuite.push_tag">
-<span class="sig-name descname"><span class="pre">push_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.study.OpenMLBenchmarkSuite.push_tag" title="Permalink to this definition">¶</a></dt>
-<dd><p>Annotates this entity with a tag on the server.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
-</dd>
-</dl>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">push_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#openml.study.OpenMLBenchmarkSuite.push_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a tag to the study.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="openml.study.OpenMLBenchmarkSuite.remove_tag">
-<span class="sig-name descname"><span class="pre">remove_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.study.OpenMLBenchmarkSuite.remove_tag" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes a tag from this entity on the server.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
-</dd>
-</dl>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">remove_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#openml.study.OpenMLBenchmarkSuite.remove_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a tag from the study.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -232,8 +223,8 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br/>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
     </p>
   </div>
 </footer>

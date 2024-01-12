@@ -35,7 +35,7 @@ Publication
 
 .. GENERATED FROM PYTHON SOURCE LINES 17-24
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # License: BSD 3-Clause
@@ -59,7 +59,7 @@ fmt: off
 
 .. GENERATED FROM PYTHON SOURCE LINES 28-42
 
-.. code-block:: default
+.. code-block:: Python
 
     dataset_ids = [
         3, 6, 12, 14, 16, 18, 21, 22, 23, 24, 26, 28, 30, 31, 32, 36, 38, 44, 46,
@@ -105,7 +105,7 @@ datasets can be found in the `online docs <https://docs.openml.org/#dataset-stat
 
 .. GENERATED FROM PYTHON SOURCE LINES 60-94
 
-.. code-block:: default
+.. code-block:: Python
 
     tasks = openml.tasks.list_tasks(
         task_type=openml.tasks.TaskType.SUPERVISED_CLASSIFICATION,
@@ -157,7 +157,7 @@ datasets can be found in the `online docs <https://docs.openml.org/#dataset-stat
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.042 seconds)
+   **Total running time of the script:** (0 minutes 23.327 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2015_neurips_feurer_example.py:
@@ -166,16 +166,13 @@ datasets can be found in the `online docs <https://docs.openml.org/#dataset-stat
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: 2015_neurips_feurer_example.ipynb <2015_neurips_feurer_example.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: 2015_neurips_feurer_example.py <2015_neurips_feurer_example.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: 2015_neurips_feurer_example.ipynb <2015_neurips_feurer_example.ipynb>`
 
 
 .. only:: html

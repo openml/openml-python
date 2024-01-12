@@ -25,7 +25,7 @@ A simple tutorial on how to train/run a model and how to upload the results.
 
 .. GENERATED FROM PYTHON SOURCE LINES 7-14
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # License: BSD 3-Clause
@@ -48,7 +48,7 @@ A simple tutorial on how to train/run a model and how to upload the results.
 
 .. GENERATED FROM PYTHON SOURCE LINES 17-19
 
-.. code-block:: default
+.. code-block:: Python
 
     openml.config.start_using_configuration_for_example()
 
@@ -60,8 +60,8 @@ A simple tutorial on how to train/run a model and how to upload the results.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
-      warnings.warn(
+    /home/runner/work/openml-python/openml-python/examples/20_basic/simple_flows_and_runs_tutorial.py:17: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      openml.config.start_using_configuration_for_example()
 
 
 
@@ -73,7 +73,7 @@ Train a machine learning model
 
 .. GENERATED FROM PYTHON SOURCE LINES 22-31
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # NOTE: We are using dataset 20 from the test server: https://test.openml.org/d/20
@@ -92,8 +92,8 @@ Train a machine learning model
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      warnings.warn(
+    /home/runner/work/openml-python/openml-python/examples/20_basic/simple_flows_and_runs_tutorial.py:24: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      dataset = openml.datasets.get_dataset(20)
 
 
 .. raw:: html
@@ -111,7 +111,7 @@ Running a model on a task
 
 .. GENERATED FROM PYTHON SOURCE LINES 34-40
 
-.. code-block:: default
+.. code-block:: Python
 
 
     task = openml.tasks.get_task(119)
@@ -127,27 +127,29 @@ Running a model on a task
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
-      warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      warnings.warn(
+    /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sphinx_gallery/gen_rst.py:722: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+      exec(self.code, self.fake_main.__dict__)
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+    /home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      return datasets.get_dataset(self.dataset_id)
+    /home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      openml.datasets.get_dataset(task.dataset_id).name,
     OpenML Run
     ==========
     Uploader Name...................: None
     Metric..........................: None
-    Local Result - Accuracy (+- STD): 0.7668 +- 0.0000
-    Local Runtime - ms (+- STD).....: 175.2206 +- 0.0000
+    Local Result - Accuracy (+- STD): 0.7628 +- 0.0000
+    Local Runtime - ms (+- STD).....: 141.3386 +- 0.0000
     Run ID..........................: None
     Task ID.........................: 119
     Task Type.......................: None
     Task URL........................: https://test.openml.org/t/119
-    Flow ID.........................: 28979
+    Flow ID.........................: 44
     Flow Name.......................: sklearn.ensemble._forest.RandomForestClassifier
-    Flow URL........................: https://test.openml.org/f/28979
+    Flow URL........................: https://test.openml.org/f/44
     Setup ID........................: None
-    Setup String....................: Python_3.8.17. Sklearn_1.3.0. NumPy_1.23.5. SciPy_1.10.1.
+    Setup String....................: Python_3.8.18. Sklearn_1.3.2. NumPy_1.23.5. SciPy_1.10.1.
     Dataset ID......................: 20
     Dataset URL.....................: https://test.openml.org/d/20
 
@@ -161,7 +163,7 @@ Publishing the run
 
 .. GENERATED FROM PYTHON SOURCE LINES 43-48
 
-.. code-block:: default
+.. code-block:: Python
 
 
     myrun = run.publish()
@@ -176,19 +178,19 @@ Publishing the run
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
-      warnings.warn(
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      warnings.warn(
-    Run was uploaded to https://test.openml.org/r/14077
-    The flow can be found at https://test.openml.org/f/28979
+    /home/runner/work/openml-python/openml-python/openml/runs/run.py:650: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+      predictions = arff.dumps(self._generate_arff_dict())
+    /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+    Run was uploaded to https://test.openml.org/r/3189
+    The flow can be found at https://test.openml.org/f/44
 
 
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 49-50
 
-.. code-block:: default
+.. code-block:: Python
 
     openml.config.stop_using_configuration_for_example()
 
@@ -201,7 +203,7 @@ Publishing the run
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  7.591 seconds)
+   **Total running time of the script:** (0 minutes 28.645 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_flows_and_runs_tutorial.py:
@@ -210,16 +212,13 @@ Publishing the run
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: simple_flows_and_runs_tutorial.ipynb <simple_flows_and_runs_tutorial.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: simple_flows_and_runs_tutorial.py <simple_flows_and_runs_tutorial.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: simple_flows_and_runs_tutorial.ipynb <simple_flows_and_runs_tutorial.ipynb>`
 
 
 .. only:: html

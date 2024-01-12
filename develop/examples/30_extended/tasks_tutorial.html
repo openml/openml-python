@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Tasks &#8212; OpenML 0.14.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
+    <title>Tasks &#8212; OpenML 0.14.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=421f3d0b"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.14.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -132,7 +132,7 @@ to download the full example code</p>
 <section class="sphx-glr-example-title" id="tasks">
 <span id="sphx-glr-examples-30-extended-tasks-tutorial-py"></span><h1>Tasks<a class="headerlink" href="#tasks" title="Permalink to this heading">¶</a></h1>
 <p>A tutorial on how to list and download tasks.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
 
 <span class="kn">import</span> <span class="nn">openml</span>
 <span class="kn">from</span> <span class="nn">openml.tasks</span> <span class="kn">import</span> <span class="n">TaskType</span>
@@ -158,7 +158,7 @@ splits in a useful manner.</p></li>
 request a
 <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html">pandas dataframe</a>
 instead to have better visualization capabilities and easier access:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span>
     <span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
@@ -174,7 +174,7 @@ instead to have better visualization capabilities and easier access:</p>
        &#39;NumberOfMissingValues&#39;, &#39;NumberOfNumericFeatures&#39;,
        &#39;NumberOfSymbolicFeatures&#39;, &#39;cost_matrix&#39;],
       dtype=&#39;object&#39;)
-First 5 of 4235 tasks:
+First 5 of 4381 tasks:
    tid  ... cost_matrix
 2    2  ...         NaN
 3    3  ...         NaN
@@ -187,39 +187,39 @@ First 5 of 4235 tasks:
 </div>
 <p>We can filter the list of tasks to only contain datasets with more than
 500 samples, but less than 1000 samples:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;NumberOfInstances &gt; 500 and NumberOfInstances &lt; 1000&quot;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;NumberOfInstances &gt; 500 and NumberOfInstances &lt; 1000&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 232, 241, 245, 259, 267, 271, 279, 283, 1766, 1775, 1779, 1793, 1801, 1805, 1813, 1817, 1882, 1891, 1895, 1909, 1917, 1921, 1929, 1933, 1945, 1952, 1956, 1967, 1973, 1977, 1983, 1987, 2079, 2125, 2944, 3022, 3034, 3047, 3049, 3053, 3054, 3055, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 4189, 4191, 4197, 4198, 4199, 4217, 4223, 4225, 4226, 4234, 4240, 4254, 4265, 4266, 4288, 4328, 4341, 4345, 4365, 4395, 4396, 4397, 4409, 4411, 4423, 4499, 4508, 4515, 4517, 4518, 4519, 4522, 4538, 4557, 4558, 4562, 4565, 4572, 4582, 4584, 4591, 4618, 4676, 4684, 4697, 4704, 7286, 7307, 7543, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 12738, 12739, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146574, 146576, 146577, 146578, 146583, 146587, 146588, 146593, 146596, 146597, 146600, 146818, 146819, 166859, 166875, 166882, 166884, 166893, 166905, 166906, 166907, 166913, 166915, 166919, 166947, 166953, 166956, 166957, 166958, 166959, 166960, 166967, 166976, 166977, 166978, 166980, 166983, 166988, 166989, 166992, 167016, 167020, 167031, 167037, 167062, 167067, 167068, 167095, 167096, 167100, 167104, 167106, 167151, 167154, 167160, 167163, 167167, 167168, 167171, 167173, 167174, 167175, 167180, 167184, 167187, 167194, 167198, 168300, 168783, 168819, 168820, 168821, 168822, 168823, 168824, 168825, 168907, 189786, 189859, 189899, 189900, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233090, 233094, 233109, 233115, 233171, 233206, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964, 361107, 361109, 361146, 361147, 361148, 361149, 361150, 361151, 361152, 361153, 361154, 361155, 361156, 361157, 361158, 361159, 361160, 361161, 361163, 361164, 361165, 361166, 361167, 361168, 361169, 361170, 361171, 361172, 361173, 361174, 361175, 361176, 361183, 361185, 361190, 361305, 361338, 361340, 361412, 361415, 361424, 361426, 361432, 361433, 361434, 361436, 361437, 361440, 361442, 361443, 361457, 361463, 361483, 361486, 361492, 361495, 361498, 361499, 361502, 361504, 361506, 361507, 361512, 361517, 361522, 361529, 361531, 361540, 361557, 361572, 361624, 361650, 361660]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 232, 241, 245, 259, 267, 271, 279, 283, 1766, 1775, 1779, 1793, 1801, 1805, 1813, 1817, 1882, 1891, 1895, 1909, 1917, 1921, 1929, 1933, 1945, 1952, 1956, 1967, 1973, 1977, 1983, 1987, 2079, 2125, 2944, 3022, 3034, 3047, 3049, 3053, 3054, 3055, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 4189, 4191, 4197, 4198, 4199, 4217, 4223, 4225, 4226, 4234, 4240, 4254, 4265, 4266, 4288, 4328, 4341, 4345, 4365, 4395, 4396, 4397, 4409, 4411, 4423, 4499, 4508, 4515, 4517, 4518, 4519, 4522, 4538, 4557, 4558, 4562, 4565, 4572, 4582, 4584, 4591, 4618, 4676, 4684, 4697, 4704, 7286, 7307, 7543, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 12738, 12739, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146574, 146576, 146577, 146578, 146583, 146587, 146588, 146593, 146596, 146597, 146600, 146818, 146819, 166859, 166875, 166882, 166884, 166893, 166905, 166906, 166907, 166913, 166915, 166919, 166947, 166953, 166956, 166957, 166958, 166959, 166960, 166967, 166976, 166977, 166978, 166980, 166983, 166988, 166989, 166992, 167016, 167020, 167031, 167037, 167062, 167067, 167068, 167095, 167096, 167100, 167104, 167106, 167151, 167154, 167160, 167163, 167167, 167168, 167171, 167173, 167174, 167175, 167180, 167184, 167187, 167194, 167198, 168300, 168783, 168819, 168820, 168821, 168822, 168823, 168824, 168825, 168907, 189786, 189859, 189899, 189900, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233090, 233094, 233109, 233115, 233171, 233206, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964, 361107, 361109, 361146, 361147, 361148, 361149, 361150, 361151, 361152, 361153, 361154, 361155, 361156, 361157, 361158, 361159, 361160, 361161, 361163, 361164, 361165, 361166, 361167, 361168, 361169, 361170, 361171, 361172, 361173, 361174, 361175, 361176, 361183, 361185, 361190, 361305, 361338, 361340, 361412, 361415, 361424, 361426, 361432, 361433, 361434, 361436, 361437, 361440, 361442, 361443, 361457, 361463, 361483, 361486, 361492, 361495, 361498, 361499, 361502, 361504, 361506, 361507, 361512, 361517, 361522, 361529, 361531, 361540, 361557, 361572, 361624, 361650, 361660, 361983, 361984, 361985, 361986, 361987, 361988, 361989]
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>368
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>375
 </pre></div>
 </div>
 <p>Then, we can further restrict the tasks to all have the same resampling strategy:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_tasks</span> <span class="o">=</span> <span class="n">filtered_tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;estimation_procedure == &quot;10-fold Crossvalidation&quot;&#39;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">filtered_tasks</span> <span class="o">=</span> <span class="n">filtered_tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;estimation_procedure == &quot;10-fold Crossvalidation&quot;&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 2079, 3022, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 7286, 7307, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146818, 146819, 168300, 168907, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233171, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964, 361107, 361109, 361146, 361147, 361148, 361149, 361150, 361151, 361152, 361153, 361154, 361155, 361156, 361157, 361158, 361159, 361160, 361161, 361163, 361164, 361165, 361166, 361167, 361168, 361169, 361170, 361171, 361172, 361173, 361174, 361175, 361176, 361183, 361185, 361190, 361305, 361338, 361340]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2, 11, 15, 29, 37, 41, 49, 53, 2079, 3022, 3484, 3486, 3492, 3493, 3494, 3512, 3518, 3520, 3521, 3529, 3535, 3549, 3560, 3561, 3583, 3623, 3636, 3640, 3660, 3690, 3691, 3692, 3704, 3706, 3718, 3794, 3803, 3810, 3812, 3813, 3814, 3817, 3833, 3852, 3853, 3857, 3860, 3867, 3877, 3879, 3886, 3913, 3971, 3979, 3992, 3999, 7286, 7307, 7548, 7558, 9904, 9905, 9946, 9950, 9971, 9980, 9989, 9990, 10097, 10098, 10101, 14954, 14968, 145682, 145800, 145804, 145805, 145825, 145836, 145839, 145848, 145878, 145882, 145914, 145917, 145952, 145959, 145970, 145976, 145978, 146062, 146064, 146065, 146066, 146069, 146092, 146156, 146216, 146219, 146231, 146818, 146819, 168300, 168907, 189932, 189937, 189941, 190136, 190138, 190139, 190140, 190143, 190146, 233171, 359953, 359954, 359955, 360857, 360865, 360868, 360869, 360951, 360953, 360964, 361107, 361109, 361146, 361147, 361148, 361149, 361150, 361151, 361152, 361153, 361154, 361155, 361156, 361157, 361158, 361159, 361160, 361161, 361163, 361164, 361165, 361166, 361167, 361168, 361169, 361170, 361171, 361172, 361173, 361174, 361175, 361176, 361183, 361185, 361190, 361305, 361338, 361340, 361983, 361984, 361985, 361987, 361988]
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of tasks</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_tasks</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>162
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>167
 </pre></div>
 </div>
 <p>Resampling strategies can be found on the
 <a class="reference external" href="https://www.openml.org/search?type=measure&amp;q=estimation%20procedure">OpenML Website</a>.</p>
 <p>Similar to listing tasks by task type, we can list tasks by tags:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s2">&quot;OpenML100&quot;</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s2">&quot;OpenML100&quot;</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First 5 of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span><span class="si">}</span><span class="s2"> tasks:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
@@ -236,7 +236,7 @@ First 5 of 4235 tasks:
 </pre></div>
 </div>
 <p>Furthermore, we can list tasks based on the dataset id:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="mi">1471</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">data_id</span><span class="o">=</span><span class="mi">1471</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First 5 of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span><span class="si">}</span><span class="s2"> tasks:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
@@ -253,7 +253,7 @@ First 5 of 4235 tasks:
 </pre></div>
 </div>
 <p>In addition, a size limit and an offset can be applied both separately and simultaneously:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -280,17 +280,17 @@ unbalanced data and sparse data. However, the tasks include missing values and
 categorical features. You can find out more about the <em>OpenML 100</em> on
 <a class="reference external" href="https://docs.openml.org/benchmark/">the OpenML benchmarking page</a>.</p>
 <p>Finally, it is also possible to list all tasks on OpenML with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>47083
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>47257
 </pre></div>
 </div>
 <section id="exercise">
 <h3>Exercise<a class="headerlink" href="#exercise" title="Permalink to this heading">¶</a></h3>
 <p>Search for the tasks on the ‘eeg-eye-state’ dataset.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;name==&quot;eeg-eye-state&quot;&#39;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tasks</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;name==&quot;eeg-eye-state&quot;&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -1130,18 +1130,18 @@ categorical features. You can find out more about the <em>OpenML 100</em> on
 <p>We provide two functions to download tasks, one which downloads only a
 single task by its ID, and one which takes a list of IDs and downloads
 all of these tasks:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">31</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">31</span>
 <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:372: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
-  warnings.warn(
-/home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-  warnings.warn(
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sphinx_gallery/gen_rst.py:722: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  exec(self.code, self.fake_main.__dict__)
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
 </pre></div>
 </div>
 <p>Properties of the task are stored as member variables:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Classification Task
@@ -1156,12 +1156,14 @@ Cost Matrix..........: Available
 </pre></div>
 </div>
 <p>And:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1891</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">9983</span><span class="p">]</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1891</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">9983</span><span class="p">]</span>
 <span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_tasks</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tasks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Classification Task
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/examples/30_extended/tasks_tutorial.py:135: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  tasks = openml.tasks.get_tasks(ids)
+OpenML Classification Task
 ==========================
 Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
 Task ID..............: 2
@@ -1206,11 +1208,11 @@ scatters results across tasks.</p>
 This prevents the main server from crowding with example datasets, tasks, runs, and so on.
 The use of this test server can affect behaviour and performance of the OpenML-Python API.</p>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
-  warnings.warn(
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/examples/30_extended/tasks_tutorial.py:171: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+  openml.config.start_using_configuration_for_example()
 </pre></div>
 </div>
 <section id="example">
@@ -1221,7 +1223,7 @@ and <em>predictive accuracy</em> as the predefined measure (this can also be lef
 If a task with these parameters exists, we will get an appropriate exception.
 If such a task doesn’t exist, a task will be created and the corresponding task_id
 will be returned.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
     <span class="n">my_task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
         <span class="n">task_type</span><span class="o">=</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span>
         <span class="n">dataset_id</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
@@ -1247,13 +1249,13 @@ will be returned.</p>
 <span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:112: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
-  warnings.warn(
-/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:112: RuntimeWarning: Could not create task type id for 11 due to error 11 is not a valid TaskType
-  warnings.warn(
-/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:263: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
-  warnings.warn(
-Task already exists. Task ID is 1305
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:285: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+  procs = _get_estimation_procedure_list()
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:285: RuntimeWarning: Could not create task type id for 11 due to error 11 is not a valid TaskType
+  procs = _get_estimation_procedure_list()
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:234: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+  return __list_tasks(api_call=api_call, output_format=output_format)
+Task already exists. Task ID is 1364
 </pre></div>
 </div>
 <ul class="simple">
@@ -1261,13 +1263,13 @@ Task already exists. Task ID is 1305
 <li><p><a class="reference external" href="https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&amp;type=measure">Complete list of model estimation procedures</a>.</p></li>
 <li><p><a class="reference external" href="https://www.openml.org/search?q=measure_type%3Aevaluation_measure&amp;type=measure">Complete list of evaluation measures</a>.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  0.957 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (6 minutes 31.857 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-tasks-tutorial-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/e6648ddbb54e75b09dd01d69be33f340/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7f02370ea703f89b42bf49582f3a252c/tasks_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">tasks_tutorial.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/e6648ddbb54e75b09dd01d69be33f340/tasks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tasks_tutorial.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -1287,8 +1289,8 @@ Task already exists. Task ID is 1305
       
     </p>
     <p>
-        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br/>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
     </p>
   </div>
 </footer>

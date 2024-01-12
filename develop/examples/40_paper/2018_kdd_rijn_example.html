@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>van Rijn and Hutter (2018) &#8212; OpenML 0.14.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
+    <title>van Rijn and Hutter (2018) &#8212; OpenML 0.14.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=421f3d0b"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.14.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -134,7 +134,7 @@ systems).</p>
 <div class="line">In <em>Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery &amp; Data Mining</em>, 2018</div>
 <div class="line">Available at <a class="reference external" href="https://dl.acm.org/doi/10.1145/3219819.3220058">https://dl.acm.org/doi/10.1145/3219819.3220058</a></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
 
 <span class="kn">import</span> <span class="nn">sys</span>
 
@@ -181,7 +181,7 @@ important when it is put on a log-scale. All these simplifications can be
 addressed by defining a ConfigSpace. For a more elaborated example that uses
 this, please see:
 <a class="reference external" href="https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdccc7b9265/examples/plot/plot_fanova_aggregates.py">https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdccc7b9265/examples/plot/plot_fanova_aggregates.py</a> # noqa F401</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">suite</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">get_suite</span><span class="p">(</span><span class="s2">&quot;OpenML100&quot;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">suite</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">get_suite</span><span class="p">(</span><span class="s2">&quot;OpenML100&quot;</span><span class="p">)</span>
 <span class="n">flow_id</span> <span class="o">=</span> <span class="mi">7707</span>
 <span class="n">parameter_filters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;sklearn.svm.classes.SVC(17)_kernel&quot;</span><span class="p">:</span> <span class="s2">&quot;sigmoid&quot;</span><span class="p">}</span>
 <span class="n">evaluation_measure</span> <span class="o">=</span> <span class="s2">&quot;predictive_accuracy&quot;</span>
@@ -295,7 +295,7 @@ Starting with task 29 (15/15)
 this data to make the Nemenyi plot, but this relies on the rather complex
 <code class="docutils literal notranslate"><span class="pre">Orange</span></code> dependency (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">Orange3</span></code>). For the complete example,
 the reader is referred to the more elaborate script (referred to earlier)</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;hyperparameter&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;fanova&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">fanova_results</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Variance Contribution&quot;</span><span class="p">)</span>
@@ -304,13 +304,17 @@ the reader is referred to the more elaborate script (referred to earlier)</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_2018_kdd_rijn_example_001.png" srcset="../../_images/sphx_glr_2018_kdd_rijn_example_001.png" alt="2018 kdd rijn example" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  23.409 seconds)</p>
-<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-kdd-rijn-example-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/fb4c80b20c8429a4165b670554f3d313/2018_kdd_rijn_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_kdd_rijn_example.py</span></code></a></p>
+<img src="../../_images/sphx_glr_2018_kdd_rijn_example_001.png" srcset="../../_images/sphx_glr_2018_kdd_rijn_example_001.png" alt="2018 kdd rijn example" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/examples/40_paper/2018_kdd_rijn_example.py:169: UserWarning: FixedFormatter should only be used together with FixedLocator
+  ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha=&quot;right&quot;)
+</pre></div>
 </div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (11 minutes 2.784 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-kdd-rijn-example-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/4076733b22158deda2a79e57d217b001/2018_kdd_rijn_example.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">2018_kdd_rijn_example.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/fb4c80b20c8429a4165b670554f3d313/2018_kdd_rijn_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_kdd_rijn_example.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -329,8 +333,8 @@ the reader is referred to the more elaborate script (referred to earlier)</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br/>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
     </p>
   </div>
 </footer>

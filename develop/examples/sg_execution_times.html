@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>openml.tasks.get_tasks &#8212; OpenML 0.14.1 documentation</title>
+    <title>Computation times &#8212; OpenML 0.14.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css?v=284a2d1d" />
     <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css?v=180e76fa" />
@@ -64,7 +64,7 @@
                 <li><a href="../index.html">Start</a></li>
                 <li><a href="../usage.html">User Guide</a></li>
                 <li><a href="../api.html">API</a></li>
-                <li><a href="../examples/index.html">Examples</a></li>
+                <li><a href="index.html">Examples</a></li>
                 <li><a href="../extensions.html">Extensions</a></li>
                 <li><a href="../contributing.html">Contributing</a></li>
                 <li><a href="../progress.html">Changelog</a></li>
@@ -106,43 +106,44 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>.get_tasks</a><ul>
-<li><a class="reference internal" href="#openml.tasks.get_tasks"><code class="docutils literal notranslate"><span class="pre">get_tasks()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">Computation times</a></li>
 </ul>
 
         </div>
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <section id="openml-tasks-get-tasks">
-<h1><a class="reference internal" href="../api.html#module-openml.tasks" title="openml.tasks"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code></a>.get_tasks<a class="headerlink" href="#openml-tasks-get-tasks" title="Permalink to this heading">¶</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="openml.tasks.get_tasks">
-<span class="sig-prename descclassname"><span class="pre">openml.tasks.</span></span><span class="sig-name descname"><span class="pre">get_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_qualities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="openml.tasks.OpenMLTask.html#openml.tasks.OpenMLTask" title="openml.tasks.OpenMLTask"><span class="pre">OpenMLTask</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#openml.tasks.get_tasks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download tasks.</p>
-<p>This function iterates <a class="reference internal" href="openml.tasks.get_task.html#openml.tasks.get_task" title="openml.tasks.get_task"><code class="xref py py-meth docutils literal notranslate"><span class="pre">openml.tasks.get_task()</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>task_ids</strong><span class="classifier">List[int]</span></dt><dd><p>A list of task ids to download.</p>
-</dd>
-<dt><strong>download_data</strong><span class="classifier">bool (default = True)</span></dt><dd><p>Option to trigger download of data along with the meta data.</p>
-</dd>
-<dt><strong>download_qualities</strong><span class="classifier">bool (default=True)</span></dt><dd><p>Option to download ‘qualities’ meta-data in addition to the minimal dataset description.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>list</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<div class="clearer"></div></section>
+  <section id="computation-times">
+<span id="sphx-glr-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this heading">¶</a></h1>
+<p><strong>00:00.000</strong> total execution time for 0 files <strong>from examples</strong>:</p>
+<div class="docutils container">
+<style scoped>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+</style>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script type="text/javascript" class="init">
+$(document).ready( function () {
+    $('table.sg-datatable').DataTable({order: [[1, 'desc']]});
+} );
+</script><table class="table table-striped sg-datatable docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Example</p></th>
+<th class="head"><p>Time</p></th>
+<th class="head"><p>Mem (MB)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 
 
     </div>

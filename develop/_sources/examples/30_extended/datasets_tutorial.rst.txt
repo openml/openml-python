@@ -26,7 +26,7 @@ How to list and download datasets.
 
 .. GENERATED FROM PYTHON SOURCE LINES 8-15
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # License: BSD 3-Clauses
@@ -57,7 +57,7 @@ openml-python 0.14, `list_datasets` will warn you to use output_format='datafram
 
 .. GENERATED FROM PYTHON SOURCE LINES 26-36
 
-.. code-block:: default
+.. code-block:: Python
 
     datalist = openml.datasets.list_datasets(output_format="dataframe")
     datalist = datalist[["did", "name", "NumberOfInstances", "NumberOfFeatures", "NumberOfClasses"]]
@@ -77,7 +77,7 @@ openml-python 0.14, `list_datasets` will warn you to use output_format='datafram
 
  .. code-block:: none
 
-    First 10 of 5301 datasets...
+    First 10 of 5404 datasets...
 
 
 .. raw:: html
@@ -328,7 +328,7 @@ Exercise 1
 
 .. GENERATED FROM PYTHON SOURCE LINES 43-49
 
-.. code-block:: default
+.. code-block:: Python
 
     datalist[datalist.NumberOfInstances > 10000].sort_values(["NumberOfInstances"]).head(n=20)
     ""
@@ -800,7 +800,7 @@ Download datasets
 
 .. GENERATED FROM PYTHON SOURCE LINES 52-64
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # This is done based on the dataset ID.
@@ -822,8 +822,8 @@ Download datasets
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      warnings.warn(
+    /home/runner/work/openml-python/openml-python/examples/30_extended/datasets_tutorial.py:54: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      dataset = openml.datasets.get_dataset(1471)
     This is dataset 'eeg-eye-state', the target feature is 'Class'
     URL: https://api.openml.org/data/v1/download/1587924/eeg-eye-state.arff
     **Author**: Oliver Roesler  
@@ -844,7 +844,7 @@ and also some additional metadata that we don't care about right now.
 
 .. GENERATED FROM PYTHON SOURCE LINES 69-71
 
-.. code-block:: default
+.. code-block:: Python
 
     eeg, *_ = dataset.get_data()
 
@@ -863,7 +863,7 @@ dataset. In particular, many datasets for supervised problems have a set
 
 .. GENERATED FROM PYTHON SOURCE LINES 75-81
 
-.. code-block:: default
+.. code-block:: Python
 
     X, y, categorical_indicator, attribute_names = dataset.get_data(
         target=dataset.default_target_attribute
@@ -926,7 +926,7 @@ openml objects, e.g., using `dataset.features`.
 
 .. GENERATED FROM PYTHON SOURCE LINES 90-92
 
-.. code-block:: default
+.. code-block:: Python
 
     dataset = openml.datasets.get_dataset(1471, download_data=False)
 
@@ -938,8 +938,8 @@ openml objects, e.g., using `dataset.features`.
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/datasets/functions.py:437: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      warnings.warn(
+    /home/runner/work/openml-python/openml-python/examples/30_extended/datasets_tutorial.py:90: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      dataset = openml.datasets.get_dataset(1471, download_data=False)
 
 
 
@@ -952,7 +952,7 @@ Exercise 2
 
 .. GENERATED FROM PYTHON SOURCE LINES 96-108
 
-.. code-block:: default
+.. code-block:: Python
 
     eegs = eeg.sample(n=1000)
     _ = pd.plotting.scatter_matrix(
@@ -979,7 +979,7 @@ Exercise 2
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.8.17/x64/lib/python3.8/site-packages/pandas/plotting/_matplotlib/misc.py:97: UserWarning: No data for colormapping provided via 'c'. Parameters 'cmap' will be ignored
+    /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/pandas/plotting/_matplotlib/misc.py:97: UserWarning: No data for colormapping provided via 'c'. Parameters 'cmap' will be ignored
       ax.scatter(
 
 
@@ -996,7 +996,7 @@ This example uses the test server, to avoid editing a dataset on the main server
 
 .. GENERATED FROM PYTHON SOURCE LINES 115-116
 
-.. code-block:: default
+.. code-block:: Python
 
     openml.config.start_using_configuration_for_example()
 
@@ -1007,8 +1007,8 @@ This example uses the test server, to avoid editing a dataset on the main server
 
  .. code-block:: none
 
-    /home/runner/work/openml-python/openml-python/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
-      warnings.warn(
+    /home/runner/work/openml-python/openml-python/examples/30_extended/datasets_tutorial.py:115: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+      openml.config.start_using_configuration_for_example()
 
 
 
@@ -1021,7 +1021,7 @@ original_data_url, paper_url
 
 .. GENERATED FROM PYTHON SOURCE LINES 120-138
 
-.. code-block:: default
+.. code-block:: Python
 
     desc = (
         "This data sets consists of 3 different types of irises' "
@@ -1049,6 +1049,8 @@ original_data_url, paper_url
 
  .. code-block:: none
 
+    /home/runner/work/openml-python/openml-python/examples/30_extended/datasets_tutorial.py:134: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      edited_dataset = get_dataset(data_id)
     Edited dataset ID: 128
 
 
@@ -1065,7 +1067,7 @@ This example here only shows a failure when trying to work on a dataset not owne
 
 .. GENERATED FROM PYTHON SOURCE LINES 145-150
 
-.. code-block:: default
+.. code-block:: Python
 
     try:
         data_id = edit_dataset(1, default_target_attribute="shape")
@@ -1096,7 +1098,7 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. GENERATED FROM PYTHON SOURCE LINES 157-164
 
-.. code-block:: default
+.. code-block:: Python
 
 
     data_id = fork_dataset(1)
@@ -1113,8 +1115,8 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
  .. code-block:: none
 
-    2683
-    Forked dataset ID: 2683
+    1764
+    Forked dataset ID: 1764
 
 
 
@@ -1122,7 +1124,7 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.871 seconds)
+   **Total running time of the script:** (1 minutes 10.602 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_datasets_tutorial.py:
@@ -1131,16 +1133,13 @@ After the dataset is forked, you can edit the new version of the dataset using e
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: datasets_tutorial.ipynb <datasets_tutorial.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: datasets_tutorial.py <datasets_tutorial.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: datasets_tutorial.ipynb <datasets_tutorial.ipynb>`
 
 
 .. only:: html

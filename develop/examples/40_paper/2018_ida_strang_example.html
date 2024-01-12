@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Strang et al. (2018) &#8212; OpenML 0.14.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
+    <title>Strang et al. (2018) &#8212; OpenML 0.14.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=421f3d0b"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.14.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -133,7 +133,7 @@ Prematurely: A Large Scale Benchmark Comparing Linear and Non-linear Classifiers
 <div class="line">In <em>Advances in Intelligent Data Analysis XVII 17th International Symposium</em>, 2018</div>
 <div class="line">Available at <a class="reference external" href="https://link.springer.com/chapter/10.1007%2F978-3-030-01768-2_25">https://link.springer.com/chapter/10.1007%2F978-3-030-01768-2_25</a></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">openml</span>
@@ -152,7 +152,7 @@ classifiers given the OpenML flow ids. Note that this allows us to reproduce
 the SVM and NN experiment, but not the DT experiment, as this requires a bit
 more effort to distinguish the same flow with different hyperparameter
 values.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">study_id</span> <span class="o">=</span> <span class="mi">123</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">study_id</span> <span class="o">=</span> <span class="mi">123</span>
 <span class="c1"># for comparing svms: flow_ids = [7754, 7756]</span>
 <span class="c1"># for comparing nns: flow_ids = [7722, 7729]</span>
 <span class="c1"># for comparing dts: flow_ids = [7725], differentiate on hyper-parameter value</span>
@@ -184,7 +184,7 @@ values.</p>
 </pre></div>
 </div>
 <p>makes the s-plot</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig_splot</span><span class="p">,</span> <span class="n">ax_splot</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">fig_splot</span><span class="p">,</span> <span class="n">ax_splot</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">ax_splot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">evaluations</span><span class="p">)),</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">evaluations</span><span class="p">[</span><span class="s2">&quot;diff&quot;</span><span class="p">]))</span>
 <span class="n">ax_splot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">classifier_family</span><span class="p">)</span>
 <span class="n">ax_splot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Dataset (sorted)&quot;</span><span class="p">)</span>
@@ -195,7 +195,7 @@ values.</p>
 </div>
 <img src="../../_images/sphx_glr_2018_ida_strang_example_001.png" srcset="../../_images/sphx_glr_2018_ida_strang_example_001.png" alt="SVM" class = "sphx-glr-single-img"/><p>adds column that indicates the difference between the two classifiers,
 needed for the scatter plot</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">determine_class</span><span class="p">(</span><span class="n">val_lin</span><span class="p">,</span> <span class="n">val_nonlin</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">determine_class</span><span class="p">(</span><span class="n">val_lin</span><span class="p">,</span> <span class="n">val_nonlin</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">val_lin</span> <span class="o">&lt;</span> <span class="n">val_nonlin</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">class_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">elif</span> <span class="n">val_nonlin</span> <span class="o">&lt;</span> <span class="n">val_lin</span><span class="p">:</span>
@@ -224,7 +224,7 @@ needed for the scatter plot</p>
 </div>
 <img src="../../_images/sphx_glr_2018_ida_strang_example_002.png" srcset="../../_images/sphx_glr_2018_ida_strang_example_002.png" alt="SVM" class = "sphx-glr-single-img"/><p>makes a scatter plot where each data point represents the performance of the
 two algorithms on various axis (not in the paper)</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig_diagplot</span><span class="p">,</span> <span class="n">ax_diagplot</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">fig_diagplot</span><span class="p">,</span> <span class="n">ax_diagplot</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">ax_diagplot</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
 <span class="n">ax_diagplot</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 <span class="n">ax_diagplot</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">],</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
@@ -235,13 +235,13 @@ two algorithms on various axis (not in the paper)</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_2018_ida_strang_example_003.png" srcset="../../_images/sphx_glr_2018_ida_strang_example_003.png" alt="2018 ida strang example" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.505 seconds)</p>
+<img src="../../_images/sphx_glr_2018_ida_strang_example_003.png" srcset="../../_images/sphx_glr_2018_ida_strang_example_003.png" alt="2018 ida strang example" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 2.418 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-ida-strang-example-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/ae217469b5304eb1a9415c36e1db590f/2018_ida_strang_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_ida_strang_example.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/51e951fb65905058a563b0f066ec5771/2018_ida_strang_example.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">2018_ida_strang_example.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/ae217469b5304eb1a9415c36e1db590f/2018_ida_strang_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_ida_strang_example.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -260,8 +260,8 @@ two algorithms on various axis (not in the paper)</p>
       
     </p>
     <p>
-        &copy; Copyright 2014-2023, the OpenML-Python team.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.0.1.<br/>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
     </p>
   </div>
 </footer>
