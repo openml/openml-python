@@ -626,6 +626,7 @@ class TestOpenMLDataset(TestBase):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels()
         assert labels == ["1", "2", "3", "4", "5", "U"]
+
         labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels(
             target_name="product-type",
         )
