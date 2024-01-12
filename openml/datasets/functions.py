@@ -1091,7 +1091,7 @@ def data_feature_add_ontology(data_id: int, index: int, ontology: str) -> bool:
 
 def data_feature_remove_ontology(data_id: int, index: int, ontology: str) -> bool:
     """
-    Removes an existing ontology (URL) to a given dataset feature (defined
+    Removes an existing ontology (URL) from a given dataset feature (defined
     by a dataset id and index). The dataset has to exists on OpenML and needs
     to have been processed by the evaluation engine. Ontology needs to be
     attached to the specific fearure.
