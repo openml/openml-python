@@ -31,11 +31,12 @@ def with_test_cache(test_files_directory, request):
             f"Cannot find test cache dir, expected it to be {test_files_directory!s}!",
         )
     _root_cache_directory = openml.config._root_cache_directory
-    tmp_cache = _root_cache_directory / request.node.name
+    tmp_cache = test_files_directory / request.node.name
     openml.config.set_root_cache_directory(tmp_cache)
     yield
     openml.config.set_root_cache_directory(_root_cache_directory)
-    shutil.rmtree(tmp_cache)
+    if tmp_cache.exists():
+        shutil.rmtree(tmp_cache)
 
 
 @pytest.fixture()
