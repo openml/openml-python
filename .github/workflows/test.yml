@@ -122,7 +122,7 @@ jobs:
           BEFORE: "${{ steps.status-before.outputs.BEFORE }}"
         run: |
           after="$(git status --porcelain -b)"
-          before="${{ env.BEFORE }}"
+          before="${{ steps.unit_test_report.outputs }}"
           if [[ "${before}" != "$after" ]]; then
               echo "git status from before: ${before}"
               echo "git status from after: ${after}"
