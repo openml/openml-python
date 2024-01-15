@@ -165,7 +165,7 @@ class OpenMLFlow(OpenMLBase):
             self._extension = extension
 
     @property
-    def id(self) -> int | None:  # noqa: A003
+    def id(self) -> int | None:
         """The ID of the flow."""
         return self.flow_id
 

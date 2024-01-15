@@ -23,7 +23,7 @@ class OpenMLBase(ABC):
 
     @property
     @abstractmethod
-    def id(self) -> int | None:  # noqa: A003
+    def id(self) -> int | None:
         """The id of the entity, it is unique for its entity type."""
 
     @property
