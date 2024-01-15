@@ -118,8 +118,6 @@ jobs:
       - name: Check for files left behind by test
         if: always()
         shell: bash
-        env:
-          BEFORE: "${{ steps.status-before.outputs.BEFORE }}"
         run: |
           after="$(git status --porcelain -b)"
           before="${{ steps.unit_test_report.outputs }}"
