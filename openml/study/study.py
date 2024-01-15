@@ -95,7 +95,7 @@ class BaseStudy(OpenMLBase):
         return "s"
 
     @property
-    def id(self) -> int | None:  # noqa: A003
+    def id(self) -> int | None:
         """Return the id of the study."""
         return self.study_id
 

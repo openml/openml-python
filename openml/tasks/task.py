@@ -101,7 +101,7 @@ class OpenMLTask(OpenMLBase):
         return "t"
 
     @property
-    def id(self) -> int | None:  # noqa: A003
+    def id(self) -> int | None:
         """Return the OpenML ID of this task."""
         return self.task_id
 
