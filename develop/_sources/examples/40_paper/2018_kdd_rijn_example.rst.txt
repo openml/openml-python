@@ -262,7 +262,7 @@ the reader is referred to the more elaborate script (referred to earlier)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 7.789 seconds)
+   **Total running time of the script:** (1 minutes 3.386 seconds)
 
 
 .. _sphx_glr_download_examples_40_paper_2018_kdd_rijn_example.py:
