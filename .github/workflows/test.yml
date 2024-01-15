@@ -19,6 +19,17 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  cores: 4
+  durations: 20
+  timeout: 600
+  timeout_method: thread
+  dist: load
+  reruns: 5
+  reruns_delay: 1
+  log_cli: true
+  capture: no
+
 jobs:
   test:
     name: (${{ matrix.os }}, Py${{ matrix.python-version }}, sk${{ matrix.scikit-learn }}, sk-only:${{ matrix.sklearn-only }})
@@ -36,19 +47,18 @@ jobs:
           - os: ubuntu-latest
             python-version: "3.8"
             scikit-learn: "0.24"
-            sklearn-only: "true"
+            sklearn-only: true
           # TODO(eddiebergman): For Python 3.8, we can run sklearn {0.24}
           - os: ubuntu-latest
             python-version: "3.9"
             scikit-learn: "0.24"
             scipy: "1.10.0"
-            sklearn-only: "true"
+            sklearn-only: true
           # Include a code cov version
           - code-cov: true
             os: ubuntu-latest
             python-version: "3.8"
             scikit-learn: 0.23.1
-            sklearn-only: 'false'
           # TODO(eddiebergman): Do we really need a dedicated windows version?
           # ... probably yes while we're not convinced we're using Path everywhere.
           # Include a windows test
@@ -56,7 +66,6 @@ jobs:
             python-version: "3.8"
             scikit-learn: 0.24.*
             scipy: "1.10.0"  # Fails with earlier version of scipy
-            sklearn-only: 'false'
       fail-fast:  false
 
     steps:
@@ -64,44 +73,55 @@ jobs:
       with:
         fetch-depth: 2
     - name: Setup Python ${{ matrix.python-version }}
-      if: matrix.os != 'windows-latest'  # windows-latest only uses preinstalled Python (3.7.9)
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install test dependencies
+      shell: bash
       run: |
         python -m pip install --upgrade pip
-        pip install -e .[test]
-    - name: Install scikit-learn ${{ matrix.scikit-learn }}
-      run: |
-        pip install scikit-learn==${{ matrix.scikit-learn }}
-    - name: Install numpy for Python 3.8
-      # Python 3.8 & scikit-learn<0.24 requires numpy<=1.23.5
-      if: ${{ matrix.python-version == '3.8' && contains(fromJSON('["0.23.1", "0.22.2", "0.21.2"]'), matrix.scikit-learn) }}
-      run: |
-        pip install numpy==1.23.5
-    - name: Install scipy ${{ matrix.scipy }}
-      if: ${{ matrix.scipy }}
-      run: |
-        pip install scipy==${{ matrix.scipy }}
+        pip install -e ".[test]"
+
+        if [ ${{ matrix.scikit-learn }} ]; then
+            pip install scikit-learn==${{ matrix.scikit-learn }}
+        else
+            pip install scikit-learn
+        fi
+        if [ ${{ matrix.scipy }} ]; then
+            pip install scipy==${{ matrix.scipy }}
+        else
+            pip install scipy
+        fi
     - name: Store repository status
       id: status-before
-      run: |
-        echo "::set-output name=BEFORE::$(git status --porcelain -b)"
+      run: echo "BEFORE=${git status --porcelain -b}" >> "$GITHUB_ENV"
     - name: Run tests on Ubuntu
-      if: matrix.os == 'ubuntu-latest'
+      shell: bash
       run: |
-        if [ ${{ matrix.code-cov }} ]; then codecov='--cov=openml --long  --cov-report=xml'; fi
+        set -x  # Print out the command run
         # Most of the time, running only the scikit-learn tests is sufficient
-        if [ ${{ matrix.sklearn-only }} = 'true' ]; then sklearn='-m sklearn'; fi
-        echo pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv $codecov $sklearn --reruns 5 --reruns-delay 1 -o log_cli=true
-        pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv $codecov $sklearn --reruns 5 --reruns-delay 1 -o log_cli=true
-    - name: Run tests on Windows
-      if: matrix.os == 'windows-latest'
-      run: |  # we need a separate step because of the bash-specific if-statement in the previous one.
-        pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv --reruns 5 --reruns-delay 1
+        if [ ${{ matrix.sklearn-only }} ]; then
+          sklearn="-m sklearn";
+        fi
+        if [ ${{ matrix.code-cov }} ]; then
+          codecov="--cov=openml --long  --cov-report=xml";
+        fi
+        pytest \
+          --verbose \
+          -n "${{env.cores}}" \
+          --capture="${{env.capture}}" \
+          --durations="${{env.durations}}" \
+          --timeout="${{env.timeout}}" \
+          --timeout-method="${{env.timeout_method}}" \
+          --dist "${{env.dist}}" \
+          --reruns "${{env.reruns}}" \
+          --reruns-delay "${{env.reruns_delay}}" \
+          ${sklearn} \
+          ${codecov} \
+          -o log_cli="${{env.log_cli}}"
     - name: Check for files left behind by test
-      if: matrix.os != 'windows-latest' && always()
+      if: always()
+      shell: bash
       run: |
         before="${{ steps.status-before.outputs.BEFORE }}"
         after="$(git status --porcelain -b)"
