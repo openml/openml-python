@@ -169,7 +169,7 @@ class OpenMLRun(OpenMLBase):
         return self._predictions
 
     @property
-    def id(self) -> int | None:  # noqa: A003
+    def id(self) -> int | None:
         """The ID of the run, None if not uploaded to the server yet."""
         return self.run_id
 

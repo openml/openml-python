@@ -272,7 +272,7 @@ class OpenMLDataset(OpenMLBase):
         return self._qualities
 
     @property
-    def id(self) -> int | None:  # noqa: A003
+    def id(self) -> int | None:
         """Get the dataset numeric id."""
         return self.dataset_id
 
