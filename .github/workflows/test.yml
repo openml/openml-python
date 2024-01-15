@@ -124,7 +124,7 @@ jobs:
           after="$(git status --porcelain -b)"
           before="${{ env.BEFORE }}"
           if [[ "${before}" != "$after" ]]; then
-              echo "git status from before: ${before }"
+              echo "git status from before: ${before}"
               echo "git status from after: ${after}"
               echo "Not all generated files have been deleted!"
               exit 1
