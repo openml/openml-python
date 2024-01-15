@@ -90,11 +90,11 @@ jobs:
               pip install scipy
           fi
       - name: Store repository status
-        id: status-before
+        id: status_before
         run: |
           status="$(git status --porcelain -b)"
           echo $status
-          echo "BEFORE=${status}" >> "$GITHUB_ENV"
+          echo "BEFORE=${status}" >> $GITHUB_ENV
       - name: Run tests on Ubuntu
         shell: bash
         run: |
@@ -120,8 +120,8 @@ jobs:
         shell: bash
         run: |
           after="$(git status --porcelain -b)"
-          before="${{ steps.unit_test_report.outputs }}"
-          if [[ "${before}" != "$after" ]]; then
+          before="${{ steps.status_before.outputs.BEFORE }}"
+          if [[ "${before}" != "${after}" ]]; then
               echo "git status from before: ${before}"
               echo "git status from after: ${after}"
               echo "Not all generated files have been deleted!"
