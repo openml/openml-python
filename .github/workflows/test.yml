@@ -91,7 +91,7 @@ jobs:
           fi
       - name: Store repository status
         id: status-before
-        run: echo "BEFORE=$(git status --porcelain -b)" >> "$GITHUB_ENV"
+        run: echo "BEFORE=$(git status --porcelain -b)" >> $GITHUB_ENV
       - name: Run tests on Ubuntu
         shell: bash
         run: |
