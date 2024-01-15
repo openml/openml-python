@@ -76,6 +76,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[test]"
 
+          if [ ${{ matrix.numpy-version }} ]; then
+              pip install numpy==${{ matrix.numpy-version }}
+          fi
           if [ ${{ matrix.scikit-learn }} ]; then
               pip install scikit-learn==${{ matrix.scikit-learn }}
           else
