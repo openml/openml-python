@@ -1,24 +1,19 @@
 name: Tests
-
 on:
   workflow_dispatch:
-
   push:
     branches:
       - main
       - develop
     tags:
       - "v*.*.*"
-
   pull_request:
     branches:
       - main
       - develop
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-
 env:
   cores: 4
   durations: 20
@@ -29,13 +24,12 @@ env:
   reruns_delay: 1
   log_cli: true
   capture: no
-
 jobs:
   test:
     name: (${{ matrix.os }}, Py${{ matrix.python-version }}, sk${{ matrix.scikit-learn }}, sk-only:${{ matrix.sklearn-only }})
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast:  false
+      fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         os: [ubuntu-latest]
@@ -44,7 +38,7 @@ jobs:
           - os: ubuntu-latest
             python-version: "3.8"
             scikit-learn: "0.23.1"
-            numpy-version: "1.23.5"  # TODO(eddiebergman): Legacy w/ sklearn
+            numpy-version: "1.23.5" # TODO(eddiebergman): Legacy w/ sklearn
             sklearn-only: true
           - os: ubuntu-latest
             python-version: "3.8"
@@ -67,76 +61,73 @@ jobs:
           - os: windows-latest
             python-version: "3.8"
             scikit-learn: 0.24.*
-            scipy: "1.10.0"  # Fails with earlier version of scipy
-
+            scipy: "1.10.0" # Fails with earlier version of scipy
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 2
-    - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install test dependencies
-      shell: bash
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e ".[test]"
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install test dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[test]"
 
-        if [ ${{ matrix.scikit-learn }} ]; then
-            pip install scikit-learn==${{ matrix.scikit-learn }}
-        else
-            pip install scikit-learn
-        fi
-        if [ ${{ matrix.scipy }} ]; then
-            pip install scipy==${{ matrix.scipy }}
-        else
-            pip install scipy
-        fi
-    - name: Store repository status
-      id: status-before
-      run: echo "BEFORE=$(git status --porcelain -b)" >> "$GITHUB_ENV"
-    - name: Run tests on Ubuntu
-      shell: bash
-      run: |
-        set -x  # Print out the command run
-        # Most of the time, running only the scikit-learn tests is sufficient
-        if [ ${{ matrix.sklearn-only }} ]; then
-          sklearn="-m sklearn";
-        fi
-        if [ ${{ matrix.code-cov }} ]; then
-          codecov="--cov=openml --long  --cov-report=xml";
-        fi
-        pytest \
-          --verbose \
-          -n "${{env.cores}}" \
-          --capture="${{env.capture}}" \
-          --durations="${{env.durations}}" \
-          --timeout="${{env.timeout}}" \
-          --timeout-method="${{env.timeout_method}}" \
-          --dist "${{env.dist}}" \
-          --reruns "${{env.reruns}}" \
-          --reruns-delay "${{env.reruns_delay}}" \
-          ${sklearn} \
-          ${codecov} \
-          -o log_cli="${{env.log_cli}}"
-    - name: Check for files left behind by test
-      if: always()
-      shell: bash
-      run: |
-        before="${{ steps.status-before.outputs.BEFORE }}"
-        after="$(git status --porcelain -b)"
-        if [[ "$before" != "$after" ]]; then
-            echo "git status from before: $before"
-            echo "git status from after: $after"
-            echo "Not all generated files have been deleted!"
-            exit 1
-        fi
-    - name: Upload coverage
-      if: matrix.code-cov && always()
-      uses: codecov/codecov-action@v3
-      with:
-        files: coverage.xml
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: true
-        verbose: true
+          if [ ${{ matrix.scikit-learn }} ]; then
+              pip install scikit-learn==${{ matrix.scikit-learn }}
+          else
+              pip install scikit-learn
+          fi
+          if [ ${{ matrix.scipy }} ]; then
+              pip install scipy==${{ matrix.scipy }}
+          else
+              pip install scipy
+          fi
+      - name: Store repository status
+        id: status-before
+        run: echo "BEFORE=$(git status --porcelain -b)" >> "$GITHUB_ENV"
+      - name: Run tests on Ubuntu
+        shell: bash
+        run: |
+          set -x  # Print out the command run
+          # Most of the time, running only the scikit-learn tests is sufficient
+          if [ ${{ matrix.sklearn-only }} ]; then sklearn="-m sklearn"; fi
+          if [ ${{ matrix.code-cov }} ]; then codecov="--cov=openml --long  --cov-report=xml"; fi
+          pytest \
+            --verbose \
+            -n "${{env.cores}}" \
+            --capture="${{env.capture}}" \
+            --durations="${{env.durations}}" \
+            --timeout="${{env.timeout}}" \
+            --timeout-method="${{env.timeout_method}}" \
+            --dist "${{env.dist}}" \
+            --reruns "${{env.reruns}}" \
+            --reruns-delay "${{env.reruns_delay}}" \
+            ${sklearn} \
+            ${codecov} \
+            -o log_cli="${{env.log_cli}}"
+      - name: Check for files left behind by test
+        if: always()
+        shell: bash
+        env:
+          BEFORE: "${{ steps.status-before.outputs.BEFORE }}"
+        run: |
+          after="$(git status --porcelain -b)"
+          before="${{ env.BEFORE }}"
+          if [[ "${before}" != "$after" ]]; then
+              echo "git status from before: ${before }"
+              echo "git status from after: ${after}"
+              echo "Not all generated files have been deleted!"
+              exit 1
+          fi
+      - name: Upload coverage
+        if: matrix.code-cov && always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          verbose: true
