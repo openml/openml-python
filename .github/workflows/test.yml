@@ -91,6 +91,7 @@ jobs:
           fi
       - name: Store repository status
         id: status_before
+        shell: bash
         run: |
           status="$(git status --porcelain -b)"
           echo $status
