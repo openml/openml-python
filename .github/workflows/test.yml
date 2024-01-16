@@ -120,7 +120,7 @@ jobs:
         shell: bash
         run: |
           after="$(git status --porcelain -b)"
-          before="${{ steps.status_before.outputs.BEFORE }}"
+          before="${{ env.BEFORE }}"
           if [[ "${before}" != "${after}" ]]; then
               echo "git status from before: ${before}"
               echo "git status from after: ${after}"
