@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**01:33.306** total execution time for 4 files **from examples/40_paper**:
+**03:25.446** total execution time for 4 files **from examples/40_paper**:
 
 .. container::
 
@@ -33,14 +33,14 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_examples_40_paper_2018_kdd_rijn_example.py` (``2018_kdd_rijn_example.py``)
-     - 01:03.386
-     - 0.0
-   * - :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py` (``2018_neurips_perrone_example.py``)
-     - 00:25.521
-     - 0.0
-   * - :ref:`sphx_glr_examples_40_paper_2015_neurips_feurer_example.py` (``2015_neurips_feurer_example.py``)
-     - 00:02.431
+     - 02:05.116
      - 0.0
    * - :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py` (``2018_ida_strang_example.py``)
-     - 00:01.968
+     - 00:37.179
+     - 0.0
+   * - :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py` (``2018_neurips_perrone_example.py``)
+     - 00:25.423
+     - 0.0
+   * - :ref:`sphx_glr_examples_40_paper_2015_neurips_feurer_example.py` (``2015_neurips_feurer_example.py``)
+     - 00:17.728
      - 0.0

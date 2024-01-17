@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:44.135** total execution time for 4 files **from examples/20_basic**:
+**00:41.681** total execution time for 4 files **from examples/20_basic**:
 
 .. container::
 
@@ -33,14 +33,14 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py` (``simple_suites_tutorial.py``)
-     - 00:18.442
+     - 00:14.686
      - 0.0
    * - :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py` (``introduction_tutorial.py``)
-     - 00:09.674
+     - 00:09.992
      - 0.0
    * - :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py` (``simple_datasets_tutorial.py``)
-     - 00:09.036
+     - 00:08.949
      - 0.0
    * - :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py` (``simple_flows_and_runs_tutorial.py``)
-     - 00:06.983
+     - 00:08.054
      - 0.0
