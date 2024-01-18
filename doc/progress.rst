@@ -9,10 +9,19 @@ Changelog
 next
 ~~~~~~
 
+ * ...
+
+0.14.2
+~~~~~~
+
  * MAINT #1280: Use the server-provided ``parquet_url`` instead of ``minio_url`` to determine the location of the parquet file.
  * ADD #716: add documentation for remaining attributes of classes and functions.
  * ADD #1261: more annotations for type hints.
  * MAINT #1294: update tests to new tag specification.
+ * FIX #1314: Update fetching a bucket from MinIO.
+ * FIX #1315: Make class label retrieval more lenient.
+ * ADD #1316: add feature descriptions ontologies support.
+ * MAINT #1310/#1307: switch to ruff and resolve all mypy errors.
 
 0.14.1
 ~~~~~~
