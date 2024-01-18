@@ -245,16 +245,16 @@ available for this run.
     predictive_accuracy
 
     The performance metric is recorded under `predictive_accuracy` per fold and can be retrieved as: 
-    Repeat #0-Fold #0: 0.7800
-    Repeat #0-Fold #1: 0.7722
-    Repeat #0-Fold #2: 0.7818
-    Repeat #0-Fold #3: 0.7836
-    Repeat #0-Fold #4: 0.7836
-    Repeat #0-Fold #5: 0.7849
-    Repeat #0-Fold #6: 0.7693
-    Repeat #0-Fold #7: 0.7755
-    Repeat #0-Fold #8: 0.7876
-    Repeat #0-Fold #9: 0.7766
+    Repeat #0-Fold #0: 0.7789
+    Repeat #0-Fold #1: 0.7653
+    Repeat #0-Fold #2: 0.7731
+    Repeat #0-Fold #3: 0.7769
+    Repeat #0-Fold #4: 0.7809
+    Repeat #0-Fold #5: 0.7854
+    Repeat #0-Fold #6: 0.7706
+    Repeat #0-Fold #7: 0.7677
+    Repeat #0-Fold #8: 0.7742
+    Repeat #0-Fold #9: 0.7780
 
 
 
@@ -292,16 +292,16 @@ follows the same procedure but for time taken for the `.predict()` procedure.
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: CPU-242.602 vs Wall-242.633
-    Repeat #0-Fold #1: CPU-242.594 vs Wall-242.609
-    Repeat #0-Fold #2: CPU-247.307 vs Wall-247.310
-    Repeat #0-Fold #3: CPU-242.724 vs Wall-242.666
-    Repeat #0-Fold #4: CPU-243.050 vs Wall-243.054
-    Repeat #0-Fold #5: CPU-239.392 vs Wall-239.397
-    Repeat #0-Fold #6: CPU-240.501 vs Wall-240.506
-    Repeat #0-Fold #7: CPU-242.013 vs Wall-241.103
-    Repeat #0-Fold #8: CPU-239.574 vs Wall-239.588
-    Repeat #0-Fold #9: CPU-240.326 vs Wall-240.330
+    Repeat #0-Fold #0: CPU-243.623 vs Wall-243.626
+    Repeat #0-Fold #1: CPU-243.925 vs Wall-243.938
+    Repeat #0-Fold #2: CPU-244.411 vs Wall-244.414
+    Repeat #0-Fold #3: CPU-241.896 vs Wall-241.847
+    Repeat #0-Fold #4: CPU-246.120 vs Wall-246.135
+    Repeat #0-Fold #5: CPU-243.298 vs Wall-243.301
+    Repeat #0-Fold #6: CPU-244.119 vs Wall-244.123
+    Repeat #0-Fold #7: CPU-247.025 vs Wall-246.020
+    Repeat #0-Fold #8: CPU-245.898 vs Wall-245.902
+    Repeat #0-Fold #9: CPU-243.679 vs Wall-243.683
 
 
 
@@ -374,16 +374,16 @@ Redefining the model to allow parallelism with `n_jobs=2` (2 cores)
       return datasets.get_dataset(self.dataset_id)
     /home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       openml.datasets.get_dataset(task.dataset_id).name,
-    Repeat #0-Fold #0: CPU-266.899 vs Wall-155.722
-    Repeat #0-Fold #1: CPU-257.467 vs Wall-152.790
-    Repeat #0-Fold #2: CPU-248.224 vs Wall-143.301
-    Repeat #0-Fold #3: CPU-256.451 vs Wall-153.735
-    Repeat #0-Fold #4: CPU-249.611 vs Wall-143.749
-    Repeat #0-Fold #5: CPU-274.070 vs Wall-163.579
-    Repeat #0-Fold #6: CPU-258.528 vs Wall-152.997
-    Repeat #0-Fold #7: CPU-252.758 vs Wall-143.610
-    Repeat #0-Fold #8: CPU-249.798 vs Wall-143.924
-    Repeat #0-Fold #9: CPU-248.372 vs Wall-143.143
+    Repeat #0-Fold #0: CPU-260.324 vs Wall-174.248
+    Repeat #0-Fold #1: CPU-259.602 vs Wall-153.508
+    Repeat #0-Fold #2: CPU-250.292 vs Wall-142.233
+    Repeat #0-Fold #3: CPU-248.486 vs Wall-143.214
+    Repeat #0-Fold #4: CPU-312.974 vs Wall-184.212
+    Repeat #0-Fold #5: CPU-287.214 vs Wall-163.219
+    Repeat #0-Fold #6: CPU-263.559 vs Wall-154.494
+    Repeat #0-Fold #7: CPU-284.553 vs Wall-162.868
+    Repeat #0-Fold #8: CPU-248.896 vs Wall-143.347
+    Repeat #0-Fold #9: CPU-267.007 vs Wall-154.332
 
 
 
@@ -457,16 +457,16 @@ Running a Random Forest model on an OpenML task in parallel (all cores available
       return datasets.get_dataset(self.dataset_id)
     /home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       openml.datasets.get_dataset(task.dataset_id).name,
-    Repeat #0-Fold #0: CPU-321.973 vs Wall-123.216
-    Repeat #0-Fold #1: CPU-322.366 vs Wall-123.000
-    Repeat #0-Fold #2: CPU-309.130 vs Wall-118.808
-    Repeat #0-Fold #3: CPU-321.876 vs Wall-122.976
-    Repeat #0-Fold #4: CPU-326.296 vs Wall-128.860
-    Repeat #0-Fold #5: CPU-312.185 vs Wall-120.547
-    Repeat #0-Fold #6: CPU-312.000 vs Wall-124.008
-    Repeat #0-Fold #7: CPU-313.076 vs Wall-125.335
-    Repeat #0-Fold #8: CPU-317.386 vs Wall-128.949
-    Repeat #0-Fold #9: CPU-319.850 vs Wall-124.805
+    Repeat #0-Fold #0: CPU-319.093 vs Wall-123.910
+    Repeat #0-Fold #1: CPU-315.432 vs Wall-123.259
+    Repeat #0-Fold #2: CPU-307.574 vs Wall-122.789
+    Repeat #0-Fold #3: CPU-316.000 vs Wall-123.517
+    Repeat #0-Fold #4: CPU-327.437 vs Wall-136.415
+    Repeat #0-Fold #5: CPU-316.715 vs Wall-125.195
+    Repeat #0-Fold #6: CPU-321.856 vs Wall-132.699
+    Repeat #0-Fold #7: CPU-312.104 vs Wall-121.273
+    Repeat #0-Fold #8: CPU-312.474 vs Wall-119.301
+    Repeat #0-Fold #9: CPU-312.718 vs Wall-118.520
 
 
 
@@ -508,16 +508,16 @@ the job distribution can change and therefore the scale of runtimes recorded too
 
     /home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       return datasets.get_dataset(self.dataset_id)
-    Repeat #0-Fold #0: CPU-382.537 vs Wall-415.756
-    Repeat #0-Fold #1: CPU-377.590 vs Wall-418.533
-    Repeat #0-Fold #2: CPU-376.581 vs Wall-382.046
-    Repeat #0-Fold #3: CPU-380.572 vs Wall-380.002
-    Repeat #0-Fold #4: CPU-400.509 vs Wall-337.454
-    Repeat #0-Fold #5: CPU-371.014 vs Wall-330.207
-    Repeat #0-Fold #6: CPU-382.229 vs Wall-387.661
-    Repeat #0-Fold #7: CPU-373.994 vs Wall-397.378
-    Repeat #0-Fold #8: CPU-372.788 vs Wall-226.100
-    Repeat #0-Fold #9: CPU-349.157 vs Wall-210.284
+    Repeat #0-Fold #0: CPU-371.749 vs Wall-274.745
+    Repeat #0-Fold #1: CPU-376.994 vs Wall-372.747
+    Repeat #0-Fold #2: CPU-368.309 vs Wall-392.530
+    Repeat #0-Fold #3: CPU-376.299 vs Wall-387.705
+    Repeat #0-Fold #4: CPU-365.095 vs Wall-337.576
+    Repeat #0-Fold #5: CPU-366.051 vs Wall-286.695
+    Repeat #0-Fold #6: CPU-375.492 vs Wall-381.082
+    Repeat #0-Fold #7: CPU-366.340 vs Wall-369.500
+    Repeat #0-Fold #8: CPU-355.077 vs Wall-208.536
+    Repeat #0-Fold #9: CPU-341.147 vs Wall-198.037
 
 
 
@@ -578,16 +578,16 @@ included in the `wall_clock_time_millis_training` measure recorded.
 
     /home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       return datasets.get_dataset(self.dataset_id)
-    Repeat #0-Fold #0: CPU-6650.354 vs Wall-3678.067
-    Repeat #0-Fold #1: CPU-6651.867 vs Wall-3666.278
-    Repeat #0-Fold #2: CPU-6616.998 vs Wall-3674.221
-    Repeat #0-Fold #3: CPU-6634.860 vs Wall-3674.693
-    Repeat #0-Fold #4: CPU-6559.111 vs Wall-3588.611
-    Repeat #0-Fold #5: CPU-6517.747 vs Wall-3582.486
-    Repeat #0-Fold #6: CPU-6614.881 vs Wall-3656.825
-    Repeat #0-Fold #7: CPU-6627.552 vs Wall-3671.911
-    Repeat #0-Fold #8: CPU-6605.665 vs Wall-3645.241
-    Repeat #0-Fold #9: CPU-6571.152 vs Wall-3626.976
+    Repeat #0-Fold #0: CPU-6205.857 vs Wall-3437.135
+    Repeat #0-Fold #1: CPU-6600.988 vs Wall-3626.321
+    Repeat #0-Fold #2: CPU-6466.119 vs Wall-3628.507
+    Repeat #0-Fold #3: CPU-6605.629 vs Wall-3752.351
+    Repeat #0-Fold #4: CPU-6599.423 vs Wall-3661.778
+    Repeat #0-Fold #5: CPU-6614.434 vs Wall-3675.460
+    Repeat #0-Fold #6: CPU-6507.427 vs Wall-3689.096
+    Repeat #0-Fold #7: CPU-6542.180 vs Wall-3720.910
+    Repeat #0-Fold #8: CPU-6524.872 vs Wall-3604.890
+    Repeat #0-Fold #9: CPU-6463.095 vs Wall-3586.576
 
 
 
@@ -627,7 +627,7 @@ the 2-fold (inner) CV search performed.
 
     # repeats: 1
     # folds: 10
-    3678.067207336426
+    3437.1345043182373
 
 
 
@@ -667,12 +667,12 @@ the 1-st repeat, 4-th fold evaluation by the Grid Search model.
 
  .. code-block:: none
 
-    Total runtime for repeat 0's fold 3: 3674.693346 ms
-    n_estimators:  1 - score: 0.775
-    n_estimators: 13 - score: 0.802
-    n_estimators: 25 - score: 0.803
-    n_estimators: 37 - score: 0.803
-    n_estimators: 50 - score: 0.805
+    Total runtime for repeat 0's fold 3: 3752.350569 ms
+    n_estimators:  1 - score: 0.760
+    n_estimators: 13 - score: 0.799
+    n_estimators: 25 - score: 0.802
+    n_estimators: 37 - score: 0.805
+    n_estimators: 50 - score: 0.806
 
 
 
@@ -723,16 +723,16 @@ This refit time can therefore be explicitly extracted in this manner:
 
  .. code-block:: none
 
-    Repeat #0-Fold #0: 815.4852
-    Repeat #0-Fold #1: 811.6798
-    Repeat #0-Fold #2: 810.5903
-    Repeat #0-Fold #3: 814.1341
-    Repeat #0-Fold #4: 800.9026
-    Repeat #0-Fold #5: 808.1834
-    Repeat #0-Fold #6: 818.9623
-    Repeat #0-Fold #7: 824.2884
-    Repeat #0-Fold #8: 810.1387
-    Repeat #0-Fold #9: 811.3103
+    Repeat #0-Fold #0: 615.7343
+    Repeat #0-Fold #1: 802.8400
+    Repeat #0-Fold #2: 811.4119
+    Repeat #0-Fold #3: 810.4417
+    Repeat #0-Fold #4: 811.5888
+    Repeat #0-Fold #5: 809.4893
+    Repeat #0-Fold #6: 804.7049
+    Repeat #0-Fold #7: 795.7842
+    Repeat #0-Fold #8: 797.6775
+    Repeat #0-Fold #9: 733.0327
 
 
 
@@ -885,16 +885,16 @@ using OpenML to parallelize evaluations for the outer-cross validation folds.
 
     /home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       return datasets.get_dataset(self.dataset_id)
-    Repeat #0-Fold #0: CPU-85.139 vs Wall-85.141
-    Repeat #0-Fold #1: CPU-82.137 vs Wall-82.139
-    Repeat #0-Fold #2: CPU-83.594 vs Wall-83.627
-    Repeat #0-Fold #3: CPU-85.429 vs Wall-85.446
-    Repeat #0-Fold #4: CPU-83.915 vs Wall-83.916
-    Repeat #0-Fold #5: CPU-83.734 vs Wall-83.736
-    Repeat #0-Fold #6: CPU-84.816 vs Wall-84.827
-    Repeat #0-Fold #7: CPU-85.054 vs Wall-85.057
-    Repeat #0-Fold #8: CPU-82.243 vs Wall-82.244
-    Repeat #0-Fold #9: CPU-83.411 vs Wall-83.412
+    Repeat #0-Fold #0: CPU-81.831 vs Wall-81.859
+    Repeat #0-Fold #1: CPU-82.860 vs Wall-82.868
+    Repeat #0-Fold #2: CPU-81.890 vs Wall-81.891
+    Repeat #0-Fold #3: CPU-83.700 vs Wall-83.701
+    Repeat #0-Fold #4: CPU-83.925 vs Wall-83.926
+    Repeat #0-Fold #5: CPU-83.685 vs Wall-83.687
+    Repeat #0-Fold #6: CPU-84.669 vs Wall-84.670
+    Repeat #0-Fold #7: CPU-84.595 vs Wall-84.596
+    Repeat #0-Fold #8: CPU-82.103 vs Wall-82.102
+    Repeat #0-Fold #9: CPU-84.675 vs Wall-84.675
 
 
 
@@ -929,34 +929,26 @@ This can result in surprising runtime measures as demonstrated below:
       return datasets.get_dataset(self.dataset_id)
     /home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       openml.datasets.get_dataset(task.dataset_id).name,
-    /home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      return datasets.get_dataset(self.dataset_id)
-    /home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      return datasets.get_dataset(self.dataset_id)
-    /home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      openml.datasets.get_dataset(task.dataset_id).name,
-    /home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      openml.datasets.get_dataset(task.dataset_id).name,
     /home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       openml.datasets.get_dataset(task.dataset_id).name,
     /home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       return datasets.get_dataset(self.dataset_id)
+    /home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+      openml.datasets.get_dataset(task.dataset_id).name,
     /home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       return datasets.get_dataset(self.dataset_id)
     /home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       openml.datasets.get_dataset(task.dataset_id).name,
-    /home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
-      openml.datasets.get_dataset(task.dataset_id).name,
-    Repeat #0-Fold #0: CPU-371.948 vs Wall-175.246
-    Repeat #0-Fold #1: CPU-388.073 vs Wall-180.891
-    Repeat #0-Fold #2: CPU-379.736 vs Wall-174.143
-    Repeat #0-Fold #3: CPU-378.667 vs Wall-164.667
-    Repeat #0-Fold #4: CPU-341.830 vs Wall-170.348
-    Repeat #0-Fold #5: CPU-334.463 vs Wall-121.615
-    Repeat #0-Fold #6: CPU-367.362 vs Wall-153.852
-    Repeat #0-Fold #7: CPU-358.944 vs Wall-149.389
-    Repeat #0-Fold #8: CPU-171.455 vs Wall-111.555
-    Repeat #0-Fold #9: CPU-144.623 vs Wall-85.923
+    Repeat #0-Fold #0: CPU-368.978 vs Wall-176.697
+    Repeat #0-Fold #1: CPU-354.199 vs Wall-144.981
+    Repeat #0-Fold #2: CPU-376.236 vs Wall-173.123
+    Repeat #0-Fold #3: CPU-391.213 vs Wall-178.883
+    Repeat #0-Fold #4: CPU-350.802 vs Wall-170.731
+    Repeat #0-Fold #5: CPU-375.879 vs Wall-164.773
+    Repeat #0-Fold #6: CPU-359.683 vs Wall-169.689
+    Repeat #0-Fold #7: CPU-325.232 vs Wall-112.342
+    Repeat #0-Fold #8: CPU-164.136 vs Wall-108.951
+    Repeat #0-Fold #9: CPU-163.915 vs Wall-110.515
 
 
 
@@ -1048,16 +1040,16 @@ parallelism using libraries such as `MKL, OpenBLAS or BLIS
       openml.datasets.get_dataset(task.dataset_id).name,
     /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn't converged yet.
       warnings.warn(
-    Repeat #0-Fold #0: CPU-956.914 vs Wall-956.962
-    Repeat #0-Fold #1: CPU-1288.060 vs Wall-1001.780
-    Repeat #0-Fold #2: CPU-1292.744 vs Wall-1007.884
-    Repeat #0-Fold #3: CPU-1292.501 vs Wall-1008.270
-    Repeat #0-Fold #4: CPU-1292.178 vs Wall-1009.069
-    Repeat #0-Fold #5: CPU-1298.673 vs Wall-1014.543
-    Repeat #0-Fold #6: CPU-1287.939 vs Wall-1006.454
-    Repeat #0-Fold #7: CPU-1293.478 vs Wall-1010.144
-    Repeat #0-Fold #8: CPU-1286.410 vs Wall-1004.046
-    Repeat #0-Fold #9: CPU-1296.635 vs Wall-1012.330
+    Repeat #0-Fold #0: CPU-934.333 vs Wall-934.352
+    Repeat #0-Fold #1: CPU-1270.033 vs Wall-983.140
+    Repeat #0-Fold #2: CPU-1265.729 vs Wall-980.385
+    Repeat #0-Fold #3: CPU-1263.288 vs Wall-976.448
+    Repeat #0-Fold #4: CPU-1281.097 vs Wall-998.048
+    Repeat #0-Fold #5: CPU-1264.367 vs Wall-979.883
+    Repeat #0-Fold #6: CPU-1260.350 vs Wall-976.273
+    Repeat #0-Fold #7: CPU-1176.044 vs Wall-969.798
+    Repeat #0-Fold #8: CPU-1261.513 vs Wall-977.615
+    Repeat #0-Fold #9: CPU-1275.951 vs Wall-991.421
 
 
 
@@ -1096,16 +1088,16 @@ that only very few models such as naive Bayes models are of this kind.
 
     /home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       return datasets.get_dataset(self.dataset_id)
-    Repeat #0-Fold #0: CPU-63.971 vs Wall-64.383
-    Repeat #0-Fold #1: CPU-63.809 vs Wall-64.106
-    Repeat #0-Fold #2: CPU-62.732 vs Wall-63.608
-    Repeat #0-Fold #3: CPU-62.860 vs Wall-63.288
-    Repeat #0-Fold #4: CPU-58.690 vs Wall-60.084
-    Repeat #0-Fold #5: CPU-59.764 vs Wall-59.810
-    Repeat #0-Fold #6: CPU-59.898 vs Wall-60.041
-    Repeat #0-Fold #7: CPU-59.883 vs Wall-60.911
-    Repeat #0-Fold #8: CPU-34.803 vs Wall-34.805
-    Repeat #0-Fold #9: CPU-33.986 vs Wall-34.009
+    Repeat #0-Fold #0: CPU-63.157 vs Wall-63.573
+    Repeat #0-Fold #1: CPU-62.866 vs Wall-63.256
+    Repeat #0-Fold #2: CPU-62.476 vs Wall-62.481
+    Repeat #0-Fold #3: CPU-62.547 vs Wall-62.852
+    Repeat #0-Fold #4: CPU-58.364 vs Wall-58.437
+    Repeat #0-Fold #5: CPU-60.423 vs Wall-60.483
+    Repeat #0-Fold #6: CPU-59.434 vs Wall-59.436
+    Repeat #0-Fold #7: CPU-61.701 vs Wall-61.951
+    Repeat #0-Fold #8: CPU-33.792 vs Wall-33.793
+    Repeat #0-Fold #9: CPU-33.777 vs Wall-33.778
 
 
 
@@ -1162,7 +1154,7 @@ when reporting runtimes for scikit-learn models measured with OpenML-Python!
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 40.320 seconds)
+   **Total running time of the script:** (1 minutes 29.016 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_fetch_runtimes_tutorial.py:

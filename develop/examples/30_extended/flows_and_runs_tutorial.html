@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Flows and Runs &#8212; OpenML 0.14.1 documentation</title>
+    <title>Flows and Runs &#8212; OpenML 0.14.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
     <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
@@ -13,7 +13,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=421f3d0b"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=75e7b761"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -55,7 +55,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           OpenML</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.14.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -259,15 +259,15 @@ OpenML Run
 ==========
 Uploader Name...................: None
 Metric..........................: None
-Local Result - Accuracy (+- STD): 0.8425 +- 0.0115
-Local Runtime - ms (+- STD).....: 165.2095 +- 2.7053
+Local Result - Accuracy (+- STD): 0.8442 +- 0.0104
+Local Runtime - ms (+- STD).....: 165.0995 +- 2.5874
 Run ID..........................: None
 Task ID.........................: 403
 Task Type.......................: None
 Task URL........................: https://test.openml.org/t/403
-Flow ID.........................: 52
+Flow ID.........................: 31062
 Flow Name.......................: sklearn.tree._classes.DecisionTreeClassifier
-Flow URL........................: https://test.openml.org/f/52
+Flow URL........................: https://test.openml.org/f/31062
 Setup ID........................: None
 Setup String....................: Python_3.8.18. Sklearn_1.3.2. NumPy_1.23.5. SciPy_1.10.1.
 Dataset ID......................: 68
@@ -287,7 +287,7 @@ the run is sent to the OpenML server:</p>
   predictions = arff.dumps(self._generate_arff_dict())
 /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
   dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
-Uploaded to https://test.openml.org/r/6517
+Uploaded to https://test.openml.org/r/6964
 </pre></div>
 </div>
 <p>We can now also inspect the flow object which was automatically created:</p>
@@ -297,11 +297,11 @@ Uploaded to https://test.openml.org/r/6517
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Flow
 ===========
-Flow ID.........: 52 (version 1)
-Flow URL........: https://test.openml.org/f/52
+Flow ID.........: 31062 (version 9)
+Flow URL........: https://test.openml.org/f/31062
 Flow Name.......: sklearn.tree._classes.DecisionTreeClassifier
 Flow Description: A decision tree classifier.
-Upload Date.....: 2024-01-10 14:06:35
+Upload Date.....: 2024-01-18 10:02:20
 Dependencies....: sklearn==1.3.2
 numpy&gt;=1.17.3
 scipy&gt;=1.5.0
@@ -404,7 +404,7 @@ variables and missing values in both.</p>
   predictions = arff.dumps(self._generate_arff_dict())
 /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
   dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
-Uploaded to https://test.openml.org/r/6519
+Uploaded to https://test.openml.org/r/6965
 /home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
   return datasets.get_dataset(self.dataset_id)
 /home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
@@ -415,7 +415,7 @@ Uploaded to https://test.openml.org/r/6519
   predictions = arff.dumps(self._generate_arff_dict())
 /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
   dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
-Uploaded to https://test.openml.org/r/6520
+Uploaded to https://test.openml.org/r/6966
 </pre></div>
 </div>
 </section>
@@ -466,16 +466,16 @@ OpenML Run
 ==========
 Uploader Name...................: None
 Metric..........................: None
-Local Result - Accuracy (+- STD): 0.8855 +- 0.0000
-Local Runtime - ms (+- STD).....: 26.4910 +- 0.0000
-Run ID..........................: 6521
-Run URL.........................: https://test.openml.org/r/6521
+Local Result - Accuracy (+- STD): 0.8722 +- 0.0000
+Local Runtime - ms (+- STD).....: 26.7066 +- 0.0000
+Run ID..........................: 6968
+Run URL.........................: https://test.openml.org/r/6968
 Task ID.........................: 96
 Task Type.......................: None
 Task URL........................: https://test.openml.org/t/96
-Flow ID.........................: 14174
+Flow ID.........................: 31468
 Flow Name.......................: sklearn.pipeline.Pipeline(Preprocessing=sklearn.compose._column_transformer.ColumnTransformer(categorical=sklearn.preprocessing._encoders.OneHotEncoder,continuous=sklearn.impute._base.SimpleImputer),Classifier=sklearn.ensemble._forest.RandomForestClassifier)
-Flow URL........................: https://test.openml.org/f/14174
+Flow URL........................: https://test.openml.org/f/31468
 Setup ID........................: None
 Setup String....................: Python_3.8.18. Sklearn_1.3.2. NumPy_1.23.5. SciPy_1.10.1.
 Dataset ID......................: None
@@ -620,13 +620,13 @@ task_id:<a class="reference external" href="https://www.openml.org/t/52950">5295
   predictions = arff.dumps(self._generate_arff_dict())
 /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
   dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
-kNN on diabetes: https://test.openml.org/r/6523
+kNN on diabetes: https://test.openml.org/r/6971
 </pre></div>
 </div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 28.703 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 16.901 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-flows-and-runs-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/d2ac26453b3a61789aac1d07c7d96d8f/flows_and_runs_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">flows_and_runs_tutorial.ipynb</span></code></a></p>

@@ -139,15 +139,15 @@ Running a model on a task
     ==========
     Uploader Name...................: None
     Metric..........................: None
-    Local Result - Accuracy (+- STD): 0.7628 +- 0.0000
-    Local Runtime - ms (+- STD).....: 141.6410 +- 0.0000
+    Local Result - Accuracy (+- STD): 0.7708 +- 0.0000
+    Local Runtime - ms (+- STD).....: 140.0662 +- 0.0000
     Run ID..........................: None
     Task ID.........................: 119
     Task Type.......................: None
     Task URL........................: https://test.openml.org/t/119
-    Flow ID.........................: 44
+    Flow ID.........................: 31001
     Flow Name.......................: sklearn.ensemble._forest.RandomForestClassifier
-    Flow URL........................: https://test.openml.org/f/44
+    Flow URL........................: https://test.openml.org/f/31001
     Setup ID........................: None
     Setup String....................: Python_3.8.18. Sklearn_1.3.2. NumPy_1.23.5. SciPy_1.10.1.
     Dataset ID......................: 20
@@ -182,8 +182,8 @@ Publishing the run
       predictions = arff.dumps(self._generate_arff_dict())
     /home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
       dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
-    Run was uploaded to https://test.openml.org/r/6421
-    The flow can be found at https://test.openml.org/f/44
+    Run was uploaded to https://test.openml.org/r/6869
+    The flow can be found at https://test.openml.org/f/31001
 
 
 
@@ -203,7 +203,7 @@ Publishing the run
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 8.054 seconds)
+   **Total running time of the script:** (0 minutes 5.794 seconds)
 
 
 .. _sphx_glr_download_examples_20_basic_simple_flows_and_runs_tutorial.py:
