@@ -324,11 +324,11 @@ because we upload some random data.
       return __list_tasks(api_call=api_call, output_format=output_format)
     OpenML Benchmark Suite
     ======================
-    ID..............: 591
+    ID..............: 615
     Name............: Test-Suite
     Status..........: None
     Main Entity Type: task
-    Study URL.......: https://test.openml.org/s/591
+    Study URL.......: https://test.openml.org/s/615
     # of Tasks......: 20
 
 
@@ -349,7 +349,7 @@ because we upload some random data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 37.431 seconds)
+   **Total running time of the script:** (2 minutes 22.760 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_suites_tutorial.py:
