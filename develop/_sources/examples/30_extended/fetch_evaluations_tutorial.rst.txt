@@ -399,7 +399,7 @@ We'll now obtain the evaluations of a task and a flow with the hyperparameters
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (4 minutes 38.709 seconds)
+   **Total running time of the script:** (3 minutes 41.387 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_fetch_evaluations_tutorial.py:
