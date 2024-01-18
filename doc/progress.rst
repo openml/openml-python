@@ -19,7 +19,7 @@ next
  * ADD #1261: more annotations for type hints.
  * MAINT #1294: update tests to new tag specification.
  * FIX #1314: Update fetching a bucket from MinIO.
- * FIX #1315: Make class label retrival more lenient.
+ * FIX #1315: Make class label retrieval more lenient.
  * ADD #1316: add feature descriptions ontologies support.
  * MAINT #1310/#1307: switch to ruff and resolve all mypy errors.
 
