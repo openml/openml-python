@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**21:29.634** total execution time for 22 files **from all galleries**:
+**17:11.441** total execution time for 22 files **from all galleries**:
 
 .. container::
 
@@ -33,64 +33,64 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_examples_40_paper_2018_kdd_rijn_example.py` (``../examples/40_paper/2018_kdd_rijn_example.py``)
-     - 05:14.232
+     - 02:23.221
      - 0.0
    * - :ref:`sphx_glr_examples_30_extended_tasks_tutorial.py` (``../examples/30_extended/tasks_tutorial.py``)
-     - 04:26.089
-     - 0.0
-   * - :ref:`sphx_glr_examples_30_extended_fetch_evaluations_tutorial.py` (``../examples/30_extended/fetch_evaluations_tutorial.py``)
-     - 03:41.387
-     - 0.0
-   * - :ref:`sphx_glr_examples_30_extended_fetch_runtimes_tutorial.py` (``../examples/30_extended/fetch_runtimes_tutorial.py``)
-     - 01:48.680
-     - 0.0
-   * - :ref:`sphx_glr_examples_40_paper_2015_neurips_feurer_example.py` (``../examples/40_paper/2015_neurips_feurer_example.py``)
-     - 01:29.869
-     - 0.0
-   * - :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py` (``../examples/40_paper/2018_ida_strang_example.py``)
-     - 01:00.149
+     - 02:19.648
      - 0.0
    * - :ref:`sphx_glr_examples_30_extended_suites_tutorial.py` (``../examples/30_extended/suites_tutorial.py``)
-     - 00:39.720
-     - 0.0
-   * - :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py` (``../examples/30_extended/datasets_tutorial.py``)
-     - 00:29.251
-     - 0.0
-   * - :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py` (``../examples/40_paper/2018_neurips_perrone_example.py``)
-     - 00:28.719
-     - 0.0
-   * - :ref:`sphx_glr_examples_30_extended_flows_and_runs_tutorial.py` (``../examples/30_extended/flows_and_runs_tutorial.py``)
-     - 00:22.038
+     - 02:09.161
      - 0.0
    * - :ref:`sphx_glr_examples_30_extended_study_tutorial.py` (``../examples/30_extended/study_tutorial.py``)
-     - 00:21.821
+     - 02:07.702
+     - 0.0
+   * - :ref:`sphx_glr_examples_30_extended_datasets_tutorial.py` (``../examples/30_extended/datasets_tutorial.py``)
+     - 01:33.227
+     - 0.0
+   * - :ref:`sphx_glr_examples_30_extended_fetch_runtimes_tutorial.py` (``../examples/30_extended/fetch_runtimes_tutorial.py``)
+     - 01:31.048
+     - 0.0
+   * - :ref:`sphx_glr_examples_30_extended_fetch_evaluations_tutorial.py` (``../examples/30_extended/fetch_evaluations_tutorial.py``)
+     - 01:08.603
+     - 0.0
+   * - :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py` (``../examples/40_paper/2018_ida_strang_example.py``)
+     - 01:06.896
+     - 0.0
+   * - :ref:`sphx_glr_examples_40_paper_2015_neurips_feurer_example.py` (``../examples/40_paper/2015_neurips_feurer_example.py``)
+     - 00:42.348
+     - 0.0
+   * - :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py` (``../examples/40_paper/2018_neurips_perrone_example.py``)
+     - 00:27.847
      - 0.0
    * - :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py` (``../examples/20_basic/simple_suites_tutorial.py``)
-     - 00:21.463
+     - 00:18.273
      - 0.0
-   * - :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py` (``../examples/20_basic/introduction_tutorial.py``)
-     - 00:12.909
-     - 0.0
-   * - :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py` (``../examples/30_extended/flow_id_tutorial.py``)
-     - 00:10.370
-     - 0.0
-   * - :ref:`sphx_glr_examples_30_extended_plot_svm_hyperparameters_tutorial.py` (``../examples/30_extended/plot_svm_hyperparameters_tutorial.py``)
-     - 00:09.683
-     - 0.0
-   * - :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py` (``../examples/20_basic/simple_datasets_tutorial.py``)
-     - 00:09.523
-     - 0.0
-   * - :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py` (``../examples/20_basic/simple_flows_and_runs_tutorial.py``)
-     - 00:07.577
+   * - :ref:`sphx_glr_examples_30_extended_flows_and_runs_tutorial.py` (``../examples/30_extended/flows_and_runs_tutorial.py``)
+     - 00:16.306
      - 0.0
    * - :ref:`sphx_glr_examples_30_extended_run_setup_tutorial.py` (``../examples/30_extended/run_setup_tutorial.py``)
-     - 00:07.176
+     - 00:12.695
+     - 0.0
+   * - :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py` (``../examples/20_basic/introduction_tutorial.py``)
+     - 00:11.596
+     - 0.0
+   * - :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py` (``../examples/30_extended/flow_id_tutorial.py``)
+     - 00:10.073
+     - 0.0
+   * - :ref:`sphx_glr_examples_20_basic_simple_datasets_tutorial.py` (``../examples/20_basic/simple_datasets_tutorial.py``)
+     - 00:08.672
+     - 0.0
+   * - :ref:`sphx_glr_examples_30_extended_plot_svm_hyperparameters_tutorial.py` (``../examples/30_extended/plot_svm_hyperparameters_tutorial.py``)
+     - 00:08.476
      - 0.0
    * - :ref:`sphx_glr_examples_30_extended_task_manual_iteration_tutorial.py` (``../examples/30_extended/task_manual_iteration_tutorial.py``)
-     - 00:05.119
+     - 00:06.558
+     - 0.0
+   * - :ref:`sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py` (``../examples/20_basic/simple_flows_and_runs_tutorial.py``)
+     - 00:05.495
      - 0.0
    * - :ref:`sphx_glr_examples_30_extended_create_upload_tutorial.py` (``../examples/30_extended/create_upload_tutorial.py``)
-     - 00:03.860
+     - 00:03.595
      - 0.0
    * - :ref:`sphx_glr_examples_30_extended_configure_logging.py` (``../examples/30_extended/configure_logging.py``)
      - 00:00.000

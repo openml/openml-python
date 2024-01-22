@@ -439,11 +439,11 @@ suite which is available on the OpenML test server.
       dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
     OpenML Study
     ============
-    ID..............: 664
+    ID..............: 724
     Name............: Test-Study
     Status..........: None
     Main Entity Type: run
-    Study URL.......: https://test.openml.org/s/664
+    Study URL.......: https://test.openml.org/s/724
     # of Runs.......: 3
 
 
@@ -464,7 +464,7 @@ suite which is available on the OpenML test server.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 21.821 seconds)
+   **Total running time of the script:** (2 minutes 7.702 seconds)
 
 
 .. _sphx_glr_download_examples_30_extended_study_tutorial.py:
