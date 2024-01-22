@@ -1,19 +1,37 @@
 name: dist-check
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - "v*.*.*"
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   dist:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.8
     - name: Build dist
       run: |
-        python setup.py sdist
+        pip install build
+        python -m build --sdist
     - name: Twine check
       run: |
         pip install twine

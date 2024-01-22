@@ -1,4 +1,6 @@
 # License: BSD 3-Clause
+from __future__ import annotations
+
 import pytest
 
 import openml
@@ -12,19 +14,26 @@ class TestEvaluationFunctions(TestBase):
 
     def _check_list_evaluation_setups(self, **kwargs):
         evals_setups = openml.evaluations.list_evaluations_setups(
-            "predictive_accuracy", **kwargs, sort_order="desc", output_format="dataframe"
+            "predictive_accuracy",
+            **kwargs,
+            sort_order="desc",
+            output_format="dataframe",
         )
         evals = openml.evaluations.list_evaluations(
-            "predictive_accuracy", **kwargs, sort_order="desc", output_format="dataframe"
+            "predictive_accuracy",
+            **kwargs,
+            sort_order="desc",
+            output_format="dataframe",
         )
 
         # Check if list is non-empty
-        self.assertGreater(len(evals_setups), 0)
+        assert len(evals_setups) > 0
         # Check if length is accurate
-        self.assertEqual(len(evals_setups), len(evals))
+        assert len(evals_setups) == len(evals)
         # Check if output from sort is sorted in the right order
         self.assertSequenceEqual(
-            sorted(evals_setups["value"].tolist(), reverse=True), evals_setups["value"].tolist()
+            sorted(evals_setups["value"].tolist(), reverse=True),
+            evals_setups["value"].tolist(),
         )
 
         # Check if output and order of list_evaluations is preserved
@@ -34,7 +43,7 @@ class TestEvaluationFunctions(TestBase):
             evals_setups = evals_setups.head(1)
 
         # Check if the hyper-parameter column is as accurate and flow_id
-        for index, row in evals_setups.iterrows():
+        for _index, row in evals_setups.iterrows():
             params = openml.runs.get_run(row["run_id"]).parameter_settings
             list1 = [param["oml:value"] for param in params]
             list2 = list(row["parameters"].values())
@@ -42,99 +51,119 @@ class TestEvaluationFunctions(TestBase):
             self.assertSequenceEqual(sorted(list1), sorted(list2))
         return evals_setups
 
+    @pytest.mark.production()
     def test_evaluation_list_filter_task(self):
         openml.config.server = self.production_server
 
         task_id = 7312
 
         evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=110, tasks=[task_id]
+            "predictive_accuracy",
+            size=110,
+            tasks=[task_id],
         )
 
-        self.assertGreater(len(evaluations), 100)
-        for run_id in evaluations.keys():
-            self.assertEqual(evaluations[run_id].task_id, task_id)
+        assert len(evaluations) > 100
+        for run_id in evaluations:
+            assert evaluations[run_id].task_id == task_id
             # default behaviour of this method: return aggregated results (not
             # per fold)
-            self.assertIsNotNone(evaluations[run_id].value)
-            self.assertIsNone(evaluations[run_id].values)
+            assert evaluations[run_id].value is not None
+            assert evaluations[run_id].values is None
 
+    @pytest.mark.production()
     def test_evaluation_list_filter_uploader_ID_16(self):
         openml.config.server = self.production_server
 
         uploader_id = 16
         evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=60, uploaders=[uploader_id], output_format="dataframe"
+            "predictive_accuracy",
+            size=60,
+            uploaders=[uploader_id],
+            output_format="dataframe",
         )
-        self.assertEqual(evaluations["uploader"].unique(), [uploader_id])
+        assert evaluations["uploader"].unique() == [uploader_id]
 
-        self.assertGreater(len(evaluations), 50)
+        assert len(evaluations) > 50
 
+    @pytest.mark.production()
     def test_evaluation_list_filter_uploader_ID_10(self):
         openml.config.server = self.production_server
 
         setup_id = 10
         evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=60, setups=[setup_id]
+            "predictive_accuracy",
+            size=60,
+            setups=[setup_id],
         )
 
-        self.assertGreater(len(evaluations), 50)
-        for run_id in evaluations.keys():
-            self.assertEqual(evaluations[run_id].setup_id, setup_id)
+        assert len(evaluations) > 50
+        for run_id in evaluations:
+            assert evaluations[run_id].setup_id == setup_id
             # default behaviour of this method: return aggregated results (not
             # per fold)
-            self.assertIsNotNone(evaluations[run_id].value)
-            self.assertIsNone(evaluations[run_id].values)
+            assert evaluations[run_id].value is not None
+            assert evaluations[run_id].values is None
 
+    @pytest.mark.production()
     def test_evaluation_list_filter_flow(self):
         openml.config.server = self.production_server
 
         flow_id = 100
 
         evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=10, flows=[flow_id]
+            "predictive_accuracy",
+            size=10,
+            flows=[flow_id],
         )
 
-        self.assertGreater(len(evaluations), 2)
-        for run_id in evaluations.keys():
-            self.assertEqual(evaluations[run_id].flow_id, flow_id)
+        assert len(evaluations) > 2
+        for run_id in evaluations:
+            assert evaluations[run_id].flow_id == flow_id
             # default behaviour of this method: return aggregated results (not
             # per fold)
-            self.assertIsNotNone(evaluations[run_id].value)
-            self.assertIsNone(evaluations[run_id].values)
+            assert evaluations[run_id].value is not None
+            assert evaluations[run_id].values is None
 
+    @pytest.mark.production()
     def test_evaluation_list_filter_run(self):
         openml.config.server = self.production_server
 
         run_id = 12
 
         evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=2, runs=[run_id]
+            "predictive_accuracy",
+            size=2,
+            runs=[run_id],
         )
 
-        self.assertEqual(len(evaluations), 1)
-        for run_id in evaluations.keys():
-            self.assertEqual(evaluations[run_id].run_id, run_id)
+        assert len(evaluations) == 1
+        for run_id in evaluations:
+            assert evaluations[run_id].run_id == run_id
             # default behaviour of this method: return aggregated results (not
             # per fold)
-            self.assertIsNotNone(evaluations[run_id].value)
-            self.assertIsNone(evaluations[run_id].values)
+            assert evaluations[run_id].value is not None
+            assert evaluations[run_id].values is None
 
+    @pytest.mark.production()
     def test_evaluation_list_limit(self):
         openml.config.server = self.production_server
 
         evaluations = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=100, offset=100
+            "predictive_accuracy",
+            size=100,
+            offset=100,
         )
-        self.assertEqual(len(evaluations), 100)
+        assert len(evaluations) == 100
 
     def test_list_evaluations_empty(self):
         evaluations = openml.evaluations.list_evaluations("unexisting_measure")
         if len(evaluations) > 0:
             raise ValueError("UnitTest Outdated, got somehow results")
 
-        self.assertIsInstance(evaluations, dict)
+        assert isinstance(evaluations, dict)
 
+    @pytest.mark.production()
     def test_evaluation_list_per_fold(self):
         openml.config.server = self.production_server
         size = 1000
@@ -152,10 +181,10 @@ class TestEvaluationFunctions(TestBase):
             per_fold=True,
         )
 
-        self.assertEqual(len(evaluations), size)
-        for run_id in evaluations.keys():
-            self.assertIsNone(evaluations[run_id].value)
-            self.assertIsNotNone(evaluations[run_id].values)
+        assert len(evaluations) == size
+        for run_id in evaluations:
+            assert evaluations[run_id].value is None
+            assert evaluations[run_id].values is not None
             # potentially we could also test array values, but these might be
             # added in the future
 
@@ -168,39 +197,48 @@ class TestEvaluationFunctions(TestBase):
             uploaders=uploader_ids,
             per_fold=False,
         )
-        for run_id in evaluations.keys():
-            self.assertIsNotNone(evaluations[run_id].value)
-            self.assertIsNone(evaluations[run_id].values)
+        for run_id in evaluations:
+            assert evaluations[run_id].value is not None
+            assert evaluations[run_id].values is None
 
+    @pytest.mark.production()
     def test_evaluation_list_sort(self):
         openml.config.server = self.production_server
         size = 10
         task_id = 6
         # Get all evaluations of the task
         unsorted_eval = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=None, offset=0, tasks=[task_id]
+            "predictive_accuracy",
+            size=None,
+            offset=0,
+            tasks=[task_id],
         )
         # Get top 10 evaluations of the same task
         sorted_eval = openml.evaluations.list_evaluations(
-            "predictive_accuracy", size=size, offset=0, tasks=[task_id], sort_order="desc"
+            "predictive_accuracy",
+            size=size,
+            offset=0,
+            tasks=[task_id],
+            sort_order="desc",
         )
-        self.assertEqual(len(sorted_eval), size)
-        self.assertGreater(len(unsorted_eval), 0)
+        assert len(sorted_eval) == size
+        assert len(unsorted_eval) > 0
         sorted_output = [evaluation.value for evaluation in sorted_eval.values()]
         unsorted_output = [evaluation.value for evaluation in unsorted_eval.values()]
 
         # Check if output from sort is sorted in the right order
-        self.assertTrue(sorted(sorted_output, reverse=True) == sorted_output)
+        assert sorted(sorted_output, reverse=True) == sorted_output
 
         # Compare manual sorting against sorted output
         test_output = sorted(unsorted_output, reverse=True)
-        self.assertTrue(test_output[:size] == sorted_output)
+        assert test_output[:size] == sorted_output
 
     def test_list_evaluation_measures(self):
         measures = openml.evaluations.list_evaluation_measures()
-        self.assertEqual(isinstance(measures, list), True)
-        self.assertEqual(all([isinstance(s, str) for s in measures]), True)
+        assert isinstance(measures, list) is True
+        assert all(isinstance(s, str) for s in measures) is True
 
+    @pytest.mark.production()
     def test_list_evaluations_setups_filter_flow(self):
         openml.config.server = self.production_server
         flow_id = [405]
@@ -217,8 +255,9 @@ class TestEvaluationFunctions(TestBase):
         )
         columns = list(evals_cols.columns)
         keys = list(evals["parameters"].values[0].keys())
-        self.assertTrue(all(elem in columns for elem in keys))
+        assert all(elem in columns for elem in keys)
 
+    @pytest.mark.production()
     def test_list_evaluations_setups_filter_task(self):
         openml.config.server = self.production_server
         task_id = [6]

@@ -1,9 +1,14 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 import openml.config
+import openml.datasets
+import openml.flows
+import openml.runs
+import openml.tasks
 
 
-class OpenMLEvaluation(object):
+class OpenMLEvaluation:
     """
     Contains all meta-information about a run / evaluation combination,
     according to the evaluation/list function
@@ -41,22 +46,22 @@ class OpenMLEvaluation(object):
         (e.g., in case of precision, auroc, recall)
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
-        run_id,
-        task_id,
-        setup_id,
-        flow_id,
-        flow_name,
-        data_id,
-        data_name,
-        function,
-        upload_time,
+        run_id: int,
+        task_id: int,
+        setup_id: int,
+        flow_id: int,
+        flow_name: str,
+        data_id: int,
+        data_name: str,
+        function: str,
+        upload_time: str,
         uploader: int,
         uploader_name: str,
-        value,
-        values,
-        array_data=None,
+        value: float | None,
+        values: list[float] | None,
+        array_data: str | None = None,
     ):
         self.run_id = run_id
         self.task_id = task_id
@@ -73,7 +78,7 @@ class OpenMLEvaluation(object):
         self.values = values
         self.array_data = array_data
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         header = "OpenML Evaluation"
         header = "{}\n{}\n".format(header, "=" * len(header))
 
@@ -107,9 +112,9 @@ class OpenMLEvaluation(object):
             "Metric Used",
             "Result",
         ]
-        fields = [(key, fields[key]) for key in order if key in fields]
+        _fields = [(key, fields[key]) for key in order if key in fields]
 
-        longest_field_name_length = max(len(name) for name, value in fields)
-        field_line_format = "{{:.<{}}}: {{}}".format(longest_field_name_length)
-        body = "\n".join(field_line_format.format(name, value) for name, value in fields)
+        longest_field_name_length = max(len(name) for name, _ in _fields)
+        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
+        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
         return header + body

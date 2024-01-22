@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 import unittest.mock
+
+import pytest
 
 import openml
 import openml.testing
@@ -6,10 +10,7 @@ import openml.testing
 
 class TestConfig(openml.testing.TestBase):
     def test_too_long_uri(self):
-        with self.assertRaisesRegex(
-            openml.exceptions.OpenMLServerError,
-            "URI too long!",
-        ):
+        with pytest.raises(openml.exceptions.OpenMLServerError, match="URI too long!"):
             openml.datasets.list_datasets(data_id=list(range(10000)), output_format="dataframe")
 
     @unittest.mock.patch("time.sleep")
@@ -25,9 +26,7 @@ class TestConfig(openml.testing.TestBase):
             "</oml:error>"
         )
         Session_class_mock.return_value.__enter__.return_value.get.return_value = response_mock
-        with self.assertRaisesRegex(
-            openml.exceptions.OpenMLServerException, "/abc returned code 107"
-        ):
+        with pytest.raises(openml.exceptions.OpenMLServerException, match="/abc returned code 107"):
             openml._api_calls._send_request("get", "/abc", {})
 
-        self.assertEqual(Session_class_mock.return_value.__enter__.return_value.get.call_count, 20)
+        assert Session_class_mock.return_value.__enter__.return_value.get.call_count == 20

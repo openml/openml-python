@@ -1,15 +1,21 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from .extension import SklearnExtension
+from typing import TYPE_CHECKING
+
 from openml.extensions import register_extension
 
+from .extension import SklearnExtension
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 __all__ = ["SklearnExtension"]
 
 register_extension(SklearnExtension)
 
 
-def cont(X):
+def cont(X: pd.DataFrame) -> pd.Series:
     """Returns True for all non-categorical columns, False for the rest.
 
     This is a helper function for OpenML datasets encoded as DataFrames simplifying the handling
@@ -23,7 +29,7 @@ def cont(X):
     return X.dtypes != "category"
 
 
-def cat(X):
+def cat(X: pd.DataFrame) -> pd.Series:
     """Returns True for all categorical columns, False for the rest.
 
     This is a helper function for OpenML datasets encoded as DataFrames simplifying the handling

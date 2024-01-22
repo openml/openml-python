@@ -1,0 +1,318 @@
+# -*- coding: utf-8 -*-
+
+# License: BSD 3-Clause
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openml"
+dynamic = ["version"]  # Will take it from the __version__ file, update there
+dependencies = [
+  "liac-arff>=2.4.0",
+  "xmltodict",
+  "requests",
+  "scikit-learn>=0.18",
+  "python-dateutil",  # Installed through pandas anyway.
+  "pandas>=1.0.0",
+  "scipy>=0.13.3",
+  "numpy>=1.6.2",
+  "minio",
+  "pyarrow",
+]
+requires-python = ">=3.8"
+authors = [
+  { name = "Matthias Feurer", email="feurerm@informatik.uni-freiburg.de" },
+  { name = "Jan van Rijn" },
+  { name = "Arlind Kadra" },
+  { name = "Pieter Gijsbers" },
+  { name = "Neeratyoy Mallik" },
+  { name = "Sahithya Ravi" },
+  { name = "Andreas Müller" },
+  { name = "Joaquin Vanschoren " },
+  { name = "Frank Hutter" },
+]
+readme = "README.md"
+description = "Python API for OpenML"
+classifiers = [
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: BSD License",
+  "Programming Language :: Python",
+  "Topic :: Software Development",
+  "Topic :: Scientific/Engineering",
+  "Operating System :: POSIX",
+  "Operating System :: Unix",
+  "Operating System :: MacOS",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+]
+license = { file = "LICENSE" }
+
+[project.scripts]
+openml = "openml.cli:main"
+
+[project.optional-dependencies]
+test=[
+    "nbconvert",
+    "jupyter_client",
+    "matplotlib",
+    "pytest",
+    "pytest-xdist",
+    "pytest-timeout",
+    "nbformat",
+    "oslo.concurrency",
+    "flaky",
+    "pre-commit",
+    "pytest-cov",
+    "pytest-rerunfailures",
+    "mypy",
+    "ruff",
+]
+examples=[
+    "matplotlib",
+    "jupyter",
+    "notebook",
+    "nbconvert",
+    "nbformat",
+    "jupyter_client",
+    "ipython",
+    "ipykernel",
+    "seaborn",
+]
+examples_unix=["fanova"]
+docs=[
+    "sphinx>=3",
+    "sphinx-gallery",
+    "sphinx_bootstrap_theme",
+    "numpydoc",
+]
+
+[project.urls]
+home="https://openml.org/"
+documentation = "https://openml.github.io/openml-python/"
+source = "https://github.com/openml/openml-python"
+
+[tool.setuptools.packages.find]
+where = [""]
+include = ["openml*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+openml = ["*.txt", "*.md", "py.typed"]
+
+[tool.setuptools.dynamic]
+version = {attr = "openml.__version__.__version__"}
+
+# https://docs.pytest.org/en/7.2.x/reference/reference.html#ini-options-ref
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+minversion = "7.0"
+xfail_strict = true
+filterwarnings=[
+    "ignore:the matrix subclass:PendingDeprecationWarning"
+]
+markers = [
+  "server: anything that connects to a server",
+  "upload: anything that uploads to a server",
+  "production: any interaction with the production server",
+  "cache: anything that interacts with the (test) cache",
+]
+
+# https://github.com/charliermarsh/ruff
+[tool.ruff]
+target-version = "py37"
+line-length = 100
+show-source = true
+src = ["openml", "tests", "examples"]
+unsafe-fixes = true
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+select = [
+  "A",
+  # "ANN", # Handled by mypy
+  "ARG",
+  "B",
+  "BLE",
+  "COM",
+  "C4",
+  "D",
+  # "DTZ",  # One day I should know how to utilize timezones and dates...
+  "E",
+  # "EXE", Meh
+  "ERA",
+  "F",
+  "FBT",
+  "I",
+  # "ISC",  # Favours implicit string concatenation
+  "INP",
+  # "INT", # I don't understand this one
+  "N",
+  "NPY",
+  "PD",
+  "PLC",
+  "PLE",
+  "PLR",
+  "PLW",
+  "PIE",
+  "PT",
+  "PTH",
+  # "PYI", # Specific to .pyi files for type stubs
+  "Q",
+  "PGH004",
+  "RET",
+  "RUF",
+  "C90",
+  "S",
+  # "SLF",    # Private member accessed (sure, it's python)
+  "SIM",
+  # "TRY", # Good in principle, would take a lot of work to statisfy
+  "T10",
+  "T20",
+  "TID",
+  "TCH",
+  "UP",
+  "N",
+  "W",
+  "YTT",
+]
+
+ignore = [
+  "D105",    # Missing docstring in magic mthod
+  "D401",    # First line of docstring should be in imperative mood
+  "N806",    # Variable X in function should be lowercase
+  "E731",    # Do not assign a lambda expression, use a def
+  "S101",    # Use of assert detected.
+  "W292",    # No newline at end of file
+  "PLC1901", # "" can be simplified to be falsey
+  "TCH003",  # Move stdlib import into TYPE_CHECKING
+  "COM812",  # Trailing comma missing (handled by linter, ruff recommend disabling if using formatter)
+  "N803",    # Argument should be lowercase (but we accept things like `X`)
+
+  # TODO(@eddibergman): These should be enabled
+  "D100",    # Missing docstring in public module
+  "D103",    # Missing docstring in public function
+  "D104",    # Missing docstring in public package
+
+  # TODO(@eddiebergman): Maybe fix
+   "PLR2004", # Magic value used in comparison, consider replacing 2 with a constant variable
+  "D400",    # First line must end with a period (@eddiebergman too many to fix so ignoring this for now)
+  "D203",    # 1 blank line required before class docstring
+  "D205",    # 1 blank line between summary and description
+
+  # TODO(@eddiebergman): Could be backwards breaking
+  "N802",    # Public function name should be lower case (i.e. get_X())
+]
+
+exclude = [
+  # TODO(eddiebergman): Tests should be re-enabled after the refactor
+  "tests",
+  #
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".hg",
+  ".mypy_cache",
+  ".nox",
+  ".pants.d",
+  ".ruff_cache",
+  ".svn",
+  ".tox",
+  ".venv",
+  "__pypackages__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "node_modules",
+  "venv",
+  "docs",
+]
+
+# Exclude a variety of commonly ignored directories.
+[tool.ruff.per-file-ignores]
+"tests/*.py" = [
+  "D100",   # Undocumented public module
+  "D101",   # Missing docstring in public class
+  "D102",   # Missing docstring in public method
+  "D103",   # Missing docstring in public function
+  "S101",   # Use of assert
+  "ANN201", # Missing return type annotation for public function
+  "FBT001", # Positional boolean argument
+  "PLR2004",# No use of magic numbers
+  "PD901",  #  X is a bad variable name. (pandas)
+  "TCH",    # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tch
+  "N803",   # Argument name {name} should be lowercase
+]
+"openml/cli.py" = [
+  "T201",   # print found
+  "T203",   # pprint found
+]
+"openml/__version__.py" = [
+  "D100",   # Undocumented public module
+]
+"__init__.py" = [
+  "I002",   # Missing required import (i.e. from __future__ import annotations)
+]
+"examples/*.py" = [
+  "D101",   # Missing docstring in public class
+  "D102",   # Missing docstring in public method
+  "D103",   # Missing docstring in public function
+  "D415",   # First line should end with a . or ? or !
+  "INP001", # File is part of an implicit namespace package, add an __init__.py
+  "I002",   # Missing required import (i.e. from __future__ import annotations) 
+  "E741",   # Ambigiuous variable name
+  "T201",   # print found
+  "T203",   # pprint found
+  "ERA001", # found commeneted out code
+  "E402",   # Module level import not at top of cell
+  "E501",   # Line too long
+]
+
+
+[tool.ruff.isort]
+known-first-party = ["openml"]
+no-lines-before = ["future"]
+required-imports = ["from __future__ import annotations"]
+combine-as-imports = true
+extra-standard-library = ["typing_extensions"]
+force-wrap-aliases = true
+
+[tool.ruff.pydocstyle]
+convention = "numpy"
+
+[tool.mypy]
+python_version = "3.7"
+packages = ["openml", "tests"]
+
+show_error_codes = true
+
+warn_unused_configs = true # warn about unused [tool.mypy] lines
+
+follow_imports = "normal"      # Type check top level api code we use from imports
+ignore_missing_imports = false # prefer explicit ignores
+
+disallow_untyped_defs = true       # All functions must have types
+disallow_untyped_decorators = true # ... even decorators
+disallow_incomplete_defs = true    # ...all types
+
+no_implicit_optional = true
+check_untyped_defs = true
+
+warn_return_any = true
+
+
+[[tool.mypy.overrides]]
+module = ["tests.*", "openml.extensions.sklearn.*"]
+
+# TODO(eddiebergman): This should be re-enabled after tests get refactored
+ignore_errors = true
+#disallow_untyped_defs = false          # Sometimes we just want to ignore verbose types
+#disallow_untyped_decorators = false    # Test decorators are not properly typed
+#disallow_incomplete_defs = false       # Sometimes we just want to ignore verbose types
+#disable_error_code = ["var-annotated"]

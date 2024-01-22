@@ -1,9 +1,10 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 from unittest import mock
 
-from openml.testing import TestBase
 import openml
+from openml.testing import TestBase
 
 
 class TestInit(TestBase):
@@ -22,21 +23,21 @@ class TestInit(TestBase):
         task_mock,
     ):
         openml.populate_cache(task_ids=[1, 2], dataset_ids=[3, 4], flow_ids=[5, 6], run_ids=[7, 8])
-        self.assertEqual(run_mock.call_count, 2)
+        assert run_mock.call_count == 2
         for argument, fixture in zip(run_mock.call_args_list, [(7,), (8,)]):
-            self.assertEqual(argument[0], fixture)
+            assert argument[0] == fixture
 
-        self.assertEqual(flow_mock.call_count, 2)
+        assert flow_mock.call_count == 2
         for argument, fixture in zip(flow_mock.call_args_list, [(5,), (6,)]):
-            self.assertEqual(argument[0], fixture)
+            assert argument[0] == fixture
 
-        self.assertEqual(dataset_mock.call_count, 2)
+        assert dataset_mock.call_count == 2
         for argument, fixture in zip(
             dataset_mock.call_args_list,
             [(3,), (4,)],
         ):
-            self.assertEqual(argument[0], fixture)
+            assert argument[0] == fixture
 
-        self.assertEqual(task_mock.call_count, 2)
+        assert task_mock.call_count == 2
         for argument, fixture in zip(task_mock.call_args_list, [(1,), (2,)]):
-            self.assertEqual(argument[0], fixture)
+            assert argument[0] == fixture

@@ -7,6 +7,9 @@ CTAGS ?= ctags
 
 all: clean inplace test
 
+check:
+	pre-commit run --all-files
+
 clean:
 	$(PYTHON) setup.py clean
 	rm -rf dist openml.egg-info

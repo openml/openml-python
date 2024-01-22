@@ -1,15 +1,16 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from collections import OrderedDict
-import os
-from typing import Dict, List, Union, Tuple, Optional  # noqa: F401
 import logging
+from collections import OrderedDict
+from pathlib import Path
+from typing import Any, Hashable, Sequence
 
 import xmltodict
 
 from openml.base import OpenMLBase
-from ..extensions import get_extension_by_flow
-from ..utils import extract_xml_tags
+from openml.extensions import Extension, get_extension_by_flow
+from openml.utils import extract_xml_tags
 
 
 class OpenMLFlow(OpenMLBase):
@@ -59,10 +60,10 @@ class OpenMLFlow(OpenMLBase):
         A list of dependencies necessary to run the flow. This field should
         contain all libraries the flow depends on. To allow reproducibility
         it should also specify the exact version numbers.
-    class_name : str
+    class_name : str, optional
         The development language name of the class which is described by this
         flow.
-    custom_name : str
+    custom_name : str, optional
         Custom name of the flow given by the owner.
     binary_url : str, optional
         Url from which the binary can be downloaded. Added by the server.
@@ -81,32 +82,34 @@ class OpenMLFlow(OpenMLBase):
         Date the flow was uploaded. Filled in by the server.
     flow_id : int, optional
         Flow ID. Assigned by the server.
+    extension : Extension, optional
+        The extension for a flow (e.g., sklearn).
     version : str, optional
         OpenML version of the flow. Assigned by the server.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
-        name,
-        description,
-        model,
-        components,
-        parameters,
-        parameters_meta_info,
-        external_version,
-        tags,
-        language,
-        dependencies,
-        class_name=None,
-        custom_name=None,
-        binary_url=None,
-        binary_format=None,
-        binary_md5=None,
-        uploader=None,
-        upload_date=None,
-        flow_id=None,
-        extension=None,
-        version=None,
+        name: str,
+        description: str,
+        model: object,
+        components: dict,
+        parameters: dict,
+        parameters_meta_info: dict,
+        external_version: str,
+        tags: list,
+        language: str,
+        dependencies: str,
+        class_name: str | None = None,
+        custom_name: str | None = None,
+        binary_url: str | None = None,
+        binary_format: str | None = None,
+        binary_md5: str | None = None,
+        uploader: str | None = None,
+        upload_date: str | None = None,
+        flow_id: int | None = None,
+        extension: Extension | None = None,
+        version: str | None = None,
     ):
         self.name = name
         self.description = description
@@ -117,10 +120,10 @@ class OpenMLFlow(OpenMLBase):
             [parameters, "parameters"],
             [parameters_meta_info, "parameters_meta_info"],
         ]:
-            if not isinstance(variable, OrderedDict):
+            if not isinstance(variable, (OrderedDict, dict)):
                 raise TypeError(
-                    "%s must be of type OrderedDict, "
-                    "but is %s." % (variable_name, type(variable))
+                    f"{variable_name} must be of type OrderedDict or dict, "
+                    f"but is {type(variable)}.",
                 )
 
         self.components = components
@@ -133,13 +136,14 @@ class OpenMLFlow(OpenMLBase):
         if len(keys_parameters.difference(keys_parameters_meta_info)) > 0:
             raise ValueError(
                 "Parameter %s only in parameters, but not in "
-                "parameters_meta_info." % str(keys_parameters.difference(keys_parameters_meta_info))
+                "parameters_meta_info."
+                % str(keys_parameters.difference(keys_parameters_meta_info)),
             )
         if len(keys_parameters_meta_info.difference(keys_parameters)) > 0:
             raise ValueError(
                 "Parameter %s only in parameters_meta_info, "
                 "but not in parameters."
-                % str(keys_parameters_meta_info.difference(keys_parameters))
+                % str(keys_parameters_meta_info.difference(keys_parameters)),
             )
 
         self.external_version = external_version
@@ -161,19 +165,21 @@ class OpenMLFlow(OpenMLBase):
             self._extension = extension
 
     @property
-    def id(self) -> Optional[int]:
+    def id(self) -> int | None:
+        """The ID of the flow."""
         return self.flow_id
 
     @property
-    def extension(self):
+    def extension(self) -> Extension:
+        """The extension of the flow (e.g., sklearn)."""
         if self._extension is not None:
             return self._extension
-        else:
-            raise RuntimeError(
-                "No extension could be found for flow {}: {}".format(self.flow_id, self.name)
-            )
 
-    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+        raise RuntimeError(
+            f"No extension could be found for flow {self.flow_id}: {self.name}",
+        )
+
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str]]]:
         """Collect all information to display in the __repr__ body."""
         fields = {
             "Flow Name": self.name,
@@ -181,10 +187,10 @@ class OpenMLFlow(OpenMLBase):
             "Dependencies": self.dependencies,
         }
         if self.flow_id is not None:
-            fields["Flow URL"] = self.openml_url
+            fields["Flow URL"] = self.openml_url if self.openml_url is not None else "None"
             fields["Flow ID"] = str(self.flow_id)
             if self.version is not None:
-                fields["Flow ID"] += " (version {})".format(self.version)
+                fields["Flow ID"] += f" (version {self.version})"
         if self.upload_date is not None:
             fields["Upload Date"] = self.upload_date.replace("T", " ")
         if self.binary_url is not None:
@@ -202,18 +208,18 @@ class OpenMLFlow(OpenMLBase):
         ]
         return [(key, fields[key]) for key in order if key in fields]
 
-    def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
+    def _to_dict(self) -> dict[str, dict]:  # noqa: C901, PLR0912
         """Creates a dictionary representation of self."""
-        flow_container = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
+        flow_container = OrderedDict()  # type: 'dict[str, dict]'
         flow_dict = OrderedDict(
-            [("@xmlns:oml", "http://openml.org/openml")]
-        )  # type: 'OrderedDict[str, Union[List, str]]'  # noqa E501
+            [("@xmlns:oml", "http://openml.org/openml")],
+        )  # type: 'dict[str, list | str]'  # E501
         flow_container["oml:flow"] = flow_dict
         _add_if_nonempty(flow_dict, "oml:id", self.flow_id)
 
         for required in ["name", "external_version"]:
             if getattr(self, required) is None:
-                raise ValueError("self.{} is required but None".format(required))
+                raise ValueError(f"self.{required} is required but None")
         for attribute in [
             "uploader",
             "name",
@@ -226,7 +232,7 @@ class OpenMLFlow(OpenMLBase):
             "language",
             "dependencies",
         ]:
-            _add_if_nonempty(flow_dict, "oml:{}".format(attribute), getattr(self, attribute))
+            _add_if_nonempty(flow_dict, f"oml:{attribute}", getattr(self, attribute))
 
         if not self.description:
             logger = logging.getLogger(__name__)
@@ -245,15 +251,15 @@ class OpenMLFlow(OpenMLBase):
             for key_, value in param_dict.items():
                 if key_ is not None and not isinstance(key_, str):
                     raise ValueError(
-                        "Parameter name %s cannot be serialized "
-                        "because it is of type %s. Only strings "
-                        "can be serialized." % (key_, type(key_))
+                        f"Parameter name {key_} cannot be serialized "
+                        f"because it is of type {type(key_)}. Only strings "
+                        "can be serialized.",
                     )
                 if value is not None and not isinstance(value, str):
                     raise ValueError(
-                        "Parameter value %s cannot be serialized "
-                        "because it is of type %s. Only strings "
-                        "can be serialized." % (value, type(value))
+                        f"Parameter value {value} cannot be serialized "
+                        f"because it is of type {type(value)}. Only strings "
+                        "can be serialized.",
                     )
 
             flow_parameters.append(param_dict)
@@ -262,7 +268,7 @@ class OpenMLFlow(OpenMLBase):
 
         components = []
         for key in self.components:
-            component_dict = OrderedDict()  # type: 'OrderedDict[str, Dict]'
+            component_dict = OrderedDict()  # type: 'OrderedDict[str, dict]'
             component_dict["oml:identifier"] = key
             if self.components[key] in ["passthrough", "drop"]:
                 component_dict["oml:flow"] = {
@@ -277,9 +283,9 @@ class OpenMLFlow(OpenMLBase):
                 # value is a flow. The flow itself is valid by recursion
                 if key_ is not None and not isinstance(key_, str):
                     raise ValueError(
-                        "Parameter name %s cannot be serialized "
-                        "because it is of type %s. Only strings "
-                        "can be serialized." % (key_, type(key_))
+                        f"Parameter name {key_} cannot be serialized "
+                        f"because it is of type {type(key_)}. Only strings "
+                        "can be serialized.",
                     )
 
             components.append(component_dict)
@@ -287,12 +293,12 @@ class OpenMLFlow(OpenMLBase):
         flow_dict["oml:component"] = components
         flow_dict["oml:tag"] = self.tags
         for attribute in ["binary_url", "binary_format", "binary_md5"]:
-            _add_if_nonempty(flow_dict, "oml:{}".format(attribute), getattr(self, attribute))
+            _add_if_nonempty(flow_dict, f"oml:{attribute}", getattr(self, attribute))
 
         return flow_container
 
     @classmethod
-    def _from_dict(cls, xml_dict):
+    def _from_dict(cls, xml_dict: dict) -> OpenMLFlow:
         """Create a flow from an xml description.
 
         Calls itself recursively to create :class:`OpenMLFlow` objects of
@@ -310,7 +316,7 @@ class OpenMLFlow(OpenMLBase):
         -------
             OpenMLFlow
 
-        """  # noqa E501
+        """  # E501
         arguments = OrderedDict()
         dic = xml_dict["oml:flow"]
 
@@ -380,30 +386,34 @@ class OpenMLFlow(OpenMLBase):
         arguments["tags"] = extract_xml_tags("oml:tag", dic)
 
         arguments["model"] = None
-        flow = cls(**arguments)
+        return cls(**arguments)
 
-        return flow
+    def to_filesystem(self, output_directory: str | Path) -> None:
+        """Write a flow to the filesystem as XML to output_directory."""
+        output_directory = Path(output_directory)
+        output_directory.mkdir(parents=True, exist_ok=True)
 
-    def to_filesystem(self, output_directory: str) -> None:
-        os.makedirs(output_directory, exist_ok=True)
-        if "flow.xml" in os.listdir(output_directory):
+        output_path = output_directory / "flow.xml"
+        if output_path.exists():
             raise ValueError("Output directory already contains a flow.xml file.")
 
         run_xml = self._to_xml()
-        with open(os.path.join(output_directory, "flow.xml"), "w") as f:
+        with output_path.open("w") as f:
             f.write(run_xml)
 
     @classmethod
-    def from_filesystem(cls, input_directory) -> "OpenMLFlow":
-        with open(os.path.join(input_directory, "flow.xml"), "r") as f:
+    def from_filesystem(cls, input_directory: str | Path) -> OpenMLFlow:
+        """Read a flow from an XML in input_directory on the filesystem."""
+        input_directory = Path(input_directory) / "flow.xml"
+        with input_directory.open() as f:
             xml_string = f.read()
         return OpenMLFlow._from_dict(xmltodict.parse(xml_string))
 
-    def _parse_publish_response(self, xml_response: Dict):
+    def _parse_publish_response(self, xml_response: dict) -> None:
         """Parse the id from the xml_response and assign it to self."""
         self.flow_id = int(xml_response["oml:upload_flow"]["oml:id"])
 
-    def publish(self, raise_error_if_exists: bool = False) -> "OpenMLFlow":
+    def publish(self, raise_error_if_exists: bool = False) -> OpenMLFlow:  # noqa: FBT001, FBT002
         """Publish this flow to OpenML server.
 
         Raises a PyOpenMLError if the flow exists on the server, but
@@ -430,17 +440,17 @@ class OpenMLFlow(OpenMLBase):
         if not flow_id:
             if self.flow_id:
                 raise openml.exceptions.PyOpenMLError(
-                    "Flow does not exist on the server, " "but 'flow.flow_id' is not None."
+                    "Flow does not exist on the server, " "but 'flow.flow_id' is not None.",
                 )
             super().publish()
+            assert self.flow_id is not None  # for mypy
             flow_id = self.flow_id
         elif raise_error_if_exists:
-            error_message = "This OpenMLFlow already exists with id: {}.".format(flow_id)
+            error_message = f"This OpenMLFlow already exists with id: {flow_id}."
             raise openml.exceptions.PyOpenMLError(error_message)
         elif self.flow_id is not None and self.flow_id != flow_id:
             raise openml.exceptions.PyOpenMLError(
-                "Local flow_id does not match server flow_id: "
-                "'{}' vs '{}'".format(self.flow_id, flow_id)
+                "Local flow_id does not match server flow_id: " f"'{self.flow_id}' vs '{flow_id}'",
             )
 
         flow = openml.flows.functions.get_flow(flow_id)
@@ -457,12 +467,12 @@ class OpenMLFlow(OpenMLBase):
             message = e.args[0]
             raise ValueError(
                 "The flow on the server is inconsistent with the local flow. "
-                "The server flow ID is {}. Please check manually and remove "
-                "the flow if necessary! Error is:\n'{}'".format(flow_id, message)
-            )
+                f"The server flow ID is {flow_id}. Please check manually and remove "
+                f"the flow if necessary! Error is:\n'{message}'",
+            ) from e
         return self
 
-    def get_structure(self, key_item: str) -> Dict[str, List[str]]:
+    def get_structure(self, key_item: str) -> dict[str, list[str]]:
         """
         Returns for each sub-component of the flow the path of identifiers
         that should be traversed to reach this component. The resulting dict
@@ -482,15 +492,15 @@ class OpenMLFlow(OpenMLBase):
         """
         if key_item not in ["flow_id", "name"]:
             raise ValueError("key_item should be in {flow_id, name}")
-        structure = dict()
+        structure = {}
         for key, sub_flow in self.components.items():
             sub_structure = sub_flow.get_structure(key_item)
             for flow_name, flow_sub_structure in sub_structure.items():
-                structure[flow_name] = [key] + flow_sub_structure
+                structure[flow_name] = [key, *flow_sub_structure]
         structure[getattr(self, key_item)] = []
         return structure
 
-    def get_subflow(self, structure):
+    def get_subflow(self, structure: list[str]) -> OpenMLFlow:
         """
         Returns a subflow from the tree of dependencies.
 
@@ -512,17 +522,30 @@ class OpenMLFlow(OpenMLBase):
         sub_identifier = structure[0]
         if sub_identifier not in self.components:
             raise ValueError(
-                "Flow %s does not contain component with "
-                "identifier %s" % (self.name, sub_identifier)
+                f"Flow {self.name} does not contain component with " f"identifier {sub_identifier}",
             )
         if len(structure) == 1:
-            return self.components[sub_identifier]
-        else:
-            structure.pop(0)
-            return self.components[sub_identifier].get_subflow(structure)
+            return self.components[sub_identifier]  # type: ignore
+
+        structure.pop(0)
+        return self.components[sub_identifier].get_subflow(structure)  # type: ignore
 
 
-def _copy_server_fields(source_flow, target_flow):
+def _copy_server_fields(source_flow: OpenMLFlow, target_flow: OpenMLFlow) -> None:
+    """Recursively copies the fields added by the server
+    from the `source_flow` to the `target_flow`.
+
+    Parameters
+    ----------
+    source_flow : OpenMLFlow
+        To copy the fields from.
+    target_flow : OpenMLFlow
+        To copy the fields to.
+
+    Returns
+    -------
+    None
+    """
     fields_added_by_the_server = ["flow_id", "uploader", "version", "upload_date"]
     for field in fields_added_by_the_server:
         setattr(target_flow, field, getattr(source_flow, field))
@@ -532,6 +555,21 @@ def _copy_server_fields(source_flow, target_flow):
         _copy_server_fields(component, target_flow.components[name])
 
 
-def _add_if_nonempty(dic, key, value):
+def _add_if_nonempty(dic: dict, key: Hashable, value: Any) -> None:
+    """Adds a key-value pair to a dictionary if the value is not None.
+
+    Parameters
+    ----------
+    dic: dict
+        To add the key-value pair to.
+    key: hashable
+        To add to the dictionary.
+    value: Any
+        To add to the dictionary.
+
+    Returns
+    -------
+    None
+    """
     if value is not None:
         dic[key] = value

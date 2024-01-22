@@ -1,12 +1,12 @@
-"""" Command Line Interface for `openml` to configure its settings. """
+""""Command Line Interface for `openml` to configure its settings."""
+from __future__ import annotations
 
 import argparse
-import os
-import pathlib
 import string
-from typing import Union, Callable
+import sys
+from pathlib import Path
+from typing import Callable
 from urllib.parse import urlparse
-
 
 from openml import config
 
@@ -19,12 +19,14 @@ def looks_like_url(url: str) -> bool:
     # There's no thorough url parser, but we only seem to use netloc.
     try:
         return bool(urlparse(url).netloc)
-    except Exception:
+    except Exception:  # noqa: BLE001
         return False
 
 
 def wait_until_valid_input(
-    prompt: str, check: Callable[[str], str], sanitize: Union[Callable[[str], str], None]
+    prompt: str,
+    check: Callable[[str], str],
+    sanitize: Callable[[str], str] | None,
 ) -> str:
     """Asks `prompt` until an input is received which returns True for `check`.
 
@@ -43,7 +45,6 @@ def wait_until_valid_input(
     valid input
 
     """
-
     while True:
         response = input(prompt)
         if sanitize:
@@ -55,7 +56,7 @@ def wait_until_valid_input(
             return response
 
 
-def print_configuration():
+def print_configuration() -> None:
     file = config.determine_config_file_path()
     header = f"File '{file}' contains (or defaults to):"
     print(header)
@@ -65,7 +66,7 @@ def print_configuration():
         print(f"{field.ljust(max_key_length)}: {value}")
 
 
-def verbose_set(field, value):
+def verbose_set(field: str, value: str) -> None:
     config.set_field_in_config_file(field, value)
     print(f"{field} set to '{value}'.")
 
@@ -123,17 +124,20 @@ def configure_server(value: str) -> None:
 
 def configure_cachedir(value: str) -> None:
     def check_cache_dir(path: str) -> str:
-        p = pathlib.Path(path)
-        if p.is_file():
-            return f"'{path}' is a file, not a directory."
-        expanded = p.expanduser()
+        _path = Path(path)
+        if _path.is_file():
+            return f"'{_path}' is a file, not a directory."
+
+        expanded = _path.expanduser()
         if not expanded.is_absolute():
-            return f"'{path}' is not absolute (even after expanding '~')."
+            return f"'{_path}' is not absolute (even after expanding '~')."
+
         if not expanded.exists():
             try:
-                os.mkdir(expanded)
+                expanded.mkdir()
             except PermissionError:
                 return f"'{path}' does not exist and there are not enough permissions to create it."
+
         return ""
 
     configure_field(
@@ -143,7 +147,6 @@ def configure_cachedir(value: str) -> None:
         intro_message="Configuring the cache directory. It can not be a relative path.",
         input_message="Specify the directory to use (or create) as cache directory: ",
     )
-    print("NOTE: Data from your old cache directory is not moved over.")
 
 
 def configure_connection_n_retries(value: str) -> None:
@@ -244,13 +247,13 @@ def configure_retry_policy(value: str) -> None:
     )
 
 
-def configure_field(
+def configure_field(  # noqa: PLR0913
     field: str,
-    value: Union[None, str],
+    value: None | str,
     check_with_message: Callable[[str], str],
     intro_message: str,
     input_message: str,
-    sanitize: Union[Callable[[str], str], None] = None,
+    sanitize: Callable[[str], str] | None = None,
 ) -> None:
     """Configure `field` with `value`. If `value` is None ask the user for input.
 
@@ -284,7 +287,7 @@ def configure_field(
         malformed_input = check_with_message(value)
         if malformed_input:
             print(malformed_input)
-            quit()
+            sys.exit()
     else:
         print(intro_message)
         value = wait_until_valid_input(
@@ -295,7 +298,7 @@ def configure_field(
     verbose_set(field, value)
 
 
-def configure(args: argparse.Namespace):
+def configure(args: argparse.Namespace) -> None:
     """Calls the right submenu(s) to edit `args.field` in the configuration file."""
     set_functions = {
         "apikey": configure_apikey,
@@ -307,7 +310,7 @@ def configure(args: argparse.Namespace):
         "verbosity": configure_verbosity,
     }
 
-    def not_supported_yet(_):
+    def not_supported_yet(_: str) -> None:
         print(f"Setting '{args.field}' is not supported yet.")
 
     if args.field not in ["all", "none"]:
@@ -315,12 +318,11 @@ def configure(args: argparse.Namespace):
     else:
         if args.value is not None:
             print(f"Can not set value ('{args.value}') when field is specified as '{args.field}'.")
-            quit()
+            sys.exit()
         print_configuration()
 
     if args.field == "all":
         for set_field_function in set_functions.values():
-            print()  # Visually separating the output by field.
             set_field_function(args.value)
 
 

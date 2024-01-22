@@ -1,7 +1,7 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from typing import Any, Optional, Type, TYPE_CHECKING
-from . import Extension
+from typing import TYPE_CHECKING, Any
 
 # Need to implement the following by its full path because otherwise it won't be possible to
 # access openml.extensions.extensions
@@ -11,8 +11,10 @@ import openml.extensions
 if TYPE_CHECKING:
     from openml.flows import OpenMLFlow
 
+    from . import Extension
 
-def register_extension(extension: Type[Extension]) -> None:
+
+def register_extension(extension: type[Extension]) -> None:
     """Register an extension.
 
     Registered extensions are considered by ``get_extension_by_flow`` and
@@ -30,9 +32,9 @@ def register_extension(extension: Type[Extension]) -> None:
 
 
 def get_extension_by_flow(
-    flow: "OpenMLFlow",
-    raise_if_no_extension: bool = False,
-) -> Optional[Extension]:
+    flow: OpenMLFlow,
+    raise_if_no_extension: bool = False,  # noqa: FBT001, FBT002
+) -> Extension | None:
     """Get an extension which can handle the given flow.
 
     Iterates all registered extensions and checks whether they can handle the presented flow.
@@ -55,22 +57,23 @@ def get_extension_by_flow(
             candidates.append(extension_class())
     if len(candidates) == 0:
         if raise_if_no_extension:
-            raise ValueError("No extension registered which can handle flow: {}".format(flow))
-        else:
-            return None
-    elif len(candidates) == 1:
+            raise ValueError(f"No extension registered which can handle flow: {flow}")
+
+        return None
+
+    if len(candidates) == 1:
         return candidates[0]
-    else:
-        raise ValueError(
-            "Multiple extensions registered which can handle flow: {}, but only one "
-            "is allowed ({}).".format(flow, candidates)
-        )
+
+    raise ValueError(
+        f"Multiple extensions registered which can handle flow: {flow}, but only one "
+        f"is allowed ({candidates}).",
+    )
 
 
 def get_extension_by_model(
     model: Any,
-    raise_if_no_extension: bool = False,
-) -> Optional[Extension]:
+    raise_if_no_extension: bool = False,  # noqa: FBT001, FBT002
+) -> Extension | None:
     """Get an extension which can handle the given flow.
 
     Iterates all registered extensions and checks whether they can handle the presented model.
@@ -93,13 +96,14 @@ def get_extension_by_model(
             candidates.append(extension_class())
     if len(candidates) == 0:
         if raise_if_no_extension:
-            raise ValueError("No extension registered which can handle model: {}".format(model))
-        else:
-            return None
-    elif len(candidates) == 1:
+            raise ValueError(f"No extension registered which can handle model: {model}")
+
+        return None
+
+    if len(candidates) == 1:
         return candidates[0]
-    else:
-        raise ValueError(
-            "Multiple extensions registered which can handle model: {}, but only one "
-            "is allowed ({}).".format(model, candidates)
-        )
+
+    raise ValueError(
+        f"Multiple extensions registered which can handle model: {model}, but only one "
+        f"is allowed ({candidates}).",
+    )

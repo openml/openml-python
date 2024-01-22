@@ -1,55 +1,50 @@
 # License: BSD 3-Clause
-import warnings
-from collections import OrderedDict
-import io
-import re
+from __future__ import annotations
+
 import os
-from typing import Union, Dict, Optional, List
+import re
+import warnings
+from typing import Any
+from typing_extensions import Literal
 
 import pandas as pd
 import xmltodict
 
-from ..exceptions import OpenMLCacheException
-from ..datasets import get_dataset
+import openml._api_calls
+import openml.utils
+from openml.datasets import get_dataset
+from openml.exceptions import OpenMLCacheException
+
 from .task import (
     OpenMLClassificationTask,
     OpenMLClusteringTask,
     OpenMLLearningCurveTask,
-    TaskType,
     OpenMLRegressionTask,
     OpenMLSupervisedTask,
     OpenMLTask,
+    TaskType,
 )
-import openml.utils
-import openml._api_calls
 
 TASKS_CACHE_DIR_NAME = "tasks"
 
 
-def _get_cached_tasks():
+def _get_cached_tasks() -> dict[int, OpenMLTask]:
     """Return a dict of all the tasks which are cached locally.
+
     Returns
     -------
     tasks : OrderedDict
         A dict of all the cached tasks. Each task is an instance of
         OpenMLTask.
     """
-    tasks = OrderedDict()
-
     task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
     directory_content = os.listdir(task_cache_dir)
     directory_content.sort()
+
     # Find all dataset ids for which we have downloaded the dataset
     # description
-
-    for filename in directory_content:
-        if not re.match(r"[0-9]*", filename):
-            continue
-
-        tid = int(filename)
-        tasks[tid] = _get_cached_task(tid)
-
-    return tasks
+    tids = (int(did) for did in directory_content if re.match(r"[0-9]*", did))
+    return {tid: _get_cached_task(tid) for tid in tids}
 
 
 def _get_cached_task(tid: int) -> OpenMLTask:
@@ -66,16 +61,18 @@ def _get_cached_task(tid: int) -> OpenMLTask:
     """
     tid_cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, tid)
 
+    task_xml_path = tid_cache_dir / "task.xml"
     try:
-        with io.open(os.path.join(tid_cache_dir, "task.xml"), encoding="utf8") as fh:
+        with task_xml_path.open(encoding="utf8") as fh:
             return _create_task_from_xml(fh.read())
-    except (OSError, IOError):
+    except OSError as e:
         openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
-        raise OpenMLCacheException("Task file for tid %d not " "cached" % tid)
+        raise OpenMLCacheException(f"Task file for tid {tid} not cached") from e
 
 
-def _get_estimation_procedure_list():
+def _get_estimation_procedure_list() -> list[dict[str, Any]]:
     """Return a list of all estimation procedures which are on OpenML.
+
     Returns
     -------
     procedures : list
@@ -90,50 +87,52 @@ def _get_estimation_procedure_list():
     # Minimalistic check if the XML is useful
     if "oml:estimationprocedures" not in procs_dict:
         raise ValueError("Error in return XML, does not contain tag oml:estimationprocedures.")
-    elif "@xmlns:oml" not in procs_dict["oml:estimationprocedures"]:
+
+    if "@xmlns:oml" not in procs_dict["oml:estimationprocedures"]:
         raise ValueError(
             "Error in return XML, does not contain tag "
-            "@xmlns:oml as a child of oml:estimationprocedures."
+            "@xmlns:oml as a child of oml:estimationprocedures.",
         )
-    elif procs_dict["oml:estimationprocedures"]["@xmlns:oml"] != "http://openml.org/openml":
+
+    if procs_dict["oml:estimationprocedures"]["@xmlns:oml"] != "http://openml.org/openml":
         raise ValueError(
             "Error in return XML, value of "
             "oml:estimationprocedures/@xmlns:oml is not "
             "http://openml.org/openml, but %s"
-            % str(procs_dict["oml:estimationprocedures"]["@xmlns:oml"])
+            % str(procs_dict["oml:estimationprocedures"]["@xmlns:oml"]),
         )
 
-    procs = []
+    procs: list[dict[str, Any]] = []
     for proc_ in procs_dict["oml:estimationprocedures"]["oml:estimationprocedure"]:
         task_type_int = int(proc_["oml:ttid"])
         try:
             task_type_id = TaskType(task_type_int)
+            procs.append(
+                {
+                    "id": int(proc_["oml:id"]),
+                    "task_type_id": task_type_id,
+                    "name": proc_["oml:name"],
+                    "type": proc_["oml:type"],
+                },
+            )
         except ValueError as e:
             warnings.warn(
                 f"Could not create task type id for {task_type_int} due to error {e}",
                 RuntimeWarning,
+                stacklevel=2,
             )
-            continue
-        procs.append(
-            {
-                "id": int(proc_["oml:id"]),
-                "task_type_id": task_type_id,
-                "name": proc_["oml:name"],
-                "type": proc_["oml:type"],
-            }
-        )
 
     return procs
 
 
 def list_tasks(
-    task_type: Optional[TaskType] = None,
-    offset: Optional[int] = None,
-    size: Optional[int] = None,
-    tag: Optional[str] = None,
-    output_format: str = "dict",
-    **kwargs,
-) -> Union[Dict, pd.DataFrame]:
+    task_type: TaskType | None = None,
+    offset: int | None = None,
+    size: int | None = None,
+    tag: str | None = None,
+    output_format: Literal["dict", "dataframe"] = "dict",
+    **kwargs: Any,
+) -> dict | pd.DataFrame:
     """
     Return a number of tasks having the given tag and task_type
 
@@ -174,7 +173,7 @@ def list_tasks(
     """
     if output_format not in ["dataframe", "dict"]:
         raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
+            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable.",
         )
     # TODO: [0.15]
     if output_format == "dict":
@@ -184,8 +183,8 @@ def list_tasks(
             "will continue to work, use `output_format`='dataframe'."
         )
         warnings.warn(msg, category=FutureWarning, stacklevel=2)
-    return openml.utils._list_all(
-        output_format=output_format,
+    return openml.utils._list_all(  # type: ignore
+        list_output_format=output_format,  # type: ignore
         listing_call=_list_tasks,
         task_type=task_type,
         offset=offset,
@@ -195,9 +194,14 @@ def list_tasks(
     )
 
 
-def _list_tasks(task_type=None, output_format="dict", **kwargs):
+def _list_tasks(
+    task_type: TaskType | None = None,
+    output_format: Literal["dict", "dataframe"] = "dict",
+    **kwargs: Any,
+) -> dict | pd.DataFrame:
     """
     Perform the api call to return a number of tasks having the given filters.
+
     Parameters
     ----------
     Filter task_type is separated from the other filters because
@@ -224,33 +228,62 @@ def _list_tasks(task_type=None, output_format="dict", **kwargs):
     if kwargs is not None:
         for operator, value in kwargs.items():
             if operator == "task_id":
-                value = ",".join([str(int(i)) for i in value])
-            api_call += "/%s/%s" % (operator, value)
+                value = ",".join([str(int(i)) for i in value])  # noqa: PLW2901
+            api_call += f"/{operator}/{value}"
+
     return __list_tasks(api_call=api_call, output_format=output_format)
 
 
-def __list_tasks(api_call, output_format="dict"):
+# TODO(eddiebergman): overload todefine type returned
+def __list_tasks(  # noqa: PLR0912, C901
+    api_call: str,
+    output_format: Literal["dict", "dataframe"] = "dict",
+) -> dict | pd.DataFrame:
+    """Returns a dictionary or a Pandas DataFrame with information about OpenML tasks.
+
+    Parameters
+    ----------
+    api_call : str
+        The API call specifying which tasks to return.
+    output_format : str in {"dict", "dataframe"}
+        Output format for the returned object.
+
+    Returns
+    -------
+    Union[Dict, pd.DataFrame]
+        A dictionary or a Pandas DataFrame with information about OpenML tasks.
+
+    Raises
+    ------
+    ValueError
+        If the XML returned by the OpenML API does not contain 'oml:tasks', '@xmlns:oml',
+        or has an incorrect value for '@xmlns:oml'.
+    KeyError
+        If an invalid key is found in the XML for a task.
+    """
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     tasks_dict = xmltodict.parse(xml_string, force_list=("oml:task", "oml:input"))
     # Minimalistic check if the XML is useful
     if "oml:tasks" not in tasks_dict:
-        raise ValueError('Error in return XML, does not contain "oml:runs": %s' % str(tasks_dict))
-    elif "@xmlns:oml" not in tasks_dict["oml:tasks"]:
+        raise ValueError(f'Error in return XML, does not contain "oml:runs": {tasks_dict}')
+
+    if "@xmlns:oml" not in tasks_dict["oml:tasks"]:
         raise ValueError(
-            "Error in return XML, does not contain " '"oml:runs"/@xmlns:oml: %s' % str(tasks_dict)
+            f'Error in return XML, does not contain "oml:runs"/@xmlns:oml: {tasks_dict}'
         )
-    elif tasks_dict["oml:tasks"]["@xmlns:oml"] != "http://openml.org/openml":
+
+    if tasks_dict["oml:tasks"]["@xmlns:oml"] != "http://openml.org/openml":
         raise ValueError(
             "Error in return XML, value of  "
             '"oml:runs"/@xmlns:oml is not '
-            '"http://openml.org/openml": %s' % str(tasks_dict)
+            '"http://openml.org/openml": %s' % str(tasks_dict),
         )
 
-    assert type(tasks_dict["oml:tasks"]["oml:task"]) == list, type(tasks_dict["oml:tasks"])
+    assert isinstance(tasks_dict["oml:tasks"]["oml:task"], list), type(tasks_dict["oml:tasks"])
 
-    tasks = dict()
+    tasks = {}
     procs = _get_estimation_procedure_list()
-    proc_dict = dict((x["id"], x) for x in procs)
+    proc_dict = {x["id"]: x for x in procs}
 
     for task_ in tasks_dict["oml:tasks"]["oml:task"]:
         tid = None
@@ -263,8 +296,10 @@ def __list_tasks(api_call, output_format="dict"):
                 warnings.warn(
                     f"Could not create task type id for {task_type_int} due to error {e}",
                     RuntimeWarning,
+                    stacklevel=2,
                 )
                 continue
+
             task = {
                 "tid": tid,
                 "ttid": task_type_id,
@@ -275,15 +310,15 @@ def __list_tasks(api_call, output_format="dict"):
             }
 
             # Other task inputs
-            for input in task_.get("oml:input", list()):
-                if input["@name"] == "estimation_procedure":
-                    task[input["@name"]] = proc_dict[int(input["#text"])]["name"]
+            for _input in task_.get("oml:input", []):
+                if _input["@name"] == "estimation_procedure":
+                    task[_input["@name"]] = proc_dict[int(_input["#text"])]["name"]
                 else:
-                    value = input.get("#text")
-                    task[input["@name"]] = value
+                    value = _input.get("#text")
+                    task[_input["@name"]] = value
 
             # The number of qualities can range from 0 to infinity
-            for quality in task_.get("oml:quality", list()):
+            for quality in task_.get("oml:quality", []):
                 if "#text" not in quality:
                     quality_value = 0.0
                 else:
@@ -295,10 +330,13 @@ def __list_tasks(api_call, output_format="dict"):
             tasks[tid] = task
         except KeyError as e:
             if tid is not None:
-                warnings.warn("Invalid xml for task %d: %s\nFrom %s" % (tid, e, task_))
+                warnings.warn(
+                    "Invalid xml for task %d: %s\nFrom %s" % (tid, e, task_),
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
             else:
-                warnings.warn("Could not find key %s in %s!" % (e, task_))
-            continue
+                warnings.warn(f"Could not find key {e} in {task_}!", RuntimeWarning, stacklevel=2)
 
     if output_format == "dataframe":
         tasks = pd.DataFrame.from_dict(tasks, orient="index")
@@ -306,9 +344,12 @@ def __list_tasks(api_call, output_format="dict"):
     return tasks
 
 
+# TODO(eddiebergman): Maybe since this isn't public api, we can make it keyword only?
 def get_tasks(
-    task_ids: List[int], download_data: bool = True, download_qualities: bool = True
-) -> List[OpenMLTask]:
+    task_ids: list[int],
+    download_data: bool = True,  # noqa: FBT001, FBT002
+    download_qualities: bool = True,  # noqa: FBT001, FBT002
+) -> list[OpenMLTask]:
     """Download tasks.
 
     This function iterates :meth:`openml.tasks.get_task`.
@@ -334,7 +375,10 @@ def get_tasks(
 
 @openml.utils.thread_safe_if_oslo_installed
 def get_task(
-    task_id: int, *dataset_args, download_splits: Optional[bool] = None, **get_dataset_kwargs
+    task_id: int,
+    *dataset_args: Any,
+    download_splits: bool | None = None,
+    **get_dataset_kwargs: Any,
 ) -> OpenMLTask:
     """Download OpenML task for a given task ID.
 
@@ -374,6 +418,7 @@ def get_task(
             "of ``True`` and be independent from `download_data`. To disable this message until "
             "version 0.15 explicitly set `download_splits` to a bool.",
             FutureWarning,
+            stacklevel=3,
         )
         download_splits = get_dataset_kwargs.get("download_data", True)
 
@@ -382,17 +427,15 @@ def get_task(
         warnings.warn(
             "Task id must be specified as `int` from 0.14.0 onwards.",
             FutureWarning,
+            stacklevel=3,
         )
 
     try:
         task_id = int(task_id)
-    except (ValueError, TypeError):
-        raise ValueError("Dataset ID is neither an Integer nor can be cast to an Integer.")
+    except (ValueError, TypeError) as e:
+        raise ValueError("Dataset ID is neither an Integer nor can be cast to an Integer.") from e
 
-    tid_cache_dir = openml.utils._create_cache_directory_for_id(
-        TASKS_CACHE_DIR_NAME,
-        task_id,
-    )
+    tid_cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
 
     try:
         task = _get_task_description(task_id)
@@ -404,38 +447,29 @@ def get_task(
             task.class_labels = dataset.retrieve_class_labels(task.target_name)
         # Clustering tasks do not have class labels
         # and do not offer download_split
-        if download_splits:
-            if isinstance(task, OpenMLSupervisedTask):
-                task.download_split()
+        if download_splits and isinstance(task, OpenMLSupervisedTask):
+            task.download_split()
     except Exception as e:
-        openml.utils._remove_cache_dir_for_id(
-            TASKS_CACHE_DIR_NAME,
-            tid_cache_dir,
-        )
+        openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
         raise e
 
     return task
 
 
-def _get_task_description(task_id):
+def _get_task_description(task_id: int) -> OpenMLTask:
     try:
         return _get_cached_task(task_id)
     except OpenMLCacheException:
-        xml_file = os.path.join(
-            openml.utils._create_cache_directory_for_id(
-                TASKS_CACHE_DIR_NAME,
-                task_id,
-            ),
-            "task.xml",
-        )
+        _cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
+        xml_file = _cache_dir / "task.xml"
         task_xml = openml._api_calls._perform_api_call("task/%d" % task_id, "get")
 
-        with io.open(xml_file, "w", encoding="utf8") as fh:
+        with xml_file.open("w", encoding="utf8") as fh:
             fh.write(task_xml)
         return _create_task_from_xml(task_xml)
 
 
-def _create_task_from_xml(xml):
+def _create_task_from_xml(xml: str) -> OpenMLTask:
     """Create a task given a xml string.
 
     Parameters
@@ -448,8 +482,8 @@ def _create_task_from_xml(xml):
     OpenMLTask
     """
     dic = xmltodict.parse(xml)["oml:task"]
-    estimation_parameters = dict()
-    inputs = dict()
+    estimation_parameters = {}
+    inputs = {}
     # Due to the unordered structure we obtain, we first have to extract
     # the possible keys of oml:input; dic["oml:input"] is a list of
     # OrderedDicts
@@ -508,22 +542,20 @@ def _create_task_from_xml(xml):
     }.get(task_type)
     if cls is None:
         raise NotImplementedError("Task type %s not supported." % common_kwargs["task_type"])
-    return cls(**common_kwargs)
+    return cls(**common_kwargs)  # type: ignore
 
 
+# TODO(eddiebergman): overload on `task_type`
 def create_task(
     task_type: TaskType,
     dataset_id: int,
     estimation_procedure_id: int,
-    target_name: Optional[str] = None,
-    evaluation_measure: Optional[str] = None,
-    **kwargs,
-) -> Union[
-    OpenMLClassificationTask,
-    OpenMLRegressionTask,
-    OpenMLLearningCurveTask,
-    OpenMLClusteringTask,
-]:
+    target_name: str | None = None,
+    evaluation_measure: str | None = None,
+    **kwargs: Any,
+) -> (
+    OpenMLClassificationTask | OpenMLRegressionTask | OpenMLLearningCurveTask | OpenMLClusteringTask
+):
     """Create a task based on different given attributes.
 
     Builds a task object with the function arguments as
@@ -556,25 +588,26 @@ def create_task(
     OpenMLClassificationTask, OpenMLRegressionTask,
     OpenMLLearningCurveTask, OpenMLClusteringTask
     """
-    task_cls = {
-        TaskType.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
-        TaskType.SUPERVISED_REGRESSION: OpenMLRegressionTask,
-        TaskType.CLUSTERING: OpenMLClusteringTask,
-        TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
-    }.get(task_type)
-
-    if task_cls is None:
-        raise NotImplementedError("Task type {0:d} not supported.".format(task_type))
+    if task_type == TaskType.CLUSTERING:
+        task_cls = OpenMLClusteringTask
+    elif task_type == TaskType.LEARNING_CURVE:
+        task_cls = OpenMLLearningCurveTask  # type: ignore
+    elif task_type == TaskType.SUPERVISED_CLASSIFICATION:
+        task_cls = OpenMLClassificationTask  # type: ignore
+    elif task_type == TaskType.SUPERVISED_REGRESSION:
+        task_cls = OpenMLRegressionTask  # type: ignore
     else:
-        return task_cls(
-            task_type_id=task_type,
-            task_type=None,
-            data_set_id=dataset_id,
-            target_name=target_name,
-            estimation_procedure_id=estimation_procedure_id,
-            evaluation_measure=evaluation_measure,
-            **kwargs,
-        )
+        raise NotImplementedError(f"Task type {task_type:d} not supported.")
+
+    return task_cls(
+        task_type_id=task_type,
+        task_type="None",  # TODO: refactor to get task type string from ID.
+        data_set_id=dataset_id,
+        target_name=target_name,
+        estimation_procedure_id=estimation_procedure_id,
+        evaluation_measure=evaluation_measure,
+        **kwargs,
+    )
 
 
 def delete_task(task_id: int) -> bool:
