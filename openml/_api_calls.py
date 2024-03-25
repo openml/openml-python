@@ -366,18 +366,15 @@ def _send_request(  # noqa: C901
                     # -- Check if encoding is not UTF-8 perhaps
                     if __is_checksum_equal(response.content, md5_checksum):
                         raise OpenMLHashException(
-                            "Checksum of downloaded file is unequal to the expected checksum {}"
-                            "because the text encoding is not UTF-8 when downloading {}. "
+                            f"Checksum of downloaded file is unequal to the expected checksum {md5_checksum}"
+                            f"because the text encoding is not UTF-8 when downloading {url}. "
                             "There might be a sever-sided issue with the file, "
-                            "see: https://github.com/openml/openml-python/issues/1180.".format(
-                                md5_checksum,
-                                url,
-                            ),
+                            "see: https://github.com/openml/openml-python/issues/1180.",
                         )
 
                     raise OpenMLHashException(
-                        "Checksum of downloaded file is unequal to the expected checksum {} "
-                        "when downloading {}.".format(md5_checksum, url),
+                        f"Checksum of downloaded file is unequal to the expected checksum {md5_checksum} "
+                        f"when downloading {url}.",
                     )
 
                 return response

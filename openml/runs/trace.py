@@ -504,10 +504,7 @@ class OpenMLRunTrace:
                     if list(param_keys) != list(trace_itr_keys):
                         raise ValueError(
                             "Cannot merge traces because the parameters are not equal: "
-                            "{} vs {}".format(
-                                list(trace_itr.parameters.keys()),
-                                list(iteration.parameters.keys()),
-                            ),
+                            f"{list(trace_itr.parameters.keys())} vs {list(iteration.parameters.keys())}",
                         )
 
                 if key in merged_trace:
@@ -521,10 +518,7 @@ class OpenMLRunTrace:
         return cls(None, merged_trace)
 
     def __repr__(self) -> str:
-        return "[Run id: {}, {} trace iterations]".format(
-            -1 if self.run_id is None else self.run_id,
-            len(self.trace_iterations),
-        )
+        return f"[Run id: {-1 if self.run_id is None else self.run_id}, {len(self.trace_iterations)} trace iterations]"
 
     def __iter__(self) -> Iterator[OpenMLTraceIteration]:
         yield from self.trace_iterations.values()

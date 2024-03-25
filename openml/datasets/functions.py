@@ -85,8 +85,7 @@ def list_datasets(
     *,
     output_format: Literal["dataframe"],
     **kwargs: Any,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 @overload
@@ -98,8 +97,7 @@ def list_datasets(
     tag: str | None,
     output_format: Literal["dataframe"],
     **kwargs: Any,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 @overload
@@ -111,8 +109,7 @@ def list_datasets(
     tag: str | None = ...,
     output_format: Literal["dict"] = "dict",
     **kwargs: Any,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 def list_datasets(
@@ -207,8 +204,7 @@ def _list_datasets(
     data_id: list | None = ...,
     output_format: Literal["dict"] = "dict",
     **kwargs: Any,
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -216,8 +212,7 @@ def _list_datasets(
     data_id: list | None = ...,
     output_format: Literal["dataframe"] = "dataframe",
     **kwargs: Any,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 def _list_datasets(
@@ -261,13 +256,11 @@ def _list_datasets(
 
 
 @overload
-def __list_datasets(api_call: str, output_format: Literal["dict"] = "dict") -> dict:
-    ...
+def __list_datasets(api_call: str, output_format: Literal["dict"] = "dict") -> dict: ...
 
 
 @overload
-def __list_datasets(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame:
-    ...
+def __list_datasets(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame: ...
 
 
 def __list_datasets(
@@ -804,10 +797,7 @@ def create_dataset(  # noqa: C901, PLR0912, PLR0915
         if not is_row_id_an_attribute:
             raise ValueError(
                 "'row_id_attribute' should be one of the data attribute. "
-                " Got '{}' while candidates are {}.".format(
-                    row_id_attribute,
-                    [attr[0] for attr in attributes_],
-                ),
+                f" Got '{row_id_attribute}' while candidates are {[attr[0] for attr in attributes_]}.",
             )
 
     if isinstance(data, pd.DataFrame):

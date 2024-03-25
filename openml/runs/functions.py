@@ -680,9 +680,9 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, PLR0913, C901
             user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[
                 measure
             ]
-            user_defined_measures_per_sample[measure][rep_no][fold_no][
-                sample_no
-            ] = user_defined_measures_fold[measure]
+            user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = (
+                user_defined_measures_fold[measure]
+            )
 
     trace: OpenMLRunTrace | None = None
     if len(traces) > 0:
@@ -784,13 +784,7 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
         raise NotImplementedError(task.task_type)
 
     config.logger.info(
-        "Going to run model {} on dataset {} for repeat {} fold {} sample {}".format(
-            str(model),
-            openml.datasets.get_dataset(task.dataset_id).name,
-            rep_no,
-            fold_no,
-            sample_no,
-        ),
+        f"Going to run model {model!s} on dataset {openml.datasets.get_dataset(task.dataset_id).name} for repeat {rep_no} fold {fold_no} sample {sample_no}",
     )
     (
         pred_y,

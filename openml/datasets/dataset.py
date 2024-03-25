@@ -156,14 +156,14 @@ class OpenMLDataset(OpenMLBase):
             )
 
         if dataset_id is None:
-            pattern = "^[\x00-\x7F]*$"
+            pattern = "^[\x00-\x7f]*$"
             if description and not re.match(pattern, description):
                 # not basiclatin (XSD complains)
                 invalid_characters = find_invalid_characters(description, pattern)
                 raise ValueError(
                     f"Invalid symbols {invalid_characters} in description: {description}",
                 )
-            pattern = "^[\x00-\x7F]*$"
+            pattern = "^[\x00-\x7f]*$"
             if citation and not re.match(pattern, citation):
                 # not basiclatin (XSD complains)
                 invalid_characters = find_invalid_characters(citation, pattern)

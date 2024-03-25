@@ -979,9 +979,7 @@ class SklearnExtension(Extension):
                         # length 2 is for {VotingClassifier.estimators,
                         # Pipeline.steps, FeatureUnion.transformer_list}
                         # length 3 is for ColumnTransformer
-                        msg = "Length of tuple of type {} does not match assumptions".format(
-                            sub_component_type,
-                        )
+                        msg = f"Length of tuple of type {sub_component_type} does not match assumptions"
                         raise ValueError(msg)
 
                     if isinstance(sub_component, str):
@@ -1008,9 +1006,9 @@ class SklearnExtension(Extension):
 
                     if identifier in reserved_keywords:
                         parent_model = f"{model.__module__}.{model.__class__.__name__}"
-                        msg = "Found element shadowing official " "parameter for {}: {}".format(
-                            parent_model,
-                            identifier,
+                        msg = (
+                            "Found element shadowing official "
+                            f"parameter for {parent_model}: {identifier}"
                         )
                         raise PyOpenMLError(msg)
 
@@ -1035,9 +1033,9 @@ class SklearnExtension(Extension):
                             model=None,
                         )
                         component_reference: OrderedDict[str, str | dict] = OrderedDict()
-                        component_reference[
-                            "oml-python:serialized_object"
-                        ] = COMPOSITION_STEP_CONSTANT
+                        component_reference["oml-python:serialized_object"] = (
+                            COMPOSITION_STEP_CONSTANT
+                        )
                         cr_value: dict[str, Any] = OrderedDict()
                         cr_value["key"] = identifier
                         cr_value["step_name"] = identifier
@@ -1812,10 +1810,7 @@ class SklearnExtension(Extension):
                     # then we need to add a column full of zeros into the probabilities
                     # for class 3 because the rest of the library expects that the
                     # probabilities are ordered the same way as the classes are ordered).
-                    message = "Estimator only predicted for {}/{} classes!".format(
-                        proba_y.shape[1],
-                        len(task.class_labels),
-                    )
+                    message = f"Estimator only predicted for {proba_y.shape[1]}/{len(task.class_labels)} classes!"
                     warnings.warn(message, stacklevel=2)
                     openml.config.logger.warning(message)
 
@@ -2008,9 +2003,7 @@ class SklearnExtension(Extension):
                                 pass
                             else:
                                 raise TypeError(
-                                    "Subcomponent flow should be of type flow, but is {}".format(
-                                        type(subcomponent_flow),
-                                    ),
+                                    f"Subcomponent flow should be of type flow, but is {type(subcomponent_flow)}",
                                 )
 
                         current = {
