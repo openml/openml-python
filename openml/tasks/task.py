@@ -280,8 +280,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
     ) -> tuple[
         np.ndarray | scipy.sparse.spmatrix,
         np.ndarray | None,
-    ]:
-        ...
+    ]: ...
 
     @overload
     def get_X_and_y(
@@ -289,8 +288,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
     ) -> tuple[
         pd.DataFrame,
         pd.Series | pd.DataFrame | None,
-    ]:
-        ...
+    ]: ...
 
     # TODO(eddiebergman): Do all OpenMLSupervisedTask have a `y`?
     def get_X_and_y(
@@ -539,12 +537,10 @@ class OpenMLClusteringTask(OpenMLTask):
     def get_X(
         self,
         dataset_format: Literal["array"] = "array",
-    ) -> np.ndarray | scipy.sparse.spmatrix:
-        ...
+    ) -> np.ndarray | scipy.sparse.spmatrix: ...
 
     @overload
-    def get_X(self, dataset_format: Literal["dataframe"]) -> pd.DataFrame:
-        ...
+    def get_X(self, dataset_format: Literal["dataframe"]) -> pd.DataFrame: ...
 
     def get_X(
         self,

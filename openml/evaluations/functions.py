@@ -32,8 +32,7 @@ def list_evaluations(
     per_fold: bool | None = ...,
     sort_order: str | None = ...,
     output_format: Literal["dict", "object"] = "dict",
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -51,8 +50,7 @@ def list_evaluations(
     per_fold: bool | None = ...,
     sort_order: str | None = ...,
     output_format: Literal["dataframe"] = ...,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 def list_evaluations(

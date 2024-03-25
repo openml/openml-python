@@ -140,8 +140,7 @@ def list_flows(
     tag: str | None = ...,
     output_format: Literal["dict"] = "dict",
     **kwargs: Any,
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -152,8 +151,7 @@ def list_flows(
     *,
     output_format: Literal["dataframe"],
     **kwargs: Any,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 @overload
@@ -163,8 +161,7 @@ def list_flows(
     tag: str | None,
     output_format: Literal["dataframe"],
     **kwargs: Any,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 def list_flows(
@@ -243,18 +240,15 @@ def list_flows(
 
 
 @overload
-def _list_flows(output_format: Literal["dict"] = ..., **kwargs: Any) -> dict:
-    ...
+def _list_flows(output_format: Literal["dict"] = ..., **kwargs: Any) -> dict: ...
 
 
 @overload
-def _list_flows(*, output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame:
-    ...
+def _list_flows(*, output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame: ...
 
 
 @overload
-def _list_flows(output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame:
-    ...
+def _list_flows(output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame: ...
 
 
 def _list_flows(
@@ -391,13 +385,11 @@ def get_flow_id(
 
 
 @overload
-def __list_flows(api_call: str, output_format: Literal["dict"] = "dict") -> dict:
-    ...
+def __list_flows(api_call: str, output_format: Literal["dict"] = "dict") -> dict: ...
 
 
 @overload
-def __list_flows(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame:
-    ...
+def __list_flows(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame: ...
 
 
 def __list_flows(

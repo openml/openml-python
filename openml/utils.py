@@ -33,8 +33,7 @@ def extract_xml_tags(
     node: Mapping[str, Any],
     *,
     allow_none: Literal[True] = ...,
-) -> Any | None:
-    ...
+) -> Any | None: ...
 
 
 @overload
@@ -43,8 +42,7 @@ def extract_xml_tags(
     node: Mapping[str, Any],
     *,
     allow_none: Literal[False],
-) -> Any:
-    ...
+) -> Any: ...
 
 
 def extract_xml_tags(
@@ -243,8 +241,7 @@ def _list_all(
     list_output_format: Literal["dict"] = ...,
     *args: P.args,
     **filters: P.kwargs,
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -253,8 +250,7 @@ def _list_all(
     list_output_format: Literal["object"],
     *args: P.args,
     **filters: P.kwargs,
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -263,8 +259,7 @@ def _list_all(
     list_output_format: Literal["dataframe"],
     *args: P.args,
     **filters: P.kwargs,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 def _list_all(  # noqa: C901, PLR0912
