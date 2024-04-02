@@ -12,6 +12,8 @@ from typing_extensions import Literal, ParamSpec
 import numpy as np
 import pandas as pd
 import xmltodict
+from minio.helpers import ProgressType
+from tqdm import tqdm
 
 import openml
 import openml._api_calls
@@ -471,3 +473,39 @@ def _create_lockfiles_dir() -> Path:
     with contextlib.suppress(OSError):
         path.mkdir(exist_ok=True, parents=True)
     return path
+
+
+class ProgressBar(ProgressType):
+    """Progressbar for MinIO function's `progress` parameter."""
+
+    def __init__(self) -> None:
+        self._object_name = ""
+        self._progress_bar: tqdm | None = None
+
+    def set_meta(self, object_name: str, total_length: int) -> None:
+        """Initializes the progress bar.
+
+        Parameters
+        ----------
+        object_name: str
+          Not used.
+
+        total_length: int
+          File size of the object in bytes.
+        """
+        self._object_name = object_name
+        self._progress_bar = tqdm(total=total_length, unit_scale=True, unit="B")
+
+    def update(self, length: int) -> None:
+        """Updates the progress bar.
+
+        Parameters
+        ----------
+        length: int
+          Number of bytes downloaded since last `update` call.
+        """
+        if not self._progress_bar:
+            raise RuntimeError("Call `set_meta` before calling `update`.")
+        self._progress_bar.update(length)
+        if self._progress_bar.total <= self._progress_bar.n:
+            self._progress_bar.close()

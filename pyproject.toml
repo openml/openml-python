@@ -19,6 +19,7 @@ dependencies = [
   "numpy>=1.6.2",
   "minio",
   "pyarrow",
+  "tqdm",  # For MinIO download progress bars
 ]
 requires-python = ">=3.8"
 authors = [
