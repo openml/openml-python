@@ -1259,10 +1259,9 @@ def _get_dataset_parquet(
     if old_file_path.is_file():
         old_file_path.rename(output_file_path)
 
-    # For this release, we want to be able to force a new download even if the
-    # parquet file is already present when ``download_all_files`` is set.
-    # For now, it would be the only way for the user to fetch the additional
-    # files in the bucket (no function exists on an OpenMLDataset to do this).
+    # The call below skips files already on disk, so avoids downloading the parquet file twice.
+    # To force the old behavior of always downloading everything, use `force_refresh_cache`
+    # of `get_dataset`
     if download_all_files:
         openml._api_calls._download_minio_bucket(source=url, destination=cache_directory)
 

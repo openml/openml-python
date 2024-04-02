@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import logging
 import math
@@ -203,11 +204,12 @@ def _download_minio_bucket(source: str, destination: str | Path) -> None:
         if file_object.object_name is None:
             raise ValueError("Object name is None.")
 
-        _download_minio_file(
-            source=source.rsplit("/", 1)[0] + "/" + file_object.object_name.rsplit("/", 1)[1],
-            destination=Path(destination, file_object.object_name.rsplit("/", 1)[1]),
-            exists_ok=True,
-        )
+        with contextlib.suppress(FileExistsError):  # Simply use cached version instead
+            _download_minio_file(
+                source=source.rsplit("/", 1)[0] + "/" + file_object.object_name.rsplit("/", 1)[1],
+                destination=Path(destination, file_object.object_name.rsplit("/", 1)[1]),
+                exists_ok=False,
+            )
 
 
 def _download_text_file(
