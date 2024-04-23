@@ -21,6 +21,9 @@ from openml.exceptions import PyOpenMLError
 
 from .data_feature import OpenMLDataFeature
 
+import requests
+from tqdm import tqdm
+
 logger = logging.getLogger(__name__)
 
 
@@ -345,9 +348,45 @@ class OpenMLDataset(OpenMLBase):
         # import required here to avoid circular import.
         from .functions import _get_dataset_arff, _get_dataset_parquet
 
-        self.data_file = str(_get_dataset_arff(self))
-        if self._parquet_url is not None:
-            self.parquet_file = str(_get_dataset_parquet(self))
+        response = requests.get(self.url, stream=True)
+        total_size_in_bytes = int(response.headers.get('content-length', 0))
+        print("Starting download...")
+        if total_size_in_bytes == 0:
+            logger.warning("Could not retrieve the content length from the header, the progress bar will not be shown.")
+        else:
+            progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
+            try:
+                with open(self.data_file, 'wb') as file:
+                    for data in response.iter_content(1024):
+                        progress_bar.update(len(data))
+                        file.write(data)
+            finally:
+                progress_bar.close()
+                if progress_bar.n != total_size_in_bytes:
+                    logger.error("ERROR, something went wrong with downloading the file")
+
+        # if self.url is None:
+        #     logger.error("No URL set for downloading dataset.")
+        #     return
+
+        # # Assuming self.url is directly usable for the download
+        # response = requests.get(self.url, stream=True)
+        # total_size_in_bytes= int(response.headers.get('content-length', 0))
+        # progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
+
+        # with open(self.data_file, 'wb') as file:
+        #     for data in response.iter_content(1024):
+        #         progress_bar.update(len(data))
+        #         file.write(data)
+        # progress_bar.close()
+        
+        # if total_size_in_bytes != 0 and progress_bar.n != total_size_in_bytes:
+        #     logger.error("ERROR, something went wrong with downloading the file")
+
+
+        # self.data_file = str(_get_dataset_arff(self))
+        # if self._parquet_url is not None:
+        #     self.parquet_file = str(_get_dataset_parquet(self))
 
     def _get_arff(self, format: str) -> dict:  # noqa: A002
         """Read ARFF file and return decoded arff.
@@ -427,92 +466,135 @@ class OpenMLDataset(OpenMLBase):
             List[str]: List of column names.
         """
         try:
-            data = self._get_arff(self.format)
-        except OSError as e:
-            logger.critical(
-                f"Please check that the data file {arff_file_path} is " "there and can be read.",
-            )
-            raise e
+            file_size = arff_file_path.stat().st_size
+            progress_bar = tqdm.tqdm(total=file_size, unit='iB', unit_scale=True)
+            
+            with open(arff_file_path, 'r', encoding='utf8') as file:
+                data = []
+                attributes = []
+                data_started = False
+                for line in file:
+                    progress_bar.update(len(line.encode('utf-8')))  # Update based on bytes read
+                    line = line.strip()
+                    if line.startswith('@data'):
+                        data_started = True
+                        continue
+                    elif line.startswith('@attribute'):
+                        attributes.append(line)
+                        continue
 
-        ARFF_DTYPES_TO_PD_DTYPE = {
-            "INTEGER": "integer",
-            "REAL": "floating",
-            "NUMERIC": "floating",
-            "STRING": "string",
-        }
-        attribute_dtype = {}
-        attribute_names = []
-        categories_names = {}
-        categorical = []
-        for name, type_ in data["attributes"]:
-            # if the feature is nominal and a sparse matrix is
-            # requested, the categories need to be numeric
-            if isinstance(type_, list) and self.format.lower() == "sparse_arff":
-                try:
-                    # checks if the strings which should be the class labels
-                    # can be encoded into integers
-                    pd.factorize(type_)[0]
-                except ValueError as e:
-                    raise ValueError(
-                        "Categorical data needs to be numeric when using sparse ARFF."
-                    ) from e
+                    if data_started and line:
+                        data.append(line.split(','))
 
-            # string can only be supported with pandas DataFrame
-            elif type_ == "STRING" and self.format.lower() == "sparse_arff":
-                raise ValueError("Dataset containing strings is not supported with sparse ARFF.")
+            progress_bar.close()
 
-            # infer the dtype from the ARFF header
-            if isinstance(type_, list):
-                categorical.append(True)
-                categories_names[name] = type_
-                if len(type_) == 2:
-                    type_norm = [cat.lower().capitalize() for cat in type_]
-                    if {"True", "False"} == set(type_norm):
-                        categories_names[name] = [cat == "True" for cat in type_norm]
-                        attribute_dtype[name] = "boolean"
-                    else:
-                        attribute_dtype[name] = "categorical"
-                else:
-                    attribute_dtype[name] = "categorical"
+            # Convert the parsed data into a DataFrame or a sparse matrix as needed
+            df = pd.DataFrame(data, columns=[attr.split(' ')[1] for attr in attributes])
+            categorical = [True if 'nominal' in attr else False for attr in attributes]
+            attribute_names = [attr.split(' ')[1] for attr in attributes]
+
+            # Convert strings to numeric values if required
+            for column in df.columns[categorical]:
+                df[column] = pd.Categorical(df[column]).codes
+
+            if self.format.lower() == 'sparse_arff':
+                # Convert DataFrame to a sparse matrix
+                from scipy.sparse import csr_matrix
+                matrix = csr_matrix(df.values)
+                return matrix, categorical, attribute_names
             else:
-                categorical.append(False)
-                attribute_dtype[name] = ARFF_DTYPES_TO_PD_DTYPE[type_]
-            attribute_names.append(name)
+                return df, categorical, attribute_names
 
-        if self.format.lower() == "sparse_arff":
-            X = data["data"]
-            X_shape = (max(X[1]) + 1, max(X[2]) + 1)
-            X = scipy.sparse.coo_matrix((X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
-            X = X.tocsr()
-        elif self.format.lower() == "arff":
-            X = pd.DataFrame(data["data"], columns=attribute_names)
+        except OSError as e:
+            logger.critical(f"Cannot read {arff_file_path}.")
+            raise e
+        # try:
+        #     data = self._get_arff(self.format)
+        # except OSError as e:
+        #     logger.critical(
+        #         f"Please check that the data file {arff_file_path} is " "there and can be read.",
+        #     )
+        #     raise e
 
-            col = []
-            for column_name in X.columns:
-                if attribute_dtype[column_name] in ("categorical", "boolean"):
-                    categories = self._unpack_categories(
-                        X[column_name],  # type: ignore
-                        categories_names[column_name],
-                    )
-                    col.append(categories)
-                elif attribute_dtype[column_name] in ("floating", "integer"):
-                    X_col = X[column_name]
-                    if X_col.min() >= 0 and X_col.max() <= 255:
-                        try:
-                            X_col_uint = X_col.astype("uint8")
-                            if (X_col == X_col_uint).all():
-                                col.append(X_col_uint)
-                                continue
-                        except ValueError:
-                            pass
-                    col.append(X[column_name])
-                else:
-                    col.append(X[column_name])
-            X = pd.concat(col, axis=1)
-        else:
-            raise ValueError(f"Dataset format '{self.format}' is not a valid format.")
+        # ARFF_DTYPES_TO_PD_DTYPE = {
+        #     "INTEGER": "integer",
+        #     "REAL": "floating",
+        #     "NUMERIC": "floating",
+        #     "STRING": "string",
+        # }
+        # attribute_dtype = {}
+        # attribute_names = []
+        # categories_names = {}
+        # categorical = []
+        # for name, type_ in data["attributes"]:
+        #     # if the feature is nominal and a sparse matrix is
+        #     # requested, the categories need to be numeric
+        #     if isinstance(type_, list) and self.format.lower() == "sparse_arff":
+        #         try:
+        #             # checks if the strings which should be the class labels
+        #             # can be encoded into integers
+        #             pd.factorize(type_)[0]
+        #         except ValueError as e:
+        #             raise ValueError(
+        #                 "Categorical data needs to be numeric when using sparse ARFF."
+        #             ) from e
 
-        return X, categorical, attribute_names  # type: ignore
+        #     # string can only be supported with pandas DataFrame
+        #     elif type_ == "STRING" and self.format.lower() == "sparse_arff":
+        #         raise ValueError("Dataset containing strings is not supported with sparse ARFF.")
+
+        #     # infer the dtype from the ARFF header
+        #     if isinstance(type_, list):
+        #         categorical.append(True)
+        #         categories_names[name] = type_
+        #         if len(type_) == 2:
+        #             type_norm = [cat.lower().capitalize() for cat in type_]
+        #             if {"True", "False"} == set(type_norm):
+        #                 categories_names[name] = [cat == "True" for cat in type_norm]
+        #                 attribute_dtype[name] = "boolean"
+        #             else:
+        #                 attribute_dtype[name] = "categorical"
+        #         else:
+        #             attribute_dtype[name] = "categorical"
+        #     else:
+        #         categorical.append(False)
+        #         attribute_dtype[name] = ARFF_DTYPES_TO_PD_DTYPE[type_]
+        #     attribute_names.append(name)
+
+        # if self.format.lower() == "sparse_arff":
+        #     X = data["data"]
+        #     X_shape = (max(X[1]) + 1, max(X[2]) + 1)
+        #     X = scipy.sparse.coo_matrix((X[0], (X[1], X[2])), shape=X_shape, dtype=np.float32)
+        #     X = X.tocsr()
+        # elif self.format.lower() == "arff":
+        #     X = pd.DataFrame(data["data"], columns=attribute_names)
+
+        #     col = []
+        #     for column_name in X.columns:
+        #         if attribute_dtype[column_name] in ("categorical", "boolean"):
+        #             categories = self._unpack_categories(
+        #                 X[column_name],  # type: ignore
+        #                 categories_names[column_name],
+        #             )
+        #             col.append(categories)
+        #         elif attribute_dtype[column_name] in ("floating", "integer"):
+        #             X_col = X[column_name]
+        #             if X_col.min() >= 0 and X_col.max() <= 255:
+        #                 try:
+        #                     X_col_uint = X_col.astype("uint8")
+        #                     if (X_col == X_col_uint).all():
+        #                         col.append(X_col_uint)
+        #                         continue
+        #                 except ValueError:
+        #                     pass
+        #             col.append(X[column_name])
+        #         else:
+        #             col.append(X[column_name])
+        #     X = pd.concat(col, axis=1)
+        # else:
+        #     raise ValueError(f"Dataset format '{self.format}' is not a valid format.")
+
+        # return X, categorical, attribute_names  # type: ignore
 
     def _compressed_cache_file_paths(self, data_file: Path) -> tuple[Path, Path, Path]:
         data_pickle_file = data_file.with_suffix(".pkl.py3")
