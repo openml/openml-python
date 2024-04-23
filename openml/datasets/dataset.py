@@ -13,16 +13,15 @@ from typing_extensions import Literal
 import arff
 import numpy as np
 import pandas as pd
+import requests
 import scipy.sparse
 import xmltodict
+from tqdm import tqdm
 
 from openml.base import OpenMLBase
 from openml.exceptions import PyOpenMLError
 
 from .data_feature import OpenMLDataFeature
-
-import requests
-from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 
@@ -346,17 +345,17 @@ class OpenMLDataset(OpenMLBase):
     def _download_data(self) -> None:
         """Download ARFF data file to standard cache directory. Set `self.data_file`."""
         # import required here to avoid circular import.
-        from .functions import _get_dataset_arff, _get_dataset_parquet
 
         response = requests.get(self.url, stream=True)
-        total_size_in_bytes = int(response.headers.get('content-length', 0))
-        print("Starting download...")
+        total_size_in_bytes = int(response.headers.get("content-length", 0))
         if total_size_in_bytes == 0:
-            logger.warning("Could not retrieve the content length from the header, the progress bar will not be shown.")
+            logger.warning(
+                "Could not retrieve the content length from the header, the progress bar will not be shown."
+            )
         else:
-            progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
+            progress_bar = tqdm(total=total_size_in_bytes, unit="iB", unit_scale=True)
             try:
-                with open(self.data_file, 'wb') as file:
+                with open(self.data_file, "wb") as file:
                     for data in response.iter_content(1024):
                         progress_bar.update(len(data))
                         file.write(data)
@@ -379,10 +378,9 @@ class OpenMLDataset(OpenMLBase):
         #         progress_bar.update(len(data))
         #         file.write(data)
         # progress_bar.close()
-        
+
         # if total_size_in_bytes != 0 and progress_bar.n != total_size_in_bytes:
         #     logger.error("ERROR, something went wrong with downloading the file")
-
 
         # self.data_file = str(_get_dataset_arff(self))
         # if self._parquet_url is not None:
@@ -447,7 +445,7 @@ class OpenMLDataset(OpenMLBase):
             with filepath.open(encoding="utf8") as fh:
                 return decode_arff(fh)
 
-    def _parse_data_from_arff(  # noqa: C901, PLR0912, PLR0915
+    def _parse_data_from_arff(
         self,
         arff_file_path: Path,
     ) -> tuple[pd.DataFrame | scipy.sparse.csr_matrix, list[bool], list[str]]:
@@ -467,39 +465,40 @@ class OpenMLDataset(OpenMLBase):
         """
         try:
             file_size = arff_file_path.stat().st_size
-            progress_bar = tqdm.tqdm(total=file_size, unit='iB', unit_scale=True)
-            
-            with open(arff_file_path, 'r', encoding='utf8') as file:
+            progress_bar = tqdm.tqdm(total=file_size, unit="iB", unit_scale=True)
+
+            with open(arff_file_path, encoding="utf8") as file:
                 data = []
                 attributes = []
                 data_started = False
                 for line in file:
-                    progress_bar.update(len(line.encode('utf-8')))  # Update based on bytes read
+                    progress_bar.update(len(line.encode("utf-8")))  # Update based on bytes read
                     line = line.strip()
-                    if line.startswith('@data'):
+                    if line.startswith("@data"):
                         data_started = True
                         continue
-                    elif line.startswith('@attribute'):
+                    elif line.startswith("@attribute"):
                         attributes.append(line)
                         continue
 
                     if data_started and line:
-                        data.append(line.split(','))
+                        data.append(line.split(","))
 
             progress_bar.close()
 
             # Convert the parsed data into a DataFrame or a sparse matrix as needed
-            df = pd.DataFrame(data, columns=[attr.split(' ')[1] for attr in attributes])
-            categorical = [True if 'nominal' in attr else False for attr in attributes]
-            attribute_names = [attr.split(' ')[1] for attr in attributes]
+            df = pd.DataFrame(data, columns=[attr.split(" ")[1] for attr in attributes])
+            categorical = ["nominal" in attr for attr in attributes]
+            attribute_names = [attr.split(" ")[1] for attr in attributes]
 
             # Convert strings to numeric values if required
             for column in df.columns[categorical]:
                 df[column] = pd.Categorical(df[column]).codes
 
-            if self.format.lower() == 'sparse_arff':
+            if self.format.lower() == "sparse_arff":
                 # Convert DataFrame to a sparse matrix
                 from scipy.sparse import csr_matrix
+
                 matrix = csr_matrix(df.values)
                 return matrix, categorical, attribute_names
             else:
