@@ -319,7 +319,7 @@ def _parse_config(config_file: str | Path) -> _Config:
     config_file_ = StringIO()
     config_file_.write("[FAKE_SECTION]\n")
     try:
-        with config_file.open("w") as fh:
+        with config_file.open("r") as fh:
             for line in fh:
                 config_file_.write(line)
     except FileNotFoundError:
