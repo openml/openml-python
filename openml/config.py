@@ -252,11 +252,11 @@ def _setup(config: _Config | None = None) -> None:
     if config is None:
         config = _parse_config(config_file)
 
-    avoid_duplicate_runs = config.get("avoid_duplicate_runs", False)
+    avoid_duplicate_runs = bool(config.get("avoid_duplicate_runs", False))
     apikey = config["apikey"]
     server = config["server"]
-    short_cache_dir = config["cachedir"]
-    n_retries = config["connection_n_retries"]
+    short_cache_dir = Path(config["cachedir"])
+    n_retries = int(config["connection_n_retries"])
 
     set_retry_policy(config["retry_policy"], n_retries)
 
