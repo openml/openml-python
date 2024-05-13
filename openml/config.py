@@ -252,7 +252,7 @@ def _setup(config: _Config | None = None) -> None:
     if config is None:
         config = _parse_config(config_file)
 
-    avoid_duplicate_runs = bool(config.get("avoid_duplicate_runs", False))
+    avoid_duplicate_runs = config.get("avoid_duplicate_runs", "").lower() == "true"
     apikey = config["apikey"]
     server = config["server"]
     short_cache_dir = Path(config["cachedir"])
