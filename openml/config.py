@@ -252,7 +252,7 @@ def _setup(config: _Config | None = None) -> None:
     if config is None:
         config = _parse_config(config_file)
 
-    avoid_duplicate_runs = config.get("avoid_duplicate_runs", "").lower() == "true"
+    avoid_duplicate_runs = config["avoid_duplicate_runs"]
     apikey = config["apikey"]
     server = config["server"]
     short_cache_dir = Path(config["cachedir"])
@@ -328,6 +328,10 @@ def _parse_config(config_file: str | Path) -> _Config:
         logger.info("Error opening file %s: %s", config_file, e.args[0])
     config_file_.seek(0)
     config.read_file(config_file_)
+    if isinstance(config["FAKE_SECTION"]["avoid_duplicate_runs"], str):
+        config["FAKE_SECTION"]["avoid_duplicate_runs"] = config["FAKE_SECTION"].getboolean(
+            "avoid_duplicate_runs"
+        )  # type: ignore
     return dict(config.items("FAKE_SECTION"))  # type: ignore
 
 
