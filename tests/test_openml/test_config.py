@@ -116,3 +116,20 @@ class TestConfigurationForExamples(openml.testing.TestBase):
 
         assert openml.config.apikey == "610344db6388d9ba34f6db45a3cf71de"
         assert openml.config.server == self.production_server
+
+
+def test_configuration_file_not_overwritten_on_load():
+    """ Regression test for #1337 """
+    config_file_content = "apikey = abcd"
+    with tempfile.TemporaryDirectory() as tmpdir:
+        config_file_path = Path(tmpdir) / "config"
+        with config_file_path.open("w") as config_file:
+            config_file.write(config_file_content)
+
+        read_config = openml.config._parse_config(config_file_path)
+
+        with config_file_path.open("r") as config_file:
+            new_file_content = config_file.read()
+
+    assert config_file_content == new_file_content
+    assert "abcd" == read_config["apikey"]
