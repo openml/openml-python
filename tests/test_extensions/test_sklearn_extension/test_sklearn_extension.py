@@ -382,9 +382,11 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     def test_serialize_model_with_subcomponent(self):
+        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
+        estimator_param = {estimator_name: sklearn.tree.DecisionTreeClassifier()}
         model = sklearn.ensemble.AdaBoostClassifier(
             n_estimators=100,
-            base_estimator=sklearn.tree.DecisionTreeClassifier(),
+            **estimator_param,
         )
 
         weight_name = "{}weight_boosting".format(
@@ -393,7 +395,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         tree_name = "tree" if LooseVersion(sklearn.__version__) < "0.22" else "_classes"
         fixture_name = (
             f"sklearn.ensemble.{weight_name}.AdaBoostClassifier"
-            f"(base_estimator=sklearn.tree.{tree_name}.DecisionTreeClassifier)"
+            f"({estimator_name}=sklearn.tree.{tree_name}.DecisionTreeClassifier)"
         )
         fixture_class_name = f"sklearn.ensemble.{weight_name}.AdaBoostClassifier"
         fixture_short_name = "sklearn.AdaBoostClassifier"
@@ -413,14 +415,14 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture_subcomponent_description = "A decision tree classifier."
         fixture_structure = {
             fixture_name: [],
-            f"sklearn.tree.{tree_name}.DecisionTreeClassifier": ["base_estimator"],
+            f"sklearn.tree.{tree_name}.DecisionTreeClassifier": [estimator_name],
         }
 
         serialization, _ = self._serialization_test_helper(
             model,
             X=self.X,
             y=self.y,
-            subcomponent_parameters=["base_estimator"],
+            subcomponent_parameters=[estimator_name],
             dependencies_mock_call_count=(2, 4),
         )
         structure = serialization.get_structure("name")
@@ -428,17 +430,18 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         assert serialization.name == fixture_name
         assert serialization.class_name == fixture_class_name
         assert serialization.custom_name == fixture_short_name
-        assert serialization.description == fixture_description
+        if LooseVersion(sklearn.__version__) < "1.4":
+            assert serialization.description == fixture_description
         assert serialization.parameters["algorithm"] == '"SAMME.R"'
-        assert isinstance(serialization.parameters["base_estimator"], str)
+        assert isinstance(serialization.parameters[estimator_name], str)
         assert serialization.parameters["learning_rate"] == "1.0"
         assert serialization.parameters["n_estimators"] == "100"
-        assert serialization.components["base_estimator"].name == fixture_subcomponent_name
+        assert serialization.components[estimator_name].name == fixture_subcomponent_name
         assert (
-            serialization.components["base_estimator"].class_name == fixture_subcomponent_class_name
+            serialization.components[estimator_name].class_name == fixture_subcomponent_class_name
         )
         assert (
-            serialization.components["base_estimator"].description
+            serialization.components[estimator_name].description
             == fixture_subcomponent_description
         )
         self.assertDictEqual(structure, fixture_structure)
@@ -807,6 +810,10 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
 
     @pytest.mark.sklearn()
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) >= "1.4",
+        "AdaBoost parameter name changed as did the way its forwarded to GridSearchCV",
+    )
     def test_serialize_complex_flow(self):
         ohe = sklearn.preprocessing.OneHotEncoder(handle_unknown="ignore")
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
