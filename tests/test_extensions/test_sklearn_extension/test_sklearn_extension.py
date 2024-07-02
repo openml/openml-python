@@ -708,7 +708,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         reason="Pipeline processing behaviour updated",
     )
     def test_serialize_feature_union(self):
-        ohe_params = {"sparse": False}
+        sparse_parameter = "sparse" if LooseVersion(sklearn.__version__) < "1.4" else "sparse_output" 
+        ohe_params = {sparse_parameter: False}
         if LooseVersion(sklearn.__version__) >= "0.20":
             ohe_params["categories"] = "auto"
         ohe = sklearn.preprocessing.OneHotEncoder(**ohe_params)
@@ -1411,10 +1412,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "OneHotEncoder__sparse": False,
                 "Estimator__min_samples_leaf": 42,
             }
-        else:
+        elif LooseVersion(sklearn.__version__) < "1.4":
             params = {
                 "Imputer__strategy": "mean",
                 "OneHotEncoder__sparse": True,
+                "Estimator__min_samples_leaf": 1,
+            }
+        else:
+            params = {
+                "Imputer__strategy": "mean",
+                "OneHotEncoder__sparse_output": True,
                 "Estimator__min_samples_leaf": 1,
             }
         pipe_adjusted.set_params(**params)
@@ -1450,10 +1457,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "OneHotEncoder__sparse": False,
                 "Estimator__n_estimators": 10,
             }
-        else:
+        elif LooseVersion(sklearn.__version__) < "1.4":
             params = {
                 "Imputer__strategy": "mean",
                 "OneHotEncoder__sparse": True,
+                "Estimator__n_estimators": 50,
+            }
+        else:
+            params = {
+                "Imputer__strategy": "mean",
+                "OneHotEncoder__sparse_output": True,
                 "Estimator__n_estimators": 50,
             }
         pipe_adjusted.set_params(**params)
@@ -1489,12 +1502,13 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         pipe_adjusted = sklearn.clone(pipe_orig)
         impute_strategy = "median" if LooseVersion(sklearn.__version__) < "0.23" else "mean"
         sparse = LooseVersion(sklearn.__version__) >= "0.23"
+        sparse_parameter = "sparse" if LooseVersion(sklearn.__version__) < "1.4" else "sparse_output"
         estimator_name = (
             "base_estimator" if LooseVersion(sklearn.__version__) < "1.2" else "estimator"
         )
         params = {
             "Imputer__strategy": impute_strategy,
-            "OneHotEncoder__sparse": sparse,
+            f"OneHotEncoder__{sparse_parameter}": sparse,
             "Estimator__n_estimators": 10,
             f"Estimator__{estimator_name}__n_estimators": 10,
             f"Estimator__{estimator_name}__{estimator_name}__learning_rate": 0.1,
@@ -1764,9 +1778,10 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y.iloc[test_indices]
 
         # Helper functions to return required columns for ColumnTransformer
+        sparse = {"sparse" if LooseVersion(sklearn.__version) < "1.4" else "sparse_output": False}
         cat_imp = make_pipeline(
             SimpleImputer(strategy="most_frequent"),
-            OneHotEncoder(handle_unknown="ignore", sparse=False),
+            OneHotEncoder(handle_unknown="ignore", **sparse),
         )
         cont_imp = make_pipeline(CustomImputer(strategy="mean"), StandardScaler())
         ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
