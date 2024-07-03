@@ -179,9 +179,10 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     def test_serialize_model(self):
+        max_features = "auto" if LooseVersion(sklearn.__version__) < "1.3" else "sqrt"
         model = sklearn.tree.DecisionTreeClassifier(
             criterion="entropy",
-            max_features="auto",
+            max_features=max_features,
             max_leaf_nodes=2000,
         )
 
@@ -236,7 +237,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("class_weight", "null"),
                     ("criterion", '"entropy"'),
                     ("max_depth", "null"),
-                    ("max_features", '"auto"'),
+                    ("max_features", f'"{max_features}"'),
                     ("max_leaf_nodes", "2000"),
                     ("min_impurity_decrease", "0.0"),
                     ("min_samples_leaf", "1"),
@@ -701,8 +702,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         structure = serialization.get_structure("name")
         assert serialization.name == fixture_name
-        assert serialization.description == fixture_description
-
+        if LooseVersion(sklearn.__version__) < "1.3":  # Not yet up-to-date for later versions
+            assert serialization.description == fixture_description
         self.assertDictEqual(structure, fixture_structure)
 
     @pytest.mark.sklearn()
