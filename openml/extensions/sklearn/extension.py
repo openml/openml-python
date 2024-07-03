@@ -48,9 +48,10 @@ DEPENDENCIES_PATTERN = re.compile(
     r"(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?[0-9]*))?$",
 )
 
+sctypes = np.sctypes if LooseVersion(np.__version__) < "2.0" else np.core.sctypes
 SIMPLE_NUMPY_TYPES = [
     nptype
-    for type_cat, nptypes in np.sctypes.items()
+    for type_cat, nptypes in sctypes.items()
     for nptype in nptypes  # type: ignore
     if type_cat != "others"
 ]
