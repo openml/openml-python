@@ -478,7 +478,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         assert serialization.name == fixture_name
         assert serialization.custom_name == fixture_short_name
-        assert serialization.description == fixture_description
+        if LooseVersion(sklearn.__version__) < "1.3":
+            # Newer versions of scikit-learn have update docstrings
+            assert serialization.description == fixture_description
         self.assertDictEqual(structure, fixture_structure)
 
         # Comparing the pipeline
@@ -545,7 +547,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         assert serialization.name == fixture_name
         assert serialization.custom_name == fixture_short_name
-        assert serialization.description == fixture_description
+        if LooseVersion(sklearn.__version__) < "1.3":
+            # Newer versions of scikit-learn have update docstrings
+            assert serialization.description == fixture_description
         self.assertDictEqual(structure, fixture_structure)
 
         # Comparing the pipeline
