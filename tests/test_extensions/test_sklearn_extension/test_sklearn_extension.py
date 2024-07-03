@@ -1786,7 +1786,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y.iloc[test_indices]
 
         # Helper functions to return required columns for ColumnTransformer
-        sparse = {"sparse" if LooseVersion(sklearn.__version) < "1.4" else "sparse_output": False}
+        sparse = {"sparse" if LooseVersion(sklearn.__version__) < "1.4" else "sparse_output": False}
         cat_imp = make_pipeline(
             SimpleImputer(strategy="most_frequent"),
             OneHotEncoder(handle_unknown="ignore", **sparse),
