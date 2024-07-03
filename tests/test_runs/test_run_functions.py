@@ -1808,7 +1808,7 @@ class TestRun(TestBase):
             scores,
             expected_scores,
             decimal=2,
-            error_msg="Observed performance scores deviate from expected ones.",
+            err_msg="Observed performance scores deviate from expected ones.",
         )
 
     @pytest.mark.sklearn()
