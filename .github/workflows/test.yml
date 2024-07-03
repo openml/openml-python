@@ -30,7 +30,8 @@ jobs:
         os: [ubuntu-latest]
         sklearn-only: ["true"]
         include:
-          - python-version: "3.8"  # no scikit-learn 0.23 release for Python 3.9
+          - os: ubuntu-latest
+            python-version: "3.8"  # no scikit-learn 0.23 release for Python 3.9
             scikit-learn: "0.23.1"
             sklearn-only: "true"
           # scikit-learn 0.24 relies on scipy defaults, so we need to fix the version
@@ -48,8 +49,8 @@ jobs:
             scipy: "1.10.0"
             sklearn-only: 'false'
           # Include a code cov version
-          - code-cov: true
-            os: ubuntu-latest
+          - os: ubuntu-latest
+            code-cov: true
             python-version: "3.8"
             scikit-learn: 0.23.1
             sklearn-only: 'false'
