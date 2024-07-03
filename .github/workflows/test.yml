@@ -30,8 +30,7 @@ jobs:
         os: [ubuntu-latest]
         sklearn-only: ["true"]
         include:
-          # no scikit-learn 0.23 release for Python 3.9
-          - python-version: "3.8"
+          - python-version: "3.8"  # no scikit-learn 0.23 release for Python 3.9
             scikit-learn: "0.23.1"
             sklearn-only: "true"
           # scikit-learn 0.24 relies on scipy defaults, so we need to fix the version
