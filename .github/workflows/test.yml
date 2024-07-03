@@ -80,7 +80,7 @@ jobs:
     - name: "Install NumPy 1.x for scikit-learn < 1.4"
       if: ${{ contains(fromJSON('["1.0", "1.1", "1.2", "1.3"]'), matrix.scikit-learn) }}
       run: |
-        pip install "numpy<=2.0"
+        pip install "numpy<2.0"
     - name: Install scipy ${{ matrix.scipy }}
       if: ${{ matrix.scipy }}
       run: |
