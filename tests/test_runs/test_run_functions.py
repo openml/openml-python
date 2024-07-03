@@ -1339,10 +1339,11 @@ class TestRun(TestBase):
         num_instances = 3196
         num_folds = 10
         num_repeats = 1
+        loss = "log" if LooseVersion(sklearn.__version__) < "1.3" else "log_loss"
 
         clf = make_pipeline(
             OneHotEncoder(handle_unknown="ignore"),
-            SGDClassifier(loss="log", random_state=1),
+            SGDClassifier(loss=loss, random_state=1),
         )
         res = openml.runs.functions._run_task_get_arffcontent(
             extension=self.extension,
@@ -1764,7 +1765,8 @@ class TestRun(TestBase):
         x, y = task.get_X_and_y(dataset_format="dataframe")
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
-        clf = SGDClassifier(loss="log", random_state=1)
+        loss = "log" if LooseVersion(sklearn.__version__) < "1.3" else "log_loss"
+        clf = SGDClassifier(loss=loss, random_state=1)
         n_jobs = 2
         backend = "loky" if LooseVersion(joblib.__version__) > "0.11" else "multiprocessing"
         with parallel_backend(backend, n_jobs=n_jobs):
@@ -1805,7 +1807,8 @@ class TestRun(TestBase):
         np.testing.assert_array_almost_equal(
             scores,
             expected_scores,
-            decimal=2 if os.name == "nt" else 7,
+            decimal=2,
+            error_msg="Observed performance scores deviate from expected ones.",
         )
 
     @pytest.mark.sklearn()
