@@ -89,6 +89,8 @@ jobs:
       id: status-before
       run: |
         echo "::set-output name=BEFORE::$(git status --porcelain -b)"
+    - name: Show installed dependencies
+      run: python -m pip list
     - name: Run tests on Ubuntu
       if: matrix.os == 'ubuntu-latest'
       run: |
