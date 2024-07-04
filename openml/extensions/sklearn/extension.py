@@ -2168,12 +2168,10 @@ class SklearnExtension(Extension):
                     value = model.cv_results_[key][itt_no]
                     # Built-in serializer does not convert all numpy types,
                     # these methods convert them to built-in types instead.
-                    if value is np.ma.masked:
-                        value = np.nan
                     if isinstance(value, np.generic):
                         # For scalars it actually returns scalars, not a list
                         value = value.tolist()
-                    serialized_value = json.dumps(value)
+                    serialized_value = json.dumps(value) if value is not np.ma.masked else np.nan
                     arff_line.append(serialized_value)
             arff_tracecontent.append(arff_line)
         return arff_tracecontent
