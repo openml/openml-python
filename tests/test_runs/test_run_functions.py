@@ -795,9 +795,10 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     def test_run_and_upload_gridsearch(self):
+        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
         gridsearch = GridSearchCV(
-            BaggingClassifier(base_estimator=SVC()),
-            {"base_estimator__C": [0.01, 0.1, 10], "base_estimator__gamma": [0.01, 0.1, 10]},
+            BaggingClassifier(**{estimator_name: SVC()}),
+            {f"{estimator_name}__C": [0.01, 0.1, 10], f"{estimator_name}__gamma": [0.01, 0.1, 10]},
             cv=3,
         )
         task_id = self.TEST_SERVER_TASK_SIMPLE["task_id"]
