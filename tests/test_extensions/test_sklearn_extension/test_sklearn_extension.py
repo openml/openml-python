@@ -231,6 +231,23 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("splitter", '"best"'),
                 ),
             )
+        elif LooseVersion(sklearn.__version__) < "1.4":
+            fixture_parameters = OrderedDict(
+                (
+                    ("class_weight", "null"),
+                    ("criterion", '"entropy"'),
+                    ("max_depth", "null"),
+                    ("max_features", f'"{max_features}"'),
+                    ("max_leaf_nodes", "2000"),
+                    ("min_impurity_decrease", "0.0"),
+                    ("min_samples_leaf", "1"),
+                    ("min_samples_split", "2"),
+                    ("min_weight_fraction_leaf", "0.0"),
+                    ("presort", presort_val),
+                    ("random_state", "null"),
+                    ("splitter", '"best"'),
+                ),
+            )
         else:
             fixture_parameters = OrderedDict(
                 (
@@ -244,6 +261,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("min_samples_split", "2"),
                     ("min_weight_fraction_leaf", "0.0"),
                     ("presort", presort_val),
+                    ('monotonic_cst', 'null'),
                     ("random_state", "null"),
                     ("splitter", '"best"'),
                 ),
@@ -289,80 +307,48 @@ class TestSklearnExtensionFlowFunctions(TestBase):
     def test_serialize_model_clustering(self):
         model = sklearn.cluster.KMeans()
 
-        cluster_name = "k_means_" if LooseVersion(sklearn.__version__) < "0.22" else "_kmeans"
+        sklearn_version = LooseVersion(sklearn.__version__)
+        cluster_name = "k_means_" if sklearn_version < "0.22" else "_kmeans"
         fixture_name = f"sklearn.cluster.{cluster_name}.KMeans"
         fixture_short_name = "sklearn.KMeans"
         # str obtained from self.extension._get_sklearn_description(model)
         fixture_description = "K-Means clustering{}".format(
-            "" if LooseVersion(sklearn.__version__) < "0.22" else ".",
+            "" if sklearn_version < "0.22" else ".",
         )
         version_fixture = self.extension._min_dependency_str(sklearn.__version__)
 
-        n_jobs_val = "null" if LooseVersion(sklearn.__version__) < "0.23" else '"deprecated"'
-        precomp_val = '"auto"' if LooseVersion(sklearn.__version__) < "0.23" else '"deprecated"'
+        n_jobs_val = "1"
+        if sklearn_version >= "0.20":
+            n_jobs_val = "null"
+        if sklearn_version >= "0.23":
+            n_jobs_val = '"deprecated"'
 
-        # n_jobs default has changed to None in 0.20
-        if LooseVersion(sklearn.__version__) < "0.20":
-            fixture_parameters = OrderedDict(
-                (
-                    ("algorithm", '"auto"'),
-                    ("copy_x", "true"),
-                    ("init", '"k-means++"'),
-                    ("max_iter", "300"),
-                    ("n_clusters", "8"),
-                    ("n_init", "10"),
-                    ("n_jobs", "1"),
-                    ("precompute_distances", '"auto"'),
-                    ("random_state", "null"),
-                    ("tol", "0.0001"),
-                    ("verbose", "0"),
-                ),
-            )
-        elif LooseVersion(sklearn.__version__) < "1.0":
-            fixture_parameters = OrderedDict(
-                (
-                    ("algorithm", '"auto"'),
-                    ("copy_x", "true"),
-                    ("init", '"k-means++"'),
-                    ("max_iter", "300"),
-                    ("n_clusters", "8"),
-                    ("n_init", "10"),
-                    ("n_jobs", n_jobs_val),
-                    ("precompute_distances", precomp_val),
-                    ("random_state", "null"),
-                    ("tol", "0.0001"),
-                    ("verbose", "0"),
-                ),
-            )
-        elif LooseVersion(sklearn.__version__) < "1.1":
-            fixture_parameters = OrderedDict(
-                (
-                    ("algorithm", '"auto"'),
-                    ("copy_x", "true"),
-                    ("init", '"k-means++"'),
-                    ("max_iter", "300"),
-                    ("n_clusters", "8"),
-                    ("n_init", "10"),
-                    ("random_state", "null"),
-                    ("tol", "0.0001"),
-                    ("verbose", "0"),
-                ),
-            )
-        else:
-            n_init = '"warn"' if LooseVersion(sklearn.__version__) >= "1.2" else "10"
-            fixture_parameters = OrderedDict(
-                (
-                    ("algorithm", '"lloyd"'),
-                    ("copy_x", "true"),
-                    ("init", '"k-means++"'),
-                    ("max_iter", "300"),
-                    ("n_clusters", "8"),
-                    ("n_init", n_init),
-                    ("random_state", "null"),
-                    ("tol", "0.0001"),
-                    ("verbose", "0"),
-                ),
-            )
+        precomp_val = '"auto"' if sklearn_version < "0.23" else '"deprecated"'
+        n_init = "10"
+        if sklearn_version >= "1.2":
+            n_init = '"warn"'
+        if sklearn_version >= "1.4":
+            n_init = '"auto"'
+
+        algorithm = '"auto"' if sklearn_version < "1.1" else '"lloyd"'
+        fixture_parameters = OrderedDict([
+            ("algorithm", algorithm),
+            ("copy_x", "true"),
+            ("init", '"k-means++"'),
+            ("max_iter", "300"),
+            ("n_clusters", "8"),
+            ("n_init", n_init),
+            ("n_jobs", n_jobs_val),
+            ("precompute_distances", precomp_val),
+            ("random_state", "null"),
+            ("tol", "0.0001"),
+            ("verbose", "0"),
+        ])
+
+        if sklearn_version >= "1.0":
+            fixture_parameters.pop("n_jobs")
+            fixture_parameters.pop("precompute_distances")
+
         fixture_structure = {f"sklearn.cluster.{cluster_name}.KMeans": []}
 
         serialization, _ = self._serialization_test_helper(
@@ -1308,6 +1294,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # using this param distribution should not raise an exception
         legal_param_dist = {"n_estimators": [2, 3, 4]}
 
+        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
         legal_models = [
             sklearn.ensemble.RandomForestClassifier(),
             sklearn.ensemble.RandomForestClassifier(n_jobs=5),
@@ -1325,7 +1312,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             sklearn.model_selection.GridSearchCV(multicore_bagging, legal_param_dist),
             sklearn.ensemble.BaggingClassifier(
                 n_jobs=-1,
-                base_estimator=sklearn.ensemble.RandomForestClassifier(n_jobs=5),
+                **{estimator_name: sklearn.ensemble.RandomForestClassifier(n_jobs=5)},
             ),
         ]
         illegal_models = [
@@ -1386,11 +1373,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
-        else:
-            # Tested with 1.0 and 1.1
+        elif sklearn_version < "1.5":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 17),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 12),
+                (sklearn.pipeline.Pipeline.__init__, 2),
+            ]
+        else:
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 18),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
 
@@ -1540,8 +1532,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
     @pytest.mark.sklearn()
     def test_openml_param_name_to_sklearn(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
+        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
         boosting = sklearn.ensemble.AdaBoostClassifier(
-            base_estimator=sklearn.tree.DecisionTreeClassifier(),
+            **{estimator_name: sklearn.tree.DecisionTreeClassifier()},
         )
         model = sklearn.pipeline.Pipeline(steps=[("scaler", scaler), ("boosting", boosting)])
         flow = self.extension.model_to_flow(model)
@@ -1582,10 +1575,13 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         with pytest.raises(ValueError, match=msg):
             self.extension.obtain_parameter_values(flow)
 
+        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
         model = sklearn.ensemble.AdaBoostClassifier(
-            base_estimator=sklearn.linear_model.LogisticRegression(
+            **{
+                estimator_name: sklearn.linear_model.LogisticRegression(
                 solver="lbfgs",
-            ),
+                ),
+            }
         )
         flow = self.extension.model_to_flow(model)
         flow.flow_id = 1
