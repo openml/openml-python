@@ -1373,7 +1373,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
-        elif sklearn_version < "1.5":
+        elif sklearn_version < "1.4":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 17),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 12),
