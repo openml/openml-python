@@ -353,8 +353,8 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) >= "1.0.1",
-        reason="Requires scikit-learn < 1.0.1.",
+        LooseVersion(sklearn.__version__) >= "1.0.0",
+        reason="Requires scikit-learn < 1.0.0.",
         # Because scikit-learn dropped min_impurity_split hyperparameter in 1.0,
         # and the requested flow is from 1.0.0 exactly.
     )
