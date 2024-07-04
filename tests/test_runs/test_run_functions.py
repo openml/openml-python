@@ -127,10 +127,11 @@ class TestRun(TestBase):
                 continue
 
             run = openml.runs.get_run(run_id, ignore_cache=True)
-            if len(run.evaluations) == 0:
+            if run.evaluations is None:
                 time.sleep(10)
                 continue
 
+            assert len(run.evaluations) > 0, "Expect not-None evaluations to always contain elements."
             return
 
         raise RuntimeError(
