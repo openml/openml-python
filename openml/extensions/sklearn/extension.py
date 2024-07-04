@@ -2166,7 +2166,14 @@ class SklearnExtension(Extension):
             for key in model.cv_results_:
                 if key.startswith("param_"):
                     value = model.cv_results_[key][itt_no]
-                    serialized_value = json.dumps(value) if value is not np.ma.masked else np.nan
+                    # Built-in serializer does not convert all numpy types,
+                    # these methods convert them to built-in types instead.
+                    if value is np.ma.masked:
+                        value = np.nan
+                    if isinstance(value, np.generic):
+                        # For scalars it actually returns scalars, not a list
+                        value = value.tolist()
+                    serialized_value = json.dumps(value)
                     arff_line.append(serialized_value)
             arff_tracecontent.append(arff_line)
         return arff_tracecontent
@@ -2215,6 +2222,8 @@ class SklearnExtension(Extension):
                 # int float
                 supported_basic_types = (bool, int, float, str)
                 for param_value in model.cv_results_[key]:
+                    if isinstance(param_value, np.generic):
+                        param_value = param_value.tolist()  # noqa: PLW2901
                     if (
                         isinstance(param_value, supported_basic_types)
                         or param_value is None
