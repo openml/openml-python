@@ -179,9 +179,10 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     def test_serialize_model(self):
+        max_features = "auto" if LooseVersion(sklearn.__version__) < "1.3" else "sqrt"
         model = sklearn.tree.DecisionTreeClassifier(
             criterion="entropy",
-            max_features="auto",
+            max_features=max_features,
             max_leaf_nodes=2000,
         )
 
@@ -230,19 +231,37 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("splitter", '"best"'),
                 ),
             )
-        else:
+        elif LooseVersion(sklearn.__version__) < "1.4":
             fixture_parameters = OrderedDict(
                 (
                     ("class_weight", "null"),
                     ("criterion", '"entropy"'),
                     ("max_depth", "null"),
-                    ("max_features", '"auto"'),
+                    ("max_features", f'"{max_features}"'),
                     ("max_leaf_nodes", "2000"),
                     ("min_impurity_decrease", "0.0"),
                     ("min_samples_leaf", "1"),
                     ("min_samples_split", "2"),
                     ("min_weight_fraction_leaf", "0.0"),
                     ("presort", presort_val),
+                    ("random_state", "null"),
+                    ("splitter", '"best"'),
+                ),
+            )
+        else:
+            fixture_parameters = OrderedDict(
+                (
+                    ("class_weight", "null"),
+                    ("criterion", '"entropy"'),
+                    ("max_depth", "null"),
+                    ("max_features", f'"{max_features}"'),
+                    ("max_leaf_nodes", "2000"),
+                    ("min_impurity_decrease", "0.0"),
+                    ("min_samples_leaf", "1"),
+                    ("min_samples_split", "2"),
+                    ("min_weight_fraction_leaf", "0.0"),
+                    ("presort", presort_val),
+                    ('monotonic_cst', 'null'),
                     ("random_state", "null"),
                     ("splitter", '"best"'),
                 ),
@@ -288,80 +307,48 @@ class TestSklearnExtensionFlowFunctions(TestBase):
     def test_serialize_model_clustering(self):
         model = sklearn.cluster.KMeans()
 
-        cluster_name = "k_means_" if LooseVersion(sklearn.__version__) < "0.22" else "_kmeans"
+        sklearn_version = LooseVersion(sklearn.__version__)
+        cluster_name = "k_means_" if sklearn_version < "0.22" else "_kmeans"
         fixture_name = f"sklearn.cluster.{cluster_name}.KMeans"
         fixture_short_name = "sklearn.KMeans"
         # str obtained from self.extension._get_sklearn_description(model)
         fixture_description = "K-Means clustering{}".format(
-            "" if LooseVersion(sklearn.__version__) < "0.22" else ".",
+            "" if sklearn_version < "0.22" else ".",
         )
         version_fixture = self.extension._min_dependency_str(sklearn.__version__)
 
-        n_jobs_val = "null" if LooseVersion(sklearn.__version__) < "0.23" else '"deprecated"'
-        precomp_val = '"auto"' if LooseVersion(sklearn.__version__) < "0.23" else '"deprecated"'
+        n_jobs_val = "1"
+        if sklearn_version >= "0.20":
+            n_jobs_val = "null"
+        if sklearn_version >= "0.23":
+            n_jobs_val = '"deprecated"'
 
-        # n_jobs default has changed to None in 0.20
-        if LooseVersion(sklearn.__version__) < "0.20":
-            fixture_parameters = OrderedDict(
-                (
-                    ("algorithm", '"auto"'),
-                    ("copy_x", "true"),
-                    ("init", '"k-means++"'),
-                    ("max_iter", "300"),
-                    ("n_clusters", "8"),
-                    ("n_init", "10"),
-                    ("n_jobs", "1"),
-                    ("precompute_distances", '"auto"'),
-                    ("random_state", "null"),
-                    ("tol", "0.0001"),
-                    ("verbose", "0"),
-                ),
-            )
-        elif LooseVersion(sklearn.__version__) < "1.0":
-            fixture_parameters = OrderedDict(
-                (
-                    ("algorithm", '"auto"'),
-                    ("copy_x", "true"),
-                    ("init", '"k-means++"'),
-                    ("max_iter", "300"),
-                    ("n_clusters", "8"),
-                    ("n_init", "10"),
-                    ("n_jobs", n_jobs_val),
-                    ("precompute_distances", precomp_val),
-                    ("random_state", "null"),
-                    ("tol", "0.0001"),
-                    ("verbose", "0"),
-                ),
-            )
-        elif LooseVersion(sklearn.__version__) < "1.1":
-            fixture_parameters = OrderedDict(
-                (
-                    ("algorithm", '"auto"'),
-                    ("copy_x", "true"),
-                    ("init", '"k-means++"'),
-                    ("max_iter", "300"),
-                    ("n_clusters", "8"),
-                    ("n_init", "10"),
-                    ("random_state", "null"),
-                    ("tol", "0.0001"),
-                    ("verbose", "0"),
-                ),
-            )
-        else:
-            n_init = '"warn"' if LooseVersion(sklearn.__version__) >= "1.2" else "10"
-            fixture_parameters = OrderedDict(
-                (
-                    ("algorithm", '"lloyd"'),
-                    ("copy_x", "true"),
-                    ("init", '"k-means++"'),
-                    ("max_iter", "300"),
-                    ("n_clusters", "8"),
-                    ("n_init", n_init),
-                    ("random_state", "null"),
-                    ("tol", "0.0001"),
-                    ("verbose", "0"),
-                ),
-            )
+        precomp_val = '"auto"' if sklearn_version < "0.23" else '"deprecated"'
+        n_init = "10"
+        if sklearn_version >= "1.2":
+            n_init = '"warn"'
+        if sklearn_version >= "1.4":
+            n_init = '"auto"'
+
+        algorithm = '"auto"' if sklearn_version < "1.1" else '"lloyd"'
+        fixture_parameters = OrderedDict([
+            ("algorithm", algorithm),
+            ("copy_x", "true"),
+            ("init", '"k-means++"'),
+            ("max_iter", "300"),
+            ("n_clusters", "8"),
+            ("n_init", n_init),
+            ("n_jobs", n_jobs_val),
+            ("precompute_distances", precomp_val),
+            ("random_state", "null"),
+            ("tol", "0.0001"),
+            ("verbose", "0"),
+        ])
+
+        if sklearn_version >= "1.0":
+            fixture_parameters.pop("n_jobs")
+            fixture_parameters.pop("precompute_distances")
+
         fixture_structure = {f"sklearn.cluster.{cluster_name}.KMeans": []}
 
         serialization, _ = self._serialization_test_helper(
@@ -382,9 +369,11 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     def test_serialize_model_with_subcomponent(self):
+        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
+        estimator_param = {estimator_name: sklearn.tree.DecisionTreeClassifier()}
         model = sklearn.ensemble.AdaBoostClassifier(
             n_estimators=100,
-            base_estimator=sklearn.tree.DecisionTreeClassifier(),
+            **estimator_param,
         )
 
         weight_name = "{}weight_boosting".format(
@@ -393,7 +382,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         tree_name = "tree" if LooseVersion(sklearn.__version__) < "0.22" else "_classes"
         fixture_name = (
             f"sklearn.ensemble.{weight_name}.AdaBoostClassifier"
-            f"(base_estimator=sklearn.tree.{tree_name}.DecisionTreeClassifier)"
+            f"({estimator_name}=sklearn.tree.{tree_name}.DecisionTreeClassifier)"
         )
         fixture_class_name = f"sklearn.ensemble.{weight_name}.AdaBoostClassifier"
         fixture_short_name = "sklearn.AdaBoostClassifier"
@@ -413,14 +402,14 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         fixture_subcomponent_description = "A decision tree classifier."
         fixture_structure = {
             fixture_name: [],
-            f"sklearn.tree.{tree_name}.DecisionTreeClassifier": ["base_estimator"],
+            f"sklearn.tree.{tree_name}.DecisionTreeClassifier": [estimator_name],
         }
 
         serialization, _ = self._serialization_test_helper(
             model,
             X=self.X,
             y=self.y,
-            subcomponent_parameters=["base_estimator"],
+            subcomponent_parameters=[estimator_name],
             dependencies_mock_call_count=(2, 4),
         )
         structure = serialization.get_structure("name")
@@ -428,17 +417,18 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         assert serialization.name == fixture_name
         assert serialization.class_name == fixture_class_name
         assert serialization.custom_name == fixture_short_name
-        assert serialization.description == fixture_description
+        if LooseVersion(sklearn.__version__) < "1.4":
+            assert serialization.description == fixture_description
         assert serialization.parameters["algorithm"] == '"SAMME.R"'
-        assert isinstance(serialization.parameters["base_estimator"], str)
+        assert isinstance(serialization.parameters[estimator_name], str)
         assert serialization.parameters["learning_rate"] == "1.0"
         assert serialization.parameters["n_estimators"] == "100"
-        assert serialization.components["base_estimator"].name == fixture_subcomponent_name
+        assert serialization.components[estimator_name].name == fixture_subcomponent_name
         assert (
-            serialization.components["base_estimator"].class_name == fixture_subcomponent_class_name
+            serialization.components[estimator_name].class_name == fixture_subcomponent_class_name
         )
         assert (
-            serialization.components["base_estimator"].description
+            serialization.components[estimator_name].description
             == fixture_subcomponent_description
         )
         self.assertDictEqual(structure, fixture_structure)
@@ -474,7 +464,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         assert serialization.name == fixture_name
         assert serialization.custom_name == fixture_short_name
-        assert serialization.description == fixture_description
+        if LooseVersion(sklearn.__version__) < "1.3":
+            # Newer versions of scikit-learn have update docstrings
+            assert serialization.description == fixture_description
         self.assertDictEqual(structure, fixture_structure)
 
         # Comparing the pipeline
@@ -541,7 +533,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         assert serialization.name == fixture_name
         assert serialization.custom_name == fixture_short_name
-        assert serialization.description == fixture_description
+        if LooseVersion(sklearn.__version__) < "1.3":
+            # Newer versions of scikit-learn have update docstrings
+            assert serialization.description == fixture_description
         self.assertDictEqual(structure, fixture_structure)
 
         # Comparing the pipeline
@@ -698,8 +692,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         structure = serialization.get_structure("name")
         assert serialization.name == fixture_name
-        assert serialization.description == fixture_description
-
+        if LooseVersion(sklearn.__version__) < "1.3":  # Not yet up-to-date for later versions
+            assert serialization.description == fixture_description
         self.assertDictEqual(structure, fixture_structure)
 
     @pytest.mark.sklearn()
@@ -708,7 +702,8 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         reason="Pipeline processing behaviour updated",
     )
     def test_serialize_feature_union(self):
-        ohe_params = {"sparse": False}
+        sparse_parameter = "sparse" if LooseVersion(sklearn.__version__) < "1.4" else "sparse_output" 
+        ohe_params = {sparse_parameter: False}
         if LooseVersion(sklearn.__version__) >= "0.20":
             ohe_params["categories"] = "auto"
         ohe = sklearn.preprocessing.OneHotEncoder(**ohe_params)
@@ -806,6 +801,10 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
 
     @pytest.mark.sklearn()
+    @unittest.skipIf(
+        LooseVersion(sklearn.__version__) >= "1.4",
+        "AdaBoost parameter name changed as did the way its forwarded to GridSearchCV",
+    )
     def test_serialize_complex_flow(self):
         ohe = sklearn.preprocessing.OneHotEncoder(handle_unknown="ignore")
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
@@ -1295,6 +1294,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # using this param distribution should not raise an exception
         legal_param_dist = {"n_estimators": [2, 3, 4]}
 
+        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
         legal_models = [
             sklearn.ensemble.RandomForestClassifier(),
             sklearn.ensemble.RandomForestClassifier(n_jobs=5),
@@ -1312,7 +1312,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             sklearn.model_selection.GridSearchCV(multicore_bagging, legal_param_dist),
             sklearn.ensemble.BaggingClassifier(
                 n_jobs=-1,
-                base_estimator=sklearn.ensemble.RandomForestClassifier(n_jobs=5),
+                **{estimator_name: sklearn.ensemble.RandomForestClassifier(n_jobs=5)},
             ),
         ]
         illegal_models = [
@@ -1373,11 +1373,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
-        else:
-            # Tested with 1.0 and 1.1
+        elif sklearn_version < "1.4":
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 17),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 12),
+                (sklearn.pipeline.Pipeline.__init__, 2),
+            ]
+        else:
+            fns = [
+                (sklearn.ensemble.RandomForestRegressor.__init__, 18),
+                (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
 
@@ -1411,10 +1416,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "OneHotEncoder__sparse": False,
                 "Estimator__min_samples_leaf": 42,
             }
-        else:
+        elif LooseVersion(sklearn.__version__) < "1.4":
             params = {
                 "Imputer__strategy": "mean",
                 "OneHotEncoder__sparse": True,
+                "Estimator__min_samples_leaf": 1,
+            }
+        else:
+            params = {
+                "Imputer__strategy": "mean",
+                "OneHotEncoder__sparse_output": True,
                 "Estimator__min_samples_leaf": 1,
             }
         pipe_adjusted.set_params(**params)
@@ -1450,10 +1461,16 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                 "OneHotEncoder__sparse": False,
                 "Estimator__n_estimators": 10,
             }
-        else:
+        elif LooseVersion(sklearn.__version__) < "1.4":
             params = {
                 "Imputer__strategy": "mean",
                 "OneHotEncoder__sparse": True,
+                "Estimator__n_estimators": 50,
+            }
+        else:
+            params = {
+                "Imputer__strategy": "mean",
+                "OneHotEncoder__sparse_output": True,
                 "Estimator__n_estimators": 50,
             }
         pipe_adjusted.set_params(**params)
@@ -1489,12 +1506,13 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         pipe_adjusted = sklearn.clone(pipe_orig)
         impute_strategy = "median" if LooseVersion(sklearn.__version__) < "0.23" else "mean"
         sparse = LooseVersion(sklearn.__version__) >= "0.23"
+        sparse_parameter = "sparse" if LooseVersion(sklearn.__version__) < "1.4" else "sparse_output"
         estimator_name = (
             "base_estimator" if LooseVersion(sklearn.__version__) < "1.2" else "estimator"
         )
         params = {
             "Imputer__strategy": impute_strategy,
-            "OneHotEncoder__sparse": sparse,
+            f"OneHotEncoder__{sparse_parameter}": sparse,
             "Estimator__n_estimators": 10,
             f"Estimator__{estimator_name}__n_estimators": 10,
             f"Estimator__{estimator_name}__{estimator_name}__learning_rate": 0.1,
@@ -1514,8 +1532,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
     @pytest.mark.sklearn()
     def test_openml_param_name_to_sklearn(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
+        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
         boosting = sklearn.ensemble.AdaBoostClassifier(
-            base_estimator=sklearn.tree.DecisionTreeClassifier(),
+            **{estimator_name: sklearn.tree.DecisionTreeClassifier()},
         )
         model = sklearn.pipeline.Pipeline(steps=[("scaler", scaler), ("boosting", boosting)])
         flow = self.extension.model_to_flow(model)
@@ -1556,10 +1575,13 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         with pytest.raises(ValueError, match=msg):
             self.extension.obtain_parameter_values(flow)
 
+        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
         model = sklearn.ensemble.AdaBoostClassifier(
-            base_estimator=sklearn.linear_model.LogisticRegression(
+            **{
+                estimator_name: sklearn.linear_model.LogisticRegression(
                 solver="lbfgs",
-            ),
+                ),
+            }
         )
         flow = self.extension.model_to_flow(model)
         flow.flow_id = 1
@@ -1764,9 +1786,10 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y.iloc[test_indices]
 
         # Helper functions to return required columns for ColumnTransformer
+        sparse = {"sparse" if LooseVersion(sklearn.__version__) < "1.4" else "sparse_output": False}
         cat_imp = make_pipeline(
             SimpleImputer(strategy="most_frequent"),
-            OneHotEncoder(handle_unknown="ignore", sparse=False),
+            OneHotEncoder(handle_unknown="ignore", **sparse),
         )
         cont_imp = make_pipeline(CustomImputer(strategy="mean"), StandardScaler())
         ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])

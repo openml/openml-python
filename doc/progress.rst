@@ -9,7 +9,7 @@ Changelog
 next
 ~~~~~~
 
- * ...
+ * MAINT #1340: Add Numpy 2.0 support. Update tests to work with scikit-learn <= 1.5.
 
 0.14.2
 ~~~~~~

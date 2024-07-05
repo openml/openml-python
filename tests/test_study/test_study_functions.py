@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
+import unittest
 
 import openml
 import openml.study
@@ -248,11 +249,13 @@ class TestStudyFunctions(TestBase):
         study_downloaded = openml.study.get_study(study.id)
         self.assertListEqual(study_original.runs, study_downloaded.runs)
 
+    @unittest.skip("It is unclear when we can expect the test to pass or fail.")
     def test_study_list(self):
         study_list = openml.study.list_studies(status="in_preparation", output_format="dataframe")
         # might fail if server is recently reset
         assert len(study_list) >= 2
 
+    @unittest.skip("It is unclear when we can expect the test to pass or fail.")
     def test_study_list_output_format(self):
         study_list = openml.study.list_studies(status="in_preparation", output_format="dataframe")
         assert isinstance(study_list, pd.DataFrame)

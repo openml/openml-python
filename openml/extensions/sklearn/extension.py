@@ -48,9 +48,10 @@ DEPENDENCIES_PATTERN = re.compile(
     r"(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?[0-9]*))?$",
 )
 
+sctypes = np.sctypes if LooseVersion(np.__version__) < "2.0" else np.core.sctypes
 SIMPLE_NUMPY_TYPES = [
     nptype
-    for type_cat, nptypes in np.sctypes.items()
+    for type_cat, nptypes in sctypes.items()
     for nptype in nptypes  # type: ignore
     if type_cat != "others"
 ]
@@ -2165,6 +2166,11 @@ class SklearnExtension(Extension):
             for key in model.cv_results_:
                 if key.startswith("param_"):
                     value = model.cv_results_[key][itt_no]
+                    # Built-in serializer does not convert all numpy types,
+                    # these methods convert them to built-in types instead.
+                    if isinstance(value, np.generic):
+                        # For scalars it actually returns scalars, not a list
+                        value = value.tolist()
                     serialized_value = json.dumps(value) if value is not np.ma.masked else np.nan
                     arff_line.append(serialized_value)
             arff_tracecontent.append(arff_line)
@@ -2214,6 +2220,8 @@ class SklearnExtension(Extension):
                 # int float
                 supported_basic_types = (bool, int, float, str)
                 for param_value in model.cv_results_[key]:
+                    if isinstance(param_value, np.generic):
+                        param_value = param_value.tolist()  # noqa: PLW2901
                     if (
                         isinstance(param_value, supported_basic_types)
                         or param_value is None
