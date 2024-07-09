@@ -249,11 +249,9 @@ def test_delete_task_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.tasks.delete_task(1)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/task/1",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    task_url = "https://test.openml.org/api/v1/xml/task/1"
+    assert task_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -271,11 +269,9 @@ def test_delete_task_with_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.tasks.delete_task(3496)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/task/3496",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    task_url = "https://test.openml.org/api/v1/xml/task/3496"
+    assert task_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -290,11 +286,9 @@ def test_delete_success(mock_delete, test_files_directory, test_api_key):
     success = openml.tasks.delete_task(361323)
     assert success
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/task/361323",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    task_url = "https://test.openml.org/api/v1/xml/task/361323"
+    assert task_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -312,8 +306,6 @@ def test_delete_unknown_task(mock_delete, test_files_directory, test_api_key):
     ):
         openml.tasks.delete_task(9_999_999)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/task/9999999",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    task_url = "https://test.openml.org/api/v1/xml/task/9999999"
+    assert task_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")

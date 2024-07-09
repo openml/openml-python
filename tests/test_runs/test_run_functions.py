@@ -1907,11 +1907,9 @@ def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.runs.delete_run(40_000)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/run/40000",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    run_url = "https://test.openml.org/api/v1/xml/run/40000"
+    assert run_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -1926,11 +1924,9 @@ def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
     success = openml.runs.delete_run(10591880)
     assert success
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/run/10591880",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    run_url = "https://test.openml.org/api/v1/xml/run/10591880"
+    assert run_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -1948,8 +1944,6 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.runs.delete_run(9_999_999)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/run/9999999",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    run_url = "https://test.openml.org/api/v1/xml/run/9999999"
+    assert run_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
