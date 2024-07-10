@@ -19,12 +19,15 @@ import xmltodict
 from urllib3 import ProxyManager
 
 from . import config
+from .__version__ import __version__
 from .exceptions import (
     OpenMLHashException,
     OpenMLServerError,
     OpenMLServerException,
     OpenMLServerNoResult,
 )
+
+_HEADERS = {"user-agent": f"openml-python/{__version__}"}
 
 DATA_TYPE = Dict[str, Union[str, int]]
 FILE_ELEMENTS_TYPE = Dict[str, Union[str, Tuple[str, str]]]
@@ -164,6 +167,7 @@ def _download_minio_file(
             bucket_name=bucket,
             object_name=object_name,
             file_path=str(destination),
+            request_headers=_HEADERS,
         )
         if destination.is_file() and destination.suffix == ".zip":
             with zipfile.ZipFile(destination, "r") as zip_ref:
@@ -350,11 +354,11 @@ def _send_request(  # noqa: C901
         for retry_counter in range(1, n_retries + 1):
             try:
                 if request_method == "get":
-                    response = session.get(url, params=data)
+                    response = session.get(url, params=data, headers=_HEADERS)
                 elif request_method == "delete":
-                    response = session.delete(url, params=data)
+                    response = session.delete(url, params=data, headers=_HEADERS)
                 elif request_method == "post":
-                    response = session.post(url, data=data, files=files)
+                    response = session.post(url, data=data, files=files, headers=_HEADERS)
                 else:
                     raise NotImplementedError()
 

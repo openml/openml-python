@@ -1768,11 +1768,9 @@ def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_ke
     ):
         openml.datasets.delete_dataset(40_000)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/data/40000",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
+    assert dataset_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -1792,11 +1790,9 @@ def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key
     ):
         openml.datasets.delete_dataset(40_000)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/data/40000",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
+    assert dataset_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -1813,11 +1809,9 @@ def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key)
     success = openml.datasets.delete_dataset(40000)
     assert success
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/data/40000",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
+    assert dataset_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -1837,11 +1831,9 @@ def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key)
     ):
         openml.datasets.delete_dataset(9_999_999)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/data/9999999",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    dataset_url = "https://test.openml.org/api/v1/xml/data/9999999"
+    assert dataset_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 def _assert_datasets_have_id_and_valid_status(datasets: pd.DataFrame):
