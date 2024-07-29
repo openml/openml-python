@@ -20,3 +20,6 @@ plugins:
         python:
           options:
             docstring_style: numpy
+  - gen-files:
+      scripts:
+        - scripts/gen_ref_pages.py
