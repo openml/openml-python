@@ -1,7 +1,3 @@
-orphan
-
-:   
-
 # Extensions
 
 OpenML-Python provides an extension interface to connect other machine
