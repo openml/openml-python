@@ -6,6 +6,7 @@ but modified for lack of "src/" file structure.
 """
 
 from pathlib import Path
+import shutil
 
 import mkdocs_gen_files
 
@@ -37,4 +38,18 @@ for path in sorted(src.rglob("*.py")):
     mkdocs_gen_files.set_edit_path(full_doc_path, path.relative_to(root))
 
     with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
+        nav_file.writelines(nav.build_literate_nav())
+
+nav = mkdocs_gen_files.Nav()
+examples_dir = root / "examples"
+examples_doc_dir = root / "docs" / "examples"
+for path in sorted(examples_dir.rglob("*.ipynb")):
+    dest_path = (root / "docs") / path.relative_to(root)
+    with mkdocs_gen_files.open(dest_path, "w") as dest_file:
+        dest_file.write(path.read_text())
+
+    new_relative_location = dest_path.relative_to(examples_doc_dir)
+    nav[new_relative_location.parts] = new_relative_location.as_posix()
+
+    with mkdocs_gen_files.open("examples/SUMMARY.md", "w") as nav_file:
         nav_file.writelines(nav.build_literate_nav())
