@@ -1,12 +1,16 @@
 site_name: openml-python
 theme:
   name: material
+  features:
+    - content.code.copy
 
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.superfences
   - attr_list
+  - pymdownx.tabbed:
+      alternate_style: true
 
 plugins:
   - search

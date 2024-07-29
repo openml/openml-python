@@ -1,7 +1,3 @@
-orphan
-
-:   
-
 # Contributing
 
 Contribution to the OpenML package is highly appreciated in all forms.

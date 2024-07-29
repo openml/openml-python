@@ -32,8 +32,7 @@ run.publish()
 print(f'View the run online: {run.openml_url}')
 ```
 
-You can find more examples in our `examples-index`{.interpreted-text
-role="ref"}.
+Find more examples in our ["Example Gallery"][example-gallery].
 
 ## How to get OpenML for python
 
@@ -45,15 +44,6 @@ python -m pip install openml
 
 For more advanced installation information, please see the
 ["Installation"][installation-guide] section.
-
-## Content
-
--   `usage`{.interpreted-text role="ref"}
--   `api`{.interpreted-text role="ref"}
--   `examples-index`{.interpreted-text role="ref"}
--   `extensions`{.interpreted-text role="ref"}
--   `contributing`{.interpreted-text role="ref"}
--   `progress`{.interpreted-text role="ref"}
 
 ## Further information
 
@@ -67,33 +57,32 @@ For more advanced installation information, please see the
 
 ## Contributing
 
-Contribution to the OpenML package is highly appreciated. The OpenML
-package currently has a 1/4 position for the development and all help
-possible is needed to extend and maintain the package, create new
-examples and improve the usability. Please see the
-`contributing`{.interpreted-text role="ref"} page for more information.
+Contribution to the OpenML package is highly appreciated. Please see the
+["Contributing"][contributing] page for more information.
 
 ## Citing OpenML-Python
 
 If you use OpenML-Python in a scientific publication, we would
-appreciate a reference to the following paper:
+appreciate a reference to our JMLR-MLOSS paper 
+["OpenML-Python: an extensible Python API for OpenML"](https://www.jmlr.org/papers/v22/19-920.html):
 
-| Matthias Feurer, Jan N. van Rijn, Arlind Kadra, Pieter Gijsbers,
-  Neeratyoy Mallik, Sahithya Ravi, Andreas Müller, Joaquin Vanschoren,
-  Frank Hutter
-| **OpenML-Python: an extensible Python API for OpenML**
-| Journal of Machine Learning Research, 22(100):1−5, 2021
-| <https://www.jmlr.org/papers/v22/19-920.html>
+=== "MLA"
 
-> Bibtex entry:
->
->     @article{JMLR:v22:19-920,
->         author  = {Matthias Feurer and Jan N. van Rijn and Arlind Kadra and Pieter Gijsbers and Neeratyoy Mallik and Sahithya Ravi and Andreas MÃ¼ller and Joaquin Vanschoren and Frank Hutter},
->         title   = {OpenML-Python: an extensible Python API for OpenML},
->         journal = {Journal of Machine Learning Research},
->         year    = {2021},
->         volume  = {22},
->         number  = {100},
->         pages   = {1--5},
->         url     = {http://jmlr.org/papers/v22/19-920.html}
->     }
+    Feurer, Matthias, et al. 
+    "OpenML-Python: an extensible Python API for OpenML."
+    _Journal of Machine Learning Research_ 22.100 (2021):1−5.
+
+=== "Bibtex"
+
+    ```bibtex
+    @article{JMLR:v22:19-920,
+        author  = {Matthias Feurer and Jan N. van Rijn and Arlind Kadra and Pieter Gijsbers and Neeratyoy Mallik and Sahithya Ravi and Andreas MÃ¼ller and Joaquin Vanschoren and Frank Hutter},
+        title   = {OpenML-Python: an extensible Python API for OpenML},
+        journal = {Journal of Machine Learning Research},
+        year    = {2021},
+        volume  = {22},
+        number  = {100},
+        pages   = {1--5},
+        url     = {http://jmlr.org/papers/v22/19-920.html}
+    }
+    ```
