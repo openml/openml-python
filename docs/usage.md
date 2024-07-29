@@ -5,6 +5,7 @@ functions and classes in the OpenML Python API. Throughout this
 document, we will use [pandas](https://pandas.pydata.org/) to format and
 filter tables.
 
+[](){#installation-guide}
 ## Installation
 
 The OpenML Python package is a connector to

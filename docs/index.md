@@ -44,7 +44,7 @@ python -m pip install openml
 ```
 
 For more advanced installation information, please see the
-["Installation"][installation] section.
+["Installation"][installation-guide] section.
 
 ## Content
 
