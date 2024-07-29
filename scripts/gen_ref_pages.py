@@ -44,7 +44,7 @@ nav = mkdocs_gen_files.Nav()
 examples_dir = root / "examples"
 examples_doc_dir = root / "docs" / "examples"
 for path in sorted(examples_dir.rglob("*.ipynb")):
-    dest_path = (root / "docs") / path.relative_to(root)
+    dest_path = examples_doc_dir / path.relative_to(examples_dir)
     with mkdocs_gen_files.open(dest_path, "w") as dest_file:
         dest_file.write(path.read_text())
 
