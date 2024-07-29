@@ -89,7 +89,8 @@ docs=[
     "sphinx_bootstrap_theme",
     "numpydoc",
     "mkdocs-material",
-    "mkdocs-autorefs"
+    "mkdocs-autorefs",
+    "mkdocstrings[python]",
 ]
 
 [project.urls]
