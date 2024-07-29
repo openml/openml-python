@@ -1,8 +1,15 @@
-"""Generate the code reference pages."""
+"""Generate the code reference pages.
+
+based on https://github.com/mkdocstrings/mkdocstrings/blob/33aa573efb17b13e7b9da77e29aeccb3fbddd8e8/docs/recipes.md
+but modified for lack of "src/" file structure.
+
+"""
 
 from pathlib import Path
 
 import mkdocs_gen_files
+
+nav = mkdocs_gen_files.Nav()
 
 root = Path(__file__).parent.parent
 src = root / "openml"
@@ -16,11 +23,18 @@ for path in sorted(src.rglob("*.py")):
 
     if parts[-1] == "__init__":
         parts = parts[:-1]
+        doc_path = doc_path.with_name("index.md")
+        full_doc_path = full_doc_path.with_name("index.md")
     elif parts[-1] == "__main__":
         continue
+
+    nav[parts] = doc_path.as_posix()
 
     with mkdocs_gen_files.open(full_doc_path, "w") as fd:
         identifier = ".".join(parts)
         print("::: " + identifier, file=fd)
 
     mkdocs_gen_files.set_edit_path(full_doc_path, path.relative_to(root))
+
+    with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
+        nav_file.writelines(nav.build_literate_nav())
