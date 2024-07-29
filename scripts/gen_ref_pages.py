@@ -43,13 +43,13 @@ for path in sorted(src.rglob("*.py")):
 nav = mkdocs_gen_files.Nav()
 examples_dir = root / "examples"
 examples_doc_dir = root / "docs" / "examples"
-for path in sorted(examples_dir.rglob("*.ipynb")):
-    dest_path = examples_doc_dir / path.relative_to(examples_dir)
+for path in sorted(examples_dir.rglob("*.py")):
+    dest_path = Path("examples") / path.relative_to(examples_dir)
     with mkdocs_gen_files.open(dest_path, "w") as dest_file:
-        dest_file.write(path.read_text())
+        print(path.read_text(), file=dest_file)
 
-    new_relative_location = dest_path.relative_to(examples_doc_dir)
-    nav[new_relative_location.parts] = new_relative_location.as_posix()
+    new_relative_location = Path("../") / dest_path
+    nav[new_relative_location.parts[2:]] = new_relative_location.as_posix()
 
     with mkdocs_gen_files.open("examples/SUMMARY.md", "w") as nav_file:
         nav_file.writelines(nav.build_literate_nav())

@@ -1,12 +1,10 @@
-"""
-Introduction tutorial & Setup
-=============================
+# %% [markdown]
+# # Introduction tutorial & Setup
+# An example how to set up OpenML-Python followed up by a simple example.
 
-An example how to set up OpenML-Python followed up by a simple example.
-"""
-############################################################################
+# %% [markdown]
 # OpenML is an online collaboration platform for machine learning which allows
-# you to:
+# you to: Pueter
 #
 # * Find or share interesting, well-documented datasets
 # * Define research / modelling goals (tasks)
@@ -16,9 +14,8 @@ An example how to set up OpenML-Python followed up by a simple example.
 # * Large scale benchmarking, compare to state of the art
 #
 
-############################################################################
-# Installation
-# ^^^^^^^^^^^^
+# %% [markdown]
+# # Installation
 # Installation is done via ``pip``:
 #
 # .. code:: bash
@@ -29,7 +26,7 @@ An example how to set up OpenML-Python followed up by a simple example.
 # :ref:`installation`.
 #
 
-############################################################################
+# %% [markdown]
 # Authentication
 # ^^^^^^^^^^^^^^
 #
@@ -55,28 +52,29 @@ An example how to set up OpenML-Python followed up by a simple example.
 # you authenticate for the duration of the python process.
 
 
-############################################################################
-
+# %%
 # License: BSD 3-Clause
 
 import openml
 from sklearn import neighbors
 
-############################################################################
+# %% [markdown]
 # .. warning::
 #    .. include:: ../../test_server_usage_warning.txt
+
+# %%
 openml.config.start_using_configuration_for_example()
 
-############################################################################
+# %% [markdown]
 # When using the main server instead, make sure your apikey is configured.
 # This can be done with the following line of code (uncomment it!).
 # Never share your apikey with others.
 
+# %%
 # openml.config.apikey = 'YOURKEY'
 
-############################################################################
-# Caching
-# ^^^^^^^
+# %% [markdown]
+# # Caching
 # When downloading datasets, tasks, runs and flows, they will be cached to
 # retrieve them without calling the server later. As with the API key,
 # the cache directory can be either specified through the config file or
@@ -87,14 +85,16 @@ openml.config.start_using_configuration_for_example()
 #   will use **~/.openml/cache** as the cache directory.
 # * Run the code below, replacing 'YOURDIR' with the path to the cache directory.
 
+# %%
 # Uncomment and set your OpenML cache directory
 # import os
 # openml.config.cache_directory = os.path.expanduser('YOURDIR')
 
-############################################################################
-# Simple Example
-# ^^^^^^^^^^^^^^
+# %% [markdown]
+# # Simple Example
 # Download the OpenML task for the eeg-eye-state.
+
+# %%
 task = openml.tasks.get_task(403)
 data = openml.datasets.get_dataset(task.dataset_id)
 clf = neighbors.KNeighborsClassifier(n_neighbors=5)
@@ -105,5 +105,5 @@ run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
 myrun = run.publish()
 print(f"kNN on {data.name}: {myrun.openml_url}")
 
-############################################################################
+# %%
 openml.config.stop_using_configuration_for_example()
