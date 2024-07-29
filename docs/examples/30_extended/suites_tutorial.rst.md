@@ -1,0 +1,291 @@
+::::: only
+html
+
+:::: {.note .sphx-glr-download-link-note}
+::: title
+Note
+:::
+
+`Go to the end <sphx_glr_download_examples_30_extended_suites_tutorial.py>`{.interpreted-text
+role="ref"} to download the full example code
+::::
+:::::
+
+::: rst-class
+sphx-glr-example-title
+:::
+
+# Benchmark suites {#sphx_glr_examples_30_extended_suites_tutorial.py}
+
+How to list, download and upload benchmark suites.
+
+If you want to learn more about benchmark suites, check out our brief
+introductory tutorial
+`sphx_glr_examples_20_basic_simple_suites_tutorial.py`{.interpreted-text
+role="ref"} or the [OpenML benchmark
+docs](https://docs.openml.org/benchmark/#benchmarking-suites).
+
+``` default
+# License: BSD 3-Clause
+
+import uuid
+
+import numpy as np
+
+import openml
+```
+
+## Listing suites
+
+-   Use the output_format parameter to select output type
+-   Default gives `dict`, but we\'ll use `dataframe` to obtain an
+    easier-to-work-with data structure
+
+``` default
+suites = openml.study.list_suites(output_format="dataframe", status="all")
+print(suites.head(n=10))
+```
+
+::: rst-class
+sphx-glr-script-out
+
+``` none
+id                             alias  ...        creation_date creator
+14    14                         OpenML100  ...  2019-02-21 18:40:13       1
+99    99                       OpenML-CC18  ...  2019-02-21 18:47:13       1
+218  218                  AutoML-Benchmark  ...  2019-05-02 13:35:08     869
+219  219                             FOREX  ...  2019-06-04 00:45:17       1
+225  225                   OpenML-friendly  ...  2019-09-16 19:41:46       1
+236  236  a9ee1f0b2a4b48b6b6da1653fe92890e  ...  2020-04-06 21:38:55      64
+239  239  c638a5d3d31241179f9b4853951fdb79  ...  2020-04-19 22:15:30      64
+240  240  e5e7f56c8655433eb2418c240ec8b8c0  ...  2020-04-28 02:30:38    2902
+253  253                         testecc18  ...  2020-09-01 00:57:54    8598
+258  258                               NaN  ...  2020-09-30 08:30:00    8598
+
+[10 rows x 7 columns]
+```
+:::
+
+### Downloading suites
+
+This is done based on the dataset ID.
+
+``` default
+suite = openml.study.get_suite(99)
+print(suite)
+```
+
+::: rst-class
+sphx-glr-script-out
+
+``` none
+OpenML Benchmark Suite
+======================
+ID..............: 99
+Name............: OpenML-CC18 Curated Classification benchmark
+Status..........: active
+Main Entity Type: task
+Study URL.......: https://www.openml.org/s/99
+# of Data.......: 72
+# of Tasks......: 72
+Creator.........: https://www.openml.org/u/1
+Upload Time.....: 2019-02-21 18:47:13
+```
+:::
+
+Suites also feature a description:
+
+``` default
+print(suite.description)
+```
+
+::: rst-class
+sphx-glr-script-out
+
+```` none
+We advocate the use of curated, comprehensive benchmark suites of machine learning datasets, backed by standardized OpenML-based interfaces and complementary software toolkits written in Python, Java and R. We demonstrate how to easily execute comprehensive benchmarking studies using standardized OpenML-based benchmarking suites and complementary software toolkits written in Python, Java and R. Major distinguishing features of OpenML benchmark suites are (i) ease of use through standardized data formats, APIs, and existing client libraries; (ii) machine-readable meta-information regarding the contents of the suite; and (iii) online sharing of results, enabling large scale comparisons. As a first such suite, we propose the OpenML-CC18, a machine learning benchmark suite of 72 classification datasets carefully curated from the thousands of datasets on OpenML. 
+
+The inclusion criteria are:  
+* classification tasks on dense data set
+independent observations  
+* number of classes larger or equal to 2, each class with at least 20 observations and ratio of minority to majority class must exceed 5%  
+* number of observations between 500 and 100000  
+* number of features after one-hot-encoding less than 5000  
+* no artificial data sets  
+* no subsets of larger data sets nor binarizations of other data sets  
+* no data sets which are perfectly predictable by using a single feature or by using a simple decision tree
+* source or reference available
+
+
+If you use this benchmarking suite, please cite:
+
+Bernd Bischl, Giuseppe Casalicchio, Matthias Feurer, Frank Hutter, Michel Lang, Rafael G. Mantovani, Jan N. van Rijn and Joaquin Vanschoren. “OpenML Benchmarking Suites” arXiv:1708.03731v2 [stats.ML] (2019).
+
+```
+@article{oml-benchmarking-suites,
+      title={OpenML Benchmarking Suites}, 
+      author={Bernd Bischl and Giuseppe Casalicchio and Matthias Feurer and Frank Hutter and Michel Lang and Rafael G. Mantovani and Jan N. van Rijn and Joaquin Vanschoren},
+      year={2019},
+      journal={arXiv:1708.03731v2 [stat.ML]}
+}
+```
+````
+:::
+
+Suites are a container for tasks:
+
+``` default
+print(suite.tasks)
+```
+
+::: rst-class
+sphx-glr-script-out
+
+``` none
+[3, 6, 11, 12, 14, 15, 16, 18, 22, 23, 28, 29, 31, 32, 37, 43, 45, 49, 53, 219, 2074, 2079, 3021, 3022, 3481, 3549, 3560, 3573, 3902, 3903, 3904, 3913, 3917, 3918, 7592, 9910, 9946, 9952, 9957, 9960, 9964, 9971, 9976, 9977, 9978, 9981, 9985, 10093, 10101, 14952, 14954, 14965, 14969, 14970, 125920, 125922, 146195, 146800, 146817, 146819, 146820, 146821, 146822, 146824, 146825, 167119, 167120, 167121, 167124, 167125, 167140, 167141]
+```
+:::
+
+And we can use the task listing functionality to learn more about them:
+
+``` default
+tasks = openml.tasks.list_tasks(output_format="dataframe")
+
+# Using ``@`` in `pd.DataFrame.query <
+# https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html>`_
+# accesses variables outside of the current dataframe.
+tasks = tasks.query("tid in @suite.tasks")
+print(tasks.describe().transpose())
+```
+
+::: rst-class
+sphx-glr-script-out
+
+``` none
+count          mean  ...       75%       max
+tid                                  72.0  41849.305556  ...  42707.50  167141.0
+did                                  72.0  10472.263889  ...  10594.25   41027.0
+MajorityClassSize                    72.0   4820.166667  ...   2796.00   48658.0
+MaxNominalAttDistinctValues          71.0      8.718310  ...     10.00      71.0
+MinorityClassSize                    72.0   2199.777778  ...   1326.50   47662.0
+NumberOfClasses                      72.0      5.680556  ...      8.25      46.0
+NumberOfFeatures                     72.0    196.597222  ...     71.50    3073.0
+NumberOfInstances                    72.0  12148.972222  ...   6771.75   96320.0
+NumberOfInstancesWithMissingValues   72.0    121.347222  ...      0.00    3772.0
+NumberOfMissingValues                72.0    226.597222  ...      0.00    6465.0
+NumberOfNumericFeatures              72.0    166.875000  ...     64.00    3072.0
+NumberOfSymbolicFeatures             72.0     29.722222  ...      5.25    1556.0
+target_feature_left                   0.0           NaN  ...       NaN       NaN
+
+[13 rows x 8 columns]
+```
+:::
+
+We\'ll use the test server for the rest of this tutorial.
+
+:::: warning
+::: title
+Warning
+:::
+
+.. include:: ../../test_server_usage_warning.txt
+::::
+
+``` default
+openml.config.start_using_configuration_for_example()
+```
+
+::: rst-class
+sphx-glr-script-out
+
+``` none
+/code/openml/config.py:184: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+  warnings.warn(
+```
+:::
+
+### Uploading suites
+
+Uploading suites is as simple as uploading any kind of other OpenML
+entity - the only reason why we need so much code in this example is
+because we upload some random data.
+
+``` default
+# We'll take a random subset of at least ten tasks of all available tasks on
+# the test server:
+all_tasks = list(openml.tasks.list_tasks(output_format="dataframe")["tid"])
+task_ids_for_suite = sorted(np.random.choice(all_tasks, replace=False, size=20))
+
+# The study needs a machine-readable and unique alias. To obtain this,
+# we simply generate a random uuid.
+
+alias = uuid.uuid4().hex
+
+new_suite = openml.study.create_benchmark_suite(
+    name="Test-Suite",
+    description="Test suite for the Python tutorial on benchmark suites",
+    task_ids=task_ids_for_suite,
+    alias=alias,
+)
+new_suite.publish()
+print(new_suite)
+```
+
+::: rst-class
+sphx-glr-script-out
+
+``` none
+/code/openml/tasks/functions.py:112: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+  warnings.warn(
+/code/openml/tasks/functions.py:112: RuntimeWarning: Could not create task type id for 11 due to error 11 is not a valid TaskType
+  warnings.warn(
+/code/openml/tasks/functions.py:263: RuntimeWarning: Could not create task type id for 10 due to error 10 is not a valid TaskType
+  warnings.warn(
+OpenML Benchmark Suite
+======================
+ID..............: 332
+Name............: Test-Suite
+Status..........: None
+Main Entity Type: task
+Study URL.......: https://test.openml.org/s/332
+# of Tasks......: 20
+```
+:::
+
+``` default
+openml.config.stop_using_configuration_for_example()
+```
+
+::: rst-class
+sphx-glr-timing
+
+**Total running time of the script:** ( 0 minutes 30.398 seconds)
+:::
+
+::::::: {#sphx_glr_download_examples_30_extended_suites_tutorial.py}
+:::::: only
+html
+
+::::: {.container .sphx-glr-footer .sphx-glr-footer-example}
+::: {.container .sphx-glr-download .sphx-glr-download-python}
+`Download Python source code: suites_tutorial.py <suites_tutorial.py>`{.interpreted-text
+role="download"}
+:::
+
+::: {.container .sphx-glr-download .sphx-glr-download-jupyter}
+`Download Jupyter notebook: suites_tutorial.ipynb <suites_tutorial.ipynb>`{.interpreted-text
+role="download"}
+:::
+:::::
+::::::
+:::::::
+
+:::: only
+html
+
+::: rst-class
+sphx-glr-signature
+
+[Gallery generated by Sphinx-Gallery](https://sphinx-gallery.github.io)
+:::
+::::

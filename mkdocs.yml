@@ -1,0 +1,13 @@
+site_name: openml-python
+theme:
+  name: material
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - attr_list
+
+plugins:
+  - search
+  - autorefs

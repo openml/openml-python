@@ -88,6 +88,8 @@ docs=[
     "sphinx-gallery",
     "sphinx_bootstrap_theme",
     "numpydoc",
+    "mkdocs-material",
+    "mkdocs-autorefs"
 ]
 
 [project.urls]
