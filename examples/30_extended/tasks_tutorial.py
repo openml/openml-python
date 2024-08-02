@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 Tasks
 =====
 
@@ -12,6 +13,7 @@ from openml.tasks import TaskType
 import pandas as pd
 
 ############################################################################
+# %% [markdown]
 #
 # Tasks are identified by IDs and can be accessed in two different ways:
 #
@@ -26,6 +28,7 @@ import pandas as pd
 #    splits in a useful manner.
 
 ############################################################################
+# %% [markdown]
 # Listing tasks
 # ^^^^^^^^^^^^^
 #
@@ -43,6 +46,7 @@ print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
 ############################################################################
+# %% [markdown]
 # We can filter the list of tasks to only contain datasets with more than
 # 500 samples, but less than 1000 samples:
 
@@ -55,6 +59,8 @@ print(list(filtered_tasks.index))
 print(len(filtered_tasks))
 
 ############################################################################
+# %% [markdown]
+# %% [markdown]
 # Then, we can further restrict the tasks to all have the same resampling strategy:
 
 filtered_tasks = filtered_tasks.query('estimation_procedure == "10-fold Crossvalidation"')
@@ -66,6 +72,7 @@ print(list(filtered_tasks.index))
 print(len(filtered_tasks))
 
 ############################################################################
+# %% [markdown]
 # Resampling strategies can be found on the
 # `OpenML Website <https://www.openml.org/search?type=measure&q=estimation%20procedure>`_.
 #
@@ -89,6 +96,7 @@ tasks = openml.tasks.list_tasks(size=10, offset=50, output_format="dataframe")
 print(tasks)
 
 ############################################################################
+# %% [markdown]
 #
 # **OpenML 100**
 # is a curated list of 100 tasks to start using OpenML. They are all
@@ -105,6 +113,7 @@ tasks = openml.tasks.list_tasks(output_format="dataframe")
 print(len(tasks))
 
 ############################################################################
+# %% [markdown]
 # Exercise
 # ########
 #
@@ -113,6 +122,7 @@ print(len(tasks))
 tasks.query('name=="eeg-eye-state"')
 
 ############################################################################
+# %% [markdown]
 # Downloading tasks
 # ^^^^^^^^^^^^^^^^^
 #
@@ -136,6 +146,7 @@ tasks = openml.tasks.get_tasks(ids)
 print(tasks[0])
 
 ############################################################################
+# %% [markdown]
 # Creating tasks
 # ^^^^^^^^^^^^^^
 #
@@ -164,6 +175,7 @@ print(tasks[0])
 # scatters results across tasks.
 
 ############################################################################
+# %% [markdown]
 # We'll use the test server for the rest of this tutorial.
 #
 # .. warning::
@@ -171,6 +183,7 @@ print(tasks[0])
 openml.config.start_using_configuration_for_example()
 
 ############################################################################
+# %% [markdown]
 # Example
 # #######
 #
@@ -209,6 +222,7 @@ openml.config.stop_using_configuration_for_example()
 
 
 ############################################################################
+# %% [markdown]
 # * `Complete list of task types <https://www.openml.org/search?type=task_type>`_.
 # * `Complete list of model estimation procedures <https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure>`_.
 # * `Complete list of evaluation measures <https://www.openml.org/search?q=measure_type%3Aevaluation_measure&type=measure>`_.

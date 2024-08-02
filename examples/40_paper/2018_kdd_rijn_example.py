@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 van Rijn and Hutter (2018)
 ==========================
 
@@ -36,6 +37,7 @@ import openml
 
 
 ##############################################################################
+# %% [markdown]
 # With the advent of automated machine learning, automated hyperparameter
 # optimization methods are by now routinely used in data mining. However, this
 # progress is not yet matched by equal progress on automatic analyses that
@@ -160,6 +162,7 @@ for idx, task_id in enumerate(suite.tasks):
 fanova_results = pd.DataFrame(fanova_results)
 
 ##############################################################################
+# %% [markdown]
 # make the boxplot of the variance contribution. Obviously, we can also use
 # this data to make the Nemenyi plot, but this relies on the rather complex
 # ``Orange`` dependency (``pip install Orange3``). For the complete example,

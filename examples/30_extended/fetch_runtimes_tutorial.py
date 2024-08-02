@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 
 ==========================================
 Measuring runtimes for Scikit-learn models
@@ -60,6 +61,7 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
 
 ############################################################################
+# %% [markdown]
 # Preparing tasks and scikit-learn models
 # ***************************************
 
@@ -92,6 +94,7 @@ def print_compare_runtimes(measures):
 
 
 ############################################################################
+# %% [markdown]
 # Case 1: Running a Random Forest model on an OpenML task
 # *******************************************************
 # We'll run a Random Forest model and obtain an OpenML run object. We can
@@ -123,6 +126,7 @@ for repeat, val1 in measures["predictive_accuracy"].items():
     print()
 
 ################################################################################
+# %% [markdown]
 # The remaining entries recorded in `measures` are the runtime records
 # related as:
 #
@@ -141,6 +145,7 @@ for repeat, val1 in measures["predictive_accuracy"].items():
 print_compare_runtimes(measures)
 
 ######################################################################
+# %% [markdown]
 # Case 2: Running Scikit-learn model on an OpenML task in parallel
 # ****************************************************************
 # Redefining the model to allow parallelism with `n_jobs=2` (2 cores)
@@ -155,6 +160,7 @@ measures = run2.fold_evaluations
 print_compare_runtimes(measures)
 
 ####################################################################################
+# %% [markdown]
 # Running a Random Forest model on an OpenML task in parallel (all cores available):
 
 # Redefining the model to use all available cores with `n_jobs=-1`
@@ -170,6 +176,7 @@ measures = run3.fold_evaluations
 print_compare_runtimes(measures)
 
 ####################################################################################
+# %% [markdown]
 # We can now observe that the ratio of CPU time to wallclock time is lower
 # than in case 1. This happens because joblib by default spawns subprocesses
 # for the workloads for which CPU time cannot be tracked. Therefore, interpreting
@@ -177,6 +184,7 @@ print_compare_runtimes(measures)
 # applied at runtime.
 
 ####################################################################################
+# %% [markdown]
 # Running the same task with a different parallel backend. Joblib provides multiple
 # backends: {`loky` (default), `multiprocessing`, `dask`, `threading`, `sequential`}.
 # The backend can be explicitly set using a joblib context manager. The behaviour of
@@ -190,6 +198,7 @@ measures = run3_.fold_evaluations
 print_compare_runtimes(measures)
 
 ####################################################################################
+# %% [markdown]
 # The CPU time interpretation becomes ambiguous when jobs are distributed over an
 # unknown number of cores or when subprocesses are spawned for which the CPU time
 # cannot be tracked, as in the examples above. It is impossible for OpenML-Python
@@ -199,6 +208,7 @@ print_compare_runtimes(measures)
 # the final interpretation of the runtimes is left to the `user`.
 
 #####################################################################
+# %% [markdown]
 # Case 3: Running and benchmarking HPO algorithms with their runtimes
 # *******************************************************************
 # We shall now optimize a similar RandomForest model for the same task using
@@ -229,6 +239,7 @@ measures = run4.fold_evaluations
 print_compare_runtimes(measures)
 
 ##################################################################################
+# %% [markdown]
 # Like any optimisation problem, scikit-learn's HPO estimators also generate
 # a sequence of configurations which are evaluated, using which the best found
 # configuration is tracked throughout the trace.
@@ -248,6 +259,7 @@ print("# repeats: {}\n# folds: {}".format(n_repeats, n_folds))
 print(run4.fold_evaluations["wall_clock_time_millis_training"][0][0])
 
 ##################################################################################
+# %% [markdown]
 # To extract the training runtime of the 1-st repeat, 4-th (outer) fold and also
 # to fetch the parameters and performance of the evaluations made during
 # the 1-st repeat, 4-th fold evaluation by the Grid Search model.
@@ -269,6 +281,7 @@ for i in range(n_iter):
     )
 
 ##################################################################################
+# %% [markdown]
 # Scikit-learn's HPO estimators also come with an argument `refit=True` as a default.
 # In our previous model definition it was set to True by default, which meant that the best
 # found hyperparameter configuration was used to refit or retrain the model without any inner
@@ -300,7 +313,8 @@ for repeat in range(n_repeats):
             )
         )
 
-############################################################################
+#########################################################
+# %% [markdown]
 # Along with the GridSearchCV already used above, we demonstrate how such
 # optimisation traces can be retrieved by showing an application of these
 # traces - comparing the speed of finding the best configuration using
@@ -321,6 +335,7 @@ run5 = openml.runs.run_model_on_task(
 )
 
 ################################################################################
+# %% [markdown]
 # Since for the call to ``openml.runs.run_model_on_task`` the parameter
 # ``n_jobs`` is set to its default ``None``, the evaluations across the OpenML folds
 # are not parallelized. Hence, the time recorded is agnostic to the ``n_jobs``
@@ -377,6 +392,7 @@ plt.legend()
 plt.show()
 
 ################################################################################
+# %% [markdown]
 # Case 4: Running models that scikit-learn doesn't parallelize
 # *************************************************************
 # Both scikit-learn and OpenML depend on parallelism implemented through `joblib`.
@@ -395,6 +411,7 @@ measures = run6.fold_evaluations
 print_compare_runtimes(measures)
 
 ################################################################################
+# %% [markdown]
 # Although the decision tree does not run in parallel, it can release the
 # `Python GIL <https://docs.python.org/dev/glossary.html#term-global-interpreter-lock>`_.
 # This can result in surprising runtime measures as demonstrated below:
@@ -407,6 +424,7 @@ measures = run7.fold_evaluations
 print_compare_runtimes(measures)
 
 ################################################################################
+# %% [markdown]
 # Running a Neural Network from scikit-learn that uses scikit-learn independent
 # parallelism using libraries such as `MKL, OpenBLAS or BLIS
 # <https://scikit-learn.org/stable/computing/parallelism.html#parallel-numpy-and-scipy-routines-from-numerical-libraries>`_.
@@ -420,6 +438,7 @@ measures = run8.fold_evaluations
 print_compare_runtimes(measures)
 
 ################################################################################
+# %% [markdown]
 # Case 5: Running Scikit-learn models that don't release GIL
 # **********************************************************
 # Certain Scikit-learn models do not release the `Python GIL
@@ -438,6 +457,7 @@ measures = run9.fold_evaluations
 print_compare_runtimes(measures)
 
 ################################################################################
+# %% [markdown]
 # Summmary
 # *********
 # The scikit-learn extension for OpenML-Python records model runtimes for the

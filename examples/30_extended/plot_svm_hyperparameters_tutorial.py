@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 ================================
 Plotting hyperparameter surfaces
 ================================
@@ -10,6 +11,7 @@ import openml
 import numpy as np
 
 ####################################################################################################
+# %% [markdown]
 # First step - obtaining the data
 # ===============================
 # First, we need to choose an SVM flow, for example 8353, and a task. Finding the IDs of them are
@@ -30,17 +32,20 @@ df = openml.evaluations.list_evaluations_setups(
 print(df.head(n=10))
 
 ####################################################################################################
+# %% [markdown]
 # We can see all the hyperparameter names in the columns of the dataframe:
 for name in df.columns:
     print(name)
 
 ####################################################################################################
+# %% [markdown]
 # Next, we cast and transform the hyperparameters of interest (``C`` and ``gamma``) so that we
 # can nicely plot them.
 hyperparameters = ["sklearn.svm.classes.SVC(16)_C", "sklearn.svm.classes.SVC(16)_gamma"]
 df[hyperparameters] = df[hyperparameters].astype(float).apply(np.log10)
 
 ####################################################################################################
+# %% [markdown]
 # Option 1 - plotting via the pandas helper functions
 # ===================================================
 #
@@ -54,6 +59,7 @@ df.plot.hexbin(
 )
 
 ####################################################################################################
+# %% [markdown]
 # Option 2 - plotting via matplotlib
 # ==================================
 #

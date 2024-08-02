@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 ========
 Logging
 ========
@@ -6,6 +7,7 @@ Logging
 Explains openml-python logging, and shows how to configure it.
 """
 ##################################################################################
+# %% [markdown]
 # Openml-python uses the `Python logging module <https://docs.python.org/3/library/logging.html>`_
 # to provide users with log messages. Each log message is assigned a level of importance, see
 # the table in Python's logging tutorial
@@ -26,6 +28,7 @@ import openml
 
 openml.datasets.get_dataset("iris")
 
+# %% [markdown]
 # With default configuration, the above example will show no output to console.
 # However, in your cache directory you should find a file named 'openml_python.log',
 # which has a DEBUG message written to it. It should be either like
@@ -41,6 +44,7 @@ openml.config.set_console_log_level(logging.DEBUG)
 openml.config.set_file_log_level(logging.WARNING)
 openml.datasets.get_dataset("iris")
 
+# %% [markdown]
 # Now the log level that was previously written to file should also be shown in the console.
 # The message is now no longer written to file as the `file_log` was set to level `WARNING`.
 #

@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 ================
 Benchmark suites
 ================
@@ -14,6 +15,7 @@ and simplify both the sharing of the setup and the results.
 import openml
 
 ####################################################################################################
+# %% [markdown]
 # OpenML-CC18
 # ===========
 #
@@ -36,6 +38,7 @@ import openml
 # In this example we'll focus on how to use benchmark suites in practice.
 
 ####################################################################################################
+# %% [markdown]
 # Downloading benchmark suites
 # ============================
 
@@ -43,6 +46,7 @@ suite = openml.study.get_suite(99)
 print(suite)
 
 ####################################################################################################
+# %% [markdown]
 # The benchmark suite does not download the included tasks and datasets itself, but only contains
 # a list of which tasks constitute the study.
 #
@@ -52,6 +56,7 @@ tasks = suite.tasks
 print(tasks)
 
 ####################################################################################################
+# %% [markdown]
 # and iterated over for benchmarking. For speed reasons we only iterate over the first three tasks:
 
 for task_id in tasks[:3]:
@@ -59,6 +64,7 @@ for task_id in tasks[:3]:
     print(task)
 
 ####################################################################################################
+# %% [markdown]
 # Further examples
 # ================
 #

@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 ====================
 Fetching Evaluations
 ====================
@@ -26,6 +27,7 @@ In this example, we shall do the following:
 import openml
 
 ############################################################################
+# %% [markdown]
 # Listing evaluations
 # *******************
 # Evaluations can be retrieved from the database in the chosen output format.
@@ -45,6 +47,7 @@ evals = openml.evaluations.list_evaluations(
 print(evals[evals.value > 0.98])
 
 #############################################################################
+# %% [markdown]
 # Viewing a sample task
 # =====================
 # Over here we shall briefly take a look at the details of the task.
@@ -55,6 +58,7 @@ task = openml.tasks.get_task(task_id)
 print(task)
 
 #############################################################################
+# %% [markdown]
 # Obtaining all the evaluations for the task
 # ==========================================
 # We'll now obtain all the evaluations that were uploaded for the task
@@ -73,6 +77,7 @@ print("\nDisplaying head of sorted dataframe: ")
 print(evals.head())
 
 #############################################################################
+# %% [markdown]
 # Obtaining CDF of metric for chosen task
 # ***************************************
 # We shall now analyse how the performance of various flows have been on this task,
@@ -104,6 +109,7 @@ plot_cdf(evals.value, metric)
 # with non-zero probability. While the maximum accuracy seen till now is 96.5%.
 
 #############################################################################
+# %% [markdown]
 # Comparing top 10 performing flows
 # *********************************
 # Let us now try to see which flows generally performed the best for this task.
@@ -155,6 +161,7 @@ for i in range(top_n):
     print((flow_ids[i], flow_names[i]))
 
 #############################################################################
+# %% [markdown]
 # Obtaining evaluations with hyperparameter settings
 # ==================================================
 # We'll now obtain the evaluations of a task and a flow with the hyperparameters

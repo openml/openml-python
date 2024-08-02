@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 Flows and Runs
 ==============
 
@@ -12,11 +13,13 @@ from sklearn import ensemble, neighbors
 
 
 ############################################################################
+# %% [markdown]
 # .. warning::
 #    .. include:: ../../test_server_usage_warning.txt
 openml.config.start_using_configuration_for_example()
 
 ############################################################################
+# %% [markdown]
 # Train a machine learning model
 # ==============================
 
@@ -29,6 +32,7 @@ clf = neighbors.KNeighborsClassifier(n_neighbors=3)
 clf.fit(X, y)
 
 ############################################################################
+# %% [markdown]
 # Running a model on a task
 # =========================
 
@@ -38,6 +42,7 @@ run = openml.runs.run_model_on_task(clf, task)
 print(run)
 
 ############################################################################
+# %% [markdown]
 # Publishing the run
 # ==================
 
@@ -46,4 +51,5 @@ print(f"Run was uploaded to {myrun.openml_url}")
 print(f"The flow can be found at {myrun.flow.openml_url}")
 
 ############################################################################
+# %% [markdown]
 openml.config.stop_using_configuration_for_example()

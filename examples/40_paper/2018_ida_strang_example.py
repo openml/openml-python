@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 Strang et al. (2018)
 ====================
 
@@ -21,6 +22,7 @@ import openml
 import pandas as pd
 
 ##############################################################################
+# %% [markdown]
 # A basic step for each data-mining or machine learning task is to determine
 # which model to choose based on the problem and the data at hand. In this
 # work we investigate when non-linear classifiers outperform linear
@@ -67,6 +69,7 @@ evaluations["diff"] = evaluations[flow_ids[0]] - evaluations[flow_ids[1]]
 
 
 ##############################################################################
+# %% [markdown]
 # makes the s-plot
 
 fig_splot, ax_splot = plt.subplots()
@@ -79,6 +82,7 @@ plt.show()
 
 
 ##############################################################################
+# %% [markdown]
 # adds column that indicates the difference between the two classifiers,
 # needed for the scatter plot
 
@@ -110,6 +114,7 @@ ax_scatter.set_yscale("log")
 plt.show()
 
 ##############################################################################
+# %% [markdown]
 # makes a scatter plot where each data point represents the performance of the
 # two algorithms on various axis (not in the paper)
 

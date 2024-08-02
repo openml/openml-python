@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 =================
 Benchmark studies
 =================
@@ -19,6 +20,7 @@ import openml
 
 
 ############################################################################
+# %% [markdown]
 # Listing studies
 # ***************
 #
@@ -31,23 +33,28 @@ print(studies.head(n=10))
 
 
 ############################################################################
+# %% [markdown]
 # Downloading studies
 # ===================
 
 ############################################################################
+# %% [markdown]
 # This is done based on the study ID.
 study = openml.study.get_study(123)
 print(study)
 
 ############################################################################
+# %% [markdown]
 # Studies also features a description:
 print(study.description)
 
 ############################################################################
+# %% [markdown]
 # Studies are a container for runs:
 print(study.runs)
 
 ############################################################################
+# %% [markdown]
 # And we can use the evaluation listing functionality to learn more about
 # the evaluations available for the conducted runs:
 evaluations = openml.evaluations.list_evaluations(
@@ -58,6 +65,7 @@ evaluations = openml.evaluations.list_evaluations(
 print(evaluations.head())
 
 ############################################################################
+# %% [markdown]
 # We'll use the test server for the rest of this tutorial.
 #
 # .. warning::
@@ -65,6 +73,7 @@ print(evaluations.head())
 openml.config.start_using_configuration_for_example()
 
 ############################################################################
+# %% [markdown]
 # Uploading studies
 # =================
 #

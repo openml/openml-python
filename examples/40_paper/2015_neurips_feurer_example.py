@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 Feurer et al. (2015)
 ====================
 
@@ -22,6 +23,7 @@ import pandas as pd
 import openml
 
 ####################################################################################################
+# %% [markdown]
 # List of dataset IDs given in the supplementary material of Feurer et al.:
 # https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning-supplemental.zip
 # fmt: off
@@ -40,6 +42,7 @@ dataset_ids = [
 # fmt: on
 
 ####################################################################################################
+# %% [markdown]
 # The dataset IDs could be used directly to load the dataset and split the data into a training set
 # and a test set. However, to be reproducible, we will first obtain the respective tasks from
 # OpenML, which define both the target feature and the train/test split.
@@ -53,6 +56,7 @@ dataset_ids = [
 #    want to learn more about them.
 
 ####################################################################################################
+# %% [markdown]
 # This lists both active and inactive tasks (because of ``status='all'``). Unfortunately,
 # this is necessary as some of the datasets contain issues found after the publication and became
 # deactivated, which also deactivated the tasks on them. More information on active or inactive

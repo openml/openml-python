@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 Flows and Runs
 ==============
 
@@ -12,6 +13,7 @@ from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipelin
 
 
 ############################################################################
+# %% [markdown]
 # We'll use the test server for the rest of this tutorial.
 #
 # .. warning::
@@ -19,6 +21,7 @@ from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipelin
 openml.config.start_using_configuration_for_example()
 
 ############################################################################
+# %% [markdown]
 # Train machine learning models
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
@@ -33,6 +36,7 @@ clf = neighbors.KNeighborsClassifier(n_neighbors=1)
 clf.fit(X, y)
 
 ############################################################################
+# %% [markdown]
 # You can also ask for meta-data to automatically preprocess the data.
 #
 # * e.g. categorical features -> do feature encoding
@@ -48,6 +52,7 @@ X = transformer.fit_transform(X)
 clf.fit(X, y)
 
 ############################################################################
+# %% [markdown]
 # Runs: Easily explore models
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # We can run (many) scikit-learn algorithms on (many) OpenML tasks.
@@ -64,6 +69,7 @@ run = openml.runs.run_model_on_task(clf, task)
 print(run)
 
 ############################################################################
+# %% [markdown]
 # Share the run on the OpenML server
 #
 # So far the run is only available locally. By calling the publish function,
@@ -75,12 +81,14 @@ myrun = run.publish()
 print(f"Uploaded to {myrun.openml_url}")
 
 ############################################################################
+# %% [markdown]
 # We can now also inspect the flow object which was automatically created:
 
 flow = openml.flows.get_flow(run.flow_id)
 print(flow)
 
 ############################################################################
+# %% [markdown]
 # It also works with pipelines
 # ############################
 #
@@ -121,6 +129,7 @@ myrun = run.publish()
 print(f"Uploaded to {myrun.openml_url}")
 
 
+# %% [markdown]
 # The above pipeline works with the helper functions that internally deal with pandas DataFrame.
 # In the case, pandas is not available, or a NumPy based data processing is the requirement, the
 # above pipeline is presented below to work with NumPy.
@@ -165,6 +174,7 @@ myrun = run.publish()
 print(f"Uploaded to {myrun.openml_url}")
 
 ###############################################################################
+# %% [markdown]
 # Running flows on tasks offline for later upload
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # For those scenarios where there is no access to internet, it is possible to run
@@ -193,6 +203,7 @@ run.publish()
 # it does not yet exist on the server.
 
 ############################################################################
+# %% [markdown]
 # Alternatively, one can also directly run flows.
 
 # Get a task
@@ -209,6 +220,7 @@ flow = extension.model_to_flow(clf)
 run = openml.runs.run_flow_on_task(flow, task)
 
 ############################################################################
+# %% [markdown]
 # Challenge
 # ^^^^^^^^^
 #

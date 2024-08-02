@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 Perrone et al. (2018)
 =====================
 
@@ -40,6 +41,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 flow_type = "svm"  # this example will use the smaller svm flow evaluations
 ############################################################################
+# %% [markdown]
 # The subsequent functions are defined to fetch tasks, flows, evaluations and preprocess them into
 # a tabular format that can be used to build models.
 
@@ -155,6 +157,7 @@ def list_categorical_attributes(flow_type="svm"):
 
 
 #############################################################################
+# %% [markdown]
 # Fetching the data from OpenML
 # *****************************
 # Now, we read all the tasks and evaluations for them and collate into a table.
@@ -167,6 +170,7 @@ print(X.head())
 print("Y : ", y[:5])
 
 #############################################################################
+# %% [markdown]
 # Creating pre-processing and modelling pipelines
 # ***********************************************
 # The two primary tasks are to impute the missing values, that is, account for the hyperparameters
@@ -192,6 +196,7 @@ model = Pipeline(steps=[("preprocess", ct), ("surrogate", clf)])
 
 
 #############################################################################
+# %% [markdown]
 # Building a surrogate model on a task's evaluation
 # *************************************************
 # The same set of functions can be used for a single task to retrieve a singular table which can

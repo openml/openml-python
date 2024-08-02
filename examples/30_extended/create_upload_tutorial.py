@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 Dataset upload tutorial
 =======================
 
@@ -15,14 +16,17 @@ from scipy.sparse import coo_matrix
 import openml
 from openml.datasets.functions import create_dataset
 
-############################################################################
+#
+# %% [markdown]
+##########################################################################
 # .. warning::
 #    .. include:: ../../test_server_usage_warning.txt
 
 openml.config.start_using_configuration_for_example()
 ############################################################################
 
-############################################################################
+##############################################################################
+# %% [markdown]
 # Below we will cover the following cases of the dataset object:
 #
 # * A numpy array
@@ -32,6 +36,7 @@ openml.config.start_using_configuration_for_example()
 # * A pandas sparse dataframe
 
 ############################################################################
+# %% [markdown]
 # Dataset is a numpy array
 # ========================
 # A numpy array can contain lists in the case of dense data or it can contain
@@ -50,6 +55,7 @@ attribute_names = diabetes.feature_names
 description = diabetes.DESCR
 
 ############################################################################
+# %% [markdown]
 # OpenML does not distinguish between the attributes and targets on the data
 # level and stores all data in a single matrix.
 #
@@ -69,6 +75,7 @@ citation = (
 paper_url = "https://web.stanford.edu/~hastie/Papers/LARS/LeastAngle_2002.pdf"
 
 ############################################################################
+# %% [markdown]
 # Create the dataset object
 # ^^^^^^^^^^^^^^^^^^^^^^^^^
 # The definition of all fields can be found in the XSD files describing the
@@ -119,6 +126,7 @@ diabetes_dataset.publish()
 print(f"URL for dataset: {diabetes_dataset.openml_url}")
 
 ############################################################################
+# %% [markdown]
 # Dataset is a list
 # =================
 # A list can contain lists in the case of dense data or it can contain
@@ -192,6 +200,7 @@ weather_dataset.publish()
 print(f"URL for dataset: {weather_dataset.openml_url}")
 
 ############################################################################
+# %% [markdown]
 # Dataset is a pandas DataFrame
 # =============================
 # It might happen that your dataset is made of heterogeneous data which can usually
@@ -210,6 +219,7 @@ df["play"] = df["play"].astype("category")
 print(df.info())
 
 ############################################################################
+# %% [markdown]
 # We enforce the column 'outlook' and 'play' to be a categorical
 # dtype while the column 'windy' is kept as a boolean column. 'temperature'
 # and 'humidity' are kept as numeric columns. Then, we can
@@ -239,6 +249,7 @@ weather_dataset.publish()
 print(f"URL for dataset: {weather_dataset.openml_url}")
 
 ############################################################################
+# %% [markdown]
 # Dataset is a sparse matrix
 # ==========================
 
@@ -276,6 +287,7 @@ print(f"URL for dataset: {xor_dataset.openml_url}")
 
 
 ############################################################################
+# %% [markdown]
 # Dataset is a pandas dataframe with sparse columns
 # =================================================
 

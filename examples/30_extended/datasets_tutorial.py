@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 ========
 Datasets
 ========
@@ -13,6 +14,7 @@ import pandas as pd
 from openml.datasets import edit_dataset, fork_dataset, get_dataset
 
 ############################################################################
+# %% [markdown]
 # Exercise 0
 # **********
 #
@@ -34,6 +36,7 @@ openml_df = openml.datasets.list_datasets(output_format="dataframe")
 openml_df.head(n=10)
 
 ############################################################################
+# %% [markdown]
 # Exercise 1
 # **********
 #
@@ -47,6 +50,7 @@ datalist.query('name == "eeg-eye-state"')
 datalist.query("NumberOfClasses > 50")
 
 ############################################################################
+# %% [markdown]
 # Download datasets
 # =================
 
@@ -62,6 +66,7 @@ print(f"URL: {dataset.url}")
 print(dataset.description[:500])
 
 ############################################################################
+# %% [markdown]
 # Get the actual data.
 #
 # openml-python returns data as pandas dataframes (stored in the `eeg` variable below),
@@ -69,6 +74,7 @@ print(dataset.description[:500])
 eeg, *_ = dataset.get_data()
 
 ############################################################################
+# %% [markdown]
 # You can optionally choose to have openml separate out a column from the
 # dataset. In particular, many datasets for supervised problems have a set
 # `default_target_attribute` which may help identify the target variable.
@@ -79,6 +85,7 @@ print(X.head())
 print(X.info())
 
 ############################################################################
+# %% [markdown]
 # Sometimes you only need access to a dataset's metadata.
 # In those cases, you can download the dataset without downloading the
 # data file. The dataset object can be used as normal.
@@ -90,6 +97,7 @@ print(X.info())
 dataset = openml.datasets.get_dataset(1471, download_data=False)
 
 ############################################################################
+# %% [markdown]
 # Exercise 2
 # **********
 # * Explore the data visually.
@@ -106,6 +114,7 @@ _ = pd.plotting.scatter_matrix(
 
 
 ############################################################################
+# %% [markdown]
 # Edit a created dataset
 # ======================
 # This example uses the test server, to avoid editing a dataset on the main server.
@@ -136,6 +145,7 @@ print(f"Edited dataset ID: {data_id}")
 
 
 ############################################################################
+# %% [markdown]
 # Editing critical fields (default_target_attribute, row_id_attribute, ignore_attribute) is allowed
 # only for the dataset owner. Further, critical fields cannot be edited if the dataset has any
 # tasks associated with it. To edit critical fields of a dataset (without tasks) owned by you,
@@ -148,6 +158,7 @@ except openml.exceptions.OpenMLServerException as e:
     print(e)
 
 ############################################################################
+# %% [markdown]
 # Fork dataset
 # ============
 # Used to create a copy of the dataset with you as the owner.

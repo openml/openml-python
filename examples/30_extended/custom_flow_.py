@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 ================================
 Creating and Using a Custom Flow
 ================================
@@ -23,11 +24,13 @@ from openml import OpenMLClassificationTask
 from openml.runs.functions import format_prediction
 
 ####################################################################################################
+# %% [markdown]
 # .. warning::
 #    .. include:: ../../test_server_usage_warning.txt
 openml.config.start_using_configuration_for_example()
 
 ####################################################################################################
+# %% [markdown]
 # 1. Defining the flow
 # ====================
 # The first step is to define all the hyperparameters of your flow.
@@ -56,6 +59,7 @@ general = dict(
 )
 
 ####################################################################################################
+# %% [markdown]
 # Next we define the flow hyperparameters. We define their name and default value in `parameters`,
 # and provide meta-data for each hyperparameter through `parameters_meta_info`.
 # Note that even though the argument name is `parameters` they describe the hyperparameters.
@@ -71,6 +75,7 @@ flow_hyperparameters = dict(
 )
 
 ####################################################################################################
+# %% [markdown]
 # It is possible to build a flow which uses other flows.
 # For example, the Random Forest Classifier is a flow, but you could also construct a flow
 # which uses a Random Forest Classifier in a ML pipeline. When constructing the pipeline flow,
@@ -94,6 +99,7 @@ subflow = dict(
 )
 
 ####################################################################################################
+# %% [markdown]
 # With all parameters of the flow defined, we can now initialize the OpenMLFlow and publish.
 # Because we provided all the details already, we do not need to provide a `model` to the flow.
 #
@@ -113,6 +119,7 @@ autosklearn_amlb_flow.publish()
 print(f"autosklearn flow created: {autosklearn_amlb_flow.flow_id}")
 
 ####################################################################################################
+# %% [markdown]
 # 2. Using the flow
 # ====================
 # This Section will show how to upload run data for your custom flow.
@@ -134,6 +141,7 @@ dataset_id = task.get_dataset().dataset_id
 
 
 ####################################################################################################
+# %% [markdown]
 # The last bit of information for the run we need are the predicted values.
 # The exact format of the predictions will depend on the task.
 #
@@ -194,6 +202,7 @@ for where, y, yp, proba in zip(all_test_indices, y_true, y_pred, y_proba):
     predictions.append(prediction)
 
 ####################################################################################################
+# %% [markdown]
 # Finally we can create the OpenMLRun object and upload.
 # We use the argument setup_string because the used flow was a script.
 

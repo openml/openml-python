@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 =========
 Run Setup
 =========
@@ -40,11 +41,13 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.decomposition import TruncatedSVD
 
 ############################################################################
+# %% [markdown]
 # .. warning::
 #    .. include:: ../../test_server_usage_warning.txt
 openml.config.start_using_configuration_for_example()
 
 ###############################################################################
+# %% [markdown]
 # 1) Create a flow and use it to solve a task
 ###############################################################################
 
@@ -70,6 +73,7 @@ model_original = Pipeline(
     ]
 )
 
+# %% [markdown]
 # Let's change some hyperparameters. Of course, in any good application we
 # would tune them using, e.g., Random Search or Bayesian Optimization, but for
 # the purpose of this tutorial we set them to some specific values that might
@@ -87,6 +91,7 @@ run = openml.runs.run_model_on_task(model_original, task, avoid_duplicate_runs=F
 run_original = run.publish()  # this implicitly uploads the flow
 
 ###############################################################################
+# %% [markdown]
 # 2) Download the flow and solve the same task again.
 ###############################################################################
 
@@ -104,6 +109,7 @@ run_duplicate = openml.runs.run_model_on_task(model_duplicate, task, avoid_dupli
 
 
 ###############################################################################
+# %% [markdown]
 # 3) We will verify that the obtained results are exactly the same.
 ###############################################################################
 

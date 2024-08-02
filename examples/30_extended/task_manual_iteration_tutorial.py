@@ -1,4 +1,5 @@
 """
+# %% [markdown]
 Tasks: retrieving splits
 ========================
 
@@ -15,6 +16,7 @@ but not OpenML's functionality to conduct runs.
 import openml
 
 ####################################################################################################
+# %% [markdown]
 # For this tutorial we will use the famous King+Rook versus King+Pawn on A7 dataset, which has
 # the dataset ID 3 (`dataset on OpenML <https://www.openml.org/d/3>`_), and for which there exist
 # tasks with all important estimation procedures. It is small enough (less than 5000 samples) to
@@ -26,12 +28,14 @@ task_id = 233
 task = openml.tasks.get_task(task_id)
 
 ####################################################################################################
+# %% [markdown]
 # Now that we have a task object we can obtain the number of repetitions, folds and samples as
 # defined by the task:
 
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 
 ####################################################################################################
+# %% [markdown]
 # * ``n_repeats``: Number of times the model quality estimation is performed
 # * ``n_folds``: Number of folds per repeat
 # * ``n_samples``: How many data points to use. This is only relevant for learning curve tasks
@@ -52,6 +56,7 @@ print(
 )
 
 ####################################################################################################
+# %% [markdown]
 # We can now retrieve the train/test split for this combination of repeats, folds and number of
 # samples (indexing is zero-based). Usually, one would loop over all repeats, folds and sample
 # sizes, but we can neglect this here as there is only a single repetition.
@@ -66,6 +71,7 @@ print(train_indices.shape, train_indices.dtype)
 print(test_indices.shape, test_indices.dtype)
 
 ####################################################################################################
+# %% [markdown]
 # And then split the data based on this:
 
 X, y = task.get_X_and_y(dataset_format="dataframe")
@@ -84,6 +90,7 @@ print(
 )
 
 ####################################################################################################
+# %% [markdown]
 # Obviously, we can also retrieve cross-validation versions of the dataset used in task ``233``:
 
 task_id = 3
@@ -100,6 +107,7 @@ print(
 )
 
 ####################################################################################################
+# %% [markdown]
 # And then perform the aforementioned iteration over all splits:
 for repeat_idx in range(n_repeats):
     for fold_idx in range(n_folds):
@@ -128,6 +136,7 @@ for repeat_idx in range(n_repeats):
             )
 
 ####################################################################################################
+# %% [markdown]
 # And also versions with multiple repeats:
 
 task_id = 1767
@@ -144,6 +153,7 @@ print(
 )
 
 ####################################################################################################
+# %% [markdown]
 # And then again perform the aforementioned iteration over all splits:
 for repeat_idx in range(n_repeats):
     for fold_idx in range(n_folds):
@@ -172,6 +182,7 @@ for repeat_idx in range(n_repeats):
             )
 
 ####################################################################################################
+# %% [markdown]
 # And finally a task based on learning curves:
 
 task_id = 1702
@@ -188,6 +199,7 @@ print(
 )
 
 ####################################################################################################
+# %% [markdown]
 # And then again perform the aforementioned iteration over all splits:
 for repeat_idx in range(n_repeats):
     for fold_idx in range(n_folds):
