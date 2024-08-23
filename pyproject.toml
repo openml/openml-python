@@ -16,7 +16,7 @@ dependencies = [
   "python-dateutil",  # Installed through pandas anyway.
   "pandas>=1.0.0",
   "scipy>=0.13.3",
-  "numpy>=1.6.2",
+  "numpy>=1.6.2,<2.0.0",
   "minio",
   "pyarrow",
 ]
