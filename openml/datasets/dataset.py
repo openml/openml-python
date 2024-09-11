@@ -345,9 +345,10 @@ class OpenMLDataset(OpenMLBase):
         # import required here to avoid circular import.
         from .functions import _get_dataset_arff, _get_dataset_parquet
 
-        self.data_file = str(_get_dataset_arff(self))
         if self._parquet_url is not None:
             self.parquet_file = str(_get_dataset_parquet(self))
+        if self.parquet_file is None:
+            self.data_file = str(_get_dataset_arff(self))
 
     def _get_arff(self, format: str) -> dict:  # noqa: A002
         """Read ARFF file and return decoded arff.
@@ -535,18 +536,7 @@ class OpenMLDataset(OpenMLBase):
             feather_attribute_file,
         ) = self._compressed_cache_file_paths(data_file)
 
-        if data_file.suffix == ".arff":
-            data, categorical, attribute_names = self._parse_data_from_arff(data_file)
-        elif data_file.suffix == ".pq":
-            try:
-                data = pd.read_parquet(data_file)
-            except Exception as e:  # noqa: BLE001
-                raise Exception(f"File: {data_file}") from e
-
-            categorical = [data[c].dtype.name == "category" for c in data.columns]
-            attribute_names = list(data.columns)
-        else:
-            raise ValueError(f"Unknown file type for file '{data_file}'.")
+        attribute_names, categorical, data = self._parse_data_from_file(data_file)
 
         # Feather format does not work for sparse datasets, so we use pickle for sparse datasets
         if scipy.sparse.issparse(data):
@@ -571,6 +561,24 @@ class OpenMLDataset(OpenMLBase):
         logger.debug(f"Saved dataset {int(self.dataset_id or -1)}: {self.name} to file {data_file}")
 
         return data, categorical, attribute_names
+
+    def _parse_data_from_file(self, data_file: Path) -> tuple[list[str], list[bool], pd.DataFrame]:
+        if data_file.suffix == ".arff":
+            data, categorical, attribute_names = self._parse_data_from_arff(data_file)
+        elif data_file.suffix == ".pq":
+            attribute_names, categorical, data = self._parse_data_from_pq(data_file)
+        else:
+            raise ValueError(f"Unknown file type for file '{data_file}'.")
+        return attribute_names, categorical, data
+
+    def _parse_data_from_pq(self, data_file: Path) -> tuple[list[str], list[bool], pd.DataFrame]:
+        try:
+            data = pd.read_parquet(data_file)
+        except Exception as e:  # noqa: BLE001
+            raise Exception(f"File: {data_file}") from e
+        categorical = [data[c].dtype.name == "category" for c in data.columns]
+        attribute_names = list(data.columns)
+        return attribute_names, categorical, data
 
     def _load_data(self) -> tuple[pd.DataFrame | scipy.sparse.csr_matrix, list[bool], list[str]]:  # noqa: PLR0912, C901
         """Load data from compressed format or arff. Download data if not present on disk."""
@@ -636,8 +644,10 @@ class OpenMLDataset(OpenMLBase):
                 "Please manually delete the cache file if you want OpenML-Python "
                 "to attempt to reconstruct it.",
             )
-            assert self.data_file is not None
-            data, categorical, attribute_names = self._parse_data_from_arff(Path(self.data_file))
+            file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
+            assert file_to_load is not None
+            attr, cat, df = self._parse_data_from_file(Path(file_to_load))
+            return df, cat, attr
 
         data_up_to_date = isinstance(data, pd.DataFrame) or scipy.sparse.issparse(data)
         if self.cache_format == "pickle" and not data_up_to_date:
