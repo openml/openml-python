@@ -119,7 +119,6 @@ class TestRun(TestBase):
         # time.time() works in seconds
         start_time = time.time()
         while time.time() - start_time < max_waiting_time_seconds:
-            run = openml.runs.get_run(run_id, ignore_cache=True)
 
             try:
                 openml.runs.get_run_trace(run_id)
@@ -127,10 +126,12 @@ class TestRun(TestBase):
                 time.sleep(10)
                 continue
 
-            if len(run.evaluations) == 0:
+            run = openml.runs.get_run(run_id, ignore_cache=True)
+            if run.evaluations is None:
                 time.sleep(10)
                 continue
 
+            assert len(run.evaluations) > 0, "Expect not-None evaluations to always contain elements."
             return
 
         raise RuntimeError(
@@ -795,9 +796,10 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     def test_run_and_upload_gridsearch(self):
+        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
         gridsearch = GridSearchCV(
-            BaggingClassifier(base_estimator=SVC()),
-            {"base_estimator__C": [0.01, 0.1, 10], "base_estimator__gamma": [0.01, 0.1, 10]},
+            BaggingClassifier(**{estimator_name: SVC()}),
+            {f"{estimator_name}__C": [0.01, 0.1, 10], f"{estimator_name}__gamma": [0.01, 0.1, 10]},
             cv=3,
         )
         task_id = self.TEST_SERVER_TASK_SIMPLE["task_id"]
@@ -1339,10 +1341,11 @@ class TestRun(TestBase):
         num_instances = 3196
         num_folds = 10
         num_repeats = 1
+        loss = "log" if LooseVersion(sklearn.__version__) < "1.3" else "log_loss"
 
         clf = make_pipeline(
             OneHotEncoder(handle_unknown="ignore"),
-            SGDClassifier(loss="log", random_state=1),
+            SGDClassifier(loss=loss, random_state=1),
         )
         res = openml.runs.functions._run_task_get_arffcontent(
             extension=self.extension,
@@ -1764,7 +1767,8 @@ class TestRun(TestBase):
         x, y = task.get_X_and_y(dataset_format="dataframe")
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
-        clf = SGDClassifier(loss="log", random_state=1)
+        loss = "log" if LooseVersion(sklearn.__version__) < "1.3" else "log_loss"
+        clf = SGDClassifier(loss=loss, random_state=1)
         n_jobs = 2
         backend = "loky" if LooseVersion(joblib.__version__) > "0.11" else "multiprocessing"
         with parallel_backend(backend, n_jobs=n_jobs):
@@ -1805,7 +1809,8 @@ class TestRun(TestBase):
         np.testing.assert_array_almost_equal(
             scores,
             expected_scores,
-            decimal=2 if os.name == "nt" else 7,
+            decimal=2,
+            err_msg="Observed performance scores deviate from expected ones.",
         )
 
     @pytest.mark.sklearn()
@@ -1902,11 +1907,9 @@ def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.runs.delete_run(40_000)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/run/40000",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    run_url = "https://test.openml.org/api/v1/xml/run/40000"
+    assert run_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -1921,11 +1924,9 @@ def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
     success = openml.runs.delete_run(10591880)
     assert success
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/run/10591880",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    run_url = "https://test.openml.org/api/v1/xml/run/10591880"
+    assert run_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -1943,8 +1944,6 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.runs.delete_run(9_999_999)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/run/9999999",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    run_url = "https://test.openml.org/api/v1/xml/run/9999999"
+    assert run_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")

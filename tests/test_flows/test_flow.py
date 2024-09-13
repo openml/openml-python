@@ -156,8 +156,9 @@ class TestFlow(TestBase):
     @pytest.mark.sklearn()
     def test_to_xml_from_xml(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
+        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
         boosting = sklearn.ensemble.AdaBoostClassifier(
-            base_estimator=sklearn.tree.DecisionTreeClassifier(),
+            **{estimator_name: sklearn.tree.DecisionTreeClassifier()},
         )
         model = sklearn.pipeline.Pipeline(steps=(("scaler", scaler), ("boosting", boosting)))
         flow = self.extension.model_to_flow(model)
@@ -268,10 +269,15 @@ class TestFlow(TestBase):
         # TODO: Test if parameters are set correctly!
         # should not throw error as it contains two differentiable forms of
         # Bagging i.e., Bagging(Bagging(J48)) and Bagging(J48)
+        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
         semi_legal = sklearn.ensemble.BaggingClassifier(
-            base_estimator=sklearn.ensemble.BaggingClassifier(
-                base_estimator=sklearn.tree.DecisionTreeClassifier(),
-            ),
+            **{
+                estimator_name: sklearn.ensemble.BaggingClassifier(
+                    **{
+                        estimator_name:sklearn.tree.DecisionTreeClassifier(),
+                    }
+                )
+            }
         )
         flow = self.extension.model_to_flow(semi_legal)
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
@@ -369,7 +375,8 @@ class TestFlow(TestBase):
         # create a flow
         nb = sklearn.naive_bayes.GaussianNB()
 
-        ohe_params = {"sparse": False, "handle_unknown": "ignore"}
+        sparse = "sparse" if LooseVersion(sklearn.__version__) < "1.4" else "sparse_output"
+        ohe_params = {sparse: False, "handle_unknown": "ignore"}
         if LooseVersion(sklearn.__version__) >= "0.20":
             ohe_params["categories"] = "auto"
         steps = [
@@ -421,8 +428,9 @@ class TestFlow(TestBase):
             percentile=30,
         )
         fu = sklearn.pipeline.FeatureUnion(transformer_list=[("pca", pca), ("fs", fs)])
+        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
         boosting = sklearn.ensemble.AdaBoostClassifier(
-            base_estimator=sklearn.tree.DecisionTreeClassifier(),
+            **{estimator_name: sklearn.tree.DecisionTreeClassifier()},
         )
         model = sklearn.pipeline.Pipeline(
             steps=[("ohe", ohe), ("scaler", scaler), ("fu", fu), ("boosting", boosting)],
@@ -430,7 +438,7 @@ class TestFlow(TestBase):
         parameter_grid = {
             "boosting__n_estimators": [1, 5, 10, 100],
             "boosting__learning_rate": scipy.stats.uniform(0.01, 0.99),
-            "boosting__base_estimator__max_depth": scipy.stats.randint(1, 10),
+            f"boosting__{estimator_name}__max_depth": scipy.stats.randint(1, 10),
         }
         cv = sklearn.model_selection.StratifiedKFold(n_splits=5, shuffle=True)
         rs = sklearn.model_selection.RandomizedSearchCV(
@@ -522,7 +530,7 @@ class TestFlow(TestBase):
                 "fs="
                 "sklearn.feature_selection._univariate_selection.SelectPercentile),"
                 "boosting=sklearn.ensemble._weight_boosting.AdaBoostClassifier("
-                "base_estimator=sklearn.tree._classes.DecisionTreeClassifier)))"
+                f"{estimator_name}=sklearn.tree._classes.DecisionTreeClassifier)))"
             )
         assert new_flow.name == fixture_name
         new_flow.model.fit(X, y)

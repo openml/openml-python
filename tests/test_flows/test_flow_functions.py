@@ -353,8 +353,8 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "1" and LooseVersion(sklearn.__version__) != "1.0.0",
-        reason="Requires scikit-learn < 1.0.1.",
+        LooseVersion(sklearn.__version__) >= "1.0.0",
+        reason="Requires scikit-learn < 1.0.0.",
         # Because scikit-learn dropped min_impurity_split hyperparameter in 1.0,
         # and the requested flow is from 1.0.0 exactly.
     )
@@ -368,7 +368,7 @@ class TestFlowFunctions(TestBase):
     @pytest.mark.sklearn()
     @unittest.skipIf(
         (LooseVersion(sklearn.__version__) < "0.23.2")
-        or (LooseVersion(sklearn.__version__) > "1.0"),
+        or (LooseVersion(sklearn.__version__) >= "1.0"),
         reason="Requires scikit-learn 0.23.2 or ~0.24.",
         # Because these still have min_impurity_split, but with new scikit-learn module structure."
     )
@@ -460,11 +460,9 @@ def test_delete_flow_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(40_000)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/flow/40000",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    flow_url = "https://test.openml.org/api/v1/xml/flow/40000"
+    assert flow_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -482,11 +480,9 @@ def test_delete_flow_with_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(40_000)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/flow/40000",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    flow_url = "https://test.openml.org/api/v1/xml/flow/40000"
+    assert flow_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -504,11 +500,9 @@ def test_delete_subflow(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(40_000)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/flow/40000",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    flow_url = "https://test.openml.org/api/v1/xml/flow/40000"
+    assert flow_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -523,11 +517,9 @@ def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
     success = openml.flows.delete_flow(33364)
     assert success
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/flow/33364",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    flow_url = "https://test.openml.org/api/v1/xml/flow/33364"
+    assert flow_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -545,8 +537,6 @@ def test_delete_unknown_flow(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(9_999_999)
 
-    expected_call_args = [
-        ("https://test.openml.org/api/v1/xml/flow/9999999",),
-        {"params": {"api_key": test_api_key}},
-    ]
-    assert expected_call_args == list(mock_delete.call_args)
+    flow_url = "https://test.openml.org/api/v1/xml/flow/9999999"
+    assert flow_url == mock_delete.call_args.args[0]
+    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")

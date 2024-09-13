@@ -270,8 +270,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
             raise PyOpenMLError(
                 "Flow does not exist on the server, but 'flow.flow_id' is not None."
             )
-
-        if upload_flow and flow_id is None:
+        if upload_flow and flow_id is False:
             flow.publish()
             flow_id = flow.flow_id
         elif flow_id:
