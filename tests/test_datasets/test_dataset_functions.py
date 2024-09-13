@@ -1574,6 +1574,7 @@ class TestOpenMLDataset(TestBase):
         assert dataset._parquet_url is not None
         assert dataset.parquet_file is not None
         assert os.path.isfile(dataset.parquet_file)
+        assert dataset.data_file is None  # is alias for arff path
 
     @pytest.mark.production()
     def test_list_datasets_with_high_size_parameter(self):
