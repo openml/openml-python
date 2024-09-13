@@ -237,11 +237,9 @@ class SklearnExtension(Extension):
         -------
         str
         """
-        # the variable is named incorrectly: major.minor.micro/patch
-        openml_major_version = Version(openml.__version__).minor
         # This explicit check is necessary to support existing entities on the OpenML servers
         # that used the fixed dependency string (in the else block)
-        if openml_major_version > 11:
+        if Version(openml.__version__) > Version("0.11"):
             # OpenML v0.11 onwards supports sklearn>=0.24
             # assumption: 0.24 onwards sklearn should contain a _min_dependencies.py file with
             # variables declared for extracting minimum dependency for that version
