@@ -308,29 +308,29 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         model = sklearn.cluster.KMeans()
 
         sklearn_version = Version(sklearn.__version__)
-        cluster_name = "k_means_" if sklearn_version < "0.22" else "_kmeans"
+        cluster_name = "k_means_" if sklearn_version < Version("0.22") else "_kmeans"
         fixture_name = f"sklearn.cluster.{cluster_name}.KMeans"
         fixture_short_name = "sklearn.KMeans"
         # str obtained from self.extension._get_sklearn_description(model)
         fixture_description = "K-Means clustering{}".format(
-            "" if sklearn_version < "0.22" else ".",
+            "" if sklearn_version < Version("0.22") else ".",
         )
         version_fixture = self.extension._min_dependency_str(sklearn.__version__)
 
         n_jobs_val = "1"
-        if sklearn_version >= "0.20":
+        if sklearn_version >= Version("0.20"):
             n_jobs_val = "null"
-        if sklearn_version >= "0.23":
+        if sklearn_version >= Version("0.23"):
             n_jobs_val = '"deprecated"'
 
-        precomp_val = '"auto"' if sklearn_version < "0.23" else '"deprecated"'
+        precomp_val = '"auto"' if sklearn_version < Version("0.23") else '"deprecated"'
         n_init = "10"
-        if sklearn_version >= "1.2":
+        if sklearn_version >= Version("1.2"):
             n_init = '"warn"'
-        if sklearn_version >= "1.4":
+        if sklearn_version >= Version("1.4"):
             n_init = '"auto"'
 
-        algorithm = '"auto"' if sklearn_version < "1.1" else '"lloyd"'
+        algorithm = '"auto"' if sklearn_version < Version("1.1") else '"lloyd"'
         fixture_parameters = OrderedDict([
             ("algorithm", algorithm),
             ("copy_x", "true"),
@@ -345,7 +345,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             ("verbose", "0"),
         ])
 
-        if sklearn_version >= "1.0":
+        if sklearn_version >= Version("1.0" ):
             fixture_parameters.pop("n_jobs")
             fixture_parameters.pop("precompute_distances")
 
@@ -1337,43 +1337,43 @@ class TestSklearnExtensionFlowFunctions(TestBase):
     @pytest.mark.sklearn()
     def test__get_fn_arguments_with_defaults(self):
         sklearn_version = Version(sklearn.__version__)
-        if sklearn_version < "0.19":
+        if sklearn_version < Version("0.19"):
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 15),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 12),
                 (sklearn.pipeline.Pipeline.__init__, 0),
             ]
-        elif sklearn_version < "0.21":
+        elif sklearn_version < Version("0.21"):
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 16),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 1),
             ]
-        elif sklearn_version < "0.22":
+        elif sklearn_version < Version("0.22"):
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 16),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
-        elif sklearn_version < "0.23":
+        elif sklearn_version < Version("0.23"):
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 18),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 14),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
-        elif sklearn_version < "0.24":
+        elif sklearn_version < Version("0.24"):
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 18),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 14),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
-        elif sklearn_version < "1.0":
+        elif sklearn_version < Version("1.0"):
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 18),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 13),
                 (sklearn.pipeline.Pipeline.__init__, 2),
             ]
-        elif sklearn_version < "1.4":
+        elif sklearn_version < Version("1.4"):
             fns = [
                 (sklearn.ensemble.RandomForestRegressor.__init__, 17),
                 (sklearn.tree.DecisionTreeClassifier.__init__, 12),
