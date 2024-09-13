@@ -165,7 +165,7 @@ def _download_minio_file(
             bucket_name=bucket,
             object_name=object_name,
             file_path=str(destination),
-            progress=ProgressBar(),
+            progress=ProgressBar() if config.show_progress else None,
         )
         if destination.is_file() and destination.suffix == ".zip":
             with zipfile.ZipFile(destination, "r") as zip_ref:

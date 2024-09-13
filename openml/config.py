@@ -28,6 +28,7 @@ class _Config(TypedDict):
     avoid_duplicate_runs: bool
     retry_policy: Literal["human", "robot"]
     connection_n_retries: int
+    show_progress: bool
 
 
 def _create_log_handlers(create_file_handler: bool = True) -> None:  # noqa: FBT001, FBT002
@@ -111,6 +112,7 @@ _defaults: _Config = {
     "avoid_duplicate_runs": True,
     "retry_policy": "human",
     "connection_n_retries": 5,
+    "show_progress": False,
 }
 
 # Default values are actually added here in the _setup() function which is
@@ -131,6 +133,7 @@ def get_server_base_url() -> str:
 
 
 apikey: str = _defaults["apikey"]
+show_progress: bool = _defaults["show_progress"]
 # The current cache directory (without the server name)
 _root_cache_directory = Path(_defaults["cachedir"])
 avoid_duplicate_runs = _defaults["avoid_duplicate_runs"]
@@ -238,6 +241,7 @@ def _setup(config: _Config | None = None) -> None:
     global server  # noqa: PLW0603
     global _root_cache_directory  # noqa: PLW0603
     global avoid_duplicate_runs  # noqa: PLW0603
+    global show_progress  # noqa: PLW0603
 
     config_file = determine_config_file_path()
     config_dir = config_file.parent
@@ -257,6 +261,7 @@ def _setup(config: _Config | None = None) -> None:
     server = config["server"]
     short_cache_dir = config["cachedir"]
     n_retries = config["connection_n_retries"]
+    show_progress = config.get("show_progress", _defaults["show_progress"])
 
     set_retry_policy(config["retry_policy"], n_retries)
 
@@ -339,6 +344,7 @@ def get_config_as_dict() -> _Config:
         "avoid_duplicate_runs": avoid_duplicate_runs,
         "connection_n_retries": connection_n_retries,
         "retry_policy": retry_policy,
+        "show_progress": show_progress,
     }
 
 
