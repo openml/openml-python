@@ -172,6 +172,7 @@ def _download_minio_file(
         if destination.is_file() and destination.suffix == ".zip":
             with zipfile.ZipFile(destination, "r") as zip_ref:
                 zip_ref.extractall(destination.parent)
+            destination.unlink()
 
     except minio.error.S3Error as e:
         if e.message is not None and e.message.startswith("Object does not exist"):
