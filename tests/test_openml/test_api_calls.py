@@ -55,21 +55,19 @@ class FakeMinio:
 
 @mock.patch.object(minio, "Minio")
 def test_download_all_files_observes_cache(mock_minio, tmp_path: Path) -> None:
+    some_prefix, some_filename = "some/prefix", "dataset.arff"
+    some_object_path = f"{some_prefix}/{some_filename}"
+    some_url = f"https://not.real.com/bucket/{some_object_path}"
     mock_minio.return_value = FakeMinio(
         objects=[
-            FakeObject("with/something/dataset.arff"),
+            FakeObject(some_object_path),
         ],
     )
 
-    _download_minio_bucket(
-        source="https://not.real.com/bucket/with/something/file.ext",
-        destination=tmp_path,
-    )
+    _download_minio_bucket(source=some_url, destination=tmp_path)
     time_created = (tmp_path / "dataset.arff").stat().st_ctime
-    _download_minio_bucket(
-        source="https://not.real.com/bucket/with/something/file.ext",
-        destination=tmp_path,
-    )
-    time_modified = (tmp_path / "dataset.arff").stat().st_mtime
+
+    _download_minio_bucket(source=some_url, destination=tmp_path)
+    time_modified = (tmp_path / some_filename).stat().st_mtime
 
     assert time_created == time_modified
