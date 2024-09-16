@@ -5,7 +5,7 @@ import copy
 import functools
 import unittest
 from collections import OrderedDict
-from distutils.version import LooseVersion
+from packaging.version import Version
 from unittest import mock
 from unittest.mock import patch
 
@@ -279,7 +279,7 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
+        Version(sklearn.__version__) < Version("0.20"),
         reason="OrdinalEncoder introduced in 0.20. "
         "No known models with list of lists parameters in older versions.",
     )
@@ -334,7 +334,7 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) == "0.19.1",
+        Version(sklearn.__version__) == Version("0.19.1"),
         reason="Requires scikit-learn!=0.19.1, because target flow is from that version.",
     )
     @pytest.mark.production()
@@ -353,7 +353,7 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) >= "1.0.0",
+        Version(sklearn.__version__) >= Version("1.0.0"),
         reason="Requires scikit-learn < 1.0.0.",
         # Because scikit-learn dropped min_impurity_split hyperparameter in 1.0,
         # and the requested flow is from 1.0.0 exactly.
@@ -367,8 +367,8 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        (LooseVersion(sklearn.__version__) < "0.23.2")
-        or (LooseVersion(sklearn.__version__) >= "1.0"),
+        (Version(sklearn.__version__) < Version("0.23.2"))
+        or (Version(sklearn.__version__) >= Version("1.0")),
         reason="Requires scikit-learn 0.23.2 or ~0.24.",
         # Because these still have min_impurity_split, but with new scikit-learn module structure."
     )
@@ -381,7 +381,7 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) > "0.23",
+        Version(sklearn.__version__) > Version("0.23"),
         reason="Requires scikit-learn<=0.23, because the scikit-learn module structure changed.",
     )
     @pytest.mark.production()
