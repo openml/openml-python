@@ -133,3 +133,13 @@ def test_configuration_file_not_overwritten_on_load():
 
     assert config_file_content == new_file_content
     assert "abcd" == read_config["apikey"]
+
+def test_configuration_loads_booleans(tmp_path):
+    config_file_content = "avoid_duplicate_runs=true\nshow_progress=false"
+    with (tmp_path/"config").open("w") as config_file:
+        config_file.write(config_file_content)
+        read_config = openml.config._parse_config(tmp_path)
+
+    # Explicit test to avoid truthy/falsy modes of other types
+    assert True == read_config["avoid_duplicate_runs"]
+    assert False == read_config["show_progress"]
