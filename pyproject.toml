@@ -20,6 +20,7 @@ dependencies = [
   "minio",
   "pyarrow",
   "tqdm",  # For MinIO download progress bars
+  "packaging",
 ]
 requires-python = ">=3.8"
 authors = [

@@ -6,7 +6,7 @@ import copy
 import hashlib
 import re
 import time
-from distutils.version import LooseVersion
+from packaging.version import Version
 from unittest import mock
 
 import pytest
@@ -156,7 +156,7 @@ class TestFlow(TestBase):
     @pytest.mark.sklearn()
     def test_to_xml_from_xml(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
-        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
+        estimator_name = "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
         boosting = sklearn.ensemble.AdaBoostClassifier(
             **{estimator_name: sklearn.tree.DecisionTreeClassifier()},
         )
@@ -269,7 +269,7 @@ class TestFlow(TestBase):
         # TODO: Test if parameters are set correctly!
         # should not throw error as it contains two differentiable forms of
         # Bagging i.e., Bagging(Bagging(J48)) and Bagging(J48)
-        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
+        estimator_name = "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
         semi_legal = sklearn.ensemble.BaggingClassifier(
             **{
                 estimator_name: sklearn.ensemble.BaggingClassifier(
@@ -311,7 +311,7 @@ class TestFlow(TestBase):
         get_flow_mock.return_value = flow_copy
         flow_exists_mock.return_value = 1
 
-        if LooseVersion(sklearn.__version__) < "0.22":
+        if Version(sklearn.__version__) < Version("0.22"):
             fixture = (
                 "The flow on the server is inconsistent with the local flow. "
                 "The server flow ID is 1. Please check manually and remove "
@@ -375,9 +375,9 @@ class TestFlow(TestBase):
         # create a flow
         nb = sklearn.naive_bayes.GaussianNB()
 
-        sparse = "sparse" if LooseVersion(sklearn.__version__) < "1.4" else "sparse_output"
+        sparse = "sparse" if Version(sklearn.__version__) < Version("1.4") else "sparse_output"
         ohe_params = {sparse: False, "handle_unknown": "ignore"}
-        if LooseVersion(sklearn.__version__) >= "0.20":
+        if Version(sklearn.__version__) >= Version("0.20"):
             ohe_params["categories"] = "auto"
         steps = [
             ("imputation", SimpleImputer(strategy="median")),
@@ -418,7 +418,7 @@ class TestFlow(TestBase):
 
         # Test a more complicated flow
         ohe_params = {"handle_unknown": "ignore"}
-        if LooseVersion(sklearn.__version__) >= "0.20":
+        if Version(sklearn.__version__) >= Version("0.20"):
             ohe_params["categories"] = "auto"
         ohe = sklearn.preprocessing.OneHotEncoder(**ohe_params)
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
@@ -428,7 +428,7 @@ class TestFlow(TestBase):
             percentile=30,
         )
         fu = sklearn.pipeline.FeatureUnion(transformer_list=[("pca", pca), ("fs", fs)])
-        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
+        estimator_name = "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
         boosting = sklearn.ensemble.AdaBoostClassifier(
             **{estimator_name: sklearn.tree.DecisionTreeClassifier()},
         )
@@ -499,8 +499,8 @@ class TestFlow(TestBase):
         assert new_flow is not flow
 
         # OneHotEncoder was moved to _encoders module in 0.20
-        module_name_encoder = "_encoders" if LooseVersion(sklearn.__version__) >= "0.20" else "data"
-        if LooseVersion(sklearn.__version__) < "0.22":
+        module_name_encoder = "_encoders" if Version(sklearn.__version__) >= Version("0.20") else "data"
+        if Version(sklearn.__version__) < Version("0.22"):
             fixture_name = (
                 f"{sentinel}sklearn.model_selection._search.RandomizedSearchCV("
                 "estimator=sklearn.pipeline.Pipeline("

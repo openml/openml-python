@@ -450,7 +450,7 @@ def get_datasets(
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_dataset(  # noqa: C901, PLR0912
+def get_dataset(  # noqa: C901, PLR0912, PLR0915
     dataset_id: int | str,
     download_data: bool | None = None,  # Optional for deprecation warning; later again only bool
     version: int | None = None,
@@ -589,7 +589,6 @@ def get_dataset(  # noqa: C901, PLR0912
         if download_qualities:
             qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
 
-        arff_file = _get_dataset_arff(description) if download_data else None
         if "oml:parquet_url" in description and download_data:
             try:
                 parquet_file = _get_dataset_parquet(
@@ -598,10 +597,14 @@ def get_dataset(  # noqa: C901, PLR0912
                 )
             except urllib3.exceptions.MaxRetryError:
                 parquet_file = None
-            if parquet_file is None and arff_file:
-                logger.warning("Failed to download parquet, fallback on ARFF.")
         else:
             parquet_file = None
+
+        arff_file = None
+        if parquet_file is None and download_data:
+            logger.warning("Failed to download parquet, fallback on ARFF.")
+            arff_file = _get_dataset_arff(description)
+
         remove_dataset_cache = False
     except OpenMLServerException as e:
         # if there was an exception
