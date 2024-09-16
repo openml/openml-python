@@ -50,6 +50,15 @@ print(dataset.description[:500])
 X, y, categorical_indicator, attribute_names = dataset.get_data(
     dataset_format="dataframe", target=dataset.default_target_attribute
 )
+
+############################################################################
+# Tip: you can get a progress bar for dataset downloads, simply set it in
+# the configuration. Either in code or in the configuration file
+# (see also the introduction tutorial)
+
+openml.config.show_progress = True
+
+
 ############################################################################
 # Visualize the dataset
 # =====================

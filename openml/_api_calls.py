@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import logging
 import math
@@ -26,6 +27,7 @@ from .exceptions import (
     OpenMLServerException,
     OpenMLServerNoResult,
 )
+from .utils import ProgressBar
 
 _HEADERS = {"user-agent": f"openml-python/{__version__}"}
 
@@ -161,12 +163,12 @@ def _download_minio_file(
     proxy_client = ProxyManager(proxy) if proxy else None
 
     client = minio.Minio(endpoint=parsed_url.netloc, secure=False, http_client=proxy_client)
-
     try:
         client.fget_object(
             bucket_name=bucket,
             object_name=object_name,
             file_path=str(destination),
+            progress=ProgressBar() if config.show_progress else None,
             request_headers=_HEADERS,
         )
         if destination.is_file() and destination.suffix == ".zip":
@@ -206,11 +208,12 @@ def _download_minio_bucket(source: str, destination: str | Path) -> None:
         if file_object.object_name is None:
             raise ValueError("Object name is None.")
 
-        _download_minio_file(
-            source=source.rsplit("/", 1)[0] + "/" + file_object.object_name.rsplit("/", 1)[1],
-            destination=Path(destination, file_object.object_name.rsplit("/", 1)[1]),
-            exists_ok=True,
-        )
+        with contextlib.suppress(FileExistsError):  # Simply use cached version instead
+            _download_minio_file(
+                source=source.rsplit("/", 1)[0] + "/" + file_object.object_name.rsplit("/", 1)[1],
+                destination=Path(destination, file_object.object_name.rsplit("/", 1)[1]),
+                exists_ok=False,
+            )
 
 
 def _download_text_file(
