@@ -259,7 +259,7 @@ def _setup(config: _Config | None = None) -> None:
     avoid_duplicate_runs = config["avoid_duplicate_runs"]
     apikey = config["apikey"]
     server = config["server"]
-    show_progress = config.get("show_progress", _defaults["show_progress"])
+    show_progress = config["show_progress"]
     short_cache_dir = Path(config["cachedir"])
     n_retries = int(config["connection_n_retries"])
 
@@ -333,11 +333,11 @@ def _parse_config(config_file: str | Path) -> _Config:
         logger.info("Error opening file %s: %s", config_file, e.args[0])
     config_file_.seek(0)
     config.read_file(config_file_)
-    if isinstance(config["FAKE_SECTION"]["avoid_duplicate_runs"], str):
-        config["FAKE_SECTION"]["avoid_duplicate_runs"] = config["FAKE_SECTION"].getboolean(
-            "avoid_duplicate_runs"
-        )  # type: ignore
-    return dict(config.items("FAKE_SECTION"))  # type: ignore
+    configuration = dict(config.items("FAKE_SECTION"))
+    for boolean_field in ["avoid_duplicate_runs", "show_progress"]:
+        if isinstance(config["FAKE_SECTION"][boolean_field], str):
+            configuration[boolean_field] = config["FAKE_SECTION"].getboolean(boolean_field)  # type: ignore
+    return configuration  # type: ignore
 
 
 def get_config_as_dict() -> _Config:
