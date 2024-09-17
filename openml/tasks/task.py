@@ -145,8 +145,11 @@ class OpenMLTask(OpenMLBase):
         ]
         return [(key, fields[key]) for key in order if key in fields]
 
-    def get_dataset(self, **kwargs) -> datasets.OpenMLDataset:
-        """Download dataset associated with task."""
+    def get_dataset(self, /, **kwargs) -> datasets.OpenMLDataset:
+        """Download dataset associated with task.
+
+        Accepts the same keyword arguments as the `openml.datasets.get_dataset`.
+        """
         return datasets.get_dataset(self.dataset_id, **kwargs)
 
     def get_train_test_split_indices(
