@@ -169,6 +169,24 @@ class TestOpenMLDataset(TestBase):
         except openml.exceptions.OpenMLServerException as e:
             assert e.code == 477
 
+    def _dataset_file_is_downloaded(self, did: int, file: str):
+        cache_directory = Path(openml.config.get_cache_directory()) / "datasets" / str(did)
+        return (cache_directory / file).exists()
+
+    def _dataset_description_is_downloaded(self, did: int):
+        return self._dataset_file_is_downloaded(did, "description.xml")
+
+    def _dataset_qualities_is_downloaded(self, did: int):
+        return self._dataset_file_is_downloaded(did, "qualities.xml")
+
+    def _dataset_features_is_downloaded(self, did: int):
+        return self._dataset_file_is_downloaded(did, "features.xml")
+
+    def _dataset_data_file_is_downloaded(self, did: int):
+        parquet_present = self._dataset_file_is_downloaded(did, "dataset.pq")
+        arff_present = self._dataset_file_is_downloaded(did, "dataset.arff")
+        return parquet_present or arff_present
+
     def _datasets_retrieved_successfully(self, dids, metadata_only=True):
         """Checks that all files for the given dids have been downloaded.
 
@@ -179,33 +197,14 @@ class TestOpenMLDataset(TestBase):
             - absence of data arff if metadata_only, else it must be present too.
         """
         for did in dids:
-            assert os.path.exists(
-                os.path.join(
-                    openml.config.get_cache_directory(), "datasets", str(did), "description.xml"
-                )
-            )
-            assert os.path.exists(
-                os.path.join(
-                    openml.config.get_cache_directory(), "datasets", str(did), "qualities.xml"
-                )
-            )
-            assert os.path.exists(
-                os.path.join(
-                    openml.config.get_cache_directory(), "datasets", str(did), "features.xml"
-                )
-            )
+            assert self._dataset_description_is_downloaded(did)
+            assert self._dataset_qualities_is_downloaded(did)
+            assert self._dataset_features_is_downloaded(did)
 
-            data_assert = self.assertFalse if metadata_only else self.assertTrue
-            data_assert(
-                os.path.exists(
-                    os.path.join(
-                        openml.config.get_cache_directory(),
-                        "datasets",
-                        str(did),
-                        "dataset.arff",
-                    ),
-                ),
-            )
+            if metadata_only:
+                assert not self._dataset_data_file_is_downloaded(did)
+            else:
+                assert self._dataset_data_file_is_downloaded(did)
 
     @pytest.mark.production()
     def test__name_to_id_with_deactivated(self):
@@ -588,9 +587,8 @@ class TestOpenMLDataset(TestBase):
         )
         assert not os.path.exists(did_cache_dir)
 
-    # Use _get_dataset_arff to load the description, trigger an exception in the
-    # test target and have a slightly higher coverage
-    @mock.patch("openml.datasets.functions._get_dataset_arff")
+    # get_dataset_description is the only data guaranteed to be downloaded
+    @mock.patch("openml.datasets.functions._get_dataset_description")
     def test_deletion_of_cache_dir_faulty_download(self, patch):
         patch.side_effect = Exception("Boom!")
         self.assertRaisesRegex(Exception, "Boom!", openml.datasets.get_dataset, dataset_id=1)
@@ -1498,7 +1496,7 @@ class TestOpenMLDataset(TestBase):
                     os.path.join(self.workdir, "org", "openml", "test", "datasets", str(did)),
                 )
 
-    def test_data_edit_errors(self):
+    def test_data_edit_requires_field(self):
         # Check server exception when no field to edit is provided
         self.assertRaisesRegex(
             OpenMLServerException,
@@ -1509,6 +1507,9 @@ class TestOpenMLDataset(TestBase):
             edit_dataset,
             data_id=64,  # blood-transfusion-service-center
         )
+
+
+    def test_data_edit_requires_valid_dataset(self):
         # Check server exception when unknown dataset is provided
         self.assertRaisesRegex(
             OpenMLServerException,
@@ -1518,6 +1519,8 @@ class TestOpenMLDataset(TestBase):
             description="xor operation dataset",
         )
 
+
+    def test_data_edit_cannot_edit_critical_field_if_dataset_has_task(self):
         # Need to own a dataset to be able to edit meta-data
         # Will be creating a forked version of an existing dataset to allow the unit test user
         #  to edit meta-data of a dataset
@@ -1543,6 +1546,7 @@ class TestOpenMLDataset(TestBase):
             default_target_attribute="y",
         )
 
+    def test_edit_data_user_cannot_edit_critical_field_of_other_users_dataset(self):
         # Check server exception when a non-owner or non-admin tries to edit critical fields
         self.assertRaisesRegex(
             OpenMLServerException,
