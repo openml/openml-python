@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import itertools
 import os
+import uuid
 from pathlib import Path
 import random
 import shutil
@@ -50,9 +51,6 @@ from openml.utils import _create_cache_directory_for_id, _tag_entity
 
 class TestOpenMLDataset(TestBase):
     _multiprocess_can_split_ = True
-
-    def setUp(self):
-        super().setUp()
 
     def tearDown(self):
         self._remove_pickle_files()
@@ -277,7 +275,7 @@ class TestOpenMLDataset(TestBase):
         dataset = openml.datasets.get_dataset(1, download_data=True)
         assert type(dataset) == OpenMLDataset
         assert dataset.name == "anneal"
-        _assert_datasets_retrieved_successfully([1])
+        _assert_datasets_retrieved_successfully([1], with_data=True)
 
         assert len(dataset.features) > 1
         assert len(dataset.qualities) > 4
@@ -293,22 +291,9 @@ class TestOpenMLDataset(TestBase):
         openml.config.server = self.production_server
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, "NAME_GOES_HERE")
 
-    @pytest.mark.production()
-    def test_get_dataset_lazy(self):
-        dataset = openml.datasets.get_dataset(1, download_data=False)
-        assert type(dataset) == OpenMLDataset
-        assert dataset.name == "anneal"
-        _assert_datasets_retrieved_successfully([1])
-
-        assert len(dataset.features) > 1
-        assert len(dataset.qualities) > 4
-
-        dataset.get_data()
-        _assert_datasets_retrieved_successfully([1], with_data=True)
-
     def test_get_dataset_lazy_all_functions(self):
         """Test that all expected functionality is available without downloading the dataset."""
-        dataset = openml.datasets.get_dataset(1, download_data=False)
+        dataset = openml.datasets.get_dataset(1)
         # We only tests functions as general integrity is tested by test_get_dataset_lazy
 
         def ensure_absence_of_real_data():
@@ -554,7 +539,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_publish_dataset(self):
         # lazy loading not possible as we need the arff-file.
-        openml.datasets.get_dataset(3)
+        openml.datasets.get_dataset(3, download_data=True)
         file_path = os.path.join(
             openml.config.get_cache_directory(),
             "datasets",
@@ -579,16 +564,16 @@ class TestOpenMLDataset(TestBase):
 
     def test__retrieve_class_labels(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels()
+        labels = openml.datasets.get_dataset(2).retrieve_class_labels()
         assert labels == ["1", "2", "3", "4", "5", "U"]
 
-        labels = openml.datasets.get_dataset(2, download_data=False).retrieve_class_labels(
+        labels = openml.datasets.get_dataset(2).retrieve_class_labels(
             target_name="product-type",
         )
         assert labels == ["C", "H", "G"]
 
         # Test workaround for string-typed class labels
-        custom_ds = openml.datasets.get_dataset(2, download_data=False)
+        custom_ds = openml.datasets.get_dataset(2)
         custom_ds.features[31].data_type = "string"
         labels = custom_ds.retrieve_class_labels(target_name=custom_ds.features[31].name)
         assert labels == ["COIL", "SHEET"]
@@ -899,7 +884,7 @@ class TestOpenMLDataset(TestBase):
     def test_get_online_dataset_arff(self):
         dataset_id = 100  # Australian
         # lazy loading not used as arff file is checked.
-        dataset = openml.datasets.get_dataset(dataset_id)
+        dataset = openml.datasets.get_dataset(dataset_id, download_data=True)
         decoder = arff.ArffDecoder()
         # check if the arff from the dataset is
         # the same as the arff from _get_arff function
@@ -1531,7 +1516,7 @@ class TestOpenMLDataset(TestBase):
         # Parquet functionality is disabled on the test server
         # There is no parquet-copy of the test server yet.
         openml.config.server = self.production_server
-        dataset = openml.datasets.get_dataset(61)
+        dataset = openml.datasets.get_dataset(61, download_data=True)
         assert dataset._parquet_url is not None
         assert dataset.parquet_file is not None
         assert os.path.isfile(dataset.parquet_file)
@@ -1915,9 +1900,9 @@ def _assert_datasets_retrieved_successfully( dids: Iterable[int], with_qualities
         assert has_data if with_data else not has_data
 
 @pytest.fixture()
-def isolate_for_test():
+def isolate_for_test(tmp_path):
     t = TestOpenMLDataset()
-    t.setUp()
+    t.setUp(tmpdir_suffix=uuid.uuid4().hex)
     yield
     t.tearDown()
 

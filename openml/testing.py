@@ -56,7 +56,7 @@ class TestBase(unittest.TestCase):
     logger = logging.getLogger("unit_tests_published_entities")
     logger.setLevel(logging.DEBUG)
 
-    def setUp(self, n_levels: int = 1) -> None:
+    def setUp(self, n_levels: int = 1, tmpdir_suffix: str = "") -> None:
         """Setup variables and temporary directories.
 
         In particular, this methods:
@@ -92,7 +92,7 @@ class TestBase(unittest.TestCase):
         self.static_cache_dir = static_cache_dir
         self.cwd = Path.cwd()
         workdir = Path(__file__).parent.absolute()
-        tmp_dir_name = self.id()
+        tmp_dir_name = self.id() + tmpdir_suffix
         self.workdir = workdir / tmp_dir_name
         shutil.rmtree(self.workdir, ignore_errors=True)
 
