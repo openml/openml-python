@@ -1,12 +1,14 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import itertools
 import os
 from pathlib import Path
 import random
 import shutil
 import time
 from itertools import product
+from typing import Iterable
 from unittest import mock
 
 import arff
@@ -105,7 +107,6 @@ class TestOpenMLDataset(TestBase):
         for did in datasets:
             self._check_dataset(datasets[did])
 
-    def test_tag_untag_dataset(self):
         tag = "test_tag_%d" % random.randint(1, 1000000)
         all_tags = _tag_entity("data", 1, tag)
         assert tag in all_tags
@@ -169,42 +170,6 @@ class TestOpenMLDataset(TestBase):
         except openml.exceptions.OpenMLServerException as e:
             assert e.code == 477
 
-    def _dataset_file_is_downloaded(self, did: int, file: str):
-        cache_directory = Path(openml.config.get_cache_directory()) / "datasets" / str(did)
-        return (cache_directory / file).exists()
-
-    def _dataset_description_is_downloaded(self, did: int):
-        return self._dataset_file_is_downloaded(did, "description.xml")
-
-    def _dataset_qualities_is_downloaded(self, did: int):
-        return self._dataset_file_is_downloaded(did, "qualities.xml")
-
-    def _dataset_features_is_downloaded(self, did: int):
-        return self._dataset_file_is_downloaded(did, "features.xml")
-
-    def _dataset_data_file_is_downloaded(self, did: int):
-        parquet_present = self._dataset_file_is_downloaded(did, "dataset.pq")
-        arff_present = self._dataset_file_is_downloaded(did, "dataset.arff")
-        return parquet_present or arff_present
-
-    def _datasets_retrieved_successfully(self, dids, metadata_only=True):
-        """Checks that all files for the given dids have been downloaded.
-
-        This includes:
-            - description
-            - qualities
-            - features
-            - absence of data arff if metadata_only, else it must be present too.
-        """
-        for did in dids:
-            assert self._dataset_description_is_downloaded(did)
-            assert self._dataset_qualities_is_downloaded(did)
-            assert self._dataset_features_is_downloaded(did)
-
-            if metadata_only:
-                assert not self._dataset_data_file_is_downloaded(did)
-            else:
-                assert self._dataset_data_file_is_downloaded(did)
 
     @pytest.mark.production()
     def test__name_to_id_with_deactivated(self):
@@ -262,37 +227,28 @@ class TestOpenMLDataset(TestBase):
         dids = ["anneal", "kr-vs-kp"]
         datasets = openml.datasets.get_datasets(dids, download_data=False)
         assert len(datasets) == 2
-        self._datasets_retrieved_successfully([1, 2])
+        _assert_datasets_retrieved_successfully([1, 2])
 
     def test_get_datasets_by_mixed(self):
         # did 1 and 2 on the test server:
         dids = ["anneal", 2]
         datasets = openml.datasets.get_datasets(dids, download_data=False)
         assert len(datasets) == 2
-        self._datasets_retrieved_successfully([1, 2])
+        _assert_datasets_retrieved_successfully([1, 2])
 
     def test_get_datasets(self):
         dids = [1, 2]
         datasets = openml.datasets.get_datasets(dids)
         assert len(datasets) == 2
-        self._datasets_retrieved_successfully([1, 2], metadata_only=False)
+        _assert_datasets_retrieved_successfully([1, 2])
 
-    def test_get_datasets_lazy(self):
-        dids = [1, 2]
-        datasets = openml.datasets.get_datasets(dids, download_data=False)
-        assert len(datasets) == 2
-        self._datasets_retrieved_successfully([1, 2], metadata_only=True)
-
-        datasets[0].get_data()
-        datasets[1].get_data()
-        self._datasets_retrieved_successfully([1, 2], metadata_only=False)
 
     @pytest.mark.production()
     def test_get_dataset_by_name(self):
         dataset = openml.datasets.get_dataset("anneal")
         assert type(dataset) == OpenMLDataset
         assert dataset.dataset_id == 1
-        self._datasets_retrieved_successfully([1], metadata_only=False)
+        _assert_datasets_retrieved_successfully([1])
 
         assert len(dataset.features) > 1
         assert len(dataset.qualities) > 4
@@ -317,37 +273,38 @@ class TestOpenMLDataset(TestBase):
         df, _, _, _ = dataset.get_data()
         assert df["carbon"].dtype == "uint8"
 
-    @pytest.mark.production()
-    def test_get_dataset(self):
-        # This is the only non-lazy load to ensure default behaviour works.
-        dataset = openml.datasets.get_dataset(1)
+    def test_get_anneal_dataset(self):
+        dataset = openml.datasets.get_dataset(1, download_data=True)
         assert type(dataset) == OpenMLDataset
         assert dataset.name == "anneal"
-        self._datasets_retrieved_successfully([1], metadata_only=False)
+        _assert_datasets_retrieved_successfully([1])
 
         assert len(dataset.features) > 1
         assert len(dataset.qualities) > 4
 
+    @pytest.mark.production()
+    def test_get_dataset_cannot_access_private_data(self):
         # Issue324 Properly handle private datasets when trying to access them
         openml.config.server = self.production_server
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
+
+    @pytest.mark.skip("Need to find dataset name of private dataset")
+    def test_dataset_by_name_cannot_access_private_data(self):
+        openml.config.server = self.production_server
+        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, "NAME_GOES_HERE")
 
     @pytest.mark.production()
     def test_get_dataset_lazy(self):
         dataset = openml.datasets.get_dataset(1, download_data=False)
         assert type(dataset) == OpenMLDataset
         assert dataset.name == "anneal"
-        self._datasets_retrieved_successfully([1], metadata_only=True)
+        _assert_datasets_retrieved_successfully([1])
 
         assert len(dataset.features) > 1
         assert len(dataset.qualities) > 4
 
         dataset.get_data()
-        self._datasets_retrieved_successfully([1], metadata_only=False)
-
-        # Issue324 Properly handle private datasets when trying to access them
-        openml.config.server = self.production_server
-        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45, False)
+        _assert_datasets_retrieved_successfully([1], with_data=True)
 
     def test_get_dataset_lazy_all_functions(self):
         """Test that all expected functionality is available without downloading the dataset."""
@@ -1916,3 +1873,68 @@ def test_list_datasets_combined_filters(all_datasets: pd.DataFrame):
     )
     assert 1 <= len(combined_filter_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(combined_filter_datasets)
+
+
+def _dataset_file_is_downloaded( did: int, file: str):
+    cache_directory = Path(openml.config.get_cache_directory()) / "datasets" / str(did)
+    return (cache_directory / file).exists()
+
+def _dataset_description_is_downloaded( did: int):
+    return _dataset_file_is_downloaded(did, "description.xml")
+
+def _dataset_qualities_is_downloaded( did: int):
+    return _dataset_file_is_downloaded(did, "qualities.xml")
+
+def _dataset_features_is_downloaded( did: int):
+    return _dataset_file_is_downloaded(did, "features.xml")
+
+def _dataset_data_file_is_downloaded( did: int):
+    parquet_present = _dataset_file_is_downloaded(did, "dataset.pq")
+    arff_present = _dataset_file_is_downloaded(did, "dataset.arff")
+    return parquet_present or arff_present
+
+def _assert_datasets_retrieved_successfully( dids: Iterable[int], with_qualities:bool=False, with_features:bool=False, with_data:bool=False):
+    """Checks that all files for the given dids have been downloaded.
+
+    This includes:
+        - description
+        - qualities
+        - features
+        - absence of data arff if metadata_only, else it must be present too.
+    """
+    for did in dids:
+        assert _dataset_description_is_downloaded(did)
+
+        has_qualities = _dataset_qualities_is_downloaded(did)
+        assert has_qualities if with_qualities else not has_qualities
+
+        has_features = _dataset_features_is_downloaded(did)
+        assert has_features if with_features else not has_features
+
+        has_data = _dataset_data_file_is_downloaded(did)
+        assert has_data if with_data else not has_data
+
+@pytest.fixture()
+def isolate_for_test():
+    t = TestOpenMLDataset()
+    t.setUp()
+    yield
+    t.tearDown()
+
+
+@pytest.mark.parametrize(
+    "with_data, with_qualities, with_features",
+    itertools.product([True, False], repeat=3)
+)
+def test_get_dataset_lazy_behavior(isolate_for_test, with_data: bool, with_qualities: bool, with_features: bool):
+    dataset = openml.datasets.get_dataset(1, download_data=with_data, download_qualities=with_qualities, download_features_meta_data=with_features)
+    assert type(dataset) == OpenMLDataset
+    assert dataset.name == "anneal"
+
+    _assert_datasets_retrieved_successfully([1], with_qualities=with_qualities,
+                                            with_features=with_features, with_data=with_data)
+    assert dataset.features, "Features should be downloaded on-demand if not during get_dataset"
+    assert dataset.qualities, "Qualities should be downloaded on-demand if not during get_dataset"
+    assert dataset.get_data(), "Data should be downloaded on-demand if not during get_dataset"
+    _assert_datasets_retrieved_successfully([1], with_qualities=True,
+                                            with_features=True, with_data=True)
