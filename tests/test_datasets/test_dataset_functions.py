@@ -1188,28 +1188,18 @@ class TestOpenMLDataset(TestBase):
         downloaded_dataset = self._wait_for_dataset_being_processed(dataset.id)
         assert downloaded_dataset.ignore_attribute == ignore_attribute
 
-    def _wait_for_dataset_being_processed(self, dataset_id):
-        downloaded_dataset = None
-        # fetching from server
-        # loop till timeout or fetch not successful
-        max_waiting_time_seconds = 600
-        # time.time() works in seconds
+    def _wait_for_dataset_being_processed(self, dataset_id, poll_delay:int=10,max_waiting_time_seconds:int=600):
         start_time = time.time()
-        while time.time() - start_time < max_waiting_time_seconds:
+        while (time.time() - start_time) < max_waiting_time_seconds:
             try:
-                downloaded_dataset = openml.datasets.get_dataset(dataset_id)
-                break
+                # being able to download qualities is a sign that the dataset is processed
+                return openml.datasets.get_dataset(dataset_id, download_qualities=True)
             except OpenMLServerException as e:
-                # returned code 273: Dataset not processed yet
-                # returned code 362: No qualities found
                 TestBase.logger.error(
                     f"Failed to fetch dataset:{dataset_id} with '{e!s}'.",
                 )
-                time.sleep(10)
-                continue
-        if downloaded_dataset is None:
-            raise ValueError(f"TIMEOUT: Failed to fetch uploaded dataset - {dataset_id}")
-        return downloaded_dataset
+                time.sleep(poll_delay)
+        raise ValueError(f"TIMEOUT: Failed to fetch uploaded dataset - {dataset_id}")
 
     def test_create_dataset_row_id_attribute_error(self):
         # meta-information
@@ -1900,7 +1890,7 @@ def _assert_datasets_retrieved_successfully( dids: Iterable[int], with_qualities
         assert has_data if with_data else not has_data
 
 @pytest.fixture()
-def isolate_for_test(tmp_path):
+def isolate_for_test():
     t = TestOpenMLDataset()
     t.setUp(tmpdir_suffix=uuid.uuid4().hex)
     yield
