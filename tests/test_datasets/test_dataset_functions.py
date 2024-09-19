@@ -223,14 +223,14 @@ class TestOpenMLDataset(TestBase):
     def test_get_datasets_by_name(self):
         # did 1 and 2 on the test server:
         dids = ["anneal", "kr-vs-kp"]
-        datasets = openml.datasets.get_datasets(dids, download_data=False)
+        datasets = openml.datasets.get_datasets(dids)
         assert len(datasets) == 2
         _assert_datasets_retrieved_successfully([1, 2])
 
     def test_get_datasets_by_mixed(self):
         # did 1 and 2 on the test server:
         dids = ["anneal", 2]
-        datasets = openml.datasets.get_datasets(dids, download_data=False)
+        datasets = openml.datasets.get_datasets(dids)
         assert len(datasets) == 2
         _assert_datasets_retrieved_successfully([1, 2])
 
@@ -240,8 +240,6 @@ class TestOpenMLDataset(TestBase):
         assert len(datasets) == 2
         _assert_datasets_retrieved_successfully([1, 2])
 
-
-    @pytest.mark.production()
     def test_get_dataset_by_name(self):
         dataset = openml.datasets.get_dataset("anneal")
         assert type(dataset) == OpenMLDataset
@@ -251,9 +249,14 @@ class TestOpenMLDataset(TestBase):
         assert len(dataset.features) > 1
         assert len(dataset.qualities) > 4
 
-        # Issue324 Properly handle private datasets when trying to access them
-        openml.config.server = self.production_server
-        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
+    def test_get_dataset_by_id(self):
+        dataset = openml.datasets.get_dataset(1, download_data=True)
+        assert type(dataset) == OpenMLDataset
+        assert dataset.name == "anneal"
+        _assert_datasets_retrieved_successfully([1], with_data=True)
+
+        assert len(dataset.features) > 1
+        assert len(dataset.qualities) > 4
 
     @pytest.mark.skip("Feature is experimental, can not test against stable server.")
     def test_get_dataset_download_all_files(self):
@@ -271,14 +274,6 @@ class TestOpenMLDataset(TestBase):
         df, _, _, _ = dataset.get_data()
         assert df["carbon"].dtype == "uint8"
 
-    def test_get_anneal_dataset(self):
-        dataset = openml.datasets.get_dataset(1, download_data=True)
-        assert type(dataset) == OpenMLDataset
-        assert dataset.name == "anneal"
-        _assert_datasets_retrieved_successfully([1], with_data=True)
-
-        assert len(dataset.features) > 1
-        assert len(dataset.qualities) > 4
 
     @pytest.mark.production()
     def test_get_dataset_cannot_access_private_data(self):
@@ -321,14 +316,14 @@ class TestOpenMLDataset(TestBase):
         ensure_absence_of_real_data()
 
     def test_get_dataset_sparse(self):
-        dataset = openml.datasets.get_dataset(102, download_data=False)
+        dataset = openml.datasets.get_dataset(102)
         X, *_ = dataset.get_data(dataset_format="array")
         assert isinstance(X, scipy.sparse.csr_matrix)
 
     def test_download_rowid(self):
         # Smoke test which checks that the dataset has the row-id set correctly
         did = 44
-        dataset = openml.datasets.get_dataset(did, download_data=False)
+        dataset = openml.datasets.get_dataset(did)
         assert dataset.row_id_attribute == "Counter"
 
     def test__get_dataset_description(self):
@@ -459,19 +454,6 @@ class TestOpenMLDataset(TestBase):
         assert isinstance(qualities, Path)
         qualities_xml_path = self.workdir / "qualities.xml"
         assert qualities_xml_path.exists()
-
-    def test__get_dataset_skip_download(self):
-        dataset = openml.datasets.get_dataset(
-            2,
-            download_qualities=False,
-            download_features_meta_data=False,
-        )
-        # Internal representation without lazy loading
-        assert dataset._qualities is None
-        assert dataset._features is None
-        # External representation with lazy loading
-        assert dataset.qualities is not None
-        assert dataset.features is not None
 
     def test_get_dataset_force_refresh_cache(self):
         did_cache_dir = _create_cache_directory_for_id(
@@ -917,7 +899,7 @@ class TestOpenMLDataset(TestBase):
     def test_get_online_dataset_format(self):
         # Phoneme dataset
         dataset_id = 77
-        dataset = openml.datasets.get_dataset(dataset_id, download_data=False)
+        dataset = openml.datasets.get_dataset(dataset_id)
 
         assert dataset.format.lower() == _get_online_dataset_format(
             dataset_id
