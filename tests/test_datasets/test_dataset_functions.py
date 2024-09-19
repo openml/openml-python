@@ -105,6 +105,7 @@ class TestOpenMLDataset(TestBase):
         for did in datasets:
             self._check_dataset(datasets[did])
 
+    def test_tag_untag_dataset(self):
         tag = "test_tag_%d" % random.randint(1, 1000000)
         all_tags = _tag_entity("data", 1, tag)
         assert tag in all_tags
