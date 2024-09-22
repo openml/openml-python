@@ -249,15 +249,6 @@ class TestOpenMLDataset(TestBase):
         assert len(dataset.features) > 1
         assert len(dataset.qualities) > 4
 
-    def test_get_dataset_by_id(self):
-        dataset = openml.datasets.get_dataset(1, download_data=True)
-        assert type(dataset) == OpenMLDataset
-        assert dataset.name == "anneal"
-        _assert_datasets_retrieved_successfully([1], with_data=True)
-
-        assert len(dataset.features) > 1
-        assert len(dataset.qualities) > 4
-
     @pytest.mark.skip("Feature is experimental, can not test against stable server.")
     def test_get_dataset_download_all_files(self):
         # openml.datasets.get_dataset(id, download_all_files=True)
