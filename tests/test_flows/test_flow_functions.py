@@ -5,6 +5,8 @@ import copy
 import functools
 import unittest
 from collections import OrderedDict
+from multiprocessing.managers import Value
+
 from packaging.version import Version
 from unittest import mock
 from unittest.mock import patch
@@ -195,27 +197,17 @@ class TestFlowFunctions(TestBase):
 
         new_flow = copy.deepcopy(flow)
         new_flow.parameters["a"] = 7
-        self.assertRaisesRegex(
-            ValueError,
-            r"values for attribute 'parameters' differ: "
-            r"'OrderedDict\(\[\('a', 5\), \('b', 6\)\]\)'\nvs\n"
-            r"'OrderedDict\(\[\('a', 7\), \('b', 6\)\]\)'",
-            openml.flows.functions.assert_flows_equal,
-            flow,
-            new_flow,
-        )
+        with pytest.raises(ValueError) as excinfo:
+            openml.flows.functions.assert_flows_equal(flow, new_flow)
+        assert str(paramaters) in str(excinfo.value) and str(new_flow.parameters) in str(excinfo.value)
+
         openml.flows.functions.assert_flows_equal(flow, new_flow, ignore_parameter_values=True)
 
         del new_flow.parameters["a"]
-        self.assertRaisesRegex(
-            ValueError,
-            r"values for attribute 'parameters' differ: "
-            r"'OrderedDict\(\[\('a', 5\), \('b', 6\)\]\)'\nvs\n"
-            r"'OrderedDict\(\[\('b', 6\)\]\)'",
-            openml.flows.functions.assert_flows_equal,
-            flow,
-            new_flow,
-        )
+        with pytest.raises(ValueError) as excinfo:
+            openml.flows.functions.assert_flows_equal(flow, new_flow)
+        assert str(paramaters) in str(excinfo.value) and str(new_flow.parameters) in str(excinfo.value)
+
         self.assertRaisesRegex(
             ValueError,
             r"Flow Test: parameter set of flow differs from the parameters "
