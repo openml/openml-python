@@ -347,8 +347,8 @@ def __list_tasks(  # noqa: PLR0912, C901
 # TODO(eddiebergman): Maybe since this isn't public api, we can make it keyword only?
 def get_tasks(
     task_ids: list[int],
-    download_data: bool = True,  # noqa: FBT001, FBT002
-    download_qualities: bool = True,  # noqa: FBT001, FBT002
+    download_data: bool | None = None,  # noqa: FBT001, FBT002
+    download_qualities: bool | None = None,  # noqa: FBT001, FBT002
 ) -> list[OpenMLTask]:
     """Download tasks.
 
@@ -367,79 +367,61 @@ def get_tasks(
     -------
     list
     """
+    if download_data is None:
+        warnings.warn(
+            "`download_data` will default to False starting in 0.16. "
+            "Please set `download_data` explicitly to suppress this warning.",
+        )
+        download_data = True
+
+    if download_qualities is None:
+        warnings.warn(
+            "`download_qualities` will default to False starting in 0.16. "
+            "Please set `download_qualities` explicitly to suppress this warning.",
+        )
+        download_qualities = True
+
     tasks = []
     for task_id in task_ids:
-        tasks.append(get_task(task_id, download_data, download_qualities))
+        tasks.append(get_task(task_id, download_data=download_data, download_qualities=download_qualities))
     return tasks
 
 
 @openml.utils.thread_safe_if_oslo_installed
 def get_task(
     task_id: int,
-    *dataset_args: Any,
-    download_splits: bool | None = None,
+    download_splits: bool = False,
     **get_dataset_kwargs: Any,
 ) -> OpenMLTask:
     """Download OpenML task for a given task ID.
 
-    Downloads the task representation. By default, this will also download the data splits and
-    the dataset. From version 0.15.0 onwards, the splits nor the dataset will not be downloaded by
-    default.
+    Downloads the task representation.
 
     Use the `download_splits` parameter to control whether the splits are downloaded.
     Moreover, you may pass additional parameter (args or kwargs) that are passed to
     :meth:`openml.datasets.get_dataset`.
-    For backwards compatibility, if `download_data` is passed as an additional parameter and
-    `download_splits` is not explicitly set, `download_data` also overrules `download_splits`'s
-    value (deprecated from Version 0.15.0 onwards).
 
     Parameters
     ----------
     task_id : int
         The OpenML task id of the task to download.
-    download_splits: bool (default=True)
-        Whether to download the splits as well. From version 0.15.0 onwards this is independent
-        of download_data and will default to ``False``.
-    dataset_args, get_dataset_kwargs :
+    download_splits: bool (default=False)
+        Whether to download the splits as well.
+    get_dataset_kwargs :
         Args and kwargs can be used pass optional parameters to :meth:`openml.datasets.get_dataset`.
-        This includes `download_data`. If set to True the splits are downloaded as well
-        (deprecated from Version 0.15.0 onwards). The args are only present for backwards
-        compatibility and will be removed from version 0.15.0 onwards.
 
     Returns
     -------
     task: OpenMLTask
     """
-    if download_splits is None:
-        # TODO(0.15): Switch download splits to False by default, adjust typing above, adjust
-        #  documentation above, and remove warning.
-        warnings.warn(
-            "Starting from Version 0.15.0 `download_splits` will default to ``False`` instead "
-            "of ``True`` and be independent from `download_data`. To disable this message until "
-            "version 0.15 explicitly set `download_splits` to a bool.",
-            FutureWarning,
-            stacklevel=3,
-        )
-        download_splits = get_dataset_kwargs.get("download_data", True)
-
     if not isinstance(task_id, int):
-        # TODO(0.15): Remove warning
-        warnings.warn(
-            "Task id must be specified as `int` from 0.14.0 onwards.",
-            FutureWarning,
-            stacklevel=3,
-        )
-
-    try:
-        task_id = int(task_id)
-    except (ValueError, TypeError) as e:
-        raise ValueError("Dataset ID is neither an Integer nor can be cast to an Integer.") from e
+        raise TypeError(f"Task id should be integer, is {type(task_id)}") from e
 
     tid_cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
 
     try:
         task = _get_task_description(task_id)
-        dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+        dataset = get_dataset(task.dataset_id, **get_dataset_kwargs)
         # List of class labels available in dataset description
         # Including class labels as part of task meta data handles
         #   the case where data download was initially disabled
