@@ -208,11 +208,11 @@ def _download_minio_bucket(source: str, destination: str | Path) -> None:
         if file_object.object_name is None:
             raise ValueError(f"Object name is None for object {file_object!r}")
 
-        marker = Path(destination, file_object.etag)
+        marker = destination / file_object.etag
         if marker.exists():
             continue
 
-        file_destination = Path(destination, file_object.object_name.rsplit("/", 1)[1])
+        file_destination = destination / file_object.object_name.rsplit("/", 1)[1]
         if (file_destination.parent / file_destination.stem).exists():
             # Marker is missing but archive exists means the server archive changed, force a refresh
             shutil.rmtree(file_destination.parent / file_destination.stem)
