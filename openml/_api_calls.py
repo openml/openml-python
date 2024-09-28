@@ -6,6 +6,7 @@ import hashlib
 import logging
 import math
 import random
+import shutil
 import time
 import urllib.parse
 import xml
@@ -212,6 +213,10 @@ def _download_minio_bucket(source: str, destination: str | Path) -> None:
             continue
 
         file_destination = Path(destination, file_object.object_name.rsplit("/", 1)[1])
+        if (file_destination.parent / file_destination.stem).exists():
+            # Marker is missing but archive exists means the server archive changed, force a refresh
+            shutil.rmtree(file_destination.parent / file_destination.stem)
+
         with contextlib.suppress(FileExistsError):
             _download_minio_file(
                 source=source.rsplit("/", 1)[0] + "/" + file_object.object_name.rsplit("/", 1)[1],
