@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import logging
 import math
@@ -172,7 +173,6 @@ def _download_minio_file(
         if destination.is_file() and destination.suffix == ".zip":
             with zipfile.ZipFile(destination, "r") as zip_ref:
                 zip_ref.extractall(destination.parent)
-            destination.unlink()
 
     except minio.error.S3Error as e:
         if e.message is not None and e.message.startswith("Object does not exist"):
@@ -185,14 +185,14 @@ def _download_minio_file(
 def _download_minio_bucket(source: str, destination: str | Path) -> None:
     """Download file ``source`` from a MinIO Bucket and store it at ``destination``.
 
+    Does not redownload files which already exist.
+
     Parameters
     ----------
     source : str
         URL to a MinIO bucket.
     destination : str | Path
         Path to a directory to store the bucket content in.
-    exists_ok : bool, optional (default=True)
-        If False, raise FileExists if a file already exists in ``destination``.
     """
     destination = Path(destination)
     parsed_url = urllib.parse.urlparse(source)
@@ -205,13 +205,23 @@ def _download_minio_bucket(source: str, destination: str | Path) -> None:
 
     for file_object in client.list_objects(bucket, prefix=prefix, recursive=True):
         if file_object.object_name is None:
-            raise ValueError("Object name is None.")
+            raise ValueError(f"Object name is None for object {file_object!r}")
 
-        _download_minio_file(
-            source=source.rsplit("/", 1)[0] + "/" + file_object.object_name.rsplit("/", 1)[1],
-            destination=Path(destination, file_object.object_name.rsplit("/", 1)[1]),
-            exists_ok=True,
-        )
+        marker = Path(destination, file_object.etag)
+        if marker.exists():
+            continue
+
+        file_destination = Path(destination, file_object.object_name.rsplit("/", 1)[1])
+        with contextlib.suppress(FileExistsError):
+            _download_minio_file(
+                source=source.rsplit("/", 1)[0] + "/" + file_object.object_name.rsplit("/", 1)[1],
+                destination=file_destination,
+                exists_ok=False,
+            )
+
+        if file_destination.is_file() and file_destination.suffix == ".zip":
+            file_destination.unlink()
+            marker.touch()
 
 
 def _download_text_file(
