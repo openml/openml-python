@@ -28,6 +28,7 @@ from .exceptions import (
     OpenMLServerException,
     OpenMLServerNoResult,
 )
+from .utils import ProgressBar
 
 _HEADERS = {"user-agent": f"openml-python/{__version__}"}
 
@@ -163,12 +164,12 @@ def _download_minio_file(
     proxy_client = ProxyManager(proxy) if proxy else None
 
     client = minio.Minio(endpoint=parsed_url.netloc, secure=False, http_client=proxy_client)
-
     try:
         client.fget_object(
             bucket_name=bucket,
             object_name=object_name,
             file_path=str(destination),
+            progress=ProgressBar() if config.show_progress else None,
             request_headers=_HEADERS,
         )
         if destination.is_file() and destination.suffix == ".zip":

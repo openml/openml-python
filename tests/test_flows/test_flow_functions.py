@@ -5,7 +5,9 @@ import copy
 import functools
 import unittest
 from collections import OrderedDict
-from distutils.version import LooseVersion
+from multiprocessing.managers import Value
+
+from packaging.version import Version
 from unittest import mock
 from unittest.mock import patch
 
@@ -195,27 +197,17 @@ class TestFlowFunctions(TestBase):
 
         new_flow = copy.deepcopy(flow)
         new_flow.parameters["a"] = 7
-        self.assertRaisesRegex(
-            ValueError,
-            r"values for attribute 'parameters' differ: "
-            r"'OrderedDict\(\[\('a', 5\), \('b', 6\)\]\)'\nvs\n"
-            r"'OrderedDict\(\[\('a', 7\), \('b', 6\)\]\)'",
-            openml.flows.functions.assert_flows_equal,
-            flow,
-            new_flow,
-        )
+        with pytest.raises(ValueError) as excinfo:
+            openml.flows.functions.assert_flows_equal(flow, new_flow)
+        assert str(paramaters) in str(excinfo.value) and str(new_flow.parameters) in str(excinfo.value)
+
         openml.flows.functions.assert_flows_equal(flow, new_flow, ignore_parameter_values=True)
 
         del new_flow.parameters["a"]
-        self.assertRaisesRegex(
-            ValueError,
-            r"values for attribute 'parameters' differ: "
-            r"'OrderedDict\(\[\('a', 5\), \('b', 6\)\]\)'\nvs\n"
-            r"'OrderedDict\(\[\('b', 6\)\]\)'",
-            openml.flows.functions.assert_flows_equal,
-            flow,
-            new_flow,
-        )
+        with pytest.raises(ValueError) as excinfo:
+            openml.flows.functions.assert_flows_equal(flow, new_flow)
+        assert str(paramaters) in str(excinfo.value) and str(new_flow.parameters) in str(excinfo.value)
+
         self.assertRaisesRegex(
             ValueError,
             r"Flow Test: parameter set of flow differs from the parameters "
@@ -279,7 +271,7 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
+        Version(sklearn.__version__) < Version("0.20"),
         reason="OrdinalEncoder introduced in 0.20. "
         "No known models with list of lists parameters in older versions.",
     )
@@ -334,7 +326,7 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) == "0.19.1",
+        Version(sklearn.__version__) == Version("0.19.1"),
         reason="Requires scikit-learn!=0.19.1, because target flow is from that version.",
     )
     @pytest.mark.production()
@@ -353,7 +345,7 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) >= "1.0.0",
+        Version(sklearn.__version__) >= Version("1.0.0"),
         reason="Requires scikit-learn < 1.0.0.",
         # Because scikit-learn dropped min_impurity_split hyperparameter in 1.0,
         # and the requested flow is from 1.0.0 exactly.
@@ -367,8 +359,8 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        (LooseVersion(sklearn.__version__) < "0.23.2")
-        or (LooseVersion(sklearn.__version__) >= "1.0"),
+        (Version(sklearn.__version__) < Version("0.23.2"))
+        or (Version(sklearn.__version__) >= Version("1.0")),
         reason="Requires scikit-learn 0.23.2 or ~0.24.",
         # Because these still have min_impurity_split, but with new scikit-learn module structure."
     )
@@ -381,7 +373,7 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) > "0.23",
+        Version(sklearn.__version__) > Version("0.23"),
         reason="Requires scikit-learn<=0.23, because the scikit-learn module structure changed.",
     )
     @pytest.mark.production()

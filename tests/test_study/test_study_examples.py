@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import unittest
-from distutils.version import LooseVersion
+from packaging.version import Version
 
 import pytest
 import sklearn
@@ -17,7 +17,7 @@ class TestStudyFunctions(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.24",
+        Version(sklearn.__version__) < Version("0.24"),
         reason="columntransformer introduction in 0.24.0",
     )
     def test_Figure1a(self):

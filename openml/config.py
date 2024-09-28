@@ -28,6 +28,7 @@ class _Config(TypedDict):
     avoid_duplicate_runs: bool
     retry_policy: Literal["human", "robot"]
     connection_n_retries: int
+    show_progress: bool
 
 
 def _create_log_handlers(create_file_handler: bool = True) -> None:  # noqa: FBT001, FBT002
@@ -111,6 +112,7 @@ _defaults: _Config = {
     "avoid_duplicate_runs": True,
     "retry_policy": "human",
     "connection_n_retries": 5,
+    "show_progress": False,
 }
 
 # Default values are actually added here in the _setup() function which is
@@ -131,6 +133,7 @@ def get_server_base_url() -> str:
 
 
 apikey: str = _defaults["apikey"]
+show_progress: bool = _defaults["show_progress"]
 # The current cache directory (without the server name)
 _root_cache_directory = Path(_defaults["cachedir"])
 avoid_duplicate_runs = _defaults["avoid_duplicate_runs"]
@@ -238,6 +241,7 @@ def _setup(config: _Config | None = None) -> None:
     global server  # noqa: PLW0603
     global _root_cache_directory  # noqa: PLW0603
     global avoid_duplicate_runs  # noqa: PLW0603
+    global show_progress  # noqa: PLW0603
 
     config_file = determine_config_file_path()
     config_dir = config_file.parent
@@ -255,6 +259,7 @@ def _setup(config: _Config | None = None) -> None:
     avoid_duplicate_runs = config["avoid_duplicate_runs"]
     apikey = config["apikey"]
     server = config["server"]
+    show_progress = config["show_progress"]
     short_cache_dir = Path(config["cachedir"])
     n_retries = int(config["connection_n_retries"])
 
@@ -328,11 +333,11 @@ def _parse_config(config_file: str | Path) -> _Config:
         logger.info("Error opening file %s: %s", config_file, e.args[0])
     config_file_.seek(0)
     config.read_file(config_file_)
-    if isinstance(config["FAKE_SECTION"]["avoid_duplicate_runs"], str):
-        config["FAKE_SECTION"]["avoid_duplicate_runs"] = config["FAKE_SECTION"].getboolean(
-            "avoid_duplicate_runs"
-        )  # type: ignore
-    return dict(config.items("FAKE_SECTION"))  # type: ignore
+    configuration = dict(config.items("FAKE_SECTION"))
+    for boolean_field in ["avoid_duplicate_runs", "show_progress"]:
+        if isinstance(config["FAKE_SECTION"][boolean_field], str):
+            configuration[boolean_field] = config["FAKE_SECTION"].getboolean(boolean_field)  # type: ignore
+    return configuration  # type: ignore
 
 
 def get_config_as_dict() -> _Config:
@@ -343,6 +348,7 @@ def get_config_as_dict() -> _Config:
         "avoid_duplicate_runs": avoid_duplicate_runs,
         "connection_n_retries": connection_n_retries,
         "retry_policy": retry_policy,
+        "show_progress": show_progress,
     }
 
 

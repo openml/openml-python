@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 import unittest.mock
+from pathlib import Path
+from typing import NamedTuple, Iterable, Iterator
+from unittest import mock
 
+import minio
 import pytest
 
 import openml
 import openml.testing
+from openml._api_calls import _download_minio_bucket
 
 
 class TestConfig(openml.testing.TestBase):
@@ -30,3 +35,39 @@ class TestConfig(openml.testing.TestBase):
             openml._api_calls._send_request("get", "/abc", {})
 
         assert Session_class_mock.return_value.__enter__.return_value.get.call_count == 20
+
+class FakeObject(NamedTuple):
+    object_name: str
+
+class FakeMinio:
+    def __init__(self, objects: Iterable[FakeObject] | None = None):
+        self._objects = objects or []
+
+    def list_objects(self, *args, **kwargs) -> Iterator[FakeObject]:
+        yield from self._objects
+
+    def fget_object(self, object_name: str, file_path: str, *args, **kwargs) -> None:
+        if object_name in [obj.object_name for obj in self._objects]:
+            Path(file_path).write_text("foo")
+            return
+        raise FileNotFoundError
+
+
+@mock.patch.object(minio, "Minio")
+def test_download_all_files_observes_cache(mock_minio, tmp_path: Path) -> None:
+    some_prefix, some_filename = "some/prefix", "dataset.arff"
+    some_object_path = f"{some_prefix}/{some_filename}"
+    some_url = f"https://not.real.com/bucket/{some_object_path}"
+    mock_minio.return_value = FakeMinio(
+        objects=[
+            FakeObject(some_object_path),
+        ],
+    )
+
+    _download_minio_bucket(source=some_url, destination=tmp_path)
+    time_created = (tmp_path / "dataset.arff").stat().st_ctime
+
+    _download_minio_bucket(source=some_url, destination=tmp_path)
+    time_modified = (tmp_path / some_filename).stat().st_mtime
+
+    assert time_created == time_modified

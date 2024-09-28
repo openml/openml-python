@@ -9,6 +9,9 @@ Changelog
 next
 ~~~~~~
 
+ * ADD #1335: Improve MinIO support.
+    * Add progress bar for downloading MinIO files. Enable it with setting `show_progress` to true on either `openml.config` or the configuration file.
+    * When using `download_all_files`, files are only downloaded if they do not yet exist in the cache.
  * MAINT #1340: Add Numpy 2.0 support. Update tests to work with scikit-learn <= 1.5.
  * ADD #1342: Add HTTP header to requests to indicate they are from openml-python.
 

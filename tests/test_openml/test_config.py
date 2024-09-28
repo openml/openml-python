@@ -49,8 +49,9 @@ class TestConfig(openml.testing.TestBase):
         _config["avoid_duplicate_runs"] = False
         _config["connection_n_retries"] = 20
         _config["retry_policy"] = "robot"
+        _config["show_progress"] = False
         assert isinstance(config, dict)
-        assert len(config) == 6
+        assert len(config) == 7
         self.assertDictEqual(config, _config)
 
     def test_setup_with_config(self):
@@ -62,6 +63,7 @@ class TestConfig(openml.testing.TestBase):
         _config["avoid_duplicate_runs"] = True
         _config["retry_policy"] = "human"
         _config["connection_n_retries"] = 100
+        _config["show_progress"] = False
         orig_config = openml.config.get_config_as_dict()
         openml.config._setup(_config)
         updated_config = openml.config.get_config_as_dict()
@@ -133,3 +135,13 @@ def test_configuration_file_not_overwritten_on_load():
 
     assert config_file_content == new_file_content
     assert "abcd" == read_config["apikey"]
+
+def test_configuration_loads_booleans(tmp_path):
+    config_file_content = "avoid_duplicate_runs=true\nshow_progress=false"
+    with (tmp_path/"config").open("w") as config_file:
+        config_file.write(config_file_content)
+        read_config = openml.config._parse_config(tmp_path)
+
+    # Explicit test to avoid truthy/falsy modes of other types
+    assert True == read_config["avoid_duplicate_runs"]
+    assert False == read_config["show_progress"]
