@@ -347,8 +347,8 @@ def __list_tasks(  # noqa: PLR0912, C901
 # TODO(eddiebergman): Maybe since this isn't public api, we can make it keyword only?
 def get_tasks(
     task_ids: list[int],
-    download_data: bool | None = None,  # noqa: FBT001, FBT002
-    download_qualities: bool | None = None,  # noqa: FBT001, FBT002
+    download_data: bool | None = None,
+    download_qualities: bool | None = None,
 ) -> list[OpenMLTask]:
     """Download tasks.
 
@@ -383,7 +383,9 @@ def get_tasks(
 
     tasks = []
     for task_id in task_ids:
-        tasks.append(get_task(task_id, download_data=download_data, download_qualities=download_qualities))
+        tasks.append(
+            get_task(task_id, download_data=download_data, download_qualities=download_qualities)
+        )
     return tasks
 
 
