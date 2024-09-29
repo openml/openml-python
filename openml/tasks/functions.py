@@ -371,6 +371,7 @@ def get_tasks(
         warnings.warn(
             "`download_data` will default to False starting in 0.16. "
             "Please set `download_data` explicitly to suppress this warning.",
+            stacklevel=1,
         )
         download_data = True
 
@@ -378,6 +379,7 @@ def get_tasks(
         warnings.warn(
             "`download_qualities` will default to False starting in 0.16. "
             "Please set `download_qualities` explicitly to suppress this warning.",
+            stacklevel=1,
         )
         download_qualities = True
 
@@ -392,7 +394,7 @@ def get_tasks(
 @openml.utils.thread_safe_if_oslo_installed
 def get_task(
     task_id: int,
-    download_splits: bool = False,
+    download_splits: bool = False,  # noqa: FBT001, FBT002
     **get_dataset_kwargs: Any,
 ) -> OpenMLTask:
     """Download OpenML task for a given task ID.
@@ -417,7 +419,7 @@ def get_task(
     task: OpenMLTask
     """
     if not isinstance(task_id, int):
-        raise TypeError(f"Task id should be integer, is {type(task_id)}") from e
+        raise TypeError(f"Task id should be integer, is {type(task_id)}")
 
     tid_cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
 
