@@ -154,7 +154,7 @@ class TestTask(TestBase):
         assert os.path.exists(
             os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "task.xml")
         )
-        assert os.path.exists(
+        assert not os.path.exists(
             os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "datasplits.arff")
         )
         assert os.path.exists(
