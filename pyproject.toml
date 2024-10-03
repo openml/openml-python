@@ -1,57 +1,59 @@
 # -*- coding: utf-8 -*-
 
-# License: BSD 3-Clause
+# license: bsd 3-clause
 [build-system]
 requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "openml"
-dynamic = ["version"]  # Will take it from the __version__ file, update there
+dynamic = ["version"]  # will take it from the __version__ file, update there
 dependencies = [
   "liac-arff>=2.4.0",
   "xmltodict",
   "requests",
   "scikit-learn>=0.18",
-  "python-dateutil",  # Installed through pandas anyway.
+  "python-dateutil",  # installed through pandas anyway.
   "pandas>=1.0.0",
   "scipy>=0.13.3",
   "numpy>=1.6.2",
   "minio",
   "pyarrow",
-  "tqdm",  # For MinIO download progress bars
+  "tqdm",  # for minio download progress bars
   "packaging",
 ]
 requires-python = ">=3.8"
 authors = [
-  { name = "Matthias Feurer", email="feurerm@informatik.uni-freiburg.de" },
-  { name = "Jan van Rijn" },
-  { name = "Arlind Kadra" },
-  { name = "Pieter Gijsbers" },
-  { name = "Neeratyoy Mallik" },
-  { name = "Sahithya Ravi" },
-  { name = "Andreas Müller" },
-  { name = "Joaquin Vanschoren " },
-  { name = "Frank Hutter" },
+  { name = "matthias feurer", email="feurerm@informatik.uni-freiburg.de" },
+  { name = "jan van rijn" },
+  { name = "arlind kadra" },
+  { name = "pieter gijsbers" },
+  { name = "neeratyoy mallik" },
+  { name = "sahithya ravi" },
+  { name = "andreas müller" },
+  { name = "joaquin vanschoren " },
+  { name = "frank hutter" },
 ]
-readme = "README.md"
-description = "Python API for OpenML"
+readme = "readme.md"
+description = "python api for openml"
 classifiers = [
-  "Intended Audience :: Science/Research",
-  "Intended Audience :: Developers",
-  "License :: OSI Approved :: BSD License",
-  "Programming Language :: Python",
-  "Topic :: Software Development",
-  "Topic :: Scientific/Engineering",
-  "Operating System :: POSIX",
-  "Operating System :: Unix",
-  "Operating System :: MacOS",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
+  "intended audience :: science/research",
+  "intended audience :: developers",
+  "license :: osi approved :: bsd license",
+  "programming language :: python",
+  "topic :: software development",
+  "topic :: scientific/engineering",
+  "operating system :: posix",
+  "operating system :: unix",
+  "operating system :: macos",
+  "programming language :: python :: 3",
+  "programming language :: python :: 3.8",
+  "programming language :: python :: 3.9",
+  "programming language :: python :: 3.10",
+  "programming language :: python :: 3.11",
+  "programming language :: python :: 3.12",
 ]
-license = { file = "LICENSE" }
+license = { file = "license" }
 
 [project.scripts]
 openml = "openml.cli:main"
@@ -114,7 +116,7 @@ testpaths = ["tests"]
 minversion = "7.0"
 xfail_strict = true
 filterwarnings=[
-    "ignore:the matrix subclass:PendingDeprecationWarning"
+    "ignore:the matrix subclass:pendingdeprecationwarning"
 ]
 markers = [
   "server: anything that connects to a server",
@@ -131,87 +133,87 @@ show-source = true
 src = ["openml", "tests", "examples"]
 unsafe-fixes = true
 
-# Allow unused variables when underscore-prefixed.
-dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+# allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-za-z0-9_]*[a-za-z0-9]+?))$"
 
 select = [
-  "A",
-  # "ANN", # Handled by mypy
-  "ARG",
-  "B",
-  "BLE",
-  "COM",
-  "C4",
-  "D",
-  # "DTZ",  # One day I should know how to utilize timezones and dates...
-  "E",
-  # "EXE", Meh
-  "ERA",
-  "F",
-  "FBT",
-  "I",
-  # "ISC",  # Favours implicit string concatenation
-  "INP",
-  # "INT", # I don't understand this one
-  "N",
-  "NPY",
-  "PD",
-  "PLC",
-  "PLE",
-  "PLR",
-  "PLW",
-  "PIE",
-  "PT",
-  "PTH",
-  # "PYI", # Specific to .pyi files for type stubs
-  "Q",
-  "PGH004",
-  "RET",
-  "RUF",
-  "C90",
-  "S",
-  # "SLF",    # Private member accessed (sure, it's python)
-  "SIM",
-  # "TRY", # Good in principle, would take a lot of work to statisfy
-  "T10",
-  "T20",
-  "TID",
-  "TCH",
-  "UP",
-  "N",
-  "W",
-  "YTT",
+  "a",
+  # "ann", # handled by mypy
+  "arg",
+  "b",
+  "ble",
+  "com",
+  "c4",
+  "d",
+  # "dtz",  # one day i should know how to utilize timezones and dates...
+  "e",
+  # "exe", meh
+  "era",
+  "f",
+  "fbt",
+  "i",
+  # "isc",  # favours implicit string concatenation
+  "inp",
+  # "int", # i don't understand this one
+  "n",
+  "npy",
+  "pd",
+  "plc",
+  "ple",
+  "plr",
+  "plw",
+  "pie",
+  "pt",
+  "pth",
+  # "pyi", # specific to .pyi files for type stubs
+  "q",
+  "pgh004",
+  "ret",
+  "ruf",
+  "c90",
+  "s",
+  # "slf",    # private member accessed (sure, it's python)
+  "sim",
+  # "try", # good in principle, would take a lot of work to statisfy
+  "t10",
+  "t20",
+  "tid",
+  "tch",
+  "up",
+  "n",
+  "w",
+  "ytt",
 ]
 
 ignore = [
-  "D105",    # Missing docstring in magic mthod
-  "D401",    # First line of docstring should be in imperative mood
-  "N806",    # Variable X in function should be lowercase
-  "E731",    # Do not assign a lambda expression, use a def
-  "S101",    # Use of assert detected.
-  "W292",    # No newline at end of file
-  "PLC1901", # "" can be simplified to be falsey
-  "TCH003",  # Move stdlib import into TYPE_CHECKING
-  "COM812",  # Trailing comma missing (handled by linter, ruff recommend disabling if using formatter)
-  "N803",    # Argument should be lowercase (but we accept things like `X`)
+  "d105",    # missing docstring in magic mthod
+  "d401",    # first line of docstring should be in imperative mood
+  "n806",    # variable x in function should be lowercase
+  "e731",    # do not assign a lambda expression, use a def
+  "s101",    # use of assert detected.
+  "w292",    # no newline at end of file
+  "plc1901", # "" can be simplified to be falsey
+  "tch003",  # move stdlib import into type_checking
+  "com812",  # trailing comma missing (handled by linter, ruff recommend disabling if using formatter)
+  "n803",    # argument should be lowercase (but we accept things like `x`)
 
-  # TODO(@eddibergman): These should be enabled
-  "D100",    # Missing docstring in public module
-  "D103",    # Missing docstring in public function
-  "D104",    # Missing docstring in public package
+  # todo(@eddibergman): these should be enabled
+  "d100",    # missing docstring in public module
+  "d103",    # missing docstring in public function
+  "d104",    # missing docstring in public package
 
-  # TODO(@eddiebergman): Maybe fix
-   "PLR2004", # Magic value used in comparison, consider replacing 2 with a constant variable
-  "D400",    # First line must end with a period (@eddiebergman too many to fix so ignoring this for now)
-  "D203",    # 1 blank line required before class docstring
-  "D205",    # 1 blank line between summary and description
+  # todo(@eddiebergman): maybe fix
+   "plr2004", # magic value used in comparison, consider replacing 2 with a constant variable
+  "d400",    # first line must end with a period (@eddiebergman too many to fix so ignoring this for now)
+  "d203",    # 1 blank line required before class docstring
+  "d205",    # 1 blank line between summary and description
 
-  # TODO(@eddiebergman): Could be backwards breaking
-  "N802",    # Public function name should be lower case (i.e. get_X())
+  # todo(@eddiebergman): could be backwards breaking
+  "n802",    # public function name should be lower case (i.e. get_x())
 ]
 
 exclude = [
-  # TODO(eddiebergman): Tests should be re-enabled after the refactor
+  # todo(eddiebergman): tests should be re-enabled after the refactor
   "tests",
   #
   ".bzr",
@@ -236,44 +238,44 @@ exclude = [
   "docs",
 ]
 
-# Exclude a variety of commonly ignored directories.
+# exclude a variety of commonly ignored directories.
 [tool.ruff.per-file-ignores]
 "tests/*.py" = [
-  "D100",   # Undocumented public module
-  "D101",   # Missing docstring in public class
-  "D102",   # Missing docstring in public method
-  "D103",   # Missing docstring in public function
-  "S101",   # Use of assert
-  "ANN201", # Missing return type annotation for public function
-  "FBT001", # Positional boolean argument
-  "PLR2004",# No use of magic numbers
-  "PD901",  #  X is a bad variable name. (pandas)
-  "TCH",    # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tch
-  "N803",   # Argument name {name} should be lowercase
+  "d100",   # undocumented public module
+  "d101",   # missing docstring in public class
+  "d102",   # missing docstring in public method
+  "d103",   # missing docstring in public function
+  "s101",   # use of assert
+  "ann201", # missing return type annotation for public function
+  "fbt001", # positional boolean argument
+  "plr2004",# no use of magic numbers
+  "pd901",  #  x is a bad variable name. (pandas)
+  "tch",    # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tch
+  "n803",   # argument name {name} should be lowercase
 ]
 "openml/cli.py" = [
-  "T201",   # print found
-  "T203",   # pprint found
+  "t201",   # print found
+  "t203",   # pprint found
 ]
 "openml/__version__.py" = [
-  "D100",   # Undocumented public module
+  "d100",   # undocumented public module
 ]
 "__init__.py" = [
-  "I002",   # Missing required import (i.e. from __future__ import annotations)
+  "i002",   # missing required import (i.e. from __future__ import annotations)
 ]
 "examples/*.py" = [
-  "D101",   # Missing docstring in public class
-  "D102",   # Missing docstring in public method
-  "D103",   # Missing docstring in public function
-  "D415",   # First line should end with a . or ? or !
-  "INP001", # File is part of an implicit namespace package, add an __init__.py
-  "I002",   # Missing required import (i.e. from __future__ import annotations) 
-  "E741",   # Ambigiuous variable name
-  "T201",   # print found
-  "T203",   # pprint found
-  "ERA001", # found commeneted out code
-  "E402",   # Module level import not at top of cell
-  "E501",   # Line too long
+  "d101",   # missing docstring in public class
+  "d102",   # missing docstring in public method
+  "d103",   # missing docstring in public function
+  "d415",   # first line should end with a . or ? or !
+  "inp001", # file is part of an implicit namespace package, add an __init__.py
+  "i002",   # missing required import (i.e. from __future__ import annotations)
+  "e741",   # ambigiuous variable name
+  "t201",   # print found
+  "t203",   # pprint found
+  "era001", # found commeneted out code
+  "e402",   # module level import not at top of cell
+  "e501",   # line too long
 ]
 
 
@@ -296,10 +298,10 @@ show_error_codes = true
 
 warn_unused_configs = true # warn about unused [tool.mypy] lines
 
-follow_imports = "normal"      # Type check top level api code we use from imports
+follow_imports = "normal"      # type check top level api code we use from imports
 ignore_missing_imports = false # prefer explicit ignores
 
-disallow_untyped_defs = true       # All functions must have types
+disallow_untyped_defs = true       # all functions must have types
 disallow_untyped_decorators = true # ... even decorators
 disallow_incomplete_defs = true    # ...all types
 
@@ -312,9 +314,9 @@ warn_return_any = true
 [[tool.mypy.overrides]]
 module = ["tests.*", "openml.extensions.sklearn.*"]
 
-# TODO(eddiebergman): This should be re-enabled after tests get refactored
+# todo(eddiebergman): this should be re-enabled after tests get refactored
 ignore_errors = true
-#disallow_untyped_defs = false          # Sometimes we just want to ignore verbose types
-#disallow_untyped_decorators = false    # Test decorators are not properly typed
-#disallow_incomplete_defs = false       # Sometimes we just want to ignore verbose types
+#disallow_untyped_defs = false          # sometimes we just want to ignore verbose types
+#disallow_untyped_decorators = false    # test decorators are not properly typed
+#disallow_incomplete_defs = false       # sometimes we just want to ignore verbose types
 #disable_error_code = ["var-annotated"]
