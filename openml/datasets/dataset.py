@@ -156,14 +156,14 @@ class OpenMLDataset(OpenMLBase):
             )
 
         if dataset_id is None:
-            pattern = "^[\x00-\x7F]*$"
+            pattern = "^[\x00-\x7f]*$"
             if description and not re.match(pattern, description):
                 # not basiclatin (XSD complains)
                 invalid_characters = find_invalid_characters(description, pattern)
                 raise ValueError(
                     f"Invalid symbols {invalid_characters} in description: {description}",
                 )
-            pattern = "^[\x00-\x7F]*$"
+            pattern = "^[\x00-\x7f]*$"
             if citation and not re.match(pattern, citation):
                 # not basiclatin (XSD complains)
                 invalid_characters = find_invalid_characters(citation, pattern)
@@ -574,7 +574,7 @@ class OpenMLDataset(OpenMLBase):
     def _parse_data_from_pq(self, data_file: Path) -> tuple[list[str], list[bool], pd.DataFrame]:
         try:
             data = pd.read_parquet(data_file)
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             raise Exception(f"File: {data_file}") from e
         categorical = [data[c].dtype.name == "category" for c in data.columns]
         attribute_names = list(data.columns)
@@ -816,7 +816,7 @@ class OpenMLDataset(OpenMLBase):
                 to_exclude.extend(self.ignore_attribute)
 
         if len(to_exclude) > 0:
-            logger.info("Going to remove the following attributes: %s" % to_exclude)
+            logger.info(f"Going to remove the following attributes: {to_exclude}")
             keep = np.array([column not in to_exclude for column in attribute_names])
             data = data.loc[:, keep] if isinstance(data, pd.DataFrame) else data[:, keep]
 

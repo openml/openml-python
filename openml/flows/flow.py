@@ -135,15 +135,13 @@ class OpenMLFlow(OpenMLBase):
         keys_parameters_meta_info = set(parameters_meta_info.keys())
         if len(keys_parameters.difference(keys_parameters_meta_info)) > 0:
             raise ValueError(
-                "Parameter %s only in parameters, but not in "
-                "parameters_meta_info."
-                % str(keys_parameters.difference(keys_parameters_meta_info)),
+                f"Parameter {keys_parameters.difference(keys_parameters_meta_info)!s} only in "
+                "parameters, but not in parameters_meta_info.",
             )
         if len(keys_parameters_meta_info.difference(keys_parameters)) > 0:
             raise ValueError(
-                "Parameter %s only in parameters_meta_info, "
-                "but not in parameters."
-                % str(keys_parameters_meta_info.difference(keys_parameters)),
+                f"Parameter {keys_parameters_meta_info.difference(keys_parameters)!s} only in "
+                " parameters_meta_info, but not in parameters.",
             )
 
         self.external_version = external_version

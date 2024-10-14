@@ -127,12 +127,79 @@ markers = [
 
 # https://github.com/charliermarsh/ruff
 [tool.ruff]
-target-version = "py37"
+target-version = "py38"
 line-length = 100
-show-source = true
+output-format = "grouped"
 src = ["openml", "tests", "examples"]
 unsafe-fixes = true
 
+exclude = [
+  # TODO(eddiebergman): Tests should be re-enabled after the refactor
+  "tests",
+  #
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".hg",
+  ".mypy_cache",
+  ".nox",
+  ".pants.d",
+  ".ruff_cache",
+  ".svn",
+  ".tox",
+  ".venv",
+  "__pypackages__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "node_modules",
+  "venv",
+  "docs",
+]
+
+# Exclude a variety of commonly ignored directories.
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = [
+  "D100",   # Undocumented public module
+  "D101",   # Missing docstring in public class
+  "D102",   # Missing docstring in public method
+  "D103",   # Missing docstring in public function
+  "S101",   # Use of assert
+  "ANN201", # Missing return type annotation for public function
+  "FBT001", # Positional boolean argument
+  "PLR2004",# No use of magic numbers
+  "PD901",  #  X is a bad variable name. (pandas)
+  "TCH",    # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tch
+  "N803",   # Argument name {name} should be lowercase
+]
+"openml/cli.py" = [
+  "T201",   # print found
+  "T203",   # pprint found
+]
+"openml/__version__.py" = [
+  "D100",   # Undocumented public module
+]
+"__init__.py" = [
+  "I002",   # Missing required import (i.e. from __future__ import annotations)
+]
+"examples/*.py" = [
+  "D101",   # Missing docstring in public class
+  "D102",   # Missing docstring in public method
+  "D103",   # Missing docstring in public function
+  "D415",   # First line should end with a . or ? or !
+  "INP001", # File is part of an implicit namespace package, add an __init__.py
+  "I002",   # Missing required import (i.e. from __future__ import annotations)
+  "E741",   # Ambigiuous variable name
+  "T201",   # print found
+  "T203",   # pprint found
+  "ERA001", # found commeneted out code
+  "E402",   # Module level import not at top of cell
+  "E501",   # Line too long
+]
+
+[tool.ruff.lint]
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
@@ -212,74 +279,9 @@ ignore = [
   "N802",    # Public function name should be lower case (i.e. get_X())
 ]
 
-exclude = [
-  # TODO(eddiebergman): Tests should be re-enabled after the refactor
-  "tests",
-  #
-  ".bzr",
-  ".direnv",
-  ".eggs",
-  ".git",
-  ".hg",
-  ".mypy_cache",
-  ".nox",
-  ".pants.d",
-  ".ruff_cache",
-  ".svn",
-  ".tox",
-  ".venv",
-  "__pypackages__",
-  "_build",
-  "buck-out",
-  "build",
-  "dist",
-  "node_modules",
-  "venv",
-  "docs",
-]
-
-# Exclude a variety of commonly ignored directories.
-[tool.ruff.per-file-ignores]
-"tests/*.py" = [
-  "D100",   # Undocumented public module
-  "D101",   # Missing docstring in public class
-  "D102",   # Missing docstring in public method
-  "D103",   # Missing docstring in public function
-  "S101",   # Use of assert
-  "ANN201", # Missing return type annotation for public function
-  "FBT001", # Positional boolean argument
-  "PLR2004",# No use of magic numbers
-  "PD901",  #  X is a bad variable name. (pandas)
-  "TCH",    # https://docs.astral.sh/ruff/rules/#flake8-type-checking-tch
-  "N803",   # Argument name {name} should be lowercase
-]
-"openml/cli.py" = [
-  "T201",   # print found
-  "T203",   # pprint found
-]
-"openml/__version__.py" = [
-  "D100",   # Undocumented public module
-]
-"__init__.py" = [
-  "I002",   # Missing required import (i.e. from __future__ import annotations)
-]
-"examples/*.py" = [
-  "D101",   # Missing docstring in public class
-  "D102",   # Missing docstring in public method
-  "D103",   # Missing docstring in public function
-  "D415",   # First line should end with a . or ? or !
-  "INP001", # File is part of an implicit namespace package, add an __init__.py
-  "I002",   # Missing required import (i.e. from __future__ import annotations) 
-  "E741",   # Ambigiuous variable name
-  "T201",   # print found
-  "T203",   # pprint found
-  "ERA001", # found commeneted out code
-  "E402",   # Module level import not at top of cell
-  "E501",   # Line too long
-]
 
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["openml"]
 no-lines-before = ["future"]
 required-imports = ["from __future__ import annotations"]
@@ -287,11 +289,11 @@ combine-as-imports = true
 extra-standard-library = ["typing_extensions"]
 force-wrap-aliases = true
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
 [tool.mypy]
-python_version = "3.7"
+python_version = "3.8"
 packages = ["openml", "tests"]
 
 show_error_codes = true
