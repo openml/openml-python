@@ -293,7 +293,7 @@ force-wrap-aliases = true
 convention = "numpy"
 
 [tool.mypy]
-python_version = "3.7"
+python_version = "3.8"
 packages = ["openml", "tests"]
 
 show_error_codes = true
