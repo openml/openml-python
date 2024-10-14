@@ -473,7 +473,7 @@ def __parse_server_exception(
     code = int(server_error["oml:code"])
     message = server_error["oml:message"]
     additional_information = server_error.get("oml:additional_information")
-    if code in [372, 512, 500, 482, 542, 674]:
+    if code in [111, 372, 512, 500, 482, 542, 674]:
         if additional_information:
             full_message = f"{message} - {additional_information}"
         else:
@@ -481,10 +481,9 @@ def __parse_server_exception(
 
         # 512 for runs, 372 for datasets, 500 for flows
         # 482 for tasks, 542 for evaluations, 674 for setups
-        return OpenMLServerNoResult(
-            code=code,
-            message=full_message,
-        )
+        # 111 for dataset descriptions
+        return OpenMLServerNoResult(code=code, message=full_message, url=url)
+
     # 163: failure to validate flow XML (https://www.openml.org/api_docs#!/flow/post_flow)
     if code in [163] and file_elements is not None and "description" in file_elements:
         # file_elements['description'] is the XML file description of the flow
