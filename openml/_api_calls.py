@@ -208,6 +208,8 @@ def _download_minio_bucket(source: str, destination: str | Path) -> None:
     for file_object in client.list_objects(bucket, prefix=prefix, recursive=True):
         if file_object.object_name is None:
             raise ValueError(f"Object name is None for object {file_object!r}")
+        if file_object.etag is None:
+            raise ValueError(f"Object etag is None for object {file_object!r}")
 
         marker = destination / file_object.etag
         if marker.exists():

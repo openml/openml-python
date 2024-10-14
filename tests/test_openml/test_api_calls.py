@@ -38,6 +38,8 @@ class TestConfig(openml.testing.TestBase):
 
 class FakeObject(NamedTuple):
     object_name: str
+    etag: str
+    """We use the etag of a Minio object as the name of a marker if we already downloaded it."""
 
 class FakeMinio:
     def __init__(self, objects: Iterable[FakeObject] | None = None):
@@ -60,7 +62,7 @@ def test_download_all_files_observes_cache(mock_minio, tmp_path: Path) -> None:
     some_url = f"https://not.real.com/bucket/{some_object_path}"
     mock_minio.return_value = FakeMinio(
         objects=[
-            FakeObject(some_object_path),
+            FakeObject(object_name=some_object_path, etag=str(hash(some_object_path))),
         ],
     )
 
