@@ -43,6 +43,7 @@ from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLPrivateDatasetError,
     OpenMLServerException,
+    OpenMLServerNoResult,
 )
 from openml.tasks import TaskType, create_task
 from openml.testing import TestBase, create_request_response
@@ -1950,6 +1951,6 @@ def test_get_dataset_lazy_behavior(
 
 def test_get_dataset_with_invalid_id() -> None:
     INVALID_ID = 123819023109238  # Well, at some point this will probably be valid...
-    with pytest.raises(OpenMLServerException, match="Unknown dataset") as e:
+    with pytest.raises(OpenMLServerNoResult, match="Unknown dataset") as e:
         openml.datasets.get_dataset(INVALID_ID)
         assert e.value.code == 111
