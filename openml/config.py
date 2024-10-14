@@ -119,7 +119,7 @@ def _resolve_default_cache_dir() -> Path:
         return Path("~", ".cache", "openml")
 
     # This is the proper XDG_CACHE_HOME directory, but
-    # we unfortunatly had a problem where we used XDG_CACHE_HOME/org,
+    # we unfortunately had a problem where we used XDG_CACHE_HOME/org,
     # we check heuristically if this old directory still exists and issue
     # a warning if it does. There's too much data to move to do this for the user.
 
