@@ -35,8 +35,7 @@ def extract_xml_tags(
     node: Mapping[str, Any],
     *,
     allow_none: Literal[True] = ...,
-) -> Any | None:
-    ...
+) -> Any | None: ...
 
 
 @overload
@@ -45,8 +44,7 @@ def extract_xml_tags(
     node: Mapping[str, Any],
     *,
     allow_none: Literal[False],
-) -> Any:
-    ...
+) -> Any: ...
 
 
 def extract_xml_tags(
@@ -198,7 +196,7 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
         "user",
     }
     if entity_type not in legal_entities:
-        raise ValueError("Can't delete a %s" % entity_type)
+        raise ValueError(f"Can't delete a {entity_type}")
 
     url_suffix = "%s/%d" % (entity_type, entity_id)
     try:
@@ -245,8 +243,7 @@ def _list_all(
     list_output_format: Literal["dict"] = ...,
     *args: P.args,
     **filters: P.kwargs,
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -255,8 +252,7 @@ def _list_all(
     list_output_format: Literal["object"],
     *args: P.args,
     **filters: P.kwargs,
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -265,8 +261,7 @@ def _list_all(
     list_output_format: Literal["dataframe"],
     *args: P.args,
     **filters: P.kwargs,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 def _list_all(  # noqa: C901, PLR0912
@@ -376,7 +371,7 @@ def _create_cache_directory(key: str) -> Path:
 
     try:
         cache_dir.mkdir(exist_ok=True, parents=True)
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         raise openml.exceptions.OpenMLCacheException(
             f"Cannot create cache directory {cache_dir}."
         ) from e
@@ -412,7 +407,7 @@ def _create_cache_directory_for_id(key: str, id_: int) -> Path:
     """
     cache_dir = _get_cache_dir_for_id(key, id_, create=True)
     if cache_dir.exists() and not cache_dir.is_dir():
-        raise ValueError("%s cache dir exists but is not a directory!" % key)
+        raise ValueError(f"{key} cache dir exists but is not a directory!")
 
     cache_dir.mkdir(exist_ok=True, parents=True)
     return cache_dir

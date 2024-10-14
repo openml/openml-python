@@ -90,7 +90,7 @@ def _get_study(id_: int | str, entity_type: str) -> BaseStudy:
     )
     result_dict = xmltodict.parse(xml_string, force_list=force_list_tags)["oml:study"]
     study_id = int(result_dict["oml:id"])
-    alias = result_dict["oml:alias"] if "oml:alias" in result_dict else None
+    alias = result_dict.get("oml:alias", None)
     main_entity_type = result_dict["oml:main_entity_type"]
 
     if entity_type != main_entity_type:
@@ -99,9 +99,7 @@ def _get_study(id_: int | str, entity_type: str) -> BaseStudy:
             f", expected '{entity_type}'"
         )
 
-    benchmark_suite = (
-        result_dict["oml:benchmark_suite"] if "oml:benchmark_suite" in result_dict else None
-    )
+    benchmark_suite = result_dict.get("oml:benchmark_suite", None)
     name = result_dict["oml:name"]
     description = result_dict["oml:description"]
     status = result_dict["oml:status"]
@@ -300,7 +298,7 @@ def update_study_status(study_id: int, status: str) -> None:
     """
     legal_status = {"active", "deactivated"}
     if status not in legal_status:
-        raise ValueError("Illegal status value. " "Legal values: %s" % legal_status)
+        raise ValueError("Illegal status value. " f"Legal values: {legal_status}")
     data = {"study_id": study_id, "status": status}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call("study/status/update", "post", data=data)
     result = xmltodict.parse(result_xml)
@@ -442,8 +440,7 @@ def list_suites(
     status: str | None = ...,
     uploader: list[int] | None = ...,
     output_format: Literal["dict"] = "dict",
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -453,8 +450,7 @@ def list_suites(
     status: str | None = ...,
     uploader: list[int] | None = ...,
     output_format: Literal["dataframe"] = "dataframe",
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 def list_suites(
@@ -538,8 +534,7 @@ def list_studies(
     uploader: list[str] | None = ...,
     benchmark_suite: int | None = ...,
     output_format: Literal["dict"] = "dict",
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -550,8 +545,7 @@ def list_studies(
     uploader: list[str] | None = ...,
     benchmark_suite: int | None = ...,
     output_format: Literal["dataframe"] = "dataframe",
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 def list_studies(
@@ -637,13 +631,11 @@ def list_studies(
 
 
 @overload
-def _list_studies(output_format: Literal["dict"] = "dict", **kwargs: Any) -> dict:
-    ...
+def _list_studies(output_format: Literal["dict"] = "dict", **kwargs: Any) -> dict: ...
 
 
 @overload
-def _list_studies(output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame:
-    ...
+def _list_studies(output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame: ...
 
 
 def _list_studies(
@@ -674,13 +666,11 @@ def _list_studies(
 
 
 @overload
-def __list_studies(api_call: str, output_format: Literal["dict"] = "dict") -> dict:
-    ...
+def __list_studies(api_call: str, output_format: Literal["dict"] = "dict") -> dict: ...
 
 
 @overload
-def __list_studies(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame:
-    ...
+def __list_studies(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame: ...
 
 
 def __list_studies(

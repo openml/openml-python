@@ -140,8 +140,7 @@ def list_flows(
     tag: str | None = ...,
     output_format: Literal["dict"] = "dict",
     **kwargs: Any,
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -152,8 +151,7 @@ def list_flows(
     *,
     output_format: Literal["dataframe"],
     **kwargs: Any,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 @overload
@@ -163,8 +161,7 @@ def list_flows(
     tag: str | None,
     output_format: Literal["dataframe"],
     **kwargs: Any,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 def list_flows(
@@ -243,18 +240,15 @@ def list_flows(
 
 
 @overload
-def _list_flows(output_format: Literal["dict"] = ..., **kwargs: Any) -> dict:
-    ...
+def _list_flows(output_format: Literal["dict"] = ..., **kwargs: Any) -> dict: ...
 
 
 @overload
-def _list_flows(*, output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame:
-    ...
+def _list_flows(*, output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame: ...
 
 
 @overload
-def _list_flows(output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame:
-    ...
+def _list_flows(output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame: ...
 
 
 def _list_flows(
@@ -391,13 +385,11 @@ def get_flow_id(
 
 
 @overload
-def __list_flows(api_call: str, output_format: Literal["dict"] = "dict") -> dict:
-    ...
+def __list_flows(api_call: str, output_format: Literal["dict"] = "dict") -> dict: ...
 
 
 @overload
-def __list_flows(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame:
-    ...
+def __list_flows(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame: ...
 
 
 def __list_flows(
@@ -453,7 +445,7 @@ def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
     while len(stack) > 0:
         current = stack.pop()
         if current.flow_id is None:
-            raise ValueError("Flow %s has no flow_id!" % current.name)
+            raise ValueError(f"Flow {current.name} has no flow_id!")
 
         for component in current.components.values():
             stack.append(component)
@@ -492,10 +484,10 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
         Whether to ignore matching of flow descriptions.
     """
     if not isinstance(flow1, OpenMLFlow):
-        raise TypeError("Argument 1 must be of type OpenMLFlow, but is %s" % type(flow1))
+        raise TypeError(f"Argument 1 must be of type OpenMLFlow, but is {type(flow1)}")
 
     if not isinstance(flow2, OpenMLFlow):
-        raise TypeError("Argument 2 must be of type OpenMLFlow, but is %s" % type(flow2))
+        raise TypeError(f"Argument 2 must be of type OpenMLFlow, but is {type(flow2)}")
 
     # TODO as they are actually now saved during publish, it might be good to
     # check for the equality of these as well.
@@ -522,11 +514,11 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
             for name in set(attr1.keys()).union(attr2.keys()):
                 if name not in attr1:
                     raise ValueError(
-                        "Component %s only available in " "argument2, but not in argument1." % name,
+                        f"Component {name} only available in " "argument2, but not in argument1.",
                     )
                 if name not in attr2:
                     raise ValueError(
-                        "Component %s only available in " "argument2, but not in argument1." % name,
+                        f"Component {name} only available in " "argument2, but not in argument1.",
                     )
                 assert_flows_equal(
                     attr1[name],
@@ -549,9 +541,9 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
                     symmetric_difference = params_flow_1 ^ params_flow_2
                     if len(symmetric_difference) > 0:
                         raise ValueError(
-                            "Flow %s: parameter set of flow "
+                            f"Flow {flow1.name}: parameter set of flow "
                             "differs from the parameters stored "
-                            "on the server." % flow1.name,
+                            "on the server.",
                         )
 
                 if ignore_parameter_values_on_older_children:

@@ -98,8 +98,9 @@ def _get_estimation_procedure_list() -> list[dict[str, Any]]:
         raise ValueError(
             "Error in return XML, value of "
             "oml:estimationprocedures/@xmlns:oml is not "
-            "http://openml.org/openml, but %s"
-            % str(procs_dict["oml:estimationprocedures"]["@xmlns:oml"]),
+            "http://openml.org/openml, but {}".format(
+                str(procs_dict["oml:estimationprocedures"]["@xmlns:oml"])
+            ),
         )
 
     procs: list[dict[str, Any]] = []
@@ -276,7 +277,7 @@ def __list_tasks(  # noqa: PLR0912, C901
         raise ValueError(
             "Error in return XML, value of  "
             '"oml:runs"/@xmlns:oml is not '
-            '"http://openml.org/openml": %s' % str(tasks_dict),
+            f'"http://openml.org/openml": {tasks_dict!s}',
         )
 
     assert isinstance(tasks_dict["oml:tasks"]["oml:task"], list), type(tasks_dict["oml:tasks"])
@@ -527,7 +528,7 @@ def _create_task_from_xml(xml: str) -> OpenMLTask:
         TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
     }.get(task_type)
     if cls is None:
-        raise NotImplementedError("Task type %s not supported." % common_kwargs["task_type"])
+        raise NotImplementedError("Task type {} not supported.".format(common_kwargs["task_type"]))
     return cls(**common_kwargs)  # type: ignore
 
 

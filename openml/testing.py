@@ -182,7 +182,7 @@ class TestBase(unittest.TestCase):
             md5.update(str(time.time()).encode("utf-8"))
             md5.update(str(os.getpid()).encode("utf-8"))
             sentinel = md5.hexdigest()[:10]
-            sentinel = "TEST%s" % sentinel
+            sentinel = f"TEST{sentinel}"
         return sentinel
 
     def _add_sentinel_to_flow_name(
