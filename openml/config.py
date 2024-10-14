@@ -111,37 +111,37 @@ def _resolve_default_cache_dir() -> Path:
     if user_defined_cache_dir is not None:
         return Path(user_defined_cache_dir)
 
-    if platform.system().lower() == "linux":
-        xdg_cache_home = os.environ.get("XDG_CACHE_HOME")
-        if xdg_cache_home is None:
-            return Path("~", ".cache", "openml")
+    if platform.system().lower() != "linux":
+        return _user_path / ".openml"
 
-        # This is the proper XDG_CACHE_HOME directory, but
-        # we unfortunatly had a problem where we used XDG_CACHE_HOME/org,
-        # we check hueristically if this old directory still exists and issue
-        # a warning if it does. There's too much data to move to do this for the user.
+    xdg_cache_home = os.environ.get("XDG_CACHE_HOME")
+    if xdg_cache_home is None:
+        return Path("~", ".cache", "openml")
 
-        # The new cache directory exists
-        cache_dir = Path(xdg_cache_home) / "openml"
-        if cache_dir.exists():
-            return cache_dir
+    # This is the proper XDG_CACHE_HOME directory, but
+    # we unfortunatly had a problem where we used XDG_CACHE_HOME/org,
+    # we check heuristically if this old directory still exists and issue
+    # a warning if it does. There's too much data to move to do this for the user.
 
-        # The old cache directory *does not* exist
-        hueristic_dir_for_backwards_compat = Path(xdg_cache_home) / "org" / "openml"
-        if not hueristic_dir_for_backwards_compat.exists():
-            return cache_dir
+    # The new cache directory exists
+    cache_dir = Path(xdg_cache_home) / "openml"
+    if cache_dir.exists():
+        return cache_dir
 
-        root_dir_to_delete = Path(xdg_cache_home) / "org"
-        openml_logger.warning(
-            "An old cache directory was found at '%s'. This directory is no longer used by "
-            "OpenML-Python. To silence this warning you would need to delete the old cache "
-            "directory. The cached files will then be located in '%s'.",
-            root_dir_to_delete,
-            cache_dir,
-        )
-        return Path(xdg_cache_home)
+    # The old cache directory *does not* exist
+    heuristic_dir_for_backwards_compat = Path(xdg_cache_home) / "org" / "openml"
+    if not heuristic_dir_for_backwards_compat.exists():
+        return cache_dir
 
-    return _user_path / ".openml"
+    root_dir_to_delete = Path(xdg_cache_home) / "org"
+    openml_logger.warning(
+        "An old cache directory was found at '%s'. This directory is no longer used by "
+        "OpenML-Python. To silence this warning you would need to delete the old cache "
+        "directory. The cached files will then be located in '%s'.",
+        root_dir_to_delete,
+        cache_dir,
+    )
+    return Path(xdg_cache_home)
 
 
 _defaults: _Config = {
@@ -265,22 +265,22 @@ def _handle_xdg_config_home_backwards_compatibility(
     # of `${XDG_CONFIG_HOME}/openml/config`. As to maintain backwards
     # compatibility, where users may already may have had a configuration,
     # we copy it over an issue a warning until it's deleted.
-    # As a huerisitic to ensure that it's "our" config file, we try
-    # parse it first.
+    # As a heurisitic to ensure that it's "our" config file, we try parse it first.
     config_dir = Path(xdg_home) / "openml"
-    backwards_compat_config_file = config_dir / "config"
+
+    backwards_compat_config_file = Path(xdg_home) / "config"
     if not backwards_compat_config_file.exists():
         return config_dir
 
-    correct_config_location = config_dir / "config"
     # If it errors, that's a good sign it's not ours and we can
-    # safely ignore it, jumping out of this block. This is a huerisitc
+    # safely ignore it, jumping out of this block. This is a heurisitc
     try:
         _parse_config(backwards_compat_config_file)
     except Exception:  # noqa: BLE001
         return config_dir
 
     # Looks like it's ours, lets try copy it to the correct place
+    correct_config_location = config_dir / "config"
     try:
         # We copy and return the new copied location
         shutil.copy(backwards_compat_config_file, correct_config_location)
