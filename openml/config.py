@@ -251,7 +251,10 @@ def _setup(config: _Config | None = None) -> None:
         if not config_dir.exists():
             config_dir.mkdir(exist_ok=True, parents=True)
     except PermissionError:
-        pass
+        openml_logger.warning(
+            f"No permission to create OpenML directory at {config_dir}!"
+            " This can result in OpenML-Python not working properly."
+        )
 
     if config is None:
         config = _parse_config(config_file)
@@ -275,8 +278,8 @@ def _setup(config: _Config | None = None) -> None:
         _create_log_handlers()
     except PermissionError:
         openml_logger.warning(
-            f"No permission to create OpenML directory at {config_dir}! This can result in "
-            " OpenML-Python not working properly."
+            f"No permission to create OpenML directory at {_root_cache_directory}!"
+            " This can result in OpenML-Python not working properly."
         )
         _create_log_handlers(create_file_handler=False)
 
