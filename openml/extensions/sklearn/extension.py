@@ -48,12 +48,27 @@ DEPENDENCIES_PATTERN = re.compile(
     r"(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?[0-9]*))?$",
 )
 
-sctypes = np.sctypes if Version(np.__version__) < Version("2.0") else np.core.sctypes
+# NOTE(eddiebergman): This was imported before but became deprecated,
+# as a result I just enumerated them manually by copy-ing and pasting,
+# recommended solution in Numpy 2.0 guide was to explicitly list them.
 SIMPLE_NUMPY_TYPES = [
-    nptype
-    for type_cat, nptypes in sctypes.items()
-    for nptype in nptypes  # type: ignore
-    if type_cat != "others"
+    np.int8,
+    np.int16,
+    np.int32,
+    np.int64,
+    np.longlong,
+    np.uint8,
+    np.uint16,
+    np.uint32,
+    np.uint64,
+    np.ulonglong,
+    np.float16,
+    np.float32,
+    np.float64,
+    np.longdouble,
+    np.complex64,
+    np.complex128,
+    np.clongdouble,
 ]
 SIMPLE_TYPES = (bool, int, float, str, *SIMPLE_NUMPY_TYPES)
 
@@ -312,7 +327,7 @@ class SklearnExtension(Extension):
             strict_version=strict_version,
         )
 
-    def _deserialize_sklearn(  # noqa: PLR0915, C901, PLR0913, PLR0912
+    def _deserialize_sklearn(  # noqa: PLR0915, C901, PLR0912
         self,
         o: Any,
         components: dict | None = None,
@@ -419,7 +434,7 @@ class SklearnExtension(Extension):
                         strict_version=strict_version,
                     )
                 else:
-                    raise ValueError("Cannot flow_to_sklearn %s" % serialized_type)
+                    raise ValueError(f"Cannot flow_to_sklearn {serialized_type}")
 
             else:
                 rval = OrderedDict(
@@ -979,17 +994,17 @@ class SklearnExtension(Extension):
                         # length 2 is for {VotingClassifier.estimators,
                         # Pipeline.steps, FeatureUnion.transformer_list}
                         # length 3 is for ColumnTransformer
-                        msg = "Length of tuple of type {} does not match assumptions".format(
-                            sub_component_type,
+                        raise ValueError(
+                            f"Length of tuple of type {sub_component_type}"
+                            " does not match assumptions"
                         )
-                        raise ValueError(msg)
 
                     if isinstance(sub_component, str):
                         if sub_component not in SKLEARN_PIPELINE_STRING_COMPONENTS:
                             msg = (
                                 "Second item of tuple does not match assumptions. "
                                 "If string, can be only 'drop' or 'passthrough' but"
-                                "got %s" % sub_component
+                                f"got {sub_component}"
                             )
                             raise ValueError(msg)
                     elif sub_component is None:
@@ -1002,15 +1017,15 @@ class SklearnExtension(Extension):
                     elif not isinstance(sub_component, OpenMLFlow):
                         msg = (
                             "Second item of tuple does not match assumptions. "
-                            "Expected OpenMLFlow, got %s" % type(sub_component)
+                            f"Expected OpenMLFlow, got {type(sub_component)}"
                         )
                         raise TypeError(msg)
 
                     if identifier in reserved_keywords:
                         parent_model = f"{model.__module__}.{model.__class__.__name__}"
-                        msg = "Found element shadowing official " "parameter for {}: {}".format(
-                            parent_model,
-                            identifier,
+                        msg = (
+                            "Found element shadowing official "
+                            f"parameter for {parent_model}: {identifier}"
                         )
                         raise PyOpenMLError(msg)
 
@@ -1035,9 +1050,9 @@ class SklearnExtension(Extension):
                             model=None,
                         )
                         component_reference: OrderedDict[str, str | dict] = OrderedDict()
-                        component_reference[
-                            "oml-python:serialized_object"
-                        ] = COMPOSITION_STEP_CONSTANT
+                        component_reference["oml-python:serialized_object"] = (
+                            COMPOSITION_STEP_CONSTANT
+                        )
                         cr_value: dict[str, Any] = OrderedDict()
                         cr_value["key"] = identifier
                         cr_value["step_name"] = identifier
@@ -1218,7 +1233,7 @@ class SklearnExtension(Extension):
         for dependency_string in dependencies_list:
             match = DEPENDENCIES_PATTERN.match(dependency_string)
             if not match:
-                raise ValueError("Cannot parse dependency %s" % dependency_string)
+                raise ValueError(f"Cannot parse dependency {dependency_string}")
 
             dependency_name = match.group("name")
             operation = match.group("operation")
@@ -1237,7 +1252,7 @@ class SklearnExtension(Extension):
                     installed_version > required_version or installed_version == required_version
                 )
             else:
-                raise NotImplementedError("operation '%s' is not supported" % operation)
+                raise NotImplementedError(f"operation '{operation}' is not supported")
             message = (
                 "Trying to deserialize a model with dependency "
                 f"{dependency_string} not satisfied."
@@ -1363,7 +1378,7 @@ class SklearnExtension(Extension):
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always", DeprecationWarning)
                 value = getattr(o, key, None)
-                if w is not None and len(w) and w[0].category == DeprecationWarning:
+                if w is not None and len(w) and w[0].category is DeprecationWarning:
                     # if the parameter is deprecated, don't show it
                     continue
 
@@ -1812,9 +1827,9 @@ class SklearnExtension(Extension):
                     # then we need to add a column full of zeros into the probabilities
                     # for class 3 because the rest of the library expects that the
                     # probabilities are ordered the same way as the classes are ordered).
-                    message = "Estimator only predicted for {}/{} classes!".format(
-                        proba_y.shape[1],
-                        len(task.class_labels),
+                    message = (
+                        f"Estimator only predicted for {proba_y.shape[1]}/{len(task.class_labels)}"
+                        " classes!"
                     )
                     warnings.warn(message, stacklevel=2)
                     openml.config.logger.warning(message)
@@ -2008,9 +2023,8 @@ class SklearnExtension(Extension):
                                 pass
                             else:
                                 raise TypeError(
-                                    "Subcomponent flow should be of type flow, but is {}".format(
-                                        type(subcomponent_flow),
-                                    ),
+                                    "Subcomponent flow should be of type flow, but is"
+                                    f" {type(subcomponent_flow)}",
                                 )
 
                         current = {
@@ -2129,8 +2143,8 @@ class SklearnExtension(Extension):
         """
         if not self._is_hpo_class(model):
             raise AssertionError(
-                "Flow model %s is not an instance of sklearn.model_selection._search.BaseSearchCV"
-                % model,
+                f"Flow model {model} is not an instance of"
+                " sklearn.model_selection._search.BaseSearchCV",
             )
         base_estimator = model.estimator
         base_estimator.set_params(**trace_iteration.get_parameters())
@@ -2197,8 +2211,8 @@ class SklearnExtension(Extension):
         """
         if not self._is_hpo_class(model):
             raise AssertionError(
-                "Flow model %s is not an instance of sklearn.model_selection._search.BaseSearchCV"
-                % model,
+                f"Flow model {model} is not an instance of "
+                "sklearn.model_selection._search.BaseSearchCV",
             )
         if not hasattr(model, "cv_results_"):
             raise ValueError("model should contain `cv_results_`")
@@ -2235,7 +2249,7 @@ class SklearnExtension(Extension):
                         # hyperparameter layer_sizes of MLPClassifier
                         type = "STRING"  # noqa: A001
                     else:
-                        raise TypeError("Unsupported param type in param grid: %s" % key)
+                        raise TypeError(f"Unsupported param type in param grid: {key}")
 
                 # renamed the attribute param to parameter, as this is a required
                 # OpenML convention - this also guards against name collisions

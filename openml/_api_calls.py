@@ -351,7 +351,7 @@ def __is_checksum_equal(downloaded_file_binary: bytes, md5_checksum: str | None 
     return md5_checksum == md5_checksum_download
 
 
-def _send_request(  # noqa: C901
+def _send_request(  # noqa: C901, PLR0912
     request_method: str,
     url: str,
     data: DATA_TYPE,
@@ -387,18 +387,15 @@ def _send_request(  # noqa: C901
                     # -- Check if encoding is not UTF-8 perhaps
                     if __is_checksum_equal(response.content, md5_checksum):
                         raise OpenMLHashException(
-                            "Checksum of downloaded file is unequal to the expected checksum {}"
-                            "because the text encoding is not UTF-8 when downloading {}. "
-                            "There might be a sever-sided issue with the file, "
-                            "see: https://github.com/openml/openml-python/issues/1180.".format(
-                                md5_checksum,
-                                url,
-                            ),
+                            f"Checksum of downloaded file is unequal to the expected checksum"
+                            f"{md5_checksum} because the text encoding is not UTF-8 when "
+                            f"downloading {url}. There might be a sever-sided issue with the file, "
+                            "see: https://github.com/openml/openml-python/issues/1180.",
                         )
 
                     raise OpenMLHashException(
-                        "Checksum of downloaded file is unequal to the expected checksum {} "
-                        "when downloading {}.".format(md5_checksum, url),
+                        f"Checksum of downloaded file is unequal to the expected checksum "
+                        f"{md5_checksum} when downloading {url}.",
                     )
 
                 return response
@@ -464,7 +461,7 @@ def __parse_server_exception(
         server_exception = xmltodict.parse(response.text)
     except xml.parsers.expat.ExpatError as e:
         raise e
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         # OpenML has a sophisticated error system
         # where information about failures is provided. try to parse this
         raise OpenMLServerError(

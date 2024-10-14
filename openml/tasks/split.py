@@ -177,9 +177,9 @@ class OpenMLSplit:
             If the specified repeat, fold, or sample is not known.
         """
         if repeat not in self.split:
-            raise ValueError("Repeat %s not known" % str(repeat))
+            raise ValueError(f"Repeat {repeat!s} not known")
         if fold not in self.split[repeat]:
-            raise ValueError("Fold %s not known" % str(fold))
+            raise ValueError(f"Fold {fold!s} not known")
         if sample not in self.split[repeat][fold]:
-            raise ValueError("Sample %s not known" % str(sample))
+            raise ValueError(f"Sample {sample!s} not known")
         return self.split[repeat][fold][sample]

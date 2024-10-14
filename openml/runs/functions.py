@@ -679,9 +679,9 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, PLR0913, C901
             user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[
                 measure
             ]
-            user_defined_measures_per_sample[measure][rep_no][fold_no][
-                sample_no
-            ] = user_defined_measures_fold[measure]
+            user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = (
+                user_defined_measures_fold[measure]
+            )
 
     trace: OpenMLRunTrace | None = None
     if len(traces) > 0:
@@ -783,13 +783,9 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
         raise NotImplementedError(task.task_type)
 
     config.logger.info(
-        "Going to run model {} on dataset {} for repeat {} fold {} sample {}".format(
-            str(model),
-            openml.datasets.get_dataset(task.dataset_id).name,
-            rep_no,
-            fold_no,
-            sample_no,
-        ),
+        f"Going to run model {model!s} on "
+        f"dataset {openml.datasets.get_dataset(task.dataset_id).name} "
+        f"for repeat {rep_no} fold {fold_no} sample {sample_no}"
     )
     (
         pred_y,
@@ -978,7 +974,7 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
                 else:
                     raise ValueError(
                         'Could not find keys "value" or '
-                        '"array_data" in %s' % str(evaluation_dict.keys()),
+                        f'"array_data" in {evaluation_dict.keys()!s}',
                     )
                 if (
                     "@repeat" in evaluation_dict
@@ -1211,15 +1207,15 @@ def _list_runs(  # noqa: PLR0913
         for operator, value in kwargs.items():
             api_call += f"/{operator}/{value}"
     if id is not None:
-        api_call += "/run/%s" % ",".join([str(int(i)) for i in id])
+        api_call += "/run/{}".format(",".join([str(int(i)) for i in id]))
     if task is not None:
-        api_call += "/task/%s" % ",".join([str(int(i)) for i in task])
+        api_call += "/task/{}".format(",".join([str(int(i)) for i in task]))
     if setup is not None:
-        api_call += "/setup/%s" % ",".join([str(int(i)) for i in setup])
+        api_call += "/setup/{}".format(",".join([str(int(i)) for i in setup]))
     if flow is not None:
-        api_call += "/flow/%s" % ",".join([str(int(i)) for i in flow])
+        api_call += "/flow/{}".format(",".join([str(int(i)) for i in flow]))
     if uploader is not None:
-        api_call += "/uploader/%s" % ",".join([str(int(i)) for i in uploader])
+        api_call += "/uploader/{}".format(",".join([str(int(i)) for i in uploader]))
     if study is not None:
         api_call += "/study/%d" % study
     if display_errors:

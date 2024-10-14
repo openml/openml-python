@@ -32,8 +32,7 @@ def list_evaluations(
     per_fold: bool | None = ...,
     sort_order: str | None = ...,
     output_format: Literal["dict", "object"] = "dict",
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -51,8 +50,7 @@ def list_evaluations(
     per_fold: bool | None = ...,
     sort_order: str | None = ...,
     output_format: Literal["dataframe"] = ...,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 def list_evaluations(
@@ -204,24 +202,24 @@ def _list_evaluations(
     -------
     dict of objects, or dataframe
     """
-    api_call = "evaluation/list/function/%s" % function
+    api_call = f"evaluation/list/function/{function}"
     if kwargs is not None:
         for operator, value in kwargs.items():
             api_call += f"/{operator}/{value}"
     if tasks is not None:
-        api_call += "/task/%s" % ",".join([str(int(i)) for i in tasks])
+        api_call += "/task/{}".format(",".join([str(int(i)) for i in tasks]))
     if setups is not None:
-        api_call += "/setup/%s" % ",".join([str(int(i)) for i in setups])
+        api_call += "/setup/{}".format(",".join([str(int(i)) for i in setups]))
     if flows is not None:
-        api_call += "/flow/%s" % ",".join([str(int(i)) for i in flows])
+        api_call += "/flow/{}".format(",".join([str(int(i)) for i in flows]))
     if runs is not None:
-        api_call += "/run/%s" % ",".join([str(int(i)) for i in runs])
+        api_call += "/run/{}".format(",".join([str(int(i)) for i in runs]))
     if uploaders is not None:
-        api_call += "/uploader/%s" % ",".join([str(int(i)) for i in uploaders])
+        api_call += "/uploader/{}".format(",".join([str(int(i)) for i in uploaders]))
     if study is not None:
         api_call += "/study/%d" % study
     if sort_order is not None:
-        api_call += "/sort_order/%s" % sort_order
+        api_call += f"/sort_order/{sort_order}"
 
     return __list_evaluations(api_call, output_format=output_format)
 
@@ -236,7 +234,7 @@ def __list_evaluations(
     # Minimalistic check if the XML is useful
     if "oml:evaluations" not in evals_dict:
         raise ValueError(
-            "Error in return XML, does not contain " '"oml:evaluations": %s' % str(evals_dict),
+            "Error in return XML, does not contain " f'"oml:evaluations": {evals_dict!s}',
         )
 
     assert isinstance(evals_dict["oml:evaluations"]["oml:evaluation"], list), type(

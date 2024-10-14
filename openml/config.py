@@ -278,8 +278,8 @@ def _setup(config: _Config | None = None) -> None:
             _root_cache_directory.mkdir(exist_ok=True, parents=True)
     except PermissionError:
         openml_logger.warning(
-            "No permission to create openml cache directory at %s! This can result in "
-            "OpenML-Python not working properly." % _root_cache_directory,
+            f"No permission to create openml cache directory at {_root_cache_directory}!"
+            " This can result in OpenML-Python not working properly.",
         )
 
     if cache_exists:
@@ -287,8 +287,8 @@ def _setup(config: _Config | None = None) -> None:
     else:
         _create_log_handlers(create_file_handler=False)
         openml_logger.warning(
-            "No permission to create OpenML directory at %s! This can result in OpenML-Python "
-            "not working properly." % config_dir,
+            f"No permission to create OpenML directory at {config_dir}! This can result in "
+            " OpenML-Python not working properly.",
         )
 
 
