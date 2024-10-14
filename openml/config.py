@@ -8,6 +8,7 @@ import logging
 import logging.handlers
 import os
 import platform
+import shutil
 import warnings
 from io import StringIO
 from pathlib import Path
@@ -19,6 +20,8 @@ logger = logging.getLogger(__name__)
 openml_logger = logging.getLogger("openml")
 console_handler: logging.StreamHandler | None = None
 file_handler: logging.handlers.RotatingFileHandler | None = None
+
+OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
 
 
 class _Config(TypedDict):
@@ -101,14 +104,50 @@ def set_file_log_level(file_output_level: int) -> None:
 
 # Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
 _user_path = Path("~").expanduser().absolute()
+
+
+def _resolve_default_cache_dir() -> Path:
+    user_defined_cache_dir = os.environ.get(OPENML_CACHE_DIR_ENV_VAR)
+    if user_defined_cache_dir is not None:
+        return Path(user_defined_cache_dir)
+
+    if platform.system().lower() != "linux":
+        return _user_path / ".openml"
+
+    xdg_cache_home = os.environ.get("XDG_CACHE_HOME")
+    if xdg_cache_home is None:
+        return Path("~", ".cache", "openml")
+
+    # This is the proper XDG_CACHE_HOME directory, but
+    # we unfortunately had a problem where we used XDG_CACHE_HOME/org,
+    # we check heuristically if this old directory still exists and issue
+    # a warning if it does. There's too much data to move to do this for the user.
+
+    # The new cache directory exists
+    cache_dir = Path(xdg_cache_home) / "openml"
+    if cache_dir.exists():
+        return cache_dir
+
+    # The old cache directory *does not* exist
+    heuristic_dir_for_backwards_compat = Path(xdg_cache_home) / "org" / "openml"
+    if not heuristic_dir_for_backwards_compat.exists():
+        return cache_dir
+
+    root_dir_to_delete = Path(xdg_cache_home) / "org"
+    openml_logger.warning(
+        "An old cache directory was found at '%s'. This directory is no longer used by "
+        "OpenML-Python. To silence this warning you would need to delete the old cache "
+        "directory. The cached files will then be located in '%s'.",
+        root_dir_to_delete,
+        cache_dir,
+    )
+    return Path(xdg_cache_home)
+
+
 _defaults: _Config = {
     "apikey": "",
     "server": "https://www.openml.org/api/v1/xml",
-    "cachedir": (
-        Path(os.environ.get("XDG_CACHE_HOME", _user_path / ".cache" / "openml"))
-        if platform.system() == "Linux"
-        else _user_path / ".openml"
-    ),
+    "cachedir": _resolve_default_cache_dir(),
     "avoid_duplicate_runs": True,
     "retry_policy": "human",
     "connection_n_retries": 5,
@@ -218,11 +257,66 @@ class ConfigurationForExamples:
         cls._start_last_called = False
 
 
+def _handle_xdg_config_home_backwards_compatibility(
+    xdg_home: str,
+) -> Path:
+    # NOTE(eddiebergman): A previous bug results in the config
+    # file being located at `${XDG_CONFIG_HOME}/config` instead
+    # of `${XDG_CONFIG_HOME}/openml/config`. As to maintain backwards
+    # compatibility, where users may already may have had a configuration,
+    # we copy it over an issue a warning until it's deleted.
+    # As a heurisitic to ensure that it's "our" config file, we try parse it first.
+    config_dir = Path(xdg_home) / "openml"
+
+    backwards_compat_config_file = Path(xdg_home) / "config"
+    if not backwards_compat_config_file.exists():
+        return config_dir
+
+    # If it errors, that's a good sign it's not ours and we can
+    # safely ignore it, jumping out of this block. This is a heurisitc
+    try:
+        _parse_config(backwards_compat_config_file)
+    except Exception:  # noqa: BLE001
+        return config_dir
+
+    # Looks like it's ours, lets try copy it to the correct place
+    correct_config_location = config_dir / "config"
+    try:
+        # We copy and return the new copied location
+        shutil.copy(backwards_compat_config_file, correct_config_location)
+        openml_logger.warning(
+            "An openml configuration file was found at the old location "
+            f"at {backwards_compat_config_file}. We have copied it to the new "
+            f"location at {correct_config_location}. "
+            "\nTo silence this warning please verify that the configuration file "
+            f"at {correct_config_location} is correct and delete the file at "
+            f"{backwards_compat_config_file}."
+        )
+        return config_dir
+    except Exception as e:  # noqa: BLE001
+        # We failed to copy and its ours, return the old one.
+        openml_logger.warning(
+            "While attempting to perform a backwards compatible fix, we "
+            f"failed to copy the openml config file at "
+            f"{backwards_compat_config_file}' to {correct_config_location}"
+            f"\n{type(e)}: {e}",
+            "\n\nTo silence this warning, please copy the file "
+            "to the new location and delete the old file at "
+            f"{backwards_compat_config_file}.",
+        )
+        return backwards_compat_config_file
+
+
 def determine_config_file_path() -> Path:
-    if platform.system() == "Linux":
-        config_dir = Path(os.environ.get("XDG_CONFIG_HOME", Path("~") / ".config" / "openml"))
+    if platform.system().lower() == "linux":
+        xdg_home = os.environ.get("XDG_CONFIG_HOME")
+        if xdg_home is not None:
+            config_dir = _handle_xdg_config_home_backwards_compatibility(xdg_home)
+        else:
+            config_dir = Path("~", ".config", "openml")
     else:
         config_dir = Path("~") / ".openml"
+
     # Still use os.path.expanduser to trigger the mock in the unit test
     config_dir = Path(config_dir).expanduser().resolve()
     return config_dir / "config"
@@ -260,11 +354,15 @@ def _setup(config: _Config | None = None) -> None:
     apikey = config["apikey"]
     server = config["server"]
     show_progress = config["show_progress"]
-    short_cache_dir = Path(config["cachedir"])
     n_retries = int(config["connection_n_retries"])
 
     set_retry_policy(config["retry_policy"], n_retries)
 
+    user_defined_cache_dir = os.environ.get(OPENML_CACHE_DIR_ENV_VAR)
+    if user_defined_cache_dir is not None:
+        short_cache_dir = Path(user_defined_cache_dir)
+    else:
+        short_cache_dir = Path(config["cachedir"])
     _root_cache_directory = short_cache_dir.expanduser().resolve()
 
     try:
