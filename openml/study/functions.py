@@ -78,7 +78,7 @@ def get_study(
     return study
 
 
-def _get_study(id_: int | str, entity_type: str) -> BaseStudy:
+def _get_study(id_: int | str, entity_type: str) -> BaseStudy:  # noqa: C901
     xml_string = openml._api_calls._perform_api_call(f"study/{id_}", "get")
     force_list_tags = (
         "oml:data_id",
