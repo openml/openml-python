@@ -1,19 +1,74 @@
-# OpenML-Python
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-A python interface for [OpenML](http://openml.org), an online platform for open science collaboration in machine learning.
-It can be used to download or upload OpenML data such as datasets and machine learning experiment results.
 
-## General
+<div align="center">
 
-* [Documentation](https://openml.github.io/openml-python).
-* [Contribution guidelines](https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md).
+<div id="user-content-toc">
+  <ul align="center" style="list-style: none;">
+    <summary>
+      <img src="https://github.com/openml/openml.org/blob/master/app/public/static/svg/logo.svg" width="50" alt="OpenML Logo"/> 
+      <h1>OpenML-Python</h1>
+      <img src="https://github.com/openml/docs/blob/master/docs/img/python.png" width="50" alt="Python Logo"/>
+    </summary>
+  </ul>
+</div>
 
+## The Python API for a World of Data and More :dizzy:
+
+[![Latest Release](https://img.shields.io/github/v/release/openml/openml-python)](https://github.com/openml/openml-python/releases)
+[![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://pypi.org/project/openml/)
+[![Downloads](https://static.pepy.tech/badge/openml)](https://pepy.tech/project/openml)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-## Citing OpenML-Python
+
+[Installation](https://openml.github.io/openml-python/main/#how-to-get-openml-for-python) | [Documentation](https://openml.github.io/openml-python) | [Contribution guidelines](https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md)
+</div>
+
+OpenML-Python provides an easy-to-use and simple Python interface for [OpenML](http://openml.org), an online platform for open science collaboration in machine learning.
+It can be used to download or upload OpenML data such as datasets and machine learning experiment results.
+
+## :joystick: Minimal Example
+
+Use the following code to get the [credit-g](https://www.openml.org/search?type=data&sort=runs&status=active&id=31) dataset for machine learning:
+
+```python
+import openml
+
+dataset = openml.datasets.get_dataset(31)
+X, y, categorical_indicator, attribute_names = dataset.get_data(target="class")
+```
+
+Get all data you need for a [supervised classification task for credit-g](https://www.openml.org/search?type=task&id=31&source_data.data_id=31):
+
+```python
+import openml
+
+task = openml.tasks.get_task(31)
+X, y = task.get_X_and_y( dataset_format ="dataframe")
+validation_split = task.download_split()  # cross-validation splits
+```
+
+Use a benchmarking suite and get all its associated machine learning tasks:
+```python
+import openml
+
+suite = openml.study.get_suite(270)  # Get a currated list of benchmark used in the AutoML Benchmark from 2024
+for task_id in suite.tasks[:3]:  # Iterate over the first three tasks
+    task = openml.tasks.get_task(task_id)
+    
+```
+
+## :magic_wand: Installation
+
+OpenML-Python is supported on Python 3.8 - 3.12 and is available on Linux, MacOS, and Windows.
+
+You can install OpenML-Python with:
+
+```bash
+pip install openml
+```
+Visit our Installation Guide for detailed instructions, including GPU support, Conda installs, and optional dependencies.
+
+## :page_facing_up: Citing OpenML-Python
 
 If you use OpenML-Python in a scientific publication, we would appreciate a reference to the
 following paper:
@@ -35,23 +90,3 @@ Bibtex entry:
   url     = {http://jmlr.org/papers/v22/19-920.html}
 }
 ```
-
-## Contributors ✨
-
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/a-moadel"><img src="https://avatars0.githubusercontent.com/u/46557866?v=4" width="100px;" alt=""/><br /><sub><b>a-moadel</b></sub></a><br /><a href="https://github.com/openml/openml-python/commits?author=a-moadel" title="Documentation">📖</a> <a href="#example-a-moadel" title="Examples">💡</a></td>
-    <td align="center"><a href="https://github.com/Neeratyoy"><img src="https://avatars2.githubusercontent.com/u/3191233?v=4" width="100px;" alt=""/><br /><sub><b>Neeratyoy Mallik</b></sub></a><br /><a href="https://github.com/openml/openml-python/commits?author=Neeratyoy" title="Code">💻</a> <a href="https://github.com/openml/openml-python/commits?author=Neeratyoy" title="Documentation">📖</a> <a href="#example-Neeratyoy" title="Examples">💡</a></td>
-  </tr>
-</table>
-
-<!-- markdownlint-enable -->
-<!-- prettier-ignore-end -->
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
