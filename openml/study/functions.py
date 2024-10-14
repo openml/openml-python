@@ -93,6 +93,12 @@ def _get_study(id_: int | str, entity_type: str) -> BaseStudy:
     alias = result_dict.get("oml:alias", None)
     main_entity_type = result_dict["oml:main_entity_type"]
 
+    # Parses edge cases where the server returns a string with a newline character for empty values.
+    none_value_indicator = "\n      "
+    for key in result_dict:
+        if result_dict[key] == none_value_indicator:
+            result_dict[key] = None
+
     if entity_type != main_entity_type:
         raise ValueError(
             f"Unexpected entity type '{main_entity_type}' reported by the server"
