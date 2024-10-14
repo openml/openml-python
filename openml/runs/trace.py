@@ -424,7 +424,9 @@ class OpenMLRunTrace:
         if isinstance(xml, Path):
             xml = str(xml.absolute())
 
-        result_dict = xmltodict.parse(xml, force_list=("oml:trace_iteration",))["oml:trace"]
+        result_dict = xmltodict.parse(
+            xml, force_list=("oml:trace_iteration",), strip_whitespace=False
+        )["oml:trace"]
 
         run_id = result_dict["oml:run_id"]
         trace = OrderedDict()

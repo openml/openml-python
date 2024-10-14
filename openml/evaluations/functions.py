@@ -230,7 +230,7 @@ def __list_evaluations(
 ) -> dict | pd.DataFrame:
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    evals_dict = xmltodict.parse(xml_string, force_list=("oml:evaluation",))
+    evals_dict = xmltodict.parse(xml_string, force_list=("oml:evaluation",), strip_whitespace=False)
     # Minimalistic check if the XML is useful
     if "oml:evaluations" not in evals_dict:
         raise ValueError(
@@ -247,7 +247,7 @@ def __list_evaluations(
     )
     api_users = "user/list/user_id/" + ",".join(uploader_ids)
     xml_string_user = openml._api_calls._perform_api_call(api_users, "get")
-    users = xmltodict.parse(xml_string_user, force_list=("oml:user",))
+    users = xmltodict.parse(xml_string_user, force_list=("oml:user",), strip_whitespace=False)
     user_dict = {user["oml:id"]: user["oml:username"] for user in users["oml:users"]["oml:user"]}
     for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]:
         run_id = int(eval_["oml:run_id"])
@@ -318,7 +318,7 @@ def list_evaluation_measures() -> list[str]:
     """
     api_call = "evaluationmeasure/list"
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    qualities = xmltodict.parse(xml_string, force_list=("oml:measures"))
+    qualities = xmltodict.parse(xml_string, force_list=("oml:measures"), strip_whitespace=False)
     # Minimalistic check if the XML is useful
     if "oml:evaluation_measures" not in qualities:
         raise ValueError("Error in return XML, does not contain " '"oml:evaluation_measures"')
@@ -339,7 +339,7 @@ def list_estimation_procedures() -> list[str]:
     """
     api_call = "estimationprocedure/list"
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    api_results = xmltodict.parse(xml_string)
+    api_results = xmltodict.parse(xml_string, strip_whitespace=False)
 
     # Minimalistic check if the XML is useful
     if "oml:estimationprocedures" not in api_results:

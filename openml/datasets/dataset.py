@@ -1077,7 +1077,9 @@ def _read_features(features_file: Path) -> dict[int, OpenMLDataFeature]:
 
 
 def _parse_features_xml(features_xml_string: str) -> dict[int, OpenMLDataFeature]:
-    xml_dict = xmltodict.parse(features_xml_string, force_list=("oml:feature", "oml:nominal_value"))
+    xml_dict = xmltodict.parse(
+        features_xml_string, force_list=("oml:feature", "oml:nominal_value"), strip_whitespace=False
+    )
     features_xml = xml_dict["oml:data_features"]
 
     features: dict[int, OpenMLDataFeature] = {}
@@ -1140,6 +1142,8 @@ def _check_qualities(qualities: list[dict[str, str]]) -> dict[str, float]:
 
 
 def _parse_qualities_xml(qualities_xml: str) -> dict[str, float]:
-    xml_as_dict = xmltodict.parse(qualities_xml, force_list=("oml:quality",))
+    xml_as_dict = xmltodict.parse(
+        qualities_xml, force_list=("oml:quality",), strip_whitespace=False
+    )
     qualities = xml_as_dict["oml:data_qualities"]["oml:quality"]
     return _check_qualities(qualities)

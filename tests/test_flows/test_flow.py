@@ -129,7 +129,7 @@ class TestFlow(TestBase):
             9,
         ]:
             flow_xml = _perform_api_call("flow/%d" % flow_id, request_method="get")
-            flow_dict = xmltodict.parse(flow_xml)
+            flow_dict = xmltodict.parse(flow_xml, strip_whitespace=False)
 
             flow = openml.OpenMLFlow._from_dict(flow_dict)
             new_xml = flow._to_xml()
@@ -166,7 +166,7 @@ class TestFlow(TestBase):
         # end of setup
 
         xml = flow._to_xml()
-        xml_dict = xmltodict.parse(xml)
+        xml_dict = xmltodict.parse(xml, strip_whitespace=False)
         new_flow = openml.flows.OpenMLFlow._from_dict(xml_dict)
 
         # Would raise exception if they are not legal
@@ -537,12 +537,12 @@ class TestFlow(TestBase):
 
     def test_extract_tags(self):
         flow_xml = "<oml:tag>study_14</oml:tag>"
-        flow_dict = xmltodict.parse(flow_xml)
+        flow_dict = xmltodict.parse(flow_xml, strip_whitespace=False)
         tags = openml.utils.extract_xml_tags("oml:tag", flow_dict)
         assert tags == ["study_14"]
 
         flow_xml = "<oml:flow><oml:tag>OpenmlWeka</oml:tag>\n" "<oml:tag>weka</oml:tag></oml:flow>"
-        flow_dict = xmltodict.parse(flow_xml)
+        flow_dict = xmltodict.parse(flow_xml, strip_whitespace=False)
         tags = openml.utils.extract_xml_tags("oml:tag", flow_dict["oml:flow"])
         assert tags == ["OpenmlWeka", "weka"]
 

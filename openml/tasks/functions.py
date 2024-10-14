@@ -83,7 +83,7 @@ def _get_estimation_procedure_list() -> list[dict[str, Any]]:
     url_suffix = "estimationprocedure/list"
     xml_string = openml._api_calls._perform_api_call(url_suffix, "get")
 
-    procs_dict = xmltodict.parse(xml_string)
+    procs_dict = xmltodict.parse(xml_string, strip_whitespace=False)
     # Minimalistic check if the XML is useful
     if "oml:estimationprocedures" not in procs_dict:
         raise ValueError("Error in return XML, does not contain tag oml:estimationprocedures.")
@@ -263,7 +263,9 @@ def __list_tasks(  # noqa: PLR0912, C901
         If an invalid key is found in the XML for a task.
     """
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    tasks_dict = xmltodict.parse(xml_string, force_list=("oml:task", "oml:input"))
+    tasks_dict = xmltodict.parse(
+        xml_string, force_list=("oml:task", "oml:input"), strip_whitespace=False
+    )
     # Minimalistic check if the XML is useful
     if "oml:tasks" not in tasks_dict:
         raise ValueError(f'Error in return XML, does not contain "oml:runs": {tasks_dict}')
@@ -468,7 +470,7 @@ def _create_task_from_xml(xml: str) -> OpenMLTask:
     -------
     OpenMLTask
     """
-    dic = xmltodict.parse(xml)["oml:task"]
+    dic = xmltodict.parse(xml, strip_whitespace=False)["oml:task"]
     estimation_parameters = {}
     inputs = {}
     # Due to the unordered structure we obtain, we first have to extract

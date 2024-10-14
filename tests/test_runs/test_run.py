@@ -367,7 +367,7 @@ class TestRun(TestBase):
             setup_string=SETUP_STRING,
         )
         xml = run._to_xml()
-        run_dict = xmltodict.parse(xml)["oml:run"]
+        run_dict = xmltodict.parse(xml, strip_whitespace=False)["oml:run"]
         assert "oml:setup_string" in run_dict
         assert run_dict["oml:setup_string"] == SETUP_STRING
 

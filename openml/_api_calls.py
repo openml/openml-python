@@ -460,7 +460,7 @@ def __parse_server_exception(
         raise OpenMLServerError(f"URI too long! ({url})")
 
     try:
-        server_exception = xmltodict.parse(response.text)
+        server_exception = xmltodict.parse(response.text, strip_whitespace=False)
     except xml.parsers.expat.ExpatError as e:
         raise e
     except Exception as e:

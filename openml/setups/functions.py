@@ -60,7 +60,7 @@ def setup_exists(flow: OpenMLFlow) -> int:
         "post",
         file_elements=file_elements,
     )
-    result_dict = xmltodict.parse(result)
+    result_dict = xmltodict.parse(result, strip_whitespace=False)
     setup_id = int(result_dict["oml:setup_exists"]["oml:id"])
     return setup_id if setup_id > 0 else False
 
@@ -88,7 +88,7 @@ def _get_cached_setup(setup_id: int) -> OpenMLSetup:
     try:
         setup_file = setup_cache_dir / "description.xml"
         with setup_file.open(encoding="utf8") as fh:
-            setup_xml = xmltodict.parse(fh.read())
+            setup_xml = xmltodict.parse(fh.read(), strip_whitespace=False)
             return _create_setup_from_xml(setup_xml, output_format="object")  # type: ignore
 
     except OSError as e:
@@ -124,7 +124,7 @@ def get_setup(setup_id: int) -> OpenMLSetup:
         with setup_file.open("w", encoding="utf8") as fh:
             fh.write(setup_xml)
 
-    result_dict = xmltodict.parse(setup_xml)
+    result_dict = xmltodict.parse(setup_xml, strip_whitespace=False)
     return _create_setup_from_xml(result_dict, output_format="object")  # type: ignore
 
 
@@ -225,7 +225,7 @@ def __list_setups(
 ) -> dict[int, dict] | pd.DataFrame | dict[int, OpenMLSetup]:
     """Helper function to parse API calls which are lists of setups"""
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    setups_dict = xmltodict.parse(xml_string, force_list=("oml:setup",))
+    setups_dict = xmltodict.parse(xml_string, force_list=("oml:setup",), strip_whitespace=False)
     openml_uri = "http://openml.org/openml"
     # Minimalistic check if the XML is useful
     if "oml:setups" not in setups_dict:

@@ -88,7 +88,9 @@ def _get_study(id_: int | str, entity_type: str) -> BaseStudy:  # noqa: C901
         "oml:run_id",
         "oml:tag",  # legacy.
     )
-    result_dict = xmltodict.parse(xml_string, force_list=force_list_tags)["oml:study"]
+    result_dict = xmltodict.parse(xml_string, force_list=force_list_tags, strip_whitespace=False)[
+        "oml:study"
+    ]
     study_id = int(result_dict["oml:id"])
     alias = result_dict.get("oml:alias", None)
     main_entity_type = result_dict["oml:main_entity_type"]
@@ -307,7 +309,7 @@ def update_study_status(study_id: int, status: str) -> None:
         raise ValueError("Illegal status value. " f"Legal values: {legal_status}")
     data = {"study_id": study_id, "status": status}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call("study/status/update", "post", data=data)
-    result = xmltodict.parse(result_xml)
+    result = xmltodict.parse(result_xml, strip_whitespace=False)
     server_study_id = result["oml:study_status_update"]["oml:id"]
     server_status = result["oml:study_status_update"]["oml:status"]
     if status != server_status or int(study_id) != int(server_study_id):
@@ -388,7 +390,7 @@ def attach_to_study(study_id: int, run_ids: list[int]) -> int:
         request_method="post",
         data={"ids": ",".join(str(x) for x in run_ids)},
     )
-    result = xmltodict.parse(result_xml)["oml:study_attach"]
+    result = xmltodict.parse(result_xml, strip_whitespace=False)["oml:study_attach"]
     return int(result["oml:linked_entities"])
 
 
@@ -435,7 +437,7 @@ def detach_from_study(study_id: int, run_ids: list[int]) -> int:
         request_method="post",
         data=post_variables,
     )
-    result = xmltodict.parse(result_xml)["oml:study_detach"]
+    result = xmltodict.parse(result_xml, strip_whitespace=False)["oml:study_detach"]
     return int(result["oml:linked_entities"])
 
 
@@ -700,7 +702,7 @@ def __list_studies(
         depending on the value of 'output_format'.
     """
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    study_dict = xmltodict.parse(xml_string, force_list=("oml:study",))
+    study_dict = xmltodict.parse(xml_string, force_list=("oml:study",), strip_whitespace=False)
 
     # Minimalistic check if the XML is useful
     assert isinstance(study_dict["oml:study_list"]["oml:study"], list), type(

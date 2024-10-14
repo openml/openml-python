@@ -157,7 +157,7 @@ def _tag_entity(entity_type: str, entity_id: int, tag: str, *, untag: bool = Fal
         {f"{entity_type}_id": entity_id, "tag": tag},
     )
 
-    result = xmltodict.parse(result_xml, force_list={"oml:tag"})[main_tag]
+    result = xmltodict.parse(result_xml, force_list={"oml:tag"}, strip_whitespace=False)[main_tag]
 
     if "oml:tag" in result:
         return result["oml:tag"]  # type: ignore
@@ -201,7 +201,7 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
     url_suffix = "%s/%d" % (entity_type, entity_id)
     try:
         result_xml = openml._api_calls._perform_api_call(url_suffix, "delete")
-        result = xmltodict.parse(result_xml)
+        result = xmltodict.parse(result_xml, strip_whitespace=False)
         return f"oml:{entity_type}_delete" in result
     except openml.exceptions.OpenMLServerException as e:
         # https://github.com/openml/OpenML/blob/21f6188d08ac24fcd2df06ab94cf421c946971b0/openml_OS/views/pages/api_new/v1/xml/pre.php

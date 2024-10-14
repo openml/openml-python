@@ -312,7 +312,7 @@ def flow_exists(name: str, external_version: str) -> int | bool:
         data={"name": name, "external_version": external_version},
     )
 
-    result_dict = xmltodict.parse(xml_response)
+    result_dict = xmltodict.parse(xml_response, strip_whitespace=False)
     flow_id = int(result_dict["oml:flow_exists"]["oml:id"])
     return flow_id if flow_id > 0 else False
 
@@ -410,7 +410,7 @@ def __list_flows(
         The flows information in the specified output format.
     """
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    flows_dict = xmltodict.parse(xml_string, force_list=("oml:flow",))
+    flows_dict = xmltodict.parse(xml_string, force_list=("oml:flow",), strip_whitespace=False)
 
     # Minimalistic check if the XML is useful
     assert isinstance(flows_dict["oml:flows"]["oml:flow"], list), type(flows_dict["oml:flows"])
@@ -623,7 +623,7 @@ def _create_flow_from_xml(flow_xml: str) -> OpenMLFlow:
     -------
     OpenMLFlow
     """
-    return OpenMLFlow._from_dict(xmltodict.parse(flow_xml))
+    return OpenMLFlow._from_dict(xmltodict.parse(flow_xml, strip_whitespace=False))
 
 
 def delete_flow(flow_id: int) -> bool:
