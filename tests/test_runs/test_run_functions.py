@@ -119,7 +119,6 @@ class TestRun(TestBase):
         # time.time() works in seconds
         start_time = time.time()
         while time.time() - start_time < max_waiting_time_seconds:
-
             try:
                 openml.runs.get_run_trace(run_id)
             except openml.exceptions.OpenMLServerException:
@@ -131,7 +130,9 @@ class TestRun(TestBase):
                 time.sleep(10)
                 continue
 
-            assert len(run.evaluations) > 0, "Expect not-None evaluations to always contain elements."
+            assert (
+                len(run.evaluations) > 0
+            ), "Expect not-None evaluations to always contain elements."
             return
 
         raise RuntimeError(
@@ -557,7 +558,7 @@ class TestRun(TestBase):
             fold_evaluations=run.fold_evaluations,
             num_repeats=1,
             num_folds=num_folds,
-            task_type=task_type
+            task_type=task_type,
         )
 
         # Check if run string and print representation do not run into an error
@@ -796,7 +797,9 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     def test_run_and_upload_gridsearch(self):
-        estimator_name = "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        estimator_name = (
+            "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        )
         gridsearch = GridSearchCV(
             BaggingClassifier(**{estimator_name: SVC()}),
             {f"{estimator_name}__C": [0.01, 0.1, 10], f"{estimator_name}__gamma": [0.01, 0.1, 10]},
@@ -1826,7 +1829,9 @@ class TestRun(TestBase):
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
 
-        backend_choice = "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"
+        backend_choice = (
+            "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"
+        )
         for n_jobs, backend, call_count in [
             (1, backend_choice, 10),
             (2, backend_choice, 10),
@@ -1877,14 +1882,23 @@ class TestRun(TestBase):
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     def test_delete_run(self):
-        rs = 1
+        rs = np.random.randint(1, 2**32 - 1)
         clf = sklearn.pipeline.Pipeline(
-            steps=[("imputer", SimpleImputer()), ("estimator", DecisionTreeClassifier())],
+            steps=[
+                (f"test_server_imputer_{rs}", SimpleImputer()),
+                ("estimator", DecisionTreeClassifier()),
+            ],
         )
         task = openml.tasks.get_task(32)  # diabetes; crossvalidation
 
-        run = openml.runs.run_model_on_task(model=clf, task=task, seed=rs)
+        run = openml.runs.run_model_on_task(
+            model=clf, task=task, seed=rs, avoid_duplicate_runs=False
+        )
         run.publish()
+
+        with pytest.raises(openml.exceptions.OpenMLRunsExistError):
+            openml.runs.run_model_on_task(model=clf, task=task, seed=rs, avoid_duplicate_runs=True)
+
         TestBase._mark_entity_for_removal("run", run.run_id)
         TestBase.logger.info(f"collected from test_run_functions: {run.run_id}")
 

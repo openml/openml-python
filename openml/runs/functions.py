@@ -206,9 +206,6 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
     avoid_duplicate_runs : bool, optional (default=True)
         If True, the run will throw an error if the setup/task combination is already present on
         the server. This feature requires an internet connection.
-    avoid_duplicate_runs : bool, optional (default=True)
-        If True, the run will throw an error if the setup/task combination is already present on
-        the server. This feature requires an internet connection.
     flow_tags : List[str], optional (default=None)
         A list of tags that the flow should have at creation.
     seed: int, optional (default=None)
