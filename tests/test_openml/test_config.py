@@ -8,6 +8,7 @@ import unittest.mock
 from copy import copy
 from typing import Any, Iterator
 from pathlib import Path
+import platform
 
 import pytest
 
@@ -37,6 +38,10 @@ class TestConfig(openml.testing.TestBase):
     @unittest.mock.patch("openml.config.openml_logger.warning")
     @unittest.mock.patch("openml.config._create_log_handlers")
     @unittest.skipIf(os.name == "nt", "https://github.com/openml/openml-python/issues/1033")
+    @unittest.skipIf(
+        platform.uname().release.endswith(("-Microsoft", "microsoft-standard-WSL2")),
+        "WSL does nto support chmod as we would need here, see https://github.com/microsoft/WSL/issues/81",
+    )
     def test_non_writable_home(self, log_handler_mock, warnings_mock):
         with tempfile.TemporaryDirectory(dir=self.workdir) as td:
             os.chmod(td, 0o444)
@@ -44,7 +49,7 @@ class TestConfig(openml.testing.TestBase):
             _dd["cachedir"] = Path(td) / "something-else"
             openml.config._setup(_dd)
 
-        assert warnings_mock.call_count == 2
+        assert warnings_mock.call_count == 1
         assert log_handler_mock.call_count == 1
         assert not log_handler_mock.call_args_list[0][1]["create_file_handler"]
         assert openml.config._root_cache_directory == Path(td) / "something-else"

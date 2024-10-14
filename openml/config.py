@@ -345,7 +345,10 @@ def _setup(config: _Config | None = None) -> None:
         if not config_dir.exists():
             config_dir.mkdir(exist_ok=True, parents=True)
     except PermissionError:
-        pass
+        openml_logger.warning(
+            f"No permission to create OpenML directory at {config_dir}!"
+            " This can result in OpenML-Python not working properly."
+        )
 
     if config is None:
         config = _parse_config(config_file)
@@ -367,27 +370,16 @@ def _setup(config: _Config | None = None) -> None:
 
     try:
         cache_exists = _root_cache_directory.exists()
-    except PermissionError:
-        cache_exists = False
-
-    # create the cache subdirectory
-    try:
-        if not _root_cache_directory.exists():
+        # create the cache subdirectory
+        if not cache_exists:
             _root_cache_directory.mkdir(exist_ok=True, parents=True)
+        _create_log_handlers()
     except PermissionError:
         openml_logger.warning(
-            f"No permission to create openml cache directory at {_root_cache_directory}!"
-            " This can result in OpenML-Python not working properly.",
+            f"No permission to create OpenML directory at {_root_cache_directory}!"
+            " This can result in OpenML-Python not working properly."
         )
-
-    if cache_exists:
-        _create_log_handlers()
-    else:
         _create_log_handlers(create_file_handler=False)
-        openml_logger.warning(
-            f"No permission to create OpenML directory at {config_dir}! This can result in "
-            " OpenML-Python not working properly.",
-        )
 
 
 def set_field_in_config_file(field: str, value: Any) -> None:
