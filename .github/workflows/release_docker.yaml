@@ -8,9 +8,6 @@ on:
       - 'docker'
     tags:
       - 'v*'
-  pull_request:
-    branches:
-      - 'develop'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
