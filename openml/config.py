@@ -499,7 +499,7 @@ stop_using_configuration_for_example = ConfigurationForExamples.stop_using_confi
 
 
 @contextmanager
-def set_context(config: dict[str, Any]) -> Iterator[_Config]:
+def overwrite_config_context(config: dict[str, Any]) -> Iterator[_Config]:
     """A context manager to temporarily override variables in the configuration."""
     existing_config = get_config_as_dict()
     merged_config = {**existing_config, **config}

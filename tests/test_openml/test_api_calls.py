@@ -120,6 +120,6 @@ def test_authentication_endpoints_requiring_api_key_show_relevant_help_link(
     method: str,
 ) -> None:
     # We need to temporarily disable the API key to test the error message
-    with openml.config.set_context({"apikey": None}):
+    with openml.config.overwrite_config_context({"apikey": None}):
         with pytest.raises(openml.exceptions.OpenMLNotAuthorizedError, match=API_TOKEN_HELP_LINK):
             openml._api_calls._perform_api_call(call=endpoint, request_method=method, data=None)
