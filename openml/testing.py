@@ -115,7 +115,7 @@ class TestBase(unittest.TestCase):
         """Tear down the test"""
         os.chdir(self.cwd)
         try:
-            shutil.rmtree(self.workdir)
+            shutil.rmtree(self.workdir, ignore_errors=True)
         except PermissionError as e:
             if os.name != "nt":
                 # one of the files may still be used by another process

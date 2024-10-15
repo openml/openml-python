@@ -1882,7 +1882,7 @@ class TestRun(TestBase):
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     def test_delete_run(self):
-        rs = np.random.randint(1, 2**32 - 1)
+        rs = np.random.randint(1, 2**31 - 1)
         clf = sklearn.pipeline.Pipeline(
             steps=[
                 (f"test_server_imputer_{rs}", SimpleImputer()),
