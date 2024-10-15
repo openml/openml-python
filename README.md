@@ -49,7 +49,7 @@ X, y, categorical_indicator, attribute_names = dataset.get_data(target=task.targ
 train_indices, test_indices = task.get_train_test_split_indices(fold=0)
 ```
 
-Use an [OpenML benchmarking suite](https://docs.openml.org/concepts/benchmarking/) to a curated list of machine-learning tasks:
+Use an [OpenML benchmarking suite](https://docs.openml.org/concepts/benchmarking/) to get a curated list of machine-learning tasks:
 ```python
 import openml
 
