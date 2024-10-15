@@ -23,8 +23,8 @@
 [Installation](https://openml.github.io/openml-python/main/#how-to-get-openml-for-python) | [Documentation](https://openml.github.io/openml-python) | [Contribution guidelines](https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md)
 </div>
 
-OpenML-Python provides an easy-to-use and simple Python interface for [OpenML](http://openml.org), an online platform for open science collaboration in machine learning.
-It can be used to download or upload OpenML data such as datasets and machine learning experiment results.
+OpenML-Python provides an easy-to-use and straightforward Python interface for [OpenML](http://openml.org), an online platform for open science collaboration in machine learning.
+It can download or upload data from OpenML, such as datasets and machine learning experiment results.
 
 ## :joystick: Minimal Example
 
@@ -37,24 +37,25 @@ dataset = openml.datasets.get_dataset(31)
 X, y, categorical_indicator, attribute_names = dataset.get_data(target="class")
 ```
 
-Get all data you need for a [supervised classification task for credit-g](https://www.openml.org/search?type=task&id=31&source_data.data_id=31):
+Get all the data you need for a [supervised classification task for credit-g](https://www.openml.org/search?type=task&id=31&source_data.data_id=31):
 
 ```python
 import openml
 
 task = openml.tasks.get_task(31)
-X, y = task.get_X_and_y( dataset_format ="dataframe")
-validation_split = task.download_split()  # cross-validation splits
+dataset = task.get_dataset()
+X, y, categorical_indicator, attribute_names = dataset.get_data(target=task.target_name)
+# get splits for the first fold of 10-fold cross-validation
+train_indices, test_indices = task.get_train_test_split_indices(fold=0)
 ```
 
-Use a benchmarking suite and get all its associated machine learning tasks:
+Use an OpenML benchmarking suite and get all its associated machine learning tasks:
 ```python
 import openml
 
-suite = openml.study.get_suite(270)  # Get a currated list of benchmark used in the AutoML Benchmark from 2024
-for task_id in suite.tasks[:3]:  # Iterate over the first three tasks
+suite = openml.study.get_suite(270)  # Get a curated list of datasets for classification
+for task_id in suite.tasks:
     task = openml.tasks.get_task(task_id)
-    
 ```
 
 ## :magic_wand: Installation
@@ -66,12 +67,10 @@ You can install OpenML-Python with:
 ```bash
 pip install openml
 ```
-Visit our Installation Guide for detailed instructions, including GPU support, Conda installs, and optional dependencies.
 
 ## :page_facing_up: Citing OpenML-Python
 
-If you use OpenML-Python in a scientific publication, we would appreciate a reference to the
-following paper:
+If you use OpenML-Python in a scientific publication, we would appreciate a reference to the following paper:
 
 [Matthias Feurer, Jan N. van Rijn, Arlind Kadra, Pieter Gijsbers, Neeratyoy Mallik, Sahithya Ravi, Andreas Müller, Joaquin Vanschoren, Frank Hutter<br/>
 **OpenML-Python: an extensible Python API for OpenML**<br/>
