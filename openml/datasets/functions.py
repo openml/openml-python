@@ -477,7 +477,7 @@ def get_dataset(  # noqa: C901, PLR0912
     Parameters
     ----------
     dataset_id : int or str
-        Dataset ID of the dataset to download
+        The ID or name of the dataset to download.
     download_data : bool (default=False)
         If True, also download the data file. Beware that some datasets are large and it might
         make the operation noticeably slower. Metadata is also still retrieved.

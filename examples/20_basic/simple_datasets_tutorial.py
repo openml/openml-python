@@ -27,7 +27,7 @@ print(datasets_df.head(n=10))
 # ==================
 
 # Iris dataset https://www.openml.org/d/61
-dataset = openml.datasets.get_dataset(61)
+dataset = openml.datasets.get_dataset(dataset_id="iris", version=1)
 
 # Print a summary
 print(
