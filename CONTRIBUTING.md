@@ -245,7 +245,7 @@ The resulting HTML files will be placed in ``build/html/`` and are viewable in
 a web browser. See the ``README`` file in the ``doc/`` directory for more
 information.
 
-For building the documentation, you will need to install a few additional dependencies and work on unix:
+For building the documentation, you will need to install a few additional dependencies:
 ```bash
 $ pip install -e .[examples,docs]
 ```
