@@ -4,8 +4,10 @@ van Rijn and Hutter (2018)
 
 A tutorial on how to reproduce the paper *Hyperparameter Importance Across Datasets*.
 
-This is a Unix-only tutorial, as the requirements can not be satisfied on a Windows machine (Untested on other
-systems).
+Example Deprecation Warning!
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example is not supported anymore by the OpenML-Python developers. The example is kept for reference purposes but not tested anymore.
 
 Publication
 ~~~~~~~~~~~
@@ -14,6 +16,16 @@ Publication
 | Jan N. van Rijn and Frank Hutter
 | In *Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining*, 2018
 | Available at https://dl.acm.org/doi/10.1145/3219819.3220058
+
+Requirements
+~~~~~~~~~~~~
+
+This is a Unix-only tutorial, as the requirements can not be satisfied on a Windows machine (Untested on other
+systems).
+
+The following Python packages are required:
+
+pip install openml[examples,docs] fanova ConfigSpace<1.0
 """
 
 # License: BSD 3-Clause
@@ -25,6 +37,10 @@ if sys.platform == "win32":  # noqa
         "The pyrfr library (requirement of fanova) can currently not be installed on Windows systems"
     )
     exit()
+
+# DEPRECATED EXAMPLE -- Avoid running this code in our CI/CD pipeline
+print("This example is deprecated, remove this code to use it manually.")
+exit()
 
 import json
 import fanova
