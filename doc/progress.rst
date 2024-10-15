@@ -3,11 +3,11 @@
 .. _progress:
 
 =========
-Changelog
+Changelog (discontinued after version 0.15.0)
 =========
 
-next
-~~~~~~
+See GitHub releases for the latest changes.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 0.15.0
 ~~~~~~

@@ -86,7 +86,6 @@ examples=[
     "ipykernel",
     "seaborn",
 ]
-examples_unix=["fanova"]
 docs=[
     "sphinx>=3",
     "sphinx-gallery",
