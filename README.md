@@ -15,10 +15,10 @@
 ## The Python API for a World of Data and More :dizzy:
 
 [![Latest Release](https://img.shields.io/github/v/release/openml/openml-python)](https://github.com/openml/openml-python/releases)
-[![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://pypi.org/project/openml/)
+[![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://pypi.org/project/openml/)
 [![Downloads](https://static.pepy.tech/badge/openml)](https://pepy.tech/project/openml)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-
+<!-- Add green badges for CI and precommit -->
 
 [Installation](https://openml.github.io/openml-python/main/#how-to-get-openml-for-python) | [Documentation](https://openml.github.io/openml-python) | [Contribution guidelines](https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md)
 </div>
@@ -28,16 +28,16 @@ It can download or upload data from OpenML, such as datasets and machine learnin
 
 ## :joystick: Minimal Example
 
-Use the following code to get the [credit-g](https://www.openml.org/search?type=data&sort=runs&status=active&id=31) dataset for machine learning:
+Use the following code to get the [credit-g](https://www.openml.org/search?type=data&sort=runs&status=active&id=31) [dataset](https://docs.openml.org/concepts/data/):
 
 ```python
 import openml
 
-dataset = openml.datasets.get_dataset(31)
+dataset = openml.datasets.get_dataset("credit-g") # or by ID get_dataset(31)
 X, y, categorical_indicator, attribute_names = dataset.get_data(target="class")
 ```
 
-Get all the data you need for a [supervised classification task for credit-g](https://www.openml.org/search?type=task&id=31&source_data.data_id=31):
+Get a [task](https://docs.openml.org/concepts/tasks/) for a [supervised classification for credit-g](https://www.openml.org/search?type=task&id=31&source_data.data_id=31):
 
 ```python
 import openml
@@ -49,18 +49,18 @@ X, y, categorical_indicator, attribute_names = dataset.get_data(target=task.targ
 train_indices, test_indices = task.get_train_test_split_indices(fold=0)
 ```
 
-Use an OpenML benchmarking suite and get all its associated machine learning tasks:
+Use an [OpenML benchmarking suite](https://docs.openml.org/concepts/benchmarking/) and get all its associated machine-learning tasks:
 ```python
 import openml
 
-suite = openml.study.get_suite(270)  # Get a curated list of datasets for classification
+suite = openml.study.get_suite("amlb-classification-all")  # Get a curated list of tasks for classification
 for task_id in suite.tasks:
     task = openml.tasks.get_task(task_id)
 ```
 
 ## :magic_wand: Installation
 
-OpenML-Python is supported on Python 3.8 - 3.12 and is available on Linux, MacOS, and Windows.
+OpenML-Python is supported on Python 3.8 - 3.13 and is available on Linux, MacOS, and Windows.
 
 You can install OpenML-Python with:
 
