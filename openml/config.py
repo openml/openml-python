@@ -10,9 +10,10 @@ import os
 import platform
 import shutil
 import warnings
+from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Iterator, cast
 from typing_extensions import Literal, TypedDict
 from urllib.parse import urlparse
 
@@ -495,6 +496,18 @@ start_using_configuration_for_example = (
     ConfigurationForExamples.start_using_configuration_for_example
 )
 stop_using_configuration_for_example = ConfigurationForExamples.stop_using_configuration_for_example
+
+
+@contextmanager
+def set_context(config: dict[str, Any]) -> Iterator[_Config]:
+    """A context manager to temporarily override variables in the configuration."""
+    existing_config = get_config_as_dict()
+    merged_config = {**existing_config, **config}
+
+    _setup(merged_config)  # type: ignore
+    yield merged_config  # type: ignore
+
+    _setup(existing_config)
 
 
 __all__ = [

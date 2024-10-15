@@ -9,6 +9,7 @@ import minio
 import pytest
 
 import openml
+from openml.config import ConfigurationForExamples
 import openml.testing
 from openml._api_calls import _download_minio_bucket, API_TOKEN_HELP_LINK
 
@@ -118,5 +119,7 @@ def test_authentication_endpoints_requiring_api_key_show_relevant_help_link(
     endpoint: str,
     method: str,
 ) -> None:
-    with pytest.raises(openml.exceptions.OpenMLNotAuthorizedError, match=API_TOKEN_HELP_LINK) as e:
-        openml._api_calls._perform_api_call(call=endpoint, request_method=method, data=None)
+    # We need to temporarily disable the API key to test the error message
+    with openml.config.set_context({"apikey": None}):
+        with pytest.raises(openml.exceptions.OpenMLNotAuthorizedError, match=API_TOKEN_HELP_LINK):
+            openml._api_calls._perform_api_call(call=endpoint, request_method=method, data=None)
