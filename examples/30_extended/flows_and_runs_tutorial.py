@@ -101,7 +101,7 @@ pipe = pipeline.Pipeline(
                 [
                     (
                         "categorical",
-                        preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
+                        preprocessing.OneHotEncoder(handle_unknown="ignore"),
                         cat,  # returns the categorical feature indices
                     ),
                     (
@@ -145,7 +145,7 @@ pipe = pipeline.Pipeline(
                 [
                     (
                         "categorical",
-                        preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
+                        preprocessing.OneHotEncoder(handle_unknown="ignore"),
                         categorical_feature_indices,
                     ),
                     (
