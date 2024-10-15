@@ -459,23 +459,28 @@ def __parse_server_exception(
     url: str,
     file_elements: FILE_ELEMENTS_TYPE | None,
 ) -> OpenMLServerError:
-    # You can find the individual codes that are parsed out of the response here:
-    # https://github.com/openml/OpenML/blob/develop/openml_OS/views/pages/api_new/v1/xml/pre.php
-    if response.status_code == 414:
+    if response.status_code == requests.codes.URI_TOO_LONG:
         raise OpenMLServerError(f"URI too long! ({url})")
 
+    # OpenML has a sophisticated error system where information about failures is provided,
+    # in the response body itself.
+    # First, we need to parse it out.
     try:
         server_exception = xmltodict.parse(response.text)
     except xml.parsers.expat.ExpatError as e:
         raise e
     except Exception as e:
-        # OpenML has a sophisticated error system
-        # where information about failures is provided. try to parse this
+        # If we failed to parse it out, then something has gone wrong in the body we have sent back
+        # from the server and there is little extra information we can capture.
         raise OpenMLServerError(
             f"Unexpected server error when calling {url}. Please contact the developers!\n"
             f"Status code: {response.status_code}\n{response.text}",
         ) from e
 
+    # Now we can parse out the specific error codes that we return. These
+    # are in addition to the typical HTTP error codes, but encode more
+    # specific informtion. You can find these codes here:
+    # https://github.com/openml/OpenML/blob/develop/openml_OS/views/pages/api_new/v1/xml/pre.php
     server_error = server_exception["oml:error"]
     code = int(server_error["oml:code"])
     message = server_error["oml:message"]
