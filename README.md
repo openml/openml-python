@@ -37,7 +37,7 @@ dataset = openml.datasets.get_dataset("credit-g") # or by ID get_dataset(31)
 X, y, categorical_indicator, attribute_names = dataset.get_data(target="class")
 ```
 
-Get a [task](https://docs.openml.org/concepts/tasks/) for [supervised classification for credit-g](https://www.openml.org/search?type=task&id=31&source_data.data_id=31):
+Get a [task](https://docs.openml.org/concepts/tasks/) for [supervised classification on credit-g](https://www.openml.org/search?type=task&id=31&source_data.data_id=31):
 
 ```python
 import openml
