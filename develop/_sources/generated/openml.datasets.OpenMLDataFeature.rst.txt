@@ -1,8 +1,0 @@
-﻿:orphan:
-
-:mod:`openml.datasets`.OpenMLDataFeature
-===============================================
-
-.. currentmodule:: openml.datasets
-
-.. autoclass:: OpenMLDataFeature

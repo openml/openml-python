@@ -1,8 +1,0 @@
-﻿:orphan:
-
-:mod:`openml.study`.OpenMLStudy
-======================================
-
-.. currentmodule:: openml.study
-
-.. autoclass:: OpenMLStudy
