@@ -54,6 +54,7 @@ class TestConfig(openml.testing.TestBase):
         assert not log_handler_mock.call_args_list[0][1]["create_file_handler"]
         assert openml.config._root_cache_directory == Path(td) / "something-else"
 
+    @unittest.skipIf(platform.system() != "Linux","XDG only exists for Linux systems.")
     def test_XDG_directories_do_not_exist(self):
         with tempfile.TemporaryDirectory(dir=self.workdir) as td:
             # Save previous state
