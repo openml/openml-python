@@ -24,6 +24,7 @@ from . import config
 from .__version__ import __version__
 from .exceptions import (
     OpenMLHashException,
+    OpenMLNotAuthorizedError,
     OpenMLServerError,
     OpenMLServerException,
     OpenMLServerNoResult,
@@ -35,6 +36,8 @@ _HEADERS = {"user-agent": f"openml-python/{__version__}"}
 DATA_TYPE = Dict[str, Union[str, int]]
 FILE_ELEMENTS_TYPE = Dict[str, Union[str, Tuple[str, str]]]
 DATABASE_CONNECTION_ERRCODE = 107
+
+API_TOKEN_HELP_LINK = "https://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial.html#authentication"  # noqa: S105
 
 
 def _robot_delay(n: int) -> float:
@@ -456,6 +459,8 @@ def __parse_server_exception(
     url: str,
     file_elements: FILE_ELEMENTS_TYPE | None,
 ) -> OpenMLServerError:
+    # You can find the individual codes that are parsed out of the response here:
+    # https://github.com/openml/OpenML/blob/develop/openml_OS/views/pages/api_new/v1/xml/pre.php
     if response.status_code == 414:
         raise OpenMLServerError(f"URI too long! ({url})")
 
@@ -496,4 +501,21 @@ def __parse_server_exception(
         )
     else:
         full_message = f"{message} - {additional_information}"
+
+    if code in [
+        102,  # flow/exists post
+        137,  # dataset post
+        350,  # dataset/42 delete
+        310,  # flow/<something> post
+        320,  # flow/42 delete
+        400,  # run/42 delete
+        460,  # task/42 delete
+    ]:
+        msg = (
+            f"The API call {url} requires authentication via an API key.\nPlease configure "
+            "OpenML-Python to use your API as described in this example:"
+            "\nhttps://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial.html#authentication"
+        )
+        return OpenMLNotAuthorizedError(message=msg)
+
     return OpenMLServerException(code=code, message=full_message, url=url)
