@@ -1920,11 +1920,6 @@ def isolate_for_test():
     t.tearDown()
 
 
-# On Python 3.8, an unexplainable oslo concurrency-related bug will make a lock file from oslo
-# be created after deleting the tmp dir and existing the tests. Moreover, we did not find a way
-# to delete the new lock file. The test will pass but the git workflow will fail because new
-# files are present in the git repo. The skipif is a workaround to avoid the issue.
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="Requires python3.9 or higher.")
 @pytest.mark.parametrize(
     ("with_data", "with_qualities", "with_features"),
     itertools.product([True, False], repeat=3),
