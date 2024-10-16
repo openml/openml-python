@@ -5,7 +5,6 @@ import os
 import re
 import warnings
 from typing import Any
-from typing_extensions import Literal
 
 import pandas as pd
 import xmltodict
@@ -131,9 +130,8 @@ def list_tasks(
     offset: int | None = None,
     size: int | None = None,
     tag: str | None = None,
-    output_format: Literal["dict", "dataframe"] = "dict",
     **kwargs: Any,
-) -> dict | pd.DataFrame:
+) -> pd.DataFrame:
     """
     Return a number of tasks having the given tag and task_type
 
@@ -150,10 +148,6 @@ def list_tasks(
         the maximum number of tasks to show
     tag : str, optional
         the tag to include
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
     kwargs: dict, optional
         Legal filter operators: data_tag, status, data_id, data_name,
         number_instances, number_features,
@@ -161,31 +155,13 @@ def list_tasks(
 
     Returns
     -------
-    dict
-        All tasks having the given task_type and the give tag. Every task is
-        represented by a dictionary containing the following information:
-        task id, dataset id, task_type and status. If qualities are calculated
-        for the associated dataset, some of these are also returned.
     dataframe
         All tasks having the given task_type and the give tag. Every task is
         represented by a row in the data frame containing the following information
         as columns: task id, dataset id, task_type and status. If qualities are
         calculated for the associated dataset, some of these are also returned.
     """
-    if output_format not in ["dataframe", "dict"]:
-        raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable.",
-        )
-    # TODO: [0.15]
-    if output_format == "dict":
-        msg = (
-            "Support for `output_format` of 'dict' will be removed in 0.15 "
-            "and pandas dataframes will be returned instead. To ensure your code "
-            "will continue to work, use `output_format`='dataframe'."
-        )
-        warnings.warn(msg, category=FutureWarning, stacklevel=2)
-    return openml.utils._list_all(  # type: ignore
-        list_output_format=output_format,  # type: ignore
+    batches = openml.utils._list_all(
         listing_call=_list_tasks,
         task_type=task_type,
         offset=offset,
@@ -193,13 +169,10 @@ def list_tasks(
         tag=tag,
         **kwargs,
     )
+    return pd.concat(batches, ignore_index=True)
 
 
-def _list_tasks(
-    task_type: TaskType | None = None,
-    output_format: Literal["dict", "dataframe"] = "dict",
-    **kwargs: Any,
-) -> dict | pd.DataFrame:
+def _list_tasks(task_type: TaskType | None = None, **kwargs: Any) -> pd.DataFrame:
     """
     Perform the api call to return a number of tasks having the given filters.
 
@@ -210,10 +183,6 @@ def _list_tasks(
     type when used as a filter in list tasks call.
     task_type : TaskType, optional
         Refers to the type of task.
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
     kwargs: dict, optional
         Legal filter operators: tag, task_id (list), data_tag, status, limit,
         offset, data_id, data_name, number_instances, number_features,
@@ -221,7 +190,7 @@ def _list_tasks(
 
     Returns
     -------
-    dict or dataframe
+    dataframe
     """
     api_call = "task/list"
     if task_type is not None:
@@ -232,27 +201,20 @@ def _list_tasks(
                 value = ",".join([str(int(i)) for i in value])  # noqa: PLW2901
             api_call += f"/{operator}/{value}"
 
-    return __list_tasks(api_call=api_call, output_format=output_format)
+    return __list_tasks(api_call=api_call)
 
 
-# TODO(eddiebergman): overload todefine type returned
-def __list_tasks(  # noqa: PLR0912, C901
-    api_call: str,
-    output_format: Literal["dict", "dataframe"] = "dict",
-) -> dict | pd.DataFrame:
-    """Returns a dictionary or a Pandas DataFrame with information about OpenML tasks.
+def __list_tasks(api_call: str) -> pd.DataFrame:  # noqa: C901, PLR0912
+    """Returns a Pandas DataFrame with information about OpenML tasks.
 
     Parameters
     ----------
     api_call : str
         The API call specifying which tasks to return.
-    output_format : str in {"dict", "dataframe"}
-        Output format for the returned object.
 
     Returns
     -------
-    Union[Dict, pd.DataFrame]
-        A dictionary or a Pandas DataFrame with information about OpenML tasks.
+        A Pandas DataFrame with information about OpenML tasks.
 
     Raises
     ------
@@ -339,13 +301,9 @@ def __list_tasks(  # noqa: PLR0912, C901
             else:
                 warnings.warn(f"Could not find key {e} in {task_}!", RuntimeWarning, stacklevel=2)
 
-    if output_format == "dataframe":
-        tasks = pd.DataFrame.from_dict(tasks, orient="index")
-
-    return tasks
+    return pd.DataFrame.from_dict(tasks, orient="index")
 
 
-# TODO(eddiebergman): Maybe since this isn't public api, we can make it keyword only?
 def get_tasks(
     task_ids: list[int],
     download_data: bool | None = None,
@@ -590,7 +548,7 @@ def create_task(
         task_type_id=task_type,
         task_type="None",  # TODO: refactor to get task type string from ID.
         data_set_id=dataset_id,
-        target_name=target_name,
+        target_name=target_name,  # type: ignore
         estimation_procedure_id=estimation_procedure_id,
         evaluation_measure=evaluation_measure,
         **kwargs,

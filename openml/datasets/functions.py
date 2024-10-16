@@ -7,7 +7,7 @@ import warnings
 from collections import OrderedDict
 from pathlib import Path
 from pyexpat import ExpatError
-from typing import TYPE_CHECKING, Any, overload
+from typing import TYPE_CHECKING, Any
 from typing_extensions import Literal
 
 import arff
@@ -75,54 +75,16 @@ def list_qualities() -> list[str]:
     return qualities["oml:data_qualities_list"]["oml:quality"]
 
 
-@overload
-def list_datasets(
-    data_id: list[int] | None = ...,
-    offset: int | None = ...,
-    size: int | None = ...,
-    status: str | None = ...,
-    tag: str | None = ...,
-    *,
-    output_format: Literal["dataframe"],
-    **kwargs: Any,
-) -> pd.DataFrame: ...
-
-
-@overload
-def list_datasets(
-    data_id: list[int] | None,
-    offset: int | None,
-    size: int | None,
-    status: str | None,
-    tag: str | None,
-    output_format: Literal["dataframe"],
-    **kwargs: Any,
-) -> pd.DataFrame: ...
-
-
-@overload
-def list_datasets(
-    data_id: list[int] | None = ...,
-    offset: int | None = ...,
-    size: int | None = ...,
-    status: str | None = ...,
-    tag: str | None = ...,
-    output_format: Literal["dict"] = "dict",
-    **kwargs: Any,
-) -> pd.DataFrame: ...
-
-
 def list_datasets(
     data_id: list[int] | None = None,
     offset: int | None = None,
     size: int | None = None,
     status: str | None = None,
     tag: str | None = None,
-    output_format: Literal["dataframe", "dict"] = "dict",
     **kwargs: Any,
-) -> dict | pd.DataFrame:
-    """
-    Return a list of all dataset which are on OpenML.
+) -> pd.DataFrame:
+    """Return a dataframe of all dataset which are on OpenML.
+
     Supports large amount of results.
 
     Parameters
@@ -139,10 +101,6 @@ def list_datasets(
         default active datasets are returned, but also datasets
         from another status can be requested.
     tag : str, optional
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
     kwargs : dict, optional
         Legal filter operators (keys in the dict):
         data_name, data_version, number_instances,
@@ -150,76 +108,29 @@ def list_datasets(
 
     Returns
     -------
-    datasets : dict of dicts, or dataframe
-        - If output_format='dict'
-            A mapping from dataset ID to dict.
-
-            Every dataset is represented by a dictionary containing
-            the following information:
-            - dataset id
-            - name
-            - format
-            - status
-            If qualities are calculated for the dataset, some of
-            these are also returned.
-
-        - If output_format='dataframe'
-            Each row maps to a dataset
-            Each column contains the following information:
-            - dataset id
-            - name
-            - format
-            - status
-            If qualities are calculated for the dataset, some of
-            these are also included as columns.
+    datasets: dataframe
+        Each row maps to a dataset
+        Each column contains the following information:
+        - dataset id
+        - name
+        - format
+        - status
+        If qualities are calculated for the dataset, some of
+        these are also included as columns.
     """
-    if output_format not in ["dataframe", "dict"]:
-        raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable.",
-        )
-
-    # TODO: [0.15]
-    if output_format == "dict":
-        msg = (
-            "Support for `output_format` of 'dict' will be removed in 0.15 "
-            "and pandas dataframes will be returned instead. To ensure your code "
-            "will continue to work, use `output_format`='dataframe'."
-        )
-        warnings.warn(msg, category=FutureWarning, stacklevel=2)
-
-    return openml.utils._list_all(  # type: ignore
-        data_id=data_id,
-        list_output_format=output_format,  # type: ignore
+    batches = openml.utils._list_all(
         listing_call=_list_datasets,
+        data_id=data_id,
         offset=offset,
         size=size,
         status=status,
         tag=tag,
         **kwargs,
     )
+    return pd.concat(batches, ignore_index=True)
 
 
-@overload
-def _list_datasets(
-    data_id: list | None = ...,
-    output_format: Literal["dict"] = "dict",
-    **kwargs: Any,
-) -> dict: ...
-
-
-@overload
-def _list_datasets(
-    data_id: list | None = ...,
-    output_format: Literal["dataframe"] = "dataframe",
-    **kwargs: Any,
-) -> pd.DataFrame: ...
-
-
-def _list_datasets(
-    data_id: list | None = None,
-    output_format: Literal["dict", "dataframe"] = "dict",
-    **kwargs: Any,
-) -> dict | pd.DataFrame:
+def _list_datasets(data_id: list[int] | None = None, **kwargs: Any) -> pd.DataFrame:
     """
     Perform api call to return a list of all datasets.
 
@@ -232,10 +143,6 @@ def _list_datasets(
 
     data_id : list, optional
 
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
     kwargs : dict, optional
         Legal filter operators (keys in the dict):
         tag, status, limit, offset, data_name, data_version, number_instances,
@@ -243,7 +150,7 @@ def _list_datasets(
 
     Returns
     -------
-    datasets : dict of dicts, or dataframe
+    datasets : dataframe
     """
     api_call = "data/list"
 
@@ -252,21 +159,10 @@ def _list_datasets(
             api_call += f"/{operator}/{value}"
     if data_id is not None:
         api_call += "/data_id/{}".format(",".join([str(int(i)) for i in data_id]))
-    return __list_datasets(api_call=api_call, output_format=output_format)
+    return __list_datasets(api_call=api_call)
 
 
-@overload
-def __list_datasets(api_call: str, output_format: Literal["dict"] = "dict") -> dict: ...
-
-
-@overload
-def __list_datasets(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame: ...
-
-
-def __list_datasets(
-    api_call: str,
-    output_format: Literal["dict", "dataframe"] = "dict",
-) -> dict | pd.DataFrame:
+def __list_datasets(api_call: str) -> pd.DataFrame:
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     datasets_dict = xmltodict.parse(xml_string, force_list=("oml:dataset",))
 
@@ -295,10 +191,7 @@ def __list_datasets(
                 dataset[quality["@name"]] = float(quality["#text"])
         datasets[dataset["did"]] = dataset
 
-    if output_format == "dataframe":
-        datasets = pd.DataFrame.from_dict(datasets, orient="index")
-
-    return datasets
+    return pd.DataFrame.from_dict(datasets, orient="index")
 
 
 def _expand_parameter(parameter: str | list[str] | None) -> list[str]:
@@ -1493,8 +1386,7 @@ def _get_online_dataset_arff(dataset_id: int) -> str | None:
 
 
 def _get_online_dataset_format(dataset_id: int) -> str:
-    """Get the dataset format for a given dataset id
-    from the OpenML website.
+    """Get the dataset format for a given dataset id from the OpenML website.
 
     Parameters
     ----------

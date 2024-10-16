@@ -413,7 +413,6 @@ class TestRun(TestBase):
                 model=clf,
                 task=task,
                 avoid_duplicate_runs=False,
-                dataset_format="array",
             )
 
     @pytest.mark.sklearn()
@@ -1355,7 +1354,6 @@ class TestRun(TestBase):
             model=clf,
             task=task,
             add_local_measures=True,
-            dataset_format="dataframe",
         )
         arff_datacontent, trace, fold_evaluations, _ = res
         # predictions
@@ -1601,7 +1599,6 @@ class TestRun(TestBase):
             task=task,
             extension=self.extension,
             add_local_measures=True,
-            dataset_format="dataframe",
         )
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
@@ -1645,7 +1642,6 @@ class TestRun(TestBase):
             task=task,
             extension=self.extension,
             add_local_measures=True,
-            dataset_format="array",  # diff test_run_on_dataset_with_missing_labels_dataframe()
         )
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
@@ -1767,7 +1763,7 @@ class TestRun(TestBase):
     def test__run_task_get_arffcontent_2(self, parallel_mock):
         """Tests if a run executed in parallel is collated correctly."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
-        x, y = task.get_X_and_y(dataset_format="dataframe")
+        x, y = task.get_X_and_y()
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
         loss = "log" if Version(sklearn.__version__) < Version("1.3") else "log_loss"
@@ -1780,7 +1776,7 @@ class TestRun(TestBase):
                 model=clf,
                 task=task,
                 add_local_measures=True,
-                dataset_format="array",  # "dataframe" would require handling of categoricals
+                # dataset_format="array",  # "dataframe" would require handling of categoricals
                 n_jobs=n_jobs,
             )
         # This unit test will fail if joblib is unable to distribute successfully since the
@@ -1825,7 +1821,7 @@ class TestRun(TestBase):
     def test_joblib_backends(self, parallel_mock):
         """Tests evaluation of a run using various joblib backends and n_jobs."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
-        x, y = task.get_X_and_y(dataset_format="dataframe")
+        x, y = task.get_X_and_y()
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
 
@@ -1865,7 +1861,7 @@ class TestRun(TestBase):
                     model=clf,
                     task=task,
                     add_local_measures=True,
-                    dataset_format="array",  # "dataframe" would require handling of categoricals
+                    # dataset_format="array",  # "dataframe" would require handling of categoricals
                     n_jobs=n_jobs,
                 )
             assert type(res[0]) == list

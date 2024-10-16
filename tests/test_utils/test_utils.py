@@ -5,6 +5,7 @@ import unittest.mock
 import pytest
 import shutil
 import openml
+from itertools import chain
 from openml.testing import _check_dataset
 
 
@@ -83,10 +84,6 @@ def _mocked_perform_api_call(call, request_method):
 @pytest.mark.server()
 def test_list_all():
     openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
-    openml.utils._list_all(
-        listing_call=openml.tasks.functions._list_tasks,
-        list_output_format="dataframe",
-    )
 
 
 @pytest.mark.server()
@@ -104,12 +101,13 @@ def test_list_all_with_multiple_batches(min_number_tasks_on_test_server):
     # By setting the batch size one lower than the minimum we guarantee at least two
     # batches and at the same time do as few batches (roundtrips) as possible.
     batch_size = min_number_tasks_on_test_server - 1
-    res = openml.utils._list_all(
+    batches = openml.utils._list_all(
         listing_call=openml.tasks.functions._list_tasks,
-        list_output_format="dataframe",
         batch_size=batch_size,
     )
-    assert min_number_tasks_on_test_server <= len(res)
+    assert len(batches) >= 2
+    flattened = list(chain(*batches))
+    assert min_number_tasks_on_test_server <= len(flattened)
 
 
 @pytest.mark.server()
@@ -202,4 +200,4 @@ def test_correct_test_server_download_state():
     """
     task = openml.tasks.get_task(119)
     dataset = task.get_dataset()
-    assert len(dataset.features) == dataset.get_data(dataset_format="dataframe")[0].shape[1]
+    assert len(dataset.features) == dataset.get_data()[0].shape[1]

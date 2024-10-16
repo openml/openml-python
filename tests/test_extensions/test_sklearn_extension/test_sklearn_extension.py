@@ -261,7 +261,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
                     ("min_samples_split", "2"),
                     ("min_weight_fraction_leaf", "0.0"),
                     ("presort", presort_val),
-                    ('monotonic_cst', 'null'),
+                    ("monotonic_cst", "null"),
                     ("random_state", "null"),
                     ("splitter", '"best"'),
                 ),
@@ -331,21 +331,23 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             n_init = '"auto"'
 
         algorithm = '"auto"' if sklearn_version < Version("1.1") else '"lloyd"'
-        fixture_parameters = OrderedDict([
-            ("algorithm", algorithm),
-            ("copy_x", "true"),
-            ("init", '"k-means++"'),
-            ("max_iter", "300"),
-            ("n_clusters", "8"),
-            ("n_init", n_init),
-            ("n_jobs", n_jobs_val),
-            ("precompute_distances", precomp_val),
-            ("random_state", "null"),
-            ("tol", "0.0001"),
-            ("verbose", "0"),
-        ])
+        fixture_parameters = OrderedDict(
+            [
+                ("algorithm", algorithm),
+                ("copy_x", "true"),
+                ("init", '"k-means++"'),
+                ("max_iter", "300"),
+                ("n_clusters", "8"),
+                ("n_init", n_init),
+                ("n_jobs", n_jobs_val),
+                ("precompute_distances", precomp_val),
+                ("random_state", "null"),
+                ("tol", "0.0001"),
+                ("verbose", "0"),
+            ]
+        )
 
-        if sklearn_version >= Version("1.0" ):
+        if sklearn_version >= Version("1.0"):
             fixture_parameters.pop("n_jobs")
             fixture_parameters.pop("precompute_distances")
 
@@ -369,7 +371,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     def test_serialize_model_with_subcomponent(self):
-        estimator_name = "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        estimator_name = (
+            "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        )
         estimator_param = {estimator_name: sklearn.tree.DecisionTreeClassifier()}
         model = sklearn.ensemble.AdaBoostClassifier(
             n_estimators=100,
@@ -428,8 +432,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             serialization.components[estimator_name].class_name == fixture_subcomponent_class_name
         )
         assert (
-            serialization.components[estimator_name].description
-            == fixture_subcomponent_description
+            serialization.components[estimator_name].description == fixture_subcomponent_description
         )
         self.assertDictEqual(structure, fixture_structure)
 
@@ -702,7 +705,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         reason="Pipeline processing behaviour updated",
     )
     def test_serialize_feature_union(self):
-        sparse_parameter = "sparse" if Version(sklearn.__version__) < Version("1.4") else "sparse_output"
+        sparse_parameter = (
+            "sparse" if Version(sklearn.__version__) < Version("1.4") else "sparse_output"
+        )
         ohe_params = {sparse_parameter: False}
         if Version(sklearn.__version__) >= Version("0.20"):
             ohe_params["categories"] = "auto"
@@ -719,7 +724,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         structure = serialization.get_structure("name")
         # OneHotEncoder was moved to _encoders module in 0.20
-        module_name_encoder = "_encoders" if Version(sklearn.__version__) >= Version("0.20") else "data"
+        module_name_encoder = (
+            "_encoders" if Version(sklearn.__version__) >= Version("0.20") else "data"
+        )
         scaler_name = "data" if Version(sklearn.__version__) < Version("0.22") else "_data"
         fixture_name = (
             "sklearn.pipeline.FeatureUnion("
@@ -765,7 +772,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
     @pytest.mark.sklearn()
     def test_serialize_feature_union_switched_names(self):
-        ohe_params = {"categories": "auto"} if Version(sklearn.__version__) >= Version("0.20") else {}
+        ohe_params = (
+            {"categories": "auto"} if Version(sklearn.__version__) >= Version("0.20") else {}
+        )
         ohe = sklearn.preprocessing.OneHotEncoder(**ohe_params)
         scaler = sklearn.preprocessing.StandardScaler()
         fu1 = sklearn.pipeline.FeatureUnion(transformer_list=[("ohe", ohe), ("scaler", scaler)])
@@ -787,7 +796,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
 
         # OneHotEncoder was moved to _encoders module in 0.20
-        module_name_encoder = "_encoders" if Version(sklearn.__version__) >= Version("0.20") else "data"
+        module_name_encoder = (
+            "_encoders" if Version(sklearn.__version__) >= Version("0.20") else "data"
+        )
         scaler_name = "data" if Version(sklearn.__version__) < Version("0.22") else "_data"
         assert (
             fu1_serialization.name == "sklearn.pipeline.FeatureUnion("
@@ -836,7 +847,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         structure = serialized.get_structure("name")
         # OneHotEncoder was moved to _encoders module in 0.20
-        module_name_encoder = "_encoders" if Version(sklearn.__version__) >= Version("0.20") else "data"
+        module_name_encoder = (
+            "_encoders" if Version(sklearn.__version__) >= Version("0.20") else "data"
+        )
         ohe_name = "sklearn.preprocessing.%s.OneHotEncoder" % module_name_encoder
         scaler_name = "sklearn.preprocessing.{}.StandardScaler".format(
             "data" if Version(sklearn.__version__) < Version("0.22") else "_data",
@@ -1294,7 +1307,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         # using this param distribution should not raise an exception
         legal_param_dist = {"n_estimators": [2, 3, 4]}
 
-        estimator_name = "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        estimator_name = (
+            "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        )
         legal_models = [
             sklearn.ensemble.RandomForestClassifier(),
             sklearn.ensemble.RandomForestClassifier(n_jobs=5),
@@ -1506,7 +1521,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         pipe_adjusted = sklearn.clone(pipe_orig)
         impute_strategy = "median" if Version(sklearn.__version__) < Version("0.23") else "mean"
         sparse = Version(sklearn.__version__) >= Version("0.23")
-        sparse_parameter = "sparse" if Version(sklearn.__version__) < Version("1.4") else "sparse_output"
+        sparse_parameter = (
+            "sparse" if Version(sklearn.__version__) < Version("1.4") else "sparse_output"
+        )
         estimator_name = (
             "base_estimator" if Version(sklearn.__version__) < Version("1.2") else "estimator"
         )
@@ -1532,7 +1549,9 @@ class TestSklearnExtensionFlowFunctions(TestBase):
     @pytest.mark.sklearn()
     def test_openml_param_name_to_sklearn(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
-        estimator_name = "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        estimator_name = (
+            "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        )
         boosting = sklearn.ensemble.AdaBoostClassifier(
             **{estimator_name: sklearn.tree.DecisionTreeClassifier()},
         )
@@ -1569,17 +1588,21 @@ class TestSklearnExtensionFlowFunctions(TestBase):
     def test_obtain_parameter_values_flow_not_from_server(self):
         model = sklearn.linear_model.LogisticRegression(solver="lbfgs")
         flow = self.extension.model_to_flow(model)
-        logistic_name = "logistic" if Version(sklearn.__version__) < Version("0.22") else "_logistic"
+        logistic_name = (
+            "logistic" if Version(sklearn.__version__) < Version("0.22") else "_logistic"
+        )
         msg = f"Flow sklearn.linear_model.{logistic_name}.LogisticRegression has no flow_id!"
 
         with pytest.raises(ValueError, match=msg):
             self.extension.obtain_parameter_values(flow)
 
-        estimator_name = "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        estimator_name = (
+            "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        )
         model = sklearn.ensemble.AdaBoostClassifier(
             **{
                 estimator_name: sklearn.linear_model.LogisticRegression(
-                solver="lbfgs",
+                    solver="lbfgs",
                 ),
             }
         )
@@ -1650,7 +1673,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 ("dummy", sklearn.dummy.DummyClassifier()),
             ],
         )
-        openml.runs.run_model_on_task(pipe, task, dataset_format="array")
+        openml.runs.run_model_on_task(pipe, task)
 
     @pytest.mark.sklearn()
     def test_seed_model(self):
@@ -1751,7 +1774,9 @@ class TestSklearnExtensionRunFunctions(TestBase):
             assert np.any(y_hat_proba.iloc[:, i].to_numpy() != np.zeros(y_test.shape))
 
         # check user defined measures
-        fold_evaluations: dict[str, dict[int, dict[int, float]]] = collections.defaultdict(lambda: collections.defaultdict(dict))
+        fold_evaluations: dict[str, dict[int, dict[int, float]]] = collections.defaultdict(
+            lambda: collections.defaultdict(dict)
+        )
         for measure in user_defined_measures:
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
@@ -1778,7 +1803,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
 
         # diff test_run_model_on_fold_classification_1_array()
-        X, y = task.get_X_and_y(dataset_format="dataframe")
+        X, y = task.get_X_and_y()
         train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0)
         X_train = X.iloc[train_indices]
         y_train = y.iloc[train_indices]
@@ -1786,7 +1811,9 @@ class TestSklearnExtensionRunFunctions(TestBase):
         y_test = y.iloc[test_indices]
 
         # Helper functions to return required columns for ColumnTransformer
-        sparse = {"sparse" if Version(sklearn.__version__) < Version("1.4") else "sparse_output": False}
+        sparse = {
+            "sparse" if Version(sklearn.__version__) < Version("1.4") else "sparse_output": False
+        }
         cat_imp = make_pipeline(
             SimpleImputer(strategy="most_frequent"),
             OneHotEncoder(handle_unknown="ignore", **sparse),
@@ -1825,7 +1852,9 @@ class TestSklearnExtensionRunFunctions(TestBase):
             assert np.any(y_hat_proba.iloc[:, i].to_numpy() != np.zeros(y_test.shape))
 
         # check user defined measures
-        fold_evaluations: dict[str, dict[int, dict[int, float]]]  = collections.defaultdict(lambda: collections.defaultdict(dict))
+        fold_evaluations: dict[str, dict[int, dict[int, float]]] = collections.defaultdict(
+            lambda: collections.defaultdict(dict)
+        )
         for measure in user_defined_measures:
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
@@ -1878,7 +1907,9 @@ class TestSklearnExtensionRunFunctions(TestBase):
             assert np.any(y_hat_proba.to_numpy()[:, i] != np.zeros(y_test.shape))
 
         # check user defined measures
-        fold_evaluations: dict[str, dict[int, dict[int, float]]] = collections.defaultdict(lambda: collections.defaultdict(dict))
+        fold_evaluations: dict[str, dict[int, dict[int, float]]] = collections.defaultdict(
+            lambda: collections.defaultdict(dict)
+        )
         for measure in user_defined_measures:
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
@@ -2001,7 +2032,9 @@ class TestSklearnExtensionRunFunctions(TestBase):
         assert y_hat_proba is None
 
         # check user defined measures
-        fold_evaluations: dict[str, dict[int, dict[int, float]]]  = collections.defaultdict(lambda: collections.defaultdict(dict))
+        fold_evaluations: dict[str, dict[int, dict[int, float]]] = collections.defaultdict(
+            lambda: collections.defaultdict(dict)
+        )
         for measure in user_defined_measures:
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
@@ -2023,7 +2056,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         openml.config.server = self.production_server
         task = openml.tasks.get_task(126033)
 
-        X = task.get_X(dataset_format="array")
+        X = task.get_X()
 
         pipeline = sklearn.pipeline.Pipeline(
             steps=[("imp", SimpleImputer()), ("clf", sklearn.cluster.KMeans())],
@@ -2045,7 +2078,9 @@ class TestSklearnExtensionRunFunctions(TestBase):
         assert y_hat_proba is None
 
         # check user defined measures
-        fold_evaluations: dict[str, dict[int, dict[int, float]]]  = collections.defaultdict(lambda: collections.defaultdict(dict))
+        fold_evaluations: dict[str, dict[int, dict[int, float]]] = collections.defaultdict(
+            lambda: collections.defaultdict(dict)
+        )
         for measure in user_defined_measures:
             fold_evaluations[measure][0][0] = user_defined_measures[measure]
 
@@ -2186,7 +2221,6 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
         X, y, categorical_ind, feature_names = dataset.get_data(
             target=dataset.default_target_attribute,
-            dataset_format="array",
         )
         categorical_ind = np.array(categorical_ind)
         (cat_idx,) = np.where(categorical_ind)

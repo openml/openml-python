@@ -308,7 +308,8 @@ class TestOpenMLDataset(TestBase):
 
     def test_get_dataset_sparse(self):
         dataset = openml.datasets.get_dataset(102)
-        X, *_ = dataset.get_data(dataset_format="array")
+        # TODO(eddiebergman): Will break from dataset_format removal
+        X, *_ = dataset.get_data()
         assert isinstance(X, scipy.sparse.csr_matrix)
 
     def test_download_rowid(self):

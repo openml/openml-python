@@ -164,13 +164,6 @@ class TestSetupFunctions(TestBase):
         assert isinstance(setups, pd.DataFrame)
         assert len(setups) == 10
 
-        # TODO: [0.15] Remove section as `dict` is no longer supported.
-        with pytest.warns(FutureWarning):
-            setups = openml.setups.list_setups(flow=flow_id, output_format="dict", size=10)
-        assert isinstance(setups, Dict)
-        assert isinstance(setups[next(iter(setups.keys()))], Dict)
-        assert len(setups) == 10
-
     def test_setuplist_offset(self):
         size = 10
         setups = openml.setups.list_setups(offset=0, size=size)
