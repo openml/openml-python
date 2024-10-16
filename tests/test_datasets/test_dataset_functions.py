@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import itertools
-import sys
 import os
 import random
 import shutil
