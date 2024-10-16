@@ -25,7 +25,7 @@ openml.config.start_using_configuration_for_example()
 # Train a scikit-learn model on the data manually.
 
 # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
-dataset = openml.datasets.get_dataset(68)
+dataset = openml.datasets.get_dataset(dataset_id="eeg-eye-state", version=1)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
     target=dataset.default_target_attribute
 )
@@ -36,7 +36,7 @@ clf.fit(X, y)
 # You can also ask for meta-data to automatically preprocess the data.
 #
 # * e.g. categorical features -> do feature encoding
-dataset = openml.datasets.get_dataset(17)
+dataset = openml.datasets.get_dataset(dataset_id="credit-g", version=1)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
     target=dataset.default_target_attribute
 )
