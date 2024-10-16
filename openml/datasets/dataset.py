@@ -329,13 +329,26 @@ class OpenMLDataset(OpenMLBase):
             "version",
             "upload_date",
             "url",
+            "_parquet_url",
             "dataset",
             "data_file",
+            "format",
+            "cache_format",
+        }
+
+        cache_fields = {
+            "_dataset",
+            "data_file",
+            "data_pickle_file",
+            "data_feather_file",
+            "feather_attribute_file",
+            "parquet_file",
         }
 
         # check that common keys and values are identical
-        self_keys = set(self.__dict__.keys()) - server_fields
-        other_keys = set(other.__dict__.keys()) - server_fields
+        ignore_fields = server_fields | cache_fields
+        self_keys = set(self.__dict__.keys()) - ignore_fields
+        other_keys = set(other.__dict__.keys()) - ignore_fields
         return self_keys == other_keys and all(
             self.__dict__[key] == other.__dict__[key] for key in self_keys
         )
