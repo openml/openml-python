@@ -78,7 +78,7 @@ def get_study(
     return study
 
 
-def _get_study(id_: int | str, entity_type: str) -> BaseStudy:  # noqa: C901
+def _get_study(id_: int | str, entity_type: str) -> BaseStudy:
     xml_string = openml._api_calls._perform_api_call(f"study/{id_}", "get")
     force_list_tags = (
         "oml:data_id",
@@ -92,12 +92,6 @@ def _get_study(id_: int | str, entity_type: str) -> BaseStudy:  # noqa: C901
     study_id = int(result_dict["oml:id"])
     alias = result_dict.get("oml:alias", None)
     main_entity_type = result_dict["oml:main_entity_type"]
-
-    # Parses edge cases where the server returns a string with a newline character for empty values.
-    none_value_indicator = "\n      "
-    for key in result_dict:
-        if result_dict[key] == none_value_indicator:
-            result_dict[key] = None
 
     if entity_type != main_entity_type:
         raise ValueError(

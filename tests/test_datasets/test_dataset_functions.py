@@ -1954,3 +1954,9 @@ def test_get_dataset_with_invalid_id() -> None:
     with pytest.raises(OpenMLServerNoResult, match="Unknown dataset") as e:
         openml.datasets.get_dataset(INVALID_ID)
         assert e.value.code == 111
+
+def test_read_features_from_xml_with_whitespace() -> None:
+    from openml.datasets.dataset import _read_features
+    features_file = Path(__file__).parent.parent / "files" / "misc" / "features_with_whitespaces.xml"
+    dict = _read_features(features_file)
+    assert dict[1].nominal_values == [" - 50000.", " 50000+."]
