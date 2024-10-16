@@ -265,7 +265,7 @@ def __list_setups(
     return setups
 
 
-def initialize_model(setup_id: int, *, strict_version: bool) -> Any:
+def initialize_model(setup_id: int, *, strict_version: bool = True) -> Any:
     """
     Initialized a model based on a setup_id (i.e., using the exact
     same parameter settings)
