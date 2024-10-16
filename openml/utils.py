@@ -238,9 +238,11 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
 
 
 def _list_all(  # noqa: C901
-    listing_call: Callable[P, _SizedT],
-    *args: P.args,
-    **filters: P.kwargs,
+    listing_call: Callable[[int, int], _SizedT],
+    *,
+    limit: int | None = None,
+    offset: int | None = None,
+    batch_size: int | None = 10_000,
 ) -> list[_SizedT]:
     """Helper to handle paged listing requests.
 
@@ -251,32 +253,35 @@ def _list_all(  # noqa: C901
     Parameters
     ----------
     listing_call : callable
-        Call listing, e.g. list_evaluations.
-    *args : Variable length argument list
-        Any required arguments for the listing call.
-    **filters : Arbitrary keyword arguments
-        Any filters that can be applied to the listing function.
-        additionally, the batch_size can be specified. This is
-        useful for testing purposes.
+        Call listing, e.g. list_evaluations. Takes two positional
+        arguments: batch_size and offset.
+    batch_size : int, optional
+        The batch size to use for the listing call.
+    offset : int, optional
+        The initial offset to use for the listing call.
+    limit : int, optional
+        The total size of the listing. If not provided, the function will
+        request the first batch and then continue until no more results are
+        returned
 
     Returns
     -------
-    List of types returned from the listing call
+    List of types returned from type of the listing call
     """
-    # eliminate filters that have a None value
-    active_filters = {key: value for key, value in filters.items() if value is not None}
     page = 0
     results: list[_SizedT] = []
+
+    LIMIT = limit
+    BATCH_SIZE_ORIG = batch_size
+    offset = offset if offset is not None else 0
+    batch_size = batch_size if batch_size is not None else 10_000
 
     # Default batch size per paging.
     # This one can be set in filters (batch_size), but should not be
     # changed afterwards. The derived batch_size can be changed.
-    BATCH_SIZE_ORIG = active_filters.pop("batch_size", 10000)
     if not isinstance(BATCH_SIZE_ORIG, int):
         raise ValueError(f"'batch_size' should be an integer but got {BATCH_SIZE_ORIG}")
 
-    # max number of results to be shown
-    LIMIT: int | float | None = active_filters.pop("size", None)  # type: ignore
     if (LIMIT is not None) and (not isinstance(LIMIT, int)) and (not np.isinf(LIMIT)):
         raise ValueError(f"'limit' should be an integer or inf but got {LIMIT}")
 
@@ -285,7 +290,6 @@ def _list_all(  # noqa: C901
     if LIMIT is not None and BATCH_SIZE_ORIG > LIMIT:
         BATCH_SIZE_ORIG = LIMIT
 
-    offset = active_filters.pop("offset", 0)
     if not isinstance(offset, int):
         raise ValueError(f"'offset' should be an integer but got {offset}")
 
@@ -293,10 +297,7 @@ def _list_all(  # noqa: C901
     while True:
         try:
             current_offset = offset + BATCH_SIZE_ORIG * page
-            new_batch = listing_call(
-                *args,
-                **{**active_filters, "limit": batch_size, "offset": current_offset},  # type: ignore
-            )
+            new_batch = listing_call(batch_size, current_offset)
         except openml.exceptions.OpenMLServerNoResult:
             # NOTE: This above statement may not actually happen, but we could just return here
             # to enforce it...

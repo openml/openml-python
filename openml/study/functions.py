@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import warnings
+from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
@@ -465,14 +466,13 @@ def list_suites(
         - creator
         - creation_date
     """
-    batches = openml.utils._list_all(
-        listing_call=_list_studies,
-        offset=offset,
-        size=size,
+    listing_call = partial(
+        _list_studies,
         main_entity_type="task",
         status=status,
         uploader=uploader,
     )
+    batches = openml.utils._list_all(listing_call, limit=size, offset=offset)
     return pd.concat(batches, ignore_index=True)
 
 
@@ -514,32 +514,35 @@ def list_studies(
         If qualities are calculated for the dataset, some of
         these are also returned.
     """
-    batches = openml.utils._list_all(
-        listing_call=_list_studies,
-        offset=offset,
-        size=size,
+    listing_call = partial(
+        _list_studies,
         main_entity_type="run",
         status=status,
         uploader=uploader,
         benchmark_suite=benchmark_suite,
     )
+    batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
     return pd.concat(batches, ignore_index=True)
 
 
-def _list_studies(**kwargs: Any) -> pd.DataFrame:
+def _list_studies(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
     """Perform api call to return a list of studies.
 
     Parameters
     ----------
+    limit: int
+        The maximum number of studies to return.
+    offset: int
+        The number of studies to skip, starting from the first.
     kwargs : dict, optional
         Legal filter operators (keys in the dict):
-        status, limit, offset, main_entity_type, uploader
+        status, main_entity_type, uploader, benchmark_suite
 
     Returns
     -------
     studies : dataframe
     """
-    api_call = "study/list"
+    api_call = f"study/list/limit/{limit}/offset/{offset}"
     if kwargs is not None:
         for operator, value in kwargs.items():
             api_call += f"/{operator}/{value}"

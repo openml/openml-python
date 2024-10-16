@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from functools import partial
 from itertools import chain
 from typing import Any
 from typing_extensions import Literal, overload
@@ -56,7 +57,7 @@ def list_evaluations(
 def list_evaluations(
     function: str,
     offset: int | None = None,
-    size: int | None = 10000,
+    size: int | None = None,
     tasks: list[str | int] | None = None,
     setups: list[str | int] | None = None,
     flows: list[str | int] | None = None,
@@ -118,11 +119,9 @@ def list_evaluations(
     if per_fold is not None:
         per_fold_str = str(per_fold).lower()
 
-    eval_collection: list[list[OpenMLEvaluation]] = openml.utils._list_all(
-        listing_call=_list_evaluations,
+    listing_call = partial(
+        _list_evaluations,
         function=function,
-        offset=offset,
-        size=size,
         tasks=tasks,
         setups=setups,
         flows=flows,
@@ -133,8 +132,9 @@ def list_evaluations(
         sort_order=sort_order,
         per_fold=per_fold_str,
     )
-    flattened = list(chain.from_iterable(eval_collection))
+    eval_collection = openml.utils._list_all(listing_call, offset=offset, limit=size)
 
+    flattened = list(chain.from_iterable(eval_collection))
     if output_format == "dataframe":
         records = [item._to_dict() for item in flattened]
         return pd.DataFrame.from_records(records, index="run_id")
@@ -143,6 +143,9 @@ def list_evaluations(
 
 
 def _list_evaluations(
+    limit: int,
+    offset: int,
+    *,
     function: str,
     tasks: list | None = None,
     setups: list | None = None,
@@ -161,6 +164,10 @@ def _list_evaluations(
     The arguments that are lists are separated from the single value
     ones which are put into the kwargs.
 
+    limit : int
+        the number of evaluations to return
+    offset : int
+        the number of evaluations to skip, starting from the first
     function : str
         the evaluation function. e.g., predictive_accuracy
 
@@ -178,7 +185,7 @@ def _list_evaluations(
     study : int, optional
 
     kwargs: dict, optional
-        Legal filter operators: tag, limit, offset.
+        Legal filter operators: tag, per_fold
 
     sort_order : str, optional
         order of sorting evaluations, ascending ("asc") or descending ("desc")
@@ -187,7 +194,7 @@ def _list_evaluations(
     -------
     list of OpenMLEvaluation objects
     """
-    api_call = f"evaluation/list/function/{function}"
+    api_call = f"evaluation/list/function/{function}/limit/{limit}/offset/{offset}"
     if kwargs is not None:
         for operator, value in kwargs.items():
             api_call += f"/{operator}/{value}"
@@ -202,7 +209,7 @@ def _list_evaluations(
     if uploaders is not None:
         api_call += "/uploader/{}".format(",".join([str(int(i)) for i in uploaders]))
     if study is not None:
-        api_call += "/study/%d" % study
+        api_call += f"/study/{study}"
     if sort_order is not None:
         api_call += f"/sort_order/{sort_order}"
 

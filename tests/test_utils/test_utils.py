@@ -115,7 +115,6 @@ def test_list_all_for_datasets(min_number_datasets_on_test_server):
     datasets = openml.datasets.list_datasets(
         batch_size=100,
         size=min_number_datasets_on_test_server,
-        output_format="dataframe",
     )
 
     assert min_number_datasets_on_test_server == len(datasets)

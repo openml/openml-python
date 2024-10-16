@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import warnings
 from collections import OrderedDict
+from functools import partial
 from pathlib import Path
 from pyexpat import ExpatError
 from typing import TYPE_CHECKING, Any
@@ -81,7 +82,12 @@ def list_datasets(
     size: int | None = None,
     status: str | None = None,
     tag: str | None = None,
-    **kwargs: Any,
+    data_name: str | None = None,
+    data_version: int | None = None,
+    number_instances: int | None = None,
+    number_features: int | None = None,
+    number_classes: int | None = None,
+    number_missing_values: int | None = None,
 ) -> pd.DataFrame:
     """Return a dataframe of all dataset which are on OpenML.
 
@@ -101,10 +107,12 @@ def list_datasets(
         default active datasets are returned, but also datasets
         from another status can be requested.
     tag : str, optional
-    kwargs : dict, optional
-        Legal filter operators (keys in the dict):
-        data_name, data_version, number_instances,
-        number_features, number_classes, number_missing_values.
+    data_name : str, optional
+    data_version : int, optional
+    number_instances : int, optional
+    number_features : int, optional
+    number_classes : int, optional
+    number_missing_values : int, optional
 
     Returns
     -------
@@ -118,19 +126,29 @@ def list_datasets(
         If qualities are calculated for the dataset, some of
         these are also included as columns.
     """
-    batches = openml.utils._list_all(
-        listing_call=_list_datasets,
+    listing_call = partial(
+        _list_datasets,
         data_id=data_id,
-        offset=offset,
-        size=size,
         status=status,
         tag=tag,
-        **kwargs,
+        data_name=data_name,
+        data_version=data_version,
+        number_instances=number_instances,
+        number_features=number_features,
+        number_classes=number_classes,
+        number_missing_values=number_missing_values,
     )
-    return pd.concat(batches, ignore_index=True)
+    batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
+    return pd.concat(batches)
 
 
-def _list_datasets(data_id: list[int] | None = None, **kwargs: Any) -> pd.DataFrame:
+def _list_datasets(
+    limit: int,
+    offset: int,
+    *,
+    data_id: list[int] | None = None,
+    **kwargs: Any,
+) -> pd.DataFrame:
     """
     Perform api call to return a list of all datasets.
 
@@ -141,6 +159,10 @@ def _list_datasets(data_id: list[int] | None = None, **kwargs: Any) -> pd.DataFr
     display_errors is also separated from the kwargs since it has a
     default value.
 
+    limit : int
+        The maximum number of datasets to show.
+    offset : int
+        The number of datasets to skip, starting from the first.
     data_id : list, optional
 
     kwargs : dict, optional
@@ -152,7 +174,7 @@ def _list_datasets(data_id: list[int] | None = None, **kwargs: Any) -> pd.DataFr
     -------
     datasets : dataframe
     """
-    api_call = "data/list"
+    api_call = f"data/list/list/{limit}/offset/{offset}"
 
     if kwargs is not None:
         for operator, value in kwargs.items():
@@ -242,12 +264,13 @@ def check_datasets_active(
     dict
         A dictionary with items {did: bool}
     """
-    datasets = list_datasets(status="all", data_id=dataset_ids, output_format="dataframe")
-    missing = set(dataset_ids) - set(datasets.get("did", []))
+    datasets = list_datasets(status="all", data_id=dataset_ids)
+    missing = set(dataset_ids) - set(datasets.index)
     if raise_error_if_not_exist and missing:
         missing_str = ", ".join(str(did) for did in missing)
         raise ValueError(f"Could not find dataset(s) {missing_str} in OpenML dataset list.")
-    return dict(datasets["status"] == "active")
+    mask = datasets["status"] == "active"
+    return dict(mask)
 
 
 def _name_to_id(
@@ -285,7 +308,6 @@ def _name_to_id(
         data_name=dataset_name,
         status=status,
         data_version=version,
-        output_format="dataframe",
     )
     if error_if_multiple and len(candidates) > 1:
         msg = f"Multiple active datasets exist with name '{dataset_name}'."

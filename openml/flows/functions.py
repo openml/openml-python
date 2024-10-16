@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import re
 from collections import OrderedDict
+from functools import partial
 from typing import Any, Dict
 
 import dateutil.parser
@@ -135,7 +136,7 @@ def list_flows(
     offset: int | None = None,
     size: int | None = None,
     tag: str | None = None,
-    **kwargs: Any,
+    uploader: str | None = None,
 ) -> pd.DataFrame:
     """
     Return a list of all flows which are on OpenML.
@@ -164,30 +165,29 @@ def list_flows(
             - external version
             - uploader
     """
-    batches = openml.utils._list_all(
-        listing_call=_list_flows,
-        offset=offset,
-        size=size,
-        tag=tag,
-        **kwargs,
-    )
+    listing_call = partial(_list_flows, tag=tag, uploader=uploader)
+    batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
     return pd.concat(batches, ignore_index=True)
 
 
-def _list_flows(**kwargs: Any) -> pd.DataFrame:
+def _list_flows(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
     """
     Perform the api call that return a list of all flows.
 
     Parameters
     ----------
+    limit : int
+        the maximum number of flows to return
+    offset : int
+        the number of flows to skip, starting from the first
     kwargs: dict, optional
-        Legal filter operators: uploader, tag, limit, offset.
+        Legal filter operators: uploader, tag
 
     Returns
     -------
     flows : dataframe
     """
-    api_call = "flow/list"
+    api_call = f"flow/list/limit/{limit}/offset/{offset}"
 
     if kwargs is not None:
         for operator, value in kwargs.items():

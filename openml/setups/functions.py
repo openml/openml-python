@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+from functools import partial
 from itertools import chain
 from pathlib import Path
 from typing import Any, Iterable
@@ -149,6 +150,7 @@ def list_setups(  # noqa: PLR0913
     output_format: str, optional (default='object')
         The parameter decides the format of the output.
         - If 'dataframe' the output is a pandas DataFrame
+        - If 'object' the output is a dictionary of OpenMLSetup objects
 
     Returns
     -------
@@ -159,15 +161,12 @@ def list_setups(  # noqa: PLR0913
             "Invalid output format selected. Only 'object', or 'dataframe' applicable.",
         )
 
-    batch_size = 1000  # batch size for setups is lower
+    listing_call = partial(_list_setups, flow=flow, tag=tag, setup=setup)
     batches = openml.utils._list_all(
-        listing_call=_list_setups,
+        listing_call,
+        batch_size=1_000,  # batch size for setups is lower
         offset=offset,
-        size=size,
-        flow=flow,
-        tag=tag,
-        setup=setup,
-        batch_size=batch_size,
+        limit=size,
     )
     flattened = list(chain.from_iterable(batches))
     if output_format == "object":
@@ -176,7 +175,14 @@ def list_setups(  # noqa: PLR0913
     return pd.DataFrame.from_records([setup._to_dict() for setup in flattened], index="setup_id")
 
 
-def _list_setups(setup: Iterable[int] | None = None, **kwargs: Any) -> list[OpenMLSetup]:
+def _list_setups(
+    limit: int,
+    offset: int,
+    *,
+    setup: Iterable[int] | None = None,
+    flow: int | None = None,
+    tag: str | None = None,
+) -> list[OpenMLSetup]:
     """Perform API call `/setup/list/{filters}`
 
     Parameters
@@ -184,21 +190,23 @@ def _list_setups(setup: Iterable[int] | None = None, **kwargs: Any) -> list[Open
     The setup argument that is a list is separated from the single value
     filters which are put into the kwargs.
 
+    limit : int
+    listing_offset : int
     setup : list(int), optional
-
-    kwargs: dict, optional
-        Legal filter operators: flow, setup, limit, offset, tag.
+    flow : int, optional
+    tag : str, optional
 
     Returns
     -------
     The setups that match the filters, going from id to the OpenMLSetup object.
     """
-    api_call = "setup/list"
+    api_call = f"setup/list/offset/{offset}/limit/{limit}"
     if setup is not None:
         api_call += "/setup/{}".format(",".join([str(int(i)) for i in setup]))
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            api_call += f"/{operator}/{value}"
+    if flow is not None:
+        api_call += f"/flow/{flow}"
+    if tag is not None:
+        api_call += f"/tag/{tag}"
 
     return __list_setups(api_call=api_call)
 

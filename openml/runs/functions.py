@@ -5,6 +5,7 @@ import itertools
 import time
 import warnings
 from collections import OrderedDict
+from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -447,8 +448,7 @@ def run_exists(task_id: int, setup_id: int) -> set[int]:
         return set()
 
     try:
-        result = list_runs(task=[task_id], setup=[setup_id], output_format="dataframe")
-        assert isinstance(result, pd.DataFrame)  # TODO(eddiebergman): Remove once #1299
+        result = list_runs(task=[task_id], setup=[setup_id])
         return set() if result.empty else set(result["run_id"])
     except OpenMLServerException as exception:
         # error code implies no results. The run does not exist yet
@@ -1033,10 +1033,10 @@ def list_runs(  # noqa: PLR0913
     tag: str | None = None,
     study: int | None = None,
     display_errors: bool = False,  # noqa: FBT001, FBT002
-    **kwargs: Any,
+    task_type: TaskType | int | None = None,
 ) -> pd.DataFrame:
-    """List all runs matching all of the given filters.
-
+    """
+    List all runs matching all of the given filters.
     (Supports large amount of results)
 
     Parameters
@@ -1064,8 +1064,7 @@ def list_runs(  # noqa: PLR0913
         Whether to list runs which have an error (for example a missing
         prediction file).
 
-    kwargs : dict, optional
-        Legal filter operators: task_type.
+    task_type : str, optional
 
     Returns
     -------
@@ -1082,10 +1081,8 @@ def list_runs(  # noqa: PLR0913
     if uploader is not None and (not isinstance(uploader, list)):
         raise TypeError("uploader must be of type list.")
 
-    batches = openml.utils._list_all(
-        listing_call=_list_runs,
-        offset=offset,
-        size=size,
+    listing_call = partial(
+        _list_runs,
         id=id,
         task=task,
         setup=setup,
@@ -1094,20 +1091,25 @@ def list_runs(  # noqa: PLR0913
         tag=tag,
         study=study,
         display_errors=display_errors,
-        **kwargs,
+        task_type=task_type,
     )
-    return pd.concat(batches, ignore_index=True)
+    batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
+    return pd.concat(batches)
 
 
 def _list_runs(  # noqa: PLR0913
+    limit: int,
+    offset: int,
+    *,
     id: list | None = None,  # noqa: A002
     task: list | None = None,
     setup: list | None = None,
     flow: list | None = None,
     uploader: list | None = None,
     study: int | None = None,
-    display_errors: bool = False,  # noqa: FBT002, FBT001
-    **kwargs: Any,
+    tag: str | None = None,
+    display_errors: bool = False,
+    task_type: TaskType | int | None = None,
 ) -> pd.DataFrame:
     """
     Perform API call `/run/list/{filters}'
@@ -1128,6 +1130,8 @@ def _list_runs(  # noqa: PLR0913
 
     flow : list, optional
 
+    tag: str, optional
+
     uploader : list, optional
 
     study : int, optional
@@ -1136,17 +1140,14 @@ def _list_runs(  # noqa: PLR0913
         Whether to list runs which have an error (for example a missing
         prediction file).
 
-    kwargs : dict, optional
-        Legal filter operators: task_type.
+    task_type : str, optional
 
     Returns
     -------
-    dataframe of found runs.
+    dict, or dataframe
+        List of found runs.
     """
-    api_call = "run/list"
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            api_call += f"/{operator}/{value}"
+    api_call = f"run/list/limit/{limit}/offset/{offset}"
     if id is not None:
         api_call += "/run/{}".format(",".join([str(int(i)) for i in id]))
     if task is not None:
@@ -1161,6 +1162,11 @@ def _list_runs(  # noqa: PLR0913
         api_call += "/study/%d" % study
     if display_errors:
         api_call += "/show_errors/true"
+    if tag is not None:
+        api_call += f"/tag/{tag}"
+    if task_type is not None:
+        tvalue = task_type.value if isinstance(task_type, TaskType) else task_type
+        api_call += f"/task_type/{tvalue}"
     return __list_runs(api_call=api_call)
 
 

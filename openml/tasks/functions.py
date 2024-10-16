@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import re
 import warnings
+from functools import partial
 from typing import Any
 
 import pandas as pd
@@ -125,12 +126,18 @@ def _get_estimation_procedure_list() -> list[dict[str, Any]]:
     return procs
 
 
-def list_tasks(
+def list_tasks(  # noqa: PLR0913
     task_type: TaskType | None = None,
     offset: int | None = None,
     size: int | None = None,
     tag: str | None = None,
-    **kwargs: Any,
+    data_tag: str | None = None,
+    status: str | None = None,
+    data_name: str | None = None,
+    number_instances: int | None = None,
+    number_features: int | None = None,
+    number_classes: int | None = None,
+    number_missing_values: int | None = None,
 ) -> pd.DataFrame:
     """
     Return a number of tasks having the given tag and task_type
@@ -140,18 +147,22 @@ def list_tasks(
     Filter task_type is separated from the other filters because
     it is used as task_type in the task description, but it is named
     type when used as a filter in list tasks call.
-    task_type : TaskType, optional
-        Refers to the type of task.
     offset : int, optional
         the number of tasks to skip, starting from the first
+    task_type : TaskType, optional
+        Refers to the type of task.
     size : int, optional
         the maximum number of tasks to show
     tag : str, optional
         the tag to include
-    kwargs: dict, optional
-        Legal filter operators: data_tag, status, data_id, data_name,
-        number_instances, number_features,
-        number_classes, number_missing_values.
+    data_tag : str, optional
+        the tag of the dataset
+    status : str, optional
+    data_name : str, optional
+    number_instances : int, optional
+    number_features : int, optional
+    number_classes : int, optional
+    number_missing_values : int, optional
 
     Returns
     -------
@@ -161,18 +172,29 @@ def list_tasks(
         as columns: task id, dataset id, task_type and status. If qualities are
         calculated for the associated dataset, some of these are also returned.
     """
-    batches = openml.utils._list_all(
-        listing_call=_list_tasks,
-        task_type=task_type,
-        offset=offset,
+    listing_call = partial(
+        _list_tasks,
         size=size,
+        task_type=task_type,
         tag=tag,
-        **kwargs,
+        data_tag=data_tag,
+        status=status,
+        data_name=data_name,
+        number_instances=number_instances,
+        number_features=number_features,
+        number_classes=number_classes,
+        number_missing_values=number_missing_values,
     )
+    batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
     return pd.concat(batches, ignore_index=True)
 
 
-def _list_tasks(task_type: TaskType | None = None, **kwargs: Any) -> pd.DataFrame:
+def _list_tasks(
+    limit: int,
+    offset: int,
+    task_type: TaskType | int | None = None,
+    **kwargs: Any,
+) -> pd.DataFrame:
     """
     Perform the api call to return a number of tasks having the given filters.
 
@@ -181,6 +203,8 @@ def _list_tasks(task_type: TaskType | None = None, **kwargs: Any) -> pd.DataFram
     Filter task_type is separated from the other filters because
     it is used as task_type in the task description, but it is named
     type when used as a filter in list tasks call.
+    limit: int
+    offset: int
     task_type : TaskType, optional
         Refers to the type of task.
     kwargs: dict, optional
@@ -192,9 +216,10 @@ def _list_tasks(task_type: TaskType | None = None, **kwargs: Any) -> pd.DataFram
     -------
     dataframe
     """
-    api_call = "task/list"
+    api_call = f"task/list/limit/{limit}/offset/{offset}"
     if task_type is not None:
-        api_call += "/type/%d" % task_type.value
+        tvalue = task_type.value if isinstance(task_type, TaskType) else task_type
+        api_call += f"/type/{tvalue}"
     if kwargs is not None:
         for operator, value in kwargs.items():
             if operator == "task_id":
