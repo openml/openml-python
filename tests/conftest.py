@@ -23,6 +23,7 @@ Possible Future: class TestBase from openml/testing.py can be included
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from collections.abc import Iterator
 import logging
 import os
 import shutil
@@ -228,7 +229,7 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
 
 def assert_static_test_cache_correct(root_dir: Path) -> None:
     for p in _expected_static_cache_state(root_dir):
-        assert p.exists(), f"Expected path {p} does not exist"
+        assert p.exists(), f"Expected path {p} exists"
 
 
 @pytest.fixture(scope="class")
@@ -236,25 +237,25 @@ def long_version(request):
     request.cls.long_version = request.config.getoption("--long")
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def test_files_directory() -> Path:
     return Path(__file__).parent / "files"
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def test_api_key() -> str:
     return "c0c42819af31e706efe1f4b88c23c6c1"
 
 
-@pytest.fixture(autouse=True)
-def verify_cache_state(test_files_directory) -> None:
+@pytest.fixture(autouse=True, scope="function")
+def verify_cache_state(test_files_directory) -> Iterator[None]:
     assert_static_test_cache_correct(test_files_directory)
     yield
     assert_static_test_cache_correct(test_files_directory)
 
 
-@pytest.fixture(autouse=True)
-def as_robot():
+@pytest.fixture(autouse=True, scope="session")
+def as_robot() -> Iterator[None]:
     policy = openml.config.retry_policy
     n_retries = openml.config.connection_n_retries
     openml.config.set_retry_policy("robot", n_retries=20)
@@ -262,7 +263,7 @@ def as_robot():
     openml.config.set_retry_policy(policy, n_retries)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True, scope="session")
 def with_test_server():
     openml.config.start_using_configuration_for_example()
     yield

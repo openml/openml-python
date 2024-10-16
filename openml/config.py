@@ -175,11 +175,11 @@ def get_server_base_url() -> str:
 apikey: str = _defaults["apikey"]
 show_progress: bool = _defaults["show_progress"]
 # The current cache directory (without the server name)
-_root_cache_directory = Path(_defaults["cachedir"])
+_root_cache_directory: Path = Path(_defaults["cachedir"])
 avoid_duplicate_runs = _defaults["avoid_duplicate_runs"]
 
-retry_policy = _defaults["retry_policy"]
-connection_n_retries = _defaults["connection_n_retries"]
+retry_policy: Literal["human", "robot"] = _defaults["retry_policy"]
+connection_n_retries: int = _defaults["connection_n_retries"]
 
 
 def set_retry_policy(value: Literal["human", "robot"], n_retries: int | None = None) -> None:
