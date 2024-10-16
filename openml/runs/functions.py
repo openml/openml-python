@@ -364,7 +364,7 @@ def get_run_trace(run_id: int) -> OpenMLRunTrace:
     return OpenMLRunTrace.trace_from_xml(trace_xml)
 
 
-def initialize_model_from_run(run_id: int) -> Any:
+def initialize_model_from_run(run_id: int, *, strict_version: bool = True) -> Any:
     """
     Initialized a model based on a run_id (i.e., using the exact
     same parameter settings)
@@ -373,6 +373,8 @@ def initialize_model_from_run(run_id: int) -> Any:
     ----------
     run_id : int
         The Openml run_id
+    strict_version: bool (default=True)
+        See `flow_to_model` strict_version.
 
     Returns
     -------
@@ -382,7 +384,7 @@ def initialize_model_from_run(run_id: int) -> Any:
     # TODO(eddiebergman): I imagine this is None if it's not published,
     # might need to raise an explicit error for that
     assert run.setup_id is not None
-    return initialize_model(run.setup_id)
+    return initialize_model(setup_id=run.setup_id, strict_version=strict_version)
 
 
 def initialize_model_from_trace(
