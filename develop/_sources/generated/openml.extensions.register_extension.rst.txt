@@ -1,0 +1,10 @@
+﻿:mod:`openml.extensions`.register_extension
+========================================================
+
+.. currentmodule:: openml.extensions
+
+.. autofunction:: register_extension
+
+.. raw:: html
+
+    <div class="clearer"></div>

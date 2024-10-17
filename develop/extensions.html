@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Extensions &#8212; OpenML 0.14.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=75e7b761"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="index.html">Start</a></li>
+                <li><a href="usage.html">User Guide</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="examples/index.html">Examples</a></li>
+                <li><a href="#">Extensions</a></li>
+                <li><a href="contributing.html">Contributing</a></li>
+                <li><a href="progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">Extensions</a><ul>
+<li><a class="reference internal" href="#list-of-extensions">List of extensions</a></li>
+<li><a class="reference internal" href="#connecting-new-machine-learning-libraries">Connecting new machine learning libraries</a><ul>
+<li><a class="reference internal" href="#content-of-the-library">Content of the Library</a><ul>
+<li><a class="reference internal" href="#api">API</a></li>
+<li><a class="reference internal" href="#interfacing-with-openml-python">Interfacing with OpenML-Python</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hosting-the-library">Hosting the library</a></li>
+<li><a class="reference internal" href="#recommended">Recommended</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <section id="extensions">
+<span id="id1"></span><h1>Extensions<a class="headerlink" href="#extensions" title="Permalink to this heading">¶</a></h1>
+<p>OpenML-Python provides an extension interface to connect other machine learning libraries than
+scikit-learn to OpenML. Please check the <a class="reference internal" href="api.html#api-extensions"><span class="std std-ref">Extensions</span></a> and use the
+scikit-learn extension in <a class="reference internal" href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension" title="openml.extensions.sklearn.SklearnExtension"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.extensions.sklearn.SklearnExtension</span></code></a> as a starting point.</p>
+<section id="list-of-extensions">
+<h2>List of extensions<a class="headerlink" href="#list-of-extensions" title="Permalink to this heading">¶</a></h2>
+<p>Here is a list of currently maintained OpenML extensions:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="generated/openml.extensions.sklearn.SklearnExtension.html#openml.extensions.sklearn.SklearnExtension" title="openml.extensions.sklearn.SklearnExtension"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.extensions.sklearn.SklearnExtension</span></code></a></p></li>
+<li><p><a class="reference external" href="https://github.com/openml/openml-keras">openml-keras</a></p></li>
+<li><p><a class="reference external" href="https://github.com/openml/openml-pytorch">openml-pytorch</a></p></li>
+<li><p><a class="reference external" href="https://github.com/openml/openml-tensorflow">openml-tensorflow (for tensorflow 2+)</a></p></li>
+</ul>
+</section>
+<section id="connecting-new-machine-learning-libraries">
+<h2>Connecting new machine learning libraries<a class="headerlink" href="#connecting-new-machine-learning-libraries" title="Permalink to this heading">¶</a></h2>
+<section id="content-of-the-library">
+<h3>Content of the Library<a class="headerlink" href="#content-of-the-library" title="Permalink to this heading">¶</a></h3>
+<p>To leverage support from the community and to tap in the potential of OpenML,
+interfacing with popular machine learning libraries is essential.
+The OpenML-Python package is capable of downloading meta-data and results (data,
+flows, runs), regardless of the library that was used to upload it.
+However, in order to simplify the process of uploading flows and runs from a
+specific library, an additional interface can be built.
+The OpenML-Python team does not have the capacity to develop and maintain such
+interfaces on its own. For this reason, we
+have built an extension interface to allows others to contribute back. Building a suitable
+extension for therefore requires an understanding of the current OpenML-Python support.</p>
+<p>The <a class="reference internal" href="examples/20_basic/simple_flows_and_runs_tutorial.html#sphx-glr-examples-20-basic-simple-flows-and-runs-tutorial-py"><span class="std std-ref">Flows and Runs</span></a> tutorial
+shows how scikit-learn currently works with OpenML-Python as an extension. The <em>sklearn</em>
+extension packaged with the <a class="reference external" href="https://github.com/openml/openml-python">openml-python</a>
+repository can be used as a template/benchmark to build the new extension.</p>
+<section id="api">
+<h4>API<a class="headerlink" href="#api" title="Permalink to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>The extension scripts must import the <cite>openml</cite> package and be able to interface with
+any function from the OpenML-Python <a class="reference internal" href="api.html#api"><span class="std std-ref">API</span></a>.</p></li>
+<li><p>The extension has to be defined as a Python class and must inherit from
+<a class="reference internal" href="generated/openml.extensions.Extension.html#openml.extensions.Extension" title="openml.extensions.Extension"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.extensions.Extension</span></code></a>.</p></li>
+<li><p>This class needs to have all the functions from <cite>class Extension</cite> overloaded as required.</p></li>
+<li><p>The redefined functions should have adequate and appropriate docstrings. The
+<cite>Sklearn Extension API :class:`openml.extensions.sklearn.SklearnExtension.html</cite>
+is a good example to follow.</p></li>
+</ul>
+</section>
+<section id="interfacing-with-openml-python">
+<h4>Interfacing with OpenML-Python<a class="headerlink" href="#interfacing-with-openml-python" title="Permalink to this heading">¶</a></h4>
+<p>Once the new extension class has been defined, the openml-python module to
+<a class="reference internal" href="generated/openml.extensions.register_extension.html#openml.extensions.register_extension" title="openml.extensions.register_extension"><code class="xref py py-meth docutils literal notranslate"><span class="pre">openml.extensions.register_extension()</span></code></a> must be called to allow OpenML-Python to
+interface the new extension.</p>
+<p>The following methods should get implemented. Although the documentation in
+the <cite>Extension</cite> interface should always be leading, here we list some additional
+information and best practices.
+The <cite>Sklearn Extension API :class:`openml.extensions.sklearn.SklearnExtension.html</cite>
+is a good example to follow. Note that most methods are relatively simple and can be implemented in several lines of code.</p>
+<ul class="simple">
+<li><p>General setup (required)</p>
+<ul>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">can_handle_flow()</span></code>: Takes as argument an OpenML flow, and checks
+whether this can be handled by the current extension. The OpenML database
+consists of many flows, from various workbenches (e.g., scikit-learn, Weka,
+mlr). This method is called before a model is being deserialized.
+Typically, the flow-dependency field is used to check whether the specific
+library is present, and no unknown libraries are present there.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">can_handle_model()</span></code>: Similar as <code class="xref py py-meth docutils literal notranslate"><span class="pre">can_handle_flow()</span></code>, except that
+in this case a Python object is given. As such, in many cases, this method
+can be implemented by checking whether this adheres to a certain base class.</p></li>
+</ul>
+</li>
+<li><p>Serialization and De-serialization (required)</p>
+<ul>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">flow_to_model()</span></code>: deserializes the OpenML Flow into a model (if the
+library can indeed handle the flow). This method has an important interplay
+with <code class="xref py py-meth docutils literal notranslate"><span class="pre">model_to_flow()</span></code>.
+Running these two methods in succession should result in exactly the same
+model (or flow). This property can be used for unit testing (e.g., build a
+model with hyperparameters, make predictions on a task, serialize it to a flow,
+deserialize it back, make it predict on the same task, and check whether the
+predictions are exactly the same.)
+The example in the scikit-learn interface might seem daunting, but note that
+here some complicated design choices were made, that allow for all sorts of
+interesting research questions. It is probably good practice to start easy.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">model_to_flow()</span></code>: The inverse of <code class="xref py py-meth docutils literal notranslate"><span class="pre">flow_to_model()</span></code>. Serializes a
+model into an OpenML Flow. The flow should preserve the class, the library
+version, and the tunable hyperparameters.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_version_information()</span></code>: Return a tuple with the version information
+of the important libraries.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_setup_string()</span></code>: No longer used, and will be deprecated soon.</p></li>
+</ul>
+</li>
+<li><p>Performing runs (required)</p>
+<ul>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_estimator()</span></code>: Gets as input a class, and checks whether it has the
+status of estimator in the library (typically, whether it has a train method
+and a predict method).</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">seed_model()</span></code>: Sets a random seed to the model.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">_run_model_on_fold()</span></code>: One of the main requirements for a library to
+generate run objects for the OpenML server. Obtains a train split (with
+labels) and a test split (without labels) and the goal is to train a model
+on the train split and return the predictions on the test split.
+On top of the actual predictions, also the class probabilities should be
+determined.
+For classifiers that do not return class probabilities, this can just be the
+hot-encoded predicted label.
+The predictions will be evaluated on the OpenML server.
+Also, additional information can be returned, for example, user-defined
+measures (such as runtime information, as this can not be inferred on the
+server).
+Additionally, information about a hyperparameter optimization trace can be
+provided.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">obtain_parameter_values()</span></code>: Obtains the hyperparameters of a given
+model and the current values. Please note that in the case of a hyperparameter
+optimization procedure (e.g., random search), you only should return the
+hyperparameters of this procedure (e.g., the hyperparameter grid, budget,
+etc) and that the chosen model will be inferred from the optimization trace.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_if_model_fitted()</span></code>: Check whether the train method of the model
+has been called (and as such, whether the predict method can be used).</p></li>
+</ul>
+</li>
+<li><p>Hyperparameter optimization (optional)</p>
+<ul>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">instantiate_model_from_hpo_class()</span></code>: If a given run has recorded the
+hyperparameter optimization trace, then this method can be used to
+reinstantiate the model with hyperparameters of a given hyperparameter
+optimization iteration. Has some similarities with <code class="xref py py-meth docutils literal notranslate"><span class="pre">flow_to_model()</span></code> (as
+this method also sets the hyperparameters of a model).
+Note that although this method is required, it is not necessary to implement
+any logic if hyperparameter optimization is not implemented. Simply raise
+a <cite>NotImplementedError</cite> then.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="hosting-the-library">
+<h3>Hosting the library<a class="headerlink" href="#hosting-the-library" title="Permalink to this heading">¶</a></h3>
+<p>Each extension created should be a stand-alone repository, compatible with the
+<a class="reference external" href="https://github.com/openml/openml-python">OpenML-Python repository</a>.
+The extension repository should work off-the-shelf with <em>OpenML-Python</em> installed.</p>
+<p>Create a <a class="reference external" href="https://docs.github.com/en/github/getting-started-with-github/create-a-repo">public Github repo</a>
+with the following directory structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="p">[</span><span class="n">repo</span> <span class="n">name</span><span class="p">]</span>
+<span class="o">|</span>    <span class="o">|--</span> <span class="p">[</span><span class="n">extension</span> <span class="n">name</span><span class="p">]</span>
+<span class="o">|</span>    <span class="o">|</span>    <span class="o">|--</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span>
+<span class="o">|</span>    <span class="o">|</span>    <span class="o">|--</span> <span class="n">extension</span><span class="o">.</span><span class="n">py</span>
+<span class="o">|</span>    <span class="o">|</span>    <span class="o">|--</span> <span class="n">config</span><span class="o">.</span><span class="n">py</span> <span class="p">(</span><span class="n">optionally</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="recommended">
+<h3>Recommended<a class="headerlink" href="#recommended" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Test cases to keep the extension up to date with the <cite>openml-python</cite> upstream changes.</p></li>
+<li><p>Documentation of the extension API, especially if any new functionality added to OpenML-Python’s
+extension design.</p></li>
+<li><p>Examples to show how the new extension interfaces and works with OpenML-Python.</p></li>
+<li><p>Create a PR to add the new extension to the OpenML-Python API documentation.</p></li>
+</ul>
+<p>Happy contributing!</p>
+</section>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

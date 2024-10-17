@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Benchmark studies &#8212; OpenML 0.14.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=75e7b761"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../index.html">Start</a></li>
+                <li><a href="../../usage.html">User Guide</a></li>
+                <li><a href="../../api.html">API</a></li>
+                <li><a href="../index.html">Examples</a></li>
+                <li><a href="../../extensions.html">Extensions</a></li>
+                <li><a href="../../contributing.html">Contributing</a></li>
+                <li><a href="../../progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">Benchmark studies</a><ul>
+<li><a class="reference internal" href="#listing-studies">Listing studies</a><ul>
+<li><a class="reference internal" href="#downloading-studies">Downloading studies</a></li>
+<li><a class="reference internal" href="#uploading-studies">Uploading studies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-examples-30-extended-study-tutorial-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="benchmark-studies">
+<span id="sphx-glr-examples-30-extended-study-tutorial-py"></span><h1>Benchmark studies<a class="headerlink" href="#benchmark-studies" title="Permalink to this heading">¶</a></h1>
+<p>How to list, download and upload benchmark studies.
+In contrast to <a class="reference external" href="https://docs.openml.org/benchmark/#benchmarking-suites">benchmark suites</a> which
+hold a list of tasks, studies hold a list of runs. As runs contain all information on flows and
+tasks, all required information about a study can be retrieved.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
+
+<span class="kn">import</span> <span class="nn">uuid</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+
+<span class="kn">import</span> <span class="nn">openml</span>
+</pre></div>
+</div>
+<section id="listing-studies">
+<h2>Listing studies<a class="headerlink" href="#listing-studies" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Use the output_format parameter to select output type</p></li>
+<li><p>Default gives <code class="docutils literal notranslate"><span class="pre">dict</span></code>, but we’ll use <code class="docutils literal notranslate"><span class="pre">dataframe</span></code> to obtain an
+easier-to-work-with data structure</p></li>
+</ul>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">studies</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">list_studies</span><span class="p">(</span><span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">studies</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>    id     alias main_entity_type  ...          status        creation_date creator
+1    1   Study_1              run  ...  in_preparation  2015-10-20 15:27:26       2
+2    2   Study_2              run  ...  in_preparation  2015-10-20 15:28:44       2
+3    3   Study_3              run  ...  in_preparation  2015-10-20 15:34:39       2
+5    5   Study_5              run  ...  in_preparation  2015-11-19 11:20:33     749
+7    7   Study_7              run  ...  in_preparation  2016-01-06 17:49:36      64
+8    8   Study_8              run  ...  in_preparation  2016-03-13 13:38:31    1135
+10  10  Study_10              run  ...  in_preparation  2016-03-16 12:16:08     507
+11  11  Study_11              run  ...  in_preparation  2016-03-22 16:48:06       1
+12  12  Study_12              run  ...  in_preparation  2016-03-31 15:05:45    1195
+13  13  Study_13              run  ...  in_preparation  2016-04-05 13:57:41      62
+
+[10 rows x 7 columns]
+</pre></div>
+</div>
+<section id="downloading-studies">
+<h3>Downloading studies<a class="headerlink" href="#downloading-studies" title="Permalink to this heading">¶</a></h3>
+<p>This is done based on the study ID.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">study</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">get_study</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">study</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OpenML Study
+============
+ID..............: 123
+Name............: Linear vs. Non Linear
+Status..........: active
+Main Entity Type: run
+Study URL.......: https://www.openml.org/s/123
+# of Data.......: 299
+# of Tasks......: 299
+# of Flows......: 5
+# of Runs.......: 1693
+Creator.........: https://www.openml.org/u/1
+Upload Time.....: 2019-02-21 19:55:30
+</pre></div>
+</div>
+<p>Studies also features a description:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">study</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Comparison of linear and non-linear models.
+
+[Jupyter Notebook](https://github.com/janvanrijn/linear-vs-non-linear/blob/master/notebook/Linear-vs-Non-Linear.ipynb)
+</pre></div>
+</div>
+<p>Studies are a container for runs:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">study</span><span class="o">.</span><span class="n">runs</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[9199877, 9199878, 9199879, 9199880, 9199881, 9199882, 9199883, 9199884, 9199885, 9199886, 9199887, 9199888, 9199889, 9199890, 9199891, 9199892, 9199893, 9199894, 9199895, 9199897, 9199898, 9199899, 9199900, 9199901, 9199902, 9199903, 9199904, 9199905, 9199906, 9199907, 9199908, 9199909, 9199910, 9199911, 9199912, 9199913, 9199914, 9199915, 9199916, 9199917, 9199918, 9199919, 9199920, 9199921, 9199922, 9199923, 9199924, 9199925, 9199926, 9199927, 9199928, 9199929, 9199930, 9199931, 9199932, 9199933, 9199934, 9199935, 9199936, 9199937, 9199938, 9199939, 9199940, 9199941, 9199942, 9199943, 9199944, 9199945, 9199946, 9199947, 9199948, 9199950, 9199951, 9199952, 9199953, 9199954, 9199955, 9199956, 9199957, 9199958, 9199959, 9199960, 9199961, 9199963, 9199964, 9199965, 9199966, 9199967, 9199968, 9199969, 9199970, 9199971, 9199972, 9199973, 9199974, 9199975, 9199976, 9199977, 9199978, 9199979, 9199981, 9199982, 9199983, 9199984, 9199985, 9199986, 9199987, 9199988, 9199989, 9199990, 9199991, 9199992, 9199993, 9199994, 9199995, 9199996, 9199997, 9199998, 9199999, 9200000, 9200001, 9200002, 9200003, 9200004, 9200006, 9200007, 9200008, 9200009, 9200010, 9200011, 9200012, 9200013, 9200014, 9200015, 9200016, 9200017, 9200018, 9200019, 9200020, 9200021, 9200022, 9200023, 9200024, 9200025, 9200026, 9200027, 9200028, 9200029, 9200030, 9200031, 9200032, 9200033, 9200034, 9200035, 9200036, 9200037, 9200038, 9200039, 9200040, 9200041, 9200042, 9200043, 9200044, 9200045, 9200046, 9200047, 9200048, 9200049, 9200050, 9200051, 9200052, 9200053, 9200054, 9200055, 9200056, 9200057, 9200058, 9200059, 9200060, 9200061, 9200062, 9200063, 9200064, 9200065, 9200066, 9200067, 9200068, 9200069, 9200070, 9200071, 9200072, 9200073, 9200074, 9200075, 9200076, 9200077, 9200078, 9200079, 9200080, 9200081, 9200082, 9200083, 9200084, 9200085, 9200086, 9200087, 9200088, 9200089, 9200090, 9200091, 9200092, 9200093, 9200094, 9200095, 9200096, 9200097, 9200098, 9200099, 9200100, 9200101, 9200102, 9200103, 9200104, 9200105, 9200106, 9200107, 9200108, 9200109, 9200110, 9200111, 9200112, 9200113, 9200114, 9200115, 9200116, 9200117, 9200118, 9200119, 9200120, 9200121, 9200122, 9200123, 9200124, 9200125, 9200126, 9200127, 9200128, 9200129, 9200130, 9200131, 9200132, 9200133, 9200134, 9200135, 9200136, 9200137, 9200138, 9200139, 9200140, 9200141, 9200142, 9200143, 9200144, 9200145, 9200146, 9200147, 9200148, 9200149, 9200150, 9200151, 9200152, 9200153, 9200154, 9200155, 9200156, 9200157, 9200158, 9200159, 9200160, 9200161, 9200162, 9200163, 9200164, 9200165, 9200166, 9200167, 9200168, 9200169, 9200171, 9200173, 9200174, 9200175, 9200176, 9200177, 9200178, 9200180, 9200181, 9200182, 9200183, 9200184, 9200185, 9200186, 9200187, 9200188, 9200189, 9200190, 9200191, 9200192, 9200193, 9200194, 9200195, 9200196, 9200197, 9200198, 9200199, 9200200, 9200201, 9200202, 9200203, 9200204, 9200205, 9200206, 9200207, 9200208, 9200209, 9200210, 9200211, 9200212, 9200213, 9200214, 9200215, 9200216, 9200217, 9200218, 9200219, 9200220, 9200221, 9200222, 9200223, 9200224, 9200225, 9200226, 9200227, 9200228, 9200229, 9200230, 9200231, 9200232, 9200233, 9200234, 9200235, 9200236, 9200237, 9200238, 9200239, 9200240, 9200241, 9200242, 9200243, 9200244, 9200245, 9200246, 9200247, 9200248, 9200249, 9200250, 9200251, 9200252, 9200253, 9200254, 9200255, 9200256, 9200257, 9200258, 9200259, 9200260, 9200261, 9200262, 9200263, 9200264, 9200265, 9200266, 9200267, 9200268, 9200269, 9200270, 9200271, 9200272, 9200273, 9200274, 9200275, 9200276, 9200277, 9200278, 9200279, 9200280, 9200281, 9200282, 9200283, 9200284, 9200285, 9200286, 9200287, 9200288, 9200289, 9200290, 9200291, 9200292, 9200293, 9200294, 9200295, 9200296, 9200297, 9200298, 9200299, 9200300, 9200301, 9200302, 9200303, 9200304, 9200305, 9200306, 9200307, 9200308, 9200310, 9200311, 9200312, 9200313, 9200314, 9200315, 9200316, 9200317, 9200318, 9200319, 9200320, 9200321, 9200322, 9200324, 9200325, 9200326, 9200327, 9200328, 9200329, 9200330, 9200331, 9200332, 9200333, 9200334, 9200335, 9200336, 9200337, 9200338, 9200339, 9200340, 9200341, 9200342, 9200343, 9200344, 9200345, 9200346, 9200347, 9200348, 9200349, 9200350, 9200351, 9200352, 9200353, 9200354, 9200355, 9200356, 9200357, 9200358, 9200359, 9200361, 9200362, 9200364, 9200365, 9200366, 9200367, 9200368, 9200369, 9200370, 9200371, 9200372, 9200373, 9200374, 9200375, 9200376, 9200377, 9200378, 9200379, 9200380, 9200382, 9200383, 9200384, 9200385, 9200386, 9200387, 9200388, 9200389, 9200390, 9200391, 9200392, 9200393, 9200394, 9200395, 9200396, 9200397, 9200398, 9200399, 9200400, 9200401, 9200402, 9200403, 9200404, 9200405, 9200406, 9200407, 9200408, 9200409, 9200410, 9200411, 9200412, 9200413, 9200414, 9200415, 9200416, 9200417, 9200418, 9200419, 9200420, 9200421, 9200422, 9200424, 9200425, 9200426, 9200427, 9200428, 9200429, 9200430, 9200431, 9200432, 9200433, 9200434, 9200435, 9200436, 9200437, 9200438, 9200439, 9200440, 9200441, 9200442, 9200443, 9200444, 9200445, 9200446, 9200447, 9200448, 9200449, 9200450, 9200451, 9200452, 9200453, 9200454, 9200455, 9200456, 9200457, 9200458, 9200459, 9200460, 9200461, 9200462, 9200463, 9200464, 9200465, 9200466, 9200467, 9200468, 9200469, 9200470, 9200471, 9200472, 9200473, 9200474, 9200475, 9200476, 9200477, 9200478, 9200479, 9200480, 9200481, 9200482, 9200483, 9200484, 9200485, 9200486, 9200487, 9200488, 9200489, 9200490, 9200491, 9200492, 9200493, 9200494, 9200495, 9200496, 9200497, 9200498, 9200499, 9200500, 9200501, 9200502, 9200503, 9200504, 9200505, 9200506, 9200507, 9200508, 9200509, 9200510, 9200511, 9200512, 9200513, 9200514, 9200515, 9200516, 9200517, 9200518, 9200519, 9200520, 9200521, 9200522, 9200523, 9200524, 9200525, 9200526, 9200527, 9200528, 9200529, 9200530, 9200531, 9200532, 9200533, 9200534, 9200535, 9200536, 9200537, 9200538, 9200539, 9200540, 9200541, 9200542, 9200543, 9200544, 9200545, 9200546, 9200547, 9200548, 9200549, 9200550, 9200551, 9200552, 9200553, 9200554, 9200555, 9200556, 9200557, 9200558, 9200559, 9200560, 9200561, 9200562, 9200563, 9200564, 9200565, 9200566, 9200567, 9200568, 9200569, 9200570, 9200571, 9200572, 9200573, 9200574, 9200575, 9200576, 9200577, 9200578, 9200579, 9200580, 9200581, 9200582, 9200583, 9200584, 9200585, 9200586, 9200587, 9200588, 9200589, 9200590, 9200591, 9200592, 9200593, 9200594, 9200595, 9200596, 9200597, 9200598, 9200599, 9200600, 9200601, 9200602, 9200603, 9200604, 9200605, 9200606, 9200607, 9200608, 9200609, 9200610, 9200611, 9200612, 9200613, 9200614, 9200615, 9200616, 9200617, 9200618, 9200619, 9200620, 9200621, 9200622, 9200623, 9200624, 9200625, 9200626, 9200627, 9200628, 9200629, 9200630, 9200631, 9200632, 9200633, 9200634, 9200635, 9200636, 9200637, 9200638, 9200639, 9200640, 9200641, 9200642, 9200643, 9200644, 9200645, 9200646, 9200647, 9200648, 9200649, 9200650, 9200651, 9200652, 9200653, 9200654, 9200655, 9200656, 9200657, 9200658, 9200659, 9200660, 9200661, 9200662, 9200663, 9200664, 9200665, 9200666, 9200667, 9200668, 9200669, 9200670, 9200671, 9200672, 9200673, 9200674, 9200675, 9200676, 9200677, 9200678, 9200679, 9200680, 9200681, 9200682, 9200683, 9200684, 9200685, 9200686, 9200687, 9200688, 9200689, 9200690, 9200691, 9200692, 9200693, 9200694, 9200695, 9200696, 9200697, 9200698, 9200699, 9200700, 9200701, 9200702, 9200703, 9200704, 9200705, 9200706, 9200707, 9200708, 9200709, 9200710, 9200711, 9200712, 9200713, 9200714, 9200715, 9200716, 9200717, 9200719, 9200720, 9200721, 9200722, 9200723, 9200724, 9200725, 9200726, 9200727, 9200728, 9200729, 9200730, 9200731, 9200732, 9200733, 9200734, 9200735, 9200736, 9200737, 9200738, 9200739, 9200740, 9200741, 9200742, 9200743, 9200744, 9200745, 9200746, 9200747, 9200748, 9200749, 9200750, 9200751, 9200752, 9200753, 9200754, 9200755, 9200756, 9200757, 9200758, 9200759, 9200760, 9200761, 9200762, 9200763, 9200764, 9200765, 9200766, 9200767, 9200768, 9200769, 9200770, 9200771, 9200772, 9200773, 9200774, 9200775, 9200776, 9200778, 9200779, 9200780, 9200781, 9200782, 9200783, 9200784, 9200785, 9200786, 9200787, 9200788, 9200789, 9200790, 9200791, 9200792, 9200793, 9200794, 9200795, 9200796, 9200797, 9200798, 9200799, 9200800, 9200801, 9200802, 9200803, 9200804, 9200806, 9200807, 9200808, 9200809, 9200810, 9200811, 9200812, 9200813, 9200814, 9200815, 9200816, 9200817, 9200818, 9200819, 9200820, 9200821, 9200822, 9200823, 9200824, 9200825, 9200826, 9200827, 9200828, 9200829, 9200830, 9200831, 9200832, 9200833, 9200834, 9200835, 9200836, 9200837, 9200838, 9200839, 9200840, 9200841, 9200842, 9200843, 9200844, 9200845, 9200846, 9200847, 9200848, 9200849, 9200850, 9200851, 9200852, 9200853, 9200854, 9200855, 9200856, 9200857, 9200858, 9200859, 9200860, 9200861, 9200862, 9200863, 9200864, 9200865, 9200866, 9200867, 9200868, 9200869, 9200870, 9200871, 9200872, 9200873, 9200874, 9200875, 9200876, 9200877, 9200878, 9200879, 9200880, 9200881, 9200882, 9200883, 9200884, 9200885, 9200886, 9200887, 9200888, 9200889, 9200890, 9200891, 9200892, 9200893, 9200894, 9200895, 9200896, 9200897, 9200898, 9200899, 9200900, 9200901, 9200902, 9200903, 9200904, 9200905, 9200906, 9200907, 9200908, 9200909, 9200910, 9200911, 9200912, 9200913, 9200914, 9200915, 9200916, 9200917, 9200918, 9200919, 9200920, 9200921, 9200922, 9200923, 9200924, 9200925, 9200926, 9200927, 9200928, 9200929, 9200930, 9200931, 9200932, 9200933, 9200934, 9200935, 9200936, 9200937, 9200938, 9200939, 9200940, 9200941, 9200942, 9200943, 9200944, 9200945, 9200946, 9200947, 9200948, 9200949, 9200950, 9200951, 9200952, 9200953, 9200954, 9200955, 9200956, 9200957, 9200958, 9200959, 9200960, 9200961, 9200962, 9200963, 9200964, 9200965, 9200966, 9200967, 9200968, 9200969, 9200970, 9200971, 9200972, 9200973, 9200974, 9200975, 9200976, 9200977, 9200978, 9200979, 9200980, 9200981, 9200982, 9200983, 9200984, 9200985, 9200986, 9200987, 9200988, 9200989, 9200990, 9200991, 9200993, 9200994, 9200995, 9200996, 9200997, 9200998, 9200999, 9201000, 9201001, 9201002, 9201003, 9201004, 9201005, 9201006, 9201007, 9201008, 9201009, 9201010, 9201011, 9201012, 9201013, 9201014, 9201015, 9201016, 9201017, 9201018, 9201019, 9201020, 9201021, 9201022, 9201023, 9201024, 9201025, 9201026, 9201027, 9201028, 9201029, 9201030, 9201031, 9201032, 9201033, 9201034, 9201035, 9201036, 9201037, 9201038, 9201039, 9201040, 9201041, 9201042, 9201043, 9201044, 9201045, 9201046, 9201047, 9201048, 9201049, 9201050, 9201051, 9201052, 9201053, 9201054, 9201055, 9201056, 9201057, 9201058, 9201059, 9201060, 9201061, 9201062, 9201063, 9201064, 9201065, 9201066, 9201067, 9201068, 9201069, 9201070, 9201071, 9201072, 9201073, 9201074, 9201075, 9201076, 9201077, 9201078, 9201079, 9201080, 9201081, 9201082, 9201083, 9201084, 9201085, 9201086, 9201087, 9201088, 9201089, 9201090, 9201091, 9201092, 9201093, 9201094, 9201095, 9201096, 9201097, 9201098, 9201099, 9201100, 9201101, 9201102, 9201103, 9201104, 9201105, 9201106, 9201107, 9201108, 9201109, 9201110, 9201111, 9201112, 9201113, 9201114, 9201115, 9201116, 9201117, 9201118, 9201119, 9201120, 9201121, 9201122, 9201124, 9201125, 9201126, 9201127, 9201128, 9201129, 9201130, 9201131, 9201132, 9201133, 9201134, 9201135, 9201136, 9201137, 9201138, 9201139, 9201140, 9201141, 9201142, 9201143, 9201144, 9201145, 9201146, 9201147, 9201148, 9201149, 9201150, 9201151, 9201152, 9201153, 9201154, 9201155, 9201156, 9201157, 9201158, 9201159, 9201160, 9201161, 9201162, 9201163, 9201164, 9201165, 9201166, 9201167, 9201168, 9201169, 9201170, 9201171, 9201172, 9201173, 9201174, 9201175, 9201176, 9201177, 9201178, 9201179, 9201180, 9201181, 9201182, 9201183, 9201184, 9201185, 9201186, 9201187, 9201188, 9201189, 9201190, 9201191, 9201192, 9201193, 9201194, 9201195, 9201196, 9201197, 9201198, 9201199, 9201200, 9201201, 9201202, 9201203, 9201204, 9201205, 9201206, 9201207, 9201208, 9201209, 9201210, 9201211, 9201212, 9201213, 9201214, 9201215, 9201216, 9201217, 9201218, 9201219, 9201220, 9201221, 9201222, 9201223, 9201224, 9201225, 9201226, 9201227, 9201228, 9201229, 9201230, 9201231, 9201232, 9201233, 9201234, 9201235, 9201236, 9201237, 9201238, 9201239, 9201240, 9201241, 9201242, 9201243, 9201244, 9201245, 9201246, 9201247, 9201248, 9201249, 9201250, 9201251, 9201252, 9201253, 9201254, 9201255, 9201256, 9201257, 9201258, 9201259, 9201260, 9201261, 9201262, 9201263, 9201264, 9201265, 9201266, 9201267, 9201268, 9201269, 9201270, 9201271, 9201272, 9201273, 9201274, 9201275, 9201276, 9201277, 9201278, 9201279, 9201280, 9201281, 9201282, 9201283, 9201284, 9201285, 9201286, 9201287, 9201288, 9201289, 9201290, 9201291, 9201292, 9201293, 9201294, 9201295, 9201296, 9201297, 9201298, 9201299, 9201300, 9201301, 9201302, 9201303, 9201304, 9201305, 9201306, 9201307, 9201308, 9201309, 9201310, 9201311, 9201312, 9201313, 9201314, 9201315, 9201316, 9201317, 9201318, 9201319, 9201320, 9201321, 9201322, 9201323, 9201324, 9201325, 9201326, 9201327, 9201328, 9201329, 9201330, 9201331, 9201332, 9201333, 9201334, 9201335, 9201336, 9201337, 9201338, 9201339, 9201340, 9201341, 9201342, 9201343, 9201344, 9201345, 9201346, 9201347, 9201348, 9201349, 9201350, 9201351, 9201352, 9201353, 9201354, 9201355, 9201356, 9201357, 9201358, 9201359, 9201360, 9201361, 9201362, 9201363, 9201364, 9201365, 9201366, 9201367, 9201368, 9201369, 9201370, 9201371, 9201372, 9201373, 9201374, 9201375, 9201376, 9201377, 9201378, 9201379, 9201380, 9201381, 9201382, 9201384, 9201385, 9201386, 9201387, 9201388, 9201389, 9201390, 9201391, 9201392, 9201393, 9201394, 9201395, 9201396, 9201397, 9201398, 9201399, 9201400, 9201401, 9201402, 9201403, 9201404, 9201405, 9201406, 9201407, 9201408, 9201409, 9201410, 9201411, 9201412, 9201413, 9201414, 9201415, 9201416, 9201417, 9201418, 9201419, 9201420, 9201422, 9201423, 9201424, 9201425, 9201426, 9201427, 9201428, 9201429, 9201430, 9201431, 9201432, 9201433, 9201434, 9201435, 9201436, 9201437, 9201438, 9201439, 9201440, 9201441, 9201442, 9201443, 9201444, 9201445, 9201446, 9201447, 9201448, 9201449, 9201450, 9201451, 9201452, 9201453, 9201454, 9201455, 9201456, 9201457, 9201458, 9201459, 9201460, 9201461, 9201462, 9201463, 9201464, 9201465, 9201466, 9201467, 9201468, 9201469, 9201470, 9201471, 9201472, 9201473, 9201474, 9201475, 9201476, 9201477, 9201478, 9201479, 9201480, 9201481, 9201482, 9201483, 9201484, 9201485, 9201486, 9201487, 9201488, 9201489, 9201490, 9201491, 9201492, 9201493, 9201494, 9201495, 9201496, 9201497, 9201498, 9201499, 9201500, 9201501, 9201502, 9201503, 9201504, 9201505, 9201506, 9201507, 9201508, 9201509, 9201510, 9201511, 9201512, 9201514, 9201515, 9201516, 9201517, 9201518, 9201519, 9201520, 9201521, 9201522, 9201523, 9201524, 9201525, 9201526, 9201527, 9201528, 9201529, 9201530, 9201531, 9201532, 9201533, 9201534, 9201535, 9201536, 9201537, 9201538, 9201539, 9201540, 9201541, 9201542, 9201543, 9201544, 9201545, 9201546, 9201547, 9201548, 9201549, 9201550, 9201551, 9201552, 9201553, 9201554, 9201555, 9201556, 9201557, 9201558, 9201559, 9201560, 9201561, 9201562, 9201563, 9201564, 9201565, 9201566, 9201567, 9201568, 9201569, 9201570, 9201571, 9201572, 9201573, 9201574, 9201575, 9201576, 9201577, 9201578, 9201579, 9201580, 9201581, 9201582, 9201583, 9201584, 9201585, 9201586, 9201587, 9201588, 9201589, 9201590, 9201591]
+</pre></div>
+</div>
+<p>And we can use the evaluation listing functionality to learn more about
+the evaluations available for the conducted runs:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">evaluations</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations</span><span class="p">(</span>
+    <span class="n">function</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">,</span>
+    <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">,</span>
+    <span class="n">study</span><span class="o">=</span><span class="n">study</span><span class="o">.</span><span class="n">study_id</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">evaluations</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>    run_id  task_id  setup_id  ...     value values  array_data
+0  9199877        3   7130157  ...  0.974969   None        None
+1  9199878        6   7130158  ...  0.716500   None        None
+2  9199879        6   7130159  ...  0.967200   None        None
+3  9199880       11   7130158  ...  0.886400   None        None
+4  9199881       11   7130159  ...  0.976000   None        None
+
+[5 rows x 14 columns]
+</pre></div>
+</div>
+<p>We’ll use the test server for the rest of this tutorial.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This example uploads data. For that reason, this example connects to the test server at test.openml.org.
+This prevents the main server from crowding with example datasets, tasks, runs, and so on.
+The use of this test server can affect behaviour and performance of the OpenML-Python API.</p>
+</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/examples/30_extended/study_tutorial.py:65: UserWarning: Switching to the test server https://test.openml.org/api/v1/xml to not upload results to the live server. Using the test server may result in reduced performance of the API!
+  openml.config.start_using_configuration_for_example()
+</pre></div>
+</div>
+</section>
+<section id="uploading-studies">
+<h3>Uploading studies<a class="headerlink" href="#uploading-studies" title="Permalink to this heading">¶</a></h3>
+<p>Creating a study is as simple as creating any kind of other OpenML entity.
+In this examples we’ll create a few runs for the OpenML-100 benchmark
+suite which is available on the OpenML test server.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Model to be used</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">()</span>
+
+<span class="c1"># We&#39;ll create a study with one run on 3 datasets present in the suite</span>
+<span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="mi">115</span><span class="p">,</span> <span class="mi">259</span><span class="p">,</span> <span class="mi">307</span><span class="p">]</span>
+
+<span class="c1"># To verify</span>
+<span class="n">suite</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">get_suite</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">all</span><span class="p">([</span><span class="n">t_id</span> <span class="ow">in</span> <span class="n">suite</span><span class="o">.</span><span class="n">tasks</span> <span class="k">for</span> <span class="n">t_id</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">]))</span>
+
+<span class="n">run_ids</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+    <span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
+    <span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+    <span class="n">run_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>
+
+<span class="c1"># The study needs a machine-readable and unique alias. To obtain this,</span>
+<span class="c1"># we simply generate a random uuid.</span>
+<span class="n">alias</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+
+<span class="n">new_study</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">create_study</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test-Study&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Test study for the Python tutorial on studies&quot;</span><span class="p">,</span>
+    <span class="n">run_ids</span><span class="o">=</span><span class="n">run_ids</span><span class="p">,</span>
+    <span class="n">alias</span><span class="o">=</span><span class="n">alias</span><span class="p">,</span>
+    <span class="n">benchmark_suite</span><span class="o">=</span><span class="n">suite</span><span class="o">.</span><span class="n">study_id</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">new_study</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">new_study</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>True
+/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sphinx_gallery/gen_rst.py:722: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  exec(self.code, self.fake_main.__dict__)
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/runs/run.py:650: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  predictions = arff.dumps(self._generate_arff_dict())
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sphinx_gallery/gen_rst.py:722: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  exec(self.code, self.fake_main.__dict__)
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/runs/run.py:650: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  predictions = arff.dumps(self._generate_arff_dict())
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sphinx_gallery/gen_rst.py:722: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  exec(self.code, self.fake_main.__dict__)
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/runs/run.py:650: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  predictions = arff.dumps(self._generate_arff_dict())
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+OpenML Study
+============
+ID..............: 724
+Name............: Test-Study
+Status..........: None
+Main Entity Type: run
+Study URL.......: https://test.openml.org/s/724
+# of Runs.......: 3
+</pre></div>
+</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_using_configuration_for_example</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (2 minutes 7.702 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-study-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/4ff7bd62b4b1b9012f431cd3c21d497d/study_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">study_tutorial.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/006bd0fc770c8918e54252890f1e023e/study_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">study_tutorial.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+﻿:mod:`openml.setups`.setup_exists
+==============================================
+
+.. currentmodule:: openml.setups
+
+.. autofunction:: setup_exists
+
+.. raw:: html
+
+    <div class="clearer"></div>

@@ -1,0 +1,10 @@
+﻿:mod:`openml.runs`.list_runs
+=========================================
+
+.. currentmodule:: openml.runs
+
+.. autofunction:: list_runs
+
+.. raw:: html
+
+    <div class="clearer"></div>

@@ -1,0 +1,10 @@
+﻿:mod:`openml.study`.detach_from_study
+==================================================
+
+.. currentmodule:: openml.study
+
+.. autofunction:: detach_from_study
+
+.. raw:: html
+
+    <div class="clearer"></div>

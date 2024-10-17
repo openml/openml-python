@@ -1,0 +1,10 @@
+﻿:mod:`openml.study`.delete_suite
+=============================================
+
+.. currentmodule:: openml.study
+
+.. autofunction:: delete_suite
+
+.. raw:: html
+
+    <div class="clearer"></div>

@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Measuring runtimes for Scikit-learn models &#8212; OpenML 0.14.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=75e7b761"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../index.html">Start</a></li>
+                <li><a href="../../usage.html">User Guide</a></li>
+                <li><a href="../../api.html">API</a></li>
+                <li><a href="../index.html">Examples</a></li>
+                <li><a href="../../extensions.html">Extensions</a></li>
+                <li><a href="../../contributing.html">Contributing</a></li>
+                <li><a href="../../progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">Measuring runtimes for Scikit-learn models</a><ul>
+<li><a class="reference internal" href="#preparing-tasks-and-scikit-learn-models">Preparing tasks and scikit-learn models</a></li>
+<li><a class="reference internal" href="#case-1-running-a-random-forest-model-on-an-openml-task">Case 1: Running a Random Forest model on an OpenML task</a></li>
+<li><a class="reference internal" href="#case-2-running-scikit-learn-model-on-an-openml-task-in-parallel">Case 2: Running Scikit-learn model on an OpenML task in parallel</a></li>
+<li><a class="reference internal" href="#case-3-running-and-benchmarking-hpo-algorithms-with-their-runtimes">Case 3: Running and benchmarking HPO algorithms with their runtimes</a></li>
+<li><a class="reference internal" href="#case-4-running-models-that-scikit-learn-doesn-t-parallelize">Case 4: Running models that scikit-learn doesn’t parallelize</a></li>
+<li><a class="reference internal" href="#case-5-running-scikit-learn-models-that-don-t-release-gil">Case 5: Running Scikit-learn models that don’t release GIL</a></li>
+<li><a class="reference internal" href="#summmary">Summmary</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-examples-30-extended-fetch-runtimes-tutorial-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="measuring-runtimes-for-scikit-learn-models">
+<span id="sphx-glr-examples-30-extended-fetch-runtimes-tutorial-py"></span><h1>Measuring runtimes for Scikit-learn models<a class="headerlink" href="#measuring-runtimes-for-scikit-learn-models" title="Permalink to this heading">¶</a></h1>
+<p>The runtime of machine learning models on specific datasets can be a deciding
+factor on the choice of algorithms, especially for benchmarking and comparison
+purposes. OpenML’s scikit-learn extension provides runtime data from runs of
+model fit and prediction on tasks or datasets, for both the CPU-clock as well
+as the actual wallclock-time incurred. The objective of this example is to
+illustrate how to retrieve such timing measures, and also offer some potential
+means of usage and interpretation of the same.</p>
+<p>It should be noted that there are multiple levels at which parallelism can occur.</p>
+<ul class="simple">
+<li><p>At the outermost level, OpenML tasks contain fixed data splits, on which the
+defined model/flow is executed. Thus, a model can be fit on each OpenML dataset fold
+in parallel using the <cite>n_jobs</cite> parameter to <cite>run_model_on_task</cite> or <cite>run_flow_on_task</cite>
+(illustrated under Case 2 &amp; 3 below).</p></li>
+<li><p>The model/flow specified can also include scikit-learn models that perform their own
+parallelization. For instance, by specifying <cite>n_jobs</cite> in a Random Forest model definition
+(covered under Case 2 below).</p></li>
+<li><p>The sklearn model can further be an HPO estimator and contain it’s own parallelization.
+If the base estimator used also supports <cite>parallelization</cite>, then there’s at least a 2-level nested
+definition for parallelization possible (covered under Case 3 below).</p></li>
+</ul>
+<p>We shall cover these 5 representative scenarios for:</p>
+<ul class="simple">
+<li><p>(Case 1) Retrieving runtimes for Random Forest training and prediction on each of the
+cross-validation folds</p></li>
+<li><p>(Case 2) Testing the above setting in a parallel setup and monitor the difference using
+runtimes retrieved</p></li>
+<li><p>(Case 3) Comparing RandomSearchCV and GridSearchCV on the above task based on runtimes</p></li>
+<li><p>(Case 4) Running models that don’t run in parallel or models which scikit-learn doesn’t
+parallelize</p></li>
+<li><p>(Case 5) Running models that do not release the Python Global Interpreter Lock (GIL)</p></li>
+</ul>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
+
+<span class="kn">import</span> <span class="nn">openml</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">joblib.parallel</span> <span class="kn">import</span> <span class="n">parallel_backend</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">GaussianNB</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.neural_network</span> <span class="kn">import</span> <span class="n">MLPClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span><span class="p">,</span> <span class="n">RandomizedSearchCV</span>
+</pre></div>
+</div>
+<section id="preparing-tasks-and-scikit-learn-models">
+<h2>Preparing tasks and scikit-learn models<a class="headerlink" href="#preparing-tasks-and-scikit-learn-models" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">167119</span>
+
+<span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+
+<span class="c1"># Viewing associated data</span>
+<span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">task_id</span><span class="p">,</span>
+        <span class="n">n_repeats</span><span class="p">,</span>
+        <span class="n">n_folds</span><span class="p">,</span>
+        <span class="n">n_samples</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+
+<span class="c1"># Creating utility function</span>
+<span class="k">def</span> <span class="nf">print_compare_runtimes</span><span class="p">(</span><span class="n">measures</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">val1</span> <span class="ow">in</span> <span class="n">measures</span><span class="p">[</span><span class="s2">&quot;usercpu_time_millis_training&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">fold</span><span class="p">,</span> <span class="n">val2</span> <span class="ow">in</span> <span class="n">val1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Repeat #</span><span class="si">{}</span><span class="s2">-Fold #</span><span class="si">{}</span><span class="s2">: CPU-</span><span class="si">{:.3f}</span><span class="s2"> vs Wall-</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">repeat</span><span class="p">,</span> <span class="n">fold</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">measures</span><span class="p">[</span><span class="s2">&quot;wall_clock_time_millis_training&quot;</span><span class="p">][</span><span class="n">repeat</span><span class="p">][</span><span class="n">fold</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sphinx_gallery/gen_rst.py:722: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  exec(self.code, self.fake_main.__dict__)
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+OpenML Classification Task
+==========================
+Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
+Task ID..............: 167119
+Task URL.............: https://www.openml.org/t/167119
+Estimation Procedure.: crossvalidation
+Target Feature.......: class
+# of Classes.........: 3
+Cost Matrix..........: Available
+Task 167119: number of repeats: 1, number of folds: 10, number of samples 1.
+</pre></div>
+</div>
+</section>
+<section id="case-1-running-a-random-forest-model-on-an-openml-task">
+<h2>Case 1: Running a Random Forest model on an OpenML task<a class="headerlink" href="#case-1-running-a-random-forest-model-on-an-openml-task" title="Permalink to this heading">¶</a></h2>
+<p>We’ll run a Random Forest model and obtain an OpenML run object. We can
+see the evaluations recorded per fold for the dataset and the information
+available for this run.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">run1</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">clf</span><span class="p">,</span>
+    <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+    <span class="n">upload_flow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">measures</span> <span class="o">=</span> <span class="n">run1</span><span class="o">.</span><span class="n">fold_evaluations</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The timing and performance metrics available: &quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">measures</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;The performance metric is recorded under `predictive_accuracy` per &quot;</span>
+    <span class="s2">&quot;fold and can be retrieved as: &quot;</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">val1</span> <span class="ow">in</span> <span class="n">measures</span><span class="p">[</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">fold</span><span class="p">,</span> <span class="n">val2</span> <span class="ow">in</span> <span class="n">val1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Repeat #</span><span class="si">{}</span><span class="s2">-Fold #</span><span class="si">{}</span><span class="s2">: </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">repeat</span><span class="p">,</span> <span class="n">fold</span><span class="p">,</span> <span class="n">val2</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+The timing and performance metrics available:
+usercpu_time_millis_training
+wall_clock_time_millis_training
+usercpu_time_millis_testing
+usercpu_time_millis
+wall_clock_time_millis_testing
+wall_clock_time_millis
+predictive_accuracy
+
+The performance metric is recorded under `predictive_accuracy` per fold and can be retrieved as:
+Repeat #0-Fold #0: 0.7769
+Repeat #0-Fold #1: 0.7755
+Repeat #0-Fold #2: 0.7793
+Repeat #0-Fold #3: 0.7825
+Repeat #0-Fold #4: 0.7869
+Repeat #0-Fold #5: 0.7851
+Repeat #0-Fold #6: 0.7677
+Repeat #0-Fold #7: 0.7791
+Repeat #0-Fold #8: 0.7816
+Repeat #0-Fold #9: 0.7833
+</pre></div>
+</div>
+<p>The remaining entries recorded in <cite>measures</cite> are the runtime records
+related as:</p>
+<p>usercpu_time_millis = usercpu_time_millis_training + usercpu_time_millis_testing</p>
+<p>wall_clock_time_millis = wall_clock_time_millis_training + wall_clock_time_millis_testing</p>
+<p>The timing measures recorded as <cite>*_millis_training</cite> contain the per
+repeat-per fold timing incurred for the execution of the <cite>.fit()</cite> procedure
+of the model. For <cite>usercpu_time_*</cite> the time recorded using <cite>time.process_time()</cite>
+is converted to <cite>milliseconds</cite> and stored. Similarly, <cite>time.time()</cite> is used
+to record the time entry for <cite>wall_clock_time_*</cite>. The <cite>*_millis_testing</cite> entry
+follows the same procedure but for time taken for the <cite>.predict()</cite> procedure.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Comparing the CPU and wall-clock training times of the Random Forest model</span>
+<span class="n">print_compare_runtimes</span><span class="p">(</span><span class="n">measures</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: CPU-241.702 vs Wall-241.704
+Repeat #0-Fold #1: CPU-242.939 vs Wall-242.973
+Repeat #0-Fold #2: CPU-240.666 vs Wall-240.716
+Repeat #0-Fold #3: CPU-242.129 vs Wall-241.758
+Repeat #0-Fold #4: CPU-244.191 vs Wall-244.194
+Repeat #0-Fold #5: CPU-243.434 vs Wall-243.438
+Repeat #0-Fold #6: CPU-244.936 vs Wall-244.985
+Repeat #0-Fold #7: CPU-246.774 vs Wall-245.595
+Repeat #0-Fold #8: CPU-242.642 vs Wall-242.644
+Repeat #0-Fold #9: CPU-242.131 vs Wall-242.157
+</pre></div>
+</div>
+</section>
+<section id="case-2-running-scikit-learn-model-on-an-openml-task-in-parallel">
+<h2>Case 2: Running Scikit-learn model on an OpenML task in parallel<a class="headerlink" href="#case-2-running-scikit-learn-model-on-an-openml-task-in-parallel" title="Permalink to this heading">¶</a></h2>
+<p>Redefining the model to allow parallelism with <cite>n_jobs=2</cite> (2 cores)</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">run2</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">clf</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">upload_flow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+<span class="n">measures</span> <span class="o">=</span> <span class="n">run2</span><span class="o">.</span><span class="n">fold_evaluations</span>
+<span class="c1"># The wall-clock time recorded per fold should be lesser than Case 1 above</span>
+<span class="n">print_compare_runtimes</span><span class="p">(</span><span class="n">measures</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+Repeat #0-Fold #0: CPU-280.316 vs Wall-173.149
+Repeat #0-Fold #1: CPU-279.312 vs Wall-164.204
+Repeat #0-Fold #2: CPU-268.563 vs Wall-154.057
+Repeat #0-Fold #3: CPU-257.682 vs Wall-154.390
+Repeat #0-Fold #4: CPU-271.761 vs Wall-154.153
+Repeat #0-Fold #5: CPU-262.257 vs Wall-153.550
+Repeat #0-Fold #6: CPU-253.686 vs Wall-153.747
+Repeat #0-Fold #7: CPU-258.001 vs Wall-153.761
+Repeat #0-Fold #8: CPU-254.586 vs Wall-153.902
+Repeat #0-Fold #9: CPU-256.080 vs Wall-154.194
+</pre></div>
+</div>
+<p>Running a Random Forest model on an OpenML task in parallel (all cores available):</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Redefining the model to use all available cores with `n_jobs=-1`</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">run3</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">clf</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">upload_flow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+<span class="n">measures</span> <span class="o">=</span> <span class="n">run3</span><span class="o">.</span><span class="n">fold_evaluations</span>
+<span class="c1"># The wall-clock time recorded per fold should be lesser than the case above,</span>
+<span class="c1"># if more than 2 CPU cores are available. The speed-up is more pronounced for</span>
+<span class="c1"># larger datasets.</span>
+<span class="n">print_compare_runtimes</span><span class="p">(</span><span class="n">measures</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+Repeat #0-Fold #0: CPU-310.636 vs Wall-119.380
+Repeat #0-Fold #1: CPU-314.176 vs Wall-123.328
+Repeat #0-Fold #2: CPU-308.787 vs Wall-122.381
+Repeat #0-Fold #3: CPU-307.092 vs Wall-119.504
+Repeat #0-Fold #4: CPU-315.243 vs Wall-119.981
+Repeat #0-Fold #5: CPU-309.822 vs Wall-122.295
+Repeat #0-Fold #6: CPU-311.892 vs Wall-122.719
+Repeat #0-Fold #7: CPU-315.177 vs Wall-118.659
+Repeat #0-Fold #8: CPU-309.139 vs Wall-121.321
+Repeat #0-Fold #9: CPU-311.637 vs Wall-123.200
+</pre></div>
+</div>
+<p>We can now observe that the ratio of CPU time to wallclock time is lower
+than in case 1. This happens because joblib by default spawns subprocesses
+for the workloads for which CPU time cannot be tracked. Therefore, interpreting
+the reported CPU and wallclock time requires knowledge of the parallelization
+applied at runtime.</p>
+<p>Running the same task with a different parallel backend. Joblib provides multiple
+backends: {<cite>loky</cite> (default), <cite>multiprocessing</cite>, <cite>dask</cite>, <cite>threading</cite>, <cite>sequential</cite>}.
+The backend can be explicitly set using a joblib context manager. The behaviour of
+the job distribution can change and therefore the scale of runtimes recorded too.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">parallel_backend</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">&quot;multiprocessing&quot;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">run3_</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">clf</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">upload_flow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+<span class="n">measures</span> <span class="o">=</span> <span class="n">run3_</span><span class="o">.</span><span class="n">fold_evaluations</span>
+<span class="n">print_compare_runtimes</span><span class="p">(</span><span class="n">measures</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+Repeat #0-Fold #0: CPU-373.340 vs Wall-342.905
+Repeat #0-Fold #1: CPU-368.424 vs Wall-345.541
+Repeat #0-Fold #2: CPU-370.444 vs Wall-326.346
+Repeat #0-Fold #3: CPU-375.756 vs Wall-420.972
+Repeat #0-Fold #4: CPU-338.597 vs Wall-328.869
+Repeat #0-Fold #5: CPU-369.475 vs Wall-358.184
+Repeat #0-Fold #6: CPU-365.052 vs Wall-373.937
+Repeat #0-Fold #7: CPU-372.496 vs Wall-357.847
+Repeat #0-Fold #8: CPU-340.695 vs Wall-209.654
+Repeat #0-Fold #9: CPU-347.011 vs Wall-184.322
+</pre></div>
+</div>
+<p>The CPU time interpretation becomes ambiguous when jobs are distributed over an
+unknown number of cores or when subprocesses are spawned for which the CPU time
+cannot be tracked, as in the examples above. It is impossible for OpenML-Python
+to capture the availability of the number of cores/threads, their eventual
+utilisation and whether workloads are executed in subprocesses, for various
+cases that can arise as demonstrated in the rest of the example. Therefore,
+the final interpretation of the runtimes is left to the <cite>user</cite>.</p>
+</section>
+<section id="case-3-running-and-benchmarking-hpo-algorithms-with-their-runtimes">
+<h2>Case 3: Running and benchmarking HPO algorithms with their runtimes<a class="headerlink" href="#case-3-running-and-benchmarking-hpo-algorithms-with-their-runtimes" title="Permalink to this heading">¶</a></h2>
+<p>We shall now optimize a similar RandomForest model for the same task using
+scikit-learn’s HPO support by using GridSearchCV to optimize our earlier
+RandomForest model’s hyperparameter <cite>n_estimators</cite>. Scikit-learn also provides a
+<cite>refit_time_</cite> for such HPO models, i.e., the time incurred by training
+and evaluating the model on the best found parameter setting. This is
+included in the <cite>wall_clock_time_millis_training</cite> measure recorded.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+
+
+<span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># GridSearchCV model</span>
+<span class="n">n_iter</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">grid_pipe</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span>
+    <span class="n">estimator</span><span class="o">=</span><span class="n">clf</span><span class="p">,</span>
+    <span class="n">param_grid</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">n_iter</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()},</span>
+    <span class="n">cv</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">run4</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">grid_pipe</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">upload_flow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+<span class="n">measures</span> <span class="o">=</span> <span class="n">run4</span><span class="o">.</span><span class="n">fold_evaluations</span>
+<span class="n">print_compare_runtimes</span><span class="p">(</span><span class="n">measures</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+Repeat #0-Fold #0: CPU-6642.962 vs Wall-3662.938
+Repeat #0-Fold #1: CPU-6582.635 vs Wall-3632.254
+Repeat #0-Fold #2: CPU-6257.806 vs Wall-3509.633
+Repeat #0-Fold #3: CPU-5854.549 vs Wall-3252.134
+Repeat #0-Fold #4: CPU-5813.369 vs Wall-3222.948
+Repeat #0-Fold #5: CPU-6020.860 vs Wall-3312.617
+Repeat #0-Fold #6: CPU-6508.397 vs Wall-3684.651
+Repeat #0-Fold #7: CPU-6539.888 vs Wall-3733.629
+Repeat #0-Fold #8: CPU-6538.228 vs Wall-3674.414
+Repeat #0-Fold #9: CPU-6440.314 vs Wall-3656.739
+</pre></div>
+</div>
+<p>Like any optimisation problem, scikit-learn’s HPO estimators also generate
+a sequence of configurations which are evaluated, using which the best found
+configuration is tracked throughout the trace.
+The OpenML run object stores these traces as OpenMLRunTrace objects accessible
+using keys of the pattern (repeat, fold, iterations). Here <cite>fold</cite> implies the
+outer-cross validation fold as obtained from the task data splits in OpenML.
+GridSearchCV here performs grid search over the inner-cross validation folds as
+parameterized by the <cite>cv</cite> parameter. Since <cite>GridSearchCV</cite> in this example performs a
+<cite>2-fold</cite> cross validation, the runtime recorded per repeat-per fold in the run object
+is for the entire <cite>fit()</cite> procedure of GridSearchCV thus subsuming the runtimes of
+the 2-fold (inner) CV search performed.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># We earlier extracted the number of repeats and folds for this task:</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;# repeats: </span><span class="si">{}</span><span class="se">\n</span><span class="s2"># folds: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">))</span>
+
+<span class="c1"># To extract the training runtime of the first repeat, first fold:</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">run4</span><span class="o">.</span><span class="n">fold_evaluations</span><span class="p">[</span><span class="s2">&quot;wall_clock_time_millis_training&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span># repeats: 1
+# folds: 10
+3662.937879562378
+</pre></div>
+</div>
+<p>To extract the training runtime of the 1-st repeat, 4-th (outer) fold and also
+to fetch the parameters and performance of the evaluations made during
+the 1-st repeat, 4-th fold evaluation by the Grid Search model.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">_repeat</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">_fold</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Total runtime for repeat </span><span class="si">{}</span><span class="s2">&#39;s fold </span><span class="si">{}</span><span class="s2">: </span><span class="si">{:4f}</span><span class="s2"> ms&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">_repeat</span><span class="p">,</span> <span class="n">_fold</span><span class="p">,</span> <span class="n">run4</span><span class="o">.</span><span class="n">fold_evaluations</span><span class="p">[</span><span class="s2">&quot;wall_clock_time_millis_training&quot;</span><span class="p">][</span><span class="n">_repeat</span><span class="p">][</span><span class="n">_fold</span><span class="p">]</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">_repeat</span><span class="p">,</span> <span class="n">_fold</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">run4</span><span class="o">.</span><span class="n">trace</span><span class="o">.</span><span class="n">trace_iterations</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;n_estimators: </span><span class="si">{:&gt;2}</span><span class="s2"> - score: </span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;parameter_n_estimators&quot;</span><span class="p">],</span> <span class="n">r</span><span class="o">.</span><span class="n">evaluation</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Total runtime for repeat 0&#39;s fold 3: 3252.134085 ms
+n_estimators:  1 - score: 0.768
+n_estimators: 13 - score: 0.801
+n_estimators: 25 - score: 0.803
+n_estimators: 37 - score: 0.803
+n_estimators: 50 - score: 0.801
+</pre></div>
+</div>
+<p>Scikit-learn’s HPO estimators also come with an argument <cite>refit=True</cite> as a default.
+In our previous model definition it was set to True by default, which meant that the best
+found hyperparameter configuration was used to refit or retrain the model without any inner
+cross validation. This extra refit time measure is provided by the scikit-learn model as the
+attribute <cite>refit_time_</cite>.
+This time is included in the <cite>wall_clock_time_millis_training</cite> measure.</p>
+<p>For non-HPO estimators, <cite>wall_clock_time_millis = wall_clock_time_millis_training + wall_clock_time_millis_testing</cite>.</p>
+<p>For HPO estimators, <cite>wall_clock_time_millis = wall_clock_time_millis_training + wall_clock_time_millis_testing + refit_time</cite>.</p>
+<p>This refit time can therefore be explicitly extracted in this manner:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">extract_refit_time</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">fold</span><span class="p">):</span>
+    <span class="n">refit_time</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">run</span><span class="o">.</span><span class="n">fold_evaluations</span><span class="p">[</span><span class="s2">&quot;wall_clock_time_millis&quot;</span><span class="p">][</span><span class="n">repeat</span><span class="p">][</span><span class="n">fold</span><span class="p">]</span>
+        <span class="o">-</span> <span class="n">run</span><span class="o">.</span><span class="n">fold_evaluations</span><span class="p">[</span><span class="s2">&quot;wall_clock_time_millis_training&quot;</span><span class="p">][</span><span class="n">repeat</span><span class="p">][</span><span class="n">fold</span><span class="p">]</span>
+        <span class="o">-</span> <span class="n">run</span><span class="o">.</span><span class="n">fold_evaluations</span><span class="p">[</span><span class="s2">&quot;wall_clock_time_millis_testing&quot;</span><span class="p">][</span><span class="n">repeat</span><span class="p">][</span><span class="n">fold</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">refit_time</span>
+
+
+<span class="k">for</span> <span class="n">repeat</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">fold</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Repeat #</span><span class="si">{}</span><span class="s2">-Fold #</span><span class="si">{}</span><span class="s2">: </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">repeat</span><span class="p">,</span> <span class="n">fold</span><span class="p">,</span> <span class="n">extract_refit_time</span><span class="p">(</span><span class="n">run4</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">fold</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0-Fold #0: 813.3802
+Repeat #0-Fold #1: 791.4357
+Repeat #0-Fold #2: 644.0177
+Repeat #0-Fold #3: 435.5114
+Repeat #0-Fold #4: 411.6311
+Repeat #0-Fold #5: 574.0488
+Repeat #0-Fold #6: 802.5000
+Repeat #0-Fold #7: 794.1074
+Repeat #0-Fold #8: 794.4789
+Repeat #0-Fold #9: 741.7681
+</pre></div>
+</div>
+<p>Along with the GridSearchCV already used above, we demonstrate how such
+optimisation traces can be retrieved by showing an application of these
+traces - comparing the speed of finding the best configuration using
+RandomizedSearchCV and GridSearchCV available with scikit-learn.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># RandomizedSearchCV model</span>
+<span class="n">rs_pipe</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span>
+    <span class="n">estimator</span><span class="o">=</span><span class="n">clf</span><span class="p">,</span>
+    <span class="n">param_distributions</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="p">},</span>
+    <span class="n">cv</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">n_iter</span><span class="o">=</span><span class="n">n_iter</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">run5</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">rs_pipe</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">upload_flow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+</pre></div>
+</div>
+<p>Since for the call to <code class="docutils literal notranslate"><span class="pre">openml.runs.run_model_on_task</span></code> the parameter
+<code class="docutils literal notranslate"><span class="pre">n_jobs</span></code> is set to its default <code class="docutils literal notranslate"><span class="pre">None</span></code>, the evaluations across the OpenML folds
+are not parallelized. Hence, the time recorded is agnostic to the <code class="docutils literal notranslate"><span class="pre">n_jobs</span></code>
+being set at both the HPO estimator <code class="docutils literal notranslate"><span class="pre">GridSearchCV</span></code> as well as the base
+estimator <code class="docutils literal notranslate"><span class="pre">RandomForestClassifier</span></code> in this case. The OpenML extension only records the
+time taken for the completion of the complete <code class="docutils literal notranslate"><span class="pre">fit()</span></code> call, per-repeat per-fold.</p>
+<p>This notion can be used to extract and plot the best found performance per
+fold by the HPO model and the corresponding time taken for search across
+that fold. Moreover, since <code class="docutils literal notranslate"><span class="pre">n_jobs=None</span></code> for <code class="docutils literal notranslate"><span class="pre">openml.runs.run_model_on_task</span></code>
+the runtimes per fold can be cumulatively added to plot the trace against time.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">extract_trace_data</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_iter</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;wall_clock_time_millis_training&quot;</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">key</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;runtime&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="k">for</span> <span class="n">i_r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i_f</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;runtime&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">fold_evaluations</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i_r</span><span class="p">][</span><span class="n">i_f</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">trace</span><span class="o">.</span><span class="n">trace_iterations</span><span class="p">[(</span><span class="n">i_r</span><span class="p">,</span> <span class="n">i_f</span><span class="p">,</span> <span class="n">i_i</span><span class="p">)]</span>
+                <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">selected</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">evaluation</span><span class="p">)</span>
+                    <span class="k">break</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+
+<span class="k">def</span> <span class="nf">get_incumbent_trace</span><span class="p">(</span><span class="n">trace</span><span class="p">):</span>
+    <span class="n">best_score</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">inc_trace</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trace</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">best_score</span><span class="p">:</span>
+            <span class="n">best_score</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">r</span>
+        <span class="n">inc_trace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">best_score</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">inc_trace</span>
+
+
+<span class="n">grid_data</span> <span class="o">=</span> <span class="n">extract_trace_data</span><span class="p">(</span><span class="n">run4</span><span class="p">,</span> <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_iter</span><span class="p">)</span>
+<span class="n">rs_data</span> <span class="o">=</span> <span class="n">extract_trace_data</span><span class="p">(</span><span class="n">run5</span><span class="p">,</span> <span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_iter</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">grid_data</span><span class="p">[</span><span class="s2">&quot;runtime&quot;</span><span class="p">]),</span> <span class="n">get_incumbent_trace</span><span class="p">(</span><span class="n">grid_data</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">]),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Grid Search&quot;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">rs_data</span><span class="p">[</span><span class="s2">&quot;runtime&quot;</span><span class="p">]),</span> <span class="n">get_incumbent_trace</span><span class="p">(</span><span class="n">rs_data</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">]),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Random Search&quot;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Wallclock time (in milliseconds)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;1 - Accuracy&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Optimisation Trace Comparison&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_fetch_runtimes_tutorial_001.png" srcset="../../_images/sphx_glr_fetch_runtimes_tutorial_001.png" alt="Optimisation Trace Comparison" class = "sphx-glr-single-img"/></section>
+<section id="case-4-running-models-that-scikit-learn-doesn-t-parallelize">
+<h2>Case 4: Running models that scikit-learn doesn’t parallelize<a class="headerlink" href="#case-4-running-models-that-scikit-learn-doesn-t-parallelize" title="Permalink to this heading">¶</a></h2>
+<p>Both scikit-learn and OpenML depend on parallelism implemented through <cite>joblib</cite>.
+However, there can be cases where either models cannot be parallelized or don’t
+depend on joblib for its parallelism. 2 such cases are illustrated below.</p>
+<p>Running a Decision Tree model that doesn’t support parallelism implicitly, but
+using OpenML to parallelize evaluations for the outer-cross validation folds.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">()</span>
+
+<span class="n">run6</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">upload_flow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+<span class="n">measures</span> <span class="o">=</span> <span class="n">run6</span><span class="o">.</span><span class="n">fold_evaluations</span>
+<span class="n">print_compare_runtimes</span><span class="p">(</span><span class="n">measures</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+Repeat #0-Fold #0: CPU-84.494 vs Wall-84.495
+Repeat #0-Fold #1: CPU-82.977 vs Wall-82.979
+Repeat #0-Fold #2: CPU-84.834 vs Wall-84.835
+Repeat #0-Fold #3: CPU-82.982 vs Wall-82.983
+Repeat #0-Fold #4: CPU-87.165 vs Wall-87.166
+Repeat #0-Fold #5: CPU-82.351 vs Wall-82.354
+Repeat #0-Fold #6: CPU-86.009 vs Wall-86.023
+Repeat #0-Fold #7: CPU-84.350 vs Wall-84.352
+Repeat #0-Fold #8: CPU-82.931 vs Wall-82.941
+Repeat #0-Fold #9: CPU-84.048 vs Wall-84.062
+</pre></div>
+</div>
+<p>Although the decision tree does not run in parallel, it can release the
+<a class="reference external" href="https://docs.python.org/dev/glossary.html#term-global-interpreter-lock">Python GIL</a>.
+This can result in surprising runtime measures as demonstrated below:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">parallel_backend</span><span class="p">(</span><span class="s2">&quot;threading&quot;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">run7</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">upload_flow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+<span class="n">measures</span> <span class="o">=</span> <span class="n">run7</span><span class="o">.</span><span class="n">fold_evaluations</span>
+<span class="n">print_compare_runtimes</span><span class="p">(</span><span class="n">measures</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+Repeat #0-Fold #0: CPU-374.032 vs Wall-151.555
+Repeat #0-Fold #1: CPU-353.557 vs Wall-166.714
+Repeat #0-Fold #2: CPU-326.556 vs Wall-140.154
+Repeat #0-Fold #3: CPU-353.765 vs Wall-133.221
+Repeat #0-Fold #4: CPU-356.343 vs Wall-171.075
+Repeat #0-Fold #5: CPU-367.270 vs Wall-170.880
+Repeat #0-Fold #6: CPU-308.771 vs Wall-116.285
+Repeat #0-Fold #7: CPU-300.280 vs Wall-100.170
+Repeat #0-Fold #8: CPU-138.429 vs Wall-81.188
+Repeat #0-Fold #9: CPU-152.551 vs Wall-99.461
+</pre></div>
+</div>
+<p>Running a Neural Network from scikit-learn that uses scikit-learn independent
+parallelism using libraries such as <a class="reference external" href="https://scikit-learn.org/stable/computing/parallelism.html#parallel-numpy-and-scipy-routines-from-numerical-libraries">MKL, OpenBLAS or BLIS</a>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mlp</span> <span class="o">=</span> <span class="n">MLPClassifier</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">run8</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">mlp</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">upload_flow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+<span class="n">measures</span> <span class="o">=</span> <span class="n">run8</span><span class="o">.</span><span class="n">fold_evaluations</span>
+<span class="n">print_compare_runtimes</span><span class="p">(</span><span class="n">measures</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+  warnings.warn(
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+  warnings.warn(
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+  warnings.warn(
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+  warnings.warn(
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+  warnings.warn(
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+  warnings.warn(
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+  warnings.warn(
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+  warnings.warn(
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+  warnings.warn(
+/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+/home/runner/work/openml-python/openml-python/openml/runs/functions.py:789: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  openml.datasets.get_dataset(task.dataset_id).name,
+/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sklearn/neural_network/_multilayer_perceptron.py:691: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (10) reached and the optimization hasn&#39;t converged yet.
+  warnings.warn(
+Repeat #0-Fold #0: CPU-923.161 vs Wall-923.203
+Repeat #0-Fold #1: CPU-1257.534 vs Wall-970.528
+Repeat #0-Fold #2: CPU-1255.577 vs Wall-970.433
+Repeat #0-Fold #3: CPU-1251.327 vs Wall-967.218
+Repeat #0-Fold #4: CPU-1248.365 vs Wall-965.516
+Repeat #0-Fold #5: CPU-1249.045 vs Wall-963.282
+Repeat #0-Fold #6: CPU-1251.485 vs Wall-964.912
+Repeat #0-Fold #7: CPU-1260.374 vs Wall-974.327
+Repeat #0-Fold #8: CPU-1251.281 vs Wall-964.823
+Repeat #0-Fold #9: CPU-1253.467 vs Wall-968.337
+</pre></div>
+</div>
+</section>
+<section id="case-5-running-scikit-learn-models-that-don-t-release-gil">
+<h2>Case 5: Running Scikit-learn models that don’t release GIL<a class="headerlink" href="#case-5-running-scikit-learn-models-that-don-t-release-gil" title="Permalink to this heading">¶</a></h2>
+<p>Certain Scikit-learn models do not release the <a class="reference external" href="https://docs.python.org/dev/glossary.html#term-global-interpreter-lock">Python GIL</a> and
+are also not executed in parallel via a BLAS library. In such cases, the
+CPU times and wallclock times are most likely trustworthy. Note however
+that only very few models such as naive Bayes models are of this kind.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">GaussianNB</span><span class="p">()</span>
+
+<span class="k">with</span> <span class="n">parallel_backend</span><span class="p">(</span><span class="s2">&quot;multiprocessing&quot;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">run9</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">clf</span><span class="p">,</span> <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span> <span class="n">upload_flow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">avoid_duplicate_runs</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+<span class="n">measures</span> <span class="o">=</span> <span class="n">run9</span><span class="o">.</span><span class="n">fold_evaluations</span>
+<span class="n">print_compare_runtimes</span><span class="p">(</span><span class="n">measures</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/openml-python/openml-python/openml/tasks/task.py:150: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  return datasets.get_dataset(self.dataset_id)
+Repeat #0-Fold #0: CPU-62.910 vs Wall-63.730
+Repeat #0-Fold #1: CPU-63.316 vs Wall-63.576
+Repeat #0-Fold #2: CPU-63.102 vs Wall-63.843
+Repeat #0-Fold #3: CPU-62.385 vs Wall-62.262
+Repeat #0-Fold #4: CPU-60.026 vs Wall-60.288
+Repeat #0-Fold #5: CPU-59.906 vs Wall-59.948
+Repeat #0-Fold #6: CPU-59.816 vs Wall-60.133
+Repeat #0-Fold #7: CPU-59.989 vs Wall-59.992
+Repeat #0-Fold #8: CPU-33.260 vs Wall-33.261
+Repeat #0-Fold #9: CPU-34.660 vs Wall-34.712
+</pre></div>
+</div>
+</section>
+<section id="summmary">
+<h2>Summmary<a class="headerlink" href="#summmary" title="Permalink to this heading">¶</a></h2>
+<p>The scikit-learn extension for OpenML-Python records model runtimes for the
+CPU-clock and the wall-clock times. The above examples illustrated how these
+recorded runtimes can be extracted when using a scikit-learn model and under
+parallel setups too. To summarize, the scikit-learn extension measures the:</p>
+<ul class="simple">
+<li><p><cite>CPU-time</cite> &amp; <cite>wallclock-time</cite> for the whole run</p>
+<ul>
+<li><p>A run here corresponds to a call to <cite>run_model_on_task</cite> or <cite>run_flow_on_task</cite></p></li>
+<li><p>The recorded time is for the model fit for each of the outer-cross validations folds,
+i.e., the OpenML data splits</p></li>
+</ul>
+</li>
+<li><p>Python’s <cite>time</cite> module is used to compute the runtimes</p>
+<ul>
+<li><p><cite>CPU-time</cite> is recorded using the responses of <cite>time.process_time()</cite></p></li>
+<li><p><cite>wallclock-time</cite> is recorded using the responses of <cite>time.time()</cite></p></li>
+</ul>
+</li>
+<li><p>The timings recorded by OpenML per outer-cross validation fold is agnostic to
+model parallelisation</p>
+<ul>
+<li><p>The wallclock times reported in Case 2 above highlights the speed-up on using <cite>n_jobs=-1</cite>
+in comparison to <cite>n_jobs=2</cite>, since the timing recorded by OpenML is for the entire
+<cite>fit()</cite> procedure, whereas the parallelisation is performed inside <cite>fit()</cite> by scikit-learn</p></li>
+<li><p>The CPU-time for models that are run in parallel can be difficult to interpret</p></li>
+</ul>
+</li>
+<li><p><cite>CPU-time</cite> &amp; <cite>wallclock-time</cite> for each search per outer fold in an HPO run</p>
+<ul>
+<li><p>Reports the total time for performing search on each of the OpenML data split, subsuming
+any sort of parallelism that happened as part of the HPO estimator or the underlying
+base estimator</p></li>
+<li><p>Also allows extraction of the <cite>refit_time</cite> that scikit-learn measures using <cite>time.time()</cite>
+for retraining the model per outer fold, for the best found configuration</p></li>
+</ul>
+</li>
+<li><p><cite>CPU-time</cite> &amp; <cite>wallclock-time</cite> for models that scikit-learn doesn’t parallelize</p>
+<ul>
+<li><p>Models like Decision Trees or naive Bayes don’t parallelize and thus both the wallclock and
+CPU times are similar in runtime for the OpenML call</p></li>
+<li><p>However, models implemented in Cython, such as the Decision Trees can release the GIL and
+still run in parallel if a <cite>threading</cite> backend is used by joblib.</p></li>
+<li><p>Scikit-learn Neural Networks can undergo parallelization implicitly owing to thread-level
+parallelism involved in the linear algebraic operations and thus the wallclock-time and
+CPU-time can differ.</p></li>
+</ul>
+</li>
+</ul>
+<p>Because of all the cases mentioned above it is crucial to understand which case is triggered
+when reporting runtimes for scikit-learn models measured with OpenML-Python!</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 31.048 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-fetch-runtimes-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/b38628dd5a6df6d64efcbd57ac258e5f/fetch_runtimes_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">fetch_runtimes_tutorial.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/8c382c76eb99f4156c49950f4c9349a0/fetch_runtimes_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_runtimes_tutorial.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

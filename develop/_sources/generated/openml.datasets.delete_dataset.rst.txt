@@ -1,0 +1,10 @@
+﻿:mod:`openml.datasets`.delete_dataset
+==================================================
+
+.. currentmodule:: openml.datasets
+
+.. autofunction:: delete_dataset
+
+.. raw:: html
+
+    <div class="clearer"></div>

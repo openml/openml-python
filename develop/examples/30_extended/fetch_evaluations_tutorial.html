@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Fetching Evaluations &#8212; OpenML 0.14.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=75e7b761"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../index.html">Start</a></li>
+                <li><a href="../../usage.html">User Guide</a></li>
+                <li><a href="../../api.html">API</a></li>
+                <li><a href="../index.html">Examples</a></li>
+                <li><a href="../../extensions.html">Extensions</a></li>
+                <li><a href="../../contributing.html">Contributing</a></li>
+                <li><a href="../../progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">Fetching Evaluations</a><ul>
+<li><a class="reference internal" href="#listing-evaluations">Listing evaluations</a><ul>
+<li><a class="reference internal" href="#viewing-a-sample-task">Viewing a sample task</a></li>
+<li><a class="reference internal" href="#obtaining-all-the-evaluations-for-the-task">Obtaining all the evaluations for the task</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#obtaining-cdf-of-metric-for-chosen-task">Obtaining CDF of metric for chosen task</a></li>
+<li><a class="reference internal" href="#comparing-top-10-performing-flows">Comparing top 10 performing flows</a><ul>
+<li><a class="reference internal" href="#obtaining-evaluations-with-hyperparameter-settings">Obtaining evaluations with hyperparameter settings</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-examples-30-extended-fetch-evaluations-tutorial-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="fetching-evaluations">
+<span id="sphx-glr-examples-30-extended-fetch-evaluations-tutorial-py"></span><h1>Fetching Evaluations<a class="headerlink" href="#fetching-evaluations" title="Permalink to this heading">¶</a></h1>
+<p>Evaluations contain a concise summary of the results of all runs made. Each evaluation
+provides information on the dataset used, the flow applied, the setup used, the metric
+evaluated, and the result obtained on the metric, for each such run made. These collection
+of results can be used for efficient benchmarking of an algorithm and also allow transparent
+reuse of results from previous experiments on similar parameters.</p>
+<p>In this example, we shall do the following:</p>
+<ul class="simple">
+<li><p>Retrieve evaluations based on different metrics</p></li>
+<li><p>Fetch evaluations pertaining to a specific task</p></li>
+<li><p>Sort the obtained results in descending order of the metric</p></li>
+<li><p>Plot a cumulative distribution function for the evaluations</p></li>
+<li><p>Compare the top 10 performing flows based on the evaluation performance</p></li>
+<li><p>Retrieve evaluations with hyperparameter settings</p></li>
+</ul>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
+
+<span class="kn">import</span> <span class="nn">openml</span>
+</pre></div>
+</div>
+<section id="listing-evaluations">
+<h2>Listing evaluations<a class="headerlink" href="#listing-evaluations" title="Permalink to this heading">¶</a></h2>
+<p>Evaluations can be retrieved from the database in the chosen output format.
+Required filters can be applied to retrieve results from runs as required.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># We shall retrieve a small set (only 10 entries) to test the listing function for evaluations</span>
+<span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations</span><span class="p">(</span>
+    <span class="n">function</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Using other evaluation metrics, &#39;precision&#39; in this case</span>
+<span class="n">evals</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations</span><span class="p">(</span>
+    <span class="n">function</span><span class="o">=</span><span class="s2">&quot;precision&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Querying the returned results for precision above 0.98</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">evals</span><span class="p">[</span><span class="n">evals</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mf">0.98</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>   run_id  task_id  ...  values                                    array_data
+0      62        1  ...    None  [0.714286,0.98,0.992658,0,0.985294,0.904762]
+1     237        1  ...    None                [1,0.942857,0.991215,0,1,0.95]
+3     413        1  ...    None            [1,0.980198,0.994152,0,1,0.948718]
+4     500        1  ...    None         [1,0.99,0.997059,0,0.985294,0.863636]
+
+[4 rows x 14 columns]
+</pre></div>
+</div>
+<section id="viewing-a-sample-task">
+<h3>Viewing a sample task<a class="headerlink" href="#viewing-a-sample-task" title="Permalink to this heading">¶</a></h3>
+<p>Over here we shall briefly take a look at the details of the task.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># We will start by displaying a simple *supervised classification* task:</span>
+<span class="n">task_id</span> <span class="o">=</span> <span class="mi">167140</span>  <span class="c1"># https://www.openml.org/t/167140</span>
+<span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/sphinx_gallery/gen_rst.py:722: FutureWarning: Starting from Version 0.15.0 `download_splits` will default to ``False`` instead of ``True`` and be independent from `download_data`. To disable this message until version 0.15 explicitly set `download_splits` to a bool.
+  exec(self.code, self.fake_main.__dict__)
+/home/runner/work/openml-python/openml-python/openml/tasks/functions.py:442: FutureWarning: Starting from Version 0.15 `download_data`, `download_qualities`, and `download_features_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy loading. To disable this message until version 0.15 explicitly set `download_data`, `download_qualities`, and `download_features_meta_data` to a bool while calling `get_dataset`.
+  dataset = get_dataset(task.dataset_id, *dataset_args, **get_dataset_kwargs)
+OpenML Classification Task
+==========================
+Task Type Description: https://www.openml.org/tt/TaskType.SUPERVISED_CLASSIFICATION
+Task ID..............: 167140
+Task URL.............: https://www.openml.org/t/167140
+Estimation Procedure.: crossvalidation
+Target Feature.......: class
+# of Classes.........: 3
+Cost Matrix..........: Available
+</pre></div>
+</div>
+</section>
+<section id="obtaining-all-the-evaluations-for-the-task">
+<h3>Obtaining all the evaluations for the task<a class="headerlink" href="#obtaining-all-the-evaluations-for-the-task" title="Permalink to this heading">¶</a></h3>
+<p>We’ll now obtain all the evaluations that were uploaded for the task
+we displayed previously.
+Note that we now filter the evaluations based on another parameter ‘task’.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">metric</span> <span class="o">=</span> <span class="s2">&quot;predictive_accuracy&quot;</span>
+<span class="n">evals</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations</span><span class="p">(</span>
+    <span class="n">function</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="n">task_id</span><span class="p">],</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span>
+<span class="p">)</span>
+<span class="c1"># Displaying the first 10 rows</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+<span class="c1"># Sorting the evaluations in decreasing order of the metric chosen</span>
+<span class="n">evals</span> <span class="o">=</span> <span class="n">evals</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Displaying head of sorted dataframe: &quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>    run_id  task_id  setup_id  ...     value values  array_data
+0  9199772   167140   7130140  ...  0.938481   None        None
+1  9199845   167140   7130139  ...  0.623352   None        None
+2  9202086   167140   7131884  ...  0.918393   None        None
+3  9202092   167140   7131890  ...  0.962335   None        None
+4  9202096   167140   7131894  ...  0.961707   None        None
+5  9202099   167140   7131897  ...  0.519146   None        None
+6  9202125   167140   7131923  ...  0.957313   None        None
+7  9202139   167140   7131937  ...  0.519146   None        None
+8  9202159   167140   7131957  ...  0.628060   None        None
+9  9202254   167140   7132052  ...  0.610483   None        None
+
+[10 rows x 14 columns]
+
+Displaying head of sorted dataframe:
+        run_id  task_id  setup_id  ...     value values  array_data
+2788  10279797   167140   8166877  ...  0.968613   None        None
+2789  10279798   167140   8166877  ...  0.968613   None        None
+2246  10232158   167140   8157180  ...  0.967671   None        None
+2263  10232987   167140   8157961  ...  0.967671   None        None
+2314  10271558   167140   8154506  ...  0.967043   None        None
+
+[5 rows x 14 columns]
+</pre></div>
+</div>
+</section>
+</section>
+<section id="obtaining-cdf-of-metric-for-chosen-task">
+<h2>Obtaining CDF of metric for chosen task<a class="headerlink" href="#obtaining-cdf-of-metric-for-chosen-task" title="Permalink to this heading">¶</a></h2>
+<p>We shall now analyse how the performance of various flows have been on this task,
+by seeing the likelihood of the accuracy obtained across all runs.
+We shall now plot a cumulative distributive function (CDF) for the accuracies obtained.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+
+<span class="k">def</span> <span class="nf">plot_cdf</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">):</span>
+    <span class="n">max_val</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">patches</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s2">&quot;step&quot;</span><span class="p">,</span> <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">patches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xy</span><span class="p">(</span><span class="n">patches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_xy</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.1</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;CDF&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Likelihood&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">minorticks_on</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;minor&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">max_val</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">max_val</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">max_val</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="n">plot_cdf</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">metric</span><span class="p">)</span>
+<span class="c1"># This CDF plot shows that for the given task, based on the results of the</span>
+<span class="c1"># runs uploaded, it is almost certain to achieve an accuracy above 52%, i.e.,</span>
+<span class="c1"># with non-zero probability. While the maximum accuracy seen till now is 96.5%.</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_fetch_evaluations_tutorial_001.png" srcset="../../_images/sphx_glr_fetch_evaluations_tutorial_001.png" alt="CDF" class = "sphx-glr-single-img"/></section>
+<section id="comparing-top-10-performing-flows">
+<h2>Comparing top 10 performing flows<a class="headerlink" href="#comparing-top-10-performing-flows" title="Permalink to this heading">¶</a></h2>
+<p>Let us now try to see which flows generally performed the best for this task.
+For this, we shall compare the top performing flows.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+
+<span class="k">def</span> <span class="nf">plot_flow_compare</span><span class="p">(</span><span class="n">evaluations</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">):</span>
+    <span class="c1"># Collecting the top 10 performing unique flow_id</span>
+    <span class="n">flow_ids</span> <span class="o">=</span> <span class="n">evaluations</span><span class="o">.</span><span class="n">flow_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()[:</span><span class="n">top_n</span><span class="p">]</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+    <span class="c1"># Creating a data frame containing only the metric values of the selected flows</span>
+    <span class="c1">#   assuming evaluations is sorted in decreasing order of metric</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flow_ids</span><span class="p">)):</span>
+        <span class="n">flow_values</span> <span class="o">=</span> <span class="n">evaluations</span><span class="p">[</span><span class="n">evaluations</span><span class="o">.</span><span class="n">flow_id</span> <span class="o">==</span> <span class="n">flow_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df</span><span class="p">,</span> <span class="n">flow_values</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">boxplot</span><span class="p">()</span>
+    <span class="n">axs</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Boxplot comparing &quot;</span> <span class="o">+</span> <span class="n">metric</span> <span class="o">+</span> <span class="s2">&quot; for different flows&quot;</span><span class="p">)</span>
+    <span class="n">axs</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
+    <span class="n">axs</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Flow ID&quot;</span><span class="p">)</span>
+    <span class="n">axs</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">flow_ids</span><span class="p">)</span>
+    <span class="n">axs</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="s2">&quot;0.5&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+    <span class="n">axs</span><span class="o">.</span><span class="n">minorticks_on</span><span class="p">()</span>
+    <span class="n">axs</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s2">&quot;minor&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="s2">&quot;0.5&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+    <span class="c1"># Counting the number of entries for each flow in the data frame</span>
+    <span class="c1">#   which gives the number of runs for each flow</span>
+    <span class="n">flow_freq</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">numeric_only</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flow_ids</span><span class="p">)):</span>
+        <span class="n">axs</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mf">1.05</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">flow_freq</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">run(s)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="n">plot_flow_compare</span><span class="p">(</span><span class="n">evals</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="c1"># The boxplots below show how the flows perform across multiple runs on the chosen</span>
+<span class="c1"># task. The green horizontal lines represent the median accuracy of all the runs for</span>
+<span class="c1"># that flow (number of runs denoted at the bottom of the boxplots). The higher the</span>
+<span class="c1"># green line, the better the flow is for the task at hand. The ordering of the flows</span>
+<span class="c1"># are in the descending order of the higest accuracy value seen under that flow.</span>
+
+<span class="c1"># Printing the corresponding flow names for the top 10 performing flow IDs</span>
+<span class="n">top_n</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">flow_ids</span> <span class="o">=</span> <span class="n">evals</span><span class="o">.</span><span class="n">flow_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()[:</span><span class="n">top_n</span><span class="p">]</span>
+<span class="n">flow_names</span> <span class="o">=</span> <span class="n">evals</span><span class="o">.</span><span class="n">flow_name</span><span class="o">.</span><span class="n">unique</span><span class="p">()[:</span><span class="n">top_n</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">top_n</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">((</span><span class="n">flow_ids</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">flow_names</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" srcset="../../_images/sphx_glr_fetch_evaluations_tutorial_002.png" alt="Boxplot comparing predictive_accuracy for different flows" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(12736, &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,histgradientboostingclassifier=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(1)&#39;)
+(8399, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC))(1)&#39;)
+(8353, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer2,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
+(12127, &#39;sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier(1)&#39;)
+(16347, &#39;sklearn.pipeline.Pipeline(simpleimputer=sklearn.impute._base.SimpleImputer,onehotencoder=sklearn.preprocessing._encoders.OneHotEncoder,svc=sklearn.svm.classes.SVC)(1)&#39;)
+(17373, &#39;sklearn.model_selection._search_successive_halving.HalvingRandomSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(4)&#39;)
+(8317, &#39;sklearn.pipeline.Pipeline(imputation=hyperimp.utils.preprocessing.ConditionalImputer,hotencoding=sklearn.preprocessing.data.OneHotEncoder,scaling=sklearn.preprocessing.data.StandardScaler,variencethreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,clf=sklearn.svm.classes.SVC)(1)&#39;)
+(17369, &#39;sklearn.model_selection._search_successive_halving.HalvingRandomSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(3)&#39;)
+(17374, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(4)&#39;)
+(17371, &#39;sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier)(3)&#39;)
+</pre></div>
+</div>
+<section id="obtaining-evaluations-with-hyperparameter-settings">
+<h3>Obtaining evaluations with hyperparameter settings<a class="headerlink" href="#obtaining-evaluations-with-hyperparameter-settings" title="Permalink to this heading">¶</a></h3>
+<p>We’ll now obtain the evaluations of a task and a flow with the hyperparameters</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># List evaluations in descending order based on predictive_accuracy with</span>
+<span class="c1"># hyperparameters</span>
+<span class="n">evals_setups</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations_setups</span><span class="p">(</span>
+    <span class="n">function</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">,</span> <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="mi">31</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="s2">&quot;desc&quot;</span>
+<span class="p">)</span>
+
+<span class="s2">&quot;&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">evals_setups</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="s2">&quot;&quot;</span>
+<span class="c1"># Return evaluations for flow_id in descending order based on predictive_accuracy</span>
+<span class="c1"># with hyperparameters. parameters_in_separate_columns returns parameters in</span>
+<span class="c1"># separate columns</span>
+<span class="n">evals_setups</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations_setups</span><span class="p">(</span>
+    <span class="n">function</span><span class="o">=</span><span class="s2">&quot;predictive_accuracy&quot;</span><span class="p">,</span> <span class="n">flows</span><span class="o">=</span><span class="p">[</span><span class="mi">6767</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">parameters_in_separate_columns</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="s2">&quot;&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">evals_setups</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="s2">&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>    run_id  ...                                         parameters
+0  6725054  ...  {&#39;mlr.classif.ranger(13)_num.trees&#39;: &#39;48&#39;, &#39;ml...
+1  2083190  ...  {&#39;sklearn.ensemble.forest.RandomForestClassifi...
+2  3962979  ...  {&#39;mlr.classif.ranger(13)_num.trees&#39;: &#39;42&#39;, &#39;ml...
+3  2083596  ...  {&#39;sklearn.ensemble.forest.RandomForestClassifi...
+4  6162649  ...  {&#39;mlr.classif.ranger(13)_num.trees&#39;: &#39;715&#39;, &#39;m...
+
+[5 rows x 15 columns]
+    run_id  ...  mlr.classif.xgboost(9)_nthread
+0  2420531  ...                             NaN
+1  2420532  ...                             NaN
+2  2420533  ...                             NaN
+3  2420534  ...                             NaN
+4  2420535  ...                             NaN
+5  2420536  ...                             NaN
+6  2420537  ...                             NaN
+7  2431903  ...                             NaN
+8  2432142  ...                             NaN
+9  2432377  ...                             NaN
+
+[10 rows x 29 columns]
+
+&#39;&#39;
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 8.603 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-fetch-evaluations-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/55fed401604e83ceb83e08221c96c779/fetch_evaluations_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">fetch_evaluations_tutorial.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/ae7e73aff29ef9ace1e17781346a204b/fetch_evaluations_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fetch_evaluations_tutorial.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

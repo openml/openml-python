@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>openml.datasets.get_dataset &#8212; OpenML 0.14.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=75e7b761"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.14.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../index.html">Start</a></li>
+                <li><a href="../usage.html">User Guide</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../examples/index.html">Examples</a></li>
+                <li><a href="../extensions.html">Extensions</a></li>
+                <li><a href="../contributing.html">Contributing</a></li>
+                <li><a href="../progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code>.get_dataset</a><ul>
+<li><a class="reference internal" href="#openml.datasets.get_dataset"><code class="docutils literal notranslate"><span class="pre">get_dataset()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <section id="openml-datasets-get-dataset">
+<h1><a class="reference internal" href="../api.html#module-openml.datasets" title="openml.datasets"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.datasets</span></code></a>.get_dataset<a class="headerlink" href="#openml-datasets-get-dataset" title="Permalink to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="openml.datasets.get_dataset">
+<span class="sig-prename descclassname"><span class="pre">openml.datasets.</span></span><span class="sig-name descname"><span class="pre">get_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_if_multiple</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'pickle'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'feather'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'pickle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_qualities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_features_meta_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_all_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_refresh_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="openml.datasets.OpenMLDataset.html#openml.datasets.OpenMLDataset" title="openml.datasets.OpenMLDataset"><span class="pre">OpenMLDataset</span></a></span></span><a class="headerlink" href="#openml.datasets.get_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the OpenML dataset representation, optionally also download actual data file.</p>
+<p>This function is by default NOT thread/multiprocessing safe, as this function uses caching.
+A check will be performed to determine if the information has previously been downloaded to a
+cache, and if so be loaded from disk instead of retrieved from the server.</p>
+<p>To make this function thread safe, you can install the python package <code class="docutils literal notranslate"><span class="pre">oslo.concurrency</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">oslo.concurrency</span></code> is installed <cite>get_dataset</cite> becomes thread safe.</p>
+<p>Alternatively, to make this function thread/multiprocessing safe initialize the cache first by
+calling <cite>get_dataset(args)</cite> once before calling <cite>get_dataset(args)</cite> many times in parallel.
+This will initialize the cache and later calls will use the cache in a thread/multiprocessing
+safe way.</p>
+<p>If dataset is retrieved by name, a version may be specified.
+If no version is specified and multiple versions of the dataset exist,
+the earliest version of the dataset that is still active will be returned.
+If no version is specified, multiple versions of the dataset exist and
+<code class="docutils literal notranslate"><span class="pre">exception_if_multiple</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, this function will raise an exception.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dataset_id</strong><span class="classifier">int or str</span></dt><dd><p>Dataset ID of the dataset to download</p>
+</dd>
+<dt><strong>download_data</strong><span class="classifier">bool (default=True)</span></dt><dd><p>If True, also download the data file. Beware that some datasets are large and it might
+make the operation noticeably slower. Metadata is also still retrieved.
+If False, create the OpenMLDataset and only populate it with the metadata.
+The data may later be retrieved through the <cite>OpenMLDataset.get_data</cite> method.</p>
+</dd>
+<dt><strong>version</strong><span class="classifier">int, optional (default=None)</span></dt><dd><p>Specifies the version if <cite>dataset_id</cite> is specified by name.
+If no version is specified, retrieve the least recent still active version.</p>
+</dd>
+<dt><strong>error_if_multiple</strong><span class="classifier">bool (default=False)</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> raise an error if multiple datasets are found with matching criteria.</p>
+</dd>
+<dt><strong>cache_format</strong><span class="classifier">str (default=’pickle’) in {‘pickle’, ‘feather’}</span></dt><dd><p>Format for caching the dataset - may be feather or pickle
+Note that the default ‘pickle’ option may load slower than feather when
+no.of.rows is very high.</p>
+</dd>
+<dt><strong>download_qualities</strong><span class="classifier">bool (default=True)</span></dt><dd><p>Option to download ‘qualities’ meta-data in addition to the minimal dataset description.
+If True, download and cache the qualities file.
+If False, create the OpenMLDataset without qualities metadata. The data may later be added
+to the OpenMLDataset through the <cite>OpenMLDataset.load_metadata(qualities=True)</cite> method.</p>
+</dd>
+<dt><strong>download_features_meta_data</strong><span class="classifier">bool (default=True)</span></dt><dd><p>Option to download ‘features’ meta-data in addition to the minimal dataset description.
+If True, download and cache the features file.
+If False, create the OpenMLDataset without features metadata. The data may later be added
+to the OpenMLDataset through the <cite>OpenMLDataset.load_metadata(features=True)</cite> method.</p>
+</dd>
+<dt><strong>download_all_files: bool (default=False)</strong></dt><dd><p>EXPERIMENTAL. Download all files related to the dataset that reside on the server.
+Useful for datasets which refer to auxiliary files (e.g., meta-album).</p>
+</dd>
+<dt><strong>force_refresh_cache</strong><span class="classifier">bool (default=False)</span></dt><dd><p>Force the cache to refreshed by deleting the cache directory and re-downloading the data.
+Note, if <cite>force_refresh_cache</cite> is True, <cite>get_dataset</cite> is NOT thread/multiprocessing safe,
+because this creates a race condition to creating and deleting the cache; as in general with
+the cache.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>dataset</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">openml.OpenMLDataset</span></code></span></dt><dd><p>The downloaded dataset.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="clearer"></div></section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

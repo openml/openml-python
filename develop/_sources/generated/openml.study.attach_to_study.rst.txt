@@ -1,0 +1,10 @@
+﻿:mod:`openml.study`.attach_to_study
+================================================
+
+.. currentmodule:: openml.study
+
+.. autofunction:: attach_to_study
+
+.. raw:: html
+
+    <div class="clearer"></div>
