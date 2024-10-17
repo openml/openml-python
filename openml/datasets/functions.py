@@ -174,7 +174,7 @@ def _list_datasets(
     -------
     datasets : dataframe
     """
-    api_call = f"data/list/list/{limit}/offset/{offset}"
+    api_call = f"data/list/{limit}/offset/{offset}"
 
     if kwargs is not None:
         for operator, value in kwargs.items():
