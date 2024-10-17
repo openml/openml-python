@@ -1905,6 +1905,16 @@ class TestRun(TestBase):
         _run_id = run.run_id
         assert delete_run(_run_id)
 
+    @unittest.skipIf(
+        Version(sklearn.__version__) < Version("0.20"),
+        reason="SimpleImputer doesn't handle mixed type DataFrame as input",
+    )
+    def test_initialize_model_from_run_nonstrict(self):
+        # We cannot guarantee that a run with an older version exists on the server.
+        # Thus, we test it simply with a run that we know exists that might not be loose.
+        # This tests all lines of code for OpenML but not the initialization, which we do not want to guarantee anyhow.
+        _ = openml.runs.initialize_model_from_run(run_id=1, strict_version=False)
+
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
