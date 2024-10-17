@@ -23,6 +23,7 @@ Possible Future: class TestBase from openml/testing.py can be included
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from collections.abc import Iterator
 import logging
 import os
 import shutil
@@ -195,55 +196,90 @@ def pytest_addoption(parser):
 def _expected_static_cache_state(root_dir: Path) -> list[Path]:
     _c_root_dir = root_dir / "org" / "openml" / "test"
     res_paths = [root_dir, _c_root_dir]
-    
+
     for _d in ["datasets", "tasks", "runs", "setups"]:
         res_paths.append(_c_root_dir / _d)
 
-    for _id in ["-1","2"]:
+    for _id in ["-1", "2"]:
         tmp_p = _c_root_dir / "datasets" / _id
-        res_paths.extend([
-            tmp_p / "dataset.arff",
-            tmp_p / "features.xml",
-            tmp_p / "qualities.xml",
-            tmp_p / "description.xml",
-        ])
+        res_paths.extend(
+            [
+                tmp_p / "dataset.arff",
+                tmp_p / "features.xml",
+                tmp_p / "qualities.xml",
+                tmp_p / "description.xml",
+            ]
+        )
 
     res_paths.append(_c_root_dir / "datasets" / "30" / "dataset_30.pq")
     res_paths.append(_c_root_dir / "runs" / "1" / "description.xml")
     res_paths.append(_c_root_dir / "setups" / "1" / "description.xml")
-    
+
     for _id in ["1", "3", "1882"]:
         tmp_p = _c_root_dir / "tasks" / _id
-        res_paths.extend([
-            tmp_p / "datasplits.arff",
-            tmp_p / "task.xml",
-        ])
-    
+        res_paths.extend(
+            [
+                tmp_p / "datasplits.arff",
+                tmp_p / "task.xml",
+            ]
+        )
+
     return res_paths
 
 
 def assert_static_test_cache_correct(root_dir: Path) -> None:
     for p in _expected_static_cache_state(root_dir):
-        assert p.exists(), f"Expected path {p} does not exist"
-    
+        assert p.exists(), f"Expected path {p} exists"
+
 
 @pytest.fixture(scope="class")
 def long_version(request):
     request.cls.long_version = request.config.getoption("--long")
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def test_files_directory() -> Path:
     return Path(__file__).parent / "files"
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def test_api_key() -> str:
     return "c0c42819af31e706efe1f4b88c23c6c1"
 
 
-@pytest.fixture(autouse=True)
-def verify_cache_state(test_files_directory) -> None:
+@pytest.fixture(autouse=True, scope="function")
+def verify_cache_state(test_files_directory) -> Iterator[None]:
     assert_static_test_cache_correct(test_files_directory)
     yield
     assert_static_test_cache_correct(test_files_directory)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def as_robot() -> Iterator[None]:
+    policy = openml.config.retry_policy
+    n_retries = openml.config.connection_n_retries
+    openml.config.set_retry_policy("robot", n_retries=20)
+    yield
+    openml.config.set_retry_policy(policy, n_retries)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def with_test_server():
+    openml.config.start_using_configuration_for_example()
+    yield
+    openml.config.stop_using_configuration_for_example()
+
+
+@pytest.fixture(autouse=True)
+def with_test_cache(test_files_directory, request):
+    if not test_files_directory.exists():
+        raise ValueError(
+            f"Cannot find test cache dir, expected it to be {test_files_directory!s}!",
+        )
+    _root_cache_directory = openml.config._root_cache_directory
+    tmp_cache = test_files_directory / request.node.name
+    openml.config.set_root_cache_directory(tmp_cache)
+    yield
+    openml.config.set_root_cache_directory(_root_cache_directory)
+    if tmp_cache.exists():
+        shutil.rmtree(tmp_cache)
