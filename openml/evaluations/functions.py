@@ -461,12 +461,10 @@ def list_evaluations_setups(
                 )
             else:
                 parameters.append({})
-        print(parameters)  # noqa: T201
         setup_data["parameters"] = parameters
         # Merge setups with evaluations
         _df = evals.merge(setup_data, on="setup_id", how="left")
 
-    print(_df)  # noqa: T201
     if parameters_in_separate_columns:
         _df = pd.concat(
             [_df.drop("parameters", axis=1), _df["parameters"].apply(pd.Series)],
