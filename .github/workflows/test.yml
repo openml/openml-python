@@ -106,8 +106,7 @@ jobs:
       run: |  # we need a separate step because of the bash-specific if-statement in the previous one.
         pytest -n 4 --durations=20 --dist load -sv --reruns 5 --reruns-delay 1
     - name: Check for files left behind by test
-      # skip 3.8 as it fails only for Python 3.8 for no explainable reason.
-      if: matrix.os != 'windows-latest' && matrix.python-version != '3.8' && always()
+      if: matrix.os != 'windows-latest' && always()
       run: |
         before="${{ steps.status-before.outputs.BEFORE }}"
         after="$(git status --porcelain -b)"
