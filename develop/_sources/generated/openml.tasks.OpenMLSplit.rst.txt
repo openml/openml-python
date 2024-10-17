@@ -1,8 +1,0 @@
-﻿:orphan:
-
-:mod:`openml.tasks`.OpenMLSplit
-======================================
-
-.. currentmodule:: openml.tasks
-
-.. autoclass:: OpenMLSplit

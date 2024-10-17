@@ -1,8 +1,0 @@
-﻿:orphan:
-
-:mod:`openml.tasks`.OpenMLLearningCurveTask
-==================================================
-
-.. currentmodule:: openml.tasks
-
-.. autoclass:: OpenMLLearningCurveTask

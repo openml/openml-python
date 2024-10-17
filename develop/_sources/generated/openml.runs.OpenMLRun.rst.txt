@@ -1,8 +1,0 @@
-﻿:orphan:
-
-:mod:`openml.runs`.OpenMLRun
-===================================
-
-.. currentmodule:: openml.runs
-
-.. autoclass:: OpenMLRun

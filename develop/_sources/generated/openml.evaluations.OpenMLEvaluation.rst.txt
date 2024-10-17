@@ -1,8 +1,0 @@
-﻿:orphan:
-
-:mod:`openml.evaluations`.OpenMLEvaluation
-=================================================
-
-.. currentmodule:: openml.evaluations
-
-.. autoclass:: OpenMLEvaluation

@@ -1,8 +1,0 @@
-﻿:orphan:
-
-:mod:`openml.tasks`.OpenMLClusteringTask
-===============================================
-
-.. currentmodule:: openml.tasks
-
-.. autoclass:: OpenMLClusteringTask

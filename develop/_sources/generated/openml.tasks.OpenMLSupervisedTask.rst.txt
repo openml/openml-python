@@ -1,8 +1,0 @@
-﻿:orphan:
-
-:mod:`openml.tasks`.OpenMLSupervisedTask
-===============================================
-
-.. currentmodule:: openml.tasks
-
-.. autoclass:: OpenMLSupervisedTask
