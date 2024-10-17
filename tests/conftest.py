@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import logging
 import os
+import shutil
 from pathlib import Path
 import pytest
 
@@ -164,6 +165,15 @@ def pytest_sessionfinish() -> None:
         # Local file deletion
         new_file_list = read_file_list()
         compare_delete_files(file_list, new_file_list)
+
+        # Delete any test dirs that remain
+        # In edge cases due to a mixture of pytest parametrization and oslo concurrency,
+        # some file lock are created after leaving the test. This removes these files!
+        test_files_dir=Path(__file__).parent.parent / "openml"
+        for f in test_files_dir.glob("tests.*"):
+            if f.is_dir():
+                shutil.rmtree(f)
+
         logger.info("Local files deleted")
 
     logger.info(f"{worker} is killed")
