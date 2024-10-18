@@ -5,9 +5,13 @@ theme:
     - content.code.copy
 
 nav:
+  - index.md
   - Code Reference: reference/
   - Examples: examples/
-
+  - Usage: usage.md
+  - Contributing: contributing.md
+  - Extensions: extensions.md
+  - Changelog: progress.md
 
 markdown_extensions:
   - pymdownx.highlight:
