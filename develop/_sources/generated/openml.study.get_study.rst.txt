@@ -1,0 +1,10 @@
+﻿:mod:`openml.study`.get_study
+==========================================
+
+.. currentmodule:: openml.study
+
+.. autofunction:: get_study
+
+.. raw:: html
+
+    <div class="clearer"></div>

@@ -1,0 +1,8 @@
+﻿:orphan:
+
+:mod:`openml.extensions.sklearn`.SklearnExtension
+========================================================
+
+.. currentmodule:: openml.extensions.sklearn
+
+.. autoclass:: SklearnExtension

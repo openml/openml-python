@@ -1,0 +1,101 @@
+
+
+.. _sphx_glr_examples_40_paper:
+
+Usage in research papers
+========================
+
+These examples demonstrate how OpenML-Python can be used for research purposes by re-implementing
+its use in recent publications.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to get the datasets used in the paper introducing Auto-sklearn by Feurer et al..">
+
+.. only:: html
+
+  .. image:: /examples/40_paper/images/thumb/sphx_glr_2015_neurips_feurer_example_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_40_paper_2015_neurips_feurer_example.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Feurer et al. (2015)</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to reproduce the analysis conducted for Don&#x27;t Rule Out Simple Models Prematurely: A Large Scale Benchmark Comparing Linear and Non-linear Classifiers in OpenML.">
+
+.. only:: html
+
+  .. image:: /examples/40_paper/images/thumb/sphx_glr_2018_ida_strang_example_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Strang et al. (2018)</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to build a surrogate model based on OpenML data as done for Scalable Hyperparameter Transfer Learning by Perrone et al..">
+
+.. only:: html
+
+  .. image:: /examples/40_paper/images/thumb/sphx_glr_2018_neurips_perrone_example_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_40_paper_2018_neurips_perrone_example.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Perrone et al. (2018)</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A tutorial on how to reproduce the paper Hyperparameter Importance Across Datasets.">
+
+.. only:: html
+
+  .. image:: /examples/40_paper/images/thumb/sphx_glr_2018_kdd_rijn_example_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_examples_40_paper_2018_kdd_rijn_example.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">van Rijn and Hutter (2018)</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /examples/40_paper/2015_neurips_feurer_example
+   /examples/40_paper/2018_ida_strang_example
+   /examples/40_paper/2018_neurips_perrone_example
+   /examples/40_paper/2018_kdd_rijn_example
+

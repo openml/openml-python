@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>openml.tasks.OpenMLClassificationTask &#8212; OpenML 0.15.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=97b2f34b"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.15.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../index.html">Start</a></li>
+                <li><a href="../usage.html">User Guide</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../examples/index.html">Examples</a></li>
+                <li><a href="../extensions.html">Extensions</a></li>
+                <li><a href="../contributing.html">Contributing</a></li>
+                <li><a href="../progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code>.OpenMLClassificationTask</a><ul>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask</span></code></a><ul>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask.download_split"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask.download_split()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask.estimation_parameters"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask.estimation_parameters</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask.get_X_and_y"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask.get_X_and_y()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask.get_dataset"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask.get_dataset()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask.get_split_dimensions"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask.get_split_dimensions()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask.get_train_test_split_indices"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask.get_train_test_split_indices()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask.id"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask.id</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask.open_in_browser"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask.open_in_browser()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask.openml_url"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask.openml_url</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask.publish"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask.publish()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask.push_tag"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask.push_tag()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask.remove_tag"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask.remove_tag()</span></code></a></li>
+<li><a class="reference internal" href="#openml.tasks.OpenMLClassificationTask.url_for_id"><code class="docutils literal notranslate"><span class="pre">OpenMLClassificationTask.url_for_id()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <section id="openml-tasks-openmlclassificationtask">
+<h1><a class="reference internal" href="../api.html#module-openml.tasks" title="openml.tasks"><code class="xref py py-mod docutils literal notranslate"><span class="pre">openml.tasks</span></code></a>.OpenMLClassificationTask<a class="headerlink" href="#openml-tasks-openmlclassificationtask" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openml.tasks.</span></span><span class="sig-name descname"><span class="pre">OpenMLClassificationTask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_type_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="openml.tasks.TaskType.html#openml.tasks.TaskType" title="openml.tasks.TaskType"><span class="pre">TaskType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_set_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimation_procedure_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimation_procedure_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimation_parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_measure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_splits_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>OpenML Classification object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>task_type_id</strong><span class="classifier">TaskType</span></dt><dd><p>ID of the Classification task type.</p>
+</dd>
+<dt><strong>task_type</strong><span class="classifier">str</span></dt><dd><p>Name of the Classification task type.</p>
+</dd>
+<dt><strong>data_set_id</strong><span class="classifier">int</span></dt><dd><p>ID of the OpenML dataset associated with the Classification task.</p>
+</dd>
+<dt><strong>target_name</strong><span class="classifier">str</span></dt><dd><p>Name of the target variable.</p>
+</dd>
+<dt><strong>estimation_procedure_id</strong><span class="classifier">int, default=None</span></dt><dd><p>ID of the estimation procedure for the Classification task.</p>
+</dd>
+<dt><strong>estimation_procedure_type</strong><span class="classifier">str, default=None</span></dt><dd><p>Type of the estimation procedure.</p>
+</dd>
+<dt><strong>estimation_parameters</strong><span class="classifier">dict, default=None</span></dt><dd><p>Estimation parameters for the Classification task.</p>
+</dd>
+<dt><strong>evaluation_measure</strong><span class="classifier">str, default=None</span></dt><dd><p>Name of the evaluation measure.</p>
+</dd>
+<dt><strong>data_splits_url</strong><span class="classifier">str, default=None</span></dt><dd><p>URL of the data splits for the Classification task.</p>
+</dd>
+<dt><strong>task_id</strong><span class="classifier">Union[int, None]</span></dt><dd><p>ID of the Classification task (if it already exists on OpenML).</p>
+</dd>
+<dt><strong>class_labels</strong><span class="classifier">List of str, default=None</span></dt><dd><p>A list of class labels (for classification tasks).</p>
+</dd>
+<dt><strong>cost_matrix</strong><span class="classifier">array, default=None</span></dt><dd><p>A cost matrix (for classification tasks).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask.download_split">
+<span class="sig-name descname"><span class="pre">download_split</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="openml.tasks.OpenMLSplit.html#openml.tasks.OpenMLSplit" title="openml.tasks.split.OpenMLSplit"><span class="pre">OpenMLSplit</span></a></span></span><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask.download_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the OpenML split for a given task.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask.estimation_parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">estimation_parameters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask.estimation_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the estimation parameters for the task.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask.get_X_and_y">
+<span class="sig-name descname"><span class="pre">get_X_and_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'dataframe'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'array'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'array'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pd.DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">scipy.sparse.spmatrix</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">np.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pd.Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pd.DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask.get_X_and_y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get data associated with the current task.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dataset_format</strong><span class="classifier">str</span></dt><dd><p>Data structure of the returned data. See <a class="reference internal" href="openml.datasets.OpenMLDataset.html#openml.datasets.OpenMLDataset.get_data" title="openml.datasets.OpenMLDataset.get_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">openml.datasets.OpenMLDataset.get_data()</span></code></a>
+for possible options.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>tuple - X and y</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask.get_dataset">
+<span class="sig-name descname"><span class="pre">get_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="openml.datasets.OpenMLDataset.html#openml.datasets.OpenMLDataset" title="openml.datasets.dataset.OpenMLDataset"><span class="pre">OpenMLDataset</span></a></span></span><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask.get_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download dataset associated with task.</p>
+<p>Accepts the same keyword arguments as the <cite>openml.datasets.get_dataset</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask.get_split_dimensions">
+<span class="sig-name descname"><span class="pre">get_split_dimensions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask.get_split_dimensions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the (repeats, folds, samples) of the split for a given task.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask.get_train_test_split_indices">
+<span class="sig-name descname"><span class="pre">get_train_test_split_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">np.ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">np.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask.get_train_test_split_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the indices of the train and test splits for a given task.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the OpenML ID of this task.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask.open_in_browser">
+<span class="sig-name descname"><span class="pre">open_in_browser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask.open_in_browser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the OpenML web page corresponding to this object in your default browser.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask.openml_url">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">openml_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask.openml_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>The URL of the object on the server, if it was uploaded, else None.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask.publish">
+<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">OpenMLBase</span></span></span><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask.publish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Publish the object on the OpenML server.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask.push_tag">
+<span class="sig-name descname"><span class="pre">push_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask.push_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotates this entity with a tag on the server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask.remove_tag">
+<span class="sig-name descname"><span class="pre">remove_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask.remove_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a tag from this entity on the server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tag</strong><span class="classifier">str</span></dt><dd><p>Tag to attach to the flow.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openml.tasks.OpenMLClassificationTask.url_for_id">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">url_for_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#openml.tasks.OpenMLClassificationTask.url_for_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the OpenML URL for the object of the class entity with the given id.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

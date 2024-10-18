@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Tasks: retrieving splits &#8212; OpenML 0.15.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=97b2f34b"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.15.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../index.html">Start</a></li>
+                <li><a href="../../usage.html">User Guide</a></li>
+                <li><a href="../../api.html">API</a></li>
+                <li><a href="../index.html">Examples</a></li>
+                <li><a href="../../extensions.html">Extensions</a></li>
+                <li><a href="../../contributing.html">Contributing</a></li>
+                <li><a href="../../progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">Tasks: retrieving splits</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-examples-30-extended-task-manual-iteration-tutorial-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="tasks-retrieving-splits">
+<span id="sphx-glr-examples-30-extended-task-manual-iteration-tutorial-py"></span><h1>Tasks: retrieving splits<a class="headerlink" href="#tasks-retrieving-splits" title="Permalink to this heading">¶</a></h1>
+<p>Tasks define a target and a train/test split. Normally, they are the input to the function
+<code class="docutils literal notranslate"><span class="pre">openml.runs.run_model_on_task</span></code> which automatically runs the model on all splits of the task.
+However, sometimes it is necessary to manually split a dataset to perform experiments outside of
+the functions provided by OpenML. One such example is in the benchmark library
+<a class="reference external" href="https://github.com/automl/HPOBench">HPOBench</a> which extensively uses data from OpenML,
+but not OpenML’s functionality to conduct runs.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
+
+<span class="kn">import</span> <span class="nn">openml</span>
+</pre></div>
+</div>
+<p>For this tutorial we will use the famous King+Rook versus King+Pawn on A7 dataset, which has
+the dataset ID 3 (<a class="reference external" href="https://www.openml.org/d/3">dataset on OpenML</a>), and for which there exist
+tasks with all important estimation procedures. It is small enough (less than 5000 samples) to
+efficiently use it in an example.</p>
+<p>We will first start with (<a class="reference external" href="https://www.openml.org/t/233">task 233</a>), which is a task with a
+holdout estimation procedure.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">233</span>
+<span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now that we have a task object we can obtain the number of repetitions, folds and samples as
+defined by the task:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">n_repeats</span></code>: Number of times the model quality estimation is performed</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_folds</span></code>: Number of folds per repeat</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_samples</span></code>: How many data points to use. This is only relevant for learning curve tasks</p></li>
+</ul>
+<p>A list of all available estimation procedures is available
+<a class="reference external" href="https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&amp;type=measure">here</a>.</p>
+<p>Task <code class="docutils literal notranslate"><span class="pre">233</span></code> is a simple task using the holdout estimation procedure and therefore has only a
+single repeat, a single fold and a single sample size:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">task_id</span><span class="p">,</span>
+        <span class="n">n_repeats</span><span class="p">,</span>
+        <span class="n">n_folds</span><span class="p">,</span>
+        <span class="n">n_samples</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task 233: number of repeats: 1, number of folds: 1, number of samples 1.
+</pre></div>
+</div>
+<p>We can now retrieve the train/test split for this combination of repeats, folds and number of
+samples (indexing is zero-based). Usually, one would loop over all repeats, folds and sample
+sizes, but we can neglect this here as there is only a single repetition.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
+    <span class="n">repeat</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">fold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">sample</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">train_indices</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">train_indices</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">test_indices</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">test_indices</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(2142,) int32
+(1054,) int32
+</pre></div>
+</div>
+<p>And then split the data based on this:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_X_and_y</span><span class="p">(</span><span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">test_indices</span><span class="p">]</span>
+<span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">test_indices</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;X_train.shape: </span><span class="si">{}</span><span class="s2">, y_train.shape: </span><span class="si">{}</span><span class="s2">, X_test.shape: </span><span class="si">{}</span><span class="s2">, y_test.shape: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+        <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+        <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+        <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0.00/33.8k [00:00&lt;?, ?B/s]
+100%|██████████| 33.8k/33.8k [00:00&lt;00:00, 220kB/s]
+100%|██████████| 33.8k/33.8k [00:00&lt;00:00, 220kB/s]
+X_train.shape: (2142, 36), y_train.shape: (2142,), X_test.shape: (1054, 36), y_test.shape: (1054,)
+</pre></div>
+</div>
+<p>Obviously, we can also retrieve cross-validation versions of the dataset used in task <code class="docutils literal notranslate"><span class="pre">233</span></code>:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_X_and_y</span><span class="p">(</span><span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
+<span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">task_id</span><span class="p">,</span>
+        <span class="n">n_repeats</span><span class="p">,</span>
+        <span class="n">n_folds</span><span class="p">,</span>
+        <span class="n">n_samples</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task 3: number of repeats: 1, number of folds: 10, number of samples 1.
+</pre></div>
+</div>
+<p>And then perform the aforementioned iteration over all splits:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">repeat_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">fold_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">sample_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
+            <span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
+                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span>
+                <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span>
+                <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
+            <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
+            <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">test_indices</span><span class="p">]</span>
+            <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">test_indices</span><span class="p">]</span>
+
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Repeat #</span><span class="si">{}</span><span class="s2">, fold #</span><span class="si">{}</span><span class="s2">, samples </span><span class="si">{}</span><span class="s2">: X_train.shape: </span><span class="si">{}</span><span class="s2">, &quot;</span>
+                <span class="s2">&quot;y_train.shape </span><span class="si">{}</span><span class="s2">, X_test.shape </span><span class="si">{}</span><span class="s2">, y_test.shape </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">repeat_idx</span><span class="p">,</span>
+                    <span class="n">fold_idx</span><span class="p">,</span>
+                    <span class="n">sample_idx</span><span class="p">,</span>
+                    <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0, fold #0, samples 0: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #1, samples 0: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #2, samples 0: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #3, samples 0: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #4, samples 0: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #5, samples 0: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #6, samples 0: X_train.shape: (2877, 36), y_train.shape (2877,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #7, samples 0: X_train.shape: (2877, 36), y_train.shape (2877,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #8, samples 0: X_train.shape: (2877, 36), y_train.shape (2877,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #9, samples 0: X_train.shape: (2877, 36), y_train.shape (2877,), X_test.shape (319, 36), y_test.shape (319,)
+</pre></div>
+</div>
+<p>And also versions with multiple repeats:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">1767</span>
+<span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_X_and_y</span><span class="p">(</span><span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
+<span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">task_id</span><span class="p">,</span>
+        <span class="n">n_repeats</span><span class="p">,</span>
+        <span class="n">n_folds</span><span class="p">,</span>
+        <span class="n">n_samples</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task 1767: number of repeats: 5, number of folds: 2, number of samples 1.
+</pre></div>
+</div>
+<p>And then again perform the aforementioned iteration over all splits:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">repeat_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">fold_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">sample_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
+            <span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
+                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span>
+                <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span>
+                <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
+            <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
+            <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">test_indices</span><span class="p">]</span>
+            <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">test_indices</span><span class="p">]</span>
+
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Repeat #</span><span class="si">{}</span><span class="s2">, fold #</span><span class="si">{}</span><span class="s2">, samples </span><span class="si">{}</span><span class="s2">: X_train.shape: </span><span class="si">{}</span><span class="s2">, &quot;</span>
+                <span class="s2">&quot;y_train.shape </span><span class="si">{}</span><span class="s2">, X_test.shape </span><span class="si">{}</span><span class="s2">, y_test.shape </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">repeat_idx</span><span class="p">,</span>
+                    <span class="n">fold_idx</span><span class="p">,</span>
+                    <span class="n">sample_idx</span><span class="p">,</span>
+                    <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0, fold #0, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,), X_test.shape (1598, 36), y_test.shape (1598,)
+Repeat #0, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,), X_test.shape (1598, 36), y_test.shape (1598,)
+Repeat #1, fold #0, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,), X_test.shape (1598, 36), y_test.shape (1598,)
+Repeat #1, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,), X_test.shape (1598, 36), y_test.shape (1598,)
+Repeat #2, fold #0, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,), X_test.shape (1598, 36), y_test.shape (1598,)
+Repeat #2, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,), X_test.shape (1598, 36), y_test.shape (1598,)
+Repeat #3, fold #0, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,), X_test.shape (1598, 36), y_test.shape (1598,)
+Repeat #3, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,), X_test.shape (1598, 36), y_test.shape (1598,)
+Repeat #4, fold #0, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,), X_test.shape (1598, 36), y_test.shape (1598,)
+Repeat #4, fold #1, samples 0: X_train.shape: (1598, 36), y_train.shape (1598,), X_test.shape (1598, 36), y_test.shape (1598,)
+</pre></div>
+</div>
+<p>And finally a task based on learning curves:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">task_id</span> <span class="o">=</span> <span class="mi">1702</span>
+<span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_X_and_y</span><span class="p">(</span><span class="n">dataset_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
+<span class="n">n_repeats</span><span class="p">,</span> <span class="n">n_folds</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_split_dimensions</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Task </span><span class="si">{}</span><span class="s2">: number of repeats: </span><span class="si">{}</span><span class="s2">, number of folds: </span><span class="si">{}</span><span class="s2">, number of samples </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">task_id</span><span class="p">,</span>
+        <span class="n">n_repeats</span><span class="p">,</span>
+        <span class="n">n_folds</span><span class="p">,</span>
+        <span class="n">n_samples</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Task 1702: number of repeats: 1, number of folds: 10, number of samples 12.
+</pre></div>
+</div>
+<p>And then again perform the aforementioned iteration over all splits:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">repeat_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeats</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">fold_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_folds</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">sample_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
+            <span class="n">train_indices</span><span class="p">,</span> <span class="n">test_indices</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_train_test_split_indices</span><span class="p">(</span>
+                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat_idx</span><span class="p">,</span>
+                <span class="n">fold</span><span class="o">=</span><span class="n">fold_idx</span><span class="p">,</span>
+                <span class="n">sample</span><span class="o">=</span><span class="n">sample_idx</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">X_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
+            <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
+            <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">test_indices</span><span class="p">]</span>
+            <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">test_indices</span><span class="p">]</span>
+
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Repeat #</span><span class="si">{}</span><span class="s2">, fold #</span><span class="si">{}</span><span class="s2">, samples </span><span class="si">{}</span><span class="s2">: X_train.shape: </span><span class="si">{}</span><span class="s2">, &quot;</span>
+                <span class="s2">&quot;y_train.shape </span><span class="si">{}</span><span class="s2">, X_test.shape </span><span class="si">{}</span><span class="s2">, y_test.shape </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">repeat_idx</span><span class="p">,</span>
+                    <span class="n">fold_idx</span><span class="p">,</span>
+                    <span class="n">sample_idx</span><span class="p">,</span>
+                    <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Repeat #0, fold #0, samples 0: X_train.shape: (64, 36), y_train.shape (64,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #0, samples 1: X_train.shape: (91, 36), y_train.shape (91,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #0, samples 2: X_train.shape: (128, 36), y_train.shape (128,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #0, samples 3: X_train.shape: (181, 36), y_train.shape (181,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #0, samples 4: X_train.shape: (256, 36), y_train.shape (256,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #0, samples 5: X_train.shape: (362, 36), y_train.shape (362,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #0, samples 6: X_train.shape: (512, 36), y_train.shape (512,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #0, samples 7: X_train.shape: (724, 36), y_train.shape (724,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #0, samples 8: X_train.shape: (1024, 36), y_train.shape (1024,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #0, samples 9: X_train.shape: (1448, 36), y_train.shape (1448,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #0, samples 10: X_train.shape: (2048, 36), y_train.shape (2048,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #0, samples 11: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #1, samples 0: X_train.shape: (64, 36), y_train.shape (64,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #1, samples 1: X_train.shape: (91, 36), y_train.shape (91,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #1, samples 2: X_train.shape: (128, 36), y_train.shape (128,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #1, samples 3: X_train.shape: (181, 36), y_train.shape (181,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #1, samples 4: X_train.shape: (256, 36), y_train.shape (256,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #1, samples 5: X_train.shape: (362, 36), y_train.shape (362,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #1, samples 6: X_train.shape: (512, 36), y_train.shape (512,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #1, samples 7: X_train.shape: (724, 36), y_train.shape (724,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #1, samples 8: X_train.shape: (1024, 36), y_train.shape (1024,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #1, samples 9: X_train.shape: (1448, 36), y_train.shape (1448,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #1, samples 10: X_train.shape: (2048, 36), y_train.shape (2048,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #1, samples 11: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #2, samples 0: X_train.shape: (64, 36), y_train.shape (64,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #2, samples 1: X_train.shape: (91, 36), y_train.shape (91,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #2, samples 2: X_train.shape: (128, 36), y_train.shape (128,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #2, samples 3: X_train.shape: (181, 36), y_train.shape (181,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #2, samples 4: X_train.shape: (256, 36), y_train.shape (256,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #2, samples 5: X_train.shape: (362, 36), y_train.shape (362,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #2, samples 6: X_train.shape: (512, 36), y_train.shape (512,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #2, samples 7: X_train.shape: (724, 36), y_train.shape (724,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #2, samples 8: X_train.shape: (1024, 36), y_train.shape (1024,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #2, samples 9: X_train.shape: (1448, 36), y_train.shape (1448,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #2, samples 10: X_train.shape: (2048, 36), y_train.shape (2048,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #2, samples 11: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #3, samples 0: X_train.shape: (64, 36), y_train.shape (64,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #3, samples 1: X_train.shape: (91, 36), y_train.shape (91,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #3, samples 2: X_train.shape: (128, 36), y_train.shape (128,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #3, samples 3: X_train.shape: (181, 36), y_train.shape (181,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #3, samples 4: X_train.shape: (256, 36), y_train.shape (256,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #3, samples 5: X_train.shape: (362, 36), y_train.shape (362,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #3, samples 6: X_train.shape: (512, 36), y_train.shape (512,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #3, samples 7: X_train.shape: (724, 36), y_train.shape (724,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #3, samples 8: X_train.shape: (1024, 36), y_train.shape (1024,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #3, samples 9: X_train.shape: (1448, 36), y_train.shape (1448,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #3, samples 10: X_train.shape: (2048, 36), y_train.shape (2048,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #3, samples 11: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #4, samples 0: X_train.shape: (64, 36), y_train.shape (64,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #4, samples 1: X_train.shape: (91, 36), y_train.shape (91,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #4, samples 2: X_train.shape: (128, 36), y_train.shape (128,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #4, samples 3: X_train.shape: (181, 36), y_train.shape (181,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #4, samples 4: X_train.shape: (256, 36), y_train.shape (256,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #4, samples 5: X_train.shape: (362, 36), y_train.shape (362,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #4, samples 6: X_train.shape: (512, 36), y_train.shape (512,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #4, samples 7: X_train.shape: (724, 36), y_train.shape (724,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #4, samples 8: X_train.shape: (1024, 36), y_train.shape (1024,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #4, samples 9: X_train.shape: (1448, 36), y_train.shape (1448,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #4, samples 10: X_train.shape: (2048, 36), y_train.shape (2048,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #4, samples 11: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #5, samples 0: X_train.shape: (64, 36), y_train.shape (64,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #5, samples 1: X_train.shape: (91, 36), y_train.shape (91,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #5, samples 2: X_train.shape: (128, 36), y_train.shape (128,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #5, samples 3: X_train.shape: (181, 36), y_train.shape (181,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #5, samples 4: X_train.shape: (256, 36), y_train.shape (256,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #5, samples 5: X_train.shape: (362, 36), y_train.shape (362,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #5, samples 6: X_train.shape: (512, 36), y_train.shape (512,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #5, samples 7: X_train.shape: (724, 36), y_train.shape (724,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #5, samples 8: X_train.shape: (1024, 36), y_train.shape (1024,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #5, samples 9: X_train.shape: (1448, 36), y_train.shape (1448,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #5, samples 10: X_train.shape: (2048, 36), y_train.shape (2048,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #5, samples 11: X_train.shape: (2876, 36), y_train.shape (2876,), X_test.shape (320, 36), y_test.shape (320,)
+Repeat #0, fold #6, samples 0: X_train.shape: (64, 36), y_train.shape (64,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #6, samples 1: X_train.shape: (91, 36), y_train.shape (91,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #6, samples 2: X_train.shape: (128, 36), y_train.shape (128,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #6, samples 3: X_train.shape: (181, 36), y_train.shape (181,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #6, samples 4: X_train.shape: (256, 36), y_train.shape (256,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #6, samples 5: X_train.shape: (362, 36), y_train.shape (362,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #6, samples 6: X_train.shape: (512, 36), y_train.shape (512,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #6, samples 7: X_train.shape: (724, 36), y_train.shape (724,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #6, samples 8: X_train.shape: (1024, 36), y_train.shape (1024,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #6, samples 9: X_train.shape: (1448, 36), y_train.shape (1448,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #6, samples 10: X_train.shape: (2048, 36), y_train.shape (2048,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #6, samples 11: X_train.shape: (2877, 36), y_train.shape (2877,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #7, samples 0: X_train.shape: (64, 36), y_train.shape (64,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #7, samples 1: X_train.shape: (91, 36), y_train.shape (91,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #7, samples 2: X_train.shape: (128, 36), y_train.shape (128,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #7, samples 3: X_train.shape: (181, 36), y_train.shape (181,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #7, samples 4: X_train.shape: (256, 36), y_train.shape (256,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #7, samples 5: X_train.shape: (362, 36), y_train.shape (362,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #7, samples 6: X_train.shape: (512, 36), y_train.shape (512,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #7, samples 7: X_train.shape: (724, 36), y_train.shape (724,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #7, samples 8: X_train.shape: (1024, 36), y_train.shape (1024,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #7, samples 9: X_train.shape: (1448, 36), y_train.shape (1448,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #7, samples 10: X_train.shape: (2048, 36), y_train.shape (2048,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #7, samples 11: X_train.shape: (2877, 36), y_train.shape (2877,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #8, samples 0: X_train.shape: (64, 36), y_train.shape (64,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #8, samples 1: X_train.shape: (91, 36), y_train.shape (91,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #8, samples 2: X_train.shape: (128, 36), y_train.shape (128,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #8, samples 3: X_train.shape: (181, 36), y_train.shape (181,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #8, samples 4: X_train.shape: (256, 36), y_train.shape (256,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #8, samples 5: X_train.shape: (362, 36), y_train.shape (362,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #8, samples 6: X_train.shape: (512, 36), y_train.shape (512,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #8, samples 7: X_train.shape: (724, 36), y_train.shape (724,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #8, samples 8: X_train.shape: (1024, 36), y_train.shape (1024,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #8, samples 9: X_train.shape: (1448, 36), y_train.shape (1448,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #8, samples 10: X_train.shape: (2048, 36), y_train.shape (2048,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #8, samples 11: X_train.shape: (2877, 36), y_train.shape (2877,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #9, samples 0: X_train.shape: (64, 36), y_train.shape (64,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #9, samples 1: X_train.shape: (91, 36), y_train.shape (91,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #9, samples 2: X_train.shape: (128, 36), y_train.shape (128,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #9, samples 3: X_train.shape: (181, 36), y_train.shape (181,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #9, samples 4: X_train.shape: (256, 36), y_train.shape (256,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #9, samples 5: X_train.shape: (362, 36), y_train.shape (362,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #9, samples 6: X_train.shape: (512, 36), y_train.shape (512,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #9, samples 7: X_train.shape: (724, 36), y_train.shape (724,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #9, samples 8: X_train.shape: (1024, 36), y_train.shape (1024,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #9, samples 9: X_train.shape: (1448, 36), y_train.shape (1448,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #9, samples 10: X_train.shape: (2048, 36), y_train.shape (2048,), X_test.shape (319, 36), y_test.shape (319,)
+Repeat #0, fold #9, samples 11: X_train.shape: (2877, 36), y_train.shape (2877,), X_test.shape (319, 36), y_test.shape (319,)
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 8.600 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-30-extended-task-manual-iteration-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/7c9d63c8c818944ac2677942af934da6/task_manual_iteration_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">task_manual_iteration_tutorial.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/c4948b7cf528f51a636efd320e0f6d57/task_manual_iteration_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">task_manual_iteration_tutorial.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/498e901031e9c21dacb83ef6583158f8/task_manual_iteration_tutorial.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">task_manual_iteration_tutorial.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+﻿:mod:`openml.study`.create_benchmark_suite
+=======================================================
+
+.. currentmodule:: openml.study
+
+.. autofunction:: create_benchmark_suite
+
+.. raw:: html
+
+    <div class="clearer"></div>

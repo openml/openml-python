@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>OpenML &#8212; OpenML 0.15.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=97b2f34b"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.15.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="#">Start</a></li>
+                <li><a href="usage.html">User Guide</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="examples/index.html">Examples</a></li>
+                <li><a href="extensions.html">Extensions</a></li>
+                <li><a href="contributing.html">Contributing</a></li>
+                <li><a href="progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">OpenML</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#how-to-get-openml-for-python">How to get OpenML for python</a></li>
+<li><a class="reference internal" href="#content">Content</a></li>
+<li><a class="reference internal" href="#further-information">Further information</a></li>
+<li><a class="reference internal" href="#contributing">Contributing</a></li>
+<li><a class="reference internal" href="#citing-openml-python">Citing OpenML-Python</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <section id="openml">
+<h1>OpenML<a class="headerlink" href="#openml" title="Permalink to this heading">¶</a></h1>
+<p><strong>Collaborative Machine Learning in Python</strong></p>
+<p>Welcome to the documentation of the OpenML Python API, a connector to the
+collaborative machine learning platform <a class="reference external" href="https://www.openml.org">OpenML.org</a>.
+The OpenML Python package allows to use datasets and tasks from OpenML together
+with scikit-learn and share the results online.</p>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">openml</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">impute</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">pipeline</span>
+
+<span class="c1"># Define a scikit-learn classifier or pipeline</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;imputer&#39;</span><span class="p">,</span> <span class="n">impute</span><span class="o">.</span><span class="n">SimpleImputer</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s1">&#39;estimator&#39;</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">())</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="c1"># Download the OpenML task for the pendigits dataset with 10-fold</span>
+<span class="c1"># cross-validation.</span>
+<span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+<span class="c1"># Run the scikit-learn model on the task.</span>
+<span class="n">run</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">run_model_on_task</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
+<span class="c1"># Publish the experiment on OpenML (optional, requires an API key.</span>
+<span class="c1"># You can get your own API key by signing up to OpenML.org)</span>
+<span class="n">run</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;View the run online: </span><span class="si">{</span><span class="n">run</span><span class="o">.</span><span class="n">openml_url</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can find more examples in our <a class="reference internal" href="examples/index.html#examples-index"><span class="std std-ref">Examples Gallery</span></a>.</p>
+</section>
+<section id="how-to-get-openml-for-python">
+<h2>How to get OpenML for python<a class="headerlink" href="#how-to-get-openml-for-python" title="Permalink to this heading">¶</a></h2>
+<p>You can install the OpenML package via <cite>pip</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>openml
+</pre></div>
+</div>
+<p>For more advanced installation information, please see the
+<a class="reference internal" href="usage.html#installation"><span class="std std-ref">Installation &amp; Set up</span></a> section.</p>
+</section>
+<section id="content">
+<h2>Content<a class="headerlink" href="#content" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="usage.html#usage"><span class="std std-ref">User Guide</span></a></p></li>
+<li><p><a class="reference internal" href="api.html#api"><span class="std std-ref">API</span></a></p></li>
+<li><p><a class="reference internal" href="examples/index.html#examples-index"><span class="std std-ref">Examples Gallery</span></a></p></li>
+<li><p><a class="reference internal" href="extensions.html#extensions"><span class="std std-ref">Extensions</span></a></p></li>
+<li><p><a class="reference internal" href="contributing.html#contributing"><span class="std std-ref">Contributing</span></a></p></li>
+<li><p><a class="reference internal" href="progress.html#progress"><span class="std std-ref">Changelog (discontinued after version 0.15.0)</span></a></p></li>
+</ul>
+</section>
+<section id="further-information">
+<h2>Further information<a class="headerlink" href="#further-information" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.openml.org/">OpenML documentation</a></p></li>
+<li><p><a class="reference external" href="https://docs.openml.org/APIs/">OpenML client APIs</a></p></li>
+<li><p><a class="reference external" href="https://docs.openml.org/contributing/Contributing/">OpenML developer guide</a></p></li>
+<li><p><a class="reference external" href="https://www.openml.org/contact">Contact information</a></p></li>
+<li><p><a class="reference external" href="https://www.openml.org/cite">Citation request</a></p></li>
+<li><p><a class="reference external" href="https://medium.com/open-machine-learning">OpenML blog</a></p></li>
+<li><p><a class="reference external" href="https://twitter.com/open_ml">OpenML twitter account</a></p></li>
+</ul>
+</section>
+<section id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">¶</a></h2>
+<p>Contribution to the OpenML package is highly appreciated. The OpenML package
+currently has a 1/4 position for the development and all help possible is
+needed to extend and maintain the package, create new examples and improve
+the usability. Please see the <a class="reference internal" href="contributing.html#contributing"><span class="std std-ref">Contributing</span></a> page for more information.</p>
+</section>
+<section id="citing-openml-python">
+<h2>Citing OpenML-Python<a class="headerlink" href="#citing-openml-python" title="Permalink to this heading">¶</a></h2>
+<p>If you use OpenML-Python in a scientific publication, we would appreciate a
+reference to the following paper:</p>
+<div class="line-block">
+<div class="line">Matthias Feurer, Jan N. van Rijn, Arlind Kadra, Pieter Gijsbers, Neeratyoy Mallik, Sahithya Ravi, Andreas Müller, Joaquin Vanschoren, Frank Hutter</div>
+<div class="line"><strong>OpenML-Python: an extensible Python API for OpenML</strong></div>
+<div class="line">Journal of Machine Learning Research, 22(100):1−5, 2021</div>
+<div class="line"><a class="reference external" href="https://www.jmlr.org/papers/v22/19-920.html">https://www.jmlr.org/papers/v22/19-920.html</a></div>
+</div>
+<blockquote>
+<div><p>Bibtex entry:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>@article{JMLR:v22:19-920,
+    author  = {Matthias Feurer and Jan N. van Rijn and Arlind Kadra and Pieter Gijsbers and Neeratyoy Mallik and Sahithya Ravi and Andreas MÃ¼ller and Joaquin Vanschoren and Frank Hutter},
+    title   = {OpenML-Python: an extensible Python API for OpenML},
+    journal = {Journal of Machine Learning Research},
+    year    = {2021},
+    volume  = {22},
+    number  = {100},
+    pages   = {1--5},
+    url     = {http://jmlr.org/papers/v22/19-920.html}
+}
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

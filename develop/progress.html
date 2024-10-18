@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Changelog (discontinued after version 0.15.0) &#8212; OpenML 0.15.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=97b2f34b"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.15.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="index.html">Start</a></li>
+                <li><a href="usage.html">User Guide</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="examples/index.html">Examples</a></li>
+                <li><a href="extensions.html">Extensions</a></li>
+                <li><a href="contributing.html">Contributing</a></li>
+                <li><a href="#">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">Changelog (discontinued after version 0.15.0)</a><ul>
+<li><a class="reference internal" href="#see-github-releases-for-the-latest-changes">See GitHub releases for the latest changes.</a></li>
+<li><a class="reference internal" href="#id1">0.15.0</a></li>
+<li><a class="reference internal" href="#id2">0.14.2</a></li>
+<li><a class="reference internal" href="#id3">0.14.1</a></li>
+<li><a class="reference internal" href="#id4">0.14.0</a></li>
+<li><a class="reference internal" href="#id5">0.13.1</a></li>
+<li><a class="reference internal" href="#id6">0.13.0</a></li>
+<li><a class="reference internal" href="#id7">0.12.2</a></li>
+<li><a class="reference internal" href="#id8">0.12.1</a></li>
+<li><a class="reference internal" href="#id9">0.12.0</a></li>
+<li><a class="reference internal" href="#id10">0.11.0</a></li>
+<li><a class="reference internal" href="#id11">0.10.2</a></li>
+<li><a class="reference internal" href="#id12">0.10.1</a></li>
+<li><a class="reference internal" href="#id13">0.10.0</a></li>
+<li><a class="reference internal" href="#id14">0.9.0</a></li>
+<li><a class="reference internal" href="#id15">0.8.0</a></li>
+<li><a class="reference internal" href="#id17">0.4.-0.7</a></li>
+<li><a class="reference internal" href="#id18">0.3.0</a></li>
+<li><a class="reference internal" href="#prior">Prior</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <section id="changelog-discontinued-after-version-0-15-0">
+<span id="progress"></span><h1>Changelog (discontinued after version 0.15.0)<a class="headerlink" href="#changelog-discontinued-after-version-0-15-0" title="Permalink to this heading">¶</a></h1>
+<section id="see-github-releases-for-the-latest-changes">
+<h2>See GitHub releases for the latest changes.<a class="headerlink" href="#see-github-releases-for-the-latest-changes" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="id1">
+<h2>0.15.0<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>ADD #1335: Improve MinIO support.</dt><dd><ul>
+<li><p>Add progress bar for downloading MinIO files. Enable it with setting <cite>show_progress</cite> to true on either <cite>openml.config</cite> or the configuration file.</p></li>
+<li><p>When using <cite>download_all_files</cite>, files are only downloaded if they do not yet exist in the cache.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>FIX #1338: Read the configuration file without overwriting it.</p></li>
+<li><p>MAINT #1340: Add Numpy 2.0 support. Update tests to work with scikit-learn &lt;= 1.5.</p></li>
+<li><p>ADD #1342: Add HTTP header to requests to indicate they are from openml-python.</p></li>
+<li><p>ADD #1345: <cite>task.get_dataset</cite> now takes the same parameters as <cite>openml.datasets.get_dataset</cite> to allow fine-grained control over file downloads.</p></li>
+<li><p>MAINT #1346: The ARFF file of a dataset is now only downloaded if parquet is not available.</p></li>
+<li><p>MAINT #1349: Removed usage of the <cite>disutils</cite> module, which allows for Py3.12 compatibility.</p></li>
+<li><p>MAINT #1351: Image archives are now automatically deleted after they have been downloaded and extracted.</p></li>
+<li><dl class="simple">
+<dt>MAINT #1352, 1354: When fetching tasks and datasets, file download parameters now default to not downloading the file.</dt><dd><p>Files will be downloaded only when a user tries to access properties which require them (e.g., <cite>dataset.qualities</cite> or <cite>dataset.get_data</cite>).</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="id2">
+<h2>0.14.2<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>MAINT #1280: Use the server-provided <code class="docutils literal notranslate"><span class="pre">parquet_url</span></code> instead of <code class="docutils literal notranslate"><span class="pre">minio_url</span></code> to determine the location of the parquet file.</p></li>
+<li><p>ADD #716: add documentation for remaining attributes of classes and functions.</p></li>
+<li><p>ADD #1261: more annotations for type hints.</p></li>
+<li><p>MAINT #1294: update tests to new tag specification.</p></li>
+<li><p>FIX #1314: Update fetching a bucket from MinIO.</p></li>
+<li><p>FIX #1315: Make class label retrieval more lenient.</p></li>
+<li><p>ADD #1316: add feature descriptions ontologies support.</p></li>
+<li><p>MAINT #1310/#1307: switch to ruff and resolve all mypy errors.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="id3">
+<h2>0.14.1<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>FIX: Fallback on downloading ARFF when failing to download parquet from MinIO due to a ServerError.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="id4">
+<h2>0.14.0<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h2>
+<p><strong>IMPORTANT:</strong> This release paves the way towards a breaking update of OpenML-Python. From version
+0.15, functions that had the option to return a pandas DataFrame will return a pandas DataFrame
+by default. This version (0.14) emits a warning if you still use the old access functionality.
+More concretely:</p>
+<ul class="simple">
+<li><p>In 0.15 we will drop the ability to return dictionaries in listing calls and only provide
+pandas DataFrames. To disable warnings in 0.14 you have to request a pandas DataFrame
+(using <code class="docutils literal notranslate"><span class="pre">output_format=&quot;dataframe&quot;</span></code>).</p></li>
+<li><p>In 0.15 we will drop the ability to return datasets as numpy arrays and only provide
+pandas DataFrames. To disable warnings in 0.14 you have to request a pandas DataFrame
+(using <code class="docutils literal notranslate"><span class="pre">dataset_format=&quot;dataframe&quot;</span></code>).</p></li>
+</ul>
+<p>Furthermore, from version 0.15, OpenML-Python will no longer download datasets and dataset metadata
+by default. This version (0.14) emits a warning if you don’t explicitly specifiy the desired behavior.</p>
+<p>Please see the pull requests #1258 and #1260 for further information.</p>
+<ul class="simple">
+<li><p>ADD #1081: New flag that allows disabling downloading dataset features.</p></li>
+<li><p>ADD #1132: New flag that forces a redownload of cached data.</p></li>
+<li><p>FIX #1244: Fixes a rare bug where task listing could fail when the server returned invalid data.</p></li>
+<li><p>DOC #1229: Fixes a comment string for the main example.</p></li>
+<li><p>DOC #1241: Fixes a comment in an example.</p></li>
+<li><p>MAINT #1124: Improve naming of helper functions that govern the cache directories.</p></li>
+<li><p>MAINT #1223, #1250: Update tools used in pre-commit to the latest versions (<code class="docutils literal notranslate"><span class="pre">black==23.30</span></code>, <code class="docutils literal notranslate"><span class="pre">mypy==1.3.0</span></code>, <code class="docutils literal notranslate"><span class="pre">flake8==6.0.0</span></code>).</p></li>
+<li><p>MAINT #1253: Update the citation request to the JMLR paper.</p></li>
+<li><p>MAINT #1246: Add a warning that warns the user that checking for duplicate runs on the server cannot be done without an API key.</p></li>
+</ul>
+</section>
+<section id="id5">
+<h2>0.13.1<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>ADD #1081 #1132: Add additional options for (not) downloading datasets <code class="docutils literal notranslate"><span class="pre">openml.datasets.get_dataset</span></code> and cache management.</p></li>
+<li><p>ADD #1028: Add functions to delete runs, flows, datasets, and tasks (e.g., <code class="docutils literal notranslate"><span class="pre">openml.datasets.delete_dataset</span></code>).</p></li>
+<li><p>ADD #1144: Add locally computed results to the <code class="docutils literal notranslate"><span class="pre">OpenMLRun</span></code> object’s representation if the run was created locally and not downloaded from the server.</p></li>
+<li><p>ADD #1180: Improve the error message when the checksum of a downloaded dataset does not match the checksum provided by the API.</p></li>
+<li><p>ADD #1201: Make <code class="docutils literal notranslate"><span class="pre">OpenMLTraceIteration</span></code> a dataclass.</p></li>
+<li><p>DOC #1069: Add argument documentation for the <code class="docutils literal notranslate"><span class="pre">OpenMLRun</span></code> class.</p></li>
+<li><p>DOC #1241 #1229 #1231: Minor documentation fixes and resolve documentation examples not working.</p></li>
+<li><p>FIX #1197 #559 #1131: Fix the order of ground truth and predictions in the <code class="docutils literal notranslate"><span class="pre">OpenMLRun</span></code> object and in <code class="docutils literal notranslate"><span class="pre">format_prediction</span></code>.</p></li>
+<li><p>FIX #1198: Support numpy 1.24 and higher.</p></li>
+<li><p>FIX #1216: Allow unknown task types on the server. This is only relevant when new task types are added to the test server.</p></li>
+<li><p>FIX #1223: Fix mypy errors for implicit optional typing.</p></li>
+<li><p>MAINT #1155: Add dependabot github action to automatically update other github actions.</p></li>
+<li><p>MAINT #1199: Obtain pre-commit’s flake8 from github.com instead of gitlab.com.</p></li>
+<li><p>MAINT #1215: Support latest numpy version.</p></li>
+<li><p>MAINT #1218: Test Python3.6 on Ubuntu 20.04 instead of the latest Ubuntu (which is 22.04).</p></li>
+<li><p>MAINT #1221 #1212 #1206 #1211: Update github actions to the latest versions.</p></li>
+</ul>
+</section>
+<section id="id6">
+<h2>0.13.0<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>FIX #1030: <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> hooks now no longer should issue a warning.</p></li>
+<li><p>FIX #1058, #1100: Avoid <code class="docutils literal notranslate"><span class="pre">NoneType</span></code> error when printing task without <code class="docutils literal notranslate"><span class="pre">class_labels</span></code> attribute.</p></li>
+<li><p>FIX #1110: Make arguments to <code class="docutils literal notranslate"><span class="pre">create_study</span></code> and <code class="docutils literal notranslate"><span class="pre">create_suite</span></code> that are defined as optional by the OpenML XSD actually optional.</p></li>
+<li><p>FIX #1147: <code class="docutils literal notranslate"><span class="pre">openml.flow.flow_exists</span></code> no longer requires an API key.</p></li>
+<li><p>FIX #1184: Automatically resolve proxies when downloading from minio. Turn this off by setting environment variable <code class="docutils literal notranslate"><span class="pre">no_proxy=&quot;*&quot;</span></code>.</p></li>
+<li><p>MAINT #1088: Do CI for Windows on Github Actions instead of Appveyor.</p></li>
+<li><p>MAINT #1104: Fix outdated docstring for <code class="docutils literal notranslate"><span class="pre">list_task</span></code>.</p></li>
+<li><p>MAINT #1146: Update the pre-commit dependencies.</p></li>
+<li><p>ADD #1103: Add a <code class="docutils literal notranslate"><span class="pre">predictions</span></code> property to OpenMLRun for easy accessibility of prediction data.</p></li>
+<li><p>ADD #1188: EXPERIMENTAL. Allow downloading all files from a minio bucket with <code class="docutils literal notranslate"><span class="pre">download_all_files=True</span></code> for <code class="docutils literal notranslate"><span class="pre">get_dataset</span></code>.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="id7">
+<h2>0.12.2<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>ADD #1065: Add a <code class="docutils literal notranslate"><span class="pre">retry_policy</span></code> configuration option that determines the frequency and number of times to attempt to retry server requests.</p></li>
+<li><p>ADD #1075: A docker image is now automatically built on a push to develop. It can be used to build docs or run tests in an isolated environment.</p></li>
+<li><p>ADD: You can now avoid downloading ‘qualities’ meta-data when downloading a task with the <code class="docutils literal notranslate"><span class="pre">download_qualities</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">openml.tasks.get_task[s]</span></code> functions.</p></li>
+<li><p>DOC: Fixes a few broken links in the documentation.</p></li>
+<li><p>DOC #1061: Improve examples to always show a warning when they switch to the test server.</p></li>
+<li><p>DOC #1067: Improve documentation on the scikit-learn extension interface.</p></li>
+<li><p>DOC #1068: Create dedicated extensions page.</p></li>
+<li><p>FIX #1075: Correctly convert <cite>y</cite> to a pandas series when downloading sparse data.</p></li>
+<li><p>MAINT: Rename <cite>master</cite> brach to ` main` branch.</p></li>
+<li><p>MAINT/DOC: Automatically check for broken external links when building the documentation.</p></li>
+<li><p>MAINT/DOC: Fail documentation building on warnings. This will make the documentation building
+fail if a reference cannot be found (i.e. an internal link is broken).</p></li>
+</ul>
+</section>
+<section id="id8">
+<h2>0.12.1<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>ADD #895/#1038: Measure runtimes of scikit-learn runs also for models which are parallelized
+via the joblib.</p></li>
+<li><p>DOC #1050: Refer to the webpage instead of the XML file in the main example.</p></li>
+<li><p>DOC #1051: Document existing extensions to OpenML-Python besides the shipped scikit-learn
+extension.</p></li>
+<li><p>FIX #1035: Render class attributes and methods again.</p></li>
+<li><p>ADD #1049: Add a command line tool for configuration openml-python.</p></li>
+<li><p>FIX #1042: Fixes a rare concurrency issue with OpenML-Python and joblib which caused the joblib
+worker pool to fail.</p></li>
+<li><p>FIX #1053: Fixes a bug which could prevent importing the package in a docker container.</p></li>
+</ul>
+</section>
+<section id="id9">
+<h2>0.12.0<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>ADD #964: Validate <code class="docutils literal notranslate"><span class="pre">ignore_attribute</span></code>, <code class="docutils literal notranslate"><span class="pre">default_target_attribute</span></code>, <code class="docutils literal notranslate"><span class="pre">row_id_attribute</span></code> are set to attributes that exist on the dataset when calling <code class="docutils literal notranslate"><span class="pre">create_dataset</span></code>.</p></li>
+<li><p>ADD #979: Dataset features and qualities are now also cached in pickle format.</p></li>
+<li><p>ADD #982: Add helper functions for column transformers.</p></li>
+<li><p>ADD #989: <code class="docutils literal notranslate"><span class="pre">run_model_on_task</span></code> will now warn the user the the model passed has already been fitted.</p></li>
+<li><p>ADD #1009 : Give possibility to not download the dataset qualities. The cached version is used even so download attribute is false.</p></li>
+<li><p>ADD #1016: Add scikit-learn 0.24 support.</p></li>
+<li><p>ADD #1020: Add option to parallelize evaluation of tasks with joblib.</p></li>
+<li><p>ADD #1022: Allow minimum version of dependencies to be listed for a flow, use more accurate minimum versions for scikit-learn dependencies.</p></li>
+<li><p>ADD #1023: Add admin-only calls for adding topics to datasets.</p></li>
+<li><p>ADD #1029: Add support for fetching dataset from a minio server in parquet format.</p></li>
+<li><p>ADD #1031: Generally improve runtime measurements, add them for some previously unsupported flows (e.g. BaseSearchCV derived flows).</p></li>
+<li><p>DOC #973 : Change the task used in the welcome page example so it no longer fails using numerical dataset.</p></li>
+<li><p>MAINT #671: Improved the performance of <code class="docutils literal notranslate"><span class="pre">check_datasets_active</span></code> by only querying the given list of datasets in contrast to querying all datasets. Modified the corresponding unit test.</p></li>
+<li><p>MAINT #891: Changed the way that numerical features are stored. Numerical features that range from 0 to 255 are now stored as uint8, which reduces the storage space required as well as storing and loading times.</p></li>
+<li><p>MAINT #975, #988: Add CI through Github Actions.</p></li>
+<li><p>MAINT #977: Allow <code class="docutils literal notranslate"><span class="pre">short</span></code> and <code class="docutils literal notranslate"><span class="pre">long</span></code> scenarios for unit tests. Reduce the workload for some unit tests.</p></li>
+<li><p>MAINT #985, #1000: Improve unit test stability and output readability, and adds load balancing.</p></li>
+<li><p>MAINT #1018: Refactor data loading and storage. Data is now compressed on the first call to <cite>get_data</cite>.</p></li>
+<li><p>MAINT #1024: Remove flaky decorator for study unit test.</p></li>
+<li><p>FIX #883 #884 #906 #972: Various improvements to the caching system.</p></li>
+<li><p>FIX #980: Speed up <code class="docutils literal notranslate"><span class="pre">check_datasets_active</span></code>.</p></li>
+<li><p>FIX #984: Add a retry mechanism when the server encounters a database issue.</p></li>
+<li><p>FIX #1004: Fixed an issue that prevented installation on some systems (e.g. Ubuntu).</p></li>
+<li><p>FIX #1013: Fixes a bug where <code class="docutils literal notranslate"><span class="pre">OpenMLRun.setup_string</span></code> was not uploaded to the server, prepares for <code class="docutils literal notranslate"><span class="pre">run_details</span></code> being sent from the server.</p></li>
+<li><p>FIX #1021: Fixes an issue that could occur when running unit tests and openml-python was not in PATH.</p></li>
+<li><p>FIX #1037: Fixes a bug where a dataset could not be loaded if a categorical value had listed nan-like as a possible category.</p></li>
+</ul>
+</section>
+<section id="id10">
+<h2>0.11.0<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>ADD #753: Allows uploading custom flows to OpenML via OpenML-Python.</p></li>
+<li><p>ADD #777: Allows running a flow on pandas dataframes (in addition to numpy arrays).</p></li>
+<li><p>ADD #888: Allow passing a <cite>task_id</cite> to <cite>run_model_on_task</cite>.</p></li>
+<li><p>ADD #894: Support caching of datasets using feather format as an option.</p></li>
+<li><p>ADD #929: Add <code class="docutils literal notranslate"><span class="pre">edit_dataset</span></code> and <code class="docutils literal notranslate"><span class="pre">fork_dataset</span></code> to allow editing and forking of uploaded datasets.</p></li>
+<li><p>ADD #866, #943: Add support for scikit-learn’s <cite>passthrough</cite> and <cite>drop</cite> when uploading flows to
+OpenML.</p></li>
+<li><p>ADD #879: Add support for scikit-learn’s MLP hyperparameter <cite>layer_sizes</cite>.</p></li>
+<li><p>ADD #894: Support caching of datasets using feather format as an option.</p></li>
+<li><p>ADD #945: PEP 561 compliance for distributing Type information.</p></li>
+<li><p>DOC #660: Remove nonexistent argument from docstring.</p></li>
+<li><p>DOC #901: The API reference now documents the config file and its options.</p></li>
+<li><p>DOC #912: API reference now shows <cite>create_task</cite>.</p></li>
+<li><p>DOC #954: Remove TODO text from documentation.</p></li>
+<li><p>DOC #960: document how to upload multiple ignore attributes.</p></li>
+<li><p>FIX #873: Fixes an issue which resulted in incorrect URLs when printing OpenML objects after
+switching the server.</p></li>
+<li><p>FIX #885: Logger no longer registered by default. Added utility functions to easily register
+logging to console and file.</p></li>
+<li><p>FIX #890: Correct the scaling of data in the SVM example.</p></li>
+<li><p>MAINT #371: <code class="docutils literal notranslate"><span class="pre">list_evaluations</span></code> default <code class="docutils literal notranslate"><span class="pre">size</span></code> changed from <code class="docutils literal notranslate"><span class="pre">None</span></code> to <code class="docutils literal notranslate"><span class="pre">10_000</span></code>.</p></li>
+<li><p>MAINT #767: Source distribution installation is now unit-tested.</p></li>
+<li><p>MAINT #781: Add pre-commit and automated code formatting with black.</p></li>
+<li><p>MAINT #804: Rename arguments of list_evaluations to indicate they expect lists of ids.</p></li>
+<li><p>MAINT #836: OpenML supports only pandas version 1.0.0 or above.</p></li>
+<li><p>MAINT #865: OpenML no longer bundles test files in the source distribution.</p></li>
+<li><p>MAINT #881: Improve the error message for too-long URIs.</p></li>
+<li><p>MAINT #897: Dropping support for Python 3.5.</p></li>
+<li><p>MAINT #916: Adding support for Python 3.8.</p></li>
+<li><p>MAINT #920: Improve error messages for dataset upload.</p></li>
+<li><p>MAINT #921: Improve hangling of the OpenML server URL in the config file.</p></li>
+<li><p>MAINT #925: Improve error handling and error message when loading datasets.</p></li>
+<li><p>MAINT #928: Restructures the contributing documentation.</p></li>
+<li><p>MAINT #936: Adding support for scikit-learn 0.23.X.</p></li>
+<li><p>MAINT #945: Make OpenML-Python PEP562 compliant.</p></li>
+<li><p>MAINT #951: Converts TaskType class to a TaskType enum.</p></li>
+</ul>
+</section>
+<section id="id11">
+<h2>0.10.2<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>ADD #857: Adds task type ID to list_runs</p></li>
+<li><p>DOC #862: Added license BSD 3-Clause to each of the source files.</p></li>
+</ul>
+</section>
+<section id="id12">
+<h2>0.10.1<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>ADD #175: Automatically adds the docstring of scikit-learn objects to flow and its parameters.</p></li>
+<li><p>ADD #737: New evaluation listing call that includes the hyperparameter settings.</p></li>
+<li><p>ADD #744: It is now possible to only issue a warning and not raise an exception if the package
+versions for a flow are not met when deserializing it.</p></li>
+<li><p>ADD #783: The URL to download the predictions for a run is now stored in the run object.</p></li>
+<li><p>ADD #790: Adds the uploader name and id as new filtering options for <code class="docutils literal notranslate"><span class="pre">list_evaluations</span></code>.</p></li>
+<li><p>ADD #792: New convenience function <code class="docutils literal notranslate"><span class="pre">openml.flow.get_flow_id</span></code>.</p></li>
+<li><p>ADD #861: Debug-level log information now being written to a file in the cache directory (at most 2 MB).</p></li>
+<li><p>DOC #778: Introduces instructions on how to publish an extension to support other libraries
+than scikit-learn.</p></li>
+<li><p>DOC #785: The examples section is completely restructured into simple simple examples, advanced
+examples and examples showcasing the use of OpenML-Python to reproduce papers which were done
+with OpenML-Python.</p></li>
+<li><p>DOC #788: New example on manually iterating through the split of a task.</p></li>
+<li><p>DOC #789: Improve the usage of dataframes in the examples.</p></li>
+<li><p>DOC #791: New example for the paper <em>Efficient and Robust Automated Machine Learning</em> by Feurer
+et al. (2015).</p></li>
+<li><p>DOC #803: New example for the paper <em>Don’t  Rule  Out  Simple  Models Prematurely:
+A Large Scale  Benchmark Comparing Linear and Non-linear Classifiers in OpenML</em> by Benjamin
+Strang et al. (2018).</p></li>
+<li><p>DOC #808: New example demonstrating basic use cases of a dataset.</p></li>
+<li><p>DOC #810: New example demonstrating the use of benchmarking studies and suites.</p></li>
+<li><p>DOC #832: New example for the paper <em>Scalable Hyperparameter Transfer Learning</em> by
+Valerio Perrone et al. (2019)</p></li>
+<li><p>DOC #834: New example showing how to plot the loss surface for a support vector machine.</p></li>
+<li><p>FIX #305: Do not require the external version in the flow XML when loading an object.</p></li>
+<li><p>FIX #734: Better handling of <em>“old”</em> flows.</p></li>
+<li><p>FIX #736: Attach a StreamHandler to the openml logger instead of the root logger.</p></li>
+<li><p>FIX #758: Fixes an error which made the client API crash when loading a sparse data with
+categorical variables.</p></li>
+<li><p>FIX #779: Do not fail on corrupt pickle</p></li>
+<li><p>FIX #782: Assign the study id to the correct class attribute.</p></li>
+<li><p>FIX #819: Automatically convert column names to type string when uploading a dataset.</p></li>
+<li><p>FIX #820: Make <code class="docutils literal notranslate"><span class="pre">__repr__</span></code> work for datasets which do not have an id.</p></li>
+<li><p>MAINT #796: Rename an argument to make the function <code class="docutils literal notranslate"><span class="pre">list_evaluations</span></code> more consistent.</p></li>
+<li><p>MAINT #811: Print the full error message given by the server.</p></li>
+<li><p>MAINT #828: Create base class for OpenML entity classes.</p></li>
+<li><p>MAINT #829: Reduce the number of data conversion warnings.</p></li>
+<li><p>MAINT #831: Warn if there’s an empty flow description when publishing a flow.</p></li>
+<li><p>MAINT #837: Also print the flow XML if a flow fails to validate.</p></li>
+<li><p>FIX #838: Fix list_evaluations_setups to work when evaluations are not a 100 multiple.</p></li>
+<li><p>FIX #847: Fixes an issue where the client API would crash when trying to download a dataset
+when there are no qualities available on the server.</p></li>
+<li><p>MAINT #849: Move logic of most different <code class="docutils literal notranslate"><span class="pre">publish</span></code> functions into the base class.</p></li>
+<li><p>MAINt #850: Remove outdated test code.</p></li>
+</ul>
+</section>
+<section id="id13">
+<h2>0.10.0<a class="headerlink" href="#id13" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>ADD #737: Add list_evaluations_setups to return hyperparameters along with list of evaluations.</p></li>
+<li><p>FIX #261: Test server is cleared of all files uploaded during unit testing.</p></li>
+<li><p>FIX #447: All files created by unit tests no longer persist in local.</p></li>
+<li><p>FIX #608: Fixing dataset_id referenced before assignment error in get_run function.</p></li>
+<li><p>FIX #447: All files created by unit tests are deleted after the completion of all unit tests.</p></li>
+<li><p>FIX #589: Fixing a bug that did not successfully upload the columns to ignore when creating and publishing a dataset.</p></li>
+<li><p>FIX #608: Fixing dataset_id referenced before assignment error in get_run function.</p></li>
+<li><p>DOC #639: More descriptive documention for function to convert array format.</p></li>
+<li><p>DOC #719: Add documentation on uploading tasks.</p></li>
+<li><p>ADD #687: Adds a function to retrieve the list of evaluation measures available.</p></li>
+<li><p>ADD #695: A function to retrieve all the data quality measures available.</p></li>
+<li><p>ADD #412: Add a function to trim flow names for scikit-learn flows.</p></li>
+<li><p>ADD #715: <cite>list_evaluations</cite> now has an option to sort evaluations by score (value).</p></li>
+<li><p>ADD #722: Automatic reinstantiation of flow in <cite>run_model_on_task</cite>. Clearer errors if that’s not possible.</p></li>
+<li><p>ADD #412: The scikit-learn extension populates the short name field for flows.</p></li>
+<li><p>MAINT #726: Update examples to remove deprecation warnings from scikit-learn</p></li>
+<li><p>MAINT #752: Update OpenML-Python to be compatible with sklearn 0.21</p></li>
+<li><p>ADD #790: Add user ID and name to list_evaluations</p></li>
+</ul>
+</section>
+<section id="id14">
+<h2>0.9.0<a class="headerlink" href="#id14" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>ADD #560: OpenML-Python can now handle regression tasks as well.</p></li>
+<li><p>ADD #620, #628, #632, #649, #682: Full support for studies and distinguishes suites from studies.</p></li>
+<li><p>ADD #607: Tasks can now be created and uploaded.</p></li>
+<li><p>ADD #647, #673: Introduced the extension interface. This provides an easy way to create a hook for machine learning packages to perform e.g. automated runs.</p></li>
+<li><p>ADD #548, #646, #676: Support for Pandas DataFrame and SparseDataFrame</p></li>
+<li><p>ADD #662: Results of listing functions can now be returned as pandas.DataFrame.</p></li>
+<li><p>ADD #59: Datasets can now also be retrieved by name.</p></li>
+<li><p>ADD #672: Add timing measurements for runs, when possible.</p></li>
+<li><p>ADD #661: Upload time and error messages now displayed with <cite>list_runs</cite>.</p></li>
+<li><p>ADD #644: Datasets can now be downloaded ‘lazily’, retrieving only metadata at first, and the full dataset only when necessary.</p></li>
+<li><p>ADD #659: Lazy loading of task splits.</p></li>
+<li><p>ADD #516: <cite>run_flow_on_task</cite> flow uploading is now optional.</p></li>
+<li><p>ADD #680: Adds <cite>openml.config.start_using_configuration_for_example</cite> (and resp. stop) to easily connect to the test server.</p></li>
+<li><p>ADD #75, #653: Adds a pretty print for objects of the top-level classes.</p></li>
+<li><p>FIX #642: <cite>check_datasets_active</cite> now correctly also returns active status of deactivated datasets.</p></li>
+<li><p>FIX #304, #636: Allow serialization of numpy datatypes and list of lists of more types (e.g. bools, ints) for flows.</p></li>
+<li><p>FIX #651: Fixed a bug that would prevent openml-python from finding the user’s config file.</p></li>
+<li><p>FIX #693: OpenML-Python uses liac-arff instead of scipy.io for loading task splits now.</p></li>
+<li><p>DOC #678: Better color scheme for code examples in documentation.</p></li>
+<li><p>DOC #681: Small improvements and removing list of missing functions.</p></li>
+<li><p>DOC #684: Add notice to examples that connect to the test server.</p></li>
+<li><p>DOC #688: Add new example on retrieving evaluations.</p></li>
+<li><p>DOC #691: Update contributing guidelines to use Github draft feature instead of tags in title.</p></li>
+<li><p>DOC #692: All functions are documented now.</p></li>
+<li><p>MAINT #184: Dropping Python2 support.</p></li>
+<li><p>MAINT #596: Fewer dependencies for regular pip install.</p></li>
+<li><p>MAINT #652: Numpy and Scipy are no longer required before installation.</p></li>
+<li><p>MAINT #655: Lazy loading is now preferred in unit tests.</p></li>
+<li><p>MAINT #667: Different tag functions now share code.</p></li>
+<li><p>MAINT #666: More descriptive error message for <cite>TypeError</cite> in <cite>list_runs</cite>.</p></li>
+<li><p>MAINT #668: Fix some type hints.</p></li>
+<li><p>MAINT #677: <cite>dataset.get_data</cite> now has consistent behavior in its return type.</p></li>
+<li><p>MAINT #686: Adds ignore directives for several <cite>mypy</cite> folders.</p></li>
+<li><p>MAINT #629, #630: Code now adheres to single PEP8 standard.</p></li>
+</ul>
+</section>
+<section id="id15">
+<h2>0.8.0<a class="headerlink" href="#id15" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>ADD #440: Improved dataset upload.</p></li>
+<li><p>ADD #545, #583: Allow uploading a dataset from a pandas DataFrame.</p></li>
+<li><p>ADD #528: New functions to update the status of a dataset.</p></li>
+<li><p>ADD #523: Support for scikit-learn 0.20’s new ColumnTransformer.</p></li>
+<li><p>ADD #459: Enhanced support to store runs on disk prior to uploading them to
+OpenML.</p></li>
+<li><p>ADD #564: New helpers to access the structure of a flow (and find its
+subflows).</p></li>
+<li><p>ADD #618: The software will from now on retry to connect to the server if a
+connection failed. The number of retries can be configured.</p></li>
+<li><p>FIX #538: Support loading clustering tasks.</p></li>
+<li><p>FIX #464: Fixes a bug related to listing functions (returns correct listing
+size).</p></li>
+<li><p>FIX #580: Listing function now works properly when there are less results
+than requested.</p></li>
+<li><p>FIX #571: Fixes an issue where tasks could not be downloaded in parallel.</p></li>
+<li><p>FIX #536: Flows can now be printed when the flow name is None.</p></li>
+<li><p>FIX #504: Better support for hierarchical hyperparameters when uploading
+scikit-learn’s grid and random search.</p></li>
+<li><p>FIX #569: Less strict checking of flow dependencies when loading flows.</p></li>
+<li><p>FIX #431: Pickle of task splits are no longer cached.</p></li>
+<li><p>DOC #540: More examples for dataset uploading.</p></li>
+<li><p>DOC #554: Remove the doubled progress entry from the docs.</p></li>
+<li><p>MAINT #613: Utilize the latest updates in OpenML evaluation listings.</p></li>
+<li><p>MAINT #482: Cleaner interface for handling search traces.</p></li>
+<li><p>MAINT #557: Continuous integration works for scikit-learn 0.18-0.20.</p></li>
+<li><p>MAINT #542: Continuous integration now runs python3.7 as well.</p></li>
+<li><p>MAINT #535: Continuous integration now enforces PEP8 compliance for new code.</p></li>
+<li><p>MAINT #527: Replace deprecated nose by pytest.</p></li>
+<li><p>MAINT #510: Documentation is now built by travis-ci instead of circle-ci.</p></li>
+<li><p>MAINT: Completely re-designed documentation built on sphinx gallery.</p></li>
+<li><p>MAINT #462: Appveyor CI support.</p></li>
+<li><p>MAINT #477: Improve error handling for issue
+<a class="reference external" href="https://github.com/openml/openml-python/pull/479">#479</a>:
+the OpenML connector fails earlier and with a better error message when
+failing to create a flow from the OpenML description.</p></li>
+<li><p>MAINT #561: Improve documentation on running specific unit tests.</p></li>
+</ul>
+</section>
+<section id="id17">
+<h2>0.4.-0.7<a class="headerlink" href="#id17" title="Permalink to this heading">¶</a></h2>
+<p>There is no changelog for these versions.</p>
+</section>
+<section id="id18">
+<h2>0.3.0<a class="headerlink" href="#id18" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Add this changelog</p></li>
+<li><p>2nd example notebook PyOpenML.ipynb</p></li>
+<li><p>Pagination support for list datasets and list tasks</p></li>
+</ul>
+</section>
+<section id="prior">
+<h2>Prior<a class="headerlink" href="#prior" title="Permalink to this heading">¶</a></h2>
+<p>There is no changelog for prior versions.</p>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

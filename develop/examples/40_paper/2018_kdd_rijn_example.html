@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>van Rijn and Hutter (2018) &#8212; OpenML 0.15.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=284a2d1d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/codehighlightstyle.css?v=180e76fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=97b2f34b"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+  
+  <a href="https://github.com/openml/openml-python"
+     class="visible-desktop hidden-xs"><img
+    id="gh-banner"
+    style="position: absolute; top: 50px; right: 0; border: 0;"
+    src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+    alt="Fork me on GitHub"></a>
+  <script>
+    // Adjust banner height.
+    $(function () {
+      var navHeight = $(".navbar .container").css("height");
+      $("#gh-banner").css("top", navHeight);
+    });
+  </script>
+
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          OpenML</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.15.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../index.html">Start</a></li>
+                <li><a href="../../usage.html">User Guide</a></li>
+                <li><a href="../../api.html">API</a></li>
+                <li><a href="../index.html">Examples</a></li>
+                <li><a href="../../extensions.html">Extensions</a></li>
+                <li><a href="../../contributing.html">Contributing</a></li>
+                <li><a href="../../progress.html">Changelog</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#">van Rijn and Hutter (2018)</a><ul>
+<li><a class="reference internal" href="#example-deprecation-warning">Example Deprecation Warning!</a></li>
+<li><a class="reference internal" href="#publication">Publication</a></li>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-examples-40-paper-2018-kdd-rijn-example-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="van-rijn-and-hutter-2018">
+<span id="sphx-glr-examples-40-paper-2018-kdd-rijn-example-py"></span><h1>van Rijn and Hutter (2018)<a class="headerlink" href="#van-rijn-and-hutter-2018" title="Permalink to this heading">¶</a></h1>
+<p>A tutorial on how to reproduce the paper <em>Hyperparameter Importance Across Datasets</em>.</p>
+<section id="example-deprecation-warning">
+<h2>Example Deprecation Warning!<a class="headerlink" href="#example-deprecation-warning" title="Permalink to this heading">¶</a></h2>
+<p>This example is not supported anymore by the OpenML-Python developers. The example is kept for reference purposes but not tested anymore.</p>
+</section>
+<section id="publication">
+<h2>Publication<a class="headerlink" href="#publication" title="Permalink to this heading">¶</a></h2>
+<div class="line-block">
+<div class="line">Hyperparameter importance across datasets</div>
+<div class="line">Jan N. van Rijn and Frank Hutter</div>
+<div class="line">In <em>Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery &amp; Data Mining</em>, 2018</div>
+<div class="line">Available at <a class="reference external" href="https://dl.acm.org/doi/10.1145/3219819.3220058">https://dl.acm.org/doi/10.1145/3219819.3220058</a></div>
+</div>
+</section>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading">¶</a></h2>
+<p>This is a Unix-only tutorial, as the requirements can not be satisfied on a Windows machine (Untested on other
+systems).</p>
+<p>The following Python packages are required:</p>
+<p>pip install openml[examples,docs] fanova ConfigSpace&lt;1.0</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>This example is deprecated, remove the `if False` in this code to use it manually.
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3-Clause</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;win32&quot;</span><span class="p">:</span>  <span class="c1"># noqa</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;The pyrfr library (requirement of fanova) can currently not be installed on Windows systems&quot;</span>
+    <span class="p">)</span>
+    <span class="n">exit</span><span class="p">()</span>
+
+<span class="c1"># DEPRECATED EXAMPLE -- Avoid running this code in our CI/CD pipeline</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This example is deprecated, remove the `if False` in this code to use it manually.&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">json</span>
+    <span class="kn">import</span> <span class="nn">fanova</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+    <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+    <span class="kn">import</span> <span class="nn">openml</span>
+
+
+    <span class="c1">##############################################################################</span>
+    <span class="c1"># With the advent of automated machine learning, automated hyperparameter</span>
+    <span class="c1"># optimization methods are by now routinely used in data mining. However, this</span>
+    <span class="c1"># progress is not yet matched by equal progress on automatic analyses that</span>
+    <span class="c1"># yield information beyond performance-optimizing hyperparameter settings.</span>
+    <span class="c1"># In this example, we aim to answer the following two questions: Given an</span>
+    <span class="c1"># algorithm, what are generally its most important hyperparameters?</span>
+    <span class="c1">#</span>
+    <span class="c1"># This work is carried out on the OpenML-100 benchmark suite, which can be</span>
+    <span class="c1"># obtained by ``openml.study.get_suite(&#39;OpenML100&#39;)``. In this example, we</span>
+    <span class="c1"># conduct the experiment on the Support Vector Machine (``flow_id=7707``)</span>
+    <span class="c1"># with specific kernel (we will perform a post-process filter operation for</span>
+    <span class="c1"># this). We should set some other experimental parameters (number of results</span>
+    <span class="c1"># per task, evaluation measure and the number of trees of the internal</span>
+    <span class="c1"># functional Anova) before the fun can begin.</span>
+    <span class="c1">#</span>
+    <span class="c1"># Note that we simplify the example in several ways:</span>
+    <span class="c1">#</span>
+    <span class="c1"># 1) We only consider numerical hyperparameters</span>
+    <span class="c1"># 2) We consider all hyperparameters that are numerical (in reality, some</span>
+    <span class="c1">#    hyperparameters might be inactive (e.g., ``degree``) or irrelevant</span>
+    <span class="c1">#    (e.g., ``random_state``)</span>
+    <span class="c1"># 3) We assume all hyperparameters to be on uniform scale</span>
+    <span class="c1">#</span>
+    <span class="c1"># Any difference in conclusion between the actual paper and the presented</span>
+    <span class="c1"># results is most likely due to one of these simplifications. For example,</span>
+    <span class="c1"># the hyperparameter C looks rather insignificant, whereas it is quite</span>
+    <span class="c1"># important when it is put on a log-scale. All these simplifications can be</span>
+    <span class="c1"># addressed by defining a ConfigSpace. For a more elaborated example that uses</span>
+    <span class="c1"># this, please see:</span>
+    <span class="c1"># https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdccc7b9265/examples/plot/plot_fanova_aggregates.py # noqa F401</span>
+
+    <span class="n">suite</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">get_suite</span><span class="p">(</span><span class="s2">&quot;OpenML100&quot;</span><span class="p">)</span>
+    <span class="n">flow_id</span> <span class="o">=</span> <span class="mi">7707</span>
+    <span class="n">parameter_filters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;sklearn.svm.classes.SVC(17)_kernel&quot;</span><span class="p">:</span> <span class="s2">&quot;sigmoid&quot;</span><span class="p">}</span>
+    <span class="n">evaluation_measure</span> <span class="o">=</span> <span class="s2">&quot;predictive_accuracy&quot;</span>
+    <span class="n">limit_per_task</span> <span class="o">=</span> <span class="mi">500</span>
+    <span class="n">limit_nr_tasks</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">n_trees</span> <span class="o">=</span> <span class="mi">16</span>
+
+    <span class="n">fanova_results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># we will obtain all results from OpenML per task. Practice has shown that this places the bottleneck on the</span>
+    <span class="c1"># communication with OpenML, and for iterated experimenting it is better to cache the results in a local file.</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">suite</span><span class="o">.</span><span class="n">tasks</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">limit_nr_tasks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="n">limit_nr_tasks</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Starting with task </span><span class="si">%d</span><span class="s2"> (</span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">)&quot;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">suite</span><span class="o">.</span><span class="n">tasks</span><span class="p">)</span> <span class="k">if</span> <span class="n">limit_nr_tasks</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">limit_nr_tasks</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="c1"># note that we explicitly only include tasks from the benchmark suite that was specified (as per the for-loop)</span>
+        <span class="n">evals</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">list_evaluations_setups</span><span class="p">(</span>
+            <span class="n">evaluation_measure</span><span class="p">,</span>
+            <span class="n">flows</span><span class="o">=</span><span class="p">[</span><span class="n">flow_id</span><span class="p">],</span>
+            <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="n">task_id</span><span class="p">],</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">limit_per_task</span><span class="p">,</span>
+            <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">performance_column</span> <span class="o">=</span> <span class="s2">&quot;value&quot;</span>
+        <span class="c1"># make a DataFrame consisting of all hyperparameters (which is a dict in setup[&#39;parameters&#39;]) and the performance</span>
+        <span class="c1"># value (in setup[&#39;value&#39;]). The following line looks a bit complicated, but combines 2 tasks: a) combine</span>
+        <span class="c1"># hyperparameters and performance data in a single dict, b) cast hyperparameter values to the appropriate format</span>
+        <span class="c1"># Note that the ``json.loads(...)`` requires the content to be in JSON format, which is only the case for</span>
+        <span class="c1"># scikit-learn setups (and even there some legacy setups might violate this requirement). It will work for the</span>
+        <span class="c1"># setups that belong to the flows embedded in this example though.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">setups_evals</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="nb">dict</span><span class="p">(</span>
+                        <span class="o">**</span><span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">setup</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+                        <span class="o">**</span><span class="p">{</span><span class="n">performance_column</span><span class="p">:</span> <span class="n">setup</span><span class="p">[</span><span class="n">performance_column</span><span class="p">]}</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">setup</span> <span class="ow">in</span> <span class="n">evals</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Task </span><span class="si">%d</span><span class="s2"> error: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+            <span class="k">continue</span>
+        <span class="c1"># apply our filters, to have only the setups that comply to the hyperparameters we want</span>
+        <span class="k">for</span> <span class="n">filter_key</span><span class="p">,</span> <span class="n">filter_value</span> <span class="ow">in</span> <span class="n">parameter_filters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">setups_evals</span> <span class="o">=</span> <span class="n">setups_evals</span><span class="p">[</span><span class="n">setups_evals</span><span class="p">[</span><span class="n">filter_key</span><span class="p">]</span> <span class="o">==</span> <span class="n">filter_value</span><span class="p">]</span>
+        <span class="c1"># in this simplified example, we only display numerical and float hyperparameters. For categorical hyperparameters,</span>
+        <span class="c1"># the fanova library needs to be informed by using a configspace object.</span>
+        <span class="n">setups_evals</span> <span class="o">=</span> <span class="n">setups_evals</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;int64&quot;</span><span class="p">,</span> <span class="s2">&quot;float64&quot;</span><span class="p">])</span>
+        <span class="c1"># drop rows with unique values. These are by definition not an interesting hyperparameter, e.g., ``axis``,</span>
+        <span class="c1"># ``verbose``.</span>
+        <span class="n">setups_evals</span> <span class="o">=</span> <span class="n">setups_evals</span><span class="p">[</span>
+            <span class="p">[</span>
+                <span class="n">c</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">setups_evals</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">setups_evals</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">c</span> <span class="o">==</span> <span class="n">performance_column</span>
+            <span class="p">]</span>
+        <span class="p">]</span>
+        <span class="c1"># We are done with processing ``setups_evals``. Note that we still might have some irrelevant hyperparameters, e.g.,</span>
+        <span class="c1"># ``random_state``. We have dropped some relevant hyperparameters, i.e., several categoricals. Let&#39;s check it out:</span>
+
+        <span class="c1"># determine x values to pass to fanova library</span>
+        <span class="n">parameter_names</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">pname</span> <span class="k">for</span> <span class="n">pname</span> <span class="ow">in</span> <span class="n">setups_evals</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="k">if</span> <span class="n">pname</span> <span class="o">!=</span> <span class="n">performance_column</span>
+        <span class="p">]</span>
+        <span class="n">evaluator</span> <span class="o">=</span> <span class="n">fanova</span><span class="o">.</span><span class="n">fanova</span><span class="o">.</span><span class="n">fANOVA</span><span class="p">(</span>
+            <span class="n">X</span><span class="o">=</span><span class="n">setups_evals</span><span class="p">[</span><span class="n">parameter_names</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+            <span class="n">Y</span><span class="o">=</span><span class="n">setups_evals</span><span class="p">[</span><span class="n">performance_column</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+            <span class="n">n_trees</span><span class="o">=</span><span class="n">n_trees</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">pname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parameter_names</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">fanova_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;hyperparameter&quot;</span><span class="p">:</span> <span class="n">pname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="s2">&quot;fanova&quot;</span><span class="p">:</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">quantify_importance</span><span class="p">([</span><span class="n">idx</span><span class="p">])[(</span><span class="n">idx</span><span class="p">,)][</span><span class="s2">&quot;individual importance&quot;</span><span class="p">],</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># functional ANOVA sometimes crashes with a RuntimeError, e.g., on tasks where the performance is constant</span>
+                <span class="c1"># for all configurations (there is no variance). We will skip these tasks (like the authors did in the</span>
+                <span class="c1"># paper).</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Task </span><span class="si">%d</span><span class="s2"> error: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+                <span class="k">continue</span>
+
+    <span class="c1"># transform ``fanova_results`` from a list of dicts into a DataFrame</span>
+    <span class="n">fanova_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">fanova_results</span><span class="p">)</span>
+
+    <span class="c1">##############################################################################</span>
+    <span class="c1"># make the boxplot of the variance contribution. Obviously, we can also use</span>
+    <span class="c1"># this data to make the Nemenyi plot, but this relies on the rather complex</span>
+    <span class="c1"># ``Orange`` dependency (``pip install Orange3``). For the complete example,</span>
+    <span class="c1"># the reader is referred to the more elaborate script (referred to earlier)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;hyperparameter&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;fanova&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">fanova_results</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Variance Contribution&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.001 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-40-paper-2018-kdd-rijn-example-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/4076733b22158deda2a79e57d217b001/2018_kdd_rijn_example.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">2018_kdd_rijn_example.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/fb4c80b20c8429a4165b670554f3d313/2018_kdd_rijn_example.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">2018_kdd_rijn_example.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/e9082cf1c1dc6a1e6a0fcccbf19df3e2/2018_kdd_rijn_example.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">2018_kdd_rijn_example.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014-2024, the OpenML-Python team.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

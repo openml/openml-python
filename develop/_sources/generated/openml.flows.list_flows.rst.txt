@@ -1,0 +1,10 @@
+﻿:mod:`openml.flows`.list_flows
+===========================================
+
+.. currentmodule:: openml.flows
+
+.. autofunction:: list_flows
+
+.. raw:: html
+
+    <div class="clearer"></div>

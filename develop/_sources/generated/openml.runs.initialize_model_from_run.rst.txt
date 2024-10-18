@@ -1,0 +1,10 @@
+﻿:mod:`openml.runs`.initialize_model_from_run
+=========================================================
+
+.. currentmodule:: openml.runs
+
+.. autofunction:: initialize_model_from_run
+
+.. raw:: html
+
+    <div class="clearer"></div>

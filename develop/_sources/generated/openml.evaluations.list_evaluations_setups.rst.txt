@@ -1,0 +1,10 @@
+﻿:mod:`openml.evaluations`.list_evaluations_setups
+==============================================================
+
+.. currentmodule:: openml.evaluations
+
+.. autofunction:: list_evaluations_setups
+
+.. raw:: html
+
+    <div class="clearer"></div>
