@@ -861,7 +861,7 @@ def status_update(data_id: int, status: Literal["active", "deactivated"]) -> Non
     Updates the status of a dataset to either 'active' or 'deactivated'.
     Please see the OpenML API documentation for a description of the status
     and all legal status transitions:
-    https://docs.openml.org/#dataset-status
+    https://docs.openml.org/concepts/data/#dataset-status
 
     Parameters
     ----------

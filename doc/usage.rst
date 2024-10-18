@@ -118,7 +118,7 @@ this should be repeated several times. Also, the task defines a target metric
 for which a flow should be optimized.
 
 Below you can find our tutorial regarding tasks and if you want to know more
-you can read the `OpenML guide <https://docs.openml.org/#tasks>`_:
+you can read the `OpenML guide <https://docs.openml.org/concepts/tasks/>`_:
 
 * :ref:`sphx_glr_examples_30_extended_tasks_tutorial.py`
 
