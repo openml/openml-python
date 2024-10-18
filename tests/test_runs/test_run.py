@@ -152,6 +152,18 @@ class TestRun(TestBase):
             "collected from {}: {}".format(__file__.split("/")[-1], run_prime.run_id),
         )
 
+    @pytest.mark.server()
+    def test_correct_test_server_download_state(self):
+        """This test verifies that the test server downloads the data from the correct source.
+
+        If this tests fails, it is highly likely that the test server is not configured correctly.
+        Usually, this means that the test server is serving data from the task with the same ID from the production server.
+        That is, it serves parquet files wrongly associated with the test server's task.
+        """
+        task=openml.tasks.get_task(119)
+        dataset=task.get_dataset()
+        assert len(dataset.features)==dataset.get_data(dataset_format="dataframe")[0].shape[1]
+
     @pytest.mark.sklearn()
     @pytest.mark.flaky()
     def test_to_from_filesystem_search(self):
