@@ -8,6 +8,8 @@ import openml.runs
 import openml.tasks
 
 
+# TODO(eddiebergman): A lot of this class is automatically
+# handled by a dataclass
 class OpenMLEvaluation:
     """
     Contains all meta-information about a run / evaluation combination,
@@ -77,6 +79,24 @@ class OpenMLEvaluation:
         self.value = value
         self.values = values
         self.array_data = array_data
+
+    def _to_dict(self) -> dict:
+        return {
+            "run_id": self.run_id,
+            "task_id": self.task_id,
+            "setup_id": self.setup_id,
+            "flow_id": self.flow_id,
+            "flow_name": self.flow_name,
+            "data_id": self.data_id,
+            "data_name": self.data_name,
+            "function": self.function,
+            "upload_time": self.upload_time,
+            "uploader": self.uploader,
+            "uploader_name": self.uploader_name,
+            "value": self.value,
+            "values": self.values,
+            "array_data": self.array_data,
+        }
 
     def __repr__(self) -> str:
         header = "OpenML Evaluation"

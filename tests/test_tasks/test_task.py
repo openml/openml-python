@@ -71,7 +71,7 @@ class OpenMLTaskTest(TestBase):
             )
 
     def _get_compatible_rand_dataset(self) -> list:
-        active_datasets = list_datasets(status="active", output_format="dataframe")
+        active_datasets = list_datasets(status="active")
 
         # depending on the task type, find either datasets
         # with only symbolic features or datasets with only

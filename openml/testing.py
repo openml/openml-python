@@ -12,7 +12,6 @@ import unittest
 from pathlib import Path
 from typing import ClassVar
 
-import pandas as pd
 import requests
 
 import openml
@@ -286,8 +285,7 @@ def check_task_existence(
     int, None
     """
     return_val = None
-    tasks = openml.tasks.list_tasks(task_type=task_type, output_format="dataframe")
-    assert isinstance(tasks, pd.DataFrame)
+    tasks = openml.tasks.list_tasks(task_type=task_type)
     if len(tasks) == 0:
         return None
     tasks = tasks.loc[tasks["did"] == dataset_id]

@@ -5,9 +5,9 @@ import itertools
 import time
 import warnings
 from collections import OrderedDict
+from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
-from typing_extensions import Literal
 
 import numpy as np
 import pandas as pd
@@ -65,7 +65,6 @@ def run_model_on_task(  # noqa: PLR0913
     add_local_measures: bool = True,  # noqa: FBT001, FBT002
     upload_flow: bool = False,  # noqa: FBT001, FBT002
     return_flow: bool = False,  # noqa: FBT001, FBT002
-    dataset_format: Literal["array", "dataframe"] = "dataframe",
     n_jobs: int | None = None,
 ) -> OpenMLRun | tuple[OpenMLRun, OpenMLFlow]:
     """Run the model on the dataset defined by the task.
@@ -93,9 +92,6 @@ def run_model_on_task(  # noqa: PLR0913
         If False, do not upload the flow to OpenML.
     return_flow : bool (default=False)
         If True, returns the OpenMLFlow generated from the model in addition to the OpenMLRun.
-    dataset_format : str (default='dataframe')
-        If 'array', the dataset is passed to the model as a numpy array.
-        If 'dataframe', the dataset is passed to the model as a pandas dataframe.
     n_jobs : int (default=None)
         The number of processes/threads to distribute the evaluation asynchronously.
         If `None` or `1`, then the evaluation is treated as synchronous and processed sequentially.
@@ -169,7 +165,6 @@ def run_model_on_task(  # noqa: PLR0913
         seed=seed,
         add_local_measures=add_local_measures,
         upload_flow=upload_flow,
-        dataset_format=dataset_format,
         n_jobs=n_jobs,
     )
     if return_flow:
@@ -185,7 +180,6 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
     seed: int | None = None,
     add_local_measures: bool = True,  # noqa: FBT001, FBT002
     upload_flow: bool = False,  # noqa: FBT001, FBT002
-    dataset_format: Literal["array", "dataframe"] = "dataframe",
     n_jobs: int | None = None,
 ) -> OpenMLRun:
     """Run the model provided by the flow on the dataset defined by task.
@@ -214,9 +208,6 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
     upload_flow : bool (default=False)
         If True, upload the flow to OpenML if it does not exist yet.
         If False, do not upload the flow to OpenML.
-    dataset_format : str (default='dataframe')
-        If 'array', the dataset is passed to the model as a numpy array.
-        If 'dataframe', the dataset is passed to the model as a pandas dataframe.
     n_jobs : int (default=None)
         The number of processes/threads to distribute the evaluation asynchronously.
         If `None` or `1`, then the evaluation is treated as synchronous and processed sequentially.
@@ -304,7 +295,6 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
         task=task,
         extension=flow.extension,
         add_local_measures=add_local_measures,
-        dataset_format=dataset_format,
         n_jobs=n_jobs,
     )
 
@@ -458,8 +448,7 @@ def run_exists(task_id: int, setup_id: int) -> set[int]:
         return set()
 
     try:
-        result = list_runs(task=[task_id], setup=[setup_id], output_format="dataframe")
-        assert isinstance(result, pd.DataFrame)  # TODO(eddiebergman): Remove once #1299
+        result = list_runs(task=[task_id], setup=[setup_id])
         return set() if result.empty else set(result["run_id"])
     except OpenMLServerException as exception:
         # error code implies no results. The run does not exist yet
@@ -468,13 +457,12 @@ def run_exists(task_id: int, setup_id: int) -> set[int]:
         return set()
 
 
-def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, PLR0913, C901
+def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
     *,
     model: Any,
     task: OpenMLTask,
     extension: Extension,
     add_local_measures: bool,
-    dataset_format: Literal["array", "dataframe"],
     n_jobs: int | None = None,
 ) -> tuple[
     list[list],
@@ -495,8 +483,6 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, PLR0913, C901
         The OpenML extension object.
     add_local_measures : bool
         Whether to compute additional local evaluation measures.
-    dataset_format : str
-        The format in which to download the dataset.
     n_jobs : int
         Number of jobs to run in parallel.
         If None, use 1 core by default. If -1, use all available cores.
@@ -560,7 +546,6 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, PLR0913, C901
             rep_no=rep_no,
             sample_no=sample_no,
             task=task,
-            dataset_format=dataset_format,
             configuration=_config,
         )
         for _n_fit, rep_no, fold_no, sample_no in jobs
@@ -704,7 +689,6 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
     rep_no: int,
     sample_no: int,
     task: OpenMLTask,
-    dataset_format: Literal["array", "dataframe"],
     configuration: _Config | None = None,
 ) -> tuple[
     np.ndarray,
@@ -730,8 +714,6 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
         Sample number to be run.
     task : OpenMLTask
         The task object from OpenML.
-    dataset_format : str
-        The dataset format to be used.
     configuration : _Config
         Hyperparameters to configure the model.
 
@@ -755,24 +737,15 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
     )
 
     if isinstance(task, OpenMLSupervisedTask):
-        x, y = task.get_X_and_y(dataset_format=dataset_format)
-        if isinstance(x, pd.DataFrame):
-            assert isinstance(y, (pd.Series, pd.DataFrame))
-            train_x = x.iloc[train_indices]
-            train_y = y.iloc[train_indices]
-            test_x = x.iloc[test_indices]
-            test_y = y.iloc[test_indices]
-        else:
-            # TODO(eddiebergman): Complains spmatrix doesn't support __getitem__ for typing
-            assert y is not None
-            train_x = x[train_indices]  # type: ignore
-            train_y = y[train_indices]
-            test_x = x[test_indices]  # type: ignore
-            test_y = y[test_indices]
+        x, y = task.get_X_and_y()
+        assert isinstance(y, (pd.Series, pd.DataFrame))
+        train_x = x.iloc[train_indices]
+        train_y = y.iloc[train_indices]
+        test_x = x.iloc[test_indices]
+        test_y = y.iloc[test_indices]
     elif isinstance(task, OpenMLClusteringTask):
-        x = task.get_X(dataset_format=dataset_format)
-        # TODO(eddiebergman): Complains spmatrix doesn't support __getitem__ for typing
-        train_x = x.iloc[train_indices] if isinstance(x, pd.DataFrame) else x[train_indices]  # type: ignore
+        x = task.get_X()
+        train_x = x.iloc[train_indices]
         train_y = None
         test_x = None
         test_y = None
@@ -793,8 +766,7 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
         model=model,
         task=task,
         X_train=train_x,
-        # TODO(eddiebergman): Likely should not be ignored
-        y_train=train_y,  # type: ignore
+        y_train=train_y,
         rep_no=rep_no,
         fold_no=fold_no,
         X_test=test_x,
@@ -1050,8 +1022,6 @@ def _get_cached_run(run_id: int) -> OpenMLRun:
         raise OpenMLCacheException(f"Run file for run id {run_id} not cached") from e
 
 
-# TODO(eddiebergman): Could overload, likely too large an annoying to do
-# nvm, will be deprecated in 0.15
 def list_runs(  # noqa: PLR0913
     offset: int | None = None,
     size: int | None = None,
@@ -1063,9 +1033,8 @@ def list_runs(  # noqa: PLR0913
     tag: str | None = None,
     study: int | None = None,
     display_errors: bool = False,  # noqa: FBT001, FBT002
-    output_format: Literal["dict", "dataframe"] = "dict",
-    **kwargs: Any,
-) -> dict | pd.DataFrame:
+    task_type: TaskType | int | None = None,
+) -> pd.DataFrame:
     """
     List all runs matching all of the given filters.
     (Supports large amount of results)
@@ -1095,31 +1064,12 @@ def list_runs(  # noqa: PLR0913
         Whether to list runs which have an error (for example a missing
         prediction file).
 
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
-
-    kwargs : dict, optional
-        Legal filter operators: task_type.
+    task_type : str, optional
 
     Returns
     -------
-    dict of dicts, or dataframe
+    dataframe
     """
-    if output_format not in ["dataframe", "dict"]:
-        raise ValueError("Invalid output format selected. Only 'dict' or 'dataframe' applicable.")
-
-    # TODO: [0.15]
-    if output_format == "dict":
-        msg = (
-            "Support for `output_format` of 'dict' will be removed in 0.15 "
-            "and pandas dataframes will be returned instead. To ensure your code "
-            "will continue to work, use `output_format`='dataframe'."
-        )
-        warnings.warn(msg, category=FutureWarning, stacklevel=2)
-
-    # TODO(eddiebergman): Do we really need this runtime type validation?
     if id is not None and (not isinstance(id, list)):
         raise TypeError("id must be of type list.")
     if task is not None and (not isinstance(task, list)):
@@ -1131,11 +1081,8 @@ def list_runs(  # noqa: PLR0913
     if uploader is not None and (not isinstance(uploader, list)):
         raise TypeError("uploader must be of type list.")
 
-    return openml.utils._list_all(  # type: ignore
-        list_output_format=output_format,  # type: ignore
-        listing_call=_list_runs,
-        offset=offset,
-        size=size,
+    listing_call = partial(
+        _list_runs,
         id=id,
         task=task,
         setup=setup,
@@ -1144,21 +1091,26 @@ def list_runs(  # noqa: PLR0913
         tag=tag,
         study=study,
         display_errors=display_errors,
-        **kwargs,
+        task_type=task_type,
     )
+    batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
+    return pd.concat(batches)
 
 
 def _list_runs(  # noqa: PLR0913
+    limit: int,
+    offset: int,
+    *,
     id: list | None = None,  # noqa: A002
     task: list | None = None,
     setup: list | None = None,
     flow: list | None = None,
     uploader: list | None = None,
     study: int | None = None,
-    display_errors: bool = False,  # noqa: FBT002, FBT001
-    output_format: Literal["dict", "dataframe"] = "dict",
-    **kwargs: Any,
-) -> dict | pd.DataFrame:
+    tag: str | None = None,
+    display_errors: bool = False,
+    task_type: TaskType | int | None = None,
+) -> pd.DataFrame:
     """
     Perform API call `/run/list/{filters}'
     <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`
@@ -1178,6 +1130,8 @@ def _list_runs(  # noqa: PLR0913
 
     flow : list, optional
 
+    tag: str, optional
+
     uploader : list, optional
 
     study : int, optional
@@ -1186,23 +1140,14 @@ def _list_runs(  # noqa: PLR0913
         Whether to list runs which have an error (for example a missing
         prediction file).
 
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
-
-    kwargs : dict, optional
-        Legal filter operators: task_type.
+    task_type : str, optional
 
     Returns
     -------
     dict, or dataframe
         List of found runs.
     """
-    api_call = "run/list"
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            api_call += f"/{operator}/{value}"
+    api_call = f"run/list/limit/{limit}/offset/{offset}"
     if id is not None:
         api_call += "/run/{}".format(",".join([str(int(i)) for i in id]))
     if task is not None:
@@ -1217,12 +1162,15 @@ def _list_runs(  # noqa: PLR0913
         api_call += "/study/%d" % study
     if display_errors:
         api_call += "/show_errors/true"
-    return __list_runs(api_call=api_call, output_format=output_format)
+    if tag is not None:
+        api_call += f"/tag/{tag}"
+    if task_type is not None:
+        tvalue = task_type.value if isinstance(task_type, TaskType) else task_type
+        api_call += f"/task_type/{tvalue}"
+    return __list_runs(api_call=api_call)
 
 
-def __list_runs(
-    api_call: str, output_format: Literal["dict", "dataframe"] = "dict"
-) -> dict | pd.DataFrame:
+def __list_runs(api_call: str) -> pd.DataFrame:
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     runs_dict = xmltodict.parse(xml_string, force_list=("oml:run",))
@@ -1257,11 +1205,7 @@ def __list_runs(
         }
         for r in runs_dict["oml:runs"]["oml:run"]
     }
-
-    if output_format == "dataframe":
-        runs = pd.DataFrame.from_dict(runs, orient="index")
-
-    return runs
+    return pd.DataFrame.from_dict(runs, orient="index")
 
 
 def format_prediction(  # noqa: PLR0913

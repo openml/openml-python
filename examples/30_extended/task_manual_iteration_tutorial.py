@@ -68,7 +68,7 @@ print(test_indices.shape, test_indices.dtype)
 ####################################################################################################
 # And then split the data based on this:
 
-X, y = task.get_X_and_y(dataset_format="dataframe")
+X, y = task.get_X_and_y()
 X_train = X.iloc[train_indices]
 y_train = y.iloc[train_indices]
 X_test = X.iloc[test_indices]
@@ -88,7 +88,7 @@ print(
 
 task_id = 3
 task = openml.tasks.get_task(task_id)
-X, y = task.get_X_and_y(dataset_format="dataframe")
+X, y = task.get_X_and_y()
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
     "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
@@ -132,7 +132,7 @@ for repeat_idx in range(n_repeats):
 
 task_id = 1767
 task = openml.tasks.get_task(task_id)
-X, y = task.get_X_and_y(dataset_format="dataframe")
+X, y = task.get_X_and_y()
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
     "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
@@ -176,7 +176,7 @@ for repeat_idx in range(n_repeats):
 
 task_id = 1702
 task = openml.tasks.get_task(task_id)
-X, y = task.get_X_and_y(dataset_format="dataframe")
+X, y = task.get_X_and_y()
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
     "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
