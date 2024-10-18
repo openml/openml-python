@@ -263,7 +263,7 @@ def as_robot() -> Iterator[None]:
     openml.config.set_retry_policy(policy, n_retries)
 
 
-@pytest.fixture(autouse=True, scope="session")
+@pytest.fixture(autouse=True, scope="function")
 def with_test_server():
     openml.config.start_using_configuration_for_example()
     yield
