@@ -6,6 +6,9 @@ theme:
   palette:
     - scheme: default
 
+extra_css:
+  - stylesheets/extra.css
+
 nav:
   - index.md
   - Code Reference: reference/
