@@ -1,5 +1,5 @@
 # %% [markdown]
-# Creating and Using a Custom Flow
+# # Creating and Using a Custom Flow
 
 # The most convenient way to create a flow for your machine learning workflow is to generate it
 # automatically as described in the :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py` tutorial.

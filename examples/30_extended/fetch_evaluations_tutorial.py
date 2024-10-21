@@ -1,5 +1,5 @@
 # %% [markdown]
-# Fetching Evaluations
+# # Fetching Evaluations
 
 # Evaluations contain a concise summary of the results of all runs made. Each evaluation
 # provides information on the dataset used, the flow applied, the setup used, the metric
