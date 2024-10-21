@@ -3,6 +3,8 @@ theme:
   name: material
   features:
     - content.code.copy
+  palette:
+    - scheme: default
 
 nav:
   - index.md
