@@ -1,17 +1,11 @@
-"""
 # %% [markdown]
-================
-Benchmark suites
-================
+# # Benchmark suites
+# This is a brief showcase of OpenML benchmark suites, which were introduced by
+# [Bischl et al. (2019)](https://arxiv.org/abs/1708.03731v2). Benchmark suites standardize the
+# datasets and splits to be used in an experiment or paper. They are fully integrated into OpenML
+# and simplify both the sharing of the setup and the results.
 
-This is a brief showcase of OpenML benchmark suites, which were introduced by
-`Bischl et al. (2019) <https://arxiv.org/abs/1708.03731v2>`_. Benchmark suites standardize the
-datasets and splits to be used in an experiment or paper. They are fully integrated into OpenML
-and simplify both the sharing of the setup and the results.
-"""
-
-# License: BSD 3-Clause
-
+# %%
 import openml
 
 ####################################################################################################
@@ -32,42 +26,44 @@ import openml
 #    imbalanced datasets which require special treatment for both algorithms and evaluation
 #    measures).
 #
-# A full description can be found in the `OpenML benchmarking docs
-# <https://docs.openml.org/benchmark/#openml-cc18>`_.
+# A full description can be found in the
+# [OpenML benchmarking docs](https://docs.openml.org/benchmark/#openml-cc18).
 #
 # In this example we'll focus on how to use benchmark suites in practice.
 
-####################################################################################################
 # %% [markdown]
 # Downloading benchmark suites
 # ============================
 
+# %%
 suite = openml.study.get_suite(99)
 print(suite)
 
-####################################################################################################
 # %% [markdown]
 # The benchmark suite does not download the included tasks and datasets itself, but only contains
 # a list of which tasks constitute the study.
 #
 # Tasks can then be accessed via
 
+# %%
 tasks = suite.tasks
 print(tasks)
 
-####################################################################################################
 # %% [markdown]
 # and iterated over for benchmarking. For speed reasons we only iterate over the first three tasks:
 
+# %%
 for task_id in tasks[:3]:
     task = openml.tasks.get_task(task_id)
     print(task)
 
-####################################################################################################
 # %% [markdown]
 # Further examples
 # ================
 #
+# * [ex](../../30_extended/suites_tutorial)
 # * :ref:`sphx_glr_examples_30_extended_suites_tutorial.py`
 # * :ref:`sphx_glr_examples_30_extended_study_tutorial.py`
 # * :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py`
+
+# License: BSD 3-Clause

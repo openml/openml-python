@@ -1,29 +1,21 @@
-"""
 # %% [markdown]
-========
-Logging
-========
-
-Explains openml-python logging, and shows how to configure it.
-"""
-##################################################################################
-# %% [markdown]
-# Openml-python uses the `Python logging module <https://docs.python.org/3/library/logging.html>`_
+# # Logging
+# This tutorial explains openml-python logging, and shows how to configure it.
+# Openml-python uses the [Python logging module[(https://docs.python.org/3/library/logging.html)
 # to provide users with log messages. Each log message is assigned a level of importance, see
 # the table in Python's logging tutorial
-# `here <https://docs.python.org/3/howto/logging.html#when-to-use-logging>`_.
+# [here](https://docs.python.org/3/howto/logging.html#when-to-use-logging).
 #
 # By default, openml-python will print log messages of level `WARNING` and above to console.
 # All log messages (including `DEBUG` and `INFO`) are also saved in a file, which can be
 # found in your cache directory (see also the
-# :ref:`sphx_glr_examples_20_basic_introduction_tutorial.py`).
+# [introduction tutorial](../20_basic/introduction_tutorial).
 # These file logs are automatically deleted if needed, and use at most 2MB of space.
 #
 # It is possible to configure what log levels to send to console and file.
 # When downloading a dataset from OpenML, a `DEBUG`-level message is written:
 
-# License: BSD 3-Clause
-
+# %%
 import openml
 
 openml.datasets.get_dataset("iris")
@@ -38,6 +30,7 @@ openml.datasets.get_dataset("iris")
 # , depending on whether or not you had downloaded iris before.
 # The processed log levels can be configured programmatically:
 
+# %%
 import logging
 
 openml.config.set_console_log_level(logging.DEBUG)
@@ -56,3 +49,5 @@ openml.datasets.get_dataset("iris")
 # * 0: `logging.WARNING` and up.
 # * 1: `logging.INFO` and up.
 # * 2: `logging.DEBUG` and up (i.e. all messages).
+#
+# License: BSD 3-Clause

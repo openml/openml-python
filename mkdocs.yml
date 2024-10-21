@@ -35,4 +35,5 @@ plugins:
         - scripts/gen_ref_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
-  - mkdocs-jupyter
+  - mkdocs-jupyter:
+      theme: light

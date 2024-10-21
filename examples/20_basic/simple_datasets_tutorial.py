@@ -8,7 +8,6 @@
 # the datasets directly.
 
 # %%
-# License: BSD 3-Clause
 
 import openml
 
@@ -69,3 +68,5 @@ combined_data = pd.concat([X, y], axis=1)
 iris_plot = sns.pairplot(combined_data, hue="class")
 iris_plot.map_upper(hide_current_axis)
 plt.show()
+
+# License: BSD 3-Clause

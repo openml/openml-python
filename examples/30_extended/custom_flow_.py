@@ -1,21 +1,16 @@
-"""
 # %% [markdown]
-================================
-Creating and Using a Custom Flow
-================================
+# Creating and Using a Custom Flow
 
-The most convenient way to create a flow for your machine learning workflow is to generate it
-automatically as described in the :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py` tutorial.
-However, there are scenarios where this is not possible, such
-as when the flow uses a framework without an extension or when the flow is described by a script.
+# The most convenient way to create a flow for your machine learning workflow is to generate it
+# automatically as described in the :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py` tutorial.
+# However, there are scenarios where this is not possible, such
+# as when the flow uses a framework without an extension or when the flow is described by a script.
 
-In those cases you can still create a custom flow by following the steps of this tutorial.
-As an example we will use the flows generated for the `AutoML Benchmark <https://openml.github.io/automlbenchmark/>`_,
-and also show how to link runs to the custom flow.
-"""
+# In those cases you can still create a custom flow by following the steps of this tutorial.
+# As an example we will use the flows generated for the `AutoML Benchmark <https://openml.github.io/automlbenchmark/>`_,
+# and also show how to link runs to the custom flow.
 
-# License: BSD 3-Clause
-
+# %%
 from collections import OrderedDict
 import numpy as np
 
@@ -23,16 +18,15 @@ import openml
 from openml import OpenMLClassificationTask
 from openml.runs.functions import format_prediction
 
-####################################################################################################
 # %% [markdown]
 # .. warning::
 #    .. include:: ../../test_server_usage_warning.txt
+
+# %%
 openml.config.start_using_configuration_for_example()
 
-####################################################################################################
 # %% [markdown]
-# 1. Defining the flow
-# ====================
+# ## 1. Defining the flow
 # The first step is to define all the hyperparameters of your flow.
 # The API pages feature a descriptions of each variable of the :class:`openml.flows.OpenMLFlow`.
 # Note that `external version` and `name` together uniquely identify a flow.
@@ -46,6 +40,7 @@ openml.config.start_using_configuration_for_example()
 # Make sure to leave enough information so others can determine exactly which
 # version of the package/script is used. Use tags so users can find your flow easily.
 
+# %%
 general = dict(
     name="automlbenchmark_autosklearn",
     description=(
@@ -58,13 +53,13 @@ general = dict(
     dependencies="amlb==0.9",
 )
 
-####################################################################################################
 # %% [markdown]
 # Next we define the flow hyperparameters. We define their name and default value in `parameters`,
 # and provide meta-data for each hyperparameter through `parameters_meta_info`.
 # Note that even though the argument name is `parameters` they describe the hyperparameters.
 # The use of ordered dicts is required.
 
+# %%
 flow_hyperparameters = dict(
     parameters=OrderedDict(time="240", memory="32", cores="8"),
     parameters_meta_info=OrderedDict(
@@ -74,7 +69,6 @@ flow_hyperparameters = dict(
     ),
 )
 
-####################################################################################################
 # %% [markdown]
 # It is possible to build a flow which uses other flows.
 # For example, the Random Forest Classifier is a flow, but you could also construct a flow
@@ -91,6 +85,7 @@ flow_hyperparameters = dict(
 # Note: flow 9313 is not actually the right flow on the test server,
 # but that does not matter for this demonstration.
 
+# %%
 autosklearn_flow = openml.flows.get_flow(9313)  # auto-sklearn 0.5.1
 subflow = dict(
     components=OrderedDict(automl_tool=autosklearn_flow),
@@ -98,7 +93,6 @@ subflow = dict(
     # components=OrderedDict(),
 )
 
-####################################################################################################
 # %% [markdown]
 # With all parameters of the flow defined, we can now initialize the OpenMLFlow and publish.
 # Because we provided all the details already, we do not need to provide a `model` to the flow.
@@ -109,6 +103,7 @@ subflow = dict(
 # So whether you have a model with no extension or no model at all, explicitly set
 # the model of the flow to `None`.
 
+# %%
 autosklearn_amlb_flow = openml.flows.OpenMLFlow(
     **general,
     **flow_hyperparameters,
@@ -118,15 +113,14 @@ autosklearn_amlb_flow = openml.flows.OpenMLFlow(
 autosklearn_amlb_flow.publish()
 print(f"autosklearn flow created: {autosklearn_amlb_flow.flow_id}")
 
-####################################################################################################
 # %% [markdown]
-# 2. Using the flow
-# ====================
+# ## 2. Using the flow
 # This Section will show how to upload run data for your custom flow.
 # Take care to change the values of parameters as well as the task id,
 # to reflect the actual run.
 # Task and parameter values in the example are fictional.
 
+# %%
 flow_id = autosklearn_amlb_flow.flow_id
 
 parameters = [
@@ -140,7 +134,6 @@ task = openml.tasks.get_task(task_id)
 dataset_id = task.get_dataset().dataset_id
 
 
-####################################################################################################
 # %% [markdown]
 # The last bit of information for the run we need are the predicted values.
 # The exact format of the predictions will depend on the task.
@@ -166,6 +159,8 @@ dataset_id = task.get_dataset().dataset_id
 # You can ignore this code, or use it to better understand the formatting of the predictions.
 #
 # Find the repeats/folds for this task:
+
+# %%
 n_repeats, n_folds, _ = task.get_split_dimensions()
 all_test_indices = [
     (repeat, fold, index)
@@ -201,11 +196,11 @@ for where, y, yp, proba in zip(all_test_indices, y_true, y_pred, y_proba):
     )
     predictions.append(prediction)
 
-####################################################################################################
 # %% [markdown]
 # Finally we can create the OpenMLRun object and upload.
 # We use the argument setup_string because the used flow was a script.
 
+# %%
 benchmark_command = f"python3 runbenchmark.py auto-sklearn medium -m aws -t 119"
 my_run = openml.runs.OpenMLRun(
     task_id=task_id,
@@ -220,4 +215,6 @@ my_run = openml.runs.OpenMLRun(
 my_run.publish()
 print("run created:", my_run.run_id)
 
+# %%
 openml.config.stop_using_configuration_for_example()
+# License: BSD 3-Clause

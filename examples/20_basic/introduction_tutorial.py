@@ -18,17 +18,12 @@
 # # Installation
 # Installation is done via ``pip``:
 #
-# .. code:: bash
-#
-#     pip install openml
-#
-# For further information, please check out the installation guide at
-# :ref:`installation`.
-#
+# ```bash
+# pip install openml
+# ```
 
 # %% [markdown]
-# Authentication
-# ^^^^^^^^^^^^^^
+# # Authentication
 #
 # The OpenML server can only be accessed by users who have signed up on the
 # OpenML platform. If you don’t have an account yet, sign up now.
@@ -53,7 +48,6 @@
 
 
 # %%
-# License: BSD 3-Clause
 
 import openml
 from sklearn import neighbors
@@ -107,3 +101,4 @@ print(f"kNN on {data.name}: {myrun.openml_url}")
 
 # %%
 openml.config.stop_using_configuration_for_example()
+# License: BSD 3-Clause

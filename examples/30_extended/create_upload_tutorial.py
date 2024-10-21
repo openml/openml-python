@@ -1,13 +1,8 @@
-"""
 # %% [markdown]
-Dataset upload tutorial
-=======================
+# # Dataset upload tutorial
+# A tutorial on how to create and upload a dataset to OpenML.
 
-A tutorial on how to create and upload a dataset to OpenML.
-"""
-
-# License: BSD 3-Clause
-
+# %%
 import numpy as np
 import pandas as pd
 import sklearn.datasets
@@ -16,16 +11,13 @@ from scipy.sparse import coo_matrix
 import openml
 from openml.datasets.functions import create_dataset
 
-#
 # %% [markdown]
-##########################################################################
 # .. warning::
 #    .. include:: ../../test_server_usage_warning.txt
 
+# %%
 openml.config.start_using_configuration_for_example()
-############################################################################
 
-##############################################################################
 # %% [markdown]
 # Below we will cover the following cases of the dataset object:
 #
@@ -35,18 +27,17 @@ openml.config.start_using_configuration_for_example()
 # * A sparse matrix
 # * A pandas sparse dataframe
 
-############################################################################
 # %% [markdown]
 # Dataset is a numpy array
 # ========================
 # A numpy array can contain lists in the case of dense data or it can contain
 # OrderedDicts in the case of sparse data.
 #
-# Prepare dataset
-# ^^^^^^^^^^^^^^^
+# # Prepare dataset
 # Load an example dataset from scikit-learn which we will upload to OpenML.org
 # via the API.
 
+# %%
 diabetes = sklearn.datasets.load_diabetes()
 name = "Diabetes(scikit-learn)"
 X = diabetes.data
@@ -54,7 +45,6 @@ y = diabetes.target
 attribute_names = diabetes.feature_names
 description = diabetes.DESCR
 
-############################################################################
 # %% [markdown]
 # OpenML does not distinguish between the attributes and targets on the data
 # level and stores all data in a single matrix.
@@ -62,6 +52,7 @@ description = diabetes.DESCR
 # The target feature is indicated as meta-data of the dataset (and tasks on
 # that data).
 
+# %%
 data = np.concatenate((X, y.reshape((-1, 1))), axis=1)
 attribute_names = list(attribute_names)
 attributes = [(attribute_name, "REAL") for attribute_name in attribute_names] + [
@@ -74,15 +65,14 @@ citation = (
 )
 paper_url = "https://web.stanford.edu/~hastie/Papers/LARS/LeastAngle_2002.pdf"
 
-############################################################################
 # %% [markdown]
-# Create the dataset object
-# ^^^^^^^^^^^^^^^^^^^^^^^^^
+# # Create the dataset object
 # The definition of all fields can be found in the XSD files describing the
 # expected format:
 #
 # https://github.com/openml/OpenML/blob/master/openml_OS/views/pages/api_new/v1/xsd/openml.data.upload.xsd
 
+#  %%
 diabetes_dataset = create_dataset(
     # The name of the dataset (needs to be unique).
     # Must not be longer than 128 characters and only contain
@@ -120,21 +110,20 @@ diabetes_dataset = create_dataset(
     paper_url=paper_url,
 )
 
-############################################################################
+# %%
 
 diabetes_dataset.publish()
 print(f"URL for dataset: {diabetes_dataset.openml_url}")
 
-############################################################################
 # %% [markdown]
-# Dataset is a list
-# =================
+# ## Dataset is a list
 # A list can contain lists in the case of dense data or it can contain
 # OrderedDicts in the case of sparse data.
 #
 # Weather dataset:
 # https://storm.cis.fordham.edu/~gweiss/data-mining/datasets.html
 
+# %%
 data = [
     ["sunny", 85, 85, "FALSE", "no"],
     ["sunny", 80, 90, "TRUE", "no"],
@@ -194,15 +183,13 @@ weather_dataset = create_dataset(
     version_label="example",
 )
 
-############################################################################
 
+# %%
 weather_dataset.publish()
 print(f"URL for dataset: {weather_dataset.openml_url}")
 
-############################################################################
 # %% [markdown]
-# Dataset is a pandas DataFrame
-# =============================
+# ## Dataset is a pandas DataFrame
 # It might happen that your dataset is made of heterogeneous data which can usually
 # be stored as a Pandas DataFrame. DataFrames offer the advantage of
 # storing the type of data for each column as well as the attribute names.
@@ -211,14 +198,15 @@ print(f"URL for dataset: {weather_dataset.openml_url}")
 # function :func:`openml.datasets.create_dataset`. In this regard, you only
 # need to pass ``'auto'`` to the ``attributes`` parameter.
 
+# %%
 df = pd.DataFrame(data, columns=[col_name for col_name, _ in attribute_names])
+
 # enforce the categorical column to have a categorical dtype
 df["outlook"] = df["outlook"].astype("category")
 df["windy"] = df["windy"].astype("bool")
 df["play"] = df["play"].astype("category")
 print(df.info())
 
-############################################################################
 # %% [markdown]
 # We enforce the column 'outlook' and 'play' to be a categorical
 # dtype while the column 'windy' is kept as a boolean column. 'temperature'
@@ -226,6 +214,7 @@ print(df.info())
 # call :func:`openml.datasets.create_dataset` by passing the dataframe and
 # fixing the parameter ``attributes`` to ``'auto'``.
 
+# %%
 weather_dataset = create_dataset(
     name="Weather",
     description=description,
@@ -243,16 +232,15 @@ weather_dataset = create_dataset(
     version_label="example",
 )
 
-############################################################################
-
+# %%
 weather_dataset.publish()
 print(f"URL for dataset: {weather_dataset.openml_url}")
 
-############################################################################
 # %% [markdown]
 # Dataset is a sparse matrix
 # ==========================
 
+# %%
 sparse_data = coo_matrix(
     ([0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1]))
 )
@@ -280,16 +268,14 @@ xor_dataset = create_dataset(
     version_label="example",
 )
 
-############################################################################
 
+# %%
 xor_dataset.publish()
 print(f"URL for dataset: {xor_dataset.openml_url}")
 
 
-############################################################################
 # %% [markdown]
-# Dataset is a pandas dataframe with sparse columns
-# =================================================
+# ## Dataset is a pandas dataframe with sparse columns
 
 sparse_data = coo_matrix(
     ([1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0], ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1]))
@@ -315,11 +301,11 @@ xor_dataset = create_dataset(
     version_label="example",
 )
 
-############################################################################
+# %%
 
 xor_dataset.publish()
 print(f"URL for dataset: {xor_dataset.openml_url}")
 
-
-############################################################################
+# %%
 openml.config.stop_using_configuration_for_example()
+# License: BSD 3-Clause
