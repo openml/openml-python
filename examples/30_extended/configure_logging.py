@@ -1,7 +1,7 @@
 # %% [markdown]
 # # Logging
 # This tutorial explains openml-python logging, and shows how to configure it.
-# Openml-python uses the [Python logging module[(https://docs.python.org/3/library/logging.html)
+# Openml-python uses the [Python logging module](https://docs.python.org/3/library/logging.html)
 # to provide users with log messages. Each log message is assigned a level of importance, see
 # the table in Python's logging tutorial
 # [here](https://docs.python.org/3/howto/logging.html#when-to-use-logging).

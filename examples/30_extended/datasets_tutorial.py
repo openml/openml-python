@@ -42,6 +42,7 @@ datalist.query("NumberOfClasses > 50")
 # %% [markdown]
 # ## Download datasets
 
+# %%
 # This is done based on the dataset ID.
 dataset = openml.datasets.get_dataset(1471)
 

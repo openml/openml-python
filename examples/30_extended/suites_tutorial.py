@@ -4,7 +4,7 @@
 # How to list, download and upload benchmark suites.
 #
 # If you want to learn more about benchmark suites, check out our
-# brief introductory tutorial :ref:`sphx_glr_examples_20_basic_simple_suites_tutorial.py` or the
+# brief introductory tutorial ["Simple suites tutorial"](../20_basic/simple_suites_tutorial) or the
 # [OpenML benchmark docs](https://docs.openml.org/benchmark/#benchmarking-suites).
 
 # %%

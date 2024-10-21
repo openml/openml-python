@@ -11,8 +11,6 @@
 # | Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Springenberg, Manuel Blum and Frank Hutter
 # | In *Advances in Neural Information Processing Systems 28*, 2015
 # | Available at https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning.pdf
-"""  # noqa F401
-
 
 # %%
 import pandas as pd

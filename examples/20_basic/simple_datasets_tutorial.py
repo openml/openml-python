@@ -37,8 +37,11 @@ print(dataset.description[:500])
 # ## Load a dataset
 # X - An array/dataframe where each row represents one example with
 # the corresponding feature values.
+#
 # y - the classes for each example
+#
 # categorical_indicator - an array that indicates which feature is categorical
+#
 # attribute_names - the names of the features for the examples (X) and
 # target feature (y)
 

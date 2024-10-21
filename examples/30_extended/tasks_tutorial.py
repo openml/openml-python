@@ -25,9 +25,10 @@ import pandas as pd
 # ## Listing tasks
 #
 # We will start by simply listing only *supervised classification* tasks.
+#
 # **openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, but we
 # request a
-# `pandas dataframe <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
+# [pandas dataframe](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html)
 # instead to have better visualization capabilities and easier access:
 
 # %%

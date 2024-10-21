@@ -8,7 +8,6 @@
 # %%
 import openml
 
-####################################################################################################
 # %% [markdown]
 # OpenML-CC18
 # ===========
@@ -61,9 +60,8 @@ for task_id in tasks[:3]:
 # Further examples
 # ================
 #
-# * [ex](../../30_extended/suites_tutorial)
-# * :ref:`sphx_glr_examples_30_extended_suites_tutorial.py`
-# * :ref:`sphx_glr_examples_30_extended_study_tutorial.py`
-# * :ref:`sphx_glr_examples_40_paper_2018_ida_strang_example.py`
+# * [Suites Tutorial](../../30_extended/suites_tutorial)
+# * [Study Tutoral](../../30_extended/study_tutorial)
+# * [Paper example: Strang et al.](../../40_paper/2018_ida_strang_example.py)
 
 # License: BSD 3-Clause

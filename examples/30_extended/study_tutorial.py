@@ -1,7 +1,8 @@
 # %% [markdown]
 # # Benchmark studies
 # How to list, download and upload benchmark studies.
-# In contrast to `benchmark suites <https://docs.openml.org/benchmark/#benchmarking-suites>`_ which
+# In contrast to
+# [benchmark suites](https://docs.openml.org/benchmark/#benchmarking-suites) which
 # hold a list of tasks, studies hold a list of runs. As runs contain all information on flows and
 # tasks, all required information about a study can be retrieved.
 

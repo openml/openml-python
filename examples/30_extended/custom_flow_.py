@@ -2,12 +2,14 @@
 # # Creating and Using a Custom Flow
 
 # The most convenient way to create a flow for your machine learning workflow is to generate it
-# automatically as described in the :ref:`sphx_glr_examples_30_extended_flow_id_tutorial.py` tutorial.
+# automatically as described in the
+# ["Obtaining Flow IDs"](../../30_extended/flow_id_tutorial) tutorial.
 # However, there are scenarios where this is not possible, such
 # as when the flow uses a framework without an extension or when the flow is described by a script.
 
 # In those cases you can still create a custom flow by following the steps of this tutorial.
-# As an example we will use the flows generated for the `AutoML Benchmark <https://openml.github.io/automlbenchmark/>`_,
+# As an example we will use the flows generated for the
+# [AutoML Benchmark](https://openml.github.io/automlbenchmark/),
 # and also show how to link runs to the custom flow.
 
 # %%
