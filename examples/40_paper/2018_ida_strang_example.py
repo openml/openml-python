@@ -1,27 +1,21 @@
-"""
 # %% [markdown]
-Strang et al. (2018)
-====================
+# # Strang et al. (2018)
+#
+# A tutorial on how to reproduce the analysis conducted for *Don't Rule Out Simple Models
+# Prematurely: A Large Scale Benchmark Comparing Linear and Non-linear Classifiers in OpenML*.
+#
+# ## Publication
+#
+# | Don't Rule Out Simple Models Prematurely: A Large Scale Benchmark Comparing Linear and Non-linear Classifiers in OpenML
+# | Benjamin Strang, Peter van der Putten, Jan N. van Rijn and Frank Hutter
+# | In *Advances in Intelligent Data Analysis XVII 17th International Symposium*, 2018
+# | Available at https://link.springer.com/chapter/10.1007%2F978-3-030-01768-2_25
 
-A tutorial on how to reproduce the analysis conducted for *Don't Rule Out Simple Models
-Prematurely: A Large Scale Benchmark Comparing Linear and Non-linear Classifiers in OpenML*.
-
-Publication
-~~~~~~~~~~~
-
-| Don't Rule Out Simple Models Prematurely: A Large Scale Benchmark Comparing Linear and Non-linear Classifiers in OpenML
-| Benjamin Strang, Peter van der Putten, Jan N. van Rijn and Frank Hutter
-| In *Advances in Intelligent Data Analysis XVII 17th International Symposium*, 2018
-| Available at https://link.springer.com/chapter/10.1007%2F978-3-030-01768-2_25
-"""
-
-# License: BSD 3-Clause
-
+# %%
 import matplotlib.pyplot as plt
 import openml
 import pandas as pd
 
-##############################################################################
 # %% [markdown]
 # A basic step for each data-mining or machine learning task is to determine
 # which model to choose based on the problem and the data at hand. In this
@@ -37,6 +31,7 @@ import pandas as pd
 # more effort to distinguish the same flow with different hyperparameter
 # values.
 
+# %%
 study_id = 123
 # for comparing svms: flow_ids = [7754, 7756]
 # for comparing nns: flow_ids = [7722, 7729]
@@ -67,11 +62,10 @@ evaluations = evaluations.join(data_qualities, how="inner")
 # adds column that indicates the difference between the two classifiers
 evaluations["diff"] = evaluations[flow_ids[0]] - evaluations[flow_ids[1]]
 
-
-##############################################################################
 # %% [markdown]
 # makes the s-plot
 
+# %%
 fig_splot, ax_splot = plt.subplots()
 ax_splot.plot(range(len(evaluations)), sorted(evaluations["diff"]))
 ax_splot.set_title(classifier_family)
@@ -81,12 +75,12 @@ ax_splot.grid(linestyle="--", axis="y")
 plt.show()
 
 
-##############################################################################
 # %% [markdown]
 # adds column that indicates the difference between the two classifiers,
 # needed for the scatter plot
 
 
+# %%
 def determine_class(val_lin, val_nonlin):
     if val_lin < val_nonlin:
         return class_values[0]
@@ -113,11 +107,11 @@ ax_scatter.set_xscale("log")
 ax_scatter.set_yscale("log")
 plt.show()
 
-##############################################################################
 # %% [markdown]
 # makes a scatter plot where each data point represents the performance of the
 # two algorithms on various axis (not in the paper)
 
+# %%
 fig_diagplot, ax_diagplot = plt.subplots()
 ax_diagplot.grid(linestyle="--")
 ax_diagplot.plot([0, 1], ls="-", color="black")
@@ -127,3 +121,4 @@ ax_diagplot.scatter(evaluations[flow_ids[0]], evaluations[flow_ids[1]])
 ax_diagplot.set_xlabel(measure)
 ax_diagplot.set_ylabel(measure)
 plt.show()
+# License: BSD 3-Clause

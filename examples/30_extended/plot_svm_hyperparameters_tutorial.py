@@ -1,25 +1,20 @@
-"""
 # %% [markdown]
-================================
-Plotting hyperparameter surfaces
-================================
-"""
+# # Plotting hyperparameter surfaces
 
-# License: BSD 3-Clause
-
+# %%
 import openml
 import numpy as np
 
-####################################################################################################
 # %% [markdown]
-# First step - obtaining the data
-# ===============================
+# # First step - obtaining the data
 # First, we need to choose an SVM flow, for example 8353, and a task. Finding the IDs of them are
 # not part of this tutorial, this could for example be done via the website.
 #
 # For this we use the function ``list_evaluations_setup`` which can automatically join
 # evaluations conducted by the server with the hyperparameter settings extracted from the
 # uploaded runs (called *setup*).
+
+# %%
 df = openml.evaluations.list_evaluations_setups(
     function="predictive_accuracy",
     flows=[8353],
@@ -31,24 +26,25 @@ df = openml.evaluations.list_evaluations_setups(
 )
 print(df.head(n=10))
 
-####################################################################################################
 # %% [markdown]
 # We can see all the hyperparameter names in the columns of the dataframe:
+
+# %%
 for name in df.columns:
     print(name)
 
-####################################################################################################
 # %% [markdown]
 # Next, we cast and transform the hyperparameters of interest (``C`` and ``gamma``) so that we
 # can nicely plot them.
+
+# %%
 hyperparameters = ["sklearn.svm.classes.SVC(16)_C", "sklearn.svm.classes.SVC(16)_gamma"]
 df[hyperparameters] = df[hyperparameters].astype(float).apply(np.log10)
 
-####################################################################################################
 # %% [markdown]
-# Option 1 - plotting via the pandas helper functions
-# ===================================================
-#
+# ## Option 1 - plotting via the pandas helper functions
+
+# %%
 df.plot.hexbin(
     x="sklearn.svm.classes.SVC(16)_C",
     y="sklearn.svm.classes.SVC(16)_gamma",
@@ -58,11 +54,10 @@ df.plot.hexbin(
     title="SVM performance landscape",
 )
 
-####################################################################################################
 # %% [markdown]
-# Option 2 - plotting via matplotlib
-# ==================================
-#
+# ## Option 2 - plotting via matplotlib
+
+# %%
 import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots()
@@ -85,3 +80,4 @@ ax.set(
     ylabel="gamma (log10)",
 )
 ax.set_title("SVM performance landscape")
+# License: BSD 3-Clause

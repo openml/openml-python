@@ -1,18 +1,12 @@
-"""
 # %% [markdown]
-Tasks
-=====
+# # Tasks
+# A tutorial on how to list and download tasks.
 
-A tutorial on how to list and download tasks.
-"""
-
-# License: BSD 3-Clause
-
+# %%
 import openml
 from openml.tasks import TaskType
 import pandas as pd
 
-############################################################################
 # %% [markdown]
 #
 # Tasks are identified by IDs and can be accessed in two different ways:
@@ -27,10 +21,8 @@ import pandas as pd
 #    metric, the splits and an iterator which can be used to access the
 #    splits in a useful manner.
 
-############################################################################
 # %% [markdown]
-# Listing tasks
-# ^^^^^^^^^^^^^
+# ## Listing tasks
 #
 # We will start by simply listing only *supervised classification* tasks.
 # **openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, but we
@@ -38,6 +30,7 @@ import pandas as pd
 # `pandas dataframe <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
 # instead to have better visualization capabilities and easier access:
 
+# %%
 tasks = openml.tasks.list_tasks(
     task_type=TaskType.SUPERVISED_CLASSIFICATION, output_format="dataframe"
 )
@@ -45,57 +38,56 @@ print(tasks.columns)
 print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
-############################################################################
 # %% [markdown]
 # We can filter the list of tasks to only contain datasets with more than
 # 500 samples, but less than 1000 samples:
 
+# %%
 filtered_tasks = tasks.query("NumberOfInstances > 500 and NumberOfInstances < 1000")
 print(list(filtered_tasks.index))
 
-############################################################################
 
+# %%
 # Number of tasks
 print(len(filtered_tasks))
 
-############################################################################
-# %% [markdown]
 # %% [markdown]
 # Then, we can further restrict the tasks to all have the same resampling strategy:
 
+# %%
 filtered_tasks = filtered_tasks.query('estimation_procedure == "10-fold Crossvalidation"')
 print(list(filtered_tasks.index))
 
-############################################################################
-
+# %%
 # Number of tasks
 print(len(filtered_tasks))
 
-############################################################################
 # %% [markdown]
 # Resampling strategies can be found on the
-# `OpenML Website <https://www.openml.org/search?type=measure&q=estimation%20procedure>`_.
+# [OpenML Website](https://www.openml.org/search?type=measure&q=estimation%20procedure).
 #
 # Similar to listing tasks by task type, we can list tasks by tags:
 
+# %%
 tasks = openml.tasks.list_tasks(tag="OpenML100", output_format="dataframe")
 print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
-############################################################################
+# %% [markdown]
 # Furthermore, we can list tasks based on the dataset id:
 
+# %%
 tasks = openml.tasks.list_tasks(data_id=1471, output_format="dataframe")
 print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
-############################################################################
+# %% [markdown]
 # In addition, a size limit and an offset can be applied both separately and simultaneously:
 
+# %%
 tasks = openml.tasks.list_tasks(size=10, offset=50, output_format="dataframe")
 print(tasks)
 
-############################################################################
 # %% [markdown]
 #
 # **OpenML 100**
@@ -104,51 +96,46 @@ print(tasks)
 # instances per task. To make things easier, the tasks do not contain highly
 # unbalanced data and sparse data. However, the tasks include missing values and
 # categorical features. You can find out more about the *OpenML 100* on
-# `the OpenML benchmarking page <https://docs.openml.org/benchmark/>`_.
+# [the OpenML benchmarking page](https://docs.openml.org/benchmark/).
 #
 # Finally, it is also possible to list all tasks on OpenML with:
 
-############################################################################
+# %%
 tasks = openml.tasks.list_tasks(output_format="dataframe")
 print(len(tasks))
 
-############################################################################
 # %% [markdown]
-# Exercise
-# ########
+# ## Exercise
 #
 # Search for the tasks on the 'eeg-eye-state' dataset.
 
+# %%
 tasks.query('name=="eeg-eye-state"')
 
-############################################################################
 # %% [markdown]
-# Downloading tasks
-# ^^^^^^^^^^^^^^^^^
+# ## Downloading tasks
 #
 # We provide two functions to download tasks, one which downloads only a
 # single task by its ID, and one which takes a list of IDs and downloads
 # all of these tasks:
 
+# %%
 task_id = 31
 task = openml.tasks.get_task(task_id)
 
-############################################################################
+# %%
 # Properties of the task are stored as member variables:
-
 print(task)
 
-############################################################################
+# %%
 # And:
 
 ids = [2, 1891, 31, 9983]
 tasks = openml.tasks.get_tasks(ids)
 print(tasks[0])
 
-############################################################################
 # %% [markdown]
-# Creating tasks
-# ^^^^^^^^^^^^^^
+# ## Creating tasks
 #
 # You can also create new tasks. Take the following into account:
 #
@@ -174,18 +161,16 @@ print(tasks[0])
 # necessary (e.g. when other measure make no sense), since it will create a new task, which
 # scatters results across tasks.
 
-############################################################################
 # %% [markdown]
 # We'll use the test server for the rest of this tutorial.
 #
 # .. warning::
 #    .. include:: ../../test_server_usage_warning.txt
+# %%
 openml.config.start_using_configuration_for_example()
 
-############################################################################
 # %% [markdown]
-# Example
-# #######
+# ## Example
 #
 # Let's create a classification task on a dataset. In this example we will do this on the
 # Iris dataset (ID=128 (on test server)). We'll use 10-fold cross-validation (ID=1),
@@ -194,7 +179,7 @@ openml.config.start_using_configuration_for_example()
 # If such a task doesn't exist, a task will be created and the corresponding task_id
 # will be returned.
 
-
+# %%
 try:
     my_task = openml.tasks.create_task(
         task_type=TaskType.SUPERVISED_CLASSIFICATION,
@@ -217,13 +202,14 @@ except openml.exceptions.OpenMLServerException as e:
         task_id = tasks.loc[:, "tid"].values[0]
         print("Task already exists. Task ID is", task_id)
 
+# %%
 # reverting to prod server
 openml.config.stop_using_configuration_for_example()
 
 
-############################################################################
 # %% [markdown]
-# * `Complete list of task types <https://www.openml.org/search?type=task_type>`_.
-# * `Complete list of model estimation procedures <https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure>`_.
-# * `Complete list of evaluation measures <https://www.openml.org/search?q=measure_type%3Aevaluation_measure&type=measure>`_.
+# * [Complete list of task types](https://www.openml.org/search?type=task_type).
+# * [Complete list of model estimation procedures](https://www.openml.org/search?q=%2520measure_type%3Aestimation_procedure&type=measure).
+# * [Complete list of evaluation measures](https://www.openml.org/search?q=measure_type%3Aevaluation_measure&type=measure).
 #
+# License: BSD 3-Clause

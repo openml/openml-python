@@ -1,32 +1,27 @@
-"""
 # %% [markdown]
-Flows and Runs
-==============
+# #Flows and Runs
+# This tutorial covers how to train/run a model and how to upload the results.
 
-How to train/run a model and how to upload the results.
-"""
-
-# License: BSD 3-Clause
-
+# %%
 import openml
 from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
 
 
-############################################################################
 # %% [markdown]
 # We'll use the test server for the rest of this tutorial.
 #
 # .. warning::
 #    .. include:: ../../test_server_usage_warning.txt
+
+# %%
 openml.config.start_using_configuration_for_example()
 
-############################################################################
 # %% [markdown]
-# Train machine learning models
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# ## Train machine learning models
 #
 # Train a scikit-learn model on the data manually.
 
+# %%
 # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
 dataset = openml.datasets.get_dataset(68)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
@@ -35,11 +30,12 @@ X, y, categorical_indicator, attribute_names = dataset.get_data(
 clf = neighbors.KNeighborsClassifier(n_neighbors=1)
 clf.fit(X, y)
 
-############################################################################
 # %% [markdown]
 # You can also ask for meta-data to automatically preprocess the data.
 #
 # * e.g. categorical features -> do feature encoding
+
+# %%
 dataset = openml.datasets.get_dataset(17)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
     target=dataset.default_target_attribute
@@ -51,12 +47,11 @@ transformer = compose.ColumnTransformer(
 X = transformer.fit_transform(X)
 clf.fit(X, y)
 
-############################################################################
 # %% [markdown]
-# Runs: Easily explore models
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# ## Runs: Easily explore models
 # We can run (many) scikit-learn algorithms on (many) OpenML tasks.
 
+# %%
 # Get a task
 task = openml.tasks.get_task(403)
 
@@ -68,34 +63,34 @@ run = openml.runs.run_model_on_task(clf, task)
 
 print(run)
 
-############################################################################
 # %% [markdown]
 # Share the run on the OpenML server
 #
 # So far the run is only available locally. By calling the publish function,
 # the run is sent to the OpenML server:
 
+# %%
 myrun = run.publish()
 # For this tutorial, our configuration publishes to the test server
 # as to not pollute the main server.
 print(f"Uploaded to {myrun.openml_url}")
 
-############################################################################
 # %% [markdown]
 # We can now also inspect the flow object which was automatically created:
 
+# %%
 flow = openml.flows.get_flow(run.flow_id)
 print(flow)
 
-############################################################################
 # %% [markdown]
-# It also works with pipelines
-# ############################
+# ## It also works with pipelines
 #
 # When you need to handle 'dirty' data, build pipelines to model then automatically.
 # To demonstrate this using the dataset `credit-a <https://test.openml.org/d/16>`_ via
 # `task <https://test.openml.org/t/96>`_ as it contains both numerical and categorical
 # variables and missing values in both.
+
+# %%
 task = openml.tasks.get_task(96)
 
 # OpenML helper functions for sklearn can be plugged in directly for complicated pipelines
@@ -134,6 +129,7 @@ print(f"Uploaded to {myrun.openml_url}")
 # In the case, pandas is not available, or a NumPy based data processing is the requirement, the
 # above pipeline is presented below to work with NumPy.
 
+# %%
 # Extracting the indices of the categorical columns
 features = task.get_dataset().features
 categorical_feature_indices = []
@@ -173,15 +169,15 @@ run = openml.runs.run_model_on_task(pipe, task, avoid_duplicate_runs=False)
 myrun = run.publish()
 print(f"Uploaded to {myrun.openml_url}")
 
-###############################################################################
 # %% [markdown]
-# Running flows on tasks offline for later upload
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# ## Running flows on tasks offline for later upload
 # For those scenarios where there is no access to internet, it is possible to run
 # a model on a task without uploading results or flows to the server immediately.
 
 # To perform the following line offline, it is required to have been called before
 # such that the task is cached on the local openml cache directory:
+
+# %%
 task = openml.tasks.get_task(96)
 
 # The following lines can then be executed offline:
@@ -202,10 +198,10 @@ run.publish()
 # Publishing the run will automatically upload the related flow if
 # it does not yet exist on the server.
 
-############################################################################
 # %% [markdown]
 # Alternatively, one can also directly run flows.
 
+# %%
 # Get a task
 task = openml.tasks.get_task(403)
 
@@ -219,10 +215,8 @@ flow = extension.model_to_flow(clf)
 
 run = openml.runs.run_flow_on_task(flow, task)
 
-############################################################################
 # %% [markdown]
-# Challenge
-# ^^^^^^^^^
+# ## Challenge
 #
 # Try to build the best possible models on several OpenML tasks,
 # compare your results with the rest of the class and learn from
@@ -239,6 +233,7 @@ run = openml.runs.run_flow_on_task(flow, task)
 # * Higgs (Physics): data_id:`23512 <https://www.openml.org/d/23512>`_,
 #   task_id:`52950 <https://www.openml.org/t/52950>`_, 100k instances, missing values.
 
+# %%
 # Easy benchmarking:
 for task_id in [115]:  # Add further tasks. Disclaimer: they might take some time
     task = openml.tasks.get_task(task_id)
@@ -250,5 +245,6 @@ for task_id in [115]:  # Add further tasks. Disclaimer: they might take some tim
     print(f"kNN on {data.name}: {myrun.openml_url}")
 
 
-############################################################################
+# %%
 openml.config.stop_using_configuration_for_example()
+# License: BSD 3-Clause

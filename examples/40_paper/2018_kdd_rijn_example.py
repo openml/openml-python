@@ -1,23 +1,17 @@
-"""
 # %% [markdown]
-van Rijn and Hutter (2018)
-==========================
-
-A tutorial on how to reproduce the paper *Hyperparameter Importance Across Datasets*.
-
-This is a Unix-only tutorial, as the requirements can not be satisfied on a Windows machine (Untested on other
-systems).
-
-Publication
-~~~~~~~~~~~
-
-| Hyperparameter importance across datasets
-| Jan N. van Rijn and Frank Hutter
-| In *Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining*, 2018
-| Available at https://dl.acm.org/doi/10.1145/3219819.3220058
-"""
-
-# License: BSD 3-Clause
+# # van Rijn and Hutter (2018)
+#
+# A tutorial on how to reproduce the paper *Hyperparameter Importance Across Datasets*.
+#
+# This is a Unix-only tutorial, as the requirements can not be satisfied on a Windows machine (Untested on other
+# systems).
+#
+# ## Publication
+#
+# | Hyperparameter importance across datasets
+# | Jan N. van Rijn and Frank Hutter
+# | In *Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining*, 2018
+# | Available at https://dl.acm.org/doi/10.1145/3219819.3220058
 
 import sys
 
@@ -36,7 +30,6 @@ import seaborn as sns
 import openml
 
 
-##############################################################################
 # %% [markdown]
 # With the advent of automated machine learning, automated hyperparameter
 # optimization methods are by now routinely used in data mining. However, this
@@ -69,6 +62,7 @@ import openml
 # this, please see:
 # https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdccc7b9265/examples/plot/plot_fanova_aggregates.py # noqa F401
 
+# %%
 suite = openml.study.get_suite("OpenML100")
 flow_id = 7707
 parameter_filters = {"sklearn.svm.classes.SVC(17)_kernel": "sigmoid"}
@@ -161,12 +155,13 @@ for idx, task_id in enumerate(suite.tasks):
 # transform ``fanova_results`` from a list of dicts into a DataFrame
 fanova_results = pd.DataFrame(fanova_results)
 
-##############################################################################
 # %% [markdown]
 # make the boxplot of the variance contribution. Obviously, we can also use
 # this data to make the Nemenyi plot, but this relies on the rather complex
 # ``Orange`` dependency (``pip install Orange3``). For the complete example,
 # the reader is referred to the more elaborate script (referred to earlier)
+
+# %%
 fig, ax = plt.subplots()
 sns.boxplot(x="hyperparameter", y="fanova", data=fanova_results, ax=ax)
 ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
@@ -174,3 +169,4 @@ ax.set_ylabel("Variance Contribution")
 ax.set_xlabel(None)
 plt.tight_layout()
 plt.show()
+# License: BSD 3-Clause
