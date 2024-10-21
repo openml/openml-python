@@ -4,7 +4,7 @@
 
 # %% [markdown]
 # OpenML is an online collaboration platform for machine learning which allows
-# you to: Pueter
+# you to:
 #
 # * Find or share interesting, well-documented datasets
 # * Define research / modelling goals (tasks)
