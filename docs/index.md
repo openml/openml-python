@@ -32,7 +32,7 @@ run.publish()
 print(f'View the run online: {run.openml_url}')
 ```
 
-Find more examples in our ["Example Gallery"][example-gallery].
+Find more examples in the sidebar on the left.
 
 ## How to get OpenML for python
 
@@ -43,7 +43,8 @@ python -m pip install openml
 ```
 
 For more advanced installation information, please see the
-["Installation"][installation-guide] section.
+["Introduction"](../examples/20_basic/introduction_tutorial.py) example.
+
 
 ## Further information
 
@@ -66,12 +67,6 @@ If you use OpenML-Python in a scientific publication, we would
 appreciate a reference to our JMLR-MLOSS paper 
 ["OpenML-Python: an extensible Python API for OpenML"](https://www.jmlr.org/papers/v22/19-920.html):
 
-=== "MLA"
-
-    Feurer, Matthias, et al. 
-    "OpenML-Python: an extensible Python API for OpenML."
-    _Journal of Machine Learning Research_ 22.100 (2021):1−5.
-
 === "Bibtex"
 
     ```bibtex
@@ -86,3 +81,9 @@ appreciate a reference to our JMLR-MLOSS paper
         url     = {http://jmlr.org/papers/v22/19-920.html}
     }
     ```
+
+=== "MLA"
+
+    Feurer, Matthias, et al. 
+    "OpenML-Python: an extensible Python API for OpenML."
+    _Journal of Machine Learning Research_ 22.100 (2021):1−5.
