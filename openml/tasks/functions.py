@@ -134,6 +134,7 @@ def list_tasks(  # noqa: PLR0913
     data_tag: str | None = None,
     status: str | None = None,
     data_name: str | None = None,
+    data_id: int | None = None,
     number_instances: int | None = None,
     number_features: int | None = None,
     number_classes: int | None = None,
@@ -157,6 +158,7 @@ def list_tasks(  # noqa: PLR0913
         the tag to include
     data_tag : str, optional
         the tag of the dataset
+    data_id : int, optional
     status : str, optional
     data_name : str, optional
     number_instances : int, optional
@@ -179,6 +181,7 @@ def list_tasks(  # noqa: PLR0913
         tag=tag,
         data_tag=data_tag,
         status=status,
+        data_id=data_id,
         data_name=data_name,
         number_instances=number_instances,
         number_features=number_features,
@@ -186,7 +189,10 @@ def list_tasks(  # noqa: PLR0913
         number_missing_values=number_missing_values,
     )
     batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
-    return pd.concat(batches, ignore_index=True)
+    if len(batches) == 0:
+        return pd.DataFrame()
+
+    return pd.concat(batches)
 
 
 def _list_tasks(
@@ -222,9 +228,10 @@ def _list_tasks(
         api_call += f"/type/{tvalue}"
     if kwargs is not None:
         for operator, value in kwargs.items():
-            if operator == "task_id":
-                value = ",".join([str(int(i)) for i in value])  # noqa: PLW2901
-            api_call += f"/{operator}/{value}"
+            if value is not None:
+                if operator == "task_id":
+                    value = ",".join([str(int(i)) for i in value])  # noqa: PLW2901
+                api_call += f"/{operator}/{value}"
 
     return __list_tasks(api_call=api_call)
 

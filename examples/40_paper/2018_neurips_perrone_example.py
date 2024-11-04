@@ -27,16 +27,17 @@ In the following section, we shall do the following:
 
 # License: BSD 3-Clause
 
-import openml
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from sklearn.pipeline import Pipeline
-from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
-from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.impute import SimpleImputer
+from sklearn.metrics import mean_squared_error
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
+
+import openml
 
 flow_type = "svm"  # this example will use the smaller svm flow evaluations
 ############################################################################
@@ -94,7 +95,6 @@ def fetch_evaluations(run_full=False, flow_type="svm", metric="area_under_roc_cu
         tasks=task_ids,
         flows=[flow_id],
         uploaders=[2702],
-        output_format="dataframe",
         parameters_in_separate_columns=True,
     )
     return eval_df, task_ids, flow_id
@@ -206,7 +206,7 @@ X, y = create_table_from_evaluations(eval_df, task_ids=[task_id], flow_type="svm
 model.fit(X, y)
 y_pred = model.predict(X)
 
-print("Training RMSE : {:.5}".format(mean_squared_error(y, y_pred)))
+print(f"Training RMSE : {mean_squared_error(y, y_pred):.5}")
 
 
 #############################################################################

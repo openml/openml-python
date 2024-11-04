@@ -13,11 +13,9 @@ Publication
 | Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Springenberg, Manuel Blum and Frank Hutter
 | In *Advances in Neural Information Processing Systems 28*, 2015
 | Available at https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning.pdf
-"""  # noqa F401
+"""
 
 # License: BSD 3-Clause
-
-import pandas as pd
 
 import openml
 
@@ -60,7 +58,6 @@ dataset_ids = [
 tasks = openml.tasks.list_tasks(
     task_type=openml.tasks.TaskType.SUPERVISED_CLASSIFICATION,
     status="all",
-    output_format="dataframe",
 )
 
 # Query only those with holdout as the resampling startegy.
@@ -68,7 +65,7 @@ tasks = tasks.query('estimation_procedure == "33% Holdout set"')
 
 task_ids = []
 for did in dataset_ids:
-    tasks_ = list(tasks.query("did == {}".format(did)).tid)
+    tasks_ = list(tasks.query(f"did == {did}").tid)
     if len(tasks_) >= 1:  # if there are multiple task, take the one with lowest ID (oldest).
         task_id = min(tasks_)
     else:

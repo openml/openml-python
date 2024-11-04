@@ -84,10 +84,10 @@ def list_datasets(
     tag: str | None = None,
     data_name: str | None = None,
     data_version: int | None = None,
-    number_instances: int | None = None,
-    number_features: int | None = None,
-    number_classes: int | None = None,
-    number_missing_values: int | None = None,
+    number_instances: int | str | None = None,
+    number_features: int | str | None = None,
+    number_classes: int | str | None = None,
+    number_missing_values: int | str | None = None,
 ) -> pd.DataFrame:
     """Return a dataframe of all dataset which are on OpenML.
 
@@ -109,10 +109,10 @@ def list_datasets(
     tag : str, optional
     data_name : str, optional
     data_version : int, optional
-    number_instances : int, optional
-    number_features : int, optional
-    number_classes : int, optional
-    number_missing_values : int, optional
+    number_instances : int | str, optional
+    number_features : int | str, optional
+    number_classes : int | str, optional
+    number_missing_values : int | str, optional
 
     Returns
     -------
@@ -139,6 +139,9 @@ def list_datasets(
         number_missing_values=number_missing_values,
     )
     batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
+    if len(batches) == 0:
+        return pd.DataFrame()
+
     return pd.concat(batches)
 
 
@@ -174,11 +177,12 @@ def _list_datasets(
     -------
     datasets : dataframe
     """
-    api_call = f"data/list/{limit}/offset/{offset}"
+    api_call = f"data/list/limit/{limit}/offset/{offset}"
 
     if kwargs is not None:
         for operator, value in kwargs.items():
-            api_call += f"/{operator}/{value}"
+            if value is not None:
+                api_call += f"/{operator}/{value}"
     if data_id is not None:
         api_call += "/data_id/{}".format(",".join([str(int(i)) for i in data_id]))
     return __list_datasets(api_call=api_call)
@@ -213,7 +217,13 @@ def __list_datasets(api_call: str) -> pd.DataFrame:
                 dataset[quality["@name"]] = float(quality["#text"])
         datasets[dataset["did"]] = dataset
 
-    return pd.DataFrame.from_dict(datasets, orient="index")
+    return pd.DataFrame.from_dict(datasets, orient="index").astype(
+        {
+            "did": int,
+            "version": int,
+            "status": pd.CategoricalDtype(["active", "deactivated", "in_preparation"]),
+        }
+    )
 
 
 def _expand_parameter(parameter: str | list[str] | None) -> list[str]:

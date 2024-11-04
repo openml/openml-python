@@ -51,7 +51,7 @@ class TestFlowFunctions(TestBase):
         openml.config.server = self.production_server
         # We can only perform a smoke test here because we test on dynamic
         # data from the internet...
-        flows = openml.flows.list_flows(output_format="dataframe")
+        flows = openml.flows.list_flows()
         # 3000 as the number of flows on openml.org
         assert len(flows) >= 1500
         for flow in flows.to_dict(orient="index").values():
@@ -62,20 +62,20 @@ class TestFlowFunctions(TestBase):
         openml.config.server = self.production_server
         # We can only perform a smoke test here because we test on dynamic
         # data from the internet...
-        flows = openml.flows.list_flows(output_format="dataframe")
+        flows = openml.flows.list_flows()
         assert isinstance(flows, pd.DataFrame)
         assert len(flows) >= 1500
 
     @pytest.mark.production()
     def test_list_flows_empty(self):
         openml.config.server = self.production_server
-        flows = openml.flows.list_flows(tag="NoOneEverUsesThisTag123", output_format="dataframe")
+        flows = openml.flows.list_flows(tag="NoOneEverUsesThisTag123")
         assert flows.empty
 
     @pytest.mark.production()
     def test_list_flows_by_tag(self):
         openml.config.server = self.production_server
-        flows = openml.flows.list_flows(tag="weka", output_format="dataframe")
+        flows = openml.flows.list_flows(tag="weka")
         assert len(flows) >= 5
         for flow in flows.to_dict(orient="index").values():
             self._check_flow(flow)
@@ -86,7 +86,7 @@ class TestFlowFunctions(TestBase):
         size = 10
         maximum = 100
         for i in range(0, maximum, size):
-            flows = openml.flows.list_flows(offset=i, size=size, output_format="dataframe")
+            flows = openml.flows.list_flows(offset=i, size=size)
             assert size >= len(flows)
             for flow in flows.to_dict(orient="index").values():
                 self._check_flow(flow)
@@ -199,14 +199,18 @@ class TestFlowFunctions(TestBase):
         new_flow.parameters["a"] = 7
         with pytest.raises(ValueError) as excinfo:
             openml.flows.functions.assert_flows_equal(flow, new_flow)
-        assert str(paramaters) in str(excinfo.value) and str(new_flow.parameters) in str(excinfo.value)
+        assert str(paramaters) in str(excinfo.value) and str(new_flow.parameters) in str(
+            excinfo.value
+        )
 
         openml.flows.functions.assert_flows_equal(flow, new_flow, ignore_parameter_values=True)
 
         del new_flow.parameters["a"]
         with pytest.raises(ValueError) as excinfo:
             openml.flows.functions.assert_flows_equal(flow, new_flow)
-        assert str(paramaters) in str(excinfo.value) and str(new_flow.parameters) in str(excinfo.value)
+        assert str(paramaters) in str(excinfo.value) and str(new_flow.parameters) in str(
+            excinfo.value
+        )
 
         self.assertRaisesRegex(
             ValueError,

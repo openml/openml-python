@@ -17,11 +17,26 @@ import scipy.sparse
 import xmltodict
 
 from openml.base import OpenMLBase
-from openml.exceptions import PyOpenMLError
 
 from .data_feature import OpenMLDataFeature
 
 logger = logging.getLogger(__name__)
+
+
+def _ensure_dataframe(
+    data: pd.DataFrame | pd.Series | np.ndarray | scipy.sparse.spmatrix,
+    attribute_names: list | None = None,
+) -> pd.DataFrame:
+    if isinstance(data, pd.DataFrame):
+        return data
+    if scipy.sparse.issparse(data):
+        return pd.DataFrame.sparse.from_spmatrix(data, columns=attribute_names)
+    if isinstance(data, np.ndarray):
+        return pd.DataFrame(data, columns=attribute_names)  # type: ignore
+    if isinstance(data, pd.Series):
+        return data.to_frame()
+
+    raise TypeError(f"Data type {type(data)} not supported.")
 
 
 class OpenMLDataset(OpenMLBase):
@@ -575,13 +590,17 @@ class OpenMLDataset(OpenMLBase):
 
         return data, categorical, attribute_names
 
-    def _parse_data_from_file(self, data_file: Path) -> tuple[list[str], list[bool], pd.DataFrame]:
+    def _parse_data_from_file(
+        self,
+        data_file: Path,
+    ) -> tuple[list[str], list[bool], pd.DataFrame | scipy.sparse.csr_matrix]:
         if data_file.suffix == ".arff":
             data, categorical, attribute_names = self._parse_data_from_arff(data_file)
         elif data_file.suffix == ".pq":
             attribute_names, categorical, data = self._parse_data_from_pq(data_file)
         else:
             raise ValueError(f"Unknown file type for file '{data_file}'.")
+
         return attribute_names, categorical, data
 
     def _parse_data_from_pq(self, data_file: Path) -> tuple[list[str], list[bool], pd.DataFrame]:
@@ -593,7 +612,7 @@ class OpenMLDataset(OpenMLBase):
         attribute_names = list(data.columns)
         return attribute_names, categorical, data
 
-    def _load_data(self) -> tuple[pd.DataFrame | scipy.sparse.csr_matrix, list[bool], list[str]]:  # noqa: PLR0912, C901
+    def _load_data(self) -> tuple[pd.DataFrame, list[bool], list[str]]:  # noqa: PLR0912, C901, PLR0915
         """Load data from compressed format or arff. Download data if not present on disk."""
         need_to_create_pickle = self.cache_format == "pickle" and self.data_pickle_file is None
         need_to_create_feather = self.cache_format == "feather" and self.data_feather_file is None
@@ -604,7 +623,8 @@ class OpenMLDataset(OpenMLBase):
 
             file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
             assert file_to_load is not None
-            return self._cache_compressed_file_from_file(Path(file_to_load))
+            data, cats, attrs = self._cache_compressed_file_from_file(Path(file_to_load))
+            return _ensure_dataframe(data, attrs), cats, attrs
 
         # helper variable to help identify where errors occur
         fpath = self.data_feather_file if self.cache_format == "feather" else self.data_pickle_file
@@ -616,12 +636,13 @@ class OpenMLDataset(OpenMLBase):
 
                 data = pd.read_feather(self.data_feather_file)
                 fpath = self.feather_attribute_file
-                with open(self.feather_attribute_file, "rb") as fh:  # noqa: PTH123
+                with self.feather_attribute_file.open("rb") as fh:
                     categorical, attribute_names = pickle.load(fh)  # noqa: S301
             else:
                 assert self.data_pickle_file is not None
-                with open(self.data_pickle_file, "rb") as fh:  # noqa: PTH123
+                with self.data_pickle_file.open("rb") as fh:
                     data, categorical, attribute_names = pickle.load(fh)  # noqa: S301
+
         except FileNotFoundError as e:
             raise ValueError(
                 f"Cannot find file for dataset {self.name} at location '{fpath}'."
@@ -660,7 +681,7 @@ class OpenMLDataset(OpenMLBase):
             file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
             assert file_to_load is not None
             attr, cat, df = self._parse_data_from_file(Path(file_to_load))
-            return df, cat, attr
+            return _ensure_dataframe(df), cat, attr
 
         data_up_to_date = isinstance(data, pd.DataFrame) or scipy.sparse.issparse(data)
         if self.cache_format == "pickle" and not data_up_to_date:
@@ -668,79 +689,9 @@ class OpenMLDataset(OpenMLBase):
             file_to_load = self.data_file if self.parquet_file is None else self.parquet_file
             assert file_to_load is not None
 
-            return self._cache_compressed_file_from_file(Path(file_to_load))
-        return data, categorical, attribute_names
+            data, cats, attrs = self._cache_compressed_file_from_file(Path(file_to_load))
 
-    # TODO(eddiebergman): Can type this better with overload
-    # TODO(eddiebergman): Could also techinically use scipy.sparse.sparray
-    @staticmethod
-    def _convert_array_format(
-        data: pd.DataFrame | pd.Series | np.ndarray | scipy.sparse.spmatrix,
-        array_format: Literal["array", "dataframe"],
-        attribute_names: list | None = None,
-    ) -> pd.DataFrame | pd.Series | np.ndarray | scipy.sparse.spmatrix:
-        """Convert a dataset to a given array format.
-
-        Converts to numpy array if data is non-sparse.
-        Converts to a sparse dataframe if data is sparse.
-
-        Parameters
-        ----------
-        array_format : str {'array', 'dataframe'}
-            Desired data type of the output
-            - If array_format='array'
-                If data is non-sparse
-                    Converts to numpy-array
-                    Enforces numeric encoding of categorical columns
-                    Missing values are represented as NaN in the numpy-array
-                else returns data as is
-            - If array_format='dataframe'
-                If data is sparse
-                    Works only on sparse data
-                    Converts sparse data to sparse dataframe
-                else returns data as is
-
-        """
-        if array_format == "array" and not isinstance(data, scipy.sparse.spmatrix):
-            # We encode the categories such that they are integer to be able
-            # to make a conversion to numeric for backward compatibility
-            def _encode_if_category(column: pd.Series | np.ndarray) -> pd.Series | np.ndarray:
-                if column.dtype.name == "category":
-                    column = column.cat.codes.astype(np.float32)
-                    mask_nan = column == -1
-                    column[mask_nan] = np.nan
-                return column
-
-            if isinstance(data, pd.DataFrame):
-                columns = {
-                    column_name: _encode_if_category(data.loc[:, column_name])
-                    for column_name in data.columns
-                }
-                data = pd.DataFrame(columns)
-            else:
-                data = _encode_if_category(data)
-
-            try:
-                # TODO(eddiebergman): float32?
-                return_array = np.asarray(data, dtype=np.float32)
-            except ValueError as e:
-                raise PyOpenMLError(
-                    "PyOpenML cannot handle string when returning numpy"
-                    ' arrays. Use dataset_format="dataframe".',
-                ) from e
-
-            return return_array
-
-        if array_format == "dataframe":
-            if scipy.sparse.issparse(data):
-                data = pd.DataFrame.sparse.from_spmatrix(data, columns=attribute_names)
-        else:
-            data_type = "sparse-data" if scipy.sparse.issparse(data) else "non-sparse data"
-            logger.warning(
-                f"Cannot convert {data_type} ({type(data)}) to '{array_format}'."
-                " Returning input data.",
-            )
-        return data
+        return _ensure_dataframe(data, attribute_names), categorical, attribute_names
 
     @staticmethod
     def _unpack_categories(series: pd.Series, categories: list) -> pd.Series:
@@ -761,19 +712,13 @@ class OpenMLDataset(OpenMLBase):
         raw_cat = pd.Categorical(col, ordered=True, categories=filtered_categories)
         return pd.Series(raw_cat, index=series.index, name=series.name)
 
-    def get_data(  # noqa: C901, PLR0912, PLR0915
+    def get_data(  # noqa: C901, PLR0912
         self,
         target: list[str] | str | None = None,
         include_row_id: bool = False,  # noqa: FBT001, FBT002
         include_ignore_attribute: bool = False,  # noqa: FBT001, FBT002
-        dataset_format: Literal["array", "dataframe"] = "dataframe",
-    ) -> tuple[
-        np.ndarray | pd.DataFrame | scipy.sparse.csr_matrix,
-        np.ndarray | pd.DataFrame | None,
-        list[bool],
-        list[str],
-    ]:
-        """Returns dataset content as dataframes or sparse matrices.
+    ) -> tuple[pd.DataFrame, pd.Series | None, list[bool], list[str]]:
+        """Returns dataset content as dataframes.
 
         Parameters
         ----------
@@ -785,35 +730,20 @@ class OpenMLDataset(OpenMLBase):
         include_ignore_attribute : boolean (default=False)
             Whether to include columns that are marked as "ignore"
             on the server in the dataset.
-        dataset_format : string (default='dataframe')
-            The format of returned dataset.
-            If ``array``, the returned dataset will be a NumPy array or a SciPy sparse
-            matrix. Support for ``array`` will be removed in 0.15.
-            If ``dataframe``, the returned dataset will be a Pandas DataFrame.
 
 
         Returns
         -------
-        X : ndarray, dataframe, or sparse matrix, shape (n_samples, n_columns)
-            Dataset
-        y : ndarray or pd.Series, shape (n_samples, ) or None
+        X : dataframe, shape (n_samples, n_columns)
+            Dataset, may have sparse dtypes in the columns if required.
+        y : pd.Series, shape (n_samples, ) or None
             Target column
-        categorical_indicator : boolean ndarray
+        categorical_indicator : list[bool]
             Mask that indicate categorical features.
-        attribute_names : List[str]
+        attribute_names : list[str]
             List of attribute names.
         """
-        # TODO: [0.15]
-        if dataset_format == "array":
-            warnings.warn(
-                "Support for `dataset_format='array'` will be removed in 0.15,"
-                "start using `dataset_format='dataframe' to ensure your code "
-                "will continue to work. You can use the dataframe's `to_numpy` "
-                "function to continue using numpy arrays.",
-                category=FutureWarning,
-                stacklevel=2,
-            )
-        data, categorical, attribute_names = self._load_data()
+        data, categorical_mask, attribute_names = self._load_data()
 
         to_exclude = []
         if not include_row_id and self.row_id_attribute is not None:
@@ -831,54 +761,43 @@ class OpenMLDataset(OpenMLBase):
         if len(to_exclude) > 0:
             logger.info(f"Going to remove the following attributes: {to_exclude}")
             keep = np.array([column not in to_exclude for column in attribute_names])
-            data = data.loc[:, keep] if isinstance(data, pd.DataFrame) else data[:, keep]
-
-            categorical = [cat for cat, k in zip(categorical, keep) if k]
+            data = data.drop(columns=to_exclude)
+            categorical_mask = [cat for cat, k in zip(categorical_mask, keep) if k]
             attribute_names = [att for att, k in zip(attribute_names, keep) if k]
 
         if target is None:
-            data = self._convert_array_format(data, dataset_format, attribute_names)  # type: ignore
-            targets = None
+            return data, None, categorical_mask, attribute_names
+
+        if isinstance(target, str):
+            target_names = target.split(",") if "," in target else [target]
         else:
-            if isinstance(target, str):
-                target = target.split(",") if "," in target else [target]
-            targets = np.array([column in target for column in attribute_names])
-            target_names = [column for column in attribute_names if column in target]
-            if np.sum(targets) > 1:
-                raise NotImplementedError(
-                    "Number of requested targets %d is not implemented." % np.sum(targets),
-                )
-            target_categorical = [
-                cat for cat, column in zip(categorical, attribute_names) if column in target
-            ]
-            target_dtype = int if target_categorical[0] else float
+            target_names = target
 
-            if isinstance(data, pd.DataFrame):
-                x = data.iloc[:, ~targets]
-                y = data.iloc[:, targets]
-            else:
-                x = data[:, ~targets]
-                y = data[:, targets].astype(target_dtype)  # type: ignore
+        # All the assumptions below for the target are dependant on the number of targets being 1
+        n_targets = len(target_names)
+        if n_targets > 1:
+            raise NotImplementedError(f"Number of targets {n_targets} not implemented.")
 
-            categorical = [cat for cat, t in zip(categorical, targets) if not t]
-            attribute_names = [att for att, k in zip(attribute_names, targets) if not k]
+        target_name = target_names[0]
+        x = data.drop(columns=[target_name])
+        y = data[target_name].squeeze()
 
-            x = self._convert_array_format(x, dataset_format, attribute_names)  # type: ignore
-            if dataset_format == "array" and scipy.sparse.issparse(y):
-                # scikit-learn requires dense representation of targets
-                y = np.asarray(y.todense()).astype(target_dtype)
-                # dense representation of single column sparse arrays become a 2-d array
-                # need to flatten it to a 1-d array for _convert_array_format()
-                y = y.squeeze()
-            y = self._convert_array_format(y, dataset_format, target_names)
-            y = y.astype(target_dtype) if isinstance(y, np.ndarray) else y
-            if len(y.shape) > 1 and y.shape[1] == 1:
-                # single column targets should be 1-d for both `array` and `dataframe` formats
-                assert isinstance(y, (np.ndarray, pd.DataFrame, pd.Series))
-                y = y.squeeze()
-            data, targets = x, y
+        if isinstance(y.dtype, pd.SparseDtype):
+            y = y.sparse.to_dense()
 
-        return data, targets, categorical, attribute_names  # type: ignore
+            # Since it was sparsified, the y column may not be of the correct dtype, hence we check
+            # if it was categorical and convert it to and integer if needs be.
+            category_names = data.columns[categorical_mask]
+            if target_name in category_names:
+                y = y.astype(int)
+
+        # Finally, remove the target from the list of attributes and categorical mask
+        target_index = attribute_names.index(target_name)
+        categorical_mask.pop(target_index)
+        attribute_names.remove(target_name)
+
+        assert isinstance(y, pd.Series)
+        return x, y, categorical_mask, attribute_names
 
     def _load_features(self) -> None:
         """Load the features metadata from the server and store it in the dataset object."""

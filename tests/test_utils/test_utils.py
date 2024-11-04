@@ -88,11 +88,7 @@ def test_list_all():
 
 @pytest.mark.server()
 def test_list_all_for_tasks(min_number_tasks_on_test_server):
-    tasks = openml.tasks.list_tasks(
-        batch_size=1000,
-        size=min_number_tasks_on_test_server,
-        output_format="dataframe",
-    )
+    tasks = openml.tasks.list_tasks(size=min_number_tasks_on_test_server)
     assert min_number_tasks_on_test_server == len(tasks)
 
 
@@ -124,11 +120,7 @@ def test_list_all_for_datasets(min_number_datasets_on_test_server):
 
 @pytest.mark.server()
 def test_list_all_for_flows(min_number_flows_on_test_server):
-    flows = openml.flows.list_flows(
-        batch_size=25,
-        size=min_number_flows_on_test_server,
-        output_format="dataframe",
-    )
+    flows = openml.flows.list_flows(size=min_number_flows_on_test_server)
     assert min_number_flows_on_test_server == len(flows)
 
 
@@ -161,12 +153,7 @@ def test_list_all_for_evaluations(min_number_evaluations_on_test_server):
 @pytest.mark.server()
 @unittest.mock.patch("openml._api_calls._perform_api_call", side_effect=_mocked_perform_api_call)
 def test_list_all_few_results_available(_perform_api_call):
-    datasets = openml.datasets.list_datasets(
-        size=1000,
-        data_name="iris",
-        data_version=1,
-        output_format="dataframe",
-    )
+    datasets = openml.datasets.list_datasets(size=1000, data_name="iris", data_version=1)
     assert len(datasets) == 1, "only one iris dataset version 1 should be present"
     assert _perform_api_call.call_count == 1, "expect just one call to get one dataset"
 

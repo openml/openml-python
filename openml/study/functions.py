@@ -473,7 +473,10 @@ def list_suites(
         uploader=uploader,
     )
     batches = openml.utils._list_all(listing_call, limit=size, offset=offset)
-    return pd.concat(batches, ignore_index=True)
+    if len(batches) == 0:
+        return pd.DataFrame()
+
+    return pd.concat(batches)
 
 
 def list_studies(
@@ -522,7 +525,10 @@ def list_studies(
         benchmark_suite=benchmark_suite,
     )
     batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
-    return pd.concat(batches, ignore_index=True)
+    if len(batches) == 0:
+        return pd.DataFrame()
+
+    return pd.concat(batches)
 
 
 def _list_studies(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
@@ -561,8 +567,7 @@ def __list_studies(api_call: str) -> pd.DataFrame:
     Returns
     -------
     pd.DataFrame
-        A dictionary or Pandas DataFrame of OpenML studies,
-        depending on the value of 'output_format'.
+        A Pandas DataFrame of OpenML studies
     """
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     study_dict = xmltodict.parse(xml_string, force_list=("oml:study",))

@@ -39,7 +39,7 @@ class OpenMLSetup:
         return {
             "setup_id": self.setup_id,
             "flow_id": self.flow_id,
-            "parameters": {p.input_id: p._to_dict() for p in self.parameters.values()}
+            "parameters": {p.id: p._to_dict() for p in self.parameters.values()}
             if self.parameters is not None
             else None,
         }

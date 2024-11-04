@@ -26,21 +26,21 @@ class TestRun(TestBase):
     # less than 1 seconds
 
     def test_tagging(self):
-        runs = openml.runs.list_runs(size=1, output_format="dataframe")
+        runs = openml.runs.list_runs(size=1)
         assert not runs.empty, "Test server state is incorrect"
         run_id = runs["run_id"].iloc[0]
         run = openml.runs.get_run(run_id)
         # tags can be at most 64 alphanumeric (+ underscore) chars
         unique_indicator = str(time()).replace(".", "")
         tag = f"test_tag_TestRun_{unique_indicator}"
-        runs = openml.runs.list_runs(tag=tag, output_format="dataframe")
+        runs = openml.runs.list_runs(tag=tag)
         assert len(runs) == 0
         run.push_tag(tag)
-        runs = openml.runs.list_runs(tag=tag, output_format="dataframe")
+        runs = openml.runs.list_runs(tag=tag)
         assert len(runs) == 1
         assert run_id in runs["run_id"]
         run.remove_tag(tag)
-        runs = openml.runs.list_runs(tag=tag, output_format="dataframe")
+        runs = openml.runs.list_runs(tag=tag)
         assert len(runs) == 0
 
     @staticmethod

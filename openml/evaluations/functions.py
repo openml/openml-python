@@ -21,37 +21,37 @@ from openml.evaluations import OpenMLEvaluation
 @overload
 def list_evaluations(
     function: str,
-    offset: int | None = ...,
-    size: int | None = ...,
-    tasks: list[str | int] | None = ...,
-    setups: list[str | int] | None = ...,
-    flows: list[str | int] | None = ...,
-    runs: list[str | int] | None = ...,
-    uploaders: list[str | int] | None = ...,
-    tag: str | None = ...,
-    study: int | None = ...,
-    per_fold: bool | None = ...,
-    sort_order: str | None = ...,
-    output_format: Literal["object"] = "object",
-) -> dict[int, OpenMLEvaluation]: ...
+    offset: int | None = None,
+    size: int | None = None,
+    tasks: list[str | int] | None = None,
+    setups: list[str | int] | None = None,
+    flows: list[str | int] | None = None,
+    runs: list[str | int] | None = None,
+    uploaders: list[str | int] | None = None,
+    tag: str | None = None,
+    study: int | None = None,
+    per_fold: bool | None = None,
+    sort_order: str | None = None,
+    output_format: Literal["dataframe"] = ...,
+) -> pd.DataFrame: ...
 
 
 @overload
 def list_evaluations(
     function: str,
-    offset: int | None = ...,
-    size: int | None = ...,
-    tasks: list[str | int] | None = ...,
-    setups: list[str | int] | None = ...,
-    flows: list[str | int] | None = ...,
-    runs: list[str | int] | None = ...,
-    uploaders: list[str | int] | None = ...,
-    tag: str | None = ...,
-    study: int | None = ...,
-    per_fold: bool | None = ...,
-    sort_order: str | None = ...,
-    output_format: Literal["dataframe"] = ...,
-) -> pd.DataFrame: ...
+    offset: int | None = None,
+    size: int | None = None,
+    tasks: list[str | int] | None = None,
+    setups: list[str | int] | None = None,
+    flows: list[str | int] | None = None,
+    runs: list[str | int] | None = None,
+    uploaders: list[str | int] | None = None,
+    tag: str | None = None,
+    study: int | None = None,
+    per_fold: bool | None = None,
+    sort_order: str | None = None,
+    output_format: Literal["object"] = "object",
+) -> dict[int, OpenMLEvaluation]: ...
 
 
 def list_evaluations(
@@ -137,12 +137,12 @@ def list_evaluations(
     flattened = list(chain.from_iterable(eval_collection))
     if output_format == "dataframe":
         records = [item._to_dict() for item in flattened]
-        return pd.DataFrame.from_records(records, index="run_id")
+        return pd.DataFrame.from_records(records)  # No index...
 
     return {e.run_id: e for e in flattened}
 
 
-def _list_evaluations(
+def _list_evaluations(  # noqa: C901
     limit: int,
     offset: int,
     *,
@@ -197,7 +197,8 @@ def _list_evaluations(
     api_call = f"evaluation/list/function/{function}/limit/{limit}/offset/{offset}"
     if kwargs is not None:
         for operator, value in kwargs.items():
-            api_call += f"/{operator}/{value}"
+            if value is not None:
+                api_call += f"/{operator}/{value}"
     if tasks is not None:
         api_call += "/task/{}".format(",".join([str(int(i)) for i in tasks]))
     if setups is not None:
@@ -243,7 +244,7 @@ def __list_evaluations(api_call: str) -> list[OpenMLEvaluation]:
     for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]:
         run_id = int(eval_["oml:run_id"])
         value = float(eval_["oml:value"]) if "oml:value" in eval_ else None
-        values = json.loads(eval_["oml:values"]) if eval_["oml:values"] is not None else None
+        values = json.loads(eval_["oml:values"]) if eval_.get("oml:values", None) else None
         array_data = eval_.get("oml:array_data")
 
         evals.append(
@@ -408,10 +409,10 @@ def list_evaluations_setups(
             assert isinstance(result, pd.DataFrame)
             result = result.drop("flow_id", axis=1)
             # concat resulting setup chunks into single datframe
-            setup_data = pd.concat([setup_data, result], ignore_index=True)
+            setup_data = pd.concat([setup_data, result])
 
         parameters = []
-        # Convert parameters of setup into list of tuples of (hyperparameter, value)
+        # Convert parameters of setup into dict of (hyperparameter, value)
         for parameter_dict in setup_data["parameters"]:
             if parameter_dict is not None:
                 parameters.append(

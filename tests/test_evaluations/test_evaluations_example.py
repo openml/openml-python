@@ -8,6 +8,7 @@ class TestEvaluationsExample(unittest.TestCase):
     def test_example_python_paper(self):
         # Example script which will appear in the upcoming OpenML-Python paper
         # This test ensures that the example will keep running!
+        #
 
         import matplotlib.pyplot as plt
         import numpy as np
@@ -18,7 +19,7 @@ class TestEvaluationsExample(unittest.TestCase):
             "predictive_accuracy",
             flows=[8353],
             tasks=[6],
-            output_format="dataframe",
+            # output_format="dataframe", ... This was removed
             parameters_in_separate_columns=True,
         )  # Choose an SVM flow, for example 8353, and a task.
 

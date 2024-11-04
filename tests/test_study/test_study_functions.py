@@ -1,7 +1,6 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import pandas as pd
 import pytest
 import unittest
 
@@ -236,13 +235,15 @@ class TestStudyFunctions(TestBase):
         study_original = openml.study.get_study(study.id)
 
         with pytest.raises(
-            openml.exceptions.OpenMLServerException, match="Problem attaching entities."
+            openml.exceptions.OpenMLServerException,
+            match="Problem attaching entities.",
         ):
             # run id does not exists
             openml.study.attach_to_study(study.id, [0])
 
         with pytest.raises(
-            openml.exceptions.OpenMLServerException, match="Problem attaching entities."
+            openml.exceptions.OpenMLServerException,
+            match="Problem attaching entities.",
         ):
             # some runs already attached
             openml.study.attach_to_study(study.id, list(run_list_more.keys()))
@@ -251,11 +252,6 @@ class TestStudyFunctions(TestBase):
 
     @unittest.skip("It is unclear when we can expect the test to pass or fail.")
     def test_study_list(self):
-        study_list = openml.study.list_studies(status="in_preparation", output_format="dataframe")
+        study_list = openml.study.list_studies(status="in_preparation")
         # might fail if server is recently reset
         assert len(study_list) >= 2
-
-    @unittest.skip("It is unclear when we can expect the test to pass or fail.")
-    def test_study_list_output_format(self):
-        study_list = openml.study.list_studies(status="in_preparation", output_format="dataframe")
-        assert isinstance(study_list, pd.DataFrame)

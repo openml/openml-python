@@ -48,7 +48,7 @@ print(dataset.description[:500])
 # attribute_names - the names of the features for the examples (X) and
 # target feature (y)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    target=dataset.default_target_attribute
+    target_names=dataset.default_target_attribute
 )
 
 ############################################################################

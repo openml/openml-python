@@ -90,7 +90,7 @@ def _get_cached_setup(setup_id: int) -> OpenMLSetup:
         setup_file = setup_cache_dir / "description.xml"
         with setup_file.open(encoding="utf8") as fh:
             setup_xml = xmltodict.parse(fh.read())
-            return _create_setup_from_xml(setup_xml, output_format="object")  # type: ignore
+            return _create_setup_from_xml(setup_xml)
 
     except OSError as e:
         raise openml.exceptions.OpenMLCacheException(
@@ -120,7 +120,7 @@ def get_setup(setup_id: int) -> OpenMLSetup:
     try:
         return _get_cached_setup(setup_id)
     except openml.exceptions.OpenMLCacheException:
-        url_suffix = "/setup/%d" % setup_id
+        url_suffix = f"/setup/{setup_id}"
         setup_xml = openml._api_calls._perform_api_call(url_suffix, "get")
         with setup_file.open("w", encoding="utf8") as fh:
             fh.write(setup_xml)
@@ -172,7 +172,8 @@ def list_setups(  # noqa: PLR0913
     if output_format == "object":
         return {setup.setup_id: setup for setup in flattened}
 
-    return pd.DataFrame.from_records([setup._to_dict() for setup in flattened], index="setup_id")
+    records = [setup._to_dict() for setup in flattened]
+    return pd.DataFrame.from_records(records, index="setup_id")
 
 
 def _list_setups(

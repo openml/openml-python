@@ -16,7 +16,7 @@ from openml._api_calls import _download_minio_bucket
 class TestConfig(openml.testing.TestBase):
     def test_too_long_uri(self):
         with pytest.raises(openml.exceptions.OpenMLServerError, match="URI too long!"):
-            openml.datasets.list_datasets(data_id=list(range(10000)), output_format="dataframe")
+            openml.datasets.list_datasets(data_id=list(range(10000)))
 
     @unittest.mock.patch("time.sleep")
     @unittest.mock.patch("requests.Session")

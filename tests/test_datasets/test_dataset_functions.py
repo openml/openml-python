@@ -113,9 +113,8 @@ class TestOpenMLDataset(TestBase):
         all_tags = _tag_entity("data", 1, tag, untag=True)
         assert tag not in all_tags
 
-    def test_list_datasets_output_format(self):
-        datasets = openml.datasets.list_datasets(output_format="dataframe")
-        assert isinstance(datasets, pd.DataFrame)
+    def test_list_datasets_length(self):
+        datasets = openml.datasets.list_datasets()
         assert len(datasets) >= 100
 
     def test_list_datasets_paginate(self):
@@ -123,14 +122,18 @@ class TestOpenMLDataset(TestBase):
         max = 100
         for i in range(0, max, size):
             datasets = openml.datasets.list_datasets(offset=i, size=size)
-            assert size == len(datasets)
-            self._check_datasets(datasets)
+            assert len(datasets) == size
+            assert len(datasets.columns) >= 2
+            # Maybe index?
+            assert "did" in datasets.columns
+            assert datasets["did"].dtype == int
+            assert "status" in datasets.columns
+            assert datasets["status"].dtype == pd.CategoricalDtype(
+                categories=["in_preparation", "active", "deactivated"],
+            )
 
     def test_list_datasets_empty(self):
-        datasets = openml.datasets.list_datasets(
-            tag="NoOneWouldUseThisTagAnyway",
-            output_format="dataframe",
-        )
+        datasets = openml.datasets.list_datasets(tag="NoOneWouldUseThisTagAnyway")
         assert datasets.empty
 
     @pytest.mark.production()
@@ -308,9 +311,9 @@ class TestOpenMLDataset(TestBase):
 
     def test_get_dataset_sparse(self):
         dataset = openml.datasets.get_dataset(102)
-        # TODO(eddiebergman): Will break from dataset_format removal
         X, *_ = dataset.get_data()
-        assert isinstance(X, scipy.sparse.csr_matrix)
+        assert isinstance(X, pd.DataFrame)
+        assert all(isinstance(col, pd.SparseDtype) for col in X.dtypes)
 
     def test_download_rowid(self):
         # Smoke test which checks that the dataset has the row-id set correctly
@@ -570,11 +573,7 @@ class TestOpenMLDataset(TestBase):
     def _assert_status_of_dataset(self, *, did: int, status: str):
         """Asserts there is exactly one dataset with id `did` and its current status is `status`"""
         # need to use listing fn, as this is immune to cache
-        result = openml.datasets.list_datasets(
-            data_id=[did],
-            status="all",
-            output_format="dataframe",
-        )
+        result = openml.datasets.list_datasets(data_id=[did], status="all")
         result = result.to_dict(orient="index")
         # I think we should drop the test that one result is returned,
         # the server should never return multiple results?
@@ -1522,8 +1521,8 @@ class TestOpenMLDataset(TestBase):
         # Testing on prod since concurrent deletion of uploded datasets make the test fail
         openml.config.server = self.production_server
 
-        datasets_a = openml.datasets.list_datasets(output_format="dataframe")
-        datasets_b = openml.datasets.list_datasets(output_format="dataframe", size=np.inf)
+        datasets_a = openml.datasets.list_datasets()
+        datasets_b = openml.datasets.list_datasets(size=np.inf)
 
         # Reverting to test server
         openml.config.server = self.test_server
@@ -1792,7 +1791,7 @@ def _assert_datasets_have_id_and_valid_status(datasets: pd.DataFrame):
 
 @pytest.fixture(scope="module")
 def all_datasets():
-    return openml.datasets.list_datasets(output_format="dataframe")
+    return openml.datasets.list_datasets()
 
 
 def test_list_datasets(all_datasets: pd.DataFrame):
@@ -1804,49 +1803,37 @@ def test_list_datasets(all_datasets: pd.DataFrame):
 
 
 def test_list_datasets_by_tag(all_datasets: pd.DataFrame):
-    tag_datasets = openml.datasets.list_datasets(tag="study_14", output_format="dataframe")
+    tag_datasets = openml.datasets.list_datasets(tag="study_14")
     assert 0 < len(tag_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(tag_datasets)
 
 
 def test_list_datasets_by_size():
-    datasets = openml.datasets.list_datasets(size=5, output_format="dataframe")
+    datasets = openml.datasets.list_datasets(size=5)
     assert len(datasets) == 5
     _assert_datasets_have_id_and_valid_status(datasets)
 
 
 def test_list_datasets_by_number_instances(all_datasets: pd.DataFrame):
-    small_datasets = openml.datasets.list_datasets(
-        number_instances="5..100",
-        output_format="dataframe",
-    )
+    small_datasets = openml.datasets.list_datasets(number_instances="5..100")
     assert 0 < len(small_datasets) <= len(all_datasets)
     _assert_datasets_have_id_and_valid_status(small_datasets)
 
 
 def test_list_datasets_by_number_features(all_datasets: pd.DataFrame):
-    wide_datasets = openml.datasets.list_datasets(
-        number_features="50..100",
-        output_format="dataframe",
-    )
+    wide_datasets = openml.datasets.list_datasets(number_features="50..100")
     assert 8 <= len(wide_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(wide_datasets)
 
 
 def test_list_datasets_by_number_classes(all_datasets: pd.DataFrame):
-    five_class_datasets = openml.datasets.list_datasets(
-        number_classes="5",
-        output_format="dataframe",
-    )
+    five_class_datasets = openml.datasets.list_datasets(number_classes="5")
     assert 3 <= len(five_class_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(five_class_datasets)
 
 
 def test_list_datasets_by_number_missing_values(all_datasets: pd.DataFrame):
-    na_datasets = openml.datasets.list_datasets(
-        number_missing_values="5..100",
-        output_format="dataframe",
-    )
+    na_datasets = openml.datasets.list_datasets(number_missing_values="5..100")
     assert 5 <= len(na_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(na_datasets)
 
@@ -1856,7 +1843,6 @@ def test_list_datasets_combined_filters(all_datasets: pd.DataFrame):
         tag="study_14",
         number_instances="100..1000",
         number_missing_values="800..1000",
-        output_format="dataframe",
     )
     assert 1 <= len(combined_filter_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(combined_filter_datasets)
@@ -1956,8 +1942,12 @@ def test_get_dataset_with_invalid_id() -> None:
         openml.datasets.get_dataset(INVALID_ID)
         assert e.value.code == 111
 
+
 def test_read_features_from_xml_with_whitespace() -> None:
     from openml.datasets.dataset import _read_features
-    features_file = Path(__file__).parent.parent / "files" / "misc" / "features_with_whitespaces.xml"
+
+    features_file = (
+        Path(__file__).parent.parent / "files" / "misc" / "features_with_whitespaces.xml"
+    )
     dict = _read_features(features_file)
     assert dict[1].nominal_values == [" - 50000.", " 50000+."]

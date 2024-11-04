@@ -1094,6 +1094,9 @@ def list_runs(  # noqa: PLR0913
         task_type=task_type,
     )
     batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
+    if len(batches) == 0:
+        return pd.DataFrame()
+
     return pd.concat(batches)
 
 

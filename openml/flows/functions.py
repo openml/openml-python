@@ -167,7 +167,10 @@ def list_flows(
     """
     listing_call = partial(_list_flows, tag=tag, uploader=uploader)
     batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
-    return pd.concat(batches, ignore_index=True)
+    if len(batches) == 0:
+        return pd.DataFrame()
+
+    return pd.concat(batches)
 
 
 def _list_flows(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:

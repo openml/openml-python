@@ -1434,25 +1434,21 @@ class TestRun(TestBase):
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
-        runs = openml.runs.list_runs(id=[2], show_errors=True, output_format="dataframe")
+        runs = openml.runs.list_runs(id=[2], display_errors=True)
         assert len(runs) == 1
         for run in runs.to_dict(orient="index").values():
             self._check_run(run)
 
     def test_list_runs_empty(self):
-        runs = openml.runs.list_runs(task=[0], output_format="dataframe")
+        runs = openml.runs.list_runs(task=[0])
         assert runs.empty
-
-    def test_list_runs_output_format(self):
-        runs = openml.runs.list_runs(size=1000, output_format="dataframe")
-        assert isinstance(runs, pd.DataFrame)
 
     @pytest.mark.production()
     def test_get_runs_list_by_task(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
         task_ids = [20]
-        runs = openml.runs.list_runs(task=task_ids, output_format="dataframe")
+        runs = openml.runs.list_runs(task=task_ids)
         assert len(runs) >= 590
         for run in runs.to_dict(orient="index").values():
             assert run["task_id"] in task_ids
@@ -1460,7 +1456,7 @@ class TestRun(TestBase):
         num_runs = len(runs)
 
         task_ids.append(21)
-        runs = openml.runs.list_runs(task=task_ids, output_format="dataframe")
+        runs = openml.runs.list_runs(task=task_ids)
         assert len(runs) >= num_runs + 1
         for run in runs.to_dict(orient="index").values():
             assert run["task_id"] in task_ids
@@ -1473,7 +1469,7 @@ class TestRun(TestBase):
         # 29 is Dominik Kirchhoff
         uploader_ids = [29]
 
-        runs = openml.runs.list_runs(uploader=uploader_ids, output_format="dataframe")
+        runs = openml.runs.list_runs(uploader=uploader_ids)
         assert len(runs) >= 2
         for run in runs.to_dict(orient="index").values():
             assert run["uploader"] in uploader_ids
@@ -1482,7 +1478,7 @@ class TestRun(TestBase):
 
         uploader_ids.append(274)
 
-        runs = openml.runs.list_runs(uploader=uploader_ids, output_format="dataframe")
+        runs = openml.runs.list_runs(uploader=uploader_ids)
         assert len(runs) >= num_runs + 1
         for run in runs.to_dict(orient="index").values():
             assert run["uploader"] in uploader_ids
@@ -1493,7 +1489,7 @@ class TestRun(TestBase):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
         flow_ids = [1154]
-        runs = openml.runs.list_runs(flow=flow_ids, output_format="dataframe")
+        runs = openml.runs.list_runs(flow=flow_ids)
         assert len(runs) >= 1
         for run in runs.to_dict(orient="index").values():
             assert run["flow_id"] in flow_ids
@@ -1501,7 +1497,7 @@ class TestRun(TestBase):
         num_runs = len(runs)
 
         flow_ids.append(1069)
-        runs = openml.runs.list_runs(flow=flow_ids, output_format="dataframe")
+        runs = openml.runs.list_runs(flow=flow_ids)
         assert len(runs) >= num_runs + 1
         for run in runs.to_dict(orient="index").values():
             assert run["flow_id"] in flow_ids
@@ -1515,12 +1511,7 @@ class TestRun(TestBase):
         size = 10
         max = 100
         for i in range(0, max, size):
-            runs = openml.runs.list_runs(
-                offset=i,
-                size=size,
-                uploader=uploader_ids,
-                output_format="dataframe",
-            )
+            runs = openml.runs.list_runs(offset=i, size=size, uploader=uploader_ids)
             assert size >= len(runs)
             for run in runs.to_dict(orient="index").values():
                 assert run["uploader"] in uploader_ids
@@ -1543,23 +1534,22 @@ class TestRun(TestBase):
         # self.assertRaises(openml.exceptions.OpenMLServerError,
         # openml.runs.list_runs)
 
-        runs = openml.runs.list_runs(id=ids, output_format="dataframe")
+        runs = openml.runs.list_runs(id=ids)
         assert len(runs) == 2
 
-        runs = openml.runs.list_runs(task=tasks, output_format="dataframe")
+        runs = openml.runs.list_runs(task=tasks)
         assert len(runs) >= 2
 
-        runs = openml.runs.list_runs(uploader=uploaders_2, output_format="dataframe")
+        runs = openml.runs.list_runs(uploader=uploaders_2)
         assert len(runs) >= 10
 
-        runs = openml.runs.list_runs(flow=flows, output_format="dataframe")
+        runs = openml.runs.list_runs(flow=flows)
         assert len(runs) >= 100
 
         runs = openml.runs.list_runs(
             id=ids,
             task=tasks,
             uploader=uploaders_1,
-            output_format="dataframe",
         )
         assert len(runs) == 2
 
@@ -1568,7 +1558,7 @@ class TestRun(TestBase):
         # TODO: comes from live, no such lists on test
         # Unit test works on production server only
         openml.config.server = self.production_server
-        runs = openml.runs.list_runs(tag="curves", output_format="dataframe")
+        runs = openml.runs.list_runs(tag="curves")
         assert len(runs) >= 1
 
     @pytest.mark.sklearn()

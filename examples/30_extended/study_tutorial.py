@@ -17,16 +17,11 @@ from sklearn.ensemble import RandomForestClassifier
 
 import openml
 
-
 ############################################################################
 # Listing studies
 # ***************
-#
-# * Use the output_format parameter to select output type
-# * Default gives ``dict``, but we'll use ``dataframe`` to obtain an
-#   easier-to-work-with data structure
 
-studies = openml.study.list_studies(output_format="dataframe", status="all")
+studies = openml.study.list_studies(status="all")
 print(studies.head(n=10))
 
 
@@ -52,7 +47,6 @@ print(study.runs)
 # the evaluations available for the conducted runs:
 evaluations = openml.evaluations.list_evaluations(
     function="predictive_accuracy",
-    output_format="dataframe",
     study=study.study_id,
 )
 print(evaluations.head())
@@ -81,7 +75,7 @@ tasks = [115, 259, 307]
 # To verify
 # https://test.openml.org/api/v1/study/1
 suite = openml.study.get_suite("OpenML100")
-print(all([t_id in suite.tasks for t_id in tasks]))
+print(all(t_id in suite.tasks for t_id in tasks))
 
 run_ids = []
 for task_id in tasks:

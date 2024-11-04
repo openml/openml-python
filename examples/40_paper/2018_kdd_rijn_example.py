@@ -32,24 +32,24 @@ pip install openml[examples,docs] fanova ConfigSpace<1.0
 
 import sys
 
-if sys.platform == "win32":  # noqa
+if sys.platform == "win32":
     print(
         "The pyrfr library (requirement of fanova) can currently not be installed on Windows systems"
     )
-    exit()
+    sys.exit()
 
 # DEPRECATED EXAMPLE -- Avoid running this code in our CI/CD pipeline
 print("This example is deprecated, remove this code to use it manually.")
-exit()
+sys.exit()
 
 import json
+
 import fanova
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
 import openml
-
 
 ##############################################################################
 # With the advent of automated machine learning, automated hyperparameter
@@ -81,7 +81,7 @@ import openml
 # important when it is put on a log-scale. All these simplifications can be
 # addressed by defining a ConfigSpace. For a more elaborated example that uses
 # this, please see:
-# https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdccc7b9265/examples/plot/plot_fanova_aggregates.py # noqa F401
+# https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdccc7b9265/examples/plot/plot_fanova_aggregates.py
 
 suite = openml.study.get_suite("OpenML100")
 flow_id = 7707
@@ -107,7 +107,6 @@ for idx, task_id in enumerate(suite.tasks):
         flows=[flow_id],
         tasks=[task_id],
         size=limit_per_task,
-        output_format="dataframe",
     )
 
     performance_column = "value"
@@ -122,7 +121,7 @@ for idx, task_id in enumerate(suite.tasks):
             [
                 dict(
                     **{name: json.loads(value) for name, value in setup["parameters"].items()},
-                    **{performance_column: setup[performance_column]}
+                    **{performance_column: setup[performance_column]},
                 )
                 for _, setup in evals.iterrows()
             ]
