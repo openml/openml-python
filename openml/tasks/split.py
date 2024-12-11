@@ -1,12 +1,12 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from collections import namedtuple, OrderedDict
 import os
 import pickle
+from collections import OrderedDict, namedtuple
 
-import numpy as np
 import arff
-
+import numpy as np
 
 # Named tuple to represent a train-test split
 Split = namedtuple("Split", ["train", "test"])
@@ -16,7 +16,7 @@ class OpenMLSplit:
     """
     Represents a split object for OpenML datasets.
 
-    This class manages train-test splits for a dataset across multiple 
+    This class manages train-test splits for a dataset across multiple
     repetitions, folds, and samples.
 
     Parameters
@@ -26,7 +26,7 @@ class OpenMLSplit:
     description : str
         A textual description of the split.
     split : dict
-        A dictionary containing the splits organized by repetition, fold, 
+        A dictionary containing the splits organized by repetition, fold,
         and sample.
 
     Attributes
@@ -36,7 +36,7 @@ class OpenMLSplit:
     description : str
         Description of the split.
     split : dict
-        Nested dictionary holding the train-test indices for each repetition, 
+        Nested dictionary holding the train-test indices for each repetition,
         fold, and sample.
     repeats : int
         Number of repetitions in the split.
@@ -54,7 +54,7 @@ class OpenMLSplit:
     def __init__(self, name, description, split):
         self.description = description
         self.name = name
-        self.split = dict()
+        self.split = {}
 
         # Populate splits according to repetitions
         for repetition in split:
@@ -66,7 +66,7 @@ class OpenMLSplit:
                     self.split[repetition][fold][sample] = split[repetition][fold][sample]
 
         self.repeats = len(self.split)
-        if any([len(self.split[0]) != len(self.split[i]) for i in range(self.repeats)]):
+        if any(len(self.split[0]) != len(self.split[i]) for i in range(self.repeats)):
             raise ValueError("Number of folds is inconsistent across repetitions.")
         self.folds = len(self.split[0])
         self.samples = len(self.split[0][0])
@@ -112,7 +112,7 @@ class OpenMLSplit:
         return True
 
     @classmethod
-    def _from_arff_file(cls, filename: str) -> "OpenMLSplit":
+    def _from_arff_file(cls, filename: str) -> OpenMLSplit:
         """
         Create an OpenMLSplit object from an ARFF file.
 
