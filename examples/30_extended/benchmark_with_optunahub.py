@@ -6,7 +6,9 @@ Hyperparameter Optimization Benchmark with OptunaHub
 In this tutorial, we walk through how to conduct hyperparameter optimization experiments using OpenML and OptunaHub.
 """
 ############################################################################
-# We first import all the necessary modules.
+# Please make sure to install the dependencies with:
+# ``pip install openml optunahub hebo`` and ``pip install --upgrade pymoo``
+# Then we import all the necessary modules.
 
 # License: BSD 3-Clause
 
