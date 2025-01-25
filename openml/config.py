@@ -23,6 +23,7 @@ console_handler: logging.StreamHandler | None = None
 file_handler: logging.handlers.RotatingFileHandler | None = None
 
 OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
+OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
 
 
 class _Config(TypedDict):

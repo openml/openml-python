@@ -18,6 +18,7 @@ import scipy.sparse
 import xmltodict
 
 from openml.base import OpenMLBase
+from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 from openml.exceptions import PyOpenMLError
 
 from .data_feature import OpenMLDataFeature
@@ -359,7 +360,7 @@ class OpenMLDataset(OpenMLBase):
         # import required here to avoid circular import.
         from .functions import _get_dataset_arff, _get_dataset_parquet
 
-        skip_parquet = os.environ.get("OPENML_SKIP_PQ", "false").casefold() == "true"
+        skip_parquet = os.environ.get(OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
         if self._parquet_url is not None and not skip_parquet:
             parquet_file = _get_dataset_parquet(self)
             self.parquet_file = None if parquet_file is None else str(parquet_file)
