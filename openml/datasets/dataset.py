@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import gzip
 import logging
+import os
 import pickle
 import re
 import warnings
@@ -358,8 +359,10 @@ class OpenMLDataset(OpenMLBase):
         # import required here to avoid circular import.
         from .functions import _get_dataset_arff, _get_dataset_parquet
 
-        if self._parquet_url is not None:
-            self.parquet_file = str(_get_dataset_parquet(self))
+        skip_parquet = os.environ.get("OPENML_SKIP_PQ", "false").casefold() == "true"
+        if self._parquet_url is not None and not skip_parquet:
+            parquet_file = _get_dataset_parquet(self)
+            self.parquet_file = None if parquet_file is None else str(parquet_file)
         if self.parquet_file is None:
             self.data_file = str(_get_dataset_arff(self))
 
