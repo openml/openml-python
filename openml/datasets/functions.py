@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import warnings
 from collections import OrderedDict
 from pathlib import Path
@@ -560,7 +561,10 @@ def get_dataset(  # noqa: C901, PLR0912
         if download_qualities:
             qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
 
-        if "oml:parquet_url" in description and download_data:
+        parquet_file = None
+        skip_parquet = os.environ.get("OPENML_SKIP_PQ", "false").casefold() == "true"
+        download_parquet = "oml:parquet_url" in description and not skip_parquet
+        if download_parquet and (download_data or download_all_files):
             try:
                 parquet_file = _get_dataset_parquet(
                     description,
@@ -568,12 +572,11 @@ def get_dataset(  # noqa: C901, PLR0912
                 )
             except urllib3.exceptions.MaxRetryError:
                 parquet_file = None
-        else:
-            parquet_file = None
 
         arff_file = None
         if parquet_file is None and download_data:
-            logger.warning("Failed to download parquet, fallback on ARFF.")
+            if download_parquet:
+                logger.warning("Failed to download parquet, fallback on ARFF.")
             arff_file = _get_dataset_arff(description)
 
         remove_dataset_cache = False
