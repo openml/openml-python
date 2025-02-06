@@ -295,7 +295,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
     # TODO(eddiebergman): Do all OpenMLSupervisedTask have a `y`?
     def get_X_and_y(
-        self, dataset_format: Literal["dataframe", "array"] = "array"
+        self, dataset_format: Literal["dataframe", "array"] = "dataframe"
     ) -> tuple[
         np.ndarray | pd.DataFrame | scipy.sparse.spmatrix,
         np.ndarray | pd.Series | pd.DataFrame | None,
@@ -547,7 +547,7 @@ class OpenMLClusteringTask(OpenMLTask):
 
     def get_X(
         self,
-        dataset_format: Literal["array", "dataframe"] = "array",
+        dataset_format: Literal["array", "dataframe"] = "dataframe",
     ) -> np.ndarray | pd.DataFrame | scipy.sparse.spmatrix:
         """Get data associated with the current task.
 

@@ -1063,7 +1063,7 @@ def list_runs(  # noqa: PLR0913
     tag: str | None = None,
     study: int | None = None,
     display_errors: bool = False,  # noqa: FBT001, FBT002
-    output_format: Literal["dict", "dataframe"] = "dict",
+    output_format: Literal["dict", "dataframe"] = "dataframe",
     **kwargs: Any,
 ) -> dict | pd.DataFrame:
     """
@@ -1095,7 +1095,7 @@ def list_runs(  # noqa: PLR0913
         Whether to list runs which have an error (for example a missing
         prediction file).
 
-    output_format: str, optional (default='dict')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
@@ -1156,7 +1156,7 @@ def _list_runs(  # noqa: PLR0913
     uploader: list | None = None,
     study: int | None = None,
     display_errors: bool = False,  # noqa: FBT002, FBT001
-    output_format: Literal["dict", "dataframe"] = "dict",
+    output_format: Literal["dict", "dataframe"] = "dataframe",
     **kwargs: Any,
 ) -> dict | pd.DataFrame:
     """
@@ -1186,7 +1186,7 @@ def _list_runs(  # noqa: PLR0913
         Whether to list runs which have an error (for example a missing
         prediction file).
 
-    output_format: str, optional (default='dict')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
@@ -1221,7 +1221,7 @@ def _list_runs(  # noqa: PLR0913
 
 
 def __list_runs(
-    api_call: str, output_format: Literal["dict", "dataframe"] = "dict"
+    api_call: str, output_format: Literal["dict", "dataframe"] = "dataframe"
 ) -> dict | pd.DataFrame:
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call, "get")

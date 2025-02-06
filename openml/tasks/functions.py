@@ -131,7 +131,7 @@ def list_tasks(
     offset: int | None = None,
     size: int | None = None,
     tag: str | None = None,
-    output_format: Literal["dict", "dataframe"] = "dict",
+    output_format: Literal["dict", "dataframe"] = "dataframe",
     **kwargs: Any,
 ) -> dict | pd.DataFrame:
     """
@@ -150,7 +150,7 @@ def list_tasks(
         the maximum number of tasks to show
     tag : str, optional
         the tag to include
-    output_format: str, optional (default='dict')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
@@ -197,7 +197,7 @@ def list_tasks(
 
 def _list_tasks(
     task_type: TaskType | None = None,
-    output_format: Literal["dict", "dataframe"] = "dict",
+    output_format: Literal["dict", "dataframe"] = "dataframe",
     **kwargs: Any,
 ) -> dict | pd.DataFrame:
     """
@@ -210,7 +210,7 @@ def _list_tasks(
     type when used as a filter in list tasks call.
     task_type : TaskType, optional
         Refers to the type of task.
-    output_format: str, optional (default='dict')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
@@ -238,7 +238,7 @@ def _list_tasks(
 # TODO(eddiebergman): overload todefine type returned
 def __list_tasks(  # noqa: PLR0912, C901
     api_call: str,
-    output_format: Literal["dict", "dataframe"] = "dict",
+    output_format: Literal["dict", "dataframe"] = "dataframe",
 ) -> dict | pd.DataFrame:
     """Returns a dictionary or a Pandas DataFrame with information about OpenML tasks.
 

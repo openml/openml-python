@@ -66,7 +66,7 @@ def list_evaluations(
     study: int | None = None,
     per_fold: bool | None = None,
     sort_order: str | None = None,
-    output_format: Literal["object", "dict", "dataframe"] = "object",
+    output_format: Literal["object", "dict", "dataframe"] = "dataframe",
 ) -> dict | pd.DataFrame:
     """
     List all run-evaluation pairs matching all of the given filters.
@@ -102,7 +102,7 @@ def list_evaluations(
     sort_order : str, optional
        order of sorting evaluations, ascending ("asc") or descending ("desc")
 
-    output_format: str, optional (default='object')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
         - If 'object' the output is a dict of OpenMLEvaluation objects
         - If 'dict' the output is a dict of dict
@@ -157,7 +157,7 @@ def _list_evaluations(
     uploaders: list | None = None,
     study: int | None = None,
     sort_order: str | None = None,
-    output_format: Literal["object", "dict", "dataframe"] = "object",
+    output_format: Literal["object", "dict", "dataframe"] = "dataframe",
     **kwargs: Any,
 ) -> dict | pd.DataFrame:
     """
@@ -190,7 +190,7 @@ def _list_evaluations(
     sort_order : str, optional
         order of sorting evaluations, ascending ("asc") or descending ("desc")
 
-    output_format: str, optional (default='dict')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         The parameter decides the format of the output.
@@ -226,7 +226,7 @@ def _list_evaluations(
 
 def __list_evaluations(
     api_call: str,
-    output_format: Literal["object", "dict", "dataframe"] = "object",
+    output_format: Literal["object", "dict", "dataframe"] = "dataframe",
 ) -> dict | pd.DataFrame:
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call, "get")

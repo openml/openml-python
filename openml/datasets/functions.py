@@ -120,7 +120,7 @@ def list_datasets(
     size: int | None = None,
     status: str | None = None,
     tag: str | None = None,
-    output_format: Literal["dataframe", "dict"] = "dict",
+    output_format: Literal["dataframe", "dict"] = "dataframe",
     **kwargs: Any,
 ) -> dict | pd.DataFrame:
     """
@@ -141,7 +141,7 @@ def list_datasets(
         default active datasets are returned, but also datasets
         from another status can be requested.
     tag : str, optional
-    output_format: str, optional (default='dict')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
@@ -219,7 +219,7 @@ def _list_datasets(
 
 def _list_datasets(
     data_id: list | None = None,
-    output_format: Literal["dict", "dataframe"] = "dict",
+    output_format: Literal["dict", "dataframe"] = "dataframe",
     **kwargs: Any,
 ) -> dict | pd.DataFrame:
     """
@@ -234,7 +234,7 @@ def _list_datasets(
 
     data_id : list, optional
 
-    output_format: str, optional (default='dict')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
@@ -267,7 +267,7 @@ def __list_datasets(api_call: str, output_format: Literal["dataframe"]) -> pd.Da
 
 def __list_datasets(
     api_call: str,
-    output_format: Literal["dict", "dataframe"] = "dict",
+    output_format: Literal["dict", "dataframe"] = "dataframe",
 ) -> dict | pd.DataFrame:
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     datasets_dict = xmltodict.parse(xml_string, force_list=("oml:dataset",))

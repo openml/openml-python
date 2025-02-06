@@ -168,7 +168,7 @@ def list_flows(
     offset: int | None = None,
     size: int | None = None,
     tag: str | None = None,
-    output_format: Literal["dict", "dataframe"] = "dict",
+    output_format: Literal["dict", "dataframe"] = "dataframe",
     **kwargs: Any,
 ) -> dict | pd.DataFrame:
     """
@@ -183,7 +183,7 @@ def list_flows(
         the maximum number of flows to return
     tag : str, optional
         the tag to include
-    output_format: str, optional (default='dict')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
@@ -252,14 +252,14 @@ def _list_flows(output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFr
 
 
 def _list_flows(
-    output_format: Literal["dict", "dataframe"] = "dict", **kwargs: Any
+    output_format: Literal["dict", "dataframe"] = "dataframe", **kwargs: Any
 ) -> dict | pd.DataFrame:
     """
     Perform the api call that return a list of all flows.
 
     Parameters
     ----------
-    output_format: str, optional (default='dict')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
@@ -393,7 +393,7 @@ def __list_flows(api_call: str, output_format: Literal["dataframe"]) -> pd.DataF
 
 
 def __list_flows(
-    api_call: str, output_format: Literal["dict", "dataframe"] = "dict"
+    api_call: str, output_format: Literal["dict", "dataframe"] = "dataframe"
 ) -> dict | pd.DataFrame:
     """Retrieve information about flows from OpenML API
     and parse it to a dictionary or a Pandas DataFrame.

@@ -134,7 +134,7 @@ def list_setups(  # noqa: PLR0913
     flow: int | None = None,
     tag: str | None = None,
     setup: Iterable[int] | None = None,
-    output_format: Literal["object", "dict", "dataframe"] = "object",
+    output_format: Literal["object", "dict", "dataframe"] = "dataframe",
 ) -> dict | pd.DataFrame:
     """
     List all setups matching all of the given filters.
@@ -146,7 +146,7 @@ def list_setups(  # noqa: PLR0913
     flow : int, optional
     tag : str, optional
     setup : Iterable[int], optional
-    output_format: str, optional (default='object')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
@@ -184,7 +184,7 @@ def list_setups(  # noqa: PLR0913
 
 def _list_setups(
     setup: Iterable[int] | None = None,
-    output_format: Literal["dict", "dataframe", "object"] = "object",
+    output_format: Literal["dict", "dataframe", "object"] = "dataframe",
     **kwargs: Any,
 ) -> dict[int, dict] | pd.DataFrame | dict[int, OpenMLSetup]:
     """
@@ -197,7 +197,7 @@ def _list_setups(
 
     setup : list(int), optional
 
-    output_format: str, optional (default='dict')
+    output_format: str, optional (default='dataframe')
         The parameter decides the format of the output.
         - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
@@ -221,7 +221,7 @@ def _list_setups(
 
 
 def __list_setups(
-    api_call: str, output_format: Literal["dict", "dataframe", "object"] = "object"
+    api_call: str, output_format: Literal["dict", "dataframe", "object"] = "dataframe"
 ) -> dict[int, dict] | pd.DataFrame | dict[int, OpenMLSetup]:
     """Helper function to parse API calls which are lists of setups"""
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
@@ -328,7 +328,7 @@ def _to_dict(
 
 
 def _create_setup_from_xml(
-    result_dict: dict, output_format: Literal["dict", "dataframe", "object"] = "object"
+    result_dict: dict, output_format: Literal["dict", "dataframe", "object"] = "dataframe"
 ) -> OpenMLSetup | dict[str, int | dict[int, Any] | None]:
     """Turns an API xml result into a OpenMLSetup object (or dict)"""
     if output_format in ["dataframe", "dict"]:
