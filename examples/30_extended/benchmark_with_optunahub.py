@@ -23,6 +23,8 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
+# Set your openml api key if you want to publish the run
+openml.config.apikey = ""
 ############################################################################
 # Prepare for preprocessors and an OpenML task
 # ============================================
@@ -30,7 +32,11 @@ from sklearn.preprocessing import OneHotEncoder
 # https://www.openml.org/search?type=study&study_type=task&id=218
 task_id = 10101
 seed = 42
-categorical_preproc = ("categorical", OneHotEncoder(sparse_output=False, handle_unknown="ignore"), cat)
+categorical_preproc = (
+    "categorical",
+    OneHotEncoder(sparse_output=False, handle_unknown="ignore"),
+    cat,
+)
 numerical_preproc = ("numerical", SimpleImputer(strategy="median"), cont)
 preproc = ColumnTransformer([categorical_preproc, numerical_preproc])
 
@@ -43,6 +49,7 @@ preproc = ColumnTransformer([categorical_preproc, numerical_preproc])
 # We can simply pass the parametrized classifier to `run_model_on_task` to obtain the performance of the pipeline
 # on the specified OpenML task.
 
+
 def objective(trial: optuna.Trial) -> Pipeline:
     clf = RandomForestClassifier(
         max_depth=trial.suggest_int("max_depth", 2, 32, log=True),
@@ -51,8 +58,18 @@ def objective(trial: optuna.Trial) -> Pipeline:
     )
     pipe = Pipeline(steps=[("preproc", preproc), ("model", clf)])
     run = openml.runs.run_model_on_task(pipe, task=task_id, avoid_duplicate_runs=False)
-    accuracy = max(run.fold_evaluations["predictive_accuracy"][0].values())    
+    if openml.config.apikey != "":
+        try:
+            run.publish()
+        except Exception as e:
+            print(f"Could not publish run - {e}")
+    else:
+        print(
+            "If you want to publish your results to OpenML, please set an apikey using `openml.config.apikey = ''`"
+        )
+    accuracy = max(run.fold_evaluations["predictive_accuracy"][0].values())
     return accuracy
+
 
 ############################################################################
 # Load a sampler from OptunaHub
