@@ -18,7 +18,7 @@
 # %%
 import openml
 
-openml.datasets.get_dataset("iris")
+openml.datasets.get_dataset("iris", version=1)
 
 # %% [markdown]
 # With default configuration, the above example will show no output to console.
@@ -35,7 +35,7 @@ import logging
 
 openml.config.set_console_log_level(logging.DEBUG)
 openml.config.set_file_log_level(logging.WARNING)
-openml.datasets.get_dataset("iris")
+openml.datasets.get_dataset("iris", version=1)
 
 # %% [markdown]
 # Now the log level that was previously written to file should also be shown in the console.

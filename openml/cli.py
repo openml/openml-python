@@ -1,4 +1,5 @@
-""""Command Line Interface for `openml` to configure its settings."""
+"""Command Line Interface for `openml` to configure its settings."""
+
 from __future__ import annotations
 
 import argparse

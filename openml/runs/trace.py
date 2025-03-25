@@ -80,8 +80,8 @@ class OpenMLTraceIteration:
 
         if self.parameters is not None and not isinstance(self.parameters, dict):
             raise TypeError(
-                "argument parameters is not an instance of OrderedDict, but %s"
-                % str(type(self.parameters)),
+                f"argument parameters is not an instance of OrderedDict, but"
+                f" {type(self.parameters)!s}",
             )
 
     def get_parameters(self) -> dict[str, Any]:
@@ -351,7 +351,7 @@ class OpenMLRunTrace:
 
         for required_attribute in REQUIRED_ATTRIBUTES:
             if required_attribute not in attribute_idx:
-                raise ValueError("arff misses required attribute: %s" % required_attribute)
+                raise ValueError(f"arff misses required attribute: {required_attribute}")
         if "setup_string" in attribute_idx:
             raise ValueError(error_message)
 
@@ -383,7 +383,7 @@ class OpenMLRunTrace:
             else:
                 raise ValueError(
                     'expected {"true", "false"} value for selected field, '
-                    "received: %s" % selected_value,
+                    f"received: {selected_value}",
                 )
 
             parameters = {
@@ -448,7 +448,7 @@ class OpenMLRunTrace:
             else:
                 raise ValueError(
                     'expected {"true", "false"} value for '
-                    "selected field, received: %s" % selected_value,
+                    f"selected field, received: {selected_value}",
                 )
 
             current = OpenMLTraceIteration(
@@ -504,10 +504,8 @@ class OpenMLRunTrace:
                     if list(param_keys) != list(trace_itr_keys):
                         raise ValueError(
                             "Cannot merge traces because the parameters are not equal: "
-                            "{} vs {}".format(
-                                list(trace_itr.parameters.keys()),
-                                list(iteration.parameters.keys()),
-                            ),
+                            f"{list(trace_itr.parameters.keys())} vs "
+                            f"{list(iteration.parameters.keys())}",
                         )
 
                 if key in merged_trace:
@@ -521,9 +519,9 @@ class OpenMLRunTrace:
         return cls(None, merged_trace)
 
     def __repr__(self) -> str:
-        return "[Run id: {}, {} trace iterations]".format(
-            -1 if self.run_id is None else self.run_id,
-            len(self.trace_iterations),
+        return (
+            f"[Run id: {-1 if self.run_id is None else self.run_id}, "
+            f"{len(self.trace_iterations)} trace iterations]"
         )
 
     def __iter__(self) -> Iterator[OpenMLTraceIteration]:

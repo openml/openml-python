@@ -12,6 +12,8 @@ from typing_extensions import Literal, ParamSpec
 import numpy as np
 import pandas as pd
 import xmltodict
+from minio.helpers import ProgressType
+from tqdm import tqdm
 
 import openml
 import openml._api_calls
@@ -33,8 +35,7 @@ def extract_xml_tags(
     node: Mapping[str, Any],
     *,
     allow_none: Literal[True] = ...,
-) -> Any | None:
-    ...
+) -> Any | None: ...
 
 
 @overload
@@ -43,8 +44,7 @@ def extract_xml_tags(
     node: Mapping[str, Any],
     *,
     allow_none: Literal[False],
-) -> Any:
-    ...
+) -> Any: ...
 
 
 def extract_xml_tags(
@@ -196,7 +196,7 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
         "user",
     }
     if entity_type not in legal_entities:
-        raise ValueError("Can't delete a %s" % entity_type)
+        raise ValueError(f"Can't delete a {entity_type}")
 
     url_suffix = "%s/%d" % (entity_type, entity_id)
     try:
@@ -234,7 +234,7 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
                     " please open an issue at: https://github.com/openml/openml/issues/new"
                 ),
             ) from e
-        raise
+        raise e
 
 
 @overload
@@ -243,8 +243,7 @@ def _list_all(
     list_output_format: Literal["dict"] = ...,
     *args: P.args,
     **filters: P.kwargs,
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -253,8 +252,7 @@ def _list_all(
     list_output_format: Literal["object"],
     *args: P.args,
     **filters: P.kwargs,
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -263,8 +261,7 @@ def _list_all(
     list_output_format: Literal["dataframe"],
     *args: P.args,
     **filters: P.kwargs,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 def _list_all(  # noqa: C901, PLR0912
@@ -374,7 +371,7 @@ def _create_cache_directory(key: str) -> Path:
 
     try:
         cache_dir.mkdir(exist_ok=True, parents=True)
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         raise openml.exceptions.OpenMLCacheException(
             f"Cannot create cache directory {cache_dir}."
         ) from e
@@ -410,7 +407,7 @@ def _create_cache_directory_for_id(key: str, id_: int) -> Path:
     """
     cache_dir = _get_cache_dir_for_id(key, id_, create=True)
     if cache_dir.exists() and not cache_dir.is_dir():
-        raise ValueError("%s cache dir exists but is not a directory!" % key)
+        raise ValueError(f"{key} cache dir exists but is not a directory!")
 
     cache_dir.mkdir(exist_ok=True, parents=True)
     return cache_dir
@@ -471,3 +468,39 @@ def _create_lockfiles_dir() -> Path:
     with contextlib.suppress(OSError):
         path.mkdir(exist_ok=True, parents=True)
     return path
+
+
+class ProgressBar(ProgressType):
+    """Progressbar for MinIO function's `progress` parameter."""
+
+    def __init__(self) -> None:
+        self._object_name = ""
+        self._progress_bar: tqdm | None = None
+
+    def set_meta(self, object_name: str, total_length: int) -> None:
+        """Initializes the progress bar.
+
+        Parameters
+        ----------
+        object_name: str
+          Not used.
+
+        total_length: int
+          File size of the object in bytes.
+        """
+        self._object_name = object_name
+        self._progress_bar = tqdm(total=total_length, unit_scale=True, unit="B")
+
+    def update(self, length: int) -> None:
+        """Updates the progress bar.
+
+        Parameters
+        ----------
+        length: int
+          Number of bytes downloaded since last `update` call.
+        """
+        if not self._progress_bar:
+            raise RuntimeError("Call `set_meta` before calling `update`.")
+        self._progress_bar.update(length)
+        if self._progress_bar.total <= self._progress_bar.n:
+            self._progress_bar.close()

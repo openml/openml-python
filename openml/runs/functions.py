@@ -74,8 +74,7 @@ def run_model_on_task(  # noqa: PLR0913
     ----------
     model : sklearn model
         A model which has a function fit(X,Y) and predict(X),
-        all supervised estimators of scikit learn follow this definition of a model
-        (https://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
+        all supervised estimators of scikit learn follow this definition of a model.
     task : OpenMLTask or int or str
         Task to perform or Task id.
         This may be a model instead if the first argument is an OpenMLTask.
@@ -199,13 +198,9 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
     flow : OpenMLFlow
         A flow wraps a machine learning model together with relevant information.
         The model has a function fit(X,Y) and predict(X),
-        all supervised estimators of scikit learn follow this definition of a model
-        (https://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
+        all supervised estimators of scikit learn follow this definition of a model.
     task : OpenMLTask
         Task to perform. This may be an OpenMLFlow instead if the first argument is an OpenMLTask.
-    avoid_duplicate_runs : bool, optional (default=True)
-        If True, the run will throw an error if the setup/task combination is already present on
-        the server. This feature requires an internet connection.
     avoid_duplicate_runs : bool, optional (default=True)
         If True, the run will throw an error if the setup/task combination is already present on
         the server. This feature requires an internet connection.
@@ -367,7 +362,7 @@ def get_run_trace(run_id: int) -> OpenMLRunTrace:
     return OpenMLRunTrace.trace_from_xml(trace_xml)
 
 
-def initialize_model_from_run(run_id: int) -> Any:
+def initialize_model_from_run(run_id: int, *, strict_version: bool = True) -> Any:
     """
     Initialized a model based on a run_id (i.e., using the exact
     same parameter settings)
@@ -376,6 +371,8 @@ def initialize_model_from_run(run_id: int) -> Any:
     ----------
     run_id : int
         The Openml run_id
+    strict_version: bool (default=True)
+        See `flow_to_model` strict_version.
 
     Returns
     -------
@@ -385,7 +382,7 @@ def initialize_model_from_run(run_id: int) -> Any:
     # TODO(eddiebergman): I imagine this is None if it's not published,
     # might need to raise an explicit error for that
     assert run.setup_id is not None
-    return initialize_model(run.setup_id)
+    return initialize_model(setup_id=run.setup_id, strict_version=strict_version)
 
 
 def initialize_model_from_trace(
@@ -679,9 +676,9 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, PLR0913, C901
             user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[
                 measure
             ]
-            user_defined_measures_per_sample[measure][rep_no][fold_no][
-                sample_no
-            ] = user_defined_measures_fold[measure]
+            user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = (
+                user_defined_measures_fold[measure]
+            )
 
     trace: OpenMLRunTrace | None = None
     if len(traces) > 0:
@@ -783,13 +780,9 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
         raise NotImplementedError(task.task_type)
 
     config.logger.info(
-        "Going to run model {} on dataset {} for repeat {} fold {} sample {}".format(
-            str(model),
-            openml.datasets.get_dataset(task.dataset_id).name,
-            rep_no,
-            fold_no,
-            sample_no,
-        ),
+        f"Going to run model {model!s} on "
+        f"dataset {openml.datasets.get_dataset(task.dataset_id).name} "
+        f"for repeat {rep_no} fold {fold_no} sample {sample_no}"
     )
     (
         pred_y,
@@ -865,7 +858,7 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
     return _create_run_from_xml(run_xml)
 
 
-def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, , FBT001, FBT002FBT
+def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT001, FBT002
     """Create a run object from xml returned from server.
 
     Parameters
@@ -978,7 +971,7 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
                 else:
                     raise ValueError(
                         'Could not find keys "value" or '
-                        '"array_data" in %s' % str(evaluation_dict.keys()),
+                        f'"array_data" in {evaluation_dict.keys()!s}',
                     )
                 if (
                     "@repeat" in evaluation_dict
@@ -1211,15 +1204,15 @@ def _list_runs(  # noqa: PLR0913
         for operator, value in kwargs.items():
             api_call += f"/{operator}/{value}"
     if id is not None:
-        api_call += "/run/%s" % ",".join([str(int(i)) for i in id])
+        api_call += "/run/{}".format(",".join([str(int(i)) for i in id]))
     if task is not None:
-        api_call += "/task/%s" % ",".join([str(int(i)) for i in task])
+        api_call += "/task/{}".format(",".join([str(int(i)) for i in task]))
     if setup is not None:
-        api_call += "/setup/%s" % ",".join([str(int(i)) for i in setup])
+        api_call += "/setup/{}".format(",".join([str(int(i)) for i in setup]))
     if flow is not None:
-        api_call += "/flow/%s" % ",".join([str(int(i)) for i in flow])
+        api_call += "/flow/{}".format(",".join([str(int(i)) for i in flow]))
     if uploader is not None:
-        api_call += "/uploader/%s" % ",".join([str(int(i)) for i in uploader])
+        api_call += "/uploader/{}".format(",".join([str(int(i)) for i in uploader]))
     if study is not None:
         api_call += "/study/%d" % study
     if display_errors:

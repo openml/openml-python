@@ -309,6 +309,10 @@ class OpenMLDatasetTest(TestBase):
         assert _dataset.features == _compare_dataset.features
         assert _dataset.qualities == _compare_dataset.qualities
 
+    def test_equality_comparison(self):
+        self.assertEqual(self.iris, self.iris)
+        self.assertNotEqual(self.iris, self.titanic)
+        self.assertNotEqual(self.titanic, 'Wrong_object')
 
 class OpenMLDatasetTestOnTestServer(TestBase):
     def setUp(self):

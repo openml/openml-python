@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import logging
+import os
 import warnings
 from collections import OrderedDict
 from pathlib import Path
+from pyexpat import ExpatError
 from typing import TYPE_CHECKING, Any, overload
 from typing_extensions import Literal
 
@@ -15,11 +17,11 @@ import numpy as np
 import pandas as pd
 import urllib3
 import xmltodict
-from pyexpat import ExpatError
 from scipy.sparse import coo_matrix
 
 import openml._api_calls
 import openml.utils
+from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 from openml.exceptions import (
     OpenMLHashException,
     OpenMLPrivateDatasetError,
@@ -85,8 +87,7 @@ def list_datasets(
     *,
     output_format: Literal["dataframe"],
     **kwargs: Any,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 @overload
@@ -98,8 +99,7 @@ def list_datasets(
     tag: str | None,
     output_format: Literal["dataframe"],
     **kwargs: Any,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 @overload
@@ -111,8 +111,7 @@ def list_datasets(
     tag: str | None = ...,
     output_format: Literal["dict"] = "dict",
     **kwargs: Any,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 def list_datasets(
@@ -207,8 +206,7 @@ def _list_datasets(
     data_id: list | None = ...,
     output_format: Literal["dict"] = "dict",
     **kwargs: Any,
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
@@ -216,8 +214,7 @@ def _list_datasets(
     data_id: list | None = ...,
     output_format: Literal["dataframe"] = "dataframe",
     **kwargs: Any,
-) -> pd.DataFrame:
-    ...
+) -> pd.DataFrame: ...
 
 
 def _list_datasets(
@@ -256,18 +253,16 @@ def _list_datasets(
         for operator, value in kwargs.items():
             api_call += f"/{operator}/{value}"
     if data_id is not None:
-        api_call += "/data_id/%s" % ",".join([str(int(i)) for i in data_id])
+        api_call += "/data_id/{}".format(",".join([str(int(i)) for i in data_id]))
     return __list_datasets(api_call=api_call, output_format=output_format)
 
 
 @overload
-def __list_datasets(api_call: str, output_format: Literal["dict"] = "dict") -> dict:
-    ...
+def __list_datasets(api_call: str, output_format: Literal["dict"] = "dict") -> dict: ...
 
 
 @overload
-def __list_datasets(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame:
-    ...
+def __list_datasets(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame: ...
 
 
 def __list_datasets(
@@ -416,8 +411,8 @@ def _name_to_id(
 
 def get_datasets(
     dataset_ids: list[str | int],
-    download_data: bool = True,  # noqa: FBT001, FBT002
-    download_qualities: bool = True,  # noqa: FBT001, FBT002
+    download_data: bool = False,  # noqa: FBT001, FBT002
+    download_qualities: bool = False,  # noqa: FBT001, FBT002
 ) -> list[OpenMLDataset]:
     """Download datasets.
 
@@ -452,12 +447,12 @@ def get_datasets(
 @openml.utils.thread_safe_if_oslo_installed
 def get_dataset(  # noqa: C901, PLR0912
     dataset_id: int | str,
-    download_data: bool | None = None,  # Optional for deprecation warning; later again only bool
+    download_data: bool = False,  # noqa: FBT002, FBT001
     version: int | None = None,
     error_if_multiple: bool = False,  # noqa: FBT002, FBT001
     cache_format: Literal["pickle", "feather"] = "pickle",
-    download_qualities: bool | None = None,  # Same as above
-    download_features_meta_data: bool | None = None,  # Same as above
+    download_qualities: bool = False,  # noqa: FBT002, FBT001
+    download_features_meta_data: bool = False,  # noqa: FBT002, FBT001
     download_all_files: bool = False,  # noqa: FBT002, FBT001
     force_refresh_cache: bool = False,  # noqa: FBT001, FBT002
 ) -> OpenMLDataset:
@@ -484,8 +479,8 @@ def get_dataset(  # noqa: C901, PLR0912
     Parameters
     ----------
     dataset_id : int or str
-        Dataset ID of the dataset to download
-    download_data : bool (default=True)
+        The ID or name of the dataset to download.
+    download_data : bool (default=False)
         If True, also download the data file. Beware that some datasets are large and it might
         make the operation noticeably slower. Metadata is also still retrieved.
         If False, create the OpenMLDataset and only populate it with the metadata.
@@ -499,12 +494,12 @@ def get_dataset(  # noqa: C901, PLR0912
         Format for caching the dataset - may be feather or pickle
         Note that the default 'pickle' option may load slower than feather when
         no.of.rows is very high.
-    download_qualities : bool (default=True)
+    download_qualities : bool (default=False)
         Option to download 'qualities' meta-data in addition to the minimal dataset description.
         If True, download and cache the qualities file.
         If False, create the OpenMLDataset without qualities metadata. The data may later be added
         to the OpenMLDataset through the `OpenMLDataset.load_metadata(qualities=True)` method.
-    download_features_meta_data : bool (default=True)
+    download_features_meta_data : bool (default=False)
         Option to download 'features' meta-data in addition to the minimal dataset description.
         If True, download and cache the features file.
         If False, create the OpenMLDataset without features metadata. The data may later be added
@@ -523,28 +518,6 @@ def get_dataset(  # noqa: C901, PLR0912
     dataset : :class:`openml.OpenMLDataset`
         The downloaded dataset.
     """
-    # TODO(0.15): Remove the deprecation warning and make the default False; adjust types above
-    #   and documentation. Also remove None-to-True-cases below
-    if any(
-        download_flag is None
-        for download_flag in [download_data, download_qualities, download_features_meta_data]
-    ):
-        warnings.warn(
-            "Starting from Version 0.15 `download_data`, `download_qualities`, and `download_featu"
-            "res_meta_data` will all be ``False`` instead of ``True`` by default to enable lazy "
-            "loading. To disable this message until version 0.15 explicitly set `download_data`, "
-            "`download_qualities`, and `download_features_meta_data` to a bool while calling "
-            "`get_dataset`.",
-            FutureWarning,
-            stacklevel=2,
-        )
-
-    download_data = True if download_data is None else download_data
-    download_qualities = True if download_qualities is None else download_qualities
-    download_features_meta_data = (
-        True if download_features_meta_data is None else download_features_meta_data
-    )
-
     if download_all_files:
         warnings.warn(
             "``download_all_files`` is experimental and is likely to break with new releases.",
@@ -589,8 +562,10 @@ def get_dataset(  # noqa: C901, PLR0912
         if download_qualities:
             qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
 
-        arff_file = _get_dataset_arff(description) if download_data else None
-        if "oml:parquet_url" in description and download_data:
+        parquet_file = None
+        skip_parquet = os.environ.get(OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+        download_parquet = "oml:parquet_url" in description and not skip_parquet
+        if download_parquet and (download_data or download_all_files):
             try:
                 parquet_file = _get_dataset_parquet(
                     description,
@@ -598,10 +573,13 @@ def get_dataset(  # noqa: C901, PLR0912
                 )
             except urllib3.exceptions.MaxRetryError:
                 parquet_file = None
-            if parquet_file is None and arff_file:
+
+        arff_file = None
+        if parquet_file is None and download_data:
+            if download_parquet:
                 logger.warning("Failed to download parquet, fallback on ARFF.")
-        else:
-            parquet_file = None
+            arff_file = _get_dataset_arff(description)
+
         remove_dataset_cache = False
     except OpenMLServerException as e:
         # if there was an exception
@@ -804,10 +782,8 @@ def create_dataset(  # noqa: C901, PLR0912, PLR0915
         if not is_row_id_an_attribute:
             raise ValueError(
                 "'row_id_attribute' should be one of the data attribute. "
-                " Got '{}' while candidates are {}.".format(
-                    row_id_attribute,
-                    [attr[0] for attr in attributes_],
-                ),
+                f" Got '{row_id_attribute}' while candidates are"
+                f" {[attr[0] for attr in attributes_]}.",
             )
 
     if isinstance(data, pd.DataFrame):
@@ -889,7 +865,7 @@ def status_update(data_id: int, status: Literal["active", "deactivated"]) -> Non
     Updates the status of a dataset to either 'active' or 'deactivated'.
     Please see the OpenML API documentation for a description of the status
     and all legal status transitions:
-    https://docs.openml.org/#dataset-status
+    https://docs.openml.org/concepts/data/#dataset-status
 
     Parameters
     ----------
@@ -1259,10 +1235,9 @@ def _get_dataset_parquet(
     if old_file_path.is_file():
         old_file_path.rename(output_file_path)
 
-    # For this release, we want to be able to force a new download even if the
-    # parquet file is already present when ``download_all_files`` is set.
-    # For now, it would be the only way for the user to fetch the additional
-    # files in the bucket (no function exists on an OpenMLDataset to do this).
+    # The call below skips files already on disk, so avoids downloading the parquet file twice.
+    # To force the old behavior of always downloading everything, use `force_refresh_cache`
+    # of `get_dataset`
     if download_all_files:
         openml._api_calls._download_minio_bucket(source=url, destination=cache_directory)
 

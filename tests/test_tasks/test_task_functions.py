@@ -149,12 +149,12 @@ class TestTask(TestBase):
         openml.tasks.get_task(34536)
 
     def test_get_task(self):
-        task = openml.tasks.get_task(1)  # anneal; crossvalidation
+        task = openml.tasks.get_task(1, download_data=True)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
         assert os.path.exists(
             os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "task.xml")
         )
-        assert os.path.exists(
+        assert not os.path.exists(
             os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "datasplits.arff")
         )
         assert os.path.exists(

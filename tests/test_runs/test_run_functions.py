@@ -7,7 +7,7 @@ import random
 import time
 import unittest
 import warnings
-from distutils.version import LooseVersion
+from packaging.version import Version
 from unittest import mock
 
 import arff
@@ -119,7 +119,6 @@ class TestRun(TestBase):
         # time.time() works in seconds
         start_time = time.time()
         while time.time() - start_time < max_waiting_time_seconds:
-
             try:
                 openml.runs.get_run_trace(run_id)
             except openml.exceptions.OpenMLServerException:
@@ -131,7 +130,9 @@ class TestRun(TestBase):
                 time.sleep(10)
                 continue
 
-            assert len(run.evaluations) > 0, "Expect not-None evaluations to always contain elements."
+            assert (
+                len(run.evaluations) > 0
+            ), "Expect not-None evaluations to always contain elements."
             return
 
         raise RuntimeError(
@@ -249,7 +250,7 @@ class TestRun(TestBase):
             "sklearn.model_selection._search.GridSearchCV",
             "sklearn.pipeline.Pipeline",
         ]
-        if LooseVersion(sklearn.__version__) < "0.22":
+        if Version(sklearn.__version__) < Version("0.22"):
             classes_without_random_state.append("sklearn.linear_model.base.LinearRegression")
         else:
             classes_without_random_state.append("sklearn.linear_model._base.LinearRegression")
@@ -557,7 +558,7 @@ class TestRun(TestBase):
             fold_evaluations=run.fold_evaluations,
             num_repeats=1,
             num_folds=num_folds,
-            task_type=task_type
+            task_type=task_type,
         )
 
         # Check if run string and print representation do not run into an error
@@ -680,7 +681,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
+        Version(sklearn.__version__) < Version("0.20"),
         reason="columntransformer introduction in 0.20.0",
     )
     def test_run_and_upload_column_transformer_pipeline(self):
@@ -745,7 +746,7 @@ class TestRun(TestBase):
     @pytest.mark.sklearn()
     @unittest.skip("https://github.com/openml/OpenML/issues/1180")
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
+        Version(sklearn.__version__) < Version("0.20"),
         reason="columntransformer introduction in 0.20.0",
     )
     @mock.patch("warnings.warn")
@@ -796,7 +797,9 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     def test_run_and_upload_gridsearch(self):
-        estimator_name = "base_estimator" if LooseVersion(sklearn.__version__) < "1.4" else "estimator"
+        estimator_name = (
+            "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        )
         gridsearch = GridSearchCV(
             BaggingClassifier(**{estimator_name: SVC()}),
             {f"{estimator_name}__C": [0.01, 0.1, 10], f"{estimator_name}__gamma": [0.01, 0.1, 10]},
@@ -935,7 +938,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.21",
+        Version(sklearn.__version__) < Version("0.21"),
         reason="Pipelines don't support indexing (used for the assert check)",
     )
     def test_initialize_cv_from_run(self):
@@ -998,7 +1001,7 @@ class TestRun(TestBase):
             (sklearn.metrics.precision_score, {"average": "macro"}),
             (sklearn.metrics.brier_score_loss, {}),
         ]
-        if LooseVersion(sklearn.__version__) < "0.23":
+        if Version(sklearn.__version__) < Version("0.23"):
             tests.append((sklearn.metrics.jaccard_similarity_score, {}))
         else:
             tests.append((sklearn.metrics.jaccard_score, {}))
@@ -1030,7 +1033,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
+        Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     def test_local_run_swapped_parameter_order_flow(self):
@@ -1059,7 +1062,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
+        Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     def test_local_run_metric_score(self):
@@ -1097,7 +1100,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
+        Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     def test_initialize_model_from_run(self):
@@ -1159,7 +1162,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
+        Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     def test__run_exists(self):
@@ -1333,7 +1336,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
+        Version(sklearn.__version__) < Version("0.20"),
         reason="OneHotEncoder cannot handle mixed type DataFrame as input",
     )
     def test__run_task_get_arffcontent(self):
@@ -1341,7 +1344,7 @@ class TestRun(TestBase):
         num_instances = 3196
         num_folds = 10
         num_repeats = 1
-        loss = "log" if LooseVersion(sklearn.__version__) < "1.3" else "log_loss"
+        loss = "log" if Version(sklearn.__version__) < Version("1.3") else "log_loss"
 
         clf = make_pipeline(
             OneHotEncoder(handle_unknown="ignore"),
@@ -1572,7 +1575,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
+        Version(sklearn.__version__) < Version("0.20"),
         reason="columntransformer introduction in 0.20.0",
     )
     def test_run_on_dataset_with_missing_labels_dataframe(self):
@@ -1609,7 +1612,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
+        Version(sklearn.__version__) < Version("0.20"),
         reason="columntransformer introduction in 0.20.0",
     )
     def test_run_on_dataset_with_missing_labels_array(self):
@@ -1757,7 +1760,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.21",
+        Version(sklearn.__version__) < Version("0.21"),
         reason="couldn't perform local tests successfully w/o bloating RAM",
     )
     @mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
@@ -1767,10 +1770,10 @@ class TestRun(TestBase):
         x, y = task.get_X_and_y(dataset_format="dataframe")
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
-        loss = "log" if LooseVersion(sklearn.__version__) < "1.3" else "log_loss"
+        loss = "log" if Version(sklearn.__version__) < Version("1.3") else "log_loss"
         clf = SGDClassifier(loss=loss, random_state=1)
         n_jobs = 2
-        backend = "loky" if LooseVersion(joblib.__version__) > "0.11" else "multiprocessing"
+        backend = "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"
         with parallel_backend(backend, n_jobs=n_jobs):
             res = openml.runs.functions._run_task_get_arffcontent(
                 extension=self.extension,
@@ -1815,7 +1818,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.21",
+        Version(sklearn.__version__) < Version("0.21"),
         reason="couldn't perform local tests successfully w/o bloating RAM",
     )
     @mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
@@ -1826,7 +1829,9 @@ class TestRun(TestBase):
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
 
-        backend_choice = "loky" if LooseVersion(joblib.__version__) > "0.11" else "multiprocessing"
+        backend_choice = (
+            "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"
+        )
         for n_jobs, backend, call_count in [
             (1, backend_choice, 10),
             (2, backend_choice, 10),
@@ -1873,23 +1878,42 @@ class TestRun(TestBase):
             assert parallel_mock.call_count == call_count
 
     @unittest.skipIf(
-        LooseVersion(sklearn.__version__) < "0.20",
+        Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     def test_delete_run(self):
-        rs = 1
+        rs = np.random.randint(1, 2**31 - 1)
         clf = sklearn.pipeline.Pipeline(
-            steps=[("imputer", SimpleImputer()), ("estimator", DecisionTreeClassifier())],
+            steps=[
+                (f"test_server_imputer_{rs}", SimpleImputer()),
+                ("estimator", DecisionTreeClassifier()),
+            ],
         )
         task = openml.tasks.get_task(32)  # diabetes; crossvalidation
 
-        run = openml.runs.run_model_on_task(model=clf, task=task, seed=rs)
+        run = openml.runs.run_model_on_task(
+            model=clf, task=task, seed=rs, avoid_duplicate_runs=False
+        )
         run.publish()
+
+        with pytest.raises(openml.exceptions.OpenMLRunsExistError):
+            openml.runs.run_model_on_task(model=clf, task=task, seed=rs, avoid_duplicate_runs=True)
+
         TestBase._mark_entity_for_removal("run", run.run_id)
         TestBase.logger.info(f"collected from test_run_functions: {run.run_id}")
 
         _run_id = run.run_id
         assert delete_run(_run_id)
+
+    @unittest.skipIf(
+        Version(sklearn.__version__) < Version("0.20"),
+        reason="SimpleImputer doesn't handle mixed type DataFrame as input",
+    )
+    def test_initialize_model_from_run_nonstrict(self):
+        # We cannot guarantee that a run with an older version exists on the server.
+        # Thus, we test it simply with a run that we know exists that might not be loose.
+        # This tests all lines of code for OpenML but not the initialization, which we do not want to guarantee anyhow.
+        _ = openml.runs.initialize_model_from_run(run_id=1, strict_version=False)
 
 
 @mock.patch.object(requests.Session, "delete")

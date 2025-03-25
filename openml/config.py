@@ -8,10 +8,12 @@ import logging
 import logging.handlers
 import os
 import platform
+import shutil
 import warnings
+from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Iterator, cast
 from typing_extensions import Literal, TypedDict
 from urllib.parse import urlparse
 
@@ -19,6 +21,9 @@ logger = logging.getLogger(__name__)
 openml_logger = logging.getLogger("openml")
 console_handler: logging.StreamHandler | None = None
 file_handler: logging.handlers.RotatingFileHandler | None = None
+
+OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
+OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
 
 
 class _Config(TypedDict):
@@ -28,6 +33,7 @@ class _Config(TypedDict):
     avoid_duplicate_runs: bool
     retry_policy: Literal["human", "robot"]
     connection_n_retries: int
+    show_progress: bool
 
 
 def _create_log_handlers(create_file_handler: bool = True) -> None:  # noqa: FBT001, FBT002
@@ -100,17 +106,54 @@ def set_file_log_level(file_output_level: int) -> None:
 
 # Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
 _user_path = Path("~").expanduser().absolute()
+
+
+def _resolve_default_cache_dir() -> Path:
+    user_defined_cache_dir = os.environ.get(OPENML_CACHE_DIR_ENV_VAR)
+    if user_defined_cache_dir is not None:
+        return Path(user_defined_cache_dir)
+
+    if platform.system().lower() != "linux":
+        return _user_path / ".openml"
+
+    xdg_cache_home = os.environ.get("XDG_CACHE_HOME")
+    if xdg_cache_home is None:
+        return Path("~", ".cache", "openml")
+
+    # This is the proper XDG_CACHE_HOME directory, but
+    # we unfortunately had a problem where we used XDG_CACHE_HOME/org,
+    # we check heuristically if this old directory still exists and issue
+    # a warning if it does. There's too much data to move to do this for the user.
+
+    # The new cache directory exists
+    cache_dir = Path(xdg_cache_home) / "openml"
+    if cache_dir.exists():
+        return cache_dir
+
+    # The old cache directory *does not* exist
+    heuristic_dir_for_backwards_compat = Path(xdg_cache_home) / "org" / "openml"
+    if not heuristic_dir_for_backwards_compat.exists():
+        return cache_dir
+
+    root_dir_to_delete = Path(xdg_cache_home) / "org"
+    openml_logger.warning(
+        "An old cache directory was found at '%s'. This directory is no longer used by "
+        "OpenML-Python. To silence this warning you would need to delete the old cache "
+        "directory. The cached files will then be located in '%s'.",
+        root_dir_to_delete,
+        cache_dir,
+    )
+    return Path(xdg_cache_home)
+
+
 _defaults: _Config = {
     "apikey": "",
     "server": "https://www.openml.org/api/v1/xml",
-    "cachedir": (
-        Path(os.environ.get("XDG_CACHE_HOME", _user_path / ".cache" / "openml"))
-        if platform.system() == "Linux"
-        else _user_path / ".openml"
-    ),
+    "cachedir": _resolve_default_cache_dir(),
     "avoid_duplicate_runs": True,
     "retry_policy": "human",
     "connection_n_retries": 5,
+    "show_progress": False,
 }
 
 # Default values are actually added here in the _setup() function which is
@@ -131,12 +174,13 @@ def get_server_base_url() -> str:
 
 
 apikey: str = _defaults["apikey"]
+show_progress: bool = _defaults["show_progress"]
 # The current cache directory (without the server name)
-_root_cache_directory = Path(_defaults["cachedir"])
+_root_cache_directory: Path = Path(_defaults["cachedir"])
 avoid_duplicate_runs = _defaults["avoid_duplicate_runs"]
 
-retry_policy = _defaults["retry_policy"]
-connection_n_retries = _defaults["connection_n_retries"]
+retry_policy: Literal["human", "robot"] = _defaults["retry_policy"]
+connection_n_retries: int = _defaults["connection_n_retries"]
 
 
 def set_retry_policy(value: Literal["human", "robot"], n_retries: int | None = None) -> None:
@@ -215,11 +259,66 @@ class ConfigurationForExamples:
         cls._start_last_called = False
 
 
+def _handle_xdg_config_home_backwards_compatibility(
+    xdg_home: str,
+) -> Path:
+    # NOTE(eddiebergman): A previous bug results in the config
+    # file being located at `${XDG_CONFIG_HOME}/config` instead
+    # of `${XDG_CONFIG_HOME}/openml/config`. As to maintain backwards
+    # compatibility, where users may already may have had a configuration,
+    # we copy it over an issue a warning until it's deleted.
+    # As a heurisitic to ensure that it's "our" config file, we try parse it first.
+    config_dir = Path(xdg_home) / "openml"
+
+    backwards_compat_config_file = Path(xdg_home) / "config"
+    if not backwards_compat_config_file.exists():
+        return config_dir
+
+    # If it errors, that's a good sign it's not ours and we can
+    # safely ignore it, jumping out of this block. This is a heurisitc
+    try:
+        _parse_config(backwards_compat_config_file)
+    except Exception:  # noqa: BLE001
+        return config_dir
+
+    # Looks like it's ours, lets try copy it to the correct place
+    correct_config_location = config_dir / "config"
+    try:
+        # We copy and return the new copied location
+        shutil.copy(backwards_compat_config_file, correct_config_location)
+        openml_logger.warning(
+            "An openml configuration file was found at the old location "
+            f"at {backwards_compat_config_file}. We have copied it to the new "
+            f"location at {correct_config_location}. "
+            "\nTo silence this warning please verify that the configuration file "
+            f"at {correct_config_location} is correct and delete the file at "
+            f"{backwards_compat_config_file}."
+        )
+        return config_dir
+    except Exception as e:  # noqa: BLE001
+        # We failed to copy and its ours, return the old one.
+        openml_logger.warning(
+            "While attempting to perform a backwards compatible fix, we "
+            f"failed to copy the openml config file at "
+            f"{backwards_compat_config_file}' to {correct_config_location}"
+            f"\n{type(e)}: {e}",
+            "\n\nTo silence this warning, please copy the file "
+            "to the new location and delete the old file at "
+            f"{backwards_compat_config_file}.",
+        )
+        return backwards_compat_config_file
+
+
 def determine_config_file_path() -> Path:
-    if platform.system() == "Linux":
-        config_dir = Path(os.environ.get("XDG_CONFIG_HOME", Path("~") / ".config" / "openml"))
+    if platform.system().lower() == "linux":
+        xdg_home = os.environ.get("XDG_CONFIG_HOME")
+        if xdg_home is not None:
+            config_dir = _handle_xdg_config_home_backwards_compatibility(xdg_home)
+        else:
+            config_dir = Path("~", ".config", "openml")
     else:
         config_dir = Path("~") / ".openml"
+
     # Still use os.path.expanduser to trigger the mock in the unit test
     config_dir = Path(config_dir).expanduser().resolve()
     return config_dir / "config"
@@ -238,6 +337,7 @@ def _setup(config: _Config | None = None) -> None:
     global server  # noqa: PLW0603
     global _root_cache_directory  # noqa: PLW0603
     global avoid_duplicate_runs  # noqa: PLW0603
+    global show_progress  # noqa: PLW0603
 
     config_file = determine_config_file_path()
     config_dir = config_file.parent
@@ -247,7 +347,10 @@ def _setup(config: _Config | None = None) -> None:
         if not config_dir.exists():
             config_dir.mkdir(exist_ok=True, parents=True)
     except PermissionError:
-        pass
+        openml_logger.warning(
+            f"No permission to create OpenML directory at {config_dir}!"
+            " This can result in OpenML-Python not working properly."
+        )
 
     if config is None:
         config = _parse_config(config_file)
@@ -255,36 +358,30 @@ def _setup(config: _Config | None = None) -> None:
     avoid_duplicate_runs = config["avoid_duplicate_runs"]
     apikey = config["apikey"]
     server = config["server"]
-    short_cache_dir = Path(config["cachedir"])
+    show_progress = config["show_progress"]
     n_retries = int(config["connection_n_retries"])
 
     set_retry_policy(config["retry_policy"], n_retries)
 
+    user_defined_cache_dir = os.environ.get(OPENML_CACHE_DIR_ENV_VAR)
+    if user_defined_cache_dir is not None:
+        short_cache_dir = Path(user_defined_cache_dir)
+    else:
+        short_cache_dir = Path(config["cachedir"])
     _root_cache_directory = short_cache_dir.expanduser().resolve()
 
     try:
         cache_exists = _root_cache_directory.exists()
-    except PermissionError:
-        cache_exists = False
-
-    # create the cache subdirectory
-    try:
-        if not _root_cache_directory.exists():
+        # create the cache subdirectory
+        if not cache_exists:
             _root_cache_directory.mkdir(exist_ok=True, parents=True)
+        _create_log_handlers()
     except PermissionError:
         openml_logger.warning(
-            "No permission to create openml cache directory at %s! This can result in "
-            "OpenML-Python not working properly." % _root_cache_directory,
+            f"No permission to create OpenML directory at {_root_cache_directory}!"
+            " This can result in OpenML-Python not working properly."
         )
-
-    if cache_exists:
-        _create_log_handlers()
-    else:
         _create_log_handlers(create_file_handler=False)
-        openml_logger.warning(
-            "No permission to create OpenML directory at %s! This can result in OpenML-Python "
-            "not working properly." % config_dir,
-        )
 
 
 def set_field_in_config_file(field: str, value: Any) -> None:
@@ -328,11 +425,11 @@ def _parse_config(config_file: str | Path) -> _Config:
         logger.info("Error opening file %s: %s", config_file, e.args[0])
     config_file_.seek(0)
     config.read_file(config_file_)
-    if isinstance(config["FAKE_SECTION"]["avoid_duplicate_runs"], str):
-        config["FAKE_SECTION"]["avoid_duplicate_runs"] = config["FAKE_SECTION"].getboolean(
-            "avoid_duplicate_runs"
-        )  # type: ignore
-    return dict(config.items("FAKE_SECTION"))  # type: ignore
+    configuration = dict(config.items("FAKE_SECTION"))
+    for boolean_field in ["avoid_duplicate_runs", "show_progress"]:
+        if isinstance(config["FAKE_SECTION"][boolean_field], str):
+            configuration[boolean_field] = config["FAKE_SECTION"].getboolean(boolean_field)  # type: ignore
+    return configuration  # type: ignore
 
 
 def get_config_as_dict() -> _Config:
@@ -343,6 +440,7 @@ def get_config_as_dict() -> _Config:
         "avoid_duplicate_runs": avoid_duplicate_runs,
         "connection_n_retries": connection_n_retries,
         "retry_policy": retry_policy,
+        "show_progress": show_progress,
     }
 
 
@@ -399,6 +497,18 @@ start_using_configuration_for_example = (
     ConfigurationForExamples.start_using_configuration_for_example
 )
 stop_using_configuration_for_example = ConfigurationForExamples.stop_using_configuration_for_example
+
+
+@contextmanager
+def overwrite_config_context(config: dict[str, Any]) -> Iterator[_Config]:
+    """A context manager to temporarily override variables in the configuration."""
+    existing_config = get_config_as_dict()
+    merged_config = {**existing_config, **config}
+
+    _setup(merged_config)  # type: ignore
+    yield merged_config  # type: ignore
+
+    _setup(existing_config)
 
 
 __all__ = [

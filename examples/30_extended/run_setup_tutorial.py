@@ -56,7 +56,7 @@ task = openml.tasks.get_task(6)
 
 # %%
 cat_imp = make_pipeline(
-    OneHotEncoder(handle_unknown="ignore", sparse=False),
+    OneHotEncoder(handle_unknown="ignore"),
     TruncatedSVD(),
 )
 cont_imp = SimpleImputer(strategy="median")

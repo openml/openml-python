@@ -1,11 +1,14 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from contextlib import contextmanager
 import os
 import tempfile
 import unittest.mock
 from copy import copy
+from typing import Any, Iterator
 from pathlib import Path
+import platform
 
 import pytest
 
@@ -13,10 +16,32 @@ import openml.config
 import openml.testing
 
 
+@contextmanager
+def safe_environ_patcher(key: str, value: Any) -> Iterator[None]:
+    """Context manager to temporarily set an environment variable.
+
+    Safe to errors happening in the yielded to function.
+    """
+    _prev = os.environ.get(key)
+    os.environ[key] = value
+    try:
+        yield
+    except Exception as e:
+        raise e
+    finally:
+        os.environ.pop(key)
+        if _prev is not None:
+            os.environ[key] = _prev
+
+
 class TestConfig(openml.testing.TestBase):
     @unittest.mock.patch("openml.config.openml_logger.warning")
     @unittest.mock.patch("openml.config._create_log_handlers")
     @unittest.skipIf(os.name == "nt", "https://github.com/openml/openml-python/issues/1033")
+    @unittest.skipIf(
+        platform.uname().release.endswith(("-Microsoft", "microsoft-standard-WSL2")),
+        "WSL does nto support chmod as we would need here, see https://github.com/microsoft/WSL/issues/81",
+    )
     def test_non_writable_home(self, log_handler_mock, warnings_mock):
         with tempfile.TemporaryDirectory(dir=self.workdir) as td:
             os.chmod(td, 0o444)
@@ -24,20 +49,28 @@ class TestConfig(openml.testing.TestBase):
             _dd["cachedir"] = Path(td) / "something-else"
             openml.config._setup(_dd)
 
-        assert warnings_mock.call_count == 2
+        assert warnings_mock.call_count == 1
         assert log_handler_mock.call_count == 1
         assert not log_handler_mock.call_args_list[0][1]["create_file_handler"]
         assert openml.config._root_cache_directory == Path(td) / "something-else"
 
-    @unittest.mock.patch("os.path.expanduser")
-    def test_XDG_directories_do_not_exist(self, expanduser_mock):
+    @unittest.skipIf(platform.system() != "Linux","XDG only exists for Linux systems.")
+    def test_XDG_directories_do_not_exist(self):
         with tempfile.TemporaryDirectory(dir=self.workdir) as td:
+            # Save previous state
+            path = Path(td) / "fake_xdg_cache_home"
+            with safe_environ_patcher("XDG_CONFIG_HOME", str(path)):
+                expected_config_dir = path / "openml"
+                expected_determined_config_file_path = expected_config_dir / "config"
 
-            def side_effect(path_):
-                return os.path.join(td, str(path_).replace("~/", ""))
+                # Ensure that it correctly determines the path to the config file
+                determined_config_file_path = openml.config.determine_config_file_path()
+                assert determined_config_file_path == expected_determined_config_file_path
 
-            expanduser_mock.side_effect = side_effect
-            openml.config._setup()
+                # Ensure that setup will create the config folder as the configuration
+                # will be written to that location.
+                openml.config._setup()
+                assert expected_config_dir.exists()
 
     def test_get_config_as_dict(self):
         """Checks if the current configuration is returned accurately as a dict."""
@@ -49,8 +82,9 @@ class TestConfig(openml.testing.TestBase):
         _config["avoid_duplicate_runs"] = False
         _config["connection_n_retries"] = 20
         _config["retry_policy"] = "robot"
+        _config["show_progress"] = False
         assert isinstance(config, dict)
-        assert len(config) == 6
+        assert len(config) == 7
         self.assertDictEqual(config, _config)
 
     def test_setup_with_config(self):
@@ -62,6 +96,7 @@ class TestConfig(openml.testing.TestBase):
         _config["avoid_duplicate_runs"] = True
         _config["retry_policy"] = "human"
         _config["connection_n_retries"] = 100
+        _config["show_progress"] = False
         orig_config = openml.config.get_config_as_dict()
         openml.config._setup(_config)
         updated_config = openml.config.get_config_as_dict()
@@ -119,7 +154,7 @@ class TestConfigurationForExamples(openml.testing.TestBase):
 
 
 def test_configuration_file_not_overwritten_on_load():
-    """ Regression test for #1337 """
+    """Regression test for #1337"""
     config_file_content = "apikey = abcd"
     with tempfile.TemporaryDirectory() as tmpdir:
         config_file_path = Path(tmpdir) / "config"
@@ -133,3 +168,23 @@ def test_configuration_file_not_overwritten_on_load():
 
     assert config_file_content == new_file_content
     assert "abcd" == read_config["apikey"]
+
+
+def test_configuration_loads_booleans(tmp_path):
+    config_file_content = "avoid_duplicate_runs=true\nshow_progress=false"
+    with (tmp_path / "config").open("w") as config_file:
+        config_file.write(config_file_content)
+        read_config = openml.config._parse_config(tmp_path)
+
+    # Explicit test to avoid truthy/falsy modes of other types
+    assert True == read_config["avoid_duplicate_runs"]
+    assert False == read_config["show_progress"]
+
+
+def test_openml_cache_dir_env_var(tmp_path: Path) -> None:
+    expected_path = tmp_path / "test-cache"
+
+    with safe_environ_patcher("OPENML_CACHE_DIR", str(expected_path)):
+        openml.config._setup()
+        assert openml.config._root_cache_directory == expected_path
+        assert openml.config.get_cache_directory() == str(expected_path / "org" / "openml" / "www")

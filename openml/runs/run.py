@@ -480,7 +480,7 @@ class OpenMLRun(OpenMLBase):
             ]
 
         else:
-            raise NotImplementedError("Task type %s is not yet supported." % str(task.task_type))
+            raise NotImplementedError(f"Task type {task.task_type!s} is not yet supported.")
 
         return arff_dict
 

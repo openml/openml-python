@@ -45,7 +45,7 @@ dataset_ids = [
 #    this does not allow reproducibility (unclear splitting). Please do not use datasets but the
 #    respective tasks as basis for a paper and publish task IDS. This example is only given to
 #    showcase the use of OpenML-Python for a published paper and as a warning on how not to do it.
-#    Please check the `OpenML documentation of tasks <https://docs.openml.org/#tasks>`_ if you
+#    Please check the `OpenML documentation of tasks <https://docs.openml.org/concepts/tasks/>`_ if you
 #    want to learn more about them.
 
 # %% [markdown]

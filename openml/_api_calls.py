@@ -1,10 +1,12 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import logging
 import math
 import random
+import shutil
 import time
 import urllib.parse
 import xml
@@ -22,16 +24,20 @@ from . import config
 from .__version__ import __version__
 from .exceptions import (
     OpenMLHashException,
+    OpenMLNotAuthorizedError,
     OpenMLServerError,
     OpenMLServerException,
     OpenMLServerNoResult,
 )
+from .utils import ProgressBar
 
 _HEADERS = {"user-agent": f"openml-python/{__version__}"}
 
 DATA_TYPE = Dict[str, Union[str, int]]
 FILE_ELEMENTS_TYPE = Dict[str, Union[str, Tuple[str, str]]]
 DATABASE_CONNECTION_ERRCODE = 107
+
+API_TOKEN_HELP_LINK = "https://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial.html#authentication"  # noqa: S105
 
 
 def _robot_delay(n: int) -> float:
@@ -161,12 +167,12 @@ def _download_minio_file(
     proxy_client = ProxyManager(proxy) if proxy else None
 
     client = minio.Minio(endpoint=parsed_url.netloc, secure=False, http_client=proxy_client)
-
     try:
         client.fget_object(
             bucket_name=bucket,
             object_name=object_name,
             file_path=str(destination),
+            progress=ProgressBar() if config.show_progress else None,
             request_headers=_HEADERS,
         )
         if destination.is_file() and destination.suffix == ".zip":
@@ -184,14 +190,14 @@ def _download_minio_file(
 def _download_minio_bucket(source: str, destination: str | Path) -> None:
     """Download file ``source`` from a MinIO Bucket and store it at ``destination``.
 
+    Does not redownload files which already exist.
+
     Parameters
     ----------
     source : str
         URL to a MinIO bucket.
     destination : str | Path
         Path to a directory to store the bucket content in.
-    exists_ok : bool, optional (default=True)
-        If False, raise FileExists if a file already exists in ``destination``.
     """
     destination = Path(destination)
     parsed_url = urllib.parse.urlparse(source)
@@ -204,13 +210,29 @@ def _download_minio_bucket(source: str, destination: str | Path) -> None:
 
     for file_object in client.list_objects(bucket, prefix=prefix, recursive=True):
         if file_object.object_name is None:
-            raise ValueError("Object name is None.")
+            raise ValueError(f"Object name is None for object {file_object!r}")
+        if file_object.etag is None:
+            raise ValueError(f"Object etag is None for object {file_object!r}")
 
-        _download_minio_file(
-            source=source.rsplit("/", 1)[0] + "/" + file_object.object_name.rsplit("/", 1)[1],
-            destination=Path(destination, file_object.object_name.rsplit("/", 1)[1]),
-            exists_ok=True,
-        )
+        marker = destination / file_object.etag
+        if marker.exists():
+            continue
+
+        file_destination = destination / file_object.object_name.rsplit("/", 1)[1]
+        if (file_destination.parent / file_destination.stem).exists():
+            # Marker is missing but archive exists means the server archive changed, force a refresh
+            shutil.rmtree(file_destination.parent / file_destination.stem)
+
+        with contextlib.suppress(FileExistsError):
+            _download_minio_file(
+                source=source.rsplit("/", 1)[0] + "/" + file_object.object_name.rsplit("/", 1)[1],
+                destination=file_destination,
+                exists_ok=False,
+            )
+
+        if file_destination.is_file() and file_destination.suffix == ".zip":
+            file_destination.unlink()
+            marker.touch()
 
 
 def _download_text_file(
@@ -334,7 +356,7 @@ def __is_checksum_equal(downloaded_file_binary: bytes, md5_checksum: str | None 
     return md5_checksum == md5_checksum_download
 
 
-def _send_request(  # noqa: C901
+def _send_request(  # noqa: C901, PLR0912
     request_method: str,
     url: str,
     data: DATA_TYPE,
@@ -370,18 +392,15 @@ def _send_request(  # noqa: C901
                     # -- Check if encoding is not UTF-8 perhaps
                     if __is_checksum_equal(response.content, md5_checksum):
                         raise OpenMLHashException(
-                            "Checksum of downloaded file is unequal to the expected checksum {}"
-                            "because the text encoding is not UTF-8 when downloading {}. "
-                            "There might be a sever-sided issue with the file, "
-                            "see: https://github.com/openml/openml-python/issues/1180.".format(
-                                md5_checksum,
-                                url,
-                            ),
+                            f"Checksum of downloaded file is unequal to the expected checksum"
+                            f"{md5_checksum} because the text encoding is not UTF-8 when "
+                            f"downloading {url}. There might be a sever-sided issue with the file, "
+                            "see: https://github.com/openml/openml-python/issues/1180.",
                         )
 
                     raise OpenMLHashException(
-                        "Checksum of downloaded file is unequal to the expected checksum {} "
-                        "when downloading {}.".format(md5_checksum, url),
+                        f"Checksum of downloaded file is unequal to the expected checksum "
+                        f"{md5_checksum} when downloading {url}.",
                     )
 
                 return response
@@ -440,26 +459,33 @@ def __parse_server_exception(
     url: str,
     file_elements: FILE_ELEMENTS_TYPE | None,
 ) -> OpenMLServerError:
-    if response.status_code == 414:
+    if response.status_code == requests.codes.URI_TOO_LONG:
         raise OpenMLServerError(f"URI too long! ({url})")
 
+    # OpenML has a sophisticated error system where information about failures is provided,
+    # in the response body itself.
+    # First, we need to parse it out.
     try:
         server_exception = xmltodict.parse(response.text)
     except xml.parsers.expat.ExpatError as e:
         raise e
-    except Exception as e:  # noqa: BLE001
-        # OpenML has a sophisticated error system
-        # where information about failures is provided. try to parse this
+    except Exception as e:
+        # If we failed to parse it out, then something has gone wrong in the body we have sent back
+        # from the server and there is little extra information we can capture.
         raise OpenMLServerError(
             f"Unexpected server error when calling {url}. Please contact the developers!\n"
             f"Status code: {response.status_code}\n{response.text}",
         ) from e
 
+    # Now we can parse out the specific error codes that we return. These
+    # are in addition to the typical HTTP error codes, but encode more
+    # specific informtion. You can find these codes here:
+    # https://github.com/openml/OpenML/blob/develop/openml_OS/views/pages/api_new/v1/xml/pre.php
     server_error = server_exception["oml:error"]
     code = int(server_error["oml:code"])
     message = server_error["oml:message"]
     additional_information = server_error.get("oml:additional_information")
-    if code in [372, 512, 500, 482, 542, 674]:
+    if code in [111, 372, 512, 500, 482, 542, 674]:
         if additional_information:
             full_message = f"{message} - {additional_information}"
         else:
@@ -467,10 +493,9 @@ def __parse_server_exception(
 
         # 512 for runs, 372 for datasets, 500 for flows
         # 482 for tasks, 542 for evaluations, 674 for setups
-        return OpenMLServerNoResult(
-            code=code,
-            message=full_message,
-        )
+        # 111 for dataset descriptions
+        return OpenMLServerNoResult(code=code, message=full_message, url=url)
+
     # 163: failure to validate flow XML (https://www.openml.org/api_docs#!/flow/post_flow)
     if code in [163] and file_elements is not None and "description" in file_elements:
         # file_elements['description'] is the XML file description of the flow
@@ -481,4 +506,21 @@ def __parse_server_exception(
         )
     else:
         full_message = f"{message} - {additional_information}"
+
+    if code in [
+        102,  # flow/exists post
+        137,  # dataset post
+        350,  # dataset/42 delete
+        310,  # flow/<something> post
+        320,  # flow/42 delete
+        400,  # run/42 delete
+        460,  # task/42 delete
+    ]:
+        msg = (
+            f"The API call {url} requires authentication via an API key.\nPlease configure "
+            "OpenML-Python to use your API as described in this example:"
+            "\nhttps://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial.html#authentication"
+        )
+        return OpenMLNotAuthorizedError(message=msg)
+
     return OpenMLServerException(code=code, message=full_message, url=url)

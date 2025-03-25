@@ -8,37 +8,6 @@ import openml
 from openml.testing import _check_dataset
 
 
-@pytest.fixture(autouse=True)
-def as_robot():
-    policy = openml.config.retry_policy
-    n_retries = openml.config.connection_n_retries
-    openml.config.set_retry_policy("robot", n_retries=20)
-    yield
-    openml.config.set_retry_policy(policy, n_retries)
-
-
-@pytest.fixture(autouse=True)
-def with_test_server():
-    openml.config.start_using_configuration_for_example()
-    yield
-    openml.config.stop_using_configuration_for_example()
-
-
-@pytest.fixture(autouse=True)
-def with_test_cache(test_files_directory, request):
-    if not test_files_directory.exists():
-        raise ValueError(
-            f"Cannot find test cache dir, expected it to be {test_files_directory!s}!",
-        )
-    _root_cache_directory = openml.config._root_cache_directory
-    tmp_cache = test_files_directory / request.node.name
-    openml.config.set_root_cache_directory(tmp_cache)
-    yield
-    openml.config.set_root_cache_directory(_root_cache_directory)
-    if tmp_cache.exists():
-        shutil.rmtree(tmp_cache)
-
-
 @pytest.fixture()
 def min_number_tasks_on_test_server() -> int:
     """After a reset at least 1068 tasks are on the test server"""

@@ -212,7 +212,7 @@ def _list_setups(
     """
     api_call = "setup/list"
     if setup is not None:
-        api_call += "/setup/%s" % ",".join([str(int(i)) for i in setup])
+        api_call += "/setup/{}".format(",".join([str(int(i)) for i in setup]))
     if kwargs is not None:
         for operator, value in kwargs.items():
             api_call += f"/{operator}/{value}"
@@ -230,13 +230,12 @@ def __list_setups(
     # Minimalistic check if the XML is useful
     if "oml:setups" not in setups_dict:
         raise ValueError(
-            'Error in return XML, does not contain "oml:setups":' " %s" % str(setups_dict),
+            'Error in return XML, does not contain "oml:setups":' f" {setups_dict!s}",
         )
 
     if "@xmlns:oml" not in setups_dict["oml:setups"]:
         raise ValueError(
-            "Error in return XML, does not contain "
-            '"oml:setups"/@xmlns:oml: %s' % str(setups_dict),
+            "Error in return XML, does not contain " f'"oml:setups"/@xmlns:oml: {setups_dict!s}',
         )
 
     if setups_dict["oml:setups"]["@xmlns:oml"] != openml_uri:
@@ -266,7 +265,7 @@ def __list_setups(
     return setups
 
 
-def initialize_model(setup_id: int) -> Any:
+def initialize_model(setup_id: int, *, strict_version: bool = True) -> Any:
     """
     Initialized a model based on a setup_id (i.e., using the exact
     same parameter settings)
@@ -275,6 +274,8 @@ def initialize_model(setup_id: int) -> Any:
     ----------
     setup_id : int
         The Openml setup_id
+    strict_version: bool (default=True)
+        See `flow_to_model` strict_version.
 
     Returns
     -------
@@ -295,7 +296,7 @@ def initialize_model(setup_id: int) -> Any:
                 subflow = flow
             subflow.parameters[hyperparameter.parameter_name] = hyperparameter.value
 
-    return flow.extension.flow_to_model(flow)
+    return flow.extension.flow_to_model(flow, strict_version=strict_version)
 
 
 def _to_dict(
@@ -364,7 +365,7 @@ def _create_setup_from_xml(
         else:
             raise ValueError(
                 "Expected None, list or dict, received "
-                "something else: %s" % str(type(xml_parameters)),
+                f"something else: {type(xml_parameters)!s}",
             )
 
     if _output_format in ["dataframe", "dict"]:

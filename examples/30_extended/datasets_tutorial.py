@@ -44,7 +44,7 @@ datalist.query("NumberOfClasses > 50")
 
 # %%
 # This is done based on the dataset ID.
-dataset = openml.datasets.get_dataset(1471)
+dataset = openml.datasets.get_dataset(dataset_id="eeg-eye-state", version=1)
 
 # Print a summary
 print(

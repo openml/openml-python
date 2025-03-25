@@ -8,9 +8,6 @@ on:
       - 'docker'
     tags:
       - 'v*'
-  pull_request:
-    branches:
-      - 'develop'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -47,7 +44,7 @@ jobs:
 
       - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./docker/
           tags: ${{ steps.meta_dockerhub.outputs.tags }}
@@ -57,7 +54,7 @@ jobs:
 
       - name: Update repo description
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        uses: peter-evans/dockerhub-description@v3
+        uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
