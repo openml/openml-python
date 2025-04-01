@@ -71,7 +71,7 @@ Further information
 
 * `OpenML documentation <https://docs.openml.org/>`_
 * `OpenML client APIs <https://docs.openml.org/APIs/>`_
-* `OpenML developer guide <https://docs.openml.org/Contributing/>`_
+* `OpenML developer guide <https://docs.openml.org/contributing/Contributing/>`_
 * `Contact information <https://www.openml.org/contact>`_
 * `Citation request <https://www.openml.org/cite>`_
 * `OpenML blog <https://medium.com/open-machine-learning>`_

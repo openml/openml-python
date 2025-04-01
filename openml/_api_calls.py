@@ -24,6 +24,7 @@ from . import config
 from .__version__ import __version__
 from .exceptions import (
     OpenMLHashException,
+    OpenMLNotAuthorizedError,
     OpenMLServerError,
     OpenMLServerException,
     OpenMLServerNoResult,
@@ -35,6 +36,8 @@ _HEADERS = {"user-agent": f"openml-python/{__version__}"}
 DATA_TYPE = Dict[str, Union[str, int]]
 FILE_ELEMENTS_TYPE = Dict[str, Union[str, Tuple[str, str]]]
 DATABASE_CONNECTION_ERRCODE = 107
+
+API_TOKEN_HELP_LINK = "https://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial.html#authentication"  # noqa: S105
 
 
 def _robot_delay(n: int) -> float:
@@ -456,21 +459,28 @@ def __parse_server_exception(
     url: str,
     file_elements: FILE_ELEMENTS_TYPE | None,
 ) -> OpenMLServerError:
-    if response.status_code == 414:
+    if response.status_code == requests.codes.URI_TOO_LONG:
         raise OpenMLServerError(f"URI too long! ({url})")
 
+    # OpenML has a sophisticated error system where information about failures is provided,
+    # in the response body itself.
+    # First, we need to parse it out.
     try:
         server_exception = xmltodict.parse(response.text)
     except xml.parsers.expat.ExpatError as e:
         raise e
     except Exception as e:
-        # OpenML has a sophisticated error system
-        # where information about failures is provided. try to parse this
+        # If we failed to parse it out, then something has gone wrong in the body we have sent back
+        # from the server and there is little extra information we can capture.
         raise OpenMLServerError(
             f"Unexpected server error when calling {url}. Please contact the developers!\n"
             f"Status code: {response.status_code}\n{response.text}",
         ) from e
 
+    # Now we can parse out the specific error codes that we return. These
+    # are in addition to the typical HTTP error codes, but encode more
+    # specific informtion. You can find these codes here:
+    # https://github.com/openml/OpenML/blob/develop/openml_OS/views/pages/api_new/v1/xml/pre.php
     server_error = server_exception["oml:error"]
     code = int(server_error["oml:code"])
     message = server_error["oml:message"]
@@ -496,4 +506,21 @@ def __parse_server_exception(
         )
     else:
         full_message = f"{message} - {additional_information}"
+
+    if code in [
+        102,  # flow/exists post
+        137,  # dataset post
+        350,  # dataset/42 delete
+        310,  # flow/<something> post
+        320,  # flow/42 delete
+        400,  # run/42 delete
+        460,  # task/42 delete
+    ]:
+        msg = (
+            f"The API call {url} requires authentication via an API key.\nPlease configure "
+            "OpenML-Python to use your API as described in this example:"
+            "\nhttps://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial.html#authentication"
+        )
+        return OpenMLNotAuthorizedError(message=msg)
+
     return OpenMLServerException(code=code, message=full_message, url=url)

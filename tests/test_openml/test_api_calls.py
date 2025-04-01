@@ -9,8 +9,9 @@ import minio
 import pytest
 
 import openml
+from openml.config import ConfigurationForExamples
 import openml.testing
-from openml._api_calls import _download_minio_bucket
+from openml._api_calls import _download_minio_bucket, API_TOKEN_HELP_LINK
 
 
 class TestConfig(openml.testing.TestBase):
@@ -99,3 +100,26 @@ def test_download_minio_failure(mock_minio, tmp_path: Path) -> None:
 
     with pytest.raises(ValueError):
         _download_minio_bucket(source=some_url, destination=tmp_path)
+
+
+@pytest.mark.parametrize(
+    "endpoint, method",
+    [
+        # https://github.com/openml/OpenML/blob/develop/openml_OS/views/pages/api_new/v1/xml/pre.php
+        ("flow/exists", "post"),  # 102
+        ("dataset", "post"),  # 137
+        ("dataset/42", "delete"),  # 350
+        # ("flow/owned", "post"),  # 310 - Couldn't find what would trigger this
+        ("flow/42", "delete"),  # 320
+        ("run/42", "delete"),  # 400
+        ("task/42", "delete"),  # 460
+    ],
+)
+def test_authentication_endpoints_requiring_api_key_show_relevant_help_link(
+    endpoint: str,
+    method: str,
+) -> None:
+    # We need to temporarily disable the API key to test the error message
+    with openml.config.overwrite_config_context({"apikey": None}):
+        with pytest.raises(openml.exceptions.OpenMLNotAuthorizedError, match=API_TOKEN_HELP_LINK):
+            openml._api_calls._perform_api_call(call=endpoint, request_method=method, data=None)

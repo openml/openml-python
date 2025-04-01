@@ -114,6 +114,7 @@ class TestSetupFunctions(TestBase):
             ),
         )
 
+    @pytest.mark.production()
     def test_get_setup(self):
         # no setups in default test server
         openml.config.server = "https://www.openml.org/api/v1/xml/"

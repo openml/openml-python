@@ -10,9 +10,10 @@ import os
 import platform
 import shutil
 import warnings
+from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Iterator, cast
 from typing_extensions import Literal, TypedDict
 from urllib.parse import urlparse
 
@@ -22,6 +23,7 @@ console_handler: logging.StreamHandler | None = None
 file_handler: logging.handlers.RotatingFileHandler | None = None
 
 OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
+OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
 
 
 class _Config(TypedDict):
@@ -174,11 +176,11 @@ def get_server_base_url() -> str:
 apikey: str = _defaults["apikey"]
 show_progress: bool = _defaults["show_progress"]
 # The current cache directory (without the server name)
-_root_cache_directory = Path(_defaults["cachedir"])
+_root_cache_directory: Path = Path(_defaults["cachedir"])
 avoid_duplicate_runs = _defaults["avoid_duplicate_runs"]
 
-retry_policy = _defaults["retry_policy"]
-connection_n_retries = _defaults["connection_n_retries"]
+retry_policy: Literal["human", "robot"] = _defaults["retry_policy"]
+connection_n_retries: int = _defaults["connection_n_retries"]
 
 
 def set_retry_policy(value: Literal["human", "robot"], n_retries: int | None = None) -> None:
@@ -495,6 +497,18 @@ start_using_configuration_for_example = (
     ConfigurationForExamples.start_using_configuration_for_example
 )
 stop_using_configuration_for_example = ConfigurationForExamples.stop_using_configuration_for_example
+
+
+@contextmanager
+def overwrite_config_context(config: dict[str, Any]) -> Iterator[_Config]:
+    """A context manager to temporarily override variables in the configuration."""
+    existing_config = get_config_as_dict()
+    merged_config = {**existing_config, **config}
+
+    _setup(merged_config)  # type: ignore
+    yield merged_config  # type: ignore
+
+    _setup(existing_config)
 
 
 __all__ = [

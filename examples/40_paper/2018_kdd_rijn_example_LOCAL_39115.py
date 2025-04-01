@@ -1,6 +1,4 @@
 """
-This example is deprecated! You will need to manually remove checks in this code to make it run.
-
 van Rijn and Hutter (2018)
 ==========================
 
@@ -31,13 +29,18 @@ pip install openml[examples,docs] fanova ConfigSpace<1.0
 """
 
 # License: BSD 3-Clause
-run_code = False
+
 import sys
+
+if sys.platform == "win32":
+    print(
+        "The pyrfr library (requirement of fanova) can currently not be installed on Windows systems"
+    )
+    sys.exit()
+
 # DEPRECATED EXAMPLE -- Avoid running this code in our CI/CD pipeline
 print("This example is deprecated, remove this code to use it manually.")
-if not run_code:
-    print("Exiting...")
-    sys.exit()
+sys.exit()
 
 import json
 
@@ -106,13 +109,19 @@ for idx, task_id in enumerate(suite.tasks):
         size=limit_per_task,
     )
 
-
+    performance_column = "value"
+    # make a DataFrame consisting of all hyperparameters (which is a dict in setup['parameters']) and the performance
+    # value (in setup['value']). The following line looks a bit complicated, but combines 2 tasks: a) combine
+    # hyperparameters and performance data in a single dict, b) cast hyperparameter values to the appropriate format
+    # Note that the ``json.loads(...)`` requires the content to be in JSON format, which is only the case for
+    # scikit-learn setups (and even there some legacy setups might violate this requirement). It will work for the
+    # setups that belong to the flows embedded in this example though.
     try:
         setups_evals = pd.DataFrame(
             [
                 dict(
                     **{name: json.loads(value) for name, value in setup["parameters"].items()},
-                    **{performance_column: setup[performance_column]}
+                    **{performance_column: setup[performance_column]},
                 )
                 for _, setup in evals.iterrows()
             ]
@@ -162,18 +171,18 @@ for idx, task_id in enumerate(suite.tasks):
             print("Task %d error: %s" % (task_id, e))
             continue
 
-    # transform ``fanova_results`` from a list of dicts into a DataFrame
-    fanova_results = pd.DataFrame(fanova_results)
+# transform ``fanova_results`` from a list of dicts into a DataFrame
+fanova_results = pd.DataFrame(fanova_results)
 
-    ##############################################################################
-    # make the boxplot of the variance contribution. Obviously, we can also use
-    # this data to make the Nemenyi plot, but this relies on the rather complex
-    # ``Orange`` dependency (``pip install Orange3``). For the complete example,
-    # the reader is referred to the more elaborate script (referred to earlier)
-    fig, ax = plt.subplots()
-    sns.boxplot(x="hyperparameter", y="fanova", data=fanova_results, ax=ax)
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
-    ax.set_ylabel("Variance Contribution")
-    ax.set_xlabel(None)
-    plt.tight_layout()
-    plt.show()
+##############################################################################
+# make the boxplot of the variance contribution. Obviously, we can also use
+# this data to make the Nemenyi plot, but this relies on the rather complex
+# ``Orange`` dependency (``pip install Orange3``). For the complete example,
+# the reader is referred to the more elaborate script (referred to earlier)
+fig, ax = plt.subplots()
+sns.boxplot(x="hyperparameter", y="fanova", data=fanova_results, ax=ax)
+ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
+ax.set_ylabel("Variance Contribution")
+ax.set_xlabel(None)
+plt.tight_layout()
+plt.show()

@@ -234,7 +234,7 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
                     " please open an issue at: https://github.com/openml/openml/issues/new"
                 ),
             ) from e
-        raise
+        raise e
 
 
 def _list_all(  # noqa: C901

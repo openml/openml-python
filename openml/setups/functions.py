@@ -243,7 +243,7 @@ def __list_setups(api_call: str) -> list[OpenMLSetup]:
     ]
 
 
-def initialize_model(setup_id: int) -> Any:
+def initialize_model(setup_id: int, *, strict_version: bool = True) -> Any:
     """
     Initialized a model based on a setup_id (i.e., using the exact
     same parameter settings)
@@ -252,6 +252,8 @@ def initialize_model(setup_id: int) -> Any:
     ----------
     setup_id : int
         The Openml setup_id
+    strict_version: bool (default=True)
+        See `flow_to_model` strict_version.
 
     Returns
     -------
@@ -272,7 +274,7 @@ def initialize_model(setup_id: int) -> Any:
                 subflow = flow
             subflow.parameters[hyperparameter.parameter_name] = hyperparameter.value
 
-    return flow.extension.flow_to_model(flow)
+    return flow.extension.flow_to_model(flow, strict_version=strict_version)
 
 
 def _to_dict(flow_id: int, openml_parameter_settings: list[dict[str, Any]]) -> OrderedDict:

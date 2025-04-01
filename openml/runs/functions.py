@@ -73,8 +73,7 @@ def run_model_on_task(  # noqa: PLR0913
     ----------
     model : sklearn model
         A model which has a function fit(X,Y) and predict(X),
-        all supervised estimators of scikit learn follow this definition of a model
-        (https://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
+        all supervised estimators of scikit learn follow this definition of a model.
     task : OpenMLTask or int or str
         Task to perform or Task id.
         This may be a model instead if the first argument is an OpenMLTask.
@@ -193,8 +192,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
     flow : OpenMLFlow
         A flow wraps a machine learning model together with relevant information.
         The model has a function fit(X,Y) and predict(X),
-        all supervised estimators of scikit learn follow this definition of a model
-        (https://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
+        all supervised estimators of scikit learn follow this definition of a model.
     task : OpenMLTask
         Task to perform. This may be an OpenMLFlow instead if the first argument is an OpenMLTask.
     avoid_duplicate_runs : bool, optional (default=True)
@@ -354,7 +352,7 @@ def get_run_trace(run_id: int) -> OpenMLRunTrace:
     return OpenMLRunTrace.trace_from_xml(trace_xml)
 
 
-def initialize_model_from_run(run_id: int) -> Any:
+def initialize_model_from_run(run_id: int, *, strict_version: bool = True) -> Any:
     """
     Initialized a model based on a run_id (i.e., using the exact
     same parameter settings)
@@ -363,6 +361,8 @@ def initialize_model_from_run(run_id: int) -> Any:
     ----------
     run_id : int
         The Openml run_id
+    strict_version: bool (default=True)
+        See `flow_to_model` strict_version.
 
     Returns
     -------
@@ -372,7 +372,7 @@ def initialize_model_from_run(run_id: int) -> Any:
     # TODO(eddiebergman): I imagine this is None if it's not published,
     # might need to raise an explicit error for that
     assert run.setup_id is not None
-    return initialize_model(run.setup_id)
+    return initialize_model(setup_id=run.setup_id, strict_version=strict_version)
 
 
 def initialize_model_from_trace(
@@ -830,7 +830,7 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
     return _create_run_from_xml(run_xml)
 
 
-def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, , FBT001, FBT002FBT
+def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT001, FBT002
     """Create a run object from xml returned from server.
 
     Parameters
