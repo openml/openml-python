@@ -120,7 +120,7 @@ class OpenMLDatasetTest(TestBase):
             assert data[col_name].dtype.name == col_dtype[col_name]
 
         X, y, _, _ = self.titanic.get_data(
-            target_names=self.titanic.default_target_attribute,
+            target=self.titanic.default_target_attribute,
         )
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.Series)
@@ -171,7 +171,7 @@ class OpenMLDatasetTest(TestBase):
 
     @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
     def test_get_data_with_target_pandas(self):
-        X, y, categorical, attribute_names = self.dataset.get_data(target_names="class")
+        X, y, categorical, attribute_names = self.dataset.get_data(target="class")
         assert isinstance(X, pd.DataFrame)
         for dtype, is_cat, col in zip(X.dtypes, categorical, X):
             self._check_expected_type(dtype, is_cat, X[col])
@@ -187,7 +187,7 @@ class OpenMLDatasetTest(TestBase):
     def test_get_data_rowid_and_ignore_and_target(self):
         self.dataset.ignore_attribute = ["condition"]
         self.dataset.row_id_attribute = ["hardness"]
-        X, y, categorical, names = self.dataset.get_data(target_names="class")
+        X, y, categorical, names = self.dataset.get_data(target="class")
         assert X.shape == (898, 36)
         assert len(categorical) == 36
         cats = [True] * 3 + [False, True, True, False] + [True] * 23 + [False] * 3 + [True] * 3
@@ -348,7 +348,7 @@ class OpenMLDatasetTestSparse(TestBase):
         self.sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
 
     def test_get_sparse_dataset_dataframe_with_target(self):
-        X, y, _, attribute_names = self.sparse_dataset.get_data(target_names="class")
+        X, y, _, attribute_names = self.sparse_dataset.get_data(target="class")
         assert isinstance(X, pd.DataFrame)
         assert isinstance(X.dtypes[0], pd.SparseDtype)
         assert X.shape == (600, 20000)
@@ -375,7 +375,7 @@ class OpenMLDatasetTestSparse(TestBase):
         self.sparse_dataset.row_id_attribute = ["V512"]
         # TODO(eddiebergman): Will break from dataset_format removal
         X, y, categorical, _ = self.sparse_dataset.get_data(
-            target_names="class",
+            target="class",
             include_row_id=False,
             include_ignore_attribute=False,
         )

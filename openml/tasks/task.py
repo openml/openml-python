@@ -292,7 +292,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         ):
             raise NotImplementedError(self.task_type)
 
-        X, y, _, _ = dataset.get_data(target_names=self.target_name)
+        X, y, _, _ = dataset.get_data(target=self.target_name)
         return X, y
 
     def _to_dict(self) -> dict[str, dict]:
@@ -502,7 +502,7 @@ class OpenMLClusteringTask(OpenMLTask):
         The X data as a dataframe
         """
         dataset = self.get_dataset()
-        data, *_ = dataset.get_data(target_names=None)
+        data, *_ = dataset.get_data(target=None)
         return data
 
     def _to_dict(self) -> dict[str, dict[str, int | str | list[dict[str, Any]]]]:

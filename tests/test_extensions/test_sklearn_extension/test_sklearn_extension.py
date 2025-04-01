@@ -2220,7 +2220,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         task = openml.tasks.get_task(59)  # mfeat-pixel; crossvalidation
 
         X, y, categorical_ind, feature_names = dataset.get_data(
-            target_names=dataset.default_target_attribute,
+            target=dataset.default_target_attribute,
         )
         categorical_ind = np.array(categorical_ind)
         (cat_idx,) = np.where(categorical_ind)

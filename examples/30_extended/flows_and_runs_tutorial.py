@@ -27,7 +27,7 @@ openml.config.start_using_configuration_for_example()
 # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
 dataset = openml.datasets.get_dataset(dataset_id="eeg-eye-state", version=1)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    target_names=dataset.default_target_attribute
+    target=dataset.default_target_attribute
 )
 clf = neighbors.KNeighborsClassifier(n_neighbors=1)
 clf.fit(X, y)
@@ -38,7 +38,7 @@ clf.fit(X, y)
 # * e.g. categorical features -> do feature encoding
 dataset = openml.datasets.get_dataset(dataset_id="credit-g", version=1)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    target_names=dataset.default_target_attribute
+    target=dataset.default_target_attribute
 )
 print(f"Categorical features: {categorical_indicator}")
 transformer = compose.ColumnTransformer(

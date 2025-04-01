@@ -68,7 +68,7 @@ eeg, *_ = dataset.get_data()
 # dataset. In particular, many datasets for supervised problems have a set
 # `default_target_attribute` which may help identify the target variable.
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    target_names=dataset.default_target_attribute
+    target=dataset.default_target_attribute
 )
 print(X.head())
 print(X.info())
