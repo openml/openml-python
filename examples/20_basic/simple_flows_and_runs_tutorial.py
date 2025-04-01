@@ -6,10 +6,22 @@
 import openml
 from sklearn import ensemble, neighbors
 
+from openml.utils import thread_safe_if_oslo_installed
+
 
 # %% [markdown]
-# .. warning::
-#    .. include:: ../../test_server_usage_warning.txt
+# <div class="admonition warning">
+#     <p class="admonition-title">Warning</p>
+#     <p>
+#         This example uploads data. For that reason, this example connects to the
+#         test server at <a href="https://test.openml.org"
+#         target="_blank">test.openml.org</a>.<br>
+#         This prevents the main server from becoming overloaded with example datasets, tasks,
+#         runs, and other submissions.<br>
+#         Using this test server may affect the behavior and performance of the
+#         OpenML-Python API.
+#     </p>
+# </div>
 
 # %%
 openml.config.start_using_configuration_for_example()

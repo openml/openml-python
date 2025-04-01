@@ -22,6 +22,7 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.superfences
+  - pymdownx.snippets
   - attr_list
   - pymdownx.tabbed:
       alternate_style: true
