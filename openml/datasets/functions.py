@@ -561,6 +561,8 @@ def get_dataset(  # noqa: C901, PLR0912
             features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
         if download_qualities:
             qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
+            if qualities_file is None:
+                logger.warning(f"No qualities found for dataset {dataset_id}. Proceeding without qualities.")
 
         parquet_file = None
         skip_parquet = os.environ.get(OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
@@ -1381,8 +1383,8 @@ def _get_dataset_qualities_file(
 
     Returns
     -------
-    str
-        Path of the cached qualities file
+    Path | None
+        Path of the cached qualities file, or None if no qualities exist.
     """
     save_did_cache_dir = (
         _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset_id)
@@ -1395,7 +1397,9 @@ def _get_dataset_qualities_file(
     try:
         with qualities_file.open(encoding="utf8") as fh:
             qualities_xml = fh.read()
-    except OSError:
+            if not qualities_xml.strip():  # Check if the file is empty
+                raise ValueError("Qualities file is empty.")
+    except (OSError, ValueError):
         try:
             qualities_xml = _get_qualities_xml(dataset_id)
             with qualities_file.open("w", encoding="utf8") as fh:
