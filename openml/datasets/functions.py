@@ -1319,6 +1319,42 @@ def _get_features_xml(dataset_id: int) -> str:
     return openml._api_calls._perform_api_call(url_extension, "get")
 
 
+def _parse_features_file(features_file: Path) -> list[dict]:
+    """Parse the features.xml file and handle None values.
+
+    Parameters
+    ----------
+    features_file : Path
+        Path to the features.xml file.
+
+    Returns
+    -------
+    list[dict]
+        A list of processed feature metadata dictionaries.
+    """
+    with features_file.open("r", encoding="utf8") as fh:
+        features_xml = fh.read()
+
+    features_dict = xmltodict.parse(features_xml)
+    features = features_dict.get("oml:data_features", {}).get("oml:feature", [])
+
+    # Ensure features is a list
+    if not isinstance(features, list):
+        features = [features]
+
+    # Handle None values
+    cleaned_features = []
+    for feature in features:
+        if feature is None:
+            warnings.warn("Detected None value in features.xml. Skipping this feature.", UserWarning)
+            continue
+        # Replace None values with default values
+        cleaned_feature = {k: (v if v is not None else "unknown") for k, v in feature.items()}
+        cleaned_features.append(cleaned_feature)
+
+    return cleaned_features
+
+
 def _get_dataset_features_file(did_cache_dir: str | Path | None, dataset_id: int) -> Path:
     """API call to load dataset features. Loads from cache or downloads them.
 
@@ -1352,7 +1388,7 @@ def _get_dataset_features_file(did_cache_dir: str | Path | None, dataset_id: int
         with features_file.open("w", encoding="utf8") as fh:
             fh.write(features_xml)
 
-    return features_file
+    return _parse_features_file(features_file)
 
 
 def _get_qualities_xml(dataset_id: int) -> str:
