@@ -1346,7 +1346,9 @@ def _parse_features_file(features_file: Path) -> list[dict]:
     cleaned_features = []
     for feature in features:
         if feature is None:
-            warnings.warn("Detected None value in features.xml. Skipping this feature.", UserWarning)
+            warnings.warn(
+                "Detected None value in features.xml. Skipping this feature.", UserWarning
+            )
             continue
         # Replace None values with default values
         cleaned_feature = {k: (v if v is not None else "unknown") for k, v in feature.items()}
