@@ -562,7 +562,9 @@ def get_dataset(  # noqa: C901, PLR0912
         if download_qualities:
             qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
             if qualities_file is None:
-                logger.warning(f"No qualities found for dataset {dataset_id}. Proceeding without qualities.")
+                logger.warning(
+                    f"No qualities found for dataset {dataset_id}. Proceeding without qualities."
+                )
 
         parquet_file = None
         skip_parquet = os.environ.get(OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
