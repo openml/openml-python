@@ -478,6 +478,7 @@ def _create_task_from_xml(xml):
         "data_set_id": inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
         "evaluation_measure": evaluation_measures,
     }
+    # TODO: add OpenMLClusteringTask?
     if task_type in (
         TaskType.SUPERVISED_CLASSIFICATION,
         TaskType.SUPERVISED_REGRESSION,
@@ -494,6 +495,10 @@ def _create_task_from_xml(xml):
         common_kwargs["estimation_procedure_type"] = inputs["estimation_procedure"][
             "oml:estimation_procedure"
         ]["oml:type"]
+        common_kwargs["estimation_procedure_id"] = int(inputs["estimation_procedure"][
+            "oml:estimation_procedure"
+        ]["oml:id"])
+
         common_kwargs["estimation_parameters"] = estimation_parameters
         common_kwargs["target_name"] = inputs["source_data"]["oml:data_set"]["oml:target_feature"]
         common_kwargs["data_splits_url"] = inputs["estimation_procedure"][
