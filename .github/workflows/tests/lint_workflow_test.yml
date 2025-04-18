@@ -1,0 +1,146 @@
+name: Test Lint Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_case:
+        description: 'Test case to run'
+        required: true
+        type: choice
+        options:
+          - valid_code
+          - invalid_formatting
+          - invalid_docstring
+          - cache_hit
+          - cache_miss
+
+jobs:
+  test_lint_workflow:
+    name: Test Lint Workflow
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+          cache: 'pip'
+      
+      - name: Cache Ruff
+        uses: actions/cache@v3
+        with:
+          path: |
+            .ruff_cache
+            .ruff_cache.db
+          key: ${{ runner.os }}-ruff-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-ruff-
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff==0.7.3
+          pip install -e ".[test]"
+      
+      - name: Prepare test case
+        run: |
+          case ${{ github.event.inputs.test_case }} in
+            "valid_code")
+              # Create a valid Python file with proper formatting and docstring
+              mkdir -p test_files
+              cat > test_files/valid.py << 'EOF'
+              """Valid module docstring."""
+              
+              def example_function(param1: int, param2: str) -> bool:
+                  """Example function with proper docstring.
+                  
+                  Parameters
+                  ----------
+                  param1 : int
+                      The first parameter.
+                  param2 : str
+                      The second parameter.
+                  
+                  Returns
+                  -------
+                  bool
+                      The return value. True for success, False otherwise.
+                  """
+                  return True
+              EOF
+              ;;
+            "invalid_formatting")
+              # Create a Python file with invalid formatting
+              mkdir -p test_files
+              cat > test_files/invalid_format.py << 'EOF'
+              def bad_formatting():
+                  return     True
+              EOF
+              ;;
+            "invalid_docstring")
+              # Create a Python file with invalid docstring
+              mkdir -p test_files
+              cat > test_files/invalid_doc.py << 'EOF'
+              def missing_docstring():
+                  return True
+              EOF
+              ;;
+            "cache_hit")
+              # Create a file that will generate cache
+              mkdir -p test_files
+              cat > test_files/cache_test.py << 'EOF'
+              """Cache test module."""
+              
+              def cache_test():
+                  """Cache test function."""
+                  return True
+              EOF
+              ;;
+            "cache_miss")
+              # Create a file that will force cache miss
+              mkdir -p test_files
+              cat > test_files/cache_miss.py << 'EOF'
+              """Cache miss test module."""
+              
+              def cache_miss_test():
+                  """Cache miss test function."""
+                  return True
+              EOF
+              ;;
+          esac
+      
+      - name: Run Ruff
+        run: |
+          case ${{ github.event.inputs.test_case }} in
+            "valid_code")
+              ruff check test_files/valid.py
+              ruff format --check test_files/valid.py
+              ;;
+            "invalid_formatting")
+              if ruff check test_files/invalid_format.py; then
+                echo "Expected lint to fail on invalid formatting"
+                exit 1
+              fi
+              if ruff format --check test_files/invalid_format.py; then
+                echo "Expected format check to fail on invalid formatting"
+                exit 1
+              fi
+              ;;
+            "invalid_docstring")
+              if ruff check test_files/invalid_doc.py; then
+                echo "Expected lint to fail on invalid docstring"
+                exit 1
+              fi
+              ;;
+            "cache_hit")
+              # First run to generate cache
+              ruff check test_files/cache_test.py
+              # Second run should use cache
+              ruff check test_files/cache_test.py
+              ;;
+            "cache_miss")
+              # Run with different file to force cache miss
+              ruff check test_files/cache_miss.py
+              ;;
+          esac 
