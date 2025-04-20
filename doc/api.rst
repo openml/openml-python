@@ -47,6 +47,17 @@ Dataset Functions
     edit_dataset
     fork_dataset
 
+Dataset Methods
+~~~~~~~~~~~~~~
+
+.. currentmodule:: openml.datasets
+
+.. autosummary::
+   :toctree: generated/
+   :template: method.rst
+
+   OpenMLDataset.to_latex
+
 :mod:`openml.evaluations`
 -------------------------
 .. automodule:: openml.evaluations
