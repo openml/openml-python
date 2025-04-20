@@ -1228,7 +1228,15 @@ class OpenMLDataset(OpenMLBase):
                 )
             else:
                 # Basic empty tabular structure
-                empty_latex = "\\begin{tabular}{@{}l@{}}\n\\toprule\nProperty \\\\\n\\midrule\n\\bottomrule\n\\end{tabular}"
+                empty_latex = (
+                    "\\begin{tabular}{@{}l@{}}\n"
+                    "\\toprule\n"
+                    "Property \\\\\n"  # LaTeX table header row
+                    "\\midrule\n"
+                    # No data rows for an empty table
+                    "\\bottomrule\n"
+                    "\\end{tabular}"
+                )
 
             if output_file:
                 try:
