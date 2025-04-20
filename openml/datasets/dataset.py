@@ -8,7 +8,7 @@ import pickle
 import re
 import warnings
 from pathlib import Path
-from typing import Any, Iterable, Sequence, List, Dict,Optional, Union
+from typing import Any, Iterable, Sequence
 from typing_extensions import Literal
 
 import arff
@@ -1075,31 +1075,33 @@ class OpenMLDataset(OpenMLBase):
         }
 
     # Helper function to gather the relevant metadata
-    def _get_metadata_dict(self) -> Dict[str, Any]:
+    def _get_metadata_dict(self) -> dict[str, Any]:
         """Collects non-None metadata attributes into a dictionary."""
         metadata = {
-            "Dataset ID": getattr(self, 'dataset_id', None),
-            "Name": getattr(self, 'name', None),
-            "Version": getattr(self, 'version', None),
-            "Description": getattr(self, 'description', None),
-            "Format": getattr(self, 'format', None),
-            "Creator": getattr(self, 'creator', None),
-            "Contributor": getattr(self, 'contributor', None),
-            "Collection Date": getattr(self, 'collection_date', None),
-            "Upload Date": getattr(self, 'upload_date', None),
-            "Language": getattr(self, 'language', None),
-            "License": getattr(self, 'licence', None), # Note: potential typo 'licence' vs 'license'
-            "URL": getattr(self, 'url', None),
-            "Default Target": getattr(self, 'default_target_attribute', None),
-            "Row ID Attribute": getattr(self, 'row_id_attribute', None),
-            "Ignore Attributes": getattr(self, 'ignore_attribute', None),
-            "Version Label": getattr(self, 'version_label', None),
-            "Citation": getattr(self, 'citation', None),
-            "Tag": getattr(self, 'tag', None),
-            "Visibility": getattr(self, 'visibility', None),
-            "Original Data URL": getattr(self, 'original_data_url', None),
-            "Paper URL": getattr(self, 'paper_url', None),
-            "Update Comment": getattr(self, 'update_comment', None),
+            "Dataset ID": getattr(self, "dataset_id", None),
+            "Name": getattr(self, "name", None),
+            "Version": getattr(self, "version", None),
+            "Description": getattr(self, "description", None),
+            "Format": getattr(self, "format", None),
+            "Creator": getattr(self, "creator", None),
+            "Contributor": getattr(self, "contributor", None),
+            "Collection Date": getattr(self, "collection_date", None),
+            "Upload Date": getattr(self, "upload_date", None),
+            "Language": getattr(self, "language", None),
+            "License": getattr(
+                self, "licence", None
+            ),  # Note: potential typo 'licence' vs 'license'
+            "URL": getattr(self, "url", None),
+            "Default Target": getattr(self, "default_target_attribute", None),
+            "Row ID Attribute": getattr(self, "row_id_attribute", None),
+            "Ignore Attributes": getattr(self, "ignore_attribute", None),
+            "Version Label": getattr(self, "version_label", None),
+            "Citation": getattr(self, "citation", None),
+            "Tag": getattr(self, "tag", None),
+            "Visibility": getattr(self, "visibility", None),
+            "Original Data URL": getattr(self, "original_data_url", None),
+            "Paper URL": getattr(self, "paper_url", None),
+            "Update Comment": getattr(self, "update_comment", None),
         }
         # Use getattr for safety if attributes might be missing
         return {k: v for k, v in metadata.items() if v is not None}
@@ -1110,12 +1112,12 @@ class OpenMLDataset(OpenMLBase):
         if not isinstance(original_value, str):
             # Convert lists or other iterables (except strings) to comma-separated strings
             if isinstance(original_value, (list, tuple, set)):
-                 processed_value = ", ".join(map(str, original_value))
+                processed_value = ", ".join(map(str, original_value))
             else:
                 # Return other non-string types directly (e.g., int, float)
                 return original_value
         else:
-             processed_value = original_value # Start with the original string
+            processed_value = original_value  # Start with the original string
 
         # --- String Processing ---
         url_keys = ["URL", "Original Data URL", "Paper URL", "Citation"]
@@ -1124,55 +1126,54 @@ class OpenMLDataset(OpenMLBase):
         if key in url_keys and processed_value:
             # Avoid double wrapping if already done somehow
             if not processed_value.strip().startswith("\\url{"):
-                 return f"\\url{{{processed_value}}}" # Return URL directly
-            else:
-                 return processed_value # Already wrapped
+                return f"\\url{{{processed_value}}}"  # Return URL directly
+            return processed_value  # Already wrapped
 
         # Escape common LaTeX special characters for non-URL strings
         # Basic escapes - add more if needed (\, {, }, etc.)
-        processed_value = processed_value.replace("\\", "\\textbackslash{}") # Must be first
+        processed_value = processed_value.replace("\\", "\\textbackslash{}")  # Must be first
         processed_value = processed_value.replace("&", "\\&")
         processed_value = processed_value.replace("%", "\\%")
         processed_value = processed_value.replace("$", "\\$")
         processed_value = processed_value.replace("#", "\\#")
-        processed_value = processed_value.replace("_", "\\_") # Escape underscores
+        processed_value = processed_value.replace("_", "\\_")  # Escape underscores
         processed_value = processed_value.replace("{", "\\{")
         processed_value = processed_value.replace("}", "\\}")
         processed_value = processed_value.replace("~", "\\textasciitilde{}")
         processed_value = processed_value.replace("^", "\\textasciicircum{}")
 
-
         # Handle simple markdown-like formatting AFTER escaping basic chars
-        processed_value = re.sub(r'\*\*(.*?)\*\*', r'\\textbf{\1}', processed_value)
-        processed_value = re.sub(r'### (.*?)(?:\r?\n|$)', r'\\subsection*{\1}', processed_value) # Handle \r\n too
+        processed_value = re.sub(r"\*\*(.*?)\*\*", r"\\textbf{\1}", processed_value)
+        processed_value = re.sub(
+            r"### (.*?)(?:\r?\n|$)", r"\\subsection*{\1}", processed_value
+        )  # Handle \r\n too
 
         # Handle pre-formatted text blocks (like attribute lists) - use verbatim
         # This regex replacement should happen after basic escapes but before newline replacements
         if "```" in processed_value:
-             processed_value = re.sub(
-                 r'```(.*?)```',
-                 r'\\begin{verbatim}\1\\end{verbatim}',
-                 processed_value,
-                 flags=re.DOTALL
+            processed_value = re.sub(
+                r"```(.*?)```",
+                r"\\begin{verbatim}\1\\end{verbatim}",
+                processed_value,
+                flags=re.DOTALL,
             )
         else:
-             # Replace newlines with LaTeX newline command only outside verbatim blocks
-             processed_value = processed_value.replace("\r\n", "\n").replace("\n", "\\newline ")
+            # Replace newlines with LaTeX newline command only outside verbatim blocks
+            processed_value = processed_value.replace("\r\n", "\n").replace("\n", "\\newline ")
 
         return processed_value
 
-
     def to_latex(
         self,
-        output_file: Union[str, Path, None] = None, # Allow Path object
-        columns: Optional[List[str]] = None,
-        caption: Optional[str] = None,
-        label: Optional[str] = None,
-        *, # Force subsequent arguments to be keyword-only (fixes pre-commit warningsFBT001/FBT002)
+        output_file: str | Path | None = None,  # Allow Path object
+        columns: list[str] | None = None,
+        caption: str | None = None,
+        label: str | None = None,
+        *,  # Force subsequent arguments to be keyword-only (fixes pre-commit warningsFBT001/FBT002)
         longtable: bool = True,
         # escape parameter removed - handled manually via _process_metadata_value_for_latex
         **kwargs: Any,
-    ) -> Optional[str]: # Return type changed to Optional[str] (fixes pre-commit mypy issue)
+    ) -> str | None:  # Return type changed to Optional[str] (fixes pre-commit mypy issue)
         r"""Export dataset information to a LaTeX table.
 
         This method uses pandas' to_latex functionality to create a LaTeX table
@@ -1219,25 +1220,26 @@ class OpenMLDataset(OpenMLBase):
         if not processed_metadata:
             empty_latex = ""
             if longtable:
-                 # Basic empty longtable structure
-                 empty_latex = (
-                     "\\begin{longtable}{@{}l@{}}\n\\toprule\nProperty \\\\\n\\midrule\n"
-                     "\\endfirsthead\n\\toprule\nProperty \\\\\n\\midrule\n\\endhead\n"
-                     "\\bottomrule\n\\endlastfoot\n\\end{longtable}"
-                 )
+                # Basic empty longtable structure
+                empty_latex = (
+                    "\\begin{longtable}{@{}l@{}}\n\\toprule\nProperty \\\\\n\\midrule\n"
+                    "\\endfirsthead\n\\toprule\nProperty \\\\\n\\midrule\n\\endhead\n"
+                    "\\bottomrule\n\\endlastfoot\n\\end{longtable}"
+                )
             else:
-                 # Basic empty tabular structure
-                 empty_latex = "\\begin{tabular}{@{}l@{}}\n\\toprule\nProperty \\\\\n\\midrule\n\\bottomrule\n\\end{tabular}"
+                # Basic empty tabular structure
+                empty_latex = "\\begin{tabular}{@{}l@{}}\n\\toprule\nProperty \\\\\n\\midrule\n\\bottomrule\n\\end{tabular}"
 
             if output_file:
                 try:
-                    output_path = Path(output_file) # Fix pre-commit warning PTH123
+                    output_path = Path(output_file)  # Fix pre-commit warning PTH123
                     output_path.parent.mkdir(parents=True, exist_ok=True)
-                    with output_path.open("w", encoding="utf-8") as f: # Fix pre-commit warning PTH123
+                    with output_path.open(
+                        "w", encoding="utf-8"
+                    ) as f:  # Fix pre-commit warning PTH123
                         f.write(empty_latex)
                     return None
-                except Exception as e:
-                    print(f"Error writing empty LaTeX file {output_path}: {e}")
+                except Exception:
                     raise
             else:
                 return empty_latex
@@ -1254,52 +1256,44 @@ class OpenMLDataset(OpenMLBase):
             valid_columns = [col for col in columns if col in metadata_df.index]
             if valid_columns:
                 metadata_df = metadata_df.loc[valid_columns]
-            elif columns: # User specified columns but none were valid
-                print(
-                    f"Warning: Specified columns not found in metadata properties: {columns}."
-                    " Returning empty table."
-                )
-                metadata_df = metadata_df.iloc[0:0] # Create empty df with same structure
+            elif columns:  # User specified columns but none were valid
+                metadata_df = metadata_df.iloc[0:0]  # Create empty df with same structure
 
         # 4. Define column format based on whether longtable is used
         # Give slightly more space to the value column in longtable
-        col_format = (
-            "@{}lp{\\dimexpr\\textwidth-2\\tabcolsep-6em}@{}" if longtable else "ll"
-        )
+        col_format = "@{}lp{\\dimexpr\\textwidth-2\\tabcolsep-6em}@{}" if longtable else "ll"
         # Adjust '6em' based on typical width of Property names if needed
 
         # 5. Prepare arguments for pandas.to_latex
         latex_args = {
             "buf": None,
-            "columns": ["Value"], # Specify the column to output
-            "header": True, # Include column name "Value"
-            "index": True, # Include index "Property"
+            "columns": ["Value"],  # Specify the column to output
+            "header": True,  # Include column name "Value"
+            "index": True,  # Include index "Property"
             "caption": caption,
             "label": label,
             "longtable": longtable,
-            "escape": False, # We did manual escaping/formatting
+            "escape": False,  # We did manual escaping/formatting
             "column_format": col_format,
-            **kwargs, # Pass through extra arguments
+            **kwargs,  # Pass through extra arguments
         }
 
         # 6. Generate LaTeX output (either to file or string)
         try:
             if output_file:
-                output_path = Path(output_file) # Fix pre-commit warning PTH123
+                output_path = Path(output_file)  # Fix pre-commit warning PTH123
                 output_path.parent.mkdir(parents=True, exist_ok=True)
                 # Use pandas 'buf' argument with pathlib.Path.open()
-                with output_path.open("w", encoding="utf-8") as f: # Fix pre-commit warning PTH123
+                with output_path.open("w", encoding="utf-8") as f:  # Fix pre-commit warning PTH123
                     latex_args["buf"] = f
                     metadata_df.to_latex(**latex_args)
                 # pandas returns None when buf is provided
                 return None
-            else:
-                # pandas returns the LaTeX string when buf is None
-                latex_string = metadata_df.to_latex(**latex_args)
-                # Ensure string return, pandas might rarely return None
-                return str(latex_string) if latex_string is not None else ""
-        except Exception as e:
-            print(f"Error during pandas.to_latex execution: {e}")
+            # pandas returns the LaTeX string when buf is None
+            latex_string = metadata_df.to_latex(**latex_args)
+            # Ensure string return, pandas might rarely return None
+            return str(latex_string) if latex_string is not None else ""
+        except Exception:
             # Re-raise or handle as appropriate for the application
             raise
 
