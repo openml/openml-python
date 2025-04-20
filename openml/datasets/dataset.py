@@ -8,7 +8,7 @@ import pickle
 import re
 import warnings
 from pathlib import Path
-from typing import Any, Iterable, Sequence
+from typing import Any, Iterable, Sequence, List, Dict,Optional, Union
 from typing_extensions import Literal
 
 import arff
@@ -1074,161 +1074,234 @@ class OpenMLDataset(OpenMLBase):
             }
         }
 
+    # Helper function to gather the relevant metadata
+    def _get_metadata_dict(self) -> Dict[str, Any]:
+        """Collects non-None metadata attributes into a dictionary."""
+        metadata = {
+            "Dataset ID": getattr(self, 'dataset_id', None),
+            "Name": getattr(self, 'name', None),
+            "Version": getattr(self, 'version', None),
+            "Description": getattr(self, 'description', None),
+            "Format": getattr(self, 'format', None),
+            "Creator": getattr(self, 'creator', None),
+            "Contributor": getattr(self, 'contributor', None),
+            "Collection Date": getattr(self, 'collection_date', None),
+            "Upload Date": getattr(self, 'upload_date', None),
+            "Language": getattr(self, 'language', None),
+            "License": getattr(self, 'licence', None), # Note: potential typo 'licence' vs 'license'
+            "URL": getattr(self, 'url', None),
+            "Default Target": getattr(self, 'default_target_attribute', None),
+            "Row ID Attribute": getattr(self, 'row_id_attribute', None),
+            "Ignore Attributes": getattr(self, 'ignore_attribute', None),
+            "Version Label": getattr(self, 'version_label', None),
+            "Citation": getattr(self, 'citation', None),
+            "Tag": getattr(self, 'tag', None),
+            "Visibility": getattr(self, 'visibility', None),
+            "Original Data URL": getattr(self, 'original_data_url', None),
+            "Paper URL": getattr(self, 'paper_url', None),
+            "Update Comment": getattr(self, 'update_comment', None),
+        }
+        # Use getattr for safety if attributes might be missing
+        return {k: v for k, v in metadata.items() if v is not None}
+
+    # Helper function to process a single metadata value for LaTeX display
+    def _process_metadata_value_for_latex(self, key: str, original_value: Any) -> Any:
+        """Formats a single metadata value for LaTeX display."""
+        if not isinstance(original_value, str):
+            # Convert lists or other iterables (except strings) to comma-separated strings
+            if isinstance(original_value, (list, tuple, set)):
+                 processed_value = ", ".join(map(str, original_value))
+            else:
+                # Return other non-string types directly (e.g., int, float)
+                return original_value
+        else:
+             processed_value = original_value # Start with the original string
+
+        # --- String Processing ---
+        url_keys = ["URL", "Original Data URL", "Paper URL", "Citation"]
+
+        # Handle URLs first to avoid escaping characters within \url{}
+        if key in url_keys and processed_value:
+            # Avoid double wrapping if already done somehow
+            if not processed_value.strip().startswith("\\url{"):
+                 return f"\\url{{{processed_value}}}" # Return URL directly
+            else:
+                 return processed_value # Already wrapped
+
+        # Escape common LaTeX special characters for non-URL strings
+        # Basic escapes - add more if needed (\, {, }, etc.)
+        processed_value = processed_value.replace("\\", "\\textbackslash{}") # Must be first
+        processed_value = processed_value.replace("&", "\\&")
+        processed_value = processed_value.replace("%", "\\%")
+        processed_value = processed_value.replace("$", "\\$")
+        processed_value = processed_value.replace("#", "\\#")
+        processed_value = processed_value.replace("_", "\\_") # Escape underscores
+        processed_value = processed_value.replace("{", "\\{")
+        processed_value = processed_value.replace("}", "\\}")
+        processed_value = processed_value.replace("~", "\\textasciitilde{}")
+        processed_value = processed_value.replace("^", "\\textasciicircum{}")
+
+
+        # Handle simple markdown-like formatting AFTER escaping basic chars
+        processed_value = re.sub(r'\*\*(.*?)\*\*', r'\\textbf{\1}', processed_value)
+        processed_value = re.sub(r'### (.*?)(?:\r?\n|$)', r'\\subsection*{\1}', processed_value) # Handle \r\n too
+
+        # Handle pre-formatted text blocks (like attribute lists) - use verbatim
+        # This regex replacement should happen after basic escapes but before newline replacements
+        if "```" in processed_value:
+             processed_value = re.sub(
+                 r'```(.*?)```',
+                 r'\\begin{verbatim}\1\\end{verbatim}',
+                 processed_value,
+                 flags=re.DOTALL
+            )
+        else:
+             # Replace newlines with LaTeX newline command only outside verbatim blocks
+             processed_value = processed_value.replace("\r\n", "\n").replace("\n", "\\newline ")
+
+        return processed_value
+
+    # Refactored main method (starts at original line 1077)
     def to_latex(
         self,
-        output_file: str | None = None,
-        columns: list[str] | None = None,
-        caption: str | None = None,
-        label: str | None = None,
+        output_file: Union[str, Path, None] = None, # Allow Path object
+        columns: Optional[List[str]] = None,
+        caption: Optional[str] = None,
+        label: Optional[str] = None,
+        *, # Force subsequent arguments to be keyword-only (fixes FBT001/FBT002)
         longtable: bool = True,
-        escape: bool = True,
+        # escape parameter removed - handled manually via _process_metadata_value_for_latex
         **kwargs: Any,
-    ) -> str:
-        """Export dataset information to a LaTeX table.
+    ) -> Optional[str]: # Return type changed to Optional[str] (fixes mypy issue)
+        r"""Export dataset information to a LaTeX table.
 
         This method uses pandas' to_latex functionality to create a LaTeX table
-        from the dataset's metadata. If the dataset is large, it will create
-        a multi-page table using the longtable package.
+        from the dataset's metadata. It applies custom formatting for URLs,
+        simple markdown, and verbatim blocks.
 
         Parameters
         ----------
-        output_file : str, optional
-            If provided, the LaTeX table will be written to this file.
+        output_file : str, Path, optional
+            If provided, the LaTeX table will be written to this file path.
         columns : list[str], optional
-            List of columns to include in the table. If None, all available
-            metadata will be included.
+            List of metadata properties (keys) to include in the table.
+            If None, all available non-None metadata will be included.
         caption : str, optional
-            Caption for the LaTeX table.
+            Caption for the LaTeX table. Passed to pandas.
         label : str, optional
-            Label for the LaTeX table.
+            Label for the LaTeX table. Passed to pandas.
         longtable : bool, default=True
-            Whether to use the longtable package for multi-page tables.
-        escape : bool, default=True
-            Whether to escape special characters in the LaTeX output.
+            Whether to use the longtable package via pandas. Passed to pandas.
         **kwargs : Any
             Additional arguments passed to pandas.DataFrame.to_latex().
 
         Returns
         -------
-        str
-            The LaTeX table as a string.
+        str or None
+            The LaTeX table as a string, or None if `output_file` is provided.
 
         Notes
         -----
-        This method requires pandas>=2.0.0. If you want to use custom templates
-        with jinja2, you need to have jinja2 installed.
+        Requires pandas >= 1.0.0 (for longtable support).
+        Ensure necessary LaTeX packages (\usepackage{booktabs}, \usepackage{longtable},
+        \usepackage{url}) are included in your LaTeX document preamble.
+        Manual escaping is applied; `escape=False` is passed to pandas.
         """
-        # Create a dictionary of metadata
-        metadata = {
-            "Dataset ID": self.dataset_id,
-            "Name": self.name,
-            "Version": self.version,
-            "Description": self.description,
-            "Format": self.format,
-            "Creator": self.creator,
-            "Contributor": self.contributor,
-            "Collection Date": self.collection_date,
-            "Upload Date": self.upload_date,
-            "Language": self.language,
-            "License": self.licence,
-            "URL": self.url,
-            "Default Target": self.default_target_attribute,
-            "Row ID Attribute": self.row_id_attribute,
-            "Ignore Attributes": self.ignore_attribute,
-            "Version Label": self.version_label,
-            "Citation": self.citation,
-            "Tag": self.tag,
-            "Visibility": self.visibility,
-            "Original Data URL": self.original_data_url,
-            "Paper URL": self.paper_url,
-            "Update Comment": self.update_comment,
+        # 1. Get and process metadata using helper functions
+        raw_metadata = self._get_metadata_dict()
+        processed_metadata = {
+            # Fixed PLW2901: process helper returns new value, no overwrite
+            key: self._process_metadata_value_for_latex(key, value)
+            for key, value in raw_metadata.items()
         }
 
-        # Remove None values
-        metadata = {k: v for k, v in metadata.items() if v is not None}
-
-        # Process values to handle special LaTeX characters and formatting
-        processed_metadata = {}
-        for key, value in metadata.items():
-            if isinstance(value, str):
-                # Escape underscores in text (but not in URLs)
-                if not key in ["URL", "Original Data URL", "Paper URL"]:
-                    value = value.replace("_", "\\_")
-                
-                # Handle URLs with \url command
-                if key in ["URL", "Original Data URL", "Paper URL"] and value:
-                    value = f"\\url{{{value}}}"
-                
-                # Handle markdown-like formatting
-                value = re.sub(r'\*\*(.*?)\*\*', r'\\textbf{\1}', value)
-                value = re.sub(r'### (.*?)(?:\n|$)', r'\\subsection*{\1}', value)
-                
-                # Handle pre-formatted text blocks (like attribute lists)
-                if "```" in value:
-                    value = re.sub(r'```(.*?)```', r'\\begin{verbatim}\1\\end{verbatim}', value, flags=re.DOTALL)
-                
-                # Replace newlines with \newline for better control
-                value = value.replace("\n", "\\newline ")
-            
-            processed_metadata[key] = value
-
-        # Create DataFrame
-        df = pd.DataFrame([processed_metadata]).T
-        df.columns = ["Value"]
-
-        # Filter columns if specified
-        if columns is not None:
-            # Only include columns that exist in the DataFrame
-            valid_columns = [col for col in columns if col in df.index]
-            if valid_columns:
-                df = df.loc[valid_columns]
+        # Handle empty metadata case gracefully
+        if not processed_metadata:
+            empty_latex = ""
+            if longtable:
+                 # Basic empty longtable structure
+                 empty_latex = (
+                     "\\begin{longtable}{@{}l@{}}\n\\toprule\nProperty \\\\\n\\midrule\n"
+                     "\\endfirsthead\n\\toprule\nProperty \\\\\n\\midrule\n\\endhead\n"
+                     "\\bottomrule\n\\endlastfoot\n\\end{longtable}"
+                 )
             else:
-                # If no valid columns, use all available columns
-                pass
+                 # Basic empty tabular structure
+                 empty_latex = "\\begin{tabular}{@{}l@{}}\n\\toprule\nProperty \\\\\n\\midrule\n\\bottomrule\n\\end{tabular}"
 
-        # Generate LaTeX with custom column specification
-        latex = df.to_latex(
-            caption=caption,
-            label=label,
-            escape=escape,
-            column_format="@{}lp{\\dimexpr\\textwidth-2\\tabcolsep-2em}@{}",
-            **kwargs,
-        )
+            if output_file:
+                try:
+                    output_path = Path(output_file) # Fix PTH123
+                    output_path.parent.mkdir(parents=True, exist_ok=True)
+                    with output_path.open("w", encoding="utf-8") as f: # Fix PTH123
+                        f.write(empty_latex)
+                    return None
+                except Exception as e:
+                    print(f"Error writing empty LaTeX file {output_path}: {e}")
+                    raise
+            else:
+                return empty_latex
 
-        # Add longtable support if requested
-        if longtable:
-            latex = latex.replace("\\begin{tabular}", "\\begin{longtable}")
-            latex = latex.replace("\\end{tabular}", "\\end{longtable}")
+        # 2. Create DataFrame (Fix PD901: use descriptive name)
+        # Use Series for easier construction, then convert to DataFrame
+        metadata_series = pd.Series(processed_metadata, name="Value")
+        metadata_series.index.name = "Property"
+        metadata_df = metadata_series.to_frame()
 
-            # Add header repetition for longtable
-            if caption is not None or label is not None:
-                # Check if there are horizontal lines in the LaTeX output
-                hlines = latex.split("\\hline")
-                if len(hlines) > 1:
-                    header = hlines[1]
-                    latex = latex.replace(
-                        "\\endfirsthead",
-                        f"\\endfirsthead\n\\multicolumn{{2}}{{l}}{{{caption}}}\\\\\n{header}\\hline\n\\endhead",
-                    )
-                else:
-                    # If no horizontal lines, just add the caption
-                    latex = latex.replace(
-                        "\\endfirsthead",
-                        f"\\endfirsthead\n\\multicolumn{{2}}{{l}}{{{caption}}}\\\\\n\\endhead",
-                    )
-                
-                # Add standard longtable headers and footers
-                latex = latex.replace(
-                    "\\endhead",
-                    "\\endhead\n\\hline\n\\endfoot\n\\hline\n\\endlastfoot"
+        # 3. Filter columns (index in this case) if specified
+        if columns is not None:
+            # Filter based on the index (Property names)
+            valid_columns = [col for col in columns if col in metadata_df.index]
+            if valid_columns:
+                metadata_df = metadata_df.loc[valid_columns]
+            elif columns: # User specified columns but none were valid
+                print(
+                    f"Warning: Specified columns not found in metadata properties: {columns}."
+                    " Returning empty table."
                 )
+                metadata_df = metadata_df.iloc[0:0] # Create empty df with same structure
 
-        # Write to file if specified
-        if output_file is not None:
-            with open(output_file, "w", encoding="utf-8") as f:
-                f.write(latex)
+        # 4. Define column format based on whether longtable is used
+        # Give slightly more space to the value column in longtable
+        col_format = (
+            "@{}lp{\\dimexpr\\textwidth-2\\tabcolsep-6em}@{}" if longtable else "ll"
+        )
+        # Adjust '6em' based on typical width of Property names if needed
 
-        return latex
+        # 5. Prepare arguments for pandas.to_latex
+        latex_args = {
+            "buf": None,
+            "columns": ["Value"], # Specify the column to output
+            "header": True, # Include column name "Value"
+            "index": True, # Include index "Property"
+            "caption": caption,
+            "label": label,
+            "longtable": longtable,
+            "escape": False, # We did manual escaping/formatting
+            "column_format": col_format,
+            **kwargs, # Pass through extra arguments
+        }
+
+        # 6. Generate LaTeX output (either to file or string)
+        try:
+            if output_file:
+                output_path = Path(output_file) # Fix PTH123
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                # Use pandas 'buf' argument with pathlib.Path.open()
+                with output_path.open("w", encoding="utf-8") as f: # Fix PTH123
+                    latex_args["buf"] = f
+                    metadata_df.to_latex(**latex_args)
+                # pandas returns None when buf is provided
+                return None
+            else:
+                # pandas returns the LaTeX string when buf is None
+                latex_string = metadata_df.to_latex(**latex_args)
+                # Ensure string return, pandas might rarely return None
+                return str(latex_string) if latex_string is not None else ""
+        except Exception as e:
+            print(f"Error during pandas.to_latex execution: {e}")
+            # Re-raise or handle as appropriate for the application
+            raise
 
 
 def _read_features(features_file: Path) -> dict[int, OpenMLDataFeature]:
