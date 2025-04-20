@@ -314,6 +314,60 @@ class OpenMLDatasetTest(TestBase):
         self.assertNotEqual(self.iris, self.titanic)
         self.assertNotEqual(self.titanic, 'Wrong_object')
 
+    def test_to_latex(self):
+        """Test the to_latex method of OpenMLDataset."""
+        import pandas as pd
+        from openml.datasets import OpenMLDataset
+
+        # Create a sample dataset
+        dataset = OpenMLDataset(
+            name="test_dataset",
+            description="A test dataset",
+            data_format="arff",
+            dataset_id=1,
+            version=1,
+            creator="Test Creator",
+            contributor="Test Contributor",
+            collection_date="2024-01-01",
+            upload_date="2024-01-02",
+            language="English",
+            licence="BSD",
+            url="http://test.com",
+            default_target_attribute="target",
+            row_id_attribute="id",
+            ignore_attribute=["ignore"],
+            version_label="v1",
+            citation="Test Citation",
+            tag="test",
+            visibility="public",
+        )
+
+        # Test basic LaTeX export
+        latex = dataset.to_latex()
+        assert "\\begin{longtable}" in latex
+        assert "test_dataset" in latex
+        assert "Test Creator" in latex
+
+        # Test with specific columns
+        latex = dataset.to_latex(columns=["Name", "Creator"])
+        assert "test_dataset" in latex
+        assert "Test Creator" in latex
+        assert "Test Citation" not in latex
+
+        # Test with caption and label
+        latex = dataset.to_latex(caption="Test Table", label="tab:test")
+        assert "\\caption{Test Table}" in latex
+        assert "\\label{tab:test}" in latex
+
+        # Test writing to file
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix=".tex", delete=False) as f:
+            dataset.to_latex(output_file=f.name)
+            with open(f.name, "r") as f2:
+                content = f2.read()
+                assert "\\begin{longtable}" in content
+                assert "test_dataset" in content
+
 class OpenMLDatasetTestOnTestServer(TestBase):
     def setUp(self):
         super().setUp()

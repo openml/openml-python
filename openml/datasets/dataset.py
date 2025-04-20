@@ -1074,6 +1074,162 @@ class OpenMLDataset(OpenMLBase):
             }
         }
 
+    def to_latex(
+        self,
+        output_file: str | None = None,
+        columns: list[str] | None = None,
+        caption: str | None = None,
+        label: str | None = None,
+        longtable: bool = True,
+        escape: bool = True,
+        **kwargs: Any,
+    ) -> str:
+        """Export dataset information to a LaTeX table.
+
+        This method uses pandas' to_latex functionality to create a LaTeX table
+        from the dataset's metadata. If the dataset is large, it will create
+        a multi-page table using the longtable package.
+
+        Parameters
+        ----------
+        output_file : str, optional
+            If provided, the LaTeX table will be written to this file.
+        columns : list[str], optional
+            List of columns to include in the table. If None, all available
+            metadata will be included.
+        caption : str, optional
+            Caption for the LaTeX table.
+        label : str, optional
+            Label for the LaTeX table.
+        longtable : bool, default=True
+            Whether to use the longtable package for multi-page tables.
+        escape : bool, default=True
+            Whether to escape special characters in the LaTeX output.
+        **kwargs : Any
+            Additional arguments passed to pandas.DataFrame.to_latex().
+
+        Returns
+        -------
+        str
+            The LaTeX table as a string.
+
+        Notes
+        -----
+        This method requires pandas>=2.0.0. If you want to use custom templates
+        with jinja2, you need to have jinja2 installed.
+        """
+        # Create a dictionary of metadata
+        metadata = {
+            "Dataset ID": self.dataset_id,
+            "Name": self.name,
+            "Version": self.version,
+            "Description": self.description,
+            "Format": self.format,
+            "Creator": self.creator,
+            "Contributor": self.contributor,
+            "Collection Date": self.collection_date,
+            "Upload Date": self.upload_date,
+            "Language": self.language,
+            "License": self.licence,
+            "URL": self.url,
+            "Default Target": self.default_target_attribute,
+            "Row ID Attribute": self.row_id_attribute,
+            "Ignore Attributes": self.ignore_attribute,
+            "Version Label": self.version_label,
+            "Citation": self.citation,
+            "Tag": self.tag,
+            "Visibility": self.visibility,
+            "Original Data URL": self.original_data_url,
+            "Paper URL": self.paper_url,
+            "Update Comment": self.update_comment,
+        }
+
+        # Remove None values
+        metadata = {k: v for k, v in metadata.items() if v is not None}
+
+        # Process values to handle special LaTeX characters and formatting
+        processed_metadata = {}
+        for key, value in metadata.items():
+            if isinstance(value, str):
+                # Escape underscores in text (but not in URLs)
+                if not key in ["URL", "Original Data URL", "Paper URL"]:
+                    value = value.replace("_", "\\_")
+                
+                # Handle URLs with \url command
+                if key in ["URL", "Original Data URL", "Paper URL"] and value:
+                    value = f"\\url{{{value}}}"
+                
+                # Handle markdown-like formatting
+                value = re.sub(r'\*\*(.*?)\*\*', r'\\textbf{\1}', value)
+                value = re.sub(r'### (.*?)(?:\n|$)', r'\\subsection*{\1}', value)
+                
+                # Handle pre-formatted text blocks (like attribute lists)
+                if "```" in value:
+                    value = re.sub(r'```(.*?)```', r'\\begin{verbatim}\1\\end{verbatim}', value, flags=re.DOTALL)
+                
+                # Replace newlines with \newline for better control
+                value = value.replace("\n", "\\newline ")
+            
+            processed_metadata[key] = value
+
+        # Create DataFrame
+        df = pd.DataFrame([processed_metadata]).T
+        df.columns = ["Value"]
+
+        # Filter columns if specified
+        if columns is not None:
+            # Only include columns that exist in the DataFrame
+            valid_columns = [col for col in columns if col in df.index]
+            if valid_columns:
+                df = df.loc[valid_columns]
+            else:
+                # If no valid columns, use all available columns
+                pass
+
+        # Generate LaTeX with custom column specification
+        latex = df.to_latex(
+            caption=caption,
+            label=label,
+            escape=escape,
+            column_format="@{}lp{\\dimexpr\\textwidth-2\\tabcolsep-2em}@{}",
+            **kwargs,
+        )
+
+        # Add longtable support if requested
+        if longtable:
+            latex = latex.replace("\\begin{tabular}", "\\begin{longtable}")
+            latex = latex.replace("\\end{tabular}", "\\end{longtable}")
+
+            # Add header repetition for longtable
+            if caption is not None or label is not None:
+                # Check if there are horizontal lines in the LaTeX output
+                hlines = latex.split("\\hline")
+                if len(hlines) > 1:
+                    header = hlines[1]
+                    latex = latex.replace(
+                        "\\endfirsthead",
+                        f"\\endfirsthead\n\\multicolumn{{2}}{{l}}{{{caption}}}\\\\\n{header}\\hline\n\\endhead",
+                    )
+                else:
+                    # If no horizontal lines, just add the caption
+                    latex = latex.replace(
+                        "\\endfirsthead",
+                        f"\\endfirsthead\n\\multicolumn{{2}}{{l}}{{{caption}}}\\\\\n\\endhead",
+                    )
+                
+                # Add standard longtable headers and footers
+                latex = latex.replace(
+                    "\\endhead",
+                    "\\endhead\n\\hline\n\\endfoot\n\\hline\n\\endlastfoot"
+                )
+
+        # Write to file if specified
+        if output_file is not None:
+            with open(output_file, "w", encoding="utf-8") as f:
+                f.write(latex)
+
+        return latex
+
 
 def _read_features(features_file: Path) -> dict[int, OpenMLDataFeature]:
     features_pickle_file = Path(_get_features_pickle_file(str(features_file)))
