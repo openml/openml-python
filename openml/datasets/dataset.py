@@ -1152,24 +1152,29 @@ class OpenMLDataset(OpenMLBase):
         for key, value in metadata.items():
             if isinstance(value, str):
                 # Escape underscores in text (but not in URLs)
-                if not key in ["URL", "Original Data URL", "Paper URL"]:
+                if key not in ["URL", "Original Data URL", "Paper URL"]:
                     value = value.replace("_", "\\_")
-                
+
                 # Handle URLs with \url command
                 if key in ["URL", "Original Data URL", "Paper URL"] and value:
                     value = f"\\url{{{value}}}"
-                
+
                 # Handle markdown-like formatting
-                value = re.sub(r'\*\*(.*?)\*\*', r'\\textbf{\1}', value)
-                value = re.sub(r'### (.*?)(?:\n|$)', r'\\subsection*{\1}', value)
-                
+                value = re.sub(r"\*\*(.*?)\*\*", r"\\textbf{\1}", value)
+                value = re.sub(r"### (.*?)(?:\n|$)", r"\\subsection*{\1}", value)
+
                 # Handle pre-formatted text blocks (like attribute lists)
                 if "```" in value:
-                    value = re.sub(r'```(.*?)```', r'\\begin{verbatim}\1\\end{verbatim}', value, flags=re.DOTALL)
-                
+                    value = re.sub(
+                        r"```(.*?)```",
+                        r"\\begin{verbatim}\1\\end{verbatim}",
+                        value,
+                        flags=re.DOTALL,
+                    )
+
                 # Replace newlines with \newline for better control
                 value = value.replace("\n", "\\newline ")
-            
+
             processed_metadata[key] = value
 
         # Create DataFrame
@@ -1216,11 +1221,10 @@ class OpenMLDataset(OpenMLBase):
                         "\\endfirsthead",
                         f"\\endfirsthead\n\\multicolumn{{2}}{{l}}{{{caption}}}\\\\\n\\endhead",
                     )
-                
+
                 # Add standard longtable headers and footers
                 latex = latex.replace(
-                    "\\endhead",
-                    "\\endhead\n\\hline\n\\endfoot\n\\hline\n\\endlastfoot"
+                    "\\endhead", "\\endhead\n\\hline\n\\endfoot\n\\hline\n\\endlastfoot"
                 )
 
         # Write to file if specified
