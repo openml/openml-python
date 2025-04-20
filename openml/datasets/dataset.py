@@ -1161,18 +1161,18 @@ class OpenMLDataset(OpenMLBase):
 
         return processed_value
 
-    # Refactored main method (starts at original line 1077)
+
     def to_latex(
         self,
         output_file: Union[str, Path, None] = None, # Allow Path object
         columns: Optional[List[str]] = None,
         caption: Optional[str] = None,
         label: Optional[str] = None,
-        *, # Force subsequent arguments to be keyword-only (fixes FBT001/FBT002)
+        *, # Force subsequent arguments to be keyword-only (fixes pre-commit warningsFBT001/FBT002)
         longtable: bool = True,
         # escape parameter removed - handled manually via _process_metadata_value_for_latex
         **kwargs: Any,
-    ) -> Optional[str]: # Return type changed to Optional[str] (fixes mypy issue)
+    ) -> Optional[str]: # Return type changed to Optional[str] (fixes pre-commit mypy issue)
         r"""Export dataset information to a LaTeX table.
 
         This method uses pandas' to_latex functionality to create a LaTeX table
@@ -1210,7 +1210,7 @@ class OpenMLDataset(OpenMLBase):
         # 1. Get and process metadata using helper functions
         raw_metadata = self._get_metadata_dict()
         processed_metadata = {
-            # Fixed PLW2901: process helper returns new value, no overwrite
+            # Fixed pre-commit warning PLW2901: process helper returns new value, no overwrite
             key: self._process_metadata_value_for_latex(key, value)
             for key, value in raw_metadata.items()
         }
@@ -1231,9 +1231,9 @@ class OpenMLDataset(OpenMLBase):
 
             if output_file:
                 try:
-                    output_path = Path(output_file) # Fix PTH123
+                    output_path = Path(output_file) # Fix pre-commit warning PTH123
                     output_path.parent.mkdir(parents=True, exist_ok=True)
-                    with output_path.open("w", encoding="utf-8") as f: # Fix PTH123
+                    with output_path.open("w", encoding="utf-8") as f: # Fix pre-commit warning PTH123
                         f.write(empty_latex)
                     return None
                 except Exception as e:
@@ -1242,7 +1242,7 @@ class OpenMLDataset(OpenMLBase):
             else:
                 return empty_latex
 
-        # 2. Create DataFrame (Fix PD901: use descriptive name)
+        # 2. Create DataFrame (Fix pre-commit warning PD901: use descriptive name)
         # Use Series for easier construction, then convert to DataFrame
         metadata_series = pd.Series(processed_metadata, name="Value")
         metadata_series.index.name = "Property"
@@ -1285,10 +1285,10 @@ class OpenMLDataset(OpenMLBase):
         # 6. Generate LaTeX output (either to file or string)
         try:
             if output_file:
-                output_path = Path(output_file) # Fix PTH123
+                output_path = Path(output_file) # Fix pre-commit warning PTH123
                 output_path.parent.mkdir(parents=True, exist_ok=True)
                 # Use pandas 'buf' argument with pathlib.Path.open()
-                with output_path.open("w", encoding="utf-8") as f: # Fix PTH123
+                with output_path.open("w", encoding="utf-8") as f: # Fix pre-commit warning PTH123
                     latex_args["buf"] = f
                     metadata_df.to_latex(**latex_args)
                 # pandas returns None when buf is provided
