@@ -1,0 +1,11 @@
+@@ -768,7 +768,8 @@
+-    def get_data(  # noqa: C901, PLR0912, PLR0915
++    def get_data(  # noqa: C901, PLR0912, PLR0915
+         self,
+         target: list[str] | str | None = None,
+         include_row_id: bool = False,  # noqa: FBT001, FBT002
+         include_ignore_attribute: bool = False,  # noqa: FBT001, FBT002
+-        dataset_format: Literal["array", "dataframe"] = "dataframe",
++        dataset_format: Literal["array", "dataframe"] = "dataframe",
++        as_frame: bool = False,
+     ) -> tuple[

@@ -1,0 +1,33 @@
+--- a/openml/datasets/dataset.py
++++ b/openml/datasets/dataset.py
+@@ -427,7 +427,8 @@ class OpenMLDataset(OpenMLBase):
+-    def get_data(  # noqa: C901, PLR0912, PLR0915
++    def get_data(  # noqa: C901, PLR0912, PLR0915
+         self,
+         target: list[str] | str | None = None,
+         include_row_id: bool = False,  # noqa: FBT001, FBT002
+         include_ignore_attribute: bool = False,  # noqa: FBT001, FBT002
+-        dataset_format: Literal["array", "dataframe"] = "dataframe",
++        dataset_format: Literal["array", "dataframe"] = "dataframe",
++        as_frame: bool = False,
+     ) -> tuple[
+         np.ndarray | pd.DataFrame | scipy.sparse.csr_matrix,
+         np.ndarray | pd.DataFrame | None,
+@@ -558,6 +559,15 @@ class OpenMLDataset(OpenMLBase):
+             data, targets = x, y
+
+-        return data, targets, categorical, attribute_names  # type: ignore
++        # --- new as_frame support ---
++        if as_frame:
++            import pandas as pd
++            # wrap X in DataFrame
++            X = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data, columns=attribute_names)
++            # wrap y in Series (or leave None/Series)
++            if isinstance(targets, np.ndarray):
++                y = pd.Series(targets, name=target if isinstance(target, str) else None)
++            else:
++                y = targets
++            return X, y, categorical, attribute_names
++
++        return data, targets, categorical, attribute_names  # type: ignore
+
