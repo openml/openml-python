@@ -5,13 +5,14 @@ from pathlib import Path
 from typing import Literal
 
 import arff
-import numpy as np
 import pandas as pd
 
 import openml._api_calls
+
 from .dataset import OpenMLDataset
 
 logger = logging.getLogger(__name__)
+
 
 def create_dataset(
     name: str,
@@ -55,7 +56,7 @@ def create_dataset(
         with open(file_path, "w") as f:
             arff.dump(arff_object, f)
 
-    dataset_id = _upload_to_server(file_path, dataset_format)
+    _upload_to_server(file_path, dataset_format)
     return OpenMLDataset(
         name=name,
         description=description,
@@ -78,10 +79,7 @@ def create_dataset(
 
 
 def _upload_to_server(file_path: str, dataset_format: str) -> str:
-    if dataset_format == "parquet":
-        content_type = "application/octet-stream"
-    else:
-        content_type = "text/plain"
+    content_type = "application/octet-stream" if dataset_format == "parquet" else "text/plain"
 
     url = openml._api_calls._create_dataset_upload_url()
     with open(file_path, "rb") as fp:
@@ -89,4 +87,3 @@ def _upload_to_server(file_path: str, dataset_format: str) -> str:
             url, "post", file_upload=(Path(file_path).name, fp, content_type)
         )
     return response["id"]
-

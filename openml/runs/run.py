@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 
 class OpenMLRun(OpenMLBase):
     """OpenML Run: result of running a model on an OpenML dataset.
-    
+
     Parameters
     ----------
     task_id: int
@@ -94,6 +94,7 @@ class OpenMLRun(OpenMLBase):
     run_details: str, optional (default=None)
         Description of the run stored in the run meta-data.
     """
+
     _client = None
 
     def __init__(  # noqa: PLR0913

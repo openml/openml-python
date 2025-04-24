@@ -1,27 +1,18 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import gzip
 import logging
-import os
-import pickle
-import re
 import warnings
-from pathlib import Path
-from typing import Any, Iterable, Sequence
+from typing import TYPE_CHECKING, Any
 from typing_extensions import Literal
 
-import arff
 import numpy as np
 import pandas as pd
-import scipy.sparse
-import xmltodict
 
 from openml.base import OpenMLBase
-from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
-from openml.exceptions import PyOpenMLError
 
-from .data_feature import OpenMLDataFeature
+if TYPE_CHECKING:
+    import scipy.sparse
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +20,7 @@ logger = logging.getLogger(__name__)
 class OpenMLDataset(OpenMLBase):
     # ... [all of your existing __init__, properties, helper methods, etc.] ...
 
-
-    def get_data(  # noqa: C901, PLR0912, PLR0915
+    def get_data(  # noqa: C901, PLR0912
         self,
         target: list[str] | str | None = None,
         include_row_id: bool = False,  # noqa: FBT001, FBT002
@@ -89,10 +79,7 @@ class OpenMLDataset(OpenMLBase):
 
         if to_exclude:
             mask = [col not in to_exclude for col in attribute_names]
-            if isinstance(data, pd.DataFrame):
-                data = data.loc[:, mask]
-            else:
-                data = data[:, mask]
+            data = data.loc[:, mask] if isinstance(data, pd.DataFrame) else data[:, mask]
             categorical = [c for c, m in zip(categorical, mask) if m]
             attribute_names = [n for n, m in zip(attribute_names, mask) if m]
 
@@ -112,7 +99,9 @@ class OpenMLDataset(OpenMLBase):
                 y = data[:, sel]
             # convert formats
             X = self._convert_array_format(X, dataset_format, attribute_names)  # type: ignore
-            y = self._convert_array_format(y, dataset_format, [name for name, s in zip(attribute_names, sel) if s])
+            y = self._convert_array_format(
+                y, dataset_format, [name for name, s in zip(attribute_names, sel) if s]
+            )
             if isinstance(y, np.ndarray):
                 y = pd.Series(y) if as_frame else y
 
@@ -132,7 +121,7 @@ class OpenMLDataset(OpenMLBase):
         return X, y, categorical, attribute_names
 
     def _dataset_to_dict(self) -> dict[str, Any]:
-        dataset_dict = {
+        return {
             "name": self.name,
             "description": self.description,
             "creator": self.creator,
@@ -150,5 +139,3 @@ class OpenMLDataset(OpenMLBase):
             "update_comment": self.update_comment,
             "format": self.data_format,  # <-- THIS LINE is the key
         }
-        return dataset_dict
-
