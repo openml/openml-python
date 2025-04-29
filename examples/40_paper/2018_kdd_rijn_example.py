@@ -66,13 +66,13 @@ if False:
 # https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdccc7b9265/examples/plot/plot_fanova_aggregates.py # noqa F401
 
 # %%
-suite = openml.study.get_suite("OpenML100")
-flow_id = 7707
-parameter_filters = {"sklearn.svm.classes.SVC(17)_kernel": "sigmoid"}
-evaluation_measure = "predictive_accuracy"
-limit_per_task = 500
-limit_nr_tasks = 15
-n_trees = 16
+    suite = openml.study.get_suite("OpenML100")
+    flow_id = 7707
+    parameter_filters = {"sklearn.svm.classes.SVC(17)_kernel": "sigmoid"}
+    evaluation_measure = "predictive_accuracy"
+    limit_per_task = 500
+    limit_nr_tasks = 15
+    n_trees = 16
 
     fanova_results = []
     # we will obtain all results from OpenML per task. Practice has shown that this places the bottleneck on the
@@ -164,12 +164,12 @@ n_trees = 16
 # ``Orange`` dependency (``pip install Orange3``). For the complete example,
 # the reader is referred to the more elaborate script (referred to earlier)
 
-# %%
-fig, ax = plt.subplots()
-sns.boxplot(x="hyperparameter", y="fanova", data=fanova_results, ax=ax)
-ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
-ax.set_ylabel("Variance Contribution")
-ax.set_xlabel(None)
-plt.tight_layout()
-plt.show()
-# License: BSD 3-Clause
+    # %%
+    fig, ax = plt.subplots()
+    sns.boxplot(x="hyperparameter", y="fanova", data=fanova_results, ax=ax)
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
+    ax.set_ylabel("Variance Contribution")
+    ax.set_xlabel(None)
+    plt.tight_layout()
+    plt.show()
+    # License: BSD 3-Clause
