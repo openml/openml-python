@@ -13,14 +13,14 @@ from openml.datasets import edit_dataset, fork_dataset, get_dataset
 # * List datasets
 
 # %%
-datalist = openml.datasets.list_datasets()
+datalist = openml.datasets.list_datasets(output_format="dataframe")
 datalist = datalist[["did", "name", "NumberOfInstances", "NumberOfFeatures", "NumberOfClasses"]]
 
 print(f"First 10 of {len(datalist)} datasets...")
 datalist.head(n=10)
 
 # The same can be done with lesser lines of code
-openml_df = openml.datasets.list_datasets()
+openml_df = openml.datasets.list_datasets(output_format="dataframe")
 openml_df.head(n=10)
 
 # %% [markdown]

@@ -34,7 +34,6 @@ logger = logging.Logger(name="Experiment Logger", level=1)
 # go to your profile and select the API-KEY.
 # Or log in, and navigate to https://www.openml.org/auth/api-key
 openml.config.apikey = ""
-
 ############################################################################
 # Prepare for preprocessors and an OpenML task
 # ============================================

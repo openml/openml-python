@@ -33,7 +33,7 @@ openml.evaluations.list_evaluations(
 
 # Using other evaluation metrics, 'precision' in this case
 evals = openml.evaluations.list_evaluations(
-    function="precision", size=10
+    function="precision", size=10, output_format="dataframe"
 )
 
 # Querying the returned results for precision above 0.98

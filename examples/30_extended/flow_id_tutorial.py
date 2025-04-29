@@ -16,6 +16,7 @@ import openml
 
 # %%
 openml.config.start_using_configuration_for_example()
+openml.config.server = "https://api.openml.org/api/v1/xml"
 
 # %%
 # Defining a classifier

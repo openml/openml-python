@@ -34,8 +34,11 @@ openml.config.start_using_configuration_for_example()
 # %%
 dataset = openml.datasets.get_dataset(20)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    target=dataset.default_target_attribute
+    dataset_format="dataframe", target=dataset.default_target_attribute
 )
+if y is None:
+    y = X["class"]
+    X = X.drop(columns=["class"], axis=1)
 clf = neighbors.KNeighborsClassifier(n_neighbors=3)
 clf.fit(X, y)
 
@@ -44,6 +47,7 @@ clf.fit(X, y)
 
 # %%
 task = openml.tasks.get_task(119)
+
 clf = ensemble.RandomForestClassifier()
 run = openml.runs.run_model_on_task(clf, task)
 print(run)
