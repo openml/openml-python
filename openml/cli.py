@@ -110,7 +110,7 @@ def configure_server(value: str) -> None:
         if server == "test":
             return "https://test.openml.org/api/v1/xml"
         if server == "production":
-            return "https://api.openml.org/api/v1/xml"
+            return "https://www.openml.org/api/v1/xml"
         return server
 
     configure_field(

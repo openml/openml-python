@@ -148,7 +148,7 @@ def _resolve_default_cache_dir() -> Path:
 
 _defaults: _Config = {
     "apikey": "",
-    "server": "https://api.openml.org/api/v1/xml",
+    "server": "https://www.openml.org/api/v1/xml",
     "cachedir": _resolve_default_cache_dir(),
     "avoid_duplicate_runs": True,
     "retry_policy": "human",
