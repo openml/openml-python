@@ -32,11 +32,9 @@ jobs:
           pip install -e .[docs,examples]
       - name: Make docs
         run: |
-          cd docs
           mkdocs build
       - name: Check links
         run: |
-          cd docs
           mkdocs-linkcheck
       - name: Deploy to GitHub Pages
         if: (contains(github.ref, 'develop') || contains(github.ref, 'main')) && github.event_name == 'push'
