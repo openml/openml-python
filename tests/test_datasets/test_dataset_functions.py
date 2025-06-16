@@ -409,7 +409,7 @@ class TestOpenMLDataset(TestBase):
 
     def test__get_dataset_parquet_file_does_not_exist(self):
         description = {
-            "oml:parquet_url": "http://data.openml..org/dataset20/does_not_exist.pq",
+            "oml:parquet_url": "http://data.openml.org/dataset20/does_not_exist.pq",
             "oml:id": "20",
         }
         path = _get_dataset_parquet(description, cache_directory=self.workdir)
