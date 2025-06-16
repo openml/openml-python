@@ -181,8 +181,18 @@ num_cols = list(set(X.columns) - set(cat_cols))
 num_imputer = SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=-1)
 
 # Creating the one-hot encoder for numerical representation of categorical columns
-enc = OneHotEncoder(handle_unknown="ignore")
-
+enc = Pipeline(
+    [
+        (
+            "cat_si",
+            SimpleImputer(
+                strategy="constant",
+                fill_value="missing",
+            ),
+        ),
+        ("cat_ohe", OneHotEncoder(handle_unknown="ignore")),
+    ],
+)
 # Combining column transformers
 ct = ColumnTransformer([("cat", enc, cat_cols), ("num", num_imputer, num_cols)])
 

@@ -51,6 +51,7 @@ evaluations = openml.evaluations.list_evaluations(
     size=None,
     flows=flow_ids,
     study=study_id,
+    output_format="dataframe",
 )
 # gives us a table with columns data_id, flow1_value, flow2_value
 evaluations = evaluations.pivot(index="data_id", columns="flow_id", values="value").dropna()
