@@ -106,13 +106,19 @@ for idx, task_id in enumerate(suite.tasks):
         size=limit_per_task,
     )
 
-
+    performance_column = "value"
+    # make a DataFrame consisting of all hyperparameters (which is a dict in setup['parameters']) and the performance
+    # value (in setup['value']). The following line looks a bit complicated, but combines 2 tasks: a) combine
+    # hyperparameters and performance data in a single dict, b) cast hyperparameter values to the appropriate format
+    # Note that the ``json.loads(...)`` requires the content to be in JSON format, which is only the case for
+    # scikit-learn setups (and even there some legacy setups might violate this requirement). It will work for the
+    # setups that belong to the flows embedded in this example though.
     try:
         setups_evals = pd.DataFrame(
             [
                 dict(
                     **{name: json.loads(value) for name, value in setup["parameters"].items()},
-                    **{performance_column: setup[performance_column]}
+                    **{performance_column: setup[performance_column]},
                 )
                 for _, setup in evals.iterrows()
             ]
@@ -152,7 +158,9 @@ for idx, task_id in enumerate(suite.tasks):
             fanova_results.append(
                 {
                     "hyperparameter": pname.split(".")[-1],
-                    "fanova": evaluator.quantify_importance([idx])[(idx,)]["individual importance"],
+                    "fanova": evaluator.quantify_importance([idx])[(idx,)][
+                        "individual importance"
+                    ],
                 }
             )
         except RuntimeError as e:
