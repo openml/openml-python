@@ -181,15 +181,24 @@ following rules before you submit a pull request:
 However it is also possible to use the [openml-python docker image](https://github.com/openml/openml-python/blob/main/docker/readme.md) for testing and building documentation.
 This can be useful for one-off contributions or when you are experiencing installation issues.
 
-First install openml with its test dependencies by running
-  ```bash
-  $ pip install -e .[test]
-  ```
+First install Python 3.8 or higher, pip, and git.
+Then clone the repository:
+```bash
+pip install uv # Install uv via pip (or see https://docs.astral.sh/uv/getting-started/installation/)
+uv venv --seed --python 3.8 ~/.venvs/openml-python
+source ~/.venvs/openml-python/bin/activate
+pip install uv # Install uv within the virtual environment
+```
+
+Then install openml with its test dependencies by running
+```bash
+uv pip install -e .[test]
+```
 from the repository folder.
 Then configure pre-commit through
- ```bash
- $ pre-commit install
- ```
+```bash
+pre-commit install
+```
 This will install dependencies to run unit tests, as well as [pre-commit](https://pre-commit.com/).
 To run the unit tests, and check their code coverage, run:
   ```bash
@@ -247,7 +256,7 @@ information.
 
 For building the documentation, you will need to install a few additional dependencies:
 ```bash
-$ pip install -e .[examples,docs]
+$ uv pip install -e .[examples,docs]
 ```
 When dependencies are installed, run
 ```bash
