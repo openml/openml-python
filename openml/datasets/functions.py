@@ -73,7 +73,7 @@ def list_qualities() -> list[str]:
         raise ValueError('Error in return XML, does not contain "oml:data_qualities_list"')
 
     if not isinstance(qualities["oml:data_qualities_list"]["oml:quality"], list):
-        raise TypeError("Error in return XML, does not contain " '"oml:quality" as a list')
+        raise TypeError('Error in return XML, does not contain "oml:quality" as a list')
 
     return qualities["oml:data_qualities_list"]["oml:quality"]
 
@@ -179,7 +179,12 @@ def _list_datasets(
     -------
     datasets : dataframe
     """
-    api_call = f"data/list/limit/{limit}/offset/{offset}"
+    api_call = "data/list"
+
+    if limit is not None:
+        api_call += f"/limit/{limit}"
+    if offset is not None:
+        api_call += f"/offset/{offset}"
 
     if kwargs is not None:
         for operator, value in kwargs.items():

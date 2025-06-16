@@ -250,8 +250,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
         if isinstance(flow.flow_id, int) and flow_id != flow.flow_id:
             if flow_id is not False:
                 raise PyOpenMLError(
-                    "Local flow_id does not match server flow_id: "
-                    f"'{flow.flow_id}' vs '{flow_id}'",
+                    f"Local flow_id does not match server flow_id: '{flow.flow_id}' vs '{flow_id}'",
                 )
             raise PyOpenMLError(
                 "Flow does not exist on the server, but 'flow.flow_id' is not None."
@@ -283,8 +282,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
 
     if flow.extension.check_if_model_fitted(flow.model):
         warnings.warn(
-            "The model is already fitted!"
-            " This might cause inconsistency in comparison of results.",
+            "The model is already fitted! This might cause inconsistency in comparison of results.",
             RuntimeWarning,
             stacklevel=2,
         )
@@ -860,7 +858,7 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
         if not from_server:
             return None
 
-        raise AttributeError("Run XML does not contain required (server) " "field: ", fieldname)
+        raise AttributeError("Run XML does not contain required (server) field: ", fieldname)
 
     run = xmltodict.parse(xml, force_list=["oml:file", "oml:evaluation", "oml:parameter_setting"])[
         "oml:run"
@@ -920,7 +918,7 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
     sample_evaluations: dict[str, dict[int, dict[int, dict[int, float | Any]]]] = {}
     if "oml:output_data" not in run:
         if from_server:
-            raise ValueError("Run does not contain output_data " "(OpenML server error?)")
+            raise ValueError("Run does not contain output_data (OpenML server error?)")
         predictions_url = None
     else:
         output_data = run["oml:output_data"]
@@ -972,7 +970,7 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
                     evaluations[key] = value
 
     if "description" not in files and from_server is True:
-        raise ValueError("No description file for run %d in run " "description XML" % run_id)
+        raise ValueError("No description file for run %d in run description XML" % run_id)
 
     if "predictions" not in files and from_server is True:
         task = openml.tasks.get_task(task_id)
@@ -1100,7 +1098,7 @@ def list_runs(  # noqa: PLR0913
     return pd.concat(batches)
 
 
-def _list_runs(  # noqa: PLR0913
+def _list_runs(  # noqa: PLR0913, C901
     limit: int,
     offset: int,
     *,
@@ -1150,7 +1148,11 @@ def _list_runs(  # noqa: PLR0913
     dict, or dataframe
         List of found runs.
     """
-    api_call = f"run/list/limit/{limit}/offset/{offset}"
+    api_call = "run/list"
+    if limit is not None:
+        api_call += f"/limit/{limit}"
+    if offset is not None:
+        api_call += f"/offset/{offset}"
     if id is not None:
         api_call += "/run/{}".format(",".join([str(int(i)) for i in id]))
     if task is not None:

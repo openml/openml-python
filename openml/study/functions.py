@@ -298,7 +298,7 @@ def update_study_status(study_id: int, status: str) -> None:
     """
     legal_status = {"active", "deactivated"}
     if status not in legal_status:
-        raise ValueError("Illegal status value. " f"Legal values: {legal_status}")
+        raise ValueError(f"Illegal status value. Legal values: {legal_status}")
     data = {"study_id": study_id, "status": status}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call("study/status/update", "post", data=data)
     result = xmltodict.parse(result_xml)
@@ -548,10 +548,15 @@ def _list_studies(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
     -------
     studies : dataframe
     """
-    api_call = f"study/list/limit/{limit}/offset/{offset}"
+    api_call = "study/list"
+    if limit is not None:
+        api_call += f"/limit/{limit}"
+    if offset is not None:
+        api_call += f"/offset/{offset}"
     if kwargs is not None:
         for operator, value in kwargs.items():
-            api_call += f"/{operator}/{value}"
+            if value is not None:
+                api_call += f"/{operator}/{value}"
     return __list_studies(api_call=api_call)
 
 

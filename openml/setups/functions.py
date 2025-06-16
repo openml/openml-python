@@ -192,7 +192,7 @@ def _list_setups(
     filters which are put into the kwargs.
 
     limit : int
-    listing_offset : int
+    offset : int
     setup : list(int), optional
     flow : int, optional
     tag : str, optional
@@ -201,7 +201,11 @@ def _list_setups(
     -------
     The setups that match the filters, going from id to the OpenMLSetup object.
     """
-    api_call = f"setup/list/offset/{offset}/limit/{limit}"
+    api_call = "setup/list"
+    if limit is not None:
+        api_call += f"/limit/{limit}"
+    if offset is not None:
+        api_call += f"/offset/{offset}"
     if setup is not None:
         api_call += "/setup/{}".format(",".join([str(int(i)) for i in setup]))
     if flow is not None:
@@ -220,12 +224,12 @@ def __list_setups(api_call: str) -> list[OpenMLSetup]:
     # Minimalistic check if the XML is useful
     if "oml:setups" not in setups_dict:
         raise ValueError(
-            'Error in return XML, does not contain "oml:setups":' f" {setups_dict!s}",
+            f'Error in return XML, does not contain "oml:setups": {setups_dict!s}',
         )
 
     if "@xmlns:oml" not in setups_dict["oml:setups"]:
         raise ValueError(
-            "Error in return XML, does not contain " f'"oml:setups"/@xmlns:oml: {setups_dict!s}',
+            f'Error in return XML, does not contain "oml:setups"/@xmlns:oml: {setups_dict!s}',
         )
 
     if setups_dict["oml:setups"]["@xmlns:oml"] != openml_uri:

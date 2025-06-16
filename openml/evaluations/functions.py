@@ -194,7 +194,11 @@ def _list_evaluations(  # noqa: C901
     -------
     list of OpenMLEvaluation objects
     """
-    api_call = f"evaluation/list/function/{function}/limit/{limit}/offset/{offset}"
+    api_call = f"evaluation/list/function/{function}"
+    if limit is not None:
+        api_call += f"/limit/{limit}"
+    if offset is not None:
+        api_call += f"/offset/{offset}"
     if kwargs is not None:
         for operator, value in kwargs.items():
             if value is not None:

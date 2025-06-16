@@ -271,10 +271,11 @@ def _list_all(  # noqa: C901
     page = 0
     results: list[_SizedT] = []
 
-    LIMIT = limit
-    BATCH_SIZE_ORIG = batch_size
     offset = offset if offset is not None else 0
     batch_size = batch_size if batch_size is not None else 10_000
+
+    LIMIT = limit
+    BATCH_SIZE_ORIG = batch_size
 
     # Default batch size per paging.
     # This one can be set in filters (batch_size), but should not be

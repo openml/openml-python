@@ -3,9 +3,7 @@ from __future__ import annotations
 import os
 import unittest.mock
 import pytest
-import shutil
 import openml
-from itertools import chain
 from openml.testing import _check_dataset
 
 
@@ -35,7 +33,7 @@ def min_number_setups_on_test_server() -> int:
 
 @pytest.fixture()
 def min_number_runs_on_test_server() -> int:
-    """After a reset at least 50 runs are on the test server"""
+    """After a reset at least 21 runs are on the test server"""
     return 21
 
 
@@ -71,14 +69,12 @@ def test_list_all_with_multiple_batches(min_number_tasks_on_test_server):
         batch_size=batch_size,
     )
     assert len(batches) >= 2
-    flattened = list(chain(*batches))
-    assert min_number_tasks_on_test_server <= len(flattened)
+    assert min_number_tasks_on_test_server <= sum(len(batch) for batch in batches)
 
 
 @pytest.mark.server()
 def test_list_all_for_datasets(min_number_datasets_on_test_server):
     datasets = openml.datasets.list_datasets(
-        batch_size=100,
         size=min_number_datasets_on_test_server,
     )
 
@@ -104,7 +100,7 @@ def test_list_all_for_setups(min_number_setups_on_test_server):
 @pytest.mark.server()
 @pytest.mark.flaky()  # Other tests might need to upload runs first
 def test_list_all_for_runs(min_number_runs_on_test_server):
-    runs = openml.runs.list_runs(batch_size=25, size=min_number_runs_on_test_server)
+    runs = openml.runs.list_runs(size=min_number_runs_on_test_server)
     assert min_number_runs_on_test_server == len(runs)
 
 

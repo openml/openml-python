@@ -176,7 +176,6 @@ def list_tasks(  # noqa: PLR0913
     """
     listing_call = partial(
         _list_tasks,
-        size=size,
         task_type=task_type,
         tag=tag,
         data_tag=data_tag,
@@ -222,7 +221,11 @@ def _list_tasks(
     -------
     dataframe
     """
-    api_call = f"task/list/limit/{limit}/offset/{offset}"
+    api_call = "task/list"
+    if limit is not None:
+        api_call += f"/limit/{limit}"
+    if offset is not None:
+        api_call += f"/offset/{offset}"
     if task_type is not None:
         tvalue = task_type.value if isinstance(task_type, TaskType) else task_type
         api_call += f"/type/{tvalue}"

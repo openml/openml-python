@@ -66,7 +66,7 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
             return _create_flow_from_xml(fh.read())
     except OSError as e:
         openml.utils._remove_cache_dir_for_id(FLOWS_CACHE_DIR_NAME, fid_cache_dir)
-        raise OpenMLCacheException("Flow file for fid %d not " "cached" % fid) from e
+        raise OpenMLCacheException("Flow file for fid %d not cached" % fid) from e
 
 
 @openml.utils.thread_safe_if_oslo_installed
@@ -190,11 +190,17 @@ def _list_flows(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
     -------
     flows : dataframe
     """
-    api_call = f"flow/list/limit/{limit}/offset/{offset}"
+    api_call = "flow/list"
+
+    if limit is not None:
+        api_call += f"/limit/{limit}"
+    if offset is not None:
+        api_call += f"/offset/{offset}"
 
     if kwargs is not None:
         for operator, value in kwargs.items():
-            api_call += f"/{operator}/{value}"
+            if value is not None:
+                api_call += f"/{operator}/{value}"
 
     return __list_flows(api_call=api_call)
 
@@ -417,11 +423,11 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
             for name in set(attr1.keys()).union(attr2.keys()):
                 if name not in attr1:
                     raise ValueError(
-                        f"Component {name} only available in " "argument2, but not in argument1.",
+                        f"Component {name} only available in argument2, but not in argument1.",
                     )
                 if name not in attr2:
                     raise ValueError(
-                        f"Component {name} only available in " "argument2, but not in argument1.",
+                        f"Component {name} only available in argument2, but not in argument1.",
                     )
                 assert_flows_equal(
                     attr1[name],
@@ -482,7 +488,7 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
                 params2 = set(flow2.parameters_meta_info)
                 if params1 != params2:
                     raise ValueError(
-                        "Parameter list in meta info for parameters differ " "in the two flows.",
+                        "Parameter list in meta info for parameters differ in the two flows.",
                     )
                 # iterating over the parameter's meta info list
                 for param in params1:
