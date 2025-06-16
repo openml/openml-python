@@ -205,16 +205,41 @@ class TestRun(TestBase):
             openml.runs.OpenMLRun.from_filesystem(cache_path)
 
     @staticmethod
+    def _cat_col_selector(X):
+        return X.select_dtypes(include=["object", "category"]).columns
+
+    @staticmethod
     def _get_models_tasks_for_tests():
+        from sklearn.compose import ColumnTransformer
+        from sklearn.preprocessing import OrdinalEncoder
+
+        basic_preprocessing = [
+            (
+                "cat_handling",
+                ColumnTransformer(
+                    transformers=[
+                        (
+                            "cat",
+                            OrdinalEncoder(
+                                handle_unknown="use_encoded_value", unknown_value=np.nan
+                            ),
+                            TestRun._cat_col_selector,
+                        )
+                    ],
+                    remainder="passthrough",
+                ),
+            ),
+            ("imp", SimpleImputer()),
+        ]
         model_clf = Pipeline(
             [
-                ("imputer", SimpleImputer(strategy="mean")),
+                *basic_preprocessing,
                 ("classifier", DummyClassifier(strategy="prior")),
             ],
         )
         model_reg = Pipeline(
             [
-                ("imputer", SimpleImputer(strategy="mean")),
+                *basic_preprocessing,
                 (
                     "regressor",
                     # LR because dummy does not produce enough float-like values
@@ -263,9 +288,8 @@ class TestRun(TestBase):
 
             assert_method = np.testing.assert_array_almost_equal
             if task.task_type == "Supervised Classification":
-                y_pred = np.take(task.class_labels, y_pred)
-                y_test = np.take(task.class_labels, y_test)
                 assert_method = np.testing.assert_array_equal
+            y_test = y_test.values
 
             # Assert correctness
             assert_method(y_pred, saved_y_pred)

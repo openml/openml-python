@@ -26,9 +26,10 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, Stratified
 from sklearn.model_selection._search import BaseSearchCV
 from sklearn.naive_bayes import GaussianNB
 from sklearn.pipeline import Pipeline, make_pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, OrdinalEncoder
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.compose import ColumnTransformer
 
 import openml
 import openml._api_calls
@@ -130,9 +131,9 @@ class TestRun(TestBase):
                 time.sleep(10)
                 continue
 
-            assert (
-                len(run.evaluations) > 0
-            ), "Expect not-None evaluations to always contain elements."
+            assert len(run.evaluations) > 0, (
+                "Expect not-None evaluations to always contain elements."
+            )
             return
 
         raise RuntimeError(
@@ -306,7 +307,7 @@ class TestRun(TestBase):
             flow_server = self.extension.model_to_flow(clf_server)
 
             if flow.class_name not in classes_without_random_state:
-                error_msg = "Flow class %s (id=%d) does not have a random " "state parameter" % (
+                error_msg = "Flow class %s (id=%d) does not have a random state parameter" % (
                     flow.class_name,
                     flow.flow_id,
                 )
@@ -479,7 +480,7 @@ class TestRun(TestBase):
                     grid_iterations += determine_grid_size(sub_grid)
                 return grid_iterations
             else:
-                raise TypeError("Param Grid should be of type list " "(GridSearch only) or dict")
+                raise TypeError("Param Grid should be of type list (GridSearch only) or dict")
 
         run = self._perform_run(
             task_id,
@@ -1286,7 +1287,7 @@ class TestRun(TestBase):
         flow_new = self.extension.model_to_flow(clf)
 
         flow_new.flow_id = -1
-        expected_message_regex = "Local flow_id does not match server flow_id: " "'-1' vs '[0-9]+'"
+        expected_message_regex = "Local flow_id does not match server flow_id: '-1' vs '[0-9]+'"
         with pytest.raises(openml.exceptions.PyOpenMLError, match=expected_message_regex):
             openml.runs.run_flow_on_task(
                 task=task,
@@ -1326,7 +1327,7 @@ class TestRun(TestBase):
         run.to_filesystem(cache_path)
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 
-        expected_message_regex = "Local flow_id does not match server flow_id: " "'-1' vs '[0-9]+'"
+        expected_message_regex = "Local flow_id does not match server flow_id: '-1' vs '[0-9]+'"
         self.assertRaisesRegex(
             openml.exceptions.PyOpenMLError,
             expected_message_regex,
@@ -1827,14 +1828,33 @@ class TestRun(TestBase):
             (1, "sequential", 40),
         ]:
             clf = sklearn.model_selection.RandomizedSearchCV(
-                estimator=sklearn.ensemble.RandomForestClassifier(n_estimators=5),
+                estimator=sklearn.pipeline.Pipeline(
+                    [
+                        (
+                            "cat_handling",
+                            ColumnTransformer(
+                                transformers=[
+                                    (
+                                        "cat",
+                                        OrdinalEncoder(
+                                            handle_unknown="use_encoded_value", unknown_value=-1
+                                        ),
+                                        x.select_dtypes(include=["object", "category"]).columns,
+                                    )
+                                ],
+                                remainder="passthrough",
+                            ),
+                        ),
+                        ("clf", sklearn.ensemble.RandomForestClassifier(n_estimators=5)),
+                    ]
+                ),
                 param_distributions={
-                    "max_depth": [3, None],
-                    "max_features": [1, 2, 3, 4],
-                    "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
-                    "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                    "bootstrap": [True, False],
-                    "criterion": ["gini", "entropy"],
+                    "clf__max_depth": [3, None],
+                    "clf__max_features": [1, 2, 3, 4],
+                    "clf__min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    "clf__min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    "clf__bootstrap": [True, False],
+                    "clf__criterion": ["gini", "entropy"],
                 },
                 random_state=1,
                 cv=sklearn.model_selection.StratifiedKFold(
@@ -1851,7 +1871,6 @@ class TestRun(TestBase):
                     model=clf,
                     task=task,
                     add_local_measures=True,
-                    # dataset_format="array",  # "dataframe" would require handling of categoricals
                     n_jobs=n_jobs,
                 )
             assert type(res[0]) == list

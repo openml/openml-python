@@ -61,27 +61,31 @@ class Model(sklearn.base.BaseEstimator):
     def fit(self, X, y):
         pass
 
+
+def _cat_col_selector(X):
+    return X.select_dtypes(include=["object", "category"]).columns
+
+
 def _get_sklearn_preprocessing():
-    from sklearn.compose import ColumnTransformer, make_column_selector
+    from sklearn.compose import ColumnTransformer
     from sklearn.preprocessing import OrdinalEncoder
 
     return [
-            (
-                "cat_handling",
-                ColumnTransformer(
-                    transformers=[
-                        (
-                            "cat",
-                            OrdinalEncoder(
-                                handle_unknown="use_encoded_value", unknown_value=np.nan
-                            ),
-                            make_column_selector(dtype_include=["object", "category"]),
-                        )
-                    ],
-                    remainder="passthrough",
-                ),
+        (
+            "cat_handling",
+            ColumnTransformer(
+                transformers=[
+                    (
+                        "cat",
+                        OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=np.nan),
+                        _cat_col_selector,
+                    )
+                ],
+                remainder="passthrough",
             ),
-            ("imp", SimpleImputer())]
+        ),
+        ("imp", SimpleImputer()),
+    ]
 
 
 class TestSklearnExtensionFlowFunctions(TestBase):
@@ -1904,7 +1908,10 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
         pipeline = sklearn.model_selection.GridSearchCV(
             sklearn.pipeline.Pipeline(
-                steps=[*_get_sklearn_preprocessing(), ("clf", sklearn.tree.DecisionTreeClassifier())],
+                steps=[
+                    *_get_sklearn_preprocessing(),
+                    ("clf", sklearn.tree.DecisionTreeClassifier()),
+                ],
             ),
             {"clf__max_depth": [1, 2]},
         )
