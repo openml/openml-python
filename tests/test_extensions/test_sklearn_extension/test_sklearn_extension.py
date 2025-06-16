@@ -68,7 +68,6 @@ def _cat_col_selector(X):
 
 def _get_sklearn_preprocessing():
     from sklearn.compose import ColumnTransformer
-    from sklearn.preprocessing import OrdinalEncoder
 
     return [
         (
@@ -77,7 +76,7 @@ def _get_sklearn_preprocessing():
                 transformers=[
                     (
                         "cat",
-                        OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=np.nan),
+                        OneHotEncoder(handle_unknown="ignore"),
                         _cat_col_selector,
                     )
                 ],

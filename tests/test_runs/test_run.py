@@ -211,7 +211,7 @@ class TestRun(TestBase):
     @staticmethod
     def _get_models_tasks_for_tests():
         from sklearn.compose import ColumnTransformer
-        from sklearn.preprocessing import OrdinalEncoder
+        from sklearn.preprocessing import OneHotEncoder
 
         basic_preprocessing = [
             (
@@ -220,9 +220,7 @@ class TestRun(TestBase):
                     transformers=[
                         (
                             "cat",
-                            OrdinalEncoder(
-                                handle_unknown="use_encoded_value", unknown_value=np.nan
-                            ),
+                            OneHotEncoder(handle_unknown="ignore"),
                             TestRun._cat_col_selector,
                         )
                     ],

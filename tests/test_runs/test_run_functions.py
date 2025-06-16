@@ -26,7 +26,7 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, Stratified
 from sklearn.model_selection._search import BaseSearchCV
 from sklearn.naive_bayes import GaussianNB
 from sklearn.pipeline import Pipeline, make_pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler, OrdinalEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.compose import ColumnTransformer
@@ -1766,9 +1766,7 @@ class TestRun(TestBase):
                         transformers=[
                             (
                                 "cat",
-                                OrdinalEncoder(
-                                    handle_unknown="use_encoded_value", unknown_value=-1
-                                ),
+                                OneHotEncoder(handle_unknown="ignore"),
                                 x.select_dtypes(include=["object", "category"]).columns,
                             )
                         ],
@@ -1854,9 +1852,7 @@ class TestRun(TestBase):
                                 transformers=[
                                     (
                                         "cat",
-                                        OrdinalEncoder(
-                                            handle_unknown="use_encoded_value", unknown_value=-1
-                                        ),
+                                        OneHotEncoder(handle_unknown="ignore"),
                                         x.select_dtypes(include=["object", "category"]).columns,
                                     )
                                 ],
