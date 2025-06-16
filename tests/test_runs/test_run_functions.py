@@ -272,7 +272,7 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(task_id)
 
         X, y = task.get_X_and_y()
-        assert np.count_nonzero(np.isnan(X)) == n_missing_vals
+        assert X.isna().sum().sum() == n_missing_vals
         run = openml.runs.run_flow_on_task(
             flow=flow,
             task=task,
@@ -401,7 +401,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     def test_run_regression_on_classif_task(self):
-        task_id = 115  # diabetes; crossvalidation
+        task_id = 259  # collins; crossvalidation; has numeric targets
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
@@ -1758,7 +1758,26 @@ class TestRun(TestBase):
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
         loss = "log" if Version(sklearn.__version__) < Version("1.3") else "log_loss"
-        clf = SGDClassifier(loss=loss, random_state=1)
+        clf = sklearn.pipeline.Pipeline(
+            [
+                (
+                    "cat_handling",
+                    ColumnTransformer(
+                        transformers=[
+                            (
+                                "cat",
+                                OrdinalEncoder(
+                                    handle_unknown="use_encoded_value", unknown_value=-1
+                                ),
+                                x.select_dtypes(include=["object", "category"]).columns,
+                            )
+                        ],
+                        remainder="passthrough",
+                    ),
+                ),
+                ("clf", SGDClassifier(loss=loss, random_state=1)),
+            ]
+        )
         n_jobs = 2
         backend = "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"
         with parallel_backend(backend, n_jobs=n_jobs):
@@ -1767,7 +1786,6 @@ class TestRun(TestBase):
                 model=clf,
                 task=task,
                 add_local_measures=True,
-                # dataset_format="array",  # "dataframe" would require handling of categoricals
                 n_jobs=n_jobs,
             )
         # This unit test will fail if joblib is unable to distribute successfully since the
@@ -1784,16 +1802,16 @@ class TestRun(TestBase):
         assert len(res[2]) == 7
         assert len(res[3]) == 7
         expected_scores = [
-            0.965625,
             0.94375,
-            0.946875,
-            0.953125,
+            0.95625,
+            0.959375,
             0.96875,
-            0.965625,
-            0.9435736677115988,
+            0.96875,
+            0.96875,
             0.9467084639498433,
-            0.9749216300940439,
-            0.9655172413793104,
+            0.9373040752351097,
+            0.9561128526645768,
+            0.9467084639498433
         ]
         scores = [v for k, v in res[2]["predictive_accuracy"][0].items()]
         np.testing.assert_array_almost_equal(

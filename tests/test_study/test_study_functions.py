@@ -183,20 +183,21 @@ class TestStudyFunctions(TestBase):
         self.assertSetEqual(set(study_downloaded.tasks), set(fixt_task_ids))
 
         # test whether the list run function also handles study data fine
-        run_ids = openml.runs.list_runs(study=study.id)
-        self.assertSetEqual(set(run_ids), set(study_downloaded.runs))
+        run_ids = openml.runs.list_runs(study=study.id) # returns DF
+        self.assertSetEqual(set(run_ids["run_id"]), set(study_downloaded.runs))
 
         # test whether the list evaluation function also handles study data fine
-        run_ids = openml.evaluations.list_evaluations(
+        run_ids = openml.evaluations.list_evaluations( # returns list of objects
             "predictive_accuracy",
             size=None,
             study=study.id,
+            output_format="object", # making the default explicit
         )
         self.assertSetEqual(set(run_ids), set(study_downloaded.runs))
 
         # attach more runs, since we fetch 11 here, at least one is non-overlapping
         run_list_additional = openml.runs.list_runs(size=11, offset=10)
-        run_list_additional = set(run_list_additional) - set(run_ids)
+        run_list_additional = set(run_list_additional["run_id"]) - set(run_ids)
         openml.study.attach_to_study(study.id, list(run_list_additional))
         study_downloaded = openml.study.get_study(study.id)
         # verify again
@@ -227,7 +228,7 @@ class TestStudyFunctions(TestBase):
             benchmark_suite=None,
             name="study with illegal runs",
             description="none",
-            run_ids=list(run_list.keys()),
+            run_ids=list(run_list["run_id"]),
         )
         study.publish()
         TestBase._mark_entity_for_removal("study", study.id)
@@ -246,7 +247,7 @@ class TestStudyFunctions(TestBase):
             match="Problem attaching entities.",
         ):
             # some runs already attached
-            openml.study.attach_to_study(study.id, list(run_list_more.keys()))
+            openml.study.attach_to_study(study.id, list(run_list_more["run_id"]))
         study_downloaded = openml.study.get_study(study.id)
         self.assertListEqual(study_original.runs, study_downloaded.runs)
 
