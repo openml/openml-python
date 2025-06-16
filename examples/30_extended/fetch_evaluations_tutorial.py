@@ -60,7 +60,9 @@ print(task)
 # Note that we now filter the evaluations based on another parameter 'task'.
 
 metric = "predictive_accuracy"
-evals = openml.evaluations.list_evaluations(function=metric, tasks=[task_id])
+evals = openml.evaluations.list_evaluations(
+    function=metric, tasks=[task_id], output_format="dataframe"
+)
 # Displaying the first 10 rows
 print(evals.head(n=10))
 # Sorting the evaluations in decreasing order of the metric chosen
@@ -158,7 +160,10 @@ for i in range(top_n):
 # List evaluations in descending order based on predictive_accuracy with
 # hyperparameters
 evals_setups = openml.evaluations.list_evaluations_setups(
-    function="predictive_accuracy", tasks=[31], size=100, sort_order="desc"
+    function="predictive_accuracy",
+    tasks=[31],
+    size=100,
+    sort_order="desc",
 )
 
 ""
