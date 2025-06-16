@@ -93,6 +93,7 @@ from sklearn import neighbors
 # Uncomment and set your OpenML cache directory
 # import os
 # openml.config.cache_directory = os.path.expanduser('YOURDIR')
+openml.config.set_root_cache_directory("YOURDIR")
 
 # %% [markdown]
 # # Simple Example
