@@ -32,7 +32,7 @@ jobs:
           pip install -e .[docs,examples]
       - name: Make docs
         run: |
-          cd doc
+          cd docs
           mkdocs build
       - name: Check links
         run: |
