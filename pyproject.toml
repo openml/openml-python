@@ -87,9 +87,7 @@ examples=[
     "seaborn",
 ]
 docs=[
-    "sphinx>=3",
-    "sphinx-gallery",
-    "sphinx_bootstrap_theme",
+    "mkdocs",
     "numpydoc",
     "mkdocs-material",
     "mkdocs-autorefs",
@@ -98,6 +96,7 @@ docs=[
     "mkdocs-literate-nav",
     "mkdocs-section-index",
     "mkdocs-jupyter",
+    "mkdocs-linkcheck"
 ]
 
 [project.urls]
