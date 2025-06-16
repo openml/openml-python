@@ -61,6 +61,28 @@ class Model(sklearn.base.BaseEstimator):
     def fit(self, X, y):
         pass
 
+def _get_sklearn_preprocessing():
+    from sklearn.compose import ColumnTransformer, make_column_selector
+    from sklearn.preprocessing import OrdinalEncoder
+
+    return [
+            (
+                "cat_handling",
+                ColumnTransformer(
+                    transformers=[
+                        (
+                            "cat",
+                            OrdinalEncoder(
+                                handle_unknown="use_encoded_value", unknown_value=np.nan
+                            ),
+                            make_column_selector(dtype_include=["object", "category"]),
+                        )
+                    ],
+                    remainder="passthrough",
+                ),
+            ),
+            ("imp", SimpleImputer())]
+
 
 class TestSklearnExtensionFlowFunctions(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take less
@@ -735,7 +757,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         )
         fixture_structure = {
             fixture_name: [],
-            f"sklearn.preprocessing.{module_name_encoder}." "OneHotEncoder": ["ohe"],
+            f"sklearn.preprocessing.{module_name_encoder}.OneHotEncoder": ["ohe"],
             f"sklearn.preprocessing.{scaler_name}.StandardScaler": ["scaler"],
         }
         assert serialization.name == fixture_name
@@ -862,13 +884,13 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             weight_name,
             tree_name,
         )
-        pipeline_name = "sklearn.pipeline.Pipeline(ohe={},scaler={}," "boosting={})".format(
+        pipeline_name = "sklearn.pipeline.Pipeline(ohe={},scaler={},boosting={})".format(
             ohe_name,
             scaler_name,
             boosting_name,
         )
         fixture_name = (
-            "sklearn.model_selection._search.RandomizedSearchCV" "(estimator=%s)" % pipeline_name
+            "sklearn.model_selection._search.RandomizedSearchCV(estimator=%s)" % pipeline_name
         )
         fixture_structure = {
             ohe_name: ["estimator", "ohe"],
@@ -1235,7 +1257,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
 
         fu = sklearn.pipeline.FeatureUnion((("pca1", pca), ("pca2", pca2)))
         fixture = (
-            "Found a second occurence of component .*.PCA when trying " "to serialize FeatureUnion"
+            "Found a second occurence of component .*.PCA when trying to serialize FeatureUnion"
         )
         with pytest.raises(ValueError, match=fixture):
             self.extension.model_to_flow(fu)
@@ -1737,13 +1759,13 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
         X, y = task.get_X_and_y()
         train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0)
-        X_train = X[train_indices]
-        y_train = y[train_indices]
-        X_test = X[test_indices]
-        y_test = y[test_indices]
+        X_train = X.iloc[train_indices]
+        y_train = y.iloc[train_indices]
+        X_test = X.iloc[test_indices]
+        y_test = y.iloc[test_indices]
 
         pipeline = sklearn.pipeline.Pipeline(
-            steps=[("imp", SimpleImputer()), ("clf", sklearn.tree.DecisionTreeClassifier())],
+            steps=[*_get_sklearn_preprocessing(), ("clf", sklearn.tree.DecisionTreeClassifier())],
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
@@ -1875,14 +1897,16 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
         X, y = task.get_X_and_y()
         train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0)
-        X_train = X[train_indices]
-        y_train = y[train_indices]
-        X_test = X[test_indices]
-        y_test = y[test_indices]
+        X_train = X.iloc[train_indices]
+        y_train = y.iloc[train_indices]
+        X_test = X.iloc[test_indices]
+        y_test = y.iloc[test_indices]
 
         pipeline = sklearn.model_selection.GridSearchCV(
-            sklearn.tree.DecisionTreeClassifier(),
-            {"max_depth": [1, 2]},
+            sklearn.pipeline.Pipeline(
+                steps=[*_get_sklearn_preprocessing(), ("clf", sklearn.tree.DecisionTreeClassifier())],
+            ),
+            {"clf__max_depth": [1, 2]},
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
@@ -1931,7 +1955,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             # class for testing a naive bayes classifier that does not allow soft
             # predictions
             def predict_proba(*args, **kwargs):
-                raise AttributeError("predict_proba is not available when " "probability=False")
+                raise AttributeError("predict_proba is not available when probability=False")
 
         # task 1 (test server) is important: it is a task with an unused class
         tasks = [
@@ -1950,17 +1974,17 @@ class TestSklearnExtensionRunFunctions(TestBase):
                 fold=0,
                 sample=0,
             )
-            X_train = X[train_indices]
-            y_train = y[train_indices]
-            X_test = X[test_indices]
+            X_train = X.iloc[train_indices]
+            y_train = y.iloc[train_indices]
+            X_test = X.iloc[test_indices]
             clf1 = sklearn.pipeline.Pipeline(
                 steps=[
-                    ("imputer", SimpleImputer()),
+                    *_get_sklearn_preprocessing(),
                     ("estimator", sklearn.naive_bayes.GaussianNB()),
                 ],
             )
             clf2 = sklearn.pipeline.Pipeline(
-                steps=[("imputer", SimpleImputer()), ("estimator", HardNaiveBayes())],
+                steps=[*_get_sklearn_preprocessing(), ("estimator", HardNaiveBayes())],
             )
 
             pred_1, proba_1, _, _ = self.extension._run_model_on_fold(
@@ -2005,10 +2029,10 @@ class TestSklearnExtensionRunFunctions(TestBase):
 
         X, y = task.get_X_and_y()
         train_indices, test_indices = task.get_train_test_split_indices(repeat=0, fold=0, sample=0)
-        X_train = X[train_indices]
-        y_train = y[train_indices]
-        X_test = X[test_indices]
-        y_test = y[test_indices]
+        X_train = X.iloc[train_indices]
+        y_train = y.iloc[train_indices]
+        X_test = X.iloc[test_indices]
+        y_test = y.iloc[test_indices]
 
         pipeline = sklearn.pipeline.Pipeline(
             steps=[("imp", SimpleImputer()), ("clf", sklearn.tree.DecisionTreeRegressor())],
@@ -2059,7 +2083,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         X = task.get_X()
 
         pipeline = sklearn.pipeline.Pipeline(
-            steps=[("imp", SimpleImputer()), ("clf", sklearn.cluster.KMeans())],
+            steps=[*_get_sklearn_preprocessing(), ("clf", sklearn.cluster.KMeans())],
         )
         # TODO add some mocking here to actually test the innards of this function, too!
         res = self.extension._run_model_on_fold(
@@ -2115,7 +2139,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
         X, y = task.get_X_and_y()
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            clf.fit(X[train], y[train])
+            clf.fit(X.iloc[train], y.iloc[train])
 
         # check num layers of MLP
         assert clf.best_estimator_.hidden_layer_sizes in param_grid["hidden_layer_sizes"]

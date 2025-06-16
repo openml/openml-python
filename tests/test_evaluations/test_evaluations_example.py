@@ -24,7 +24,6 @@ class TestEvaluationsExample(unittest.TestCase):
                 "predictive_accuracy",
                 flows=[8353],
                 tasks=[6],
-                # output_format="dataframe", ... This was removed
                 parameters_in_separate_columns=True,
             )  # Choose an SVM flow, for example 8353, and a task.
 
