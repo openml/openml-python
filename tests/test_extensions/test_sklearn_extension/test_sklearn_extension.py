@@ -76,7 +76,18 @@ def _get_sklearn_preprocessing():
                 transformers=[
                     (
                         "cat",
-                        OneHotEncoder(handle_unknown="ignore"),
+                        sklearn.pipeline.Pipeline(
+                            [
+                                (
+                                    "cat_si",
+                                    SimpleImputer(
+                                        strategy="constant",
+                                        fill_value="missing",
+                                    ),
+                                ),
+                                ("cat_ohe", OneHotEncoder(handle_unknown="ignore")),
+                            ],
+                        ),
                         _cat_col_selector,
                     )
                 ],
