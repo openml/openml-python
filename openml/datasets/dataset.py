@@ -463,7 +463,7 @@ class OpenMLDataset(OpenMLBase):
             data = self._get_arff(self.format)
         except OSError as e:
             logger.critical(
-                f"Please check that the data file {arff_file_path} is " "there and can be read.",
+                f"Please check that the data file {arff_file_path} is there and can be read.",
             )
             raise e
 
@@ -716,7 +716,7 @@ class OpenMLDataset(OpenMLBase):
         raw_cat = pd.Categorical(col, ordered=True, categories=filtered_categories)
         return pd.Series(raw_cat, index=series.index, name=series.name)
 
-    def get_data(  # noqa: C901, PLR0912
+    def get_data(  # noqa: C901
         self,
         target: list[str] | str | None = None,
         include_row_id: bool = False,  # noqa: FBT001, FBT002
@@ -790,10 +790,10 @@ class OpenMLDataset(OpenMLBase):
             y = y.sparse.to_dense()
 
             # Since it was sparsified, the y column may not be of the correct dtype, hence we check
-            # if it was categorical and convert it to and integer if needs be.
+            # if it was categorical and convert it to an integer if needs be.
             category_names = data.columns[categorical_mask]
-            if target_name in category_names:
-                y = y.astype(int)
+            target_dtype = int if target_name in category_names else float
+            y = y.astype(target_dtype)
 
         # Finally, remove the target from the list of attributes and categorical mask
         target_index = attribute_names.index(target_name)
