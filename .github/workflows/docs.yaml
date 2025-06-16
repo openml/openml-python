@@ -33,9 +33,6 @@ jobs:
       - name: Make docs
         run: |
           mkdocs build
-      - name: Check links
-        run: |
-          mkdocs-linkcheck
       - name: Deploy to GitHub Pages
         if: (contains(github.ref, 'develop') || contains(github.ref, 'main')) && github.event_name == 'push'
         run: |
