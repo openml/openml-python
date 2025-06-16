@@ -1,5 +1,6 @@
 """
-This example is deprecated! You will need to manually remove checks in this code to make it run.
+This example is deprecated! You will need to manually remove adapt this code to make it run.
+We deprecated this example in our CI as it requires fanova as a dependency. However, fanova is not supported in all Python versions used in our CI/CD.
 
 van Rijn and Hutter (2018)
 ==========================

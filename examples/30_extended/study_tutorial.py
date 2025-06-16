@@ -48,6 +48,7 @@ print(study.runs)
 evaluations = openml.evaluations.list_evaluations(
     function="predictive_accuracy",
     study=study.study_id,
+    output_format="dataframe",
 )
 print(evaluations.head())
 
