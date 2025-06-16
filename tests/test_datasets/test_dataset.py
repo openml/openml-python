@@ -373,14 +373,14 @@ class OpenMLDatasetTestSparse(TestBase):
         # TODO: re-add row_id and ignore attributes
         self.sparse_dataset.ignore_attribute = ["V256"]
         self.sparse_dataset.row_id_attribute = ["V512"]
-        # TODO(eddiebergman): Will break from dataset_format removal
         X, y, categorical, _ = self.sparse_dataset.get_data(
             target="class",
             include_row_id=False,
             include_ignore_attribute=False,
         )
         assert all(dtype == pd.SparseDtype(np.float32, fill_value=0.0) for dtype in X.dtypes)
-        assert y.dtype in [np.int32, np.int64]
+        # array format returned dense, but now we only return sparse and let the user handle it.
+        assert isinstance(y.dtypes, pd.SparseDtype)
         assert X.shape == (600, 19998)
 
         assert len(categorical) == 19998

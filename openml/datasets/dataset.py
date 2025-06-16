@@ -786,15 +786,6 @@ class OpenMLDataset(OpenMLBase):
         x = data.drop(columns=[target_name])
         y = data[target_name].squeeze()
 
-        if isinstance(y.dtype, pd.SparseDtype):
-            y = y.sparse.to_dense()
-
-            # Since it was sparsified, the y column may not be of the correct dtype, hence we check
-            # if it was categorical and convert it to an integer if needs be.
-            category_names = data.columns[categorical_mask]
-            target_dtype = int if target_name in category_names else float
-            y = y.astype(target_dtype)
-
         # Finally, remove the target from the list of attributes and categorical mask
         target_index = attribute_names.index(target_name)
         categorical_mask.pop(target_index)
