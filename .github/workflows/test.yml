@@ -89,6 +89,7 @@ jobs:
         pip install scipy==${{ matrix.scipy }}
     - name: Store repository status
       id: status-before
+      if: matrix.os != 'windows-latest'
       run: |
         git_status=$(git status --porcelain -b)
         echo "BEFORE=$git_status" >> $GITHUB_ENV
