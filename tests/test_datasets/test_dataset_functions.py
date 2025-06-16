@@ -339,14 +339,14 @@ class TestOpenMLDataset(TestBase):
             FileNotFoundError,
             r"Object at .* does not exist",
             _download_minio_file,
-            source="http://openml1.win.tue.nl/dataset20/i_do_not_exist.pq",
+            source="http://data.openml.org/dataset20/i_do_not_exist.pq",
             destination=self.workdir,
             exists_ok=True,
         )
 
     def test__download_minio_file_to_directory(self):
         _download_minio_file(
-            source="http://openml1.win.tue.nl/dataset20/dataset_20.pq",
+            source="http://data.openml.org/dataset20/dataset_20.pq",
             destination=self.workdir,
             exists_ok=True,
         )
@@ -357,7 +357,7 @@ class TestOpenMLDataset(TestBase):
     def test__download_minio_file_to_path(self):
         file_destination = os.path.join(self.workdir, "custom.pq")
         _download_minio_file(
-            source="http://openml1.win.tue.nl/dataset20/dataset_20.pq",
+            source="http://data.openml.org/dataset20/dataset_20.pq",
             destination=file_destination,
             exists_ok=True,
         )
@@ -372,7 +372,7 @@ class TestOpenMLDataset(TestBase):
         self.assertRaises(
             FileExistsError,
             _download_minio_file,
-            source="http://openml1.win.tue.nl/dataset20/dataset_20.pq",
+            source="http://data.openml.org/dataset20/dataset_20.pq",
             destination=str(file_destination),
             exists_ok=False,
         )
@@ -380,7 +380,7 @@ class TestOpenMLDataset(TestBase):
     def test__download_minio_file_works_with_bucket_subdirectory(self):
         file_destination = Path(self.workdir, "custom.pq")
         _download_minio_file(
-            source="http://openml1.win.tue.nl/dataset61/dataset_61.pq",
+            source="http://data.openml.org/dataset61/dataset_61.pq",
             destination=file_destination,
             exists_ok=True,
         )
@@ -390,7 +390,7 @@ class TestOpenMLDataset(TestBase):
 
     def test__get_dataset_parquet_not_cached(self):
         description = {
-            "oml:parquet_url": "http://openml1.win.tue.nl/dataset20/dataset_20.pq",
+            "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
             "oml:id": "20",
         }
         path = _get_dataset_parquet(description, cache_directory=self.workdir)
@@ -404,7 +404,7 @@ class TestOpenMLDataset(TestBase):
             "_download_parquet_url should not be called when loading from cache",
         )
         description = {
-            "oml:parquet_url": "http://openml1.win.tue.nl/dataset30/dataset_30.pq",
+            "oml:parquet_url": "http://data.openml.org/dataset30/dataset_30.pq",
             "oml:id": "30",
         }
         path = _get_dataset_parquet(description, cache_directory=None)
@@ -413,7 +413,7 @@ class TestOpenMLDataset(TestBase):
 
     def test__get_dataset_parquet_file_does_not_exist(self):
         description = {
-            "oml:parquet_url": "http://openml1.win.tue.nl/dataset20/does_not_exist.pq",
+            "oml:parquet_url": "http://data.openml.org/dataset20/does_not_exist.pq",
             "oml:id": "20",
         }
         path = _get_dataset_parquet(description, cache_directory=self.workdir)
