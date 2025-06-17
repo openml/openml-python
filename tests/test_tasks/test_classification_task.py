@@ -15,7 +15,7 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
         super().setUp()
         self.task_id = 119  # diabetes
         self.task_type = TaskType.SUPERVISED_CLASSIFICATION
-        self.estimation_procedure = 1
+        self.estimation_procedure = 5
 
     def test_get_X_and_Y(self):
         X, Y = super().test_get_X_and_Y()
@@ -30,6 +30,7 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
         assert task.task_id == self.task_id
         assert task.task_type_id == TaskType.SUPERVISED_CLASSIFICATION
         assert task.dataset_id == 20
+        assert task.estimation_procedure_id == self.estimation_procedure
 
     def test_class_labels(self):
         task = get_task(self.task_id)
