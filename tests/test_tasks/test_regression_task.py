@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import ast
 
-import numpy as np
+import pandas as pd
 
 import openml
 from openml.exceptions import OpenMLServerException
@@ -51,10 +51,10 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
     def test_get_X_and_Y(self):
         X, Y = super().test_get_X_and_Y()
         assert X.shape == (194, 32)
-        assert isinstance(X, np.ndarray)
+        assert isinstance(X, pd.DataFrame)
         assert Y.shape == (194,)
-        assert isinstance(Y, np.ndarray)
-        assert Y.dtype == float
+        assert isinstance(Y, pd.Series)
+        assert pd.api.types.is_numeric_dtype(Y)
 
     def test_download_task(self):
         task = super().test_download_task()

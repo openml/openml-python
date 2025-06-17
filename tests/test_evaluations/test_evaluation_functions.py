@@ -17,7 +17,6 @@ class TestEvaluationFunctions(TestBase):
             "predictive_accuracy",
             **kwargs,
             sort_order="desc",
-            output_format="dataframe",
         )
         evals = openml.evaluations.list_evaluations(
             "predictive_accuracy",
@@ -250,7 +249,6 @@ class TestEvaluationFunctions(TestBase):
             flows=flow_id,
             size=size,
             sort_order="desc",
-            output_format="dataframe",
             parameters_in_separate_columns=True,
         )
         columns = list(evals_cols.columns)

@@ -6,8 +6,9 @@ Plotting hyperparameter surfaces
 
 # License: BSD 3-Clause
 
-import openml
 import numpy as np
+
+import openml
 
 ####################################################################################################
 # First step - obtaining the data
@@ -22,7 +23,6 @@ df = openml.evaluations.list_evaluations_setups(
     function="predictive_accuracy",
     flows=[8353],
     tasks=[6],
-    output_format="dataframe",
     # Using this flag incorporates the hyperparameters into the returned dataframe. Otherwise,
     # the dataframe would contain a field ``paramaters`` containing an unparsed dictionary.
     parameters_in_separate_columns=True,
