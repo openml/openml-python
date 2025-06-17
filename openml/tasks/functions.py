@@ -509,9 +509,9 @@ def _create_task_from_xml(xml: str) -> OpenMLTask:
         common_kwargs["estimation_procedure_type"] = inputs["estimation_procedure"][
             "oml:estimation_procedure"
         ]["oml:type"]
-        common_kwargs["estimation_procedure_id"] = int(inputs["estimation_procedure"][
-            "oml:estimation_procedure"
-        ]["oml:id"])
+        common_kwargs["estimation_procedure_id"] = int(
+            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:id"]
+        )
 
         common_kwargs["estimation_parameters"] = estimation_parameters
         common_kwargs["target_name"] = inputs["source_data"]["oml:data_set"]["oml:target_feature"]
