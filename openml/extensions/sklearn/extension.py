@@ -1,60 +1,76 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from collections import OrderedDict  # noqa: F401
+import contextlib
 import copy
-from distutils.version import LooseVersion
 import importlib
 import inspect
 import json
 import logging
 import re
-from re import IGNORECASE
 import sys
 import time
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union, cast, Sized
+import traceback
 import warnings
+from collections import OrderedDict
+from json.decoder import JSONDecodeError
+from re import IGNORECASE
+from typing import Any, Callable, List, Sized, cast
 
 import numpy as np
 import pandas as pd
-import scipy.stats
 import scipy.sparse
+import scipy.stats
 import sklearn.base
 import sklearn.model_selection
 import sklearn.pipeline
+from packaging.version import Version
 
 import openml
 from openml.exceptions import PyOpenMLError
 from openml.extensions import Extension
 from openml.flows import OpenMLFlow
-from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration, PREFIX
+from openml.runs.trace import PREFIX, OpenMLRunTrace, OpenMLTraceIteration
 from openml.tasks import (
-    OpenMLTask,
-    OpenMLSupervisedTask,
     OpenMLClassificationTask,
-    OpenMLLearningCurveTask,
     OpenMLClusteringTask,
+    OpenMLLearningCurveTask,
     OpenMLRegressionTask,
+    OpenMLSupervisedTask,
+    OpenMLTask,
 )
 
 logger = logging.getLogger(__name__)
 
-if sys.version_info >= (3, 5):
-    from json.decoder import JSONDecodeError
-else:
-    JSONDecodeError = ValueError
 
 DEPENDENCIES_PATTERN = re.compile(
     r"^(?P<name>[\w\-]+)((?P<operation>==|>=|>)"
-    r"(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?[0-9]*))?$"
+    r"(?P<version>(\d+\.)?(\d+\.)?(\d+)?(dev)?[0-9]*))?$",
 )
 
+# NOTE(eddiebergman): This was imported before but became deprecated,
+# as a result I just enumerated them manually by copy-ing and pasting,
+# recommended solution in Numpy 2.0 guide was to explicitly list them.
 SIMPLE_NUMPY_TYPES = [
-    nptype
-    for type_cat, nptypes in np.sctypes.items()
-    for nptype in nptypes  # type: ignore
-    if type_cat != "others"
+    np.int8,
+    np.int16,
+    np.int32,
+    np.int64,
+    np.longlong,
+    np.uint8,
+    np.uint16,
+    np.uint32,
+    np.uint64,
+    np.ulonglong,
+    np.float16,
+    np.float32,
+    np.float64,
+    np.longdouble,
+    np.complex64,
+    np.complex128,
+    np.clongdouble,
 ]
-SIMPLE_TYPES = tuple([bool, int, float, str] + SIMPLE_NUMPY_TYPES)
+SIMPLE_TYPES = (bool, int, float, str, *SIMPLE_NUMPY_TYPES)
 
 SKLEARN_PIPELINE_STRING_COMPONENTS = ("drop", "passthrough")
 COMPONENT_REFERENCE = "component_reference"
@@ -71,7 +87,7 @@ class SklearnExtension(Extension):
     # General setup
 
     @classmethod
-    def can_handle_flow(cls, flow: "OpenMLFlow") -> bool:
+    def can_handle_flow(cls, flow: OpenMLFlow) -> bool:
         """Check whether a given describes a scikit-learn estimator.
 
         This is done by parsing the ``external_version`` field.
@@ -101,8 +117,11 @@ class SklearnExtension(Extension):
         return isinstance(model, sklearn.base.BaseEstimator)
 
     @classmethod
-    def trim_flow_name(
-        cls, long_name: str, extra_trim_length: int = 100, _outer: bool = True
+    def trim_flow_name(  # noqa: C901
+        cls,
+        long_name: str,
+        extra_trim_length: int = 100,
+        _outer: bool = True,  # noqa: FBT001, FBT002
     ) -> str:
         """Shorten generated sklearn flow name to at most ``max_length`` characters.
 
@@ -157,7 +176,7 @@ class SklearnExtension(Extension):
         # the example below, we want to trim `sklearn.tree.tree.DecisionTreeClassifier`, and
         # keep it in the final trimmed flow name:
         # sklearn.pipeline.Pipeline(Imputer=sklearn.preprocessing.imputation.Imputer,
-        # VarianceThreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,
+        # VarianceThreshold=sklearn.feature_selection.variance_threshold.VarianceThreshold,  # noqa: ERA001, E501
         # Estimator=sklearn.model_selection._search.RandomizedSearchCV(estimator=
         # sklearn.tree.tree.DecisionTreeClassifier))
         if "sklearn.model_selection" in long_name:
@@ -173,7 +192,7 @@ class SklearnExtension(Extension):
             # Now we want to also find and parse the `estimator`, for this we find the closing
             # parenthesis to the model selection technique:
             closing_parenthesis_expected = 1
-            for i, char in enumerate(long_name[estimator_start:], start=estimator_start):
+            for char in long_name[estimator_start:]:
                 if char == "(":
                     closing_parenthesis_expected += 1
                 if char == ")":
@@ -181,11 +200,13 @@ class SklearnExtension(Extension):
                 if closing_parenthesis_expected == 0:
                     break
 
-            model_select_pipeline = long_name[estimator_start:i]
+            _end: int = estimator_start + len(long_name[estimator_start:]) - 1
+            model_select_pipeline = long_name[estimator_start:_end]
+
             trimmed_pipeline = cls.trim_flow_name(model_select_pipeline, _outer=False)
             _, trimmed_pipeline = trimmed_pipeline.split(".", maxsplit=1)  # trim module prefix
-            model_select_short = "sklearn.{}[{}]".format(model_selection_class, trimmed_pipeline)
-            name = long_name[:start_index] + model_select_short + long_name[i + 1 :]
+            model_select_short = f"sklearn.{model_selection_class}[{trimmed_pipeline}]"
+            name = long_name[:start_index] + model_select_short + long_name[_end + 1 :]
         else:
             name = long_name
 
@@ -204,7 +225,7 @@ class SklearnExtension(Extension):
             components = [component.split(".")[-1] for component in pipeline.split(",")]
             pipeline = "{}({})".format(pipeline_class, ",".join(components))
             if len(short_name.format(pipeline)) > extra_trim_length:
-                pipeline = "{}(...,{})".format(pipeline_class, components[-1])
+                pipeline = f"{pipeline_class}(...,{components[-1]})"
         else:
             # Just a simple component: e.g. sklearn.tree.DecisionTreeClassifier
             pipeline = remove_all_in_parentheses(name).split(".")[-1]
@@ -231,34 +252,33 @@ class SklearnExtension(Extension):
         -------
         str
         """
-        openml_major_version = int(LooseVersion(openml.__version__).version[1])
         # This explicit check is necessary to support existing entities on the OpenML servers
         # that used the fixed dependency string (in the else block)
-        if openml_major_version > 11:
+        if Version(openml.__version__) > Version("0.11"):
             # OpenML v0.11 onwards supports sklearn>=0.24
             # assumption: 0.24 onwards sklearn should contain a _min_dependencies.py file with
             # variables declared for extracting minimum dependency for that version
-            if LooseVersion(sklearn_version) >= "0.24":
+            if Version(sklearn_version) >= Version("0.24"):
                 from sklearn import _min_dependencies as _mindep
 
                 dependency_list = {
-                    "numpy": "{}".format(_mindep.NUMPY_MIN_VERSION),
-                    "scipy": "{}".format(_mindep.SCIPY_MIN_VERSION),
-                    "joblib": "{}".format(_mindep.JOBLIB_MIN_VERSION),
-                    "threadpoolctl": "{}".format(_mindep.THREADPOOLCTL_MIN_VERSION),
+                    "numpy": f"{_mindep.NUMPY_MIN_VERSION}",
+                    "scipy": f"{_mindep.SCIPY_MIN_VERSION}",
+                    "joblib": f"{_mindep.JOBLIB_MIN_VERSION}",
+                    "threadpoolctl": f"{_mindep.THREADPOOLCTL_MIN_VERSION}",
                 }
-            elif LooseVersion(sklearn_version) >= "0.23":
+            elif Version(sklearn_version) >= Version("0.23"):
                 dependency_list = {
                     "numpy": "1.13.3",
                     "scipy": "0.19.1",
                     "joblib": "0.11",
                     "threadpoolctl": "2.0.0",
                 }
-                if LooseVersion(sklearn_version).version[2] == 0:
+                if Version(sklearn_version).micro == 0:
                     dependency_list.pop("threadpoolctl")
-            elif LooseVersion(sklearn_version) >= "0.21":
+            elif Version(sklearn_version) >= Version("0.21"):
                 dependency_list = {"numpy": "1.11.0", "scipy": "0.17.0", "joblib": "0.11"}
-            elif LooseVersion(sklearn_version) >= "0.19":
+            elif Version(sklearn_version) >= Version("0.19"):
                 dependency_list = {"numpy": "1.8.2", "scipy": "0.13.3"}
             else:
                 dependency_list = {"numpy": "1.6.1", "scipy": "0.9"}
@@ -269,8 +289,8 @@ class SklearnExtension(Extension):
             # the dependency list will be accurately updated for any flow uploaded to OpenML
             dependency_list = {"numpy": "1.6.1", "scipy": "0.9"}
 
-        sklearn_dep = "sklearn=={}".format(sklearn_version)
-        dep_str = "\n".join(["{}>={}".format(k, v) for k, v in dependency_list.items()])
+        sklearn_dep = f"sklearn=={sklearn_version}"
+        dep_str = "\n".join([f"{k}>={v}" for k, v in dependency_list.items()])
         return "\n".join([sklearn_dep, dep_str])
 
     ################################################################################################
@@ -278,9 +298,9 @@ class SklearnExtension(Extension):
 
     def flow_to_model(
         self,
-        flow: "OpenMLFlow",
-        initialize_with_defaults: bool = False,
-        strict_version: bool = True,
+        flow: OpenMLFlow,
+        initialize_with_defaults: bool = False,  # noqa: FBT001, FBT002
+        strict_version: bool = True,  # noqa: FBT001, FBT002
     ) -> Any:
         """Initializes a sklearn model based on a flow.
 
@@ -302,16 +322,18 @@ class SklearnExtension(Extension):
         mixed
         """
         return self._deserialize_sklearn(
-            flow, initialize_with_defaults=initialize_with_defaults, strict_version=strict_version
+            flow,
+            initialize_with_defaults=initialize_with_defaults,
+            strict_version=strict_version,
         )
 
-    def _deserialize_sklearn(
+    def _deserialize_sklearn(  # noqa: PLR0915, C901, PLR0912
         self,
         o: Any,
-        components: Optional[Dict] = None,
-        initialize_with_defaults: bool = False,
+        components: dict | None = None,
+        initialize_with_defaults: bool = False,  # noqa: FBT001, FBT002
         recursion_depth: int = 0,
-        strict_version: bool = True,
+        strict_version: bool = True,  # noqa: FBT002, FBT001
     ) -> Any:
         """Recursive function to deserialize a scikit-learn flow.
 
@@ -346,10 +368,10 @@ class SklearnExtension(Extension):
         -------
         mixed
         """
-
         logger.info(
-            "-%s flow_to_sklearn START o=%s, components=%s, init_defaults=%s"
-            % ("-" * recursion_depth, o, components, initialize_with_defaults)
+            "-{} flow_to_sklearn START o={}, components={}, init_defaults={}".format(
+                "-" * recursion_depth, o, components, initialize_with_defaults
+            ),
         )
         depth_pp = recursion_depth + 1  # shortcut var, depth plus plus
 
@@ -359,10 +381,8 @@ class SklearnExtension(Extension):
         # the parameter values to the correct type.
 
         if isinstance(o, str):
-            try:
+            with contextlib.suppress(JSONDecodeError):
                 o = json.loads(o)
-            except JSONDecodeError:
-                pass
 
         if isinstance(o, dict):
             # Check if the dict encodes a 'special' object, which could not
@@ -382,7 +402,9 @@ class SklearnExtension(Extension):
                         pass
                     elif serialized_type == COMPONENT_REFERENCE:
                         value = self._deserialize_sklearn(
-                            value, recursion_depth=depth_pp, strict_version=strict_version
+                            value,
+                            recursion_depth=depth_pp,
+                            strict_version=strict_version,
                         )
                     else:
                         raise NotImplementedError(serialized_type)
@@ -407,10 +429,12 @@ class SklearnExtension(Extension):
                         rval = (step_name, component, value["argument_1"])
                 elif serialized_type == "cv_object":
                     rval = self._deserialize_cross_validator(
-                        value, recursion_depth=recursion_depth, strict_version=strict_version
+                        value,
+                        recursion_depth=recursion_depth,
+                        strict_version=strict_version,
                     )
                 else:
-                    raise ValueError("Cannot flow_to_sklearn %s" % serialized_type)
+                    raise ValueError(f"Cannot flow_to_sklearn {serialized_type}")
 
             else:
                 rval = OrderedDict(
@@ -458,10 +482,12 @@ class SklearnExtension(Extension):
             )
         else:
             raise TypeError(o)
-        logger.info("-%s flow_to_sklearn END   o=%s, rval=%s" % ("-" * recursion_depth, o, rval))
+        logger.info(
+            "-{} flow_to_sklearn END   o={}, rval={}".format("-" * recursion_depth, o, rval)
+        )
         return rval
 
-    def model_to_flow(self, model: Any) -> "OpenMLFlow":
+    def model_to_flow(self, model: Any) -> OpenMLFlow:
         """Transform a scikit-learn model to a flow for uploading it to OpenML.
 
         Parameters
@@ -475,7 +501,7 @@ class SklearnExtension(Extension):
         # Necessary to make pypy not complain about all the different possible return types
         return self._serialize_sklearn(model)
 
-    def _serialize_sklearn(self, o: Any, parent_model: Optional[Any] = None) -> Any:
+    def _serialize_sklearn(self, o: Any, parent_model: Any | None = None) -> Any:  # noqa: PLR0912, C901
         rval = None  # type: Any
 
         # TODO: assert that only on first recursion lvl `parent_model` can be None
@@ -502,19 +528,17 @@ class SklearnExtension(Extension):
         elif isinstance(o, dict):
             # TODO: explain what type of parameter is here
             if not isinstance(o, OrderedDict):
-                o = OrderedDict([(key, value) for key, value in sorted(o.items())])
+                o = OrderedDict(sorted(o.items()))
 
             rval = OrderedDict()
             for key, value in o.items():
                 if not isinstance(key, str):
                     raise TypeError(
                         "Can only use string as keys, you passed "
-                        "type %s for value %s." % (type(key), str(key))
+                        f"type {type(key)} for value {key!s}.",
                     )
-                key = self._serialize_sklearn(key, parent_model)
-                value = self._serialize_sklearn(value, parent_model)
-                rval[key] = value
-            rval = rval
+                _key = self._serialize_sklearn(key, parent_model)
+                rval[_key] = self._serialize_sklearn(value, parent_model)
         elif isinstance(o, type):
             # TODO: explain what type of parameter is here
             rval = self._serialize_type(o)
@@ -534,7 +558,7 @@ class SklearnExtension(Extension):
 
         return rval
 
-    def get_version_information(self) -> List[str]:
+    def get_version_information(self) -> list[str]:
         """List versions of libraries required by the flow.
 
         Libraries listed are ``Python``, ``scikit-learn``, ``numpy`` and ``scipy``.
@@ -543,22 +567,21 @@ class SklearnExtension(Extension):
         -------
         List
         """
-
         # This can possibly be done by a package such as pyxb, but I could not get
         # it to work properly.
-        import sklearn
-        import scipy
         import numpy
+        import scipy
+        import sklearn
 
         major, minor, micro, _, _ = sys.version_info
         python_version = "Python_{}.".format(".".join([str(major), str(minor), str(micro)]))
-        sklearn_version = "Sklearn_{}.".format(sklearn.__version__)
-        numpy_version = "NumPy_{}.".format(numpy.__version__)  # type: ignore
-        scipy_version = "SciPy_{}.".format(scipy.__version__)
+        sklearn_version = f"Sklearn_{sklearn.__version__}."
+        numpy_version = f"NumPy_{numpy.__version__}."  # type: ignore
+        scipy_version = f"SciPy_{scipy.__version__}."
 
         return [python_version, sklearn_version, numpy_version, scipy_version]
 
-    def create_setup_string(self, model: Any) -> str:
+    def create_setup_string(self, model: Any) -> str:  # noqa: ARG002
         """Create a string which can be used to reinstantiate the given model.
 
         Parameters
@@ -569,8 +592,7 @@ class SklearnExtension(Extension):
         -------
         str
         """
-        run_environment = " ".join(self.get_version_information())
-        return run_environment
+        return " ".join(self.get_version_information())
 
     def _is_cross_validator(self, o: Any) -> bool:
         return isinstance(o, sklearn.model_selection.BaseCrossValidator)
@@ -584,7 +606,7 @@ class SklearnExtension(Extension):
         return sklearn_dependency or sklearn_as_external
 
     def _get_sklearn_description(self, model: Any, char_lim: int = 1024) -> str:
-        """Fetches the sklearn function docstring for the flow description
+        r"""Fetches the sklearn function docstring for the flow description
 
         Retrieves the sklearn docstring available and does the following:
         * If length of docstring <= char_lim, then returns the complete docstring
@@ -618,14 +640,13 @@ class SklearnExtension(Extension):
             s = s[:index]
             # trimming docstring to be within char_lim
             if len(s) > char_lim:
-                s = "{}...".format(s[: char_lim - 3])
+                s = f"{s[: char_lim - 3]}..."
             return s.strip()
         except ValueError:
             logger.warning(
                 "'Read more' not found in descriptions. "
-                "Trying to trim till 'Parameters' if available in docstring."
+                "Trying to trim till 'Parameters' if available in docstring.",
             )
-            pass
         try:
             # if 'Read more' doesn't exist, trim till 'Parameters'
             pattern = "Parameters"
@@ -637,10 +658,10 @@ class SklearnExtension(Extension):
         s = s[:index]
         # trimming docstring to be within char_lim
         if len(s) > char_lim:
-            s = "{}...".format(s[: char_lim - 3])
+            s = f"{s[: char_lim - 3]}..."
         return s.strip()
 
-    def _extract_sklearn_parameter_docstring(self, model) -> Union[None, str]:
+    def _extract_sklearn_parameter_docstring(self, model) -> None | str:
         """Extracts the part of sklearn docstring containing parameter information
 
         Fetches the entire docstring and trims just the Parameter section.
@@ -678,7 +699,7 @@ class SklearnExtension(Extension):
                 index2 = s.index(match_format(h))
                 break
             except ValueError:
-                logger.warning("{} not available in docstring".format(h))
+                logger.warning(f"{h} not available in docstring")
                 continue
         else:
             # in the case only 'Parameters' exist, trim till end of docstring
@@ -686,7 +707,7 @@ class SklearnExtension(Extension):
         s = s[index1:index2]
         return s.strip()
 
-    def _extract_sklearn_param_info(self, model, char_lim=1024) -> Union[None, Dict]:
+    def _extract_sklearn_param_info(self, model, char_lim=1024) -> None | dict:
         """Parses parameter type and description from sklearn dosctring
 
         Parameters
@@ -715,7 +736,7 @@ class SklearnExtension(Extension):
 
         # collecting parameters and their descriptions
         description = []  # type: List
-        for i, s in enumerate(lines):
+        for s in lines:
             param = p.findall(s)
             if param != []:
                 # a parameter definition is found by regex
@@ -724,19 +745,18 @@ class SklearnExtension(Extension):
                 # till another parameter is found and a new placeholder is created
                 placeholder = [""]  # type: List[str]
                 description.append(placeholder)
-            else:
-                if len(description) > 0:  # description=[] means no parameters found yet
-                    # appending strings to the placeholder created when parameter found
-                    description[-1].append(s)
+            elif len(description) > 0:  # description=[] means no parameters found yet
+                # appending strings to the placeholder created when parameter found
+                description[-1].append(s)
         for i in range(len(description)):
             # concatenating parameter description strings
             description[i] = "\n".join(description[i]).strip()
             # limiting all parameter descriptions to accepted OpenML string length
             if len(description[i]) > char_lim:
-                description[i] = "{}...".format(description[i][: char_lim - 3])
+                description[i] = f"{description[i][: char_lim - 3]}..."
 
         # collecting parameters and their types
-        parameter_docs = OrderedDict()  # type: Dict
+        parameter_docs = OrderedDict()
         matches = p.findall(docstring)
         for i, param in enumerate(matches):
             key, value = str(param).split(":")
@@ -765,7 +785,6 @@ class SklearnExtension(Extension):
         OpenMLFlow
 
         """
-
         # Get all necessary information about the model objects itself
         (
             parameters,
@@ -786,25 +805,24 @@ class SklearnExtension(Extension):
         # will be part of the name (in brackets)
         sub_components_names = ""
         for key in subcomponents:
-            if isinstance(subcomponents[key], OpenMLFlow):
-                name = subcomponents[key].name
+            name_thing = subcomponents[key]
+            if isinstance(name_thing, OpenMLFlow):
+                name = name_thing.name
             elif (
-                isinstance(subcomponents[key], str)
+                isinstance(name_thing, str)
                 and subcomponents[key] in SKLEARN_PIPELINE_STRING_COMPONENTS
             ):
-                name = subcomponents[key]
+                name = name_thing
             else:
                 raise TypeError(type(subcomponents[key]))
+
             if key in subcomponents_explicit:
                 sub_components_names += "," + key + "=" + name
             else:
                 sub_components_names += "," + name
 
-        if sub_components_names:
-            # slice operation on string in order to get rid of leading comma
-            name = "%s(%s)" % (class_name, sub_components_names[1:])
-        else:
-            name = class_name
+        # slice operation on string in order to get rid of leading comma
+        name = f"{class_name}({sub_components_names[1:]})" if sub_components_names else class_name
         short_name = SklearnExtension.trim_flow_name(name)
 
         # Get the external versions of all sub-components
@@ -813,7 +831,7 @@ class SklearnExtension(Extension):
         tags = self._get_tags()
 
         sklearn_description = self._get_sklearn_description(model)
-        flow = OpenMLFlow(
+        return OpenMLFlow(
             name=name,
             class_name=class_name,
             custom_name=short_name,
@@ -829,14 +847,11 @@ class SklearnExtension(Extension):
             dependencies=dependencies,
         )
 
-        return flow
-
     def _get_dependencies(self) -> str:
-        dependencies = self._min_dependency_str(sklearn.__version__)
-        return dependencies
+        return self._min_dependency_str(sklearn.__version__)  # type: ignore
 
-    def _get_tags(self) -> List[str]:
-        sklearn_version = self._format_external_version("sklearn", sklearn.__version__)
+    def _get_tags(self) -> list[str]:
+        sklearn_version = self._format_external_version("sklearn", sklearn.__version__)  # type: ignore
         sklearn_version_formatted = sklearn_version.replace("==", "_")
         return [
             "openml-python",
@@ -853,7 +868,7 @@ class SklearnExtension(Extension):
     def _get_external_version_string(
         self,
         model: Any,
-        sub_components: Dict[str, OpenMLFlow],
+        sub_components: dict[str, OpenMLFlow],
     ) -> str:
         # Create external version string for a flow, given the model and the
         # already parsed dictionary of sub_components. Retrieves the external
@@ -875,7 +890,7 @@ class SklearnExtension(Extension):
             external_versions.add(external_version)
 
         openml_version = self._format_external_version("openml", openml.__version__)
-        sklearn_version = self._format_external_version("sklearn", sklearn.__version__)
+        sklearn_version = self._format_external_version("sklearn", sklearn.__version__)  # type: ignore
         external_versions.add(openml_version)
         external_versions.add(sklearn_version)
         for visitee in sub_components.values():
@@ -883,16 +898,16 @@ class SklearnExtension(Extension):
                 continue
             for external_version in visitee.external_version.split(","):
                 external_versions.add(external_version)
-        return ",".join(list(sorted(external_versions)))
+        return ",".join(sorted(external_versions))
 
     def _check_multiple_occurence_of_component_in_flow(
         self,
         model: Any,
-        sub_components: Dict[str, OpenMLFlow],
+        sub_components: dict[str, OpenMLFlow],
     ) -> None:
-        to_visit_stack = []  # type: List[OpenMLFlow]
+        to_visit_stack: list[OpenMLFlow] = []
         to_visit_stack.extend(sub_components.values())
-        known_sub_components = set()  # type: Set[str]
+        known_sub_components: set[str] = set()
 
         while len(to_visit_stack) > 0:
             visitee = to_visit_stack.pop()
@@ -900,21 +915,21 @@ class SklearnExtension(Extension):
                 known_sub_components.add(visitee)
             elif visitee.name in known_sub_components:
                 raise ValueError(
-                    "Found a second occurence of component %s when "
-                    "trying to serialize %s." % (visitee.name, model)
+                    f"Found a second occurence of component {visitee.name} when "
+                    f"trying to serialize {model}.",
                 )
             else:
                 known_sub_components.add(visitee.name)
                 to_visit_stack.extend(visitee.components.values())
 
-    def _extract_information_from_model(
+    def _extract_information_from_model(  # noqa: PLR0915, C901, PLR0912
         self,
         model: Any,
-    ) -> Tuple[
-        "OrderedDict[str, Optional[str]]",
-        "OrderedDict[str, Optional[Dict]]",
-        "OrderedDict[str, OpenMLFlow]",
-        Set,
+    ) -> tuple[
+        OrderedDict[str, str | None],
+        OrderedDict[str, dict | None],
+        OrderedDict[str, OpenMLFlow],
+        set,
     ]:
         # This function contains four "global" states and is quite long and
         # complicated. If it gets to complicated to ensure it's correctness,
@@ -926,8 +941,8 @@ class SklearnExtension(Extension):
         sub_components = OrderedDict()  # type: OrderedDict[str, OpenMLFlow]
         # stores the keys of all subcomponents that should become
         sub_components_explicit = set()
-        parameters = OrderedDict()  # type: OrderedDict[str, Optional[str]]
-        parameters_meta_info = OrderedDict()  # type: OrderedDict[str, Optional[Dict]]
+        parameters: OrderedDict[str, str | None] = OrderedDict()
+        parameters_meta_info: OrderedDict[str, dict | None] = OrderedDict()
         parameters_docs = self._extract_sklearn_param_info(model)
 
         model_parameters = model.get_params(deep=False)
@@ -951,18 +966,16 @@ class SklearnExtension(Extension):
                 isinstance(rval, (list, tuple))
                 and len(rval) > 0
                 and isinstance(rval[0], (list, tuple))
-                and all([isinstance(rval_i, type(rval[0])) for rval_i in rval])
+                and all(isinstance(rval_i, type(rval[0])) for rval_i in rval)
             )
 
             # Check that all list elements are of simple types.
             nested_list_of_simple_types = (
                 is_non_empty_list_of_lists_with_same_type
-                and all([isinstance(el, SIMPLE_TYPES) for el in flatten_all(rval)])
+                and all(isinstance(el, SIMPLE_TYPES) for el in flatten_all(rval))
                 and all(
-                    [
-                        len(rv) in (2, 3) and rv[1] not in SKLEARN_PIPELINE_STRING_COMPONENTS
-                        for rv in rval
-                    ]
+                    len(rv) in (2, 3) and rv[1] not in SKLEARN_PIPELINE_STRING_COMPONENTS
+                    for rv in rval
                 )
             )
 
@@ -970,10 +983,10 @@ class SklearnExtension(Extension):
                 # If a list of lists is identified that include 'non-simple' types (e.g. objects),
                 # we assume they are steps in a pipeline, feature union, or base classifiers in
                 # a voting classifier.
-                parameter_value = list()  # type: List
+                parameter_value = []  # type: List
                 reserved_keywords = set(model.get_params(deep=False).keys())
 
-                for i, sub_component_tuple in enumerate(rval):
+                for sub_component_tuple in rval:
                     identifier = sub_component_tuple[0]
                     sub_component = sub_component_tuple[1]
                     sub_component_type = type(sub_component_tuple)
@@ -981,22 +994,20 @@ class SklearnExtension(Extension):
                         # length 2 is for {VotingClassifier.estimators,
                         # Pipeline.steps, FeatureUnion.transformer_list}
                         # length 3 is for ColumnTransformer
-                        msg = "Length of tuple of type {} does not match assumptions".format(
-                            sub_component_type
+                        raise ValueError(
+                            f"Length of tuple of type {sub_component_type}"
+                            " does not match assumptions"
                         )
-                        raise ValueError(msg)
 
                     if isinstance(sub_component, str):
                         if sub_component not in SKLEARN_PIPELINE_STRING_COMPONENTS:
                             msg = (
                                 "Second item of tuple does not match assumptions. "
                                 "If string, can be only 'drop' or 'passthrough' but"
-                                "got %s" % sub_component
+                                f"got {sub_component}"
                             )
                             raise ValueError(msg)
-                        else:
-                            pass
-                    elif isinstance(sub_component, type(None)):
+                    elif sub_component is None:
                         msg = (
                             "Cannot serialize objects of None type. Please use a valid "
                             "placeholder for None. Note that empty sklearn estimators can be "
@@ -1006,15 +1017,15 @@ class SklearnExtension(Extension):
                     elif not isinstance(sub_component, OpenMLFlow):
                         msg = (
                             "Second item of tuple does not match assumptions. "
-                            "Expected OpenMLFlow, got %s" % type(sub_component)
+                            f"Expected OpenMLFlow, got {type(sub_component)}"
                         )
                         raise TypeError(msg)
 
                     if identifier in reserved_keywords:
-                        parent_model = "{}.{}".format(model.__module__, model.__class__.__name__)
-                        msg = "Found element shadowing official " "parameter for %s: %s" % (
-                            parent_model,
-                            identifier,
+                        parent_model = f"{model.__module__}.{model.__class__.__name__}"
+                        msg = (
+                            "Found element shadowing official "
+                            f"parameter for {parent_model}: {identifier}"
                         )
                         raise PyOpenMLError(msg)
 
@@ -1038,11 +1049,11 @@ class SklearnExtension(Extension):
                             dependencies=dependencies,
                             model=None,
                         )
-                        component_reference = OrderedDict()  # type: Dict[str, Union[str, Dict]]
-                        component_reference[
-                            "oml-python:serialized_object"
-                        ] = COMPOSITION_STEP_CONSTANT
-                        cr_value = OrderedDict()  # type: Dict[str, Any]
+                        component_reference: OrderedDict[str, str | dict] = OrderedDict()
+                        component_reference["oml-python:serialized_object"] = (
+                            COMPOSITION_STEP_CONSTANT
+                        )
+                        cr_value: dict[str, Any] = OrderedDict()
                         cr_value["key"] = identifier
                         cr_value["step_name"] = identifier
                         if len(sub_component_tuple) == 3:
@@ -1084,27 +1095,27 @@ class SklearnExtension(Extension):
                 cr = self._serialize_sklearn(component_reference, model)
                 parameters[k] = json.dumps(cr)
 
+            elif not (hasattr(rval, "__len__") and len(rval) == 0):
+                rval = json.dumps(rval)
+                parameters[k] = rval
+            # a regular hyperparameter
             else:
-                # a regular hyperparameter
-                if not (hasattr(rval, "__len__") and len(rval) == 0):
-                    rval = json.dumps(rval)
-                    parameters[k] = rval
-                else:
-                    parameters[k] = None
+                parameters[k] = None
 
             if parameters_docs is not None:
                 data_type, description = parameters_docs[k]
                 parameters_meta_info[k] = OrderedDict(
-                    (("description", description), ("data_type", data_type))
+                    (("description", description), ("data_type", data_type)),
                 )
             else:
                 parameters_meta_info[k] = OrderedDict((("description", None), ("data_type", None)))
 
         return parameters, parameters_meta_info, sub_components, sub_components_explicit
 
-    def _get_fn_arguments_with_defaults(self, fn_name: Callable) -> Tuple[Dict, Set]:
+    def _get_fn_arguments_with_defaults(self, fn_name: Callable) -> tuple[dict, set]:
         """
-        Returns:
+        Returns
+        -------
             i) a dict with all parameter names that have a default value, and
             ii) a set with all parameter names that do not have a default
 
@@ -1123,8 +1134,8 @@ class SklearnExtension(Extension):
         # parameters with defaults are optional, all others are required.
         parameters = inspect.signature(fn_name).parameters
         required_params = set()
-        optional_params = dict()
-        for param in parameters.keys():
+        optional_params = {}
+        for param in parameters:
             parameter = parameters.get(param)
             default_val = parameter.default  # type: ignore
             if default_val is inspect.Signature.empty:
@@ -1133,20 +1144,20 @@ class SklearnExtension(Extension):
                 optional_params[param] = default_val
         return optional_params, required_params
 
-    def _deserialize_model(
+    def _deserialize_model(  # noqa: C901
         self,
         flow: OpenMLFlow,
-        keep_defaults: bool,
+        keep_defaults: bool,  # noqa: FBT001
         recursion_depth: int,
-        strict_version: bool = True,
+        strict_version: bool = True,  # noqa: FBT002, FBT001
     ) -> Any:
-        logger.info("-%s deserialize %s" % ("-" * recursion_depth, flow.name))
+        logger.info("-{} deserialize {}".format("-" * recursion_depth, flow.name))
         model_name = flow.class_name
         self._check_dependencies(flow.dependencies, strict_version=strict_version)
 
         parameters = flow.parameters
         components = flow.components
-        parameter_dict = OrderedDict()  # type: Dict[str, Any]
+        parameter_dict: dict[str, Any] = OrderedDict()
 
         # Do a shallow copy of the components dictionary so we can remove the
         # components from this copy once we added them into the pipeline. This
@@ -1157,7 +1168,9 @@ class SklearnExtension(Extension):
 
         for name in parameters:
             value = parameters.get(name)
-            logger.info("--%s flow_parameter=%s, value=%s" % ("-" * recursion_depth, name, value))
+            logger.info(
+                "--{} flow_parameter={}, value={}".format("-" * recursion_depth, name, value)
+            )
             rval = self._deserialize_sklearn(
                 value,
                 components=components_,
@@ -1173,36 +1186,60 @@ class SklearnExtension(Extension):
             if name not in components_:
                 continue
             value = components[name]
-            logger.info("--%s flow_component=%s, value=%s" % ("-" * recursion_depth, name, value))
+            logger.info(
+                "--{} flow_component={}, value={}".format("-" * recursion_depth, name, value)
+            )
             rval = self._deserialize_sklearn(
-                value, recursion_depth=recursion_depth + 1, strict_version=strict_version
+                value,
+                recursion_depth=recursion_depth + 1,
+                strict_version=strict_version,
             )
             parameter_dict[name] = rval
 
         if model_name is None and flow.name in SKLEARN_PIPELINE_STRING_COMPONENTS:
             return flow.name
-        else:
-            module_name = model_name.rsplit(".", 1)
-            model_class = getattr(importlib.import_module(module_name[0]), module_name[1])
 
-            if keep_defaults:
-                # obtain all params with a default
-                param_defaults, _ = self._get_fn_arguments_with_defaults(model_class.__init__)
+        assert model_name is not None
+        module_name = model_name.rsplit(".", 1)
+        model_class = getattr(importlib.import_module(module_name[0]), module_name[1])
 
-                # delete the params that have a default from the dict,
-                # so they get initialized with their default value
-                # except [...]
-                for param in param_defaults:
-                    # [...] the ones that also have a key in the components dict.
-                    # As OpenML stores different flows for ensembles with different
-                    # (base-)components, in OpenML terms, these are not considered
-                    # hyperparameters but rather constants (i.e., changing them would
-                    # result in a different flow)
-                    if param not in components.keys():
-                        del parameter_dict[param]
-            return model_class(**parameter_dict)
+        if keep_defaults:
+            # obtain all params with a default
+            param_defaults, _ = self._get_fn_arguments_with_defaults(model_class.__init__)
 
-    def _check_dependencies(self, dependencies: str, strict_version: bool = True) -> None:
+            # delete the params that have a default from the dict,
+            # so they get initialized with their default value
+            # except [...]
+            for param in param_defaults:
+                # [...] the ones that also have a key in the components dict.
+                # As OpenML stores different flows for ensembles with different
+                # (base-)components, in OpenML terms, these are not considered
+                # hyperparameters but rather constants (i.e., changing them would
+                # result in a different flow)
+                if param not in components:
+                    del parameter_dict[param]
+
+        if not strict_version:
+            # Ignore incompatible parameters
+            allowed_parameter = list(inspect.signature(model_class.__init__).parameters)
+            for p in list(parameter_dict.keys()):
+                if p not in allowed_parameter:
+                    warnings.warn(
+                        f"While deserializing in a non-strict way, parameter {p} is not "
+                        f"allowed for {model_class.__name__} likely due to a version mismatch. "
+                        "We ignore the parameter.",
+                        UserWarning,
+                        stacklevel=2,
+                    )
+                    del parameter_dict[p]
+
+        return model_class(**parameter_dict)
+
+    def _check_dependencies(
+        self,
+        dependencies: str,
+        strict_version: bool = True,  # noqa: FBT001, FBT002
+    ) -> None:
         if not dependencies:
             return
 
@@ -1210,15 +1247,15 @@ class SklearnExtension(Extension):
         for dependency_string in dependencies_list:
             match = DEPENDENCIES_PATTERN.match(dependency_string)
             if not match:
-                raise ValueError("Cannot parse dependency %s" % dependency_string)
+                raise ValueError(f"Cannot parse dependency {dependency_string}")
 
             dependency_name = match.group("name")
             operation = match.group("operation")
             version = match.group("version")
 
             module = importlib.import_module(dependency_name)
-            required_version = LooseVersion(version)
-            installed_version = LooseVersion(module.__version__)  # type: ignore
+            required_version = Version(version)
+            installed_version = Version(module.__version__)  # type: ignore
 
             if operation == "==":
                 check = required_version == installed_version
@@ -1229,18 +1266,17 @@ class SklearnExtension(Extension):
                     installed_version > required_version or installed_version == required_version
                 )
             else:
-                raise NotImplementedError("operation '%s' is not supported" % operation)
+                raise NotImplementedError(f"operation '{operation}' is not supported")
             message = (
-                "Trying to deserialize a model with dependency "
-                "%s not satisfied." % dependency_string
+                f"Trying to deserialize a model with dependency {dependency_string} not satisfied."
             )
             if not check:
                 if strict_version:
                     raise ValueError(message)
-                else:
-                    warnings.warn(message)
 
-    def _serialize_type(self, o: Any) -> "OrderedDict[str, str]":
+                warnings.warn(message, category=UserWarning, stacklevel=2)
+
+    def _serialize_type(self, o: Any) -> OrderedDict[str, str]:
         mapping = {
             float: "float",
             np.float32: "np.float32",
@@ -1249,9 +1285,9 @@ class SklearnExtension(Extension):
             np.int32: "np.int32",
             np.int64: "np.int64",
         }
-        if LooseVersion(np.__version__) < "1.24":
-            mapping[np.float] = "np.float"
-            mapping[np.int] = "np.int"
+        if Version(np.__version__) < Version("1.24"):
+            mapping[float] = "np.float"
+            mapping[int] = "np.int"
 
         ret = OrderedDict()  # type: 'OrderedDict[str, str]'
         ret["oml-python:serialized_object"] = "type"
@@ -1267,26 +1303,28 @@ class SklearnExtension(Extension):
             "np.int32": np.int32,
             "np.int64": np.int64,
         }
-        if LooseVersion(np.__version__) < "1.24":
-            mapping["np.float"] = np.float
-            mapping["np.int"] = np.int
+
+        # TODO(eddiebergman): Might be able to remove this
+        if Version(np.__version__) < Version("1.24"):
+            mapping["np.float"] = np.float  # type: ignore # noqa: NPY001
+            mapping["np.int"] = np.int  # type: ignore # noqa: NPY001
 
         return mapping[o]
 
-    def _serialize_rv_frozen(self, o: Any) -> "OrderedDict[str, Union[str, Dict]]":
+    def _serialize_rv_frozen(self, o: Any) -> OrderedDict[str, str | dict]:
         args = o.args
         kwds = o.kwds
         a = o.a
         b = o.b
         dist = o.dist.__class__.__module__ + "." + o.dist.__class__.__name__
-        ret = OrderedDict()  # type: 'OrderedDict[str, Union[str, Dict]]'
+        ret: OrderedDict[str, str | dict] = OrderedDict()
         ret["oml-python:serialized_object"] = "rv_frozen"
         ret["value"] = OrderedDict(
-            (("dist", dist), ("a", a), ("b", b), ("args", args), ("kwds", kwds))
+            (("dist", dist), ("a", a), ("b", b), ("args", args), ("kwds", kwds)),
         )
         return ret
 
-    def _deserialize_rv_frozen(self, o: "OrderedDict[str, str]") -> Any:
+    def _deserialize_rv_frozen(self, o: OrderedDict[str, str]) -> Any:
         args = o["args"]
         kwds = o["kwds"]
         a = o["a"]
@@ -1296,17 +1334,23 @@ class SklearnExtension(Extension):
         module_name = dist_name.rsplit(".", 1)
         try:
             rv_class = getattr(importlib.import_module(module_name[0]), module_name[1])
-        except AttributeError:
-            warnings.warn("Cannot create model %s for flow." % dist_name)
+        except AttributeError as e:
+            _tb = traceback.format_exc()
+            warnings.warn(
+                f"Cannot create model {dist_name} for flow. Reason is from error {type(e)}:{e}"
+                f"\nTraceback: {_tb}",
+                RuntimeWarning,
+                stacklevel=2,
+            )
             return None
 
-        dist = scipy.stats.distributions.rv_frozen(rv_class(), *args, **kwds)
+        dist = scipy.stats.distributions.rv_frozen(rv_class(), *args, **kwds)  # type: ignore
         dist.a = a
         dist.b = b
 
         return dist
 
-    def _serialize_function(self, o: Callable) -> "OrderedDict[str, str]":
+    def _serialize_function(self, o: Callable) -> OrderedDict[str, str]:
         name = o.__module__ + "." + o.__name__
         ret = OrderedDict()  # type: 'OrderedDict[str, str]'
         ret["oml-python:serialized_object"] = "function"
@@ -1315,11 +1359,10 @@ class SklearnExtension(Extension):
 
     def _deserialize_function(self, name: str) -> Callable:
         module_name = name.rsplit(".", 1)
-        function_handle = getattr(importlib.import_module(module_name[0]), module_name[1])
-        return function_handle
+        return getattr(importlib.import_module(module_name[0]), module_name[1])
 
-    def _serialize_cross_validator(self, o: Any) -> "OrderedDict[str, Union[str, Dict]]":
-        ret = OrderedDict()  # type: 'OrderedDict[str, Union[str, Dict]]'
+    def _serialize_cross_validator(self, o: Any) -> OrderedDict[str, str | dict]:
+        ret: OrderedDict[str, str | dict] = OrderedDict()
 
         parameters = OrderedDict()  # type: 'OrderedDict[str, Any]'
 
@@ -1327,7 +1370,7 @@ class SklearnExtension(Extension):
         cls = o.__class__
         init = getattr(cls.__init__, "deprecated_original", cls.__init__)
         # Ignore varargs, kw and default values and pop self
-        init_signature = inspect.signature(init)
+        init_signature = inspect.signature(init)  # type: ignore
         # Consider the constructor parameters excluding 'self'
         if init is object.__init__:
             args = []  # type: List
@@ -1337,7 +1380,7 @@ class SklearnExtension(Extension):
                     p.name
                     for p in init_signature.parameters.values()
                     if p.name != "self" and p.kind != p.VAR_KEYWORD
-                ]
+                ],
             )
 
         for key in args:
@@ -1348,7 +1391,7 @@ class SklearnExtension(Extension):
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always", DeprecationWarning)
                 value = getattr(o, key, None)
-                if w is not None and len(w) and w[0].category == DeprecationWarning:
+                if w is not None and len(w) and w[0].category is DeprecationWarning:
                     # if the parameter is deprecated, don't show it
                     continue
 
@@ -1366,7 +1409,10 @@ class SklearnExtension(Extension):
         return ret
 
     def _deserialize_cross_validator(
-        self, value: "OrderedDict[str, Any]", recursion_depth: int, strict_version: bool = True
+        self,
+        value: OrderedDict[str, Any],
+        recursion_depth: int,
+        strict_version: bool = True,  # noqa: FBT002, FBT001
     ) -> Any:
         model_name = value["name"]
         parameters = value["parameters"]
@@ -1386,12 +1432,13 @@ class SklearnExtension(Extension):
         model_package_name: str,
         model_package_version_number: str,
     ) -> str:
-        return "%s==%s" % (model_package_name, model_package_version_number)
+        return f"{model_package_name}=={model_package_version_number}"
 
     @staticmethod
     def _get_parameter_values_recursive(
-        param_grid: Union[Dict, List[Dict]], parameter_name: str
-    ) -> List[Any]:
+        param_grid: dict | list[dict],
+        parameter_name: str,
+    ) -> list[Any]:
         """
         Returns a list of values for a given hyperparameter, encountered
         recursively throughout the flow. (e.g., n_jobs can be defined
@@ -1412,28 +1459,28 @@ class SklearnExtension(Extension):
             A list of all values of hyperparameters with this name
         """
         if isinstance(param_grid, dict):
-            result = list()
-            for param, value in param_grid.items():
-                # n_jobs is scikit-learn parameter for parallelizing jobs
-                if param.split("__")[-1] == parameter_name:
-                    result.append(value)
-            return result
-        elif isinstance(param_grid, list):
-            result = list()
+            return [
+                value
+                for param, value in param_grid.items()
+                if param.split("__")[-1] == parameter_name
+            ]
+
+        if isinstance(param_grid, list):
+            result = []
             for sub_grid in param_grid:
                 result.extend(
-                    SklearnExtension._get_parameter_values_recursive(sub_grid, parameter_name)
+                    SklearnExtension._get_parameter_values_recursive(sub_grid, parameter_name),
                 )
             return result
-        else:
-            raise ValueError("Param_grid should either be a dict or list of dicts")
+
+        raise ValueError("Param_grid should either be a dict or list of dicts")
 
     def _prevent_optimize_n_jobs(self, model):
         """
         Ensures that HPO classes will not optimize the n_jobs hyperparameter
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         model:
             The model that will be fitted
         """
@@ -1450,19 +1497,20 @@ class SklearnExtension(Extension):
                         "Using subclass BaseSearchCV other than "
                         "{GridSearchCV, RandomizedSearchCV}. "
                         "Could not find attribute "
-                        "param_distributions."
+                        "param_distributions.",
                     )
                 logger.warning(
                     "Warning! Using subclass BaseSearchCV other than "
                     "{GridSearchCV, RandomizedSearchCV}. "
-                    "Should implement param check. "
+                    "Should implement param check. ",
                 )
             n_jobs_vals = SklearnExtension._get_parameter_values_recursive(
-                param_distributions, "n_jobs"
+                param_distributions,
+                "n_jobs",
             )
             if len(n_jobs_vals) > 0:
                 raise PyOpenMLError(
-                    "openml-python should not be used to " "optimize the n_jobs parameter."
+                    "openml-python should not be used to optimize the n_jobs parameter.",
                 )
 
     ################################################################################################
@@ -1485,7 +1533,7 @@ class SklearnExtension(Extension):
         o = model
         return hasattr(o, "fit") and hasattr(o, "get_params") and hasattr(o, "set_params")
 
-    def seed_model(self, model: Any, seed: Optional[int] = None) -> Any:
+    def seed_model(self, model: Any, seed: int | None = None) -> Any:  # noqa: C901
         """Set the random state of all the unseeded components of a model and return the seeded
         model.
 
@@ -1511,17 +1559,19 @@ class SklearnExtension(Extension):
         def _seed_current_object(current_value):
             if isinstance(current_value, int):  # acceptable behaviour
                 return False
-            elif isinstance(current_value, np.random.RandomState):
+
+            if isinstance(current_value, np.random.RandomState):
                 raise ValueError(
                     "Models initialized with a RandomState object are not "
-                    "supported. Please seed with an integer. "
+                    "supported. Please seed with an integer. ",
                 )
-            elif current_value is not None:
+
+            if current_value is not None:
                 raise ValueError(
-                    "Models should be seeded with int or None (this should never " "happen). "
+                    "Models should be seeded with int or None (this should never happen). ",
                 )
-            else:
-                return True
+
+            return True
 
         rs = np.random.RandomState(seed)
         model_params = model.get_params()
@@ -1561,12 +1611,15 @@ class SklearnExtension(Extension):
         -------
         bool
         """
+        from sklearn.exceptions import NotFittedError
+        from sklearn.utils.validation import check_is_fitted
+
         try:
             # check if model is fitted
-            from sklearn.exceptions import NotFittedError
+            check_is_fitted(model)
 
             # Creating random dummy data of arbitrary size
-            dummy_data = np.random.uniform(size=(10, 3))
+            dummy_data = np.random.uniform(size=(10, 3))  # noqa: NPY002
             # Using 'predict' instead of 'sklearn.utils.validation.check_is_fitted' for a more
             # robust check that works across sklearn versions and models. Internally, 'predict'
             # should call 'check_is_fitted' for every concerned attribute, thus offering a more
@@ -1581,17 +1634,20 @@ class SklearnExtension(Extension):
             # Will reach here if the model was fit on a dataset with more or less than 3 features
             return True
 
-    def _run_model_on_fold(
+    def _run_model_on_fold(  # noqa: PLR0915, PLR0913, C901, PLR0912
         self,
         model: Any,
-        task: "OpenMLTask",
-        X_train: Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame],
+        task: OpenMLTask,
+        X_train: np.ndarray | scipy.sparse.spmatrix | pd.DataFrame,
         rep_no: int,
         fold_no: int,
-        y_train: Optional[np.ndarray] = None,
-        X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix, pd.DataFrame]] = None,
-    ) -> Tuple[
-        np.ndarray, Optional[pd.DataFrame], "OrderedDict[str, float]", Optional[OpenMLRunTrace]
+        y_train: np.ndarray | None = None,
+        X_test: np.ndarray | scipy.sparse.spmatrix | pd.DataFrame | None = None,
+    ) -> tuple[
+        np.ndarray,
+        pd.DataFrame | None,
+        OrderedDict[str, float],
+        OpenMLRunTrace | None,
     ]:
         """Run a model on a repeat,fold,subsample triplet of the task and return prediction
         information.
@@ -1640,7 +1696,9 @@ class SklearnExtension(Extension):
         """
 
         def _prediction_to_probabilities(
-            y: Union[np.ndarray, List], model_classes: List[Any], class_labels: Optional[List[str]]
+            y: np.ndarray | list,
+            model_classes: list[Any],
+            class_labels: list[str] | None,
         ) -> pd.DataFrame:
             """Transforms predicted probabilities to match with OpenML class indices.
 
@@ -1673,7 +1731,10 @@ class SklearnExtension(Extension):
 
             # DataFrame allows more accurate mapping of classes as column names
             result = pd.DataFrame(
-                0, index=np.arange(len(y)), columns=model_classes, dtype=np.float32
+                0,
+                index=np.arange(len(y)),
+                columns=model_classes,
+                dtype=np.float32,
             )
             for obs, prediction in enumerate(y):
                 result.loc[obs, prediction] = 1.0
@@ -1696,20 +1757,20 @@ class SklearnExtension(Extension):
             modelfit_start_walltime = time.time()
 
             if isinstance(task, OpenMLSupervisedTask):
-                model_copy.fit(X_train, y_train)
+                model_copy.fit(X_train, y_train)  # type: ignore
             elif isinstance(task, OpenMLClusteringTask):
-                model_copy.fit(X_train)
+                model_copy.fit(X_train)  # type: ignore
 
             modelfit_dur_cputime = (time.process_time() - modelfit_start_cputime) * 1000
             modelfit_dur_walltime = (time.time() - modelfit_start_walltime) * 1000
 
             user_defined_measures["usercpu_time_millis_training"] = modelfit_dur_cputime
-            refit_time = model_copy.refit_time_ * 1000 if hasattr(model_copy, "refit_time_") else 0
+            refit_time = model_copy.refit_time_ * 1000 if hasattr(model_copy, "refit_time_") else 0  # type: ignore
             user_defined_measures["wall_clock_time_millis_training"] = modelfit_dur_walltime
 
         except AttributeError as e:
             # typically happens when training a regressor on classification task
-            raise PyOpenMLError(str(e))
+            raise PyOpenMLError(str(e)) from e
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
             # search for model classes_ (might differ depending on modeltype)
@@ -1732,9 +1793,10 @@ class SklearnExtension(Extension):
             # to handle the case when dataset is numpy and categories are encoded
             # however the class labels stored in task are still categories
             if isinstance(y_train, np.ndarray) and isinstance(
-                cast(List, task.class_labels)[0], str
+                cast("List", task.class_labels)[0],
+                str,
             ):
-                model_classes = [cast(List[str], task.class_labels)[i] for i in model_classes]
+                model_classes = [cast("List[str]", task.class_labels)[i] for i in model_classes]
 
         modelpredict_start_cputime = time.process_time()
         modelpredict_start_walltime = time.time()
@@ -1778,14 +1840,14 @@ class SklearnExtension(Extension):
                     # then we need to add a column full of zeros into the probabilities
                     # for class 3 because the rest of the library expects that the
                     # probabilities are ordered the same way as the classes are ordered).
-                    message = "Estimator only predicted for {}/{} classes!".format(
-                        proba_y.shape[1],
-                        len(task.class_labels),
+                    message = (
+                        f"Estimator only predicted for {proba_y.shape[1]}/{len(task.class_labels)}"
+                        " classes!"
                     )
-                    warnings.warn(message)
+                    warnings.warn(message, stacklevel=2)
                     openml.config.logger.warning(message)
 
-                    for i, col in enumerate(task.class_labels):
+                    for _i, col in enumerate(task.class_labels):
                         # adding missing columns with 0 probability
                         if col not in model_classes:
                             proba_y[col] = 0
@@ -1798,30 +1860,27 @@ class SklearnExtension(Extension):
                 missing_cols = list(set(task.class_labels) - set(proba_y.columns))
                 raise ValueError("Predicted probabilities missing for the columns: ", missing_cols)
 
-        elif isinstance(task, OpenMLRegressionTask):
+        elif isinstance(task, (OpenMLRegressionTask, OpenMLClusteringTask)):
             proba_y = None
-
-        elif isinstance(task, OpenMLClusteringTask):
-            proba_y = None
-
         else:
             raise TypeError(type(task))
 
         if self._is_hpo_class(model_copy):
             trace_data = self._extract_trace_data(model_copy, rep_no, fold_no)
-            trace = self._obtain_arff_trace(
-                model_copy, trace_data
-            )  # type: Optional[OpenMLRunTrace]  # noqa E501
+            trace: OpenMLRunTrace | None = self._obtain_arff_trace(
+                model_copy,
+                trace_data,
+            )
         else:
             trace = None
 
         return pred_y, proba_y, user_defined_measures, trace
 
-    def obtain_parameter_values(
+    def obtain_parameter_values(  # noqa: C901, PLR0915
         self,
-        flow: "OpenMLFlow",
+        flow: OpenMLFlow,
         model: Any = None,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Extracts all parameter settings required for the flow from the model.
 
         If no explicit model is provided, the parameters will be extracted from `flow.model`
@@ -1852,7 +1911,13 @@ class SklearnExtension(Extension):
                 flow_map.update(get_flow_dict(_flow.components[subflow]))
             return flow_map
 
-        def extract_parameters(_flow, _flow_dict, component_model, _main_call=False, main_id=None):
+        def extract_parameters(  # noqa: PLR0915, PLR0912, C901
+            _flow,
+            _flow_dict,
+            component_model,
+            _main_call=False,  # noqa: FBT002
+            main_id=None,
+        ):
             def is_subcomponent_specification(values):
                 # checks whether the current value can be a specification of
                 # subcomponents, as for example the value for steps parameter
@@ -1885,7 +1950,7 @@ class SklearnExtension(Extension):
             ):
                 model_parameters = set()
             else:
-                model_parameters = set([mp for mp in component_model.get_params(deep=False)])
+                model_parameters = set(component_model.get_params(deep=False))
             if len(exp_parameters.symmetric_difference(model_parameters)) != 0:
                 flow_params = sorted(exp_parameters)
                 model_params = sorted(model_parameters)
@@ -1893,7 +1958,7 @@ class SklearnExtension(Extension):
                     "Parameters of the model do not match the "
                     "parameters expected by the "
                     "flow:\nexpected flow parameters: "
-                    "%s\nmodel parameters: %s" % (flow_params, model_params)
+                    f"{flow_params}\nmodel parameters: {model_params}",
                 )
             exp_components = set(_flow.components)
             if (
@@ -1902,14 +1967,12 @@ class SklearnExtension(Extension):
             ):
                 model_components = set()
             else:
-                _ = set([mp for mp in component_model.get_params(deep=False)])
-                model_components = set(
-                    [
-                        mp
-                        for mp in component_model.get_params(deep=True)
-                        if "__" not in mp and mp not in _
-                    ]
-                )
+                _ = set(component_model.get_params(deep=False))
+                model_components = {
+                    mp
+                    for mp in component_model.get_params(deep=True)
+                    if "__" not in mp and mp not in _
+                }
             if len(exp_components.symmetric_difference(model_components)) != 0:
                 is_problem = True
                 if len(exp_components - model_components) > 0:
@@ -1931,7 +1994,7 @@ class SklearnExtension(Extension):
                         "Subcomponents of the model do not match the "
                         "parameters expected by the "
                         "flow:\nexpected flow subcomponents: "
-                        "%s\nmodel subcomponents: %s" % (flow_components, model_components)
+                        f"{flow_components}\nmodel subcomponents: {model_components}",
                     )
 
             _params = []
@@ -1949,21 +2012,21 @@ class SklearnExtension(Extension):
 
                 if is_subcomponent_specification(current_param_values):
                     # complex parameter value, with subcomponents
-                    parsed_values = list()
+                    parsed_values = []
                     for subcomponent in current_param_values:
                         # scikit-learn stores usually tuples in the form
                         # (name (str), subcomponent (mixed), argument
                         # (mixed)). OpenML replaces the subcomponent by an
                         # OpenMLFlow object.
                         if len(subcomponent) < 2 or len(subcomponent) > 3:
-                            raise ValueError("Component reference should be " "size {2,3}. ")
+                            raise ValueError("Component reference should be size {2,3}. ")
 
                         subcomponent_identifier = subcomponent[0]
                         subcomponent_flow = subcomponent[1]
                         if not isinstance(subcomponent_identifier, str):
                             raise TypeError(
                                 "Subcomponent identifier should be of type string, "
-                                "but is {}".format(type(subcomponent_identifier))
+                                f"but is {type(subcomponent_identifier)}",
                             )
                         if not isinstance(subcomponent_flow, (openml.flows.OpenMLFlow, str)):
                             if (
@@ -1973,9 +2036,8 @@ class SklearnExtension(Extension):
                                 pass
                             else:
                                 raise TypeError(
-                                    "Subcomponent flow should be of type flow, but is {}".format(
-                                        type(subcomponent_flow)
-                                    )
+                                    "Subcomponent flow should be of type flow, but is"
+                                    f" {type(subcomponent_flow)}",
                                 )
 
                         current = {
@@ -1987,10 +2049,11 @@ class SklearnExtension(Extension):
                         }
                         if len(subcomponent) == 3:
                             if not isinstance(subcomponent[2], list) and not isinstance(
-                                subcomponent[2], OrderedDict
+                                subcomponent[2],
+                                OrderedDict,
                             ):
                                 raise TypeError(
-                                    "Subcomponent argument should be list or OrderedDict"
+                                    "Subcomponent argument should be list or OrderedDict",
                                 )
                             current["value"]["argument_1"] = subcomponent[2]
                         parsed_values.append(current)
@@ -2010,16 +2073,16 @@ class SklearnExtension(Extension):
                 subcomponent_model = component_model.get_params()[_identifier]
                 _params.extend(
                     extract_parameters(
-                        _flow.components[_identifier], _flow_dict, subcomponent_model
-                    )
+                        _flow.components[_identifier],
+                        _flow_dict,
+                        subcomponent_model,
+                    ),
                 )
             return _params
 
         flow_dict = get_flow_dict(flow)
         model = model if model is not None else flow.model
-        parameters = extract_parameters(flow, flow_dict, model, True, flow.flow_id)
-
-        return parameters
+        return extract_parameters(flow, flow_dict, model, _main_call=True, main_id=flow.flow_id)
 
     def _openml_param_name_to_sklearn(
         self,
@@ -2093,16 +2156,32 @@ class SklearnExtension(Extension):
         """
         if not self._is_hpo_class(model):
             raise AssertionError(
-                "Flow model %s is not an instance of sklearn.model_selection._search.BaseSearchCV"
-                % model
+                f"Flow model {model} is not an instance of"
+                " sklearn.model_selection._search.BaseSearchCV",
             )
         base_estimator = model.estimator
         base_estimator.set_params(**trace_iteration.get_parameters())
         return base_estimator
 
     def _extract_trace_data(self, model, rep_no, fold_no):
+        """Extracts data from a machine learning model's cross-validation results
+        and creates an ARFF (Attribute-Relation File Format) trace.
+
+        Parameters
+        ----------
+        model : Any
+            A fitted hyperparameter optimization model.
+        rep_no : int
+            The repetition number.
+        fold_no : int
+            The fold number.
+
+        Returns
+        -------
+        A list of ARFF tracecontent.
+        """
         arff_tracecontent = []
-        for itt_no in range(0, len(model.cv_results_["mean_test_score"])):
+        for itt_no in range(len(model.cv_results_["mean_test_score"])):
             # we use the string values for True and False, as it is defined in
             # this way by the OpenML server
             selected = "false"
@@ -2113,10 +2192,12 @@ class SklearnExtension(Extension):
             for key in model.cv_results_:
                 if key.startswith("param_"):
                     value = model.cv_results_[key][itt_no]
-                    if value is not np.ma.masked:
-                        serialized_value = json.dumps(value)
-                    else:
-                        serialized_value = np.nan
+                    # Built-in serializer does not convert all numpy types,
+                    # these methods convert them to built-in types instead.
+                    if isinstance(value, np.generic):
+                        # For scalars it actually returns scalars, not a list
+                        value = value.tolist()
+                    serialized_value = json.dumps(value) if value is not np.ma.masked else np.nan
                     arff_line.append(serialized_value)
             arff_tracecontent.append(arff_line)
         return arff_tracecontent
@@ -2124,8 +2205,8 @@ class SklearnExtension(Extension):
     def _obtain_arff_trace(
         self,
         model: Any,
-        trace_content: List,
-    ) -> "OpenMLRunTrace":
+        trace_content: list,
+    ) -> OpenMLRunTrace:
         """Create arff trace object from a fitted model and the trace content obtained by
         repeatedly calling ``run_model_on_task``.
 
@@ -2143,8 +2224,8 @@ class SklearnExtension(Extension):
         """
         if not self._is_hpo_class(model):
             raise AssertionError(
-                "Flow model %s is not an instance of sklearn.model_selection._search.BaseSearchCV"
-                % model
+                f"Flow model {model} is not an instance of "
+                "sklearn.model_selection._search.BaseSearchCV",
             )
         if not hasattr(model, "cv_results_"):
             raise ValueError("model should contain `cv_results_`")
@@ -2165,26 +2246,28 @@ class SklearnExtension(Extension):
                 # int float
                 supported_basic_types = (bool, int, float, str)
                 for param_value in model.cv_results_[key]:
+                    if isinstance(param_value, np.generic):
+                        param_value = param_value.tolist()  # noqa: PLW2901
                     if (
                         isinstance(param_value, supported_basic_types)
                         or param_value is None
                         or param_value is np.ma.masked
                     ):
                         # basic string values
-                        type = "STRING"
+                        type = "STRING"  # noqa: A001
                     elif isinstance(param_value, (list, tuple)) and all(
                         isinstance(i, int) for i in param_value
                     ):
                         # list of integers (usually for selecting features)
                         # hyperparameter layer_sizes of MLPClassifier
-                        type = "STRING"
+                        type = "STRING"  # noqa: A001
                     else:
-                        raise TypeError("Unsupported param type in param grid: %s" % key)
+                        raise TypeError(f"Unsupported param type in param grid: {key}")
 
                 # renamed the attribute param to parameter, as this is a required
                 # OpenML convention - this also guards against name collisions
                 # with the required trace attributes
-                attribute = (PREFIX + key[6:], type)
+                attribute = (PREFIX + key[6:], type)  # type: ignore
                 trace_attributes.append(attribute)
 
         return OpenMLRunTrace.generate(

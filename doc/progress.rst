@@ -2,9 +2,41 @@
 
 .. _progress:
 
-=========
-Changelog
-=========
+=============================================
+Changelog (discontinued after version 0.15.0)
+=============================================
+
+See GitHub releases for the latest changes.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+0.15.0
+~~~~~~
+
+ * ADD #1335: Improve MinIO support.
+    * Add progress bar for downloading MinIO files. Enable it with setting `show_progress` to true on either `openml.config` or the configuration file.
+    * When using `download_all_files`, files are only downloaded if they do not yet exist in the cache.
+ * FIX #1338: Read the configuration file without overwriting it.
+ * MAINT #1340: Add Numpy 2.0 support. Update tests to work with scikit-learn <= 1.5.
+ * ADD #1342: Add HTTP header to requests to indicate they are from openml-python.
+ * ADD #1345: `task.get_dataset` now takes the same parameters as `openml.datasets.get_dataset` to allow fine-grained control over file downloads.
+ * MAINT #1346: The ARFF file of a dataset is now only downloaded if parquet is not available.
+ * MAINT #1349: Removed usage of the `disutils` module, which allows for Py3.12 compatibility.
+ * MAINT #1351: Image archives are now automatically deleted after they have been downloaded and extracted.
+ * MAINT #1352, 1354: When fetching tasks and datasets, file download parameters now default to not downloading the file.
+    Files will be downloaded only when a user tries to access properties which require them (e.g., `dataset.qualities` or `dataset.get_data`).
+
+
+0.14.2
+~~~~~~
+
+ * MAINT #1280: Use the server-provided ``parquet_url`` instead of ``minio_url`` to determine the location of the parquet file.
+ * ADD #716: add documentation for remaining attributes of classes and functions.
+ * ADD #1261: more annotations for type hints.
+ * MAINT #1294: update tests to new tag specification.
+ * FIX #1314: Update fetching a bucket from MinIO.
+ * FIX #1315: Make class label retrieval more lenient.
+ * ADD #1316: add feature descriptions ontologies support.
+ * MAINT #1310/#1307: switch to ruff and resolve all mypy errors.
 
 0.14.1
 ~~~~~~

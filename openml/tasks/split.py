@@ -1,17 +1,24 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from collections import namedtuple, OrderedDict
-import os
 import pickle
+from collections import OrderedDict
+from pathlib import Path
+from typing import Any
+from typing_extensions import NamedTuple
 
+import arff  # type: ignore
 import numpy as np
-import arff
 
 
-Split = namedtuple("Split", ["train", "test"])
+class Split(NamedTuple):
+    """A single split of a dataset."""
+
+    train: np.ndarray
+    test: np.ndarray
 
 
-class OpenMLSplit(object):
+class OpenMLSplit:
     """OpenML Split object.
 
     Parameters
@@ -21,27 +28,35 @@ class OpenMLSplit(object):
     split : dict
     """
 
-    def __init__(self, name, description, split):
+    def __init__(
+        self,
+        name: int | str,
+        description: str,
+        split: dict[int, dict[int, dict[int, tuple[np.ndarray, np.ndarray]]]],
+    ):
         self.description = description
         self.name = name
-        self.split = dict()
+        self.split: dict[int, dict[int, dict[int, tuple[np.ndarray, np.ndarray]]]] = {}
 
         # Add splits according to repetition
         for repetition in split:
-            repetition = int(repetition)
-            self.split[repetition] = OrderedDict()
-            for fold in split[repetition]:
-                self.split[repetition][fold] = OrderedDict()
-                for sample in split[repetition][fold]:
-                    self.split[repetition][fold][sample] = split[repetition][fold][sample]
+            _rep = int(repetition)
+            self.split[_rep] = OrderedDict()
+            for fold in split[_rep]:
+                self.split[_rep][fold] = OrderedDict()
+                for sample in split[_rep][fold]:
+                    self.split[_rep][fold][sample] = split[_rep][fold][sample]
 
         self.repeats = len(self.split)
-        if any([len(self.split[0]) != len(self.split[i]) for i in range(self.repeats)]):
+
+        # TODO(eddiebergman): Better error message
+        if any(len(self.split[0]) != len(self.split[i]) for i in range(self.repeats)):
             raise ValueError("")
+
         self.folds = len(self.split[0])
         self.samples = len(self.split[0][0])
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if (
             (not isinstance(self, type(other)))
             or self.name != other.name
@@ -69,23 +84,26 @@ class OpenMLSplit(object):
         return True
 
     @classmethod
-    def _from_arff_file(cls, filename: str) -> "OpenMLSplit":
+    def _from_arff_file(cls, filename: Path) -> OpenMLSplit:  # noqa: C901, PLR0912
         repetitions = None
+        name = None
 
-        pkl_filename = filename.replace(".arff", ".pkl.py3")
+        pkl_filename = filename.with_suffix(".pkl.py3")
 
-        if os.path.exists(pkl_filename):
-            with open(pkl_filename, "rb") as fh:
-                _ = pickle.load(fh)
-            repetitions = _["repetitions"]
-            name = _["name"]
+        if pkl_filename.exists():
+            with pkl_filename.open("rb") as fh:
+                # TODO(eddiebergman): Would be good to figure out what _split is and assert it is
+                _split = pickle.load(fh)  # noqa: S301
+            repetitions = _split["repetitions"]
+            name = _split["name"]
 
         # Cache miss
         if repetitions is None:
             # Faster than liac-arff and sufficient in this situation!
-            if not os.path.exists(filename):
-                raise FileNotFoundError("Split arff %s does not exist!" % filename)
-            file_data = arff.load(open(filename), return_type=arff.DENSE_GEN)
+            if not filename.exists():
+                raise FileNotFoundError(f"Split arff {filename} does not exist!")
+
+            file_data = arff.load(filename.open("r"), return_type=arff.DENSE_GEN)
             splits = file_data["data"]
             name = file_data["relation"]
             attrnames = [attr[0] for attr in file_data["attributes"]]
@@ -130,19 +148,38 @@ class OpenMLSplit(object):
                             np.array(repetitions[repetition][fold][sample][1], dtype=np.int32),
                         )
 
-            with open(pkl_filename, "wb") as fh:
+            with pkl_filename.open("wb") as fh:
                 pickle.dump({"name": name, "repetitions": repetitions}, fh, protocol=2)
 
+        assert name is not None
         return cls(name, "", repetitions)
 
-    def from_dataset(self, X, Y, folds, repeats):
-        raise NotImplementedError()
+    def get(self, repeat: int = 0, fold: int = 0, sample: int = 0) -> tuple[np.ndarray, np.ndarray]:
+        """Returns the specified data split from the CrossValidationSplit object.
 
-    def get(self, repeat=0, fold=0, sample=0):
+        Parameters
+        ----------
+        repeat : int
+            Index of the repeat to retrieve.
+        fold : int
+            Index of the fold to retrieve.
+        sample : int
+            Index of the sample to retrieve.
+
+        Returns
+        -------
+        numpy.ndarray
+            The data split for the specified repeat, fold, and sample.
+
+        Raises
+        ------
+        ValueError
+            If the specified repeat, fold, or sample is not known.
+        """
         if repeat not in self.split:
-            raise ValueError("Repeat %s not known" % str(repeat))
+            raise ValueError(f"Repeat {repeat!s} not known")
         if fold not in self.split[repeat]:
-            raise ValueError("Fold %s not known" % str(fold))
+            raise ValueError(f"Fold {fold!s} not known")
         if sample not in self.split[repeat][fold]:
-            raise ValueError("Sample %s not known" % str(sample))
+            raise ValueError(f"Sample {sample!s} not known")
         return self.split[repeat][fold][sample]

@@ -13,11 +13,9 @@ Publication
 | Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Springenberg, Manuel Blum and Frank Hutter
 | In *Advances in Neural Information Processing Systems 28*, 2015
 | Available at https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning.pdf
-"""  # noqa F401
+"""
 
 # License: BSD 3-Clause
-
-import pandas as pd
 
 import openml
 
@@ -49,18 +47,17 @@ dataset_ids = [
 #    this does not allow reproducibility (unclear splitting). Please do not use datasets but the
 #    respective tasks as basis for a paper and publish task IDS. This example is only given to
 #    showcase the use of OpenML-Python for a published paper and as a warning on how not to do it.
-#    Please check the `OpenML documentation of tasks <https://docs.openml.org/#tasks>`_ if you
+#    Please check the `OpenML documentation of tasks <https://docs.openml.org/concepts/tasks/>`_ if you
 #    want to learn more about them.
 
 ####################################################################################################
 # This lists both active and inactive tasks (because of ``status='all'``). Unfortunately,
 # this is necessary as some of the datasets contain issues found after the publication and became
 # deactivated, which also deactivated the tasks on them. More information on active or inactive
-# datasets can be found in the `online docs <https://docs.openml.org/#dataset-status>`_.
+# datasets can be found in the `online docs <https://docs.openml.org/concepts/data/#dataset-status>`_.
 tasks = openml.tasks.list_tasks(
     task_type=openml.tasks.TaskType.SUPERVISED_CLASSIFICATION,
     status="all",
-    output_format="dataframe",
 )
 
 # Query only those with holdout as the resampling startegy.
@@ -68,7 +65,7 @@ tasks = tasks.query('estimation_procedure == "33% Holdout set"')
 
 task_ids = []
 for did in dataset_ids:
-    tasks_ = list(tasks.query("did == {}".format(did)).tid)
+    tasks_ = list(tasks.query(f"did == {did}").tid)
     if len(tasks_) >= 1:  # if there are multiple task, take the one with lowest ID (oldest).
         task_id = min(tasks_)
     else:

@@ -141,7 +141,7 @@ following rules before you submit a pull request:
 
 -  If your pull request addresses an issue, please use the pull request title
    to describe the issue and mention the issue number in the pull request description. This will make sure a link back to the original issue is
-   created.
+   created. Make sure the title is descriptive enough to understand what the pull request does! 
 
 -  An incomplete contribution -- where you expect to do more work before
    receiving a full review -- should be submitted as a `draft`. These may be useful
@@ -174,8 +174,6 @@ following rules before you submit a pull request:
    For the Bug-fixes case, at the time of the PR, this tests should fail for
    the code base in develop and pass for the PR code.
 
- - Add your changes to the changelog in the file doc/progress.rst.
-
  - If any source file is being added to the repository, please add the BSD 3-Clause license to it.
 
 
@@ -201,42 +199,24 @@ Make sure your code has good unittest **coverage** (at least 80%).
 
 Pre-commit is used for various style checking and code formatting.
 Before each commit, it will automatically run:
- - [black](https://black.readthedocs.io/en/stable/) a code formatter.
+ - [ruff](https://docs.astral.sh/ruff/) a code formatter and linter.
    This will automatically format your code.
    Make sure to take a second look after any formatting takes place,
    if the resulting code is very bloated, consider a (small) refactor.
-   *note*: If Black reformats your code, the commit will automatically be aborted.
-   Make sure to add the formatted files (back) to your commit after checking them.
  - [mypy](https://mypy.readthedocs.io/en/stable/) a static type checker.
    In particular, make sure each function you work on has type hints.
- - [flake8](https://flake8.pycqa.org/en/latest/index.html) style guide enforcement.
-   Almost all of the black-formatted code should automatically pass this check,
-   but make sure to make adjustments if it does fail.
     
 If you want to run the pre-commit tests without doing a commit, run:
-  ```bash
-  $ pre-commit run --all-files
-  ```
+```bash
+$ make check
+```
+or on a system without make, like Windows:
+```bash
+$ pre-commit run --all-files
+```
 Make sure to do this at least once before your first commit to check your setup works.
 
 Executing a specific unit test can be done by specifying the module, test case, and test.
-To obtain a hierarchical list of all tests, run
-
-  ```bash
-  $  pytest --collect-only
-
-    <Module 'tests/test_datasets/test_dataset.py'>
-      <UnitTestCase 'OpenMLDatasetTest'>
-        <TestCaseFunction 'test_dataset_format_constructor'>
-        <TestCaseFunction 'test_get_data'>
-        <TestCaseFunction 'test_get_data_rowid_and_ignore_and_target'>
-        <TestCaseFunction 'test_get_data_with_ignore_attributes'>
-        <TestCaseFunction 'test_get_data_with_rowid'>
-        <TestCaseFunction 'test_get_data_with_target'>
-      <UnitTestCase 'OpenMLDatasetTestOnTestServer'>
-        <TestCaseFunction 'test_tagging'>
-   ```
-
 You may then run a specific module, test case, or unit test respectively:
 ```bash
   $ pytest tests/test_datasets/test_dataset.py
@@ -267,7 +247,7 @@ information.
 
 For building the documentation, you will need to install a few additional dependencies:
 ```bash
-$ pip install -e .[docs]
+$ pip install -e .[examples,docs]
 ```
 When dependencies are installed, run
 ```bash

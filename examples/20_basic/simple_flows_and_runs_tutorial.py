@@ -7,9 +7,9 @@ A simple tutorial on how to train/run a model and how to upload the results.
 
 # License: BSD 3-Clause
 
-import openml
 from sklearn import ensemble, neighbors
 
+import openml
 
 ############################################################################
 # .. warning::
@@ -20,8 +20,8 @@ openml.config.start_using_configuration_for_example()
 # Train a machine learning model
 # ==============================
 
-# NOTE: We are using dataset 20 from the test server: https://test.openml.org/d/20
-dataset = openml.datasets.get_dataset(20)
+# NOTE: We are using dataset "diabetes" from the test server: https://test.openml.org/d/20
+dataset = openml.datasets.get_dataset(dataset_id="diabetes", version=1)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
     target=dataset.default_target_attribute
 )

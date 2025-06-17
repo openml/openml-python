@@ -21,15 +21,22 @@ Possible Future: class TestBase from openml/testing.py can be included
 """
 
 # License: BSD 3-Clause
+from __future__ import annotations
 
-import os
+import multiprocessing
+
+multiprocessing.set_start_method("spawn", force=True)
+
+from collections.abc import Iterator
 import logging
-import pathlib
-from typing import List
+import os
+import shutil
+from pathlib import Path
 import pytest
 
 import openml
 from openml.testing import TestBase
+
 
 # creating logger for unit test file deletion status
 logger = logging.getLogger("unit_tests")
@@ -52,29 +59,29 @@ def worker_id() -> str:
         return "master"
 
 
-def read_file_list() -> List[pathlib.Path]:
+def read_file_list() -> list[Path]:
     """Returns a list of paths to all files that currently exist in 'openml/tests/files/'
 
-    :return: List[pathlib.Path]
+    :return: List[Path]
     """
-    test_files_dir = pathlib.Path(__file__).parent / "files"
+    test_files_dir = Path(__file__).parent / "files"
     return [f for f in test_files_dir.rglob("*") if f.is_file()]
 
 
-def compare_delete_files(old_list: List[pathlib.Path], new_list: List[pathlib.Path]) -> None:
+def compare_delete_files(old_list: list[Path], new_list: list[Path]) -> None:
     """Deletes files that are there in the new_list but not in the old_list
 
-    :param old_list: List[pathlib.Path]
-    :param new_list: List[pathlib.Path]
+    :param old_list: List[Path]
+    :param new_list: List[Path]
     :return: None
     """
     file_list = list(set(new_list) - set(old_list))
     for file in file_list:
         os.remove(file)
-        logger.info("Deleted from local: {}".format(file))
+        logger.info(f"Deleted from local: {file}")
 
 
-def delete_remote_files(tracker) -> None:
+def delete_remote_files(tracker, flow_names) -> None:
     """Function that deletes the entities passed as input, from the OpenML test server
 
     The TestBase class in openml/testing.py has an attribute called publish_tracker.
@@ -94,27 +101,27 @@ def delete_remote_files(tracker) -> None:
     # reordering to delete sub flows at the end of flows
     # sub-flows have shorter names, hence, sorting by descending order of flow name length
     if "flow" in tracker:
+        to_sort = list(zip(tracker["flow"], flow_names))
         flow_deletion_order = [
-            entity_id
-            for entity_id, _ in sorted(tracker["flow"], key=lambda x: len(x[1]), reverse=True)
+            entity_id for entity_id, _ in sorted(to_sort, key=lambda x: len(x[1]), reverse=True)
         ]
-        tracker["flow"] = flow_deletion_order
+        tracker["flow"] = [flow_deletion_order[1] for flow_id, _ in flow_deletion_order]
 
     # deleting all collected entities published to test server
     # 'run's are deleted first to prevent dependency issue of entities on deletion
     logger.info("Entity Types: {}".format(["run", "data", "flow", "task", "study"]))
     for entity_type in ["run", "data", "flow", "task", "study"]:
-        logger.info("Deleting {}s...".format(entity_type))
-        for i, entity in enumerate(tracker[entity_type]):
+        logger.info(f"Deleting {entity_type}s...")
+        for _i, entity in enumerate(tracker[entity_type]):
             try:
                 openml.utils._delete_entity(entity_type, entity)
-                logger.info("Deleted ({}, {})".format(entity_type, entity))
+                logger.info(f"Deleted ({entity_type}, {entity})")
             except Exception as e:
-                logger.warning("Cannot delete ({},{}): {}".format(entity_type, entity, e))
+                logger.warning(f"Cannot delete ({entity_type},{entity}): {e}")
 
 
 def pytest_sessionstart() -> None:
-    """pytest hook that is executed before any unit test starts
+    """Pytest hook that is executed before any unit test starts
 
     This function will be called by each of the worker processes, along with the master process
     when they are spawned. This happens even before the collection of unit tests.
@@ -136,7 +143,7 @@ def pytest_sessionstart() -> None:
 
 
 def pytest_sessionfinish() -> None:
-    """pytest hook that is executed after all unit tests of a worker ends
+    """Pytest hook that is executed after all unit tests of a worker ends
 
     This function will be called by each of the worker processes, along with the master process
     when they are done with the unit tests allocated to them.
@@ -154,19 +161,28 @@ def pytest_sessionfinish() -> None:
     # allows access to the file_list read in the set up phase
     global file_list
     worker = worker_id()
-    logger.info("Finishing worker {}".format(worker))
+    logger.info(f"Finishing worker {worker}")
 
     # Test file deletion
-    logger.info("Deleting files uploaded to test server for worker {}".format(worker))
-    delete_remote_files(TestBase.publish_tracker)
+    logger.info(f"Deleting files uploaded to test server for worker {worker}")
+    delete_remote_files(TestBase.publish_tracker, TestBase.flow_name_tracker)
 
     if worker == "master":
         # Local file deletion
         new_file_list = read_file_list()
         compare_delete_files(file_list, new_file_list)
+
+        # Delete any test dirs that remain
+        # In edge cases due to a mixture of pytest parametrization and oslo concurrency,
+        # some file lock are created after leaving the test. This removes these files!
+        test_files_dir = Path(__file__).parent.parent / "openml"
+        for f in test_files_dir.glob("tests.*"):
+            if f.is_dir():
+                shutil.rmtree(f)
+
         logger.info("Local files deleted")
 
-    logger.info("{} is killed".format(worker))
+    logger.info(f"{worker} is killed")
 
 
 def pytest_configure(config):
@@ -182,16 +198,93 @@ def pytest_addoption(parser):
     )
 
 
+def _expected_static_cache_state(root_dir: Path) -> list[Path]:
+    _c_root_dir = root_dir / "org" / "openml" / "test"
+    res_paths = [root_dir, _c_root_dir]
+
+    for _d in ["datasets", "tasks", "runs", "setups"]:
+        res_paths.append(_c_root_dir / _d)
+
+    for _id in ["-1", "2"]:
+        tmp_p = _c_root_dir / "datasets" / _id
+        res_paths.extend(
+            [
+                tmp_p / "dataset.arff",
+                tmp_p / "features.xml",
+                tmp_p / "qualities.xml",
+                tmp_p / "description.xml",
+            ]
+        )
+
+    res_paths.append(_c_root_dir / "datasets" / "30" / "dataset_30.pq")
+    res_paths.append(_c_root_dir / "runs" / "1" / "description.xml")
+    res_paths.append(_c_root_dir / "setups" / "1" / "description.xml")
+
+    for _id in ["1", "3", "1882"]:
+        tmp_p = _c_root_dir / "tasks" / _id
+        res_paths.extend(
+            [
+                tmp_p / "datasplits.arff",
+                tmp_p / "task.xml",
+            ]
+        )
+
+    return res_paths
+
+
+def assert_static_test_cache_correct(root_dir: Path) -> None:
+    for p in _expected_static_cache_state(root_dir):
+        assert p.exists(), f"Expected path {p} exists"
+
+
 @pytest.fixture(scope="class")
 def long_version(request):
     request.cls.long_version = request.config.getoption("--long")
 
 
-@pytest.fixture
-def test_files_directory() -> pathlib.Path:
-    return pathlib.Path(__file__).parent / "files"
+@pytest.fixture(scope="session")
+def test_files_directory() -> Path:
+    return Path(__file__).parent / "files"
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def test_api_key() -> str:
     return "c0c42819af31e706efe1f4b88c23c6c1"
+
+
+@pytest.fixture(autouse=True, scope="function")
+def verify_cache_state(test_files_directory) -> Iterator[None]:
+    assert_static_test_cache_correct(test_files_directory)
+    yield
+    assert_static_test_cache_correct(test_files_directory)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def as_robot() -> Iterator[None]:
+    policy = openml.config.retry_policy
+    n_retries = openml.config.connection_n_retries
+    openml.config.set_retry_policy("robot", n_retries=20)
+    yield
+    openml.config.set_retry_policy(policy, n_retries)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def with_test_server():
+    openml.config.start_using_configuration_for_example()
+    yield
+    openml.config.stop_using_configuration_for_example()
+
+
+@pytest.fixture(autouse=True)
+def with_test_cache(test_files_directory, request):
+    if not test_files_directory.exists():
+        raise ValueError(
+            f"Cannot find test cache dir, expected it to be {test_files_directory!s}!",
+        )
+    _root_cache_directory = openml.config._root_cache_directory
+    tmp_cache = test_files_directory / request.node.name
+    openml.config.set_root_cache_directory(tmp_cache)
+    yield
+    openml.config.set_root_cache_directory(_root_cache_directory)
+    if tmp_cache.exists():
+        shutil.rmtree(tmp_cache)

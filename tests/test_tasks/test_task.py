@@ -1,16 +1,16 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 import unittest
-from typing import List
 from random import randint, shuffle
 
-from openml.exceptions import OpenMLServerException
-from openml.testing import TestBase
 from openml.datasets import (
     get_dataset,
     list_datasets,
 )
+from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType, create_task, get_task
+from openml.testing import TestBase
 
 
 class OpenMLTaskTest(TestBase):
@@ -25,10 +25,10 @@ class OpenMLTaskTest(TestBase):
     def setUpClass(cls):
         if cls is OpenMLTaskTest:
             raise unittest.SkipTest("Skip OpenMLTaskTest tests," " it's a base class")
-        super(OpenMLTaskTest, cls).setUpClass()
+        super().setUpClass()
 
     def setUp(self, n_levels: int = 1):
-        super(OpenMLTaskTest, self).setUp()
+        super().setUp()
 
     def test_download_task(self):
         return get_task(self.task_id)
@@ -53,7 +53,7 @@ class OpenMLTaskTest(TestBase):
                 task.publish()
                 TestBase._mark_entity_for_removal("task", task.id)
                 TestBase.logger.info(
-                    "collected from {}: {}".format(__file__.split("/")[-1], task.id)
+                    "collected from {}: {}".format(__file__.split("/")[-1], task.id),
                 )
                 # success
                 break
@@ -67,11 +67,11 @@ class OpenMLTaskTest(TestBase):
                     raise e
         else:
             raise ValueError(
-                "Could not create a valid task for task type ID {}".format(self.task_type)
+                f"Could not create a valid task for task type ID {self.task_type}",
             )
 
-    def _get_compatible_rand_dataset(self) -> List:
-        active_datasets = list_datasets(status="active", output_format="dataframe")
+    def _get_compatible_rand_dataset(self) -> list:
+        active_datasets = list_datasets(status="active")
 
         # depending on the task type, find either datasets
         # with only symbolic features or datasets with only

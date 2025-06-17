@@ -1,11 +1,12 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from typing import Tuple
 import unittest
 
-import numpy as np
+import pandas as pd
 
 from openml.tasks import get_task
+
 from .test_task import OpenMLTaskTest
 
 
@@ -21,12 +22,12 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
     def setUpClass(cls):
         if cls is OpenMLSupervisedTaskTest:
             raise unittest.SkipTest("Skip OpenMLSupervisedTaskTest tests," " it's a base class")
-        super(OpenMLSupervisedTaskTest, cls).setUpClass()
+        super().setUpClass()
 
     def setUp(self, n_levels: int = 1):
-        super(OpenMLSupervisedTaskTest, self).setUp()
+        super().setUp()
 
-    def test_get_X_and_Y(self) -> Tuple[np.ndarray, np.ndarray]:
+    def test_get_X_and_Y(self) -> tuple[pd.DataFrame, pd.Series]:
         task = get_task(self.task_id)
         X, Y = task.get_X_and_y()
         return X, Y

@@ -1,70 +1,79 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from collections import OrderedDict
-import io
 import itertools
-import os
 import time
-from typing import Any, List, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING, cast  # noqa F401
 import warnings
+from collections import OrderedDict
+from functools import partial
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
-import sklearn.metrics
-import xmltodict
 import numpy as np
 import pandas as pd
+import sklearn.metrics
+import xmltodict
 from joblib.parallel import Parallel, delayed
 
 import openml
-import openml.utils
 import openml._api_calls
-from openml.exceptions import PyOpenMLError
-from openml.extensions import get_extension_by_model
+import openml.utils
 from openml import config
+from openml.exceptions import (
+    OpenMLCacheException,
+    OpenMLRunsExistError,
+    OpenMLServerException,
+    PyOpenMLError,
+)
+from openml.extensions import get_extension_by_model
+from openml.flows import OpenMLFlow, flow_exists, get_flow
 from openml.flows.flow import _copy_server_fields
-from ..flows import get_flow, flow_exists, OpenMLFlow
-from ..setups import setup_exists, initialize_model
-from ..exceptions import OpenMLCacheException, OpenMLServerException, OpenMLRunsExistError
-from ..tasks import (
-    OpenMLTask,
+from openml.setups import initialize_model, setup_exists
+from openml.tasks import (
     OpenMLClassificationTask,
     OpenMLClusteringTask,
+    OpenMLLearningCurveTask,
     OpenMLRegressionTask,
     OpenMLSupervisedTask,
-    OpenMLLearningCurveTask,
+    OpenMLTask,
+    TaskType,
+    get_task,
 )
+
 from .run import OpenMLRun
 from .trace import OpenMLRunTrace
-from ..tasks import TaskType, get_task
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
+    from openml.config import _Config
     from openml.extensions.extension_interface import Extension
 
 # get_dict is in run.py to avoid circular imports
 
 RUNS_CACHE_DIR_NAME = "runs"
+ERROR_CODE = 512
 
 
-def run_model_on_task(
+# TODO(eddiebergman): Could potentially overload this but
+# it seems very big to do so
+def run_model_on_task(  # noqa: PLR0913
     model: Any,
-    task: Union[int, str, OpenMLTask],
-    avoid_duplicate_runs: bool = True,
-    flow_tags: Optional[List[str]] = None,
-    seed: Optional[int] = None,
-    add_local_measures: bool = True,
-    upload_flow: bool = False,
-    return_flow: bool = False,
-    dataset_format: str = "dataframe",
-    n_jobs: Optional[int] = None,
-) -> Union[OpenMLRun, Tuple[OpenMLRun, OpenMLFlow]]:
+    task: int | str | OpenMLTask,
+    avoid_duplicate_runs: bool = True,  # noqa: FBT001, FBT002
+    flow_tags: list[str] | None = None,
+    seed: int | None = None,
+    add_local_measures: bool = True,  # noqa: FBT001, FBT002
+    upload_flow: bool = False,  # noqa: FBT001, FBT002
+    return_flow: bool = False,  # noqa: FBT001, FBT002
+    n_jobs: int | None = None,
+) -> OpenMLRun | tuple[OpenMLRun, OpenMLFlow]:
     """Run the model on the dataset defined by the task.
 
     Parameters
     ----------
     model : sklearn model
         A model which has a function fit(X,Y) and predict(X),
-        all supervised estimators of scikit learn follow this definition of a model
-        (https://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
+        all supervised estimators of scikit learn follow this definition of a model.
     task : OpenMLTask or int or str
         Task to perform or Task id.
         This may be a model instead if the first argument is an OpenMLTask.
@@ -83,9 +92,6 @@ def run_model_on_task(
         If False, do not upload the flow to OpenML.
     return_flow : bool (default=False)
         If True, returns the OpenMLFlow generated from the model in addition to the OpenMLRun.
-    dataset_format : str (default='dataframe')
-        If 'array', the dataset is passed to the model as a numpy array.
-        If 'dataframe', the dataset is passed to the model as a pandas dataframe.
     n_jobs : int (default=None)
         The number of processes/threads to distribute the evaluation asynchronously.
         If `None` or `1`, then the evaluation is treated as synchronous and processed sequentially.
@@ -104,6 +110,8 @@ def run_model_on_task(
             "Please set your API key in the OpenML configuration file, see"
             "https://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial"
             ".html#authentication for more information on authentication.",
+            RuntimeWarning,
+            stacklevel=2,
         )
 
     # TODO: At some point in the future do not allow for arguments in old order (6-2018).
@@ -116,6 +124,7 @@ def run_model_on_task(
             "will not be supported in the future. Please use the "
             "order (model, task).",
             DeprecationWarning,
+            stacklevel=2,
         )
         task, model = model, task
 
@@ -127,11 +136,24 @@ def run_model_on_task(
 
     flow = extension.model_to_flow(model)
 
-    def get_task_and_type_conversion(task: Union[int, str, OpenMLTask]) -> OpenMLTask:
-        if isinstance(task, (int, str)):
-            return get_task(int(task))
-        else:
-            return task
+    def get_task_and_type_conversion(_task: int | str | OpenMLTask) -> OpenMLTask:
+        """Retrieve an OpenMLTask object from either an integer or string ID,
+        or directly from an OpenMLTask object.
+
+        Parameters
+        ----------
+        _task : Union[int, str, OpenMLTask]
+            The task ID or the OpenMLTask object.
+
+        Returns
+        -------
+        OpenMLTask
+            The OpenMLTask object.
+        """
+        if isinstance(_task, (int, str)):
+            return get_task(int(_task))  # type: ignore
+
+        return _task
 
     task = get_task_and_type_conversion(task)
 
@@ -143,7 +165,6 @@ def run_model_on_task(
         seed=seed,
         add_local_measures=add_local_measures,
         upload_flow=upload_flow,
-        dataset_format=dataset_format,
         n_jobs=n_jobs,
     )
     if return_flow:
@@ -151,16 +172,15 @@ def run_model_on_task(
     return run
 
 
-def run_flow_on_task(
+def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
     flow: OpenMLFlow,
     task: OpenMLTask,
-    avoid_duplicate_runs: bool = True,
-    flow_tags: Optional[List[str]] = None,
-    seed: Optional[int] = None,
-    add_local_measures: bool = True,
-    upload_flow: bool = False,
-    dataset_format: str = "dataframe",
-    n_jobs: Optional[int] = None,
+    avoid_duplicate_runs: bool = True,  # noqa: FBT002, FBT001
+    flow_tags: list[str] | None = None,
+    seed: int | None = None,
+    add_local_measures: bool = True,  # noqa: FBT001, FBT002
+    upload_flow: bool = False,  # noqa: FBT001, FBT002
+    n_jobs: int | None = None,
 ) -> OpenMLRun:
     """Run the model provided by the flow on the dataset defined by task.
 
@@ -172,13 +192,9 @@ def run_flow_on_task(
     flow : OpenMLFlow
         A flow wraps a machine learning model together with relevant information.
         The model has a function fit(X,Y) and predict(X),
-        all supervised estimators of scikit learn follow this definition of a model
-        (https://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html)
+        all supervised estimators of scikit learn follow this definition of a model.
     task : OpenMLTask
         Task to perform. This may be an OpenMLFlow instead if the first argument is an OpenMLTask.
-    avoid_duplicate_runs : bool, optional (default=True)
-        If True, the run will throw an error if the setup/task combination is already present on
-        the server. This feature requires an internet connection.
     avoid_duplicate_runs : bool, optional (default=True)
         If True, the run will throw an error if the setup/task combination is already present on
         the server. This feature requires an internet connection.
@@ -192,9 +208,6 @@ def run_flow_on_task(
     upload_flow : bool (default=False)
         If True, upload the flow to OpenML if it does not exist yet.
         If False, do not upload the flow to OpenML.
-    dataset_format : str (default='dataframe')
-        If 'array', the dataset is passed to the model as a numpy array.
-        If 'dataframe', the dataset is passed to the model as a pandas dataframe.
     n_jobs : int (default=None)
         The number of processes/threads to distribute the evaluation asynchronously.
         If `None` or `1`, then the evaluation is treated as synchronous and processed sequentially.
@@ -217,6 +230,7 @@ def run_flow_on_task(
             "will not be supported in the future. Please use the "
             "order (model, Flow).",
             DeprecationWarning,
+            stacklevel=2,
         )
         task, flow = flow, task
 
@@ -225,6 +239,7 @@ def run_flow_on_task(
 
     if flow.model is None:
         flow.model = flow.extension.flow_to_model(flow)
+
     flow.model = flow.extension.seed_model(flow.model, seed=seed)
 
     # We only need to sync with the server right now if we want to upload the flow,
@@ -233,17 +248,14 @@ def run_flow_on_task(
     if upload_flow or avoid_duplicate_runs:
         flow_id = flow_exists(flow.name, flow.external_version)
         if isinstance(flow.flow_id, int) and flow_id != flow.flow_id:
-            if flow_id:
+            if flow_id is not False:
                 raise PyOpenMLError(
-                    "Local flow_id does not match server flow_id: "
-                    "'{}' vs '{}'".format(flow.flow_id, flow_id)
+                    f"Local flow_id does not match server flow_id: '{flow.flow_id}' vs '{flow_id}'",
                 )
-            else:
-                raise PyOpenMLError(
-                    "Flow does not exist on the server, " "but 'flow.flow_id' is not None."
-                )
-
-        if upload_flow and not flow_id:
+            raise PyOpenMLError(
+                "Flow does not exist on the server, but 'flow.flow_id' is not None."
+            )
+        if upload_flow and flow_id is False:
             flow.publish()
             flow_id = flow.flow_id
         elif flow_id:
@@ -255,14 +267,13 @@ def run_flow_on_task(
                 ids = run_exists(task.task_id, setup_id)
                 if ids:
                     error_message = (
-                        "One or more runs of this setup were " "already performed on the task."
+                        "One or more runs of this setup were already performed on the task."
                     )
                     raise OpenMLRunsExistError(ids, error_message)
         else:
             # Flow does not exist on server and we do not want to upload it.
             # No sync with the server happens.
             flow_id = None
-            pass
 
     dataset = task.get_dataset()
 
@@ -271,8 +282,9 @@ def run_flow_on_task(
 
     if flow.extension.check_if_model_fitted(flow.model):
         warnings.warn(
-            "The model is already fitted!"
-            " This might cause inconsistency in comparison of results."
+            "The model is already fitted! This might cause inconsistency in comparison of results.",
+            RuntimeWarning,
+            stacklevel=2,
         )
 
     # execute the run
@@ -281,7 +293,6 @@ def run_flow_on_task(
         task=task,
         extension=flow.extension,
         add_local_measures=add_local_measures,
-        dataset_format=dataset_format,
         n_jobs=n_jobs,
     )
 
@@ -315,9 +326,9 @@ def run_flow_on_task(
         run.fold_evaluations = fold_evaluations
 
     if flow_id:
-        message = "Executed Task {} with Flow id:{}".format(task.task_id, run.flow_id)
+        message = f"Executed Task {task.task_id} with Flow id:{run.flow_id}"
     else:
-        message = "Executed Task {} on local Flow with name {}.".format(task.task_id, flow.name)
+        message = f"Executed Task {task.task_id} on local Flow with name {flow.name}."
     config.logger.info(message)
 
     return run
@@ -336,11 +347,10 @@ def get_run_trace(run_id: int) -> OpenMLRunTrace:
     openml.runs.OpenMLTrace
     """
     trace_xml = openml._api_calls._perform_api_call("run/trace/%d" % run_id, "get")
-    run_trace = OpenMLRunTrace.trace_from_xml(trace_xml)
-    return run_trace
+    return OpenMLRunTrace.trace_from_xml(trace_xml)
 
 
-def initialize_model_from_run(run_id: int) -> Any:
+def initialize_model_from_run(run_id: int, *, strict_version: bool = True) -> Any:
     """
     Initialized a model based on a run_id (i.e., using the exact
     same parameter settings)
@@ -349,20 +359,25 @@ def initialize_model_from_run(run_id: int) -> Any:
     ----------
     run_id : int
         The Openml run_id
+    strict_version: bool (default=True)
+        See `flow_to_model` strict_version.
 
     Returns
     -------
     model
     """
     run = get_run(run_id)
-    return initialize_model(run.setup_id)
+    # TODO(eddiebergman): I imagine this is None if it's not published,
+    # might need to raise an explicit error for that
+    assert run.setup_id is not None
+    return initialize_model(setup_id=run.setup_id, strict_version=strict_version)
 
 
 def initialize_model_from_trace(
     run_id: int,
     repeat: int,
     fold: int,
-    iteration: Optional[int] = None,
+    iteration: int | None = None,
 ) -> Any:
     """
     Initialize a model based on the parameters that were set
@@ -392,6 +407,10 @@ def initialize_model_from_trace(
     model
     """
     run = get_run(run_id)
+    # TODO(eddiebergman): I imagine this is None if it's not published,
+    # might need to raise an explicit error for that
+    assert run.flow_id is not None
+
     flow = get_flow(run.flow_id)
     run_trace = get_run_trace(run_id)
 
@@ -404,11 +423,10 @@ def initialize_model_from_trace(
     current = run_trace.trace_iterations[(repeat, fold, iteration)]
 
     search_model = initialize_model_from_run(run_id)
-    model = flow.extension.instantiate_model_from_hpo_class(search_model, current)
-    return model
+    return flow.extension.instantiate_model_from_hpo_class(search_model, current)
 
 
-def run_exists(task_id: int, setup_id: int) -> Set[int]:
+def run_exists(task_id: int, setup_id: int) -> set[int]:
     """Checks whether a task/setup combination is already present on the
     server.
 
@@ -428,31 +446,54 @@ def run_exists(task_id: int, setup_id: int) -> Set[int]:
         return set()
 
     try:
-        result = cast(
-            pd.DataFrame, list_runs(task=[task_id], setup=[setup_id], output_format="dataframe")
-        )
+        result = list_runs(task=[task_id], setup=[setup_id])
         return set() if result.empty else set(result["run_id"])
     except OpenMLServerException as exception:
-        # error code 512 implies no results. The run does not exist yet
-        assert exception.code == 512
+        # error code implies no results. The run does not exist yet
+        if exception.code != ERROR_CODE:
+            raise exception
         return set()
 
 
-def _run_task_get_arffcontent(
+def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
+    *,
     model: Any,
     task: OpenMLTask,
-    extension: "Extension",
+    extension: Extension,
     add_local_measures: bool,
-    dataset_format: str,
-    n_jobs: Optional[int] = None,
-) -> Tuple[
-    List[List],
-    Optional[OpenMLRunTrace],
-    "OrderedDict[str, OrderedDict]",
-    "OrderedDict[str, OrderedDict]",
+    n_jobs: int | None = None,
+) -> tuple[
+    list[list],
+    OpenMLRunTrace | None,
+    OrderedDict[str, OrderedDict],
+    OrderedDict[str, OrderedDict],
 ]:
-    arff_datacontent = []  # type: List[List]
-    traces = []  # type: List[OpenMLRunTrace]
+    """Runs the hyperparameter optimization on the given task
+    and returns the arfftrace content.
+
+    Parameters
+    ----------
+    model : Any
+        The model that is to be evalauted.
+    task : OpenMLTask
+        The OpenMLTask to evaluate.
+    extension : Extension
+        The OpenML extension object.
+    add_local_measures : bool
+        Whether to compute additional local evaluation measures.
+    n_jobs : int
+        Number of jobs to run in parallel.
+        If None, use 1 core by default. If -1, use all available cores.
+
+    Returns
+    -------
+    Tuple[List[List], Optional[OpenMLRunTrace],
+        OrderedDict[str, OrderedDict], OrderedDict[str, OrderedDict]]
+    A tuple containing the arfftrace content,
+    the OpenML run trace, the global and local evaluation measures.
+    """
+    arff_datacontent = []  # type: list[list]
+    traces = []  # type: list[OpenMLRunTrace]
     # stores fold-based evaluation measures. In case of a sample based task,
     # this information is multiple times overwritten, but due to the ordering
     # of tne loops, eventually it contains the information based on the full
@@ -484,7 +525,18 @@ def _run_task_get_arffcontent(
     # Execute runs in parallel
     # assuming the same number of tasks as workers (n_jobs), the total compute time for this
     # statement will be similar to the slowest run
-    job_rvals = Parallel(verbose=0, n_jobs=n_jobs)(
+    # TODO(eddiebergman): Simplify this
+    job_rvals: list[
+        tuple[
+            np.ndarray,
+            pd.DataFrame | None,
+            np.ndarray,
+            pd.DataFrame | None,
+            OpenMLRunTrace | None,
+            OrderedDict[str, float],
+        ],
+    ]
+    job_rvals = Parallel(verbose=0, n_jobs=n_jobs)(  # type: ignore
         delayed(_run_task_get_arffcontent_parallel_helper)(
             extension=extension,
             fold_no=fold_no,
@@ -492,25 +544,34 @@ def _run_task_get_arffcontent(
             rep_no=rep_no,
             sample_no=sample_no,
             task=task,
-            dataset_format=dataset_format,
             configuration=_config,
         )
-        for n_fit, rep_no, fold_no, sample_no in jobs
+        for _n_fit, rep_no, fold_no, sample_no in jobs
     )  # job_rvals contain the output of all the runs with one-to-one correspondence with `jobs`
 
     for n_fit, rep_no, fold_no, sample_no in jobs:
-        pred_y, proba_y, test_indices, test_y, trace, user_defined_measures_fold = job_rvals[
+        pred_y, proba_y, test_indices, test_y, inner_trace, user_defined_measures_fold = job_rvals[
             n_fit - 1
         ]
-        if trace is not None:
-            traces.append(trace)
+
+        if inner_trace is not None:
+            traces.append(inner_trace)
 
         # add client-side calculated metrics. These is used on the server as
         # consistency check, only useful for supervised tasks
-        def _calculate_local_measure(sklearn_fn, openml_name):
-            user_defined_measures_fold[openml_name] = sklearn_fn(test_y, pred_y)
+        def _calculate_local_measure(  # type: ignore
+            sklearn_fn,
+            openml_name,
+            _test_y=test_y,
+            _pred_y=pred_y,
+            _user_defined_measures_fold=user_defined_measures_fold,
+        ):
+            _user_defined_measures_fold[openml_name] = sklearn_fn(_test_y, _pred_y)
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
+            assert test_y is not None
+            assert proba_y is not None
+
             for i, tst_idx in enumerate(test_indices):
                 if task.class_labels is not None:
                     prediction = (
@@ -554,6 +615,7 @@ def _run_task_get_arffcontent(
                 )
 
         elif isinstance(task, OpenMLRegressionTask):
+            assert test_y is not None
             for i, _ in enumerate(test_indices):
                 truth = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
                 arff_line = format_prediction(
@@ -597,19 +659,18 @@ def _run_task_get_arffcontent(
             user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[
                 measure
             ]
-            user_defined_measures_per_sample[measure][rep_no][fold_no][
-                sample_no
-            ] = user_defined_measures_fold[measure]
-
-    if len(traces) > 0:
-        if len(traces) != n_fit:
-            raise ValueError(
-                "Did not find enough traces (expected {}, found {})".format(n_fit, len(traces))
+            user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = (
+                user_defined_measures_fold[measure]
             )
-        else:
-            trace = OpenMLRunTrace.merge_traces(traces)
-    else:
-        trace = None
+
+    trace: OpenMLRunTrace | None = None
+    if len(traces) > 0:
+        if len(traces) != len(jobs):
+            raise ValueError(
+                f"Did not find enough traces (expected {len(jobs)}, found {len(traces)})",
+            )
+
+        trace = OpenMLRunTrace.merge_traces(traces)
 
     return (
         arff_datacontent,
@@ -619,62 +680,80 @@ def _run_task_get_arffcontent(
     )
 
 
-def _run_task_get_arffcontent_parallel_helper(
-    extension: "Extension",
+def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
+    extension: Extension,
     fold_no: int,
     model: Any,
     rep_no: int,
     sample_no: int,
     task: OpenMLTask,
-    dataset_format: str,
-    configuration: Optional[Dict] = None,
-) -> Tuple[
+    configuration: _Config | None = None,
+) -> tuple[
     np.ndarray,
-    Optional[pd.DataFrame],
+    pd.DataFrame | None,
     np.ndarray,
-    Optional[pd.DataFrame],
-    Optional[OpenMLRunTrace],
-    "OrderedDict[str, float]",
+    pd.DataFrame | None,
+    OpenMLRunTrace | None,
+    OrderedDict[str, float],
 ]:
+    """Helper function that runs a single model on a single task fold sample.
+
+    Parameters
+    ----------
+    extension : Extension
+        An OpenML extension instance.
+    fold_no : int
+        The fold number to be run.
+    model : Any
+        The model that is to be evaluated.
+    rep_no : int
+        Repetition number to be run.
+    sample_no : int
+        Sample number to be run.
+    task : OpenMLTask
+        The task object from OpenML.
+    configuration : _Config
+        Hyperparameters to configure the model.
+
+    Returns
+    -------
+    Tuple[np.ndarray, Optional[pd.DataFrame], np.ndarray, Optional[pd.DataFrame],
+           Optional[OpenMLRunTrace], OrderedDict[str, float]]
+    A tuple containing the predictions, probability estimates (if applicable),
+    actual target values, actual target value probabilities (if applicable),
+    the trace object of the OpenML run (if applicable),
+    and a dictionary of local measures for this particular fold.
+    """
     # Sets up the OpenML instantiated in the child process to match that of the parent's
     # if configuration=None, loads the default
     config._setup(configuration)
 
     train_indices, test_indices = task.get_train_test_split_indices(
-        repeat=rep_no, fold=fold_no, sample=sample_no
+        repeat=rep_no,
+        fold=fold_no,
+        sample=sample_no,
     )
 
     if isinstance(task, OpenMLSupervisedTask):
-        x, y = task.get_X_and_y(dataset_format=dataset_format)
-        if dataset_format == "dataframe":
-            train_x = x.iloc[train_indices]
-            train_y = y.iloc[train_indices]
-            test_x = x.iloc[test_indices]
-            test_y = y.iloc[test_indices]
-        else:
-            train_x = x[train_indices]
-            train_y = y[train_indices]
-            test_x = x[test_indices]
-            test_y = y[test_indices]
+        x, y = task.get_X_and_y()
+        assert isinstance(y, (pd.Series, pd.DataFrame))
+        train_x = x.iloc[train_indices]
+        train_y = y.iloc[train_indices]
+        test_x = x.iloc[test_indices]
+        test_y = y.iloc[test_indices]
     elif isinstance(task, OpenMLClusteringTask):
-        x = task.get_X(dataset_format=dataset_format)
-        if dataset_format == "dataframe":
-            train_x = x.iloc[train_indices]
-        else:
-            train_x = x[train_indices]
+        x = task.get_X()
+        train_x = x.iloc[train_indices]
         train_y = None
         test_x = None
         test_y = None
     else:
         raise NotImplementedError(task.task_type)
+
     config.logger.info(
-        "Going to run model {} on dataset {} for repeat {} fold {} sample {}".format(
-            str(model),
-            openml.datasets.get_dataset(task.dataset_id).name,
-            rep_no,
-            fold_no,
-            sample_no,
-        )
+        f"Going to run model {model!s} on "
+        f"dataset {openml.datasets.get_dataset(task.dataset_id).name} "
+        f"for repeat {rep_no} fold {fold_no} sample {sample_no}"
     )
     (
         pred_y,
@@ -690,10 +769,10 @@ def _run_task_get_arffcontent_parallel_helper(
         fold_no=fold_no,
         X_test=test_x,
     )
-    return pred_y, proba_y, test_indices, test_y, trace, user_defined_measures_fold
+    return pred_y, proba_y, test_indices, test_y, trace, user_defined_measures_fold  # type: ignore
 
 
-def get_runs(run_ids):
+def get_runs(run_ids: list[int]) -> list[OpenMLRun]:
     """Gets all runs in run_ids list.
 
     Parameters
@@ -705,7 +784,6 @@ def get_runs(run_ids):
     runs : list of OpenMLRun
         List of runs corresponding to IDs, fetched from the server.
     """
-
     runs = []
     for run_id in run_ids:
         runs.append(get_run(run_id))
@@ -713,7 +791,7 @@ def get_runs(run_ids):
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:
+def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT002, FBT001
     """Gets run corresponding to run_id.
 
     Parameters
@@ -731,29 +809,26 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    run_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id)
-    run_file = os.path.join(run_dir, "description.xml")
+    run_dir = Path(openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id))
+    run_file = run_dir / "description.xml"
 
-    if not os.path.exists(run_dir):
-        os.makedirs(run_dir)
+    run_dir.mkdir(parents=True, exist_ok=True)
 
     try:
         if not ignore_cache:
             return _get_cached_run(run_id)
-        else:
-            raise OpenMLCacheException(message="dummy")
+
+        raise OpenMLCacheException(message="dummy")
 
     except OpenMLCacheException:
         run_xml = openml._api_calls._perform_api_call("run/%d" % run_id, "get")
-        with io.open(run_file, "w", encoding="utf8") as fh:
+        with run_file.open("w", encoding="utf8") as fh:
             fh.write(run_xml)
 
-    run = _create_run_from_xml(run_xml)
-
-    return run
+    return _create_run_from_xml(run_xml)
 
 
-def _create_run_from_xml(xml, from_server=True):
+def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT001, FBT002
     """Create a run object from xml returned from server.
 
     Parameters
@@ -771,7 +846,7 @@ def _create_run_from_xml(xml, from_server=True):
         New run object representing run_xml.
     """
 
-    def obtain_field(xml_obj, fieldname, from_server, cast=None):
+    def obtain_field(xml_obj, fieldname, from_server, cast=None):  # type: ignore
         # this function can be used to check whether a field is present in an
         # object. if it is not present, either returns None or throws an error
         # (this is usually done if the xml comes from the server)
@@ -779,10 +854,11 @@ def _create_run_from_xml(xml, from_server=True):
             if cast is not None:
                 return cast(xml_obj[fieldname])
             return xml_obj[fieldname]
-        elif not from_server:
+
+        if not from_server:
             return None
-        else:
-            raise AttributeError("Run XML does not contain required (server) " "field: ", fieldname)
+
+        raise AttributeError("Run XML does not contain required (server) field: ", fieldname)
 
     run = xmltodict.parse(xml, force_list=["oml:file", "oml:evaluation", "oml:parameter_setting"])[
         "oml:run"
@@ -794,10 +870,7 @@ def _create_run_from_xml(xml, from_server=True):
     task_type = obtain_field(run, "oml:task_type", from_server)
 
     # even with the server requirement this field may be empty.
-    if "oml:task_evaluation_measure" in run:
-        task_evaluation_measure = run["oml:task_evaluation_measure"]
-    else:
-        task_evaluation_measure = None
+    task_evaluation_measure = run.get("oml:task_evaluation_measure", None)
 
     if not from_server and run["oml:flow_id"] is None:
         # This can happen for a locally stored run of which the flow is not yet published.
@@ -811,9 +884,10 @@ def _create_run_from_xml(xml, from_server=True):
         if "oml:parameter_setting" in run:
             obtained_parameter_settings = run["oml:parameter_setting"]
             for parameter_dict in obtained_parameter_settings:
-                current_parameter = OrderedDict()
-                current_parameter["oml:name"] = parameter_dict["oml:name"]
-                current_parameter["oml:value"] = parameter_dict["oml:value"]
+                current_parameter = {
+                    "oml:name": parameter_dict["oml:name"],
+                    "oml:value": parameter_dict["oml:value"],
+                }
                 if "oml:component" in parameter_dict:
                     current_parameter["oml:component"] = parameter_dict["oml:component"]
                 parameters.append(current_parameter)
@@ -834,18 +908,17 @@ def _create_run_from_xml(xml, from_server=True):
         t = openml.tasks.get_task(task_id, download_data=False)
         if not hasattr(t, "dataset_id"):
             raise ValueError(
-                "Unable to fetch dataset_id from the task({}) "
-                "linked to run({})".format(task_id, run_id)
+                f"Unable to fetch dataset_id from the task({task_id}) linked to run({run_id})",
             )
         dataset_id = t.dataset_id
 
-    files = OrderedDict()
-    evaluations = OrderedDict()
-    fold_evaluations = OrderedDict()
-    sample_evaluations = OrderedDict()
+    files: dict[str, int] = {}
+    evaluations: dict[str, float | Any] = {}
+    fold_evaluations: dict[str, dict[int, dict[int, float | Any]]] = {}
+    sample_evaluations: dict[str, dict[int, dict[int, dict[int, float | Any]]]] = {}
     if "oml:output_data" not in run:
         if from_server:
-            raise ValueError("Run does not contain output_data " "(OpenML server error?)")
+            raise ValueError("Run does not contain output_data (OpenML server error?)")
         predictions_url = None
     else:
         output_data = run["oml:output_data"]
@@ -868,7 +941,7 @@ def _create_run_from_xml(xml, from_server=True):
                 else:
                     raise ValueError(
                         'Could not find keys "value" or '
-                        '"array_data" in %s' % str(evaluation_dict.keys())
+                        f'"array_data" in {evaluation_dict.keys()!s}',
                     )
                 if (
                     "@repeat" in evaluation_dict
@@ -879,36 +952,36 @@ def _create_run_from_xml(xml, from_server=True):
                     fold = int(evaluation_dict["@fold"])
                     sample = int(evaluation_dict["@sample"])
                     if key not in sample_evaluations:
-                        sample_evaluations[key] = OrderedDict()
+                        sample_evaluations[key] = {}
                     if repeat not in sample_evaluations[key]:
-                        sample_evaluations[key][repeat] = OrderedDict()
+                        sample_evaluations[key][repeat] = {}
                     if fold not in sample_evaluations[key][repeat]:
-                        sample_evaluations[key][repeat][fold] = OrderedDict()
+                        sample_evaluations[key][repeat][fold] = {}
                     sample_evaluations[key][repeat][fold][sample] = value
                 elif "@repeat" in evaluation_dict and "@fold" in evaluation_dict:
                     repeat = int(evaluation_dict["@repeat"])
                     fold = int(evaluation_dict["@fold"])
                     if key not in fold_evaluations:
-                        fold_evaluations[key] = OrderedDict()
+                        fold_evaluations[key] = {}
                     if repeat not in fold_evaluations[key]:
-                        fold_evaluations[key][repeat] = OrderedDict()
+                        fold_evaluations[key][repeat] = {}
                     fold_evaluations[key][repeat][fold] = value
                 else:
                     evaluations[key] = value
 
     if "description" not in files and from_server is True:
-        raise ValueError("No description file for run %d in run " "description XML" % run_id)
+        raise ValueError("No description file for run %d in run description XML" % run_id)
 
     if "predictions" not in files and from_server is True:
         task = openml.tasks.get_task(task_id)
         if task.task_type_id == TaskType.SUBGROUP_DISCOVERY:
             raise NotImplementedError("Subgroup discovery tasks are not yet supported.")
-        else:
-            # JvR: actually, I am not sure whether this error should be raised.
-            # a run can consist without predictions. But for now let's keep it
-            # Matthias: yes, it should stay as long as we do not really handle
-            # this stuff
-            raise ValueError("No prediction files for run %d in run " "description XML" % run_id)
+
+        # JvR: actually, I am not sure whether this error should be raised.
+        # a run can consist without predictions. But for now let's keep it
+        # Matthias: yes, it should stay as long as we do not really handle
+        # this stuff
+        raise ValueError("No prediction files for run %d in run description XML" % run_id)
 
     tags = openml.utils.extract_xml_tags("oml:tag", run)
 
@@ -936,36 +1009,30 @@ def _create_run_from_xml(xml, from_server=True):
     )
 
 
-def _get_cached_run(run_id):
+def _get_cached_run(run_id: int) -> OpenMLRun:
     """Load a run from the cache."""
-    run_cache_dir = openml.utils._create_cache_directory_for_id(
-        RUNS_CACHE_DIR_NAME,
-        run_id,
-    )
+    run_cache_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id)
+    run_file = run_cache_dir / "description.xml"
     try:
-        run_file = os.path.join(run_cache_dir, "description.xml")
-        with io.open(run_file, encoding="utf8") as fh:
-            run = _create_run_from_xml(xml=fh.read())
-        return run
-
-    except (OSError, IOError):
-        raise OpenMLCacheException("Run file for run id %d not " "cached" % run_id)
+        with run_file.open(encoding="utf8") as fh:
+            return _create_run_from_xml(xml=fh.read())
+    except OSError as e:
+        raise OpenMLCacheException(f"Run file for run id {run_id} not cached") from e
 
 
-def list_runs(
-    offset: Optional[int] = None,
-    size: Optional[int] = None,
-    id: Optional[List] = None,
-    task: Optional[List[int]] = None,
-    setup: Optional[List] = None,
-    flow: Optional[List] = None,
-    uploader: Optional[List] = None,
-    tag: Optional[str] = None,
-    study: Optional[int] = None,
-    display_errors: bool = False,
-    output_format: str = "dict",
-    **kwargs,
-) -> Union[Dict, pd.DataFrame]:
+def list_runs(  # noqa: PLR0913
+    offset: int | None = None,
+    size: int | None = None,
+    id: list | None = None,  # noqa: A002
+    task: list[int] | None = None,
+    setup: list | None = None,
+    flow: list | None = None,
+    uploader: list | None = None,
+    tag: str | None = None,
+    study: int | None = None,
+    display_errors: bool = False,  # noqa: FBT001, FBT002
+    task_type: TaskType | int | None = None,
+) -> pd.DataFrame:
     """
     List all runs matching all of the given filters.
     (Supports large amount of results)
@@ -995,31 +1062,12 @@ def list_runs(
         Whether to list runs which have an error (for example a missing
         prediction file).
 
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
-
-    kwargs : dict, optional
-        Legal filter operators: task_type.
+    task_type : str, optional
 
     Returns
     -------
-    dict of dicts, or dataframe
+    dataframe
     """
-    if output_format not in ["dataframe", "dict"]:
-        raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable."
-        )
-    # TODO: [0.15]
-    if output_format == "dict":
-        msg = (
-            "Support for `output_format` of 'dict' will be removed in 0.15 "
-            "and pandas dataframes will be returned instead. To ensure your code "
-            "will continue to work, use `output_format`='dataframe'."
-        )
-        warnings.warn(msg, category=FutureWarning, stacklevel=2)
-
     if id is not None and (not isinstance(id, list)):
         raise TypeError("id must be of type list.")
     if task is not None and (not isinstance(task, list)):
@@ -1031,11 +1079,8 @@ def list_runs(
     if uploader is not None and (not isinstance(uploader, list)):
         raise TypeError("uploader must be of type list.")
 
-    return openml.utils._list_all(
-        output_format=output_format,
-        listing_call=_list_runs,
-        offset=offset,
-        size=size,
+    listing_call = partial(
+        _list_runs,
         id=id,
         task=task,
         setup=setup,
@@ -1044,21 +1089,29 @@ def list_runs(
         tag=tag,
         study=study,
         display_errors=display_errors,
-        **kwargs,
+        task_type=task_type,
     )
+    batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
+    if len(batches) == 0:
+        return pd.DataFrame()
+
+    return pd.concat(batches)
 
 
-def _list_runs(
-    id: Optional[List] = None,
-    task: Optional[List] = None,
-    setup: Optional[List] = None,
-    flow: Optional[List] = None,
-    uploader: Optional[List] = None,
-    study: Optional[int] = None,
+def _list_runs(  # noqa: PLR0913, C901
+    limit: int,
+    offset: int,
+    *,
+    id: list | None = None,  # noqa: A002
+    task: list | None = None,
+    setup: list | None = None,
+    flow: list | None = None,
+    uploader: list | None = None,
+    study: int | None = None,
+    tag: str | None = None,
     display_errors: bool = False,
-    output_format: str = "dict",
-    **kwargs,
-) -> Union[Dict, pd.DataFrame]:
+    task_type: TaskType | int | None = None,
+) -> pd.DataFrame:
     """
     Perform API call `/run/list/{filters}'
     <https://www.openml.org/api_docs/#!/run/get_run_list_filters>`
@@ -1078,6 +1131,8 @@ def _list_runs(
 
     flow : list, optional
 
+    tag: str, optional
+
     uploader : list, optional
 
     study : int, optional
@@ -1086,92 +1141,88 @@ def _list_runs(
         Whether to list runs which have an error (for example a missing
         prediction file).
 
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
-
-    kwargs : dict, optional
-        Legal filter operators: task_type.
+    task_type : str, optional
 
     Returns
     -------
     dict, or dataframe
         List of found runs.
     """
-
     api_call = "run/list"
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            api_call += "/%s/%s" % (operator, value)
+    if limit is not None:
+        api_call += f"/limit/{limit}"
+    if offset is not None:
+        api_call += f"/offset/{offset}"
     if id is not None:
-        api_call += "/run/%s" % ",".join([str(int(i)) for i in id])
+        api_call += "/run/{}".format(",".join([str(int(i)) for i in id]))
     if task is not None:
-        api_call += "/task/%s" % ",".join([str(int(i)) for i in task])
+        api_call += "/task/{}".format(",".join([str(int(i)) for i in task]))
     if setup is not None:
-        api_call += "/setup/%s" % ",".join([str(int(i)) for i in setup])
+        api_call += "/setup/{}".format(",".join([str(int(i)) for i in setup]))
     if flow is not None:
-        api_call += "/flow/%s" % ",".join([str(int(i)) for i in flow])
+        api_call += "/flow/{}".format(",".join([str(int(i)) for i in flow]))
     if uploader is not None:
-        api_call += "/uploader/%s" % ",".join([str(int(i)) for i in uploader])
+        api_call += "/uploader/{}".format(",".join([str(int(i)) for i in uploader]))
     if study is not None:
         api_call += "/study/%d" % study
     if display_errors:
         api_call += "/show_errors/true"
-    return __list_runs(api_call=api_call, output_format=output_format)
+    if tag is not None:
+        api_call += f"/tag/{tag}"
+    if task_type is not None:
+        tvalue = task_type.value if isinstance(task_type, TaskType) else task_type
+        api_call += f"/task_type/{tvalue}"
+    return __list_runs(api_call=api_call)
 
 
-def __list_runs(api_call, output_format="dict"):
+def __list_runs(api_call: str) -> pd.DataFrame:
     """Helper function to parse API calls which are lists of runs"""
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     runs_dict = xmltodict.parse(xml_string, force_list=("oml:run",))
     # Minimalistic check if the XML is useful
     if "oml:runs" not in runs_dict:
-        raise ValueError('Error in return XML, does not contain "oml:runs": %s' % str(runs_dict))
-    elif "@xmlns:oml" not in runs_dict["oml:runs"]:
+        raise ValueError(f'Error in return XML, does not contain "oml:runs": {runs_dict}')
+
+    if "@xmlns:oml" not in runs_dict["oml:runs"]:
         raise ValueError(
-            "Error in return XML, does not contain " '"oml:runs"/@xmlns:oml: %s' % str(runs_dict)
+            f'Error in return XML, does not contain "oml:runs"/@xmlns:oml: {runs_dict}'
         )
-    elif runs_dict["oml:runs"]["@xmlns:oml"] != "http://openml.org/openml":
+
+    if runs_dict["oml:runs"]["@xmlns:oml"] != "http://openml.org/openml":
         raise ValueError(
             "Error in return XML, value of  "
             '"oml:runs"/@xmlns:oml is not '
-            '"http://openml.org/openml": %s' % str(runs_dict)
+            f'"http://openml.org/openml": {runs_dict}',
         )
 
     assert isinstance(runs_dict["oml:runs"]["oml:run"], list), type(runs_dict["oml:runs"])
 
-    runs = OrderedDict()
-    for run_ in runs_dict["oml:runs"]["oml:run"]:
-        run_id = int(run_["oml:run_id"])
-        run = {
-            "run_id": run_id,
-            "task_id": int(run_["oml:task_id"]),
-            "setup_id": int(run_["oml:setup_id"]),
-            "flow_id": int(run_["oml:flow_id"]),
-            "uploader": int(run_["oml:uploader"]),
-            "task_type": TaskType(int(run_["oml:task_type_id"])),
-            "upload_time": str(run_["oml:upload_time"]),
-            "error_message": str((run_["oml:error_message"]) or ""),
+    runs = {
+        int(r["oml:run_id"]): {
+            "run_id": int(r["oml:run_id"]),
+            "task_id": int(r["oml:task_id"]),
+            "setup_id": int(r["oml:setup_id"]),
+            "flow_id": int(r["oml:flow_id"]),
+            "uploader": int(r["oml:uploader"]),
+            "task_type": TaskType(int(r["oml:task_type_id"])),
+            "upload_time": str(r["oml:upload_time"]),
+            "error_message": str((r["oml:error_message"]) or ""),
         }
-        runs[run_id] = run
-
-    if output_format == "dataframe":
-        runs = pd.DataFrame.from_dict(runs, orient="index")
-
-    return runs
+        for r in runs_dict["oml:runs"]["oml:run"]
+    }
+    return pd.DataFrame.from_dict(runs, orient="index")
 
 
-def format_prediction(
+def format_prediction(  # noqa: PLR0913
     task: OpenMLSupervisedTask,
     repeat: int,
     fold: int,
     index: int,
-    prediction: Union[str, int, float],
-    truth: Union[str, int, float],
-    sample: Optional[int] = None,
-    proba: Optional[Dict[str, float]] = None,
-) -> List[Union[str, int, float]]:
+    prediction: str | int | float,
+    truth: str | int | float,
+    sample: int | None = None,
+    proba: dict[str, float] | None = None,
+) -> list[str | int | float]:
     """Format the predictions in the specific order as required for the run results.
 
     Parameters
@@ -1216,14 +1267,15 @@ def format_prediction(
         if sample is None:
             if isinstance(task, OpenMLLearningCurveTask):
                 raise ValueError("`sample` can not be none for LearningCurveTask")
-            else:
-                sample = 0
+
+            sample = 0
         probabilities = [proba[c] for c in task.class_labels]
         return [repeat, fold, sample, index, prediction, truth, *probabilities]
-    elif isinstance(task, OpenMLRegressionTask):
+
+    if isinstance(task, OpenMLRegressionTask):
         return [repeat, fold, index, prediction, truth]
-    else:
-        raise NotImplementedError(f"Formatting for {type(task)} is not supported.")
+
+    raise NotImplementedError(f"Formatting for {type(task)} is not supported.")
 
 
 def delete_run(run_id: int) -> bool:

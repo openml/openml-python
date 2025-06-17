@@ -19,7 +19,7 @@ import openml
 # List datasets
 # =============
 
-datasets_df = openml.datasets.list_datasets(output_format="dataframe")
+datasets_df = openml.datasets.list_datasets()
 print(datasets_df.head(n=10))
 
 ############################################################################
@@ -27,7 +27,7 @@ print(datasets_df.head(n=10))
 # ==================
 
 # Iris dataset https://www.openml.org/d/61
-dataset = openml.datasets.get_dataset(61)
+dataset = openml.datasets.get_dataset(dataset_id="iris", version=1)
 
 # Print a summary
 print(
@@ -48,15 +48,24 @@ print(dataset.description[:500])
 # attribute_names - the names of the features for the examples (X) and
 # target feature (y)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    dataset_format="dataframe", target=dataset.default_target_attribute
+    target=dataset.default_target_attribute
 )
+
+############################################################################
+# Tip: you can get a progress bar for dataset downloads, simply set it in
+# the configuration. Either in code or in the configuration file
+# (see also the introduction tutorial)
+
+openml.config.show_progress = True
+
+
 ############################################################################
 # Visualize the dataset
 # =====================
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 sns.set_style("darkgrid")
 

@@ -39,7 +39,9 @@ import openml
 # Downloading benchmark suites
 # ============================
 
-suite = openml.study.get_suite(99)
+# OpenML Benchmarking Suites and the OpenML-CC18
+# https://www.openml.org/s/99
+suite = openml.study.get_suite("OpenML-CC18")
 print(suite)
 
 ####################################################################################################

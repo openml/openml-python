@@ -1,10 +1,16 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
-from collections import OrderedDict
 import pickle
 import time
-from typing import Any, IO, TextIO, List, Union, Tuple, Optional, Dict  # noqa F401
-import os
+from collections import OrderedDict
+from pathlib import Path
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Sequence,
+)
 
 import arff
 import numpy as np
@@ -13,16 +19,20 @@ import pandas as pd
 import openml
 import openml._api_calls
 from openml.base import OpenMLBase
-from ..exceptions import PyOpenMLError
-from ..flows import get_flow
-from ..tasks import (
-    get_task,
-    TaskType,
+from openml.exceptions import PyOpenMLError
+from openml.flows import OpenMLFlow, get_flow
+from openml.tasks import (
     OpenMLClassificationTask,
-    OpenMLLearningCurveTask,
     OpenMLClusteringTask,
+    OpenMLLearningCurveTask,
     OpenMLRegressionTask,
+    OpenMLTask,
+    TaskType,
+    get_task,
 )
+
+if TYPE_CHECKING:
+    from openml.runs.trace import OpenMLRunTrace
 
 
 class OpenMLRun(OpenMLBase):
@@ -38,7 +48,7 @@ class OpenMLRun(OpenMLBase):
         The ID of the OpenML dataset used for the run.
     setup_string: str
         The setup string of the run.
-    output_files: Dict[str, str]
+    output_files: Dict[str, int]
         Specifies where each related file can be found.
     setup_id: int
         An integer representing the ID of the setup used for the run.
@@ -66,7 +76,7 @@ class OpenMLRun(OpenMLBase):
         The evaluation measure used for the task.
     flow_name: str
         The name of the OpenML flow associated with the run.
-    parameter_settings: List[OrderedDict]
+    parameter_settings: list[OrderedDict]
         Representing the parameter settings used for the run.
     predictions_url: str
         The URL of the predictions file.
@@ -85,33 +95,33 @@ class OpenMLRun(OpenMLBase):
         Description of the run stored in the run meta-data.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
-        task_id,
-        flow_id,
-        dataset_id,
-        setup_string=None,
-        output_files=None,
-        setup_id=None,
-        tags=None,
-        uploader=None,
-        uploader_name=None,
-        evaluations=None,
-        fold_evaluations=None,
-        sample_evaluations=None,
-        data_content=None,
-        trace=None,
-        model=None,
-        task_type=None,
-        task_evaluation_measure=None,
-        flow_name=None,
-        parameter_settings=None,
-        predictions_url=None,
-        task=None,
-        flow=None,
-        run_id=None,
-        description_text=None,
-        run_details=None,
+        task_id: int,
+        flow_id: int | None,
+        dataset_id: int | None,
+        setup_string: str | None = None,
+        output_files: dict[str, int] | None = None,
+        setup_id: int | None = None,
+        tags: list[str] | None = None,
+        uploader: int | None = None,
+        uploader_name: str | None = None,
+        evaluations: dict | None = None,
+        fold_evaluations: dict | None = None,
+        sample_evaluations: dict | None = None,
+        data_content: list[list] | None = None,
+        trace: OpenMLRunTrace | None = None,
+        model: object | None = None,
+        task_type: str | None = None,
+        task_evaluation_measure: str | None = None,
+        flow_name: str | None = None,
+        parameter_settings: list[dict[str, Any]] | None = None,
+        predictions_url: str | None = None,
+        task: OpenMLTask | None = None,
+        flow: OpenMLFlow | None = None,
+        run_id: int | None = None,
+        description_text: str | None = None,
+        run_details: str | None = None,
     ):
         self.uploader = uploader
         self.uploader_name = uploader_name
@@ -153,12 +163,14 @@ class OpenMLRun(OpenMLBase):
             else:
                 raise RuntimeError("Run has no predictions.")
             self._predictions = pd.DataFrame(
-                arff_dict["data"], columns=[name for name, _ in arff_dict["attributes"]]
+                arff_dict["data"],
+                columns=[name for name, _ in arff_dict["attributes"]],
             )
         return self._predictions
 
     @property
-    def id(self) -> Optional[int]:
+    def id(self) -> int | None:
+        """The ID of the run, None if not uploaded to the server yet."""
         return self.run_id
 
     def _evaluation_summary(self, metric: str) -> str:
@@ -181,15 +193,17 @@ class OpenMLRun(OpenMLBase):
             A formatted string that displays the metric's evaluation summary.
             The summary consists of the mean and std.
         """
+        if self.fold_evaluations is None:
+            raise ValueError("No fold evaluations available.")
         fold_score_lists = self.fold_evaluations[metric].values()
 
         # Get the mean and std over all repetitions
         rep_means = [np.mean(list(x.values())) for x in fold_score_lists]
         rep_stds = [np.std(list(x.values())) for x in fold_score_lists]
 
-        return "{:.4f} +- {:.4f}".format(np.mean(rep_means), np.mean(rep_stds))
+        return f"{np.mean(rep_means):.4f} +- {np.mean(rep_stds):.4f}"
 
-    def _get_repr_body_fields(self) -> List[Tuple[str, Union[str, int, List[str]]]]:
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str]]]:
         """Collect all information to display in the __repr__ body."""
         # Set up fields
         fields = {
@@ -201,20 +215,26 @@ class OpenMLRun(OpenMLBase):
             "Task URL": openml.tasks.OpenMLTask.url_for_id(self.task_id),
             "Flow ID": self.flow_id,
             "Flow Name": self.flow_name,
-            "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
+            "Flow URL": (
+                openml.flows.OpenMLFlow.url_for_id(self.flow_id)
+                if self.flow_id is not None
+                else None
+            ),
             "Setup ID": self.setup_id,
             "Setup String": self.setup_string,
             "Dataset ID": self.dataset_id,
-            "Dataset URL": openml.datasets.OpenMLDataset.url_for_id(self.dataset_id),
+            "Dataset URL": (
+                openml.datasets.OpenMLDataset.url_for_id(self.dataset_id)
+                if self.dataset_id is not None
+                else None
+            ),
         }
 
         # determines the order of the initial fields in which the information will be printed
         order = ["Uploader Name", "Uploader Profile", "Metric", "Result"]
 
         if self.uploader is not None:
-            fields["Uploader Profile"] = "{}/u/{}".format(
-                openml.config.get_server_base_url(), self.uploader
-            )
+            fields["Uploader Profile"] = f"{openml.config.get_server_base_url()}/u/{self.uploader}"
         if self.run_id is not None:
             fields["Run URL"] = self.openml_url
         if self.evaluations is not None and self.task_evaluation_measure in self.evaluations:
@@ -223,13 +243,11 @@ class OpenMLRun(OpenMLBase):
             # -- Add locally computed summary values if possible
             if "predictive_accuracy" in self.fold_evaluations:
                 # OpenMLClassificationTask; OpenMLLearningCurveTask
-                # default: predictive_accuracy
                 result_field = "Local Result - Accuracy (+- STD)"
                 fields[result_field] = self._evaluation_summary("predictive_accuracy")
                 order.append(result_field)
             elif "mean_absolute_error" in self.fold_evaluations:
                 # OpenMLRegressionTask
-                # default: mean_absolute_error
                 result_field = "Local Result - MAE (+- STD)"
                 fields[result_field] = self._evaluation_summary("mean_absolute_error")
                 order.append(result_field)
@@ -255,10 +273,14 @@ class OpenMLRun(OpenMLBase):
             "Dataset ID",
             "Dataset URL",
         ]
-        return [(key, fields[key]) for key in order if key in fields]
+        return [
+            (key, "None" if fields[key] is None else fields[key])  # type: ignore
+            for key in order
+            if key in fields
+        ]
 
     @classmethod
-    def from_filesystem(cls, directory: str, expect_model: bool = True) -> "OpenMLRun":
+    def from_filesystem(cls, directory: str | Path, expect_model: bool = True) -> OpenMLRun:  # noqa: FBT001, FBT002
         """
         The inverse of the to_filesystem method. Instantiates an OpenMLRun
         object based on files stored on the file system.
@@ -279,26 +301,26 @@ class OpenMLRun(OpenMLBase):
         run : OpenMLRun
             the re-instantiated run object
         """
-
         # Avoiding cyclic imports
         import openml.runs.functions
 
-        if not os.path.isdir(directory):
+        directory = Path(directory)
+        if not directory.is_dir():
             raise ValueError("Could not find folder")
 
-        description_path = os.path.join(directory, "description.xml")
-        predictions_path = os.path.join(directory, "predictions.arff")
-        trace_path = os.path.join(directory, "trace.arff")
-        model_path = os.path.join(directory, "model.pkl")
+        description_path = directory / "description.xml"
+        predictions_path = directory / "predictions.arff"
+        trace_path = directory / "trace.arff"
+        model_path = directory / "model.pkl"
 
-        if not os.path.isfile(description_path):
+        if not description_path.is_file():
             raise ValueError("Could not find description.xml")
-        if not os.path.isfile(predictions_path):
+        if not predictions_path.is_file():
             raise ValueError("Could not find predictions.arff")
-        if not os.path.isfile(model_path) and expect_model:
+        if (not model_path.is_file()) and expect_model:
             raise ValueError("Could not find model.pkl")
 
-        with open(description_path, "r") as fht:
+        with description_path.open() as fht:
             xml_string = fht.read()
         run = openml.runs.functions._create_run_from_xml(xml_string, from_server=False)
 
@@ -307,25 +329,25 @@ class OpenMLRun(OpenMLBase):
             run.flow = flow
             run.flow_name = flow.name
 
-        with open(predictions_path, "r") as fht:
+        with predictions_path.open() as fht:
             predictions = arff.load(fht)
             run.data_content = predictions["data"]
 
-        if os.path.isfile(model_path):
+        if model_path.is_file():
             # note that it will load the model if the file exists, even if
             # expect_model is False
-            with open(model_path, "rb") as fhb:
-                run.model = pickle.load(fhb)
+            with model_path.open("rb") as fhb:
+                run.model = pickle.load(fhb)  # noqa: S301
 
-        if os.path.isfile(trace_path):
+        if trace_path.is_file():
             run.trace = openml.runs.OpenMLRunTrace._from_filesystem(trace_path)
 
         return run
 
     def to_filesystem(
         self,
-        directory: str,
-        store_model: bool = True,
+        directory: str | Path,
+        store_model: bool = True,  # noqa: FBT001, FBT002
     ) -> None:
         """
         The inverse of the from_filesystem method. Serializes a run
@@ -344,32 +366,31 @@ class OpenMLRun(OpenMLBase):
         """
         if self.data_content is None or self.model is None:
             raise ValueError("Run should have been executed (and contain " "model / predictions)")
+        directory = Path(directory)
+        directory.mkdir(exist_ok=True, parents=True)
 
-        os.makedirs(directory, exist_ok=True)
-        if not os.listdir(directory) == []:
-            raise ValueError(
-                "Output directory {} should be empty".format(os.path.abspath(directory))
-            )
+        if any(directory.iterdir()):
+            raise ValueError(f"Output directory {directory.expanduser().resolve()} should be empty")
 
         run_xml = self._to_xml()
         predictions_arff = arff.dumps(self._generate_arff_dict())
 
         # It seems like typing does not allow to define the same variable multiple times
-        with open(os.path.join(directory, "description.xml"), "w") as fh:  # type: TextIO
+        with (directory / "description.xml").open("w") as fh:
             fh.write(run_xml)
-        with open(os.path.join(directory, "predictions.arff"), "w") as fh:
+        with (directory / "predictions.arff").open("w") as fh:
             fh.write(predictions_arff)
         if store_model:
-            with open(os.path.join(directory, "model.pkl"), "wb") as fh_b:  # type: IO[bytes]
+            with (directory / "model.pkl").open("wb") as fh_b:
                 pickle.dump(self.model, fh_b)
 
-        if self.flow_id is None:
+        if self.flow_id is None and self.flow is not None:
             self.flow.to_filesystem(directory)
 
         if self.trace is not None:
             self.trace._to_filesystem(directory)
 
-    def _generate_arff_dict(self) -> "OrderedDict[str, Any]":
+    def _generate_arff_dict(self) -> OrderedDict[str, Any]:
         """Generates the arff dictionary for uploading predictions to the
         server.
 
@@ -386,6 +407,7 @@ class OpenMLRun(OpenMLBase):
         if self.data_content is None:
             raise ValueError("Run has not been executed.")
         if self.flow is None:
+            assert self.flow_id is not None, "Run has no associated flow id!"
             self.flow = get_flow(self.flow_id)
 
         if self.description_text is None:
@@ -395,7 +417,7 @@ class OpenMLRun(OpenMLBase):
         arff_dict = OrderedDict()  # type: 'OrderedDict[str, Any]'
         arff_dict["data"] = self.data_content
         arff_dict["description"] = self.description_text
-        arff_dict["relation"] = "openml_task_{}_predictions".format(task.task_id)
+        arff_dict["relation"] = f"openml_task_{task.task_id}_predictions"
 
         if isinstance(task, OpenMLLearningCurveTask):
             class_labels = task.class_labels
@@ -458,11 +480,11 @@ class OpenMLRun(OpenMLBase):
             ]
 
         else:
-            raise NotImplementedError("Task type %s is not yet supported." % str(task.task_type))
+            raise NotImplementedError(f"Task type {task.task_type!s} is not yet supported.")
 
         return arff_dict
 
-    def get_metric_fn(self, sklearn_fn, kwargs=None):
+    def get_metric_fn(self, sklearn_fn: Callable, kwargs: dict | None = None) -> np.ndarray:  # noqa: PLR0915, PLR0912, C901
         """Calculates metric scores based on predicted values. Assumes the
         run has been executed locally (and contains run_data). Furthermore,
         it assumes that the 'correct' or 'truth' attribute is specified in
@@ -474,16 +496,18 @@ class OpenMLRun(OpenMLBase):
         sklearn_fn : function
             a function pointer to a sklearn function that
             accepts ``y_true``, ``y_pred`` and ``**kwargs``
+        kwargs : dict
+            kwargs for the function
 
         Returns
         -------
-        scores : list
-            a list of floats, of length num_folds * num_repeats
+        scores : ndarray of scores of length num_folds * num_repeats
+            metric results
         """
-        kwargs = kwargs if kwargs else dict()
+        kwargs = kwargs if kwargs else {}
         if self.data_content is not None and self.task_id is not None:
             predictions_arff = self._generate_arff_dict()
-        elif "predictions" in self.output_files:
+        elif (self.output_files is not None) and ("predictions" in self.output_files):
             predictions_file_url = openml._api_calls._file_id_to_url(
                 self.output_files["predictions"],
                 "predictions.arff",
@@ -493,7 +517,7 @@ class OpenMLRun(OpenMLBase):
             # TODO: make this a stream reader
         else:
             raise ValueError(
-                "Run should have been locally executed or " "contain outputfile reference."
+                "Run should have been locally executed or " "contain outputfile reference.",
             )
 
         # Need to know more about the task to compute scores correctly
@@ -510,7 +534,7 @@ class OpenMLRun(OpenMLBase):
         if task.task_type_id != TaskType.CLUSTERING and "prediction" not in attribute_names:
             raise ValueError('Attribute "predict" should be set for ' "supervised task runs")
 
-        def _attribute_list_to_dict(attribute_list):
+        def _attribute_list_to_dict(attribute_list):  # type: ignore
             # convenience function: Creates a mapping to map from the name of
             # attributes present in the arff prediction file to their index.
             # This is necessary because the number of classes can be different
@@ -526,10 +550,7 @@ class OpenMLRun(OpenMLBase):
         fold_idx = attribute_dict["fold"]
         predicted_idx = attribute_dict["prediction"]  # Assume supervised task
 
-        if (
-            task.task_type_id == TaskType.SUPERVISED_CLASSIFICATION
-            or task.task_type_id == TaskType.LEARNING_CURVE
-        ):
+        if task.task_type_id in (TaskType.SUPERVISED_CLASSIFICATION, TaskType.LEARNING_CURVE):
             correct_idx = attribute_dict["correct"]
         elif task.task_type_id == TaskType.SUPERVISED_REGRESSION:
             correct_idx = attribute_dict["truth"]
@@ -545,27 +566,23 @@ class OpenMLRun(OpenMLBase):
             pred = predictions_arff["attributes"][predicted_idx][1]
             corr = predictions_arff["attributes"][correct_idx][1]
             raise ValueError(
-                "Predicted and Correct do not have equal values:"
-                " %s Vs. %s" % (str(pred), str(corr))
+                "Predicted and Correct do not have equal values:" f" {pred!s} Vs. {corr!s}",
             )
 
         # TODO: these could be cached
-        values_predict = {}
-        values_correct = {}
-        for line_idx, line in enumerate(predictions_arff["data"]):
+        values_predict: dict[int, dict[int, dict[int, list[float]]]] = {}
+        values_correct: dict[int, dict[int, dict[int, list[float]]]] = {}
+        for _line_idx, line in enumerate(predictions_arff["data"]):
             rep = line[repeat_idx]
             fold = line[fold_idx]
-            if has_samples:
-                samp = line[sample_idx]
-            else:
-                samp = 0  # No learning curve sample, always 0
+            samp = line[sample_idx] if has_samples else 0
 
             if task.task_type_id in [
                 TaskType.SUPERVISED_CLASSIFICATION,
                 TaskType.LEARNING_CURVE,
             ]:
                 prediction = predictions_arff["attributes"][predicted_idx][1].index(
-                    line[predicted_idx]
+                    line[predicted_idx],
                 )
                 correct = predictions_arff["attributes"][predicted_idx][1].index(line[correct_idx])
             elif task.task_type_id == TaskType.SUPERVISED_REGRESSION:
@@ -585,19 +602,19 @@ class OpenMLRun(OpenMLBase):
             values_correct[rep][fold][samp].append(correct)
 
         scores = []
-        for rep in values_predict.keys():
-            for fold in values_predict[rep].keys():
+        for rep in values_predict:
+            for fold in values_predict[rep]:
                 last_sample = len(values_predict[rep][fold]) - 1
                 y_pred = values_predict[rep][fold][last_sample]
                 y_true = values_correct[rep][fold][last_sample]
                 scores.append(sklearn_fn(y_true, y_pred, **kwargs))
         return np.array(scores)
 
-    def _parse_publish_response(self, xml_response: Dict):
+    def _parse_publish_response(self, xml_response: dict) -> None:
         """Parse the id from the xml_response and assign it to self."""
         self.run_id = int(xml_response["oml:upload_run"]["oml:run_id"])
 
-    def _get_file_elements(self) -> Dict:
+    def _get_file_elements(self) -> dict:
         """Get file_elements to upload to the server.
 
         Derived child classes should overwrite this method as necessary.
@@ -605,21 +622,22 @@ class OpenMLRun(OpenMLBase):
         """
         if self.parameter_settings is None and self.model is None:
             raise PyOpenMLError(
-                "OpenMLRun must contain a model or be initialized with parameter_settings."
+                "OpenMLRun must contain a model or be initialized with parameter_settings.",
             )
         if self.flow_id is None:
             if self.flow is None:
                 raise PyOpenMLError(
                     "OpenMLRun object does not contain a flow id or reference to OpenMLFlow "
-                    "(these should have been added while executing the task). "
+                    "(these should have been added while executing the task). ",
                 )
-            else:
-                # publish the linked Flow before publishing the run.
-                self.flow.publish()
-                self.flow_id = self.flow.flow_id
+
+            # publish the linked Flow before publishing the run.
+            self.flow.publish()
+            self.flow_id = self.flow.flow_id
 
         if self.parameter_settings is None:
             if self.flow is None:
+                assert self.flow_id is not None  # for mypy
                 self.flow = openml.flows.get_flow(self.flow_id)
             self.parameter_settings = self.flow.extension.obtain_parameter_values(
                 self.flow,
@@ -637,7 +655,7 @@ class OpenMLRun(OpenMLBase):
             file_elements["trace"] = ("trace.arff", trace_arff)
         return file_elements
 
-    def _to_dict(self) -> "OrderedDict[str, OrderedDict]":
+    def _to_dict(self) -> dict[str, dict]:  # noqa: PLR0912, C901
         """Creates a dictionary representation of self."""
         description = OrderedDict()  # type: 'OrderedDict'
         description["oml:run"] = OrderedDict()
@@ -657,7 +675,7 @@ class OpenMLRun(OpenMLBase):
             self.sample_evaluations is not None and len(self.sample_evaluations) > 0
         ):
             description["oml:run"]["oml:output_data"] = OrderedDict()
-            description["oml:run"]["oml:output_data"]["oml:evaluation"] = list()
+            description["oml:run"]["oml:output_data"]["oml:evaluation"] = []
         if self.fold_evaluations is not None:
             for measure in self.fold_evaluations:
                 for repeat in self.fold_evaluations[measure]:
@@ -668,7 +686,7 @@ class OpenMLRun(OpenMLBase):
                                 ("@fold", str(fold)),
                                 ("oml:name", measure),
                                 ("oml:value", str(value)),
-                            ]
+                            ],
                         )
                         description["oml:run"]["oml:output_data"]["oml:evaluation"].append(current)
         if self.sample_evaluations is not None:
@@ -683,9 +701,9 @@ class OpenMLRun(OpenMLBase):
                                     ("@sample", str(sample)),
                                     ("oml:name", measure),
                                     ("oml:value", str(value)),
-                                ]
+                                ],
                             )
                             description["oml:run"]["oml:output_data"]["oml:evaluation"].append(
-                                current
+                                current,
                             )
         return description

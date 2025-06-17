@@ -1,21 +1,21 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections import OrderedDict  # noqa: F401
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union
-
-import numpy as np
-import scipy.sparse
+from collections import OrderedDict
+from typing import TYPE_CHECKING, Any
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
+    import numpy as np
+    import scipy.sparse
+
     from openml.flows import OpenMLFlow
+    from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration  # F401
     from openml.tasks.task import OpenMLTask
-    from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration  # noqa F401
 
 
 class Extension(ABC):
-
     """Defines the interface to connect machine learning libraries to OpenML-Python.
 
     See ``openml.extension.sklearn.extension`` for an implementation to bootstrap from.
@@ -26,7 +26,7 @@ class Extension(ABC):
 
     @classmethod
     @abstractmethod
-    def can_handle_flow(cls, flow: "OpenMLFlow") -> bool:
+    def can_handle_flow(cls, flow: OpenMLFlow) -> bool:
         """Check whether a given flow can be handled by this extension.
 
         This is typically done by parsing the ``external_version`` field.
@@ -62,9 +62,9 @@ class Extension(ABC):
     @abstractmethod
     def flow_to_model(
         self,
-        flow: "OpenMLFlow",
-        initialize_with_defaults: bool = False,
-        strict_version: bool = True,
+        flow: OpenMLFlow,
+        initialize_with_defaults: bool = False,  # noqa: FBT001, FBT002
+        strict_version: bool = True,  # noqa: FBT002, FBT001
     ) -> Any:
         """Instantiate a model from the flow representation.
 
@@ -85,7 +85,7 @@ class Extension(ABC):
         """
 
     @abstractmethod
-    def model_to_flow(self, model: Any) -> "OpenMLFlow":
+    def model_to_flow(self, model: Any) -> OpenMLFlow:
         """Transform a model to a flow for uploading it to OpenML.
 
         Parameters
@@ -98,7 +98,7 @@ class Extension(ABC):
         """
 
     @abstractmethod
-    def get_version_information(self) -> List[str]:
+    def get_version_information(self) -> list[str]:
         """List versions of libraries required by the flow.
 
         Returns
@@ -139,7 +139,7 @@ class Extension(ABC):
         """
 
     @abstractmethod
-    def seed_model(self, model: Any, seed: Optional[int]) -> Any:
+    def seed_model(self, model: Any, seed: int | None) -> Any:
         """Set the seed of all the unseeded components of a model and return the seeded model.
 
         Required so that all seed information can be uploaded to OpenML for reproducible results.
@@ -156,16 +156,16 @@ class Extension(ABC):
         """
 
     @abstractmethod
-    def _run_model_on_fold(
+    def _run_model_on_fold(  # noqa: PLR0913
         self,
         model: Any,
-        task: "OpenMLTask",
-        X_train: Union[np.ndarray, scipy.sparse.spmatrix],
+        task: OpenMLTask,
+        X_train: np.ndarray | scipy.sparse.spmatrix,
         rep_no: int,
         fold_no: int,
-        y_train: Optional[np.ndarray] = None,
-        X_test: Optional[Union[np.ndarray, scipy.sparse.spmatrix]] = None,
-    ) -> Tuple[np.ndarray, np.ndarray, "OrderedDict[str, float]", Optional["OpenMLRunTrace"]]:
+        y_train: np.ndarray | None = None,
+        X_test: np.ndarray | scipy.sparse.spmatrix | None = None,
+    ) -> tuple[np.ndarray, np.ndarray | None, OrderedDict[str, float], OpenMLRunTrace | None]:
         """Run a model on a repeat, fold, subsample triplet of the task.
 
         Returns the data that is necessary to construct the OpenML Run object. Is used by
@@ -205,9 +205,9 @@ class Extension(ABC):
     @abstractmethod
     def obtain_parameter_values(
         self,
-        flow: "OpenMLFlow",
+        flow: OpenMLFlow,
         model: Any = None,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Extracts all parameter settings required for the flow from the model.
 
         If no explicit model is provided, the parameters will be extracted from `flow.model`
@@ -251,7 +251,7 @@ class Extension(ABC):
     def instantiate_model_from_hpo_class(
         self,
         model: Any,
-        trace_iteration: "OpenMLTraceIteration",
+        trace_iteration: OpenMLTraceIteration,
     ) -> Any:
         """Instantiate a base model which can be searched over by the hyperparameter optimization
         model.

@@ -8,29 +8,24 @@ How to list and download datasets.
 
 # License: BSD 3-Clauses
 
-import openml
 import pandas as pd
+
+import openml
 from openml.datasets import edit_dataset, fork_dataset, get_dataset
 
 ############################################################################
 # Exercise 0
 # **********
 #
-# * List datasets
-#
-#   * Use the output_format parameter to select output type
-#   * Default gives 'dict' (other option: 'dataframe', see below)
-#
-# Note: list_datasets will return a pandas dataframe by default from 0.15. When using
-# openml-python 0.14, `list_datasets` will warn you to use output_format='dataframe'.
-datalist = openml.datasets.list_datasets(output_format="dataframe")
+# * List datasets and return a dataframe
+datalist = openml.datasets.list_datasets()
 datalist = datalist[["did", "name", "NumberOfInstances", "NumberOfFeatures", "NumberOfClasses"]]
 
 print(f"First 10 of {len(datalist)} datasets...")
 datalist.head(n=10)
 
 # The same can be done with lesser lines of code
-openml_df = openml.datasets.list_datasets(output_format="dataframe")
+openml_df = openml.datasets.list_datasets()
 openml_df.head(n=10)
 
 ############################################################################
@@ -51,7 +46,7 @@ datalist.query("NumberOfClasses > 50")
 # =================
 
 # This is done based on the dataset ID.
-dataset = openml.datasets.get_dataset(1471)
+dataset = openml.datasets.get_dataset(dataset_id="eeg-eye-state", version=1)
 
 # Print a summary
 print(
@@ -87,8 +82,7 @@ print(X.info())
 # Starting from 0.15, not downloading data will be the default behavior instead.
 # The data will be downloading automatically when you try to access it through
 # openml objects, e.g., using `dataset.features`.
-dataset = openml.datasets.get_dataset(1471, download_data=False)
-
+dataset = openml.datasets.get_dataset(dataset_id="eeg-eye-state", version=1, download_data=False)
 ############################################################################
 # Exercise 2
 # **********

@@ -17,6 +17,14 @@ doc/auto_examples/
 doc/modules/generated/
 doc/datasets/generated/
 
+# Some stuff from testing?
+tests/files/org/openml/test/datasets/1/
+tests/files/org/openml/test/datasets/2/features.xml.pkl
+tests/files/org/openml/test/datasets/2/qualities.xml.pkl
+tests/files/org/openml/test/locks/
+tests/files/org/openml/test/tasks/1/datasplits.pkl.py3
+tests/files/org/openml/test/tasks/1882/datasplits.pkl.py3
+
 # Distribution / packaging
 
 .Python

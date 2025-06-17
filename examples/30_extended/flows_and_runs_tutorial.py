@@ -7,9 +7,9 @@ How to train/run a model and how to upload the results.
 
 # License: BSD 3-Clause
 
-import openml
-from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
+from sklearn import compose, ensemble, impute, neighbors, pipeline, preprocessing, tree
 
+import openml
 
 ############################################################################
 # We'll use the test server for the rest of this tutorial.
@@ -25,7 +25,7 @@ openml.config.start_using_configuration_for_example()
 # Train a scikit-learn model on the data manually.
 
 # NOTE: We are using dataset 68 from the test server: https://test.openml.org/d/68
-dataset = openml.datasets.get_dataset(68)
+dataset = openml.datasets.get_dataset(dataset_id="eeg-eye-state", version=1)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
     target=dataset.default_target_attribute
 )
@@ -36,7 +36,7 @@ clf.fit(X, y)
 # You can also ask for meta-data to automatically preprocess the data.
 #
 # * e.g. categorical features -> do feature encoding
-dataset = openml.datasets.get_dataset(17)
+dataset = openml.datasets.get_dataset(dataset_id="credit-g", version=1)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
     target=dataset.default_target_attribute
 )
@@ -101,7 +101,7 @@ pipe = pipeline.Pipeline(
                 [
                     (
                         "categorical",
-                        preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
+                        preprocessing.OneHotEncoder(handle_unknown="ignore"),
                         cat,  # returns the categorical feature indices
                     ),
                     (
@@ -145,7 +145,7 @@ pipe = pipeline.Pipeline(
                 [
                     (
                         "categorical",
-                        preprocessing.OneHotEncoder(sparse=False, handle_unknown="ignore"),
+                        preprocessing.OneHotEncoder(handle_unknown="ignore"),
                         categorical_feature_indices,
                     ),
                     (

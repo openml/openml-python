@@ -1,21 +1,35 @@
 name: Docs
-on: [pull_request, push]
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - "v*.*.*"
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.8
     - name: Install dependencies
       run: |
-        pip install -e .[docs,examples,examples_unix]
-        # dependency "fanova" does not work with numpy 1.24 or later
-        # https://github.com/automl/fanova/issues/108
-        pip install numpy==1.23.5
+          pip install -e .[docs,examples]
     - name: Make docs
       run: |
         cd doc
@@ -47,4 +61,4 @@ jobs:
         git config --global user.email 'not@mail.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         git commit -am "$last_commit"
-        git push
+        git diff --quiet @{u} HEAD || git push
