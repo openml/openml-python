@@ -1142,7 +1142,7 @@ class SklearnExtension(Extension):
                 optional_params[param] = default_val
         return optional_params, required_params
 
-    def _deserialize_model(
+    def _deserialize_model(  # noqa: C901
         self,
         flow: OpenMLFlow,
         keep_defaults: bool,  # noqa: FBT001
@@ -1213,6 +1213,20 @@ class SklearnExtension(Extension):
                 if param not in components:
                     del parameter_dict[param]
 
+        if not strict_version:
+            # Ignore incompatible parameters
+            allowed_parameter = list(inspect.signature(model_class.__init__).parameters)
+            for p in list(parameter_dict.keys()):
+                if p not in allowed_parameter:
+                    warnings.warn(
+                        f"While deserializing in a non-strict way, parameter {p} is not "
+                        f"allowed for {model_class.__name__} likely due to a version mismatch. "
+                        "We ignore the parameter.",
+                        UserWarning,
+                        stacklevel=2,
+                    )
+                    del parameter_dict[p]
+
         return model_class(**parameter_dict)
 
     def _check_dependencies(
@@ -1248,8 +1262,7 @@ class SklearnExtension(Extension):
             else:
                 raise NotImplementedError(f"operation '{operation}' is not supported")
             message = (
-                "Trying to deserialize a model with dependency "
-                f"{dependency_string} not satisfied."
+                f"Trying to deserialize a model with dependency {dependency_string} not satisfied."
             )
             if not check:
                 if strict_version:
@@ -1491,7 +1504,7 @@ class SklearnExtension(Extension):
             )
             if len(n_jobs_vals) > 0:
                 raise PyOpenMLError(
-                    "openml-python should not be used to " "optimize the n_jobs parameter.",
+                    "openml-python should not be used to optimize the n_jobs parameter.",
                 )
 
     ################################################################################################
@@ -1549,7 +1562,7 @@ class SklearnExtension(Extension):
 
             if current_value is not None:
                 raise ValueError(
-                    "Models should be seeded with int or None (this should never " "happen). ",
+                    "Models should be seeded with int or None (this should never happen). ",
                 )
 
             return True
@@ -1774,10 +1787,10 @@ class SklearnExtension(Extension):
             # to handle the case when dataset is numpy and categories are encoded
             # however the class labels stored in task are still categories
             if isinstance(y_train, np.ndarray) and isinstance(
-                cast(List, task.class_labels)[0],
+                cast("List", task.class_labels)[0],
                 str,
             ):
-                model_classes = [cast(List[str], task.class_labels)[i] for i in model_classes]
+                model_classes = [cast("List[str]", task.class_labels)[i] for i in model_classes]
 
         modelpredict_start_cputime = time.process_time()
         modelpredict_start_walltime = time.time()
@@ -2000,7 +2013,7 @@ class SklearnExtension(Extension):
                         # (mixed)). OpenML replaces the subcomponent by an
                         # OpenMLFlow object.
                         if len(subcomponent) < 2 or len(subcomponent) > 3:
-                            raise ValueError("Component reference should be " "size {2,3}. ")
+                            raise ValueError("Component reference should be size {2,3}. ")
 
                         subcomponent_identifier = subcomponent[0]
                         subcomponent_flow = subcomponent[1]

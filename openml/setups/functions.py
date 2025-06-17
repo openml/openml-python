@@ -1,8 +1,9 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import warnings
 from collections import OrderedDict
+from functools import partial
+from itertools import chain
 from pathlib import Path
 from typing import Any, Iterable
 from typing_extensions import Literal
@@ -89,7 +90,7 @@ def _get_cached_setup(setup_id: int) -> OpenMLSetup:
         setup_file = setup_cache_dir / "description.xml"
         with setup_file.open(encoding="utf8") as fh:
             setup_xml = xmltodict.parse(fh.read())
-            return _create_setup_from_xml(setup_xml, output_format="object")  # type: ignore
+            return _create_setup_from_xml(setup_xml)
 
     except OSError as e:
         raise openml.exceptions.OpenMLCacheException(
@@ -119,13 +120,13 @@ def get_setup(setup_id: int) -> OpenMLSetup:
     try:
         return _get_cached_setup(setup_id)
     except openml.exceptions.OpenMLCacheException:
-        url_suffix = "/setup/%d" % setup_id
+        url_suffix = f"/setup/{setup_id}"
         setup_xml = openml._api_calls._perform_api_call(url_suffix, "get")
         with setup_file.open("w", encoding="utf8") as fh:
             fh.write(setup_xml)
 
     result_dict = xmltodict.parse(setup_xml)
-    return _create_setup_from_xml(result_dict, output_format="object")  # type: ignore
+    return _create_setup_from_xml(result_dict)
 
 
 def list_setups(  # noqa: PLR0913
@@ -134,8 +135,8 @@ def list_setups(  # noqa: PLR0913
     flow: int | None = None,
     tag: str | None = None,
     setup: Iterable[int] | None = None,
-    output_format: Literal["object", "dict", "dataframe"] = "object",
-) -> dict | pd.DataFrame:
+    output_format: Literal["object", "dataframe"] = "object",
+) -> dict[int, OpenMLSetup] | pd.DataFrame:
     """
     List all setups matching all of the given filters.
 
@@ -148,81 +149,74 @@ def list_setups(  # noqa: PLR0913
     setup : Iterable[int], optional
     output_format: str, optional (default='object')
         The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
         - If 'dataframe' the output is a pandas DataFrame
+        - If 'object' the output is a dictionary of OpenMLSetup objects
 
     Returns
     -------
     dict or dataframe
     """
-    if output_format not in ["dataframe", "dict", "object"]:
+    if output_format not in ["dataframe", "object"]:
         raise ValueError(
-            "Invalid output format selected. " "Only 'dict', 'object', or 'dataframe' applicable.",
+            "Invalid output format selected. Only 'object', or 'dataframe' applicable.",
         )
 
-    # TODO: [0.15]
-    if output_format == "dict":
-        msg = (
-            "Support for `output_format` of 'dict' will be removed in 0.15. "
-            "To ensure your code will continue to work, "
-            "use `output_format`='dataframe' or `output_format`='object'."
-        )
-        warnings.warn(msg, category=FutureWarning, stacklevel=2)
-
-    batch_size = 1000  # batch size for setups is lower
-    return openml.utils._list_all(  # type: ignore
-        list_output_format=output_format,  # type: ignore
-        listing_call=_list_setups,
+    listing_call = partial(_list_setups, flow=flow, tag=tag, setup=setup)
+    batches = openml.utils._list_all(
+        listing_call,
+        batch_size=1_000,  # batch size for setups is lower
         offset=offset,
-        size=size,
-        flow=flow,
-        tag=tag,
-        setup=setup,
-        batch_size=batch_size,
+        limit=size,
     )
+    flattened = list(chain.from_iterable(batches))
+    if output_format == "object":
+        return {setup.setup_id: setup for setup in flattened}
+
+    records = [setup._to_dict() for setup in flattened]
+    return pd.DataFrame.from_records(records, index="setup_id")
 
 
 def _list_setups(
+    limit: int,
+    offset: int,
+    *,
     setup: Iterable[int] | None = None,
-    output_format: Literal["dict", "dataframe", "object"] = "object",
-    **kwargs: Any,
-) -> dict[int, dict] | pd.DataFrame | dict[int, OpenMLSetup]:
-    """
-    Perform API call `/setup/list/{filters}`
+    flow: int | None = None,
+    tag: str | None = None,
+) -> list[OpenMLSetup]:
+    """Perform API call `/setup/list/{filters}`
 
     Parameters
     ----------
     The setup argument that is a list is separated from the single value
     filters which are put into the kwargs.
 
+    limit : int
+    offset : int
     setup : list(int), optional
-
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
-        - If 'object' the output is a dict of OpenMLSetup objects
-
-    kwargs: dict, optional
-        Legal filter operators: flow, setup, limit, offset, tag.
+    flow : int, optional
+    tag : str, optional
 
     Returns
     -------
-    dict or dataframe or list[OpenMLSetup]
+    The setups that match the filters, going from id to the OpenMLSetup object.
     """
     api_call = "setup/list"
+    if limit is not None:
+        api_call += f"/limit/{limit}"
+    if offset is not None:
+        api_call += f"/offset/{offset}"
     if setup is not None:
-        api_call += f"/setup/{','.join([str(int(i)) for i in setup])}"
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            api_call += f"/{operator}/{value}"
+        api_call += f"/setup/{','.join([str(int(i)}" for i in setup]))
+    if flow is not None:
+        api_call += f"/flow/{flow}"
+    if tag is not None:
+        api_call += f"/tag/{tag}"
 
-    return __list_setups(api_call=api_call, output_format=output_format)
+    return __list_setups(api_call=api_call)
 
 
-def __list_setups(
-    api_call: str, output_format: Literal["dict", "dataframe", "object"] = "object"
-) -> dict[int, dict] | pd.DataFrame | dict[int, OpenMLSetup]:
+def __list_setups(api_call: str) -> list[OpenMLSetup]:
     """Helper function to parse API calls which are lists of setups"""
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     setups_dict = xmltodict.parse(xml_string, force_list=("oml:setup",))
@@ -230,12 +224,12 @@ def __list_setups(
     # Minimalistic check if the XML is useful
     if "oml:setups" not in setups_dict:
         raise ValueError(
-            'Error in return XML, does not contain "oml:setups":' f" {setups_dict!s}",
+            f'Error in return XML, does not contain "oml:setups": {setups_dict!s}',
         )
 
     if "@xmlns:oml" not in setups_dict["oml:setups"]:
         raise ValueError(
-            "Error in return XML, does not contain " f'"oml:setups"/@xmlns:oml: {setups_dict!s}',
+            f'Error in return XML, does not contain "oml:setups"/@xmlns:oml: {setups_dict!s}',
         )
 
     if setups_dict["oml:setups"]["@xmlns:oml"] != openml_uri:
@@ -247,22 +241,10 @@ def __list_setups(
 
     assert isinstance(setups_dict["oml:setups"]["oml:setup"], list), type(setups_dict["oml:setups"])
 
-    setups = {}
-    for setup_ in setups_dict["oml:setups"]["oml:setup"]:
-        # making it a dict to give it the right format
-        current = _create_setup_from_xml(
-            {"oml:setup_parameters": setup_},
-            output_format=output_format,
-        )
-        if output_format == "object":
-            setups[current.setup_id] = current  # type: ignore
-        else:
-            setups[current["setup_id"]] = current  # type: ignore
-
-    if output_format == "dataframe":
-        setups = pd.DataFrame.from_dict(setups, orient="index")
-
-    return setups
+    return [
+        _create_setup_from_xml({"oml:setup_parameters": setup_})
+        for setup_ in setups_dict["oml:setups"]["oml:setup"]
+    ]
 
 
 def initialize_model(setup_id: int, *, strict_version: bool = True) -> Any:
@@ -299,9 +281,7 @@ def initialize_model(setup_id: int, *, strict_version: bool = True) -> Any:
     return flow.extension.flow_to_model(flow, strict_version=strict_version)
 
 
-def _to_dict(
-    flow_id: int, openml_parameter_settings: list[OpenMLParameter] | list[dict[str, Any]]
-) -> OrderedDict:
+def _to_dict(flow_id: int, openml_parameter_settings: list[dict[str, Any]]) -> OrderedDict:
     """Convert a flow ID and a list of OpenML parameter settings to
     a dictionary representation that can be serialized to XML.
 
@@ -309,7 +289,7 @@ def _to_dict(
     ----------
     flow_id : int
         ID of the flow.
-    openml_parameter_settings : List[OpenMLParameter]
+    openml_parameter_settings : list[dict[str, Any]]
         A list of OpenML parameter settings.
 
     Returns
@@ -327,77 +307,41 @@ def _to_dict(
     return xml
 
 
-def _create_setup_from_xml(
-    result_dict: dict, output_format: Literal["dict", "dataframe", "object"] = "object"
-) -> OpenMLSetup | dict[str, int | dict[int, Any] | None]:
+def _create_setup_from_xml(result_dict: dict) -> OpenMLSetup:
     """Turns an API xml result into a OpenMLSetup object (or dict)"""
-    if output_format in ["dataframe", "dict"]:
-        _output_format: Literal["dict", "object"] = "dict"
-    elif output_format == "object":
-        _output_format = "object"
-    else:
-        raise ValueError(
-            f"Invalid output format selected: {output_format}"
-            "Only 'dict', 'object', or 'dataframe' applicable.",
-        )
-
     setup_id = int(result_dict["oml:setup_parameters"]["oml:setup_id"])
     flow_id = int(result_dict["oml:setup_parameters"]["oml:flow_id"])
-    if "oml:parameter" not in result_dict["oml:setup_parameters"]:
-        parameters = None
-    else:
-        parameters = {}
-        # basically all others
-        xml_parameters = result_dict["oml:setup_parameters"]["oml:parameter"]
-        if isinstance(xml_parameters, dict):
-            oml_id = int(xml_parameters["oml:id"])
-            parameters[oml_id] = _create_setup_parameter_from_xml(
-                result_dict=xml_parameters,
-                output_format=_output_format,
-            )
-        elif isinstance(xml_parameters, list):
-            for xml_parameter in xml_parameters:
-                oml_id = int(xml_parameter["oml:id"])
-                parameters[oml_id] = _create_setup_parameter_from_xml(
-                    result_dict=xml_parameter,
-                    output_format=_output_format,
-                )
-        else:
-            raise ValueError(
-                "Expected None, list or dict, received "
-                f"something else: {type(xml_parameters)!s}",
-            )
 
-    if _output_format in ["dataframe", "dict"]:
-        return {"setup_id": setup_id, "flow_id": flow_id, "parameters": parameters}
+    if "oml:parameter" not in result_dict["oml:setup_parameters"]:
+        return OpenMLSetup(setup_id, flow_id, parameters=None)
+
+    xml_parameters = result_dict["oml:setup_parameters"]["oml:parameter"]
+    if isinstance(xml_parameters, dict):
+        parameters = {
+            int(xml_parameters["oml:id"]): _create_setup_parameter_from_xml(xml_parameters),
+        }
+    elif isinstance(xml_parameters, list):
+        parameters = {
+            int(xml_parameter["oml:id"]): _create_setup_parameter_from_xml(xml_parameter)
+            for xml_parameter in xml_parameters
+        }
+    else:
+        raise ValueError(
+            f"Expected None, list or dict, received something else: {type(xml_parameters)!s}",
+        )
+
     return OpenMLSetup(setup_id, flow_id, parameters)
 
 
-def _create_setup_parameter_from_xml(
-    result_dict: dict[str, str], output_format: Literal["object", "dict"] = "object"
-) -> dict[str, int | str] | OpenMLParameter:
+def _create_setup_parameter_from_xml(result_dict: dict[str, str]) -> OpenMLParameter:
     """Create an OpenMLParameter object or a dictionary from an API xml result."""
-    if output_format == "object":
-        return OpenMLParameter(
-            input_id=int(result_dict["oml:id"]),
-            flow_id=int(result_dict["oml:flow_id"]),
-            flow_name=result_dict["oml:flow_name"],
-            full_name=result_dict["oml:full_name"],
-            parameter_name=result_dict["oml:parameter_name"],
-            data_type=result_dict["oml:data_type"],
-            default_value=result_dict["oml:default_value"],
-            value=result_dict["oml:value"],
-        )
-
-    # FIXME: likely we want to crash here if unknown output_format but not backwards compatible
-    # output_format == "dict" case,
-    return {
-        "input_id": int(result_dict["oml:id"]),
-        "flow_id": int(result_dict["oml:flow_id"]),
-        "flow_name": result_dict["oml:flow_name"],
-        "full_name": result_dict["oml:full_name"],
-        "parameter_name": result_dict["oml:parameter_name"],
-        "data_type": result_dict["oml:data_type"],
-        "default_value": result_dict["oml:default_value"],
-        "value": result_dict["oml:value"],
-    }
+    return OpenMLParameter(
+        input_id=int(result_dict["oml:id"]),
+        flow_id=int(result_dict["oml:flow_id"]),
+        flow_name=result_dict["oml:flow_name"],
+        full_name=result_dict["oml:full_name"],
+        parameter_name=result_dict["oml:parameter_name"],
+        data_type=result_dict["oml:data_type"],
+        default_value=result_dict["oml:default_value"],
+        value=result_dict["oml:value"],
+    )

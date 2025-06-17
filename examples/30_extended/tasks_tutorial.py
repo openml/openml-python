@@ -9,7 +9,6 @@ A tutorial on how to list and download tasks.
 
 import openml
 from openml.tasks import TaskType
-import pandas as pd
 
 ############################################################################
 #
@@ -30,14 +29,11 @@ import pandas as pd
 # ^^^^^^^^^^^^^
 #
 # We will start by simply listing only *supervised classification* tasks.
-# **openml.tasks.list_tasks()** returns a dictionary of dictionaries by default, but we
-# request a
+# **openml.tasks.list_tasks()** getting a
 # `pandas dataframe <https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
-# instead to have better visualization capabilities and easier access:
+# to have good visualization capabilities and easier access:
 
-tasks = openml.tasks.list_tasks(
-    task_type=TaskType.SUPERVISED_CLASSIFICATION, output_format="dataframe"
-)
+tasks = openml.tasks.list_tasks(task_type=TaskType.SUPERVISED_CLASSIFICATION)
 print(tasks.columns)
 print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
@@ -71,21 +67,21 @@ print(len(filtered_tasks))
 #
 # Similar to listing tasks by task type, we can list tasks by tags:
 
-tasks = openml.tasks.list_tasks(tag="OpenML100", output_format="dataframe")
+tasks = openml.tasks.list_tasks(tag="OpenML100")
 print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
 ############################################################################
 # Furthermore, we can list tasks based on the dataset id:
 
-tasks = openml.tasks.list_tasks(data_id=1471, output_format="dataframe")
+tasks = openml.tasks.list_tasks(data_id=1471)
 print(f"First 5 of {len(tasks)} tasks:")
 print(tasks.head())
 
 ############################################################################
 # In addition, a size limit and an offset can be applied both separately and simultaneously:
 
-tasks = openml.tasks.list_tasks(size=10, offset=50, output_format="dataframe")
+tasks = openml.tasks.list_tasks(size=10, offset=50)
 print(tasks)
 
 ############################################################################
@@ -101,7 +97,7 @@ print(tasks)
 # Finally, it is also possible to list all tasks on OpenML with:
 
 ############################################################################
-tasks = openml.tasks.list_tasks(output_format="dataframe")
+tasks = openml.tasks.list_tasks()
 print(len(tasks))
 
 ############################################################################
@@ -195,7 +191,7 @@ except openml.exceptions.OpenMLServerException as e:
     # Error code for 'task already exists'
     if e.code == 614:
         # Lookup task
-        tasks = openml.tasks.list_tasks(data_id=128, output_format="dataframe")
+        tasks = openml.tasks.list_tasks(data_id=128)
         tasks = tasks.query(
             'task_type == "Supervised Classification" '
             'and estimation_procedure == "10-fold Crossvalidation" '

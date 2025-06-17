@@ -5,7 +5,7 @@
 <div id="user-content-toc">
   <ul align="center" style="list-style: none;">
     <summary>
-      <img src="https://github.com/openml/openml.org/blob/master/app/public/static/svg/logo.svg" width="50" alt="OpenML Logo"/> 
+      <img src="https://github.com/openml/openml.org/blob/master/app/public/static/svg/logo.svg" width="50" alt="OpenML Logo"/>
       <h1>OpenML-Python</h1>
       <img src="https://github.com/openml/docs/blob/master/docs/img/python.png" width="50" alt="Python Logo"/>
     </summary>

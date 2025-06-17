@@ -13,11 +13,9 @@ Publication
 | Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Springenberg, Manuel Blum and Frank Hutter
 | In *Advances in Neural Information Processing Systems 28*, 2015
 | Available at https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning.pdf
-"""  # noqa F401
+"""
 
 # License: BSD 3-Clause
-
-import pandas as pd
 
 import openml
 
@@ -60,7 +58,6 @@ dataset_ids = [
 tasks = openml.tasks.list_tasks(
     task_type=openml.tasks.TaskType.SUPERVISED_CLASSIFICATION,
     status="all",
-    output_format="dataframe",
 )
 
 # Query only those with holdout as the resampling startegy.

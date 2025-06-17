@@ -19,16 +19,11 @@ import numpy as np
 
 import openml
 
-
 ############################################################################
 # Listing suites
 # **************
-#
-# * Use the output_format parameter to select output type
-# * Default gives ``dict``, but we'll use ``dataframe`` to obtain an
-#   easier-to-work-with data structure
 
-suites = openml.study.list_suites(output_format="dataframe", status="all")
+suites = openml.study.list_suites(status="all")
 print(suites.head(n=10))
 
 ############################################################################
@@ -51,7 +46,7 @@ print(suite.tasks)
 
 ############################################################################
 # And we can use the task listing functionality to learn more about them:
-tasks = openml.tasks.list_tasks(output_format="dataframe")
+tasks = openml.tasks.list_tasks()
 
 # Using ``@`` in `pd.DataFrame.query <
 # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.query.html>`_
@@ -76,7 +71,7 @@ openml.config.start_using_configuration_for_example()
 
 # We'll take a random subset of at least ten tasks of all available tasks on
 # the test server:
-all_tasks = list(openml.tasks.list_tasks(output_format="dataframe")["tid"])
+all_tasks = list(openml.tasks.list_tasks()["tid"])
 task_ids_for_suite = sorted(np.random.choice(all_tasks, replace=False, size=20))
 
 # The study needs a machine-readable and unique alias. To obtain this,

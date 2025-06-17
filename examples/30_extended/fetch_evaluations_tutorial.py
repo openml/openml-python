@@ -32,9 +32,7 @@ import openml
 # Required filters can be applied to retrieve results from runs as required.
 
 # We shall retrieve a small set (only 10 entries) to test the listing function for evaluations
-openml.evaluations.list_evaluations(
-    function="predictive_accuracy", size=10, output_format="dataframe"
-)
+openml.evaluations.list_evaluations(function="predictive_accuracy", size=10)
 
 # Using other evaluation metrics, 'precision' in this case
 evals = openml.evaluations.list_evaluations(
@@ -162,7 +160,10 @@ for i in range(top_n):
 # List evaluations in descending order based on predictive_accuracy with
 # hyperparameters
 evals_setups = openml.evaluations.list_evaluations_setups(
-    function="predictive_accuracy", tasks=[31], size=100, sort_order="desc"
+    function="predictive_accuracy",
+    tasks=[31],
+    size=100,
+    sort_order="desc",
 )
 
 ""

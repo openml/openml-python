@@ -26,21 +26,21 @@ class TestRun(TestBase):
     # less than 1 seconds
 
     def test_tagging(self):
-        runs = openml.runs.list_runs(size=1, output_format="dataframe")
+        runs = openml.runs.list_runs(size=1)
         assert not runs.empty, "Test server state is incorrect"
         run_id = runs["run_id"].iloc[0]
         run = openml.runs.get_run(run_id)
         # tags can be at most 64 alphanumeric (+ underscore) chars
         unique_indicator = str(time()).replace(".", "")
         tag = f"test_tag_TestRun_{unique_indicator}"
-        runs = openml.runs.list_runs(tag=tag, output_format="dataframe")
+        runs = openml.runs.list_runs(tag=tag)
         assert len(runs) == 0
         run.push_tag(tag)
-        runs = openml.runs.list_runs(tag=tag, output_format="dataframe")
+        runs = openml.runs.list_runs(tag=tag)
         assert len(runs) == 1
         assert run_id in runs["run_id"]
         run.remove_tag(tag)
-        runs = openml.runs.list_runs(tag=tag, output_format="dataframe")
+        runs = openml.runs.list_runs(tag=tag)
         assert len(runs) == 0
 
     @staticmethod
@@ -205,16 +205,39 @@ class TestRun(TestBase):
             openml.runs.OpenMLRun.from_filesystem(cache_path)
 
     @staticmethod
+    def _cat_col_selector(X):
+        return X.select_dtypes(include=["object", "category"]).columns
+
+    @staticmethod
     def _get_models_tasks_for_tests():
+        from sklearn.compose import ColumnTransformer
+        from sklearn.preprocessing import OneHotEncoder
+
+        basic_preprocessing = [
+            (
+                "cat_handling",
+                ColumnTransformer(
+                    transformers=[
+                        (
+                            "cat",
+                            OneHotEncoder(handle_unknown="ignore"),
+                            TestRun._cat_col_selector,
+                        )
+                    ],
+                    remainder="passthrough",
+                ),
+            ),
+            ("imp", SimpleImputer()),
+        ]
         model_clf = Pipeline(
             [
-                ("imputer", SimpleImputer(strategy="mean")),
+                *basic_preprocessing,
                 ("classifier", DummyClassifier(strategy="prior")),
             ],
         )
         model_reg = Pipeline(
             [
-                ("imputer", SimpleImputer(strategy="mean")),
+                *basic_preprocessing,
                 (
                     "regressor",
                     # LR because dummy does not produce enough float-like values
@@ -263,9 +286,8 @@ class TestRun(TestBase):
 
             assert_method = np.testing.assert_array_almost_equal
             if task.task_type == "Supervised Classification":
-                y_pred = np.take(task.class_labels, y_pred)
-                y_test = np.take(task.class_labels, y_test)
                 assert_method = np.testing.assert_array_equal
+            y_test = y_test.values
 
             # Assert correctness
             assert_method(y_pred, saved_y_pred)

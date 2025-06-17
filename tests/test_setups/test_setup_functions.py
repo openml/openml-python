@@ -4,7 +4,6 @@ from __future__ import annotations
 import hashlib
 import time
 import unittest.mock
-from typing import Dict
 
 import pandas as pd
 import pytest
@@ -156,20 +155,13 @@ class TestSetupFunctions(TestBase):
     def test_list_setups_output_format(self):
         openml.config.server = self.production_server
         flow_id = 6794
-        setups = openml.setups.list_setups(flow=flow_id, output_format="object", size=10)
-        assert isinstance(setups, Dict)
+        setups = openml.setups.list_setups(flow=flow_id, size=10)
+        assert isinstance(setups, dict)
         assert isinstance(setups[next(iter(setups.keys()))], openml.setups.setup.OpenMLSetup)
         assert len(setups) == 10
 
-        setups = openml.setups.list_setups(flow=flow_id, output_format="dataframe", size=10)
+        setups = openml.setups.list_setups(flow=flow_id, size=10, output_format="dataframe")
         assert isinstance(setups, pd.DataFrame)
-        assert len(setups) == 10
-
-        # TODO: [0.15] Remove section as `dict` is no longer supported.
-        with pytest.warns(FutureWarning):
-            setups = openml.setups.list_setups(flow=flow_id, output_format="dict", size=10)
-        assert isinstance(setups, Dict)
-        assert isinstance(setups[next(iter(setups.keys()))], Dict)
         assert len(setups) == 10
 
     def test_setuplist_offset(self):

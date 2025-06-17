@@ -23,6 +23,10 @@ Possible Future: class TestBase from openml/testing.py can be included
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import multiprocessing
+
+multiprocessing.set_start_method("spawn", force=True)
+
 from collections.abc import Iterator
 import logging
 import os
@@ -32,6 +36,7 @@ import pytest
 
 import openml
 from openml.testing import TestBase
+
 
 # creating logger for unit test file deletion status
 logger = logging.getLogger("unit_tests")
@@ -170,7 +175,7 @@ def pytest_sessionfinish() -> None:
         # Delete any test dirs that remain
         # In edge cases due to a mixture of pytest parametrization and oslo concurrency,
         # some file lock are created after leaving the test. This removes these files!
-        test_files_dir=Path(__file__).parent.parent / "openml"
+        test_files_dir = Path(__file__).parent.parent / "openml"
         for f in test_files_dir.glob("tests.*"):
             if f.is_dir():
                 shutil.rmtree(f)

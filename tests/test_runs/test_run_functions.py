@@ -29,6 +29,7 @@ from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.compose import ColumnTransformer
 
 import openml
 import openml._api_calls
@@ -130,9 +131,9 @@ class TestRun(TestBase):
                 time.sleep(10)
                 continue
 
-            assert (
-                len(run.evaluations) > 0
-            ), "Expect not-None evaluations to always contain elements."
+            assert len(run.evaluations) > 0, (
+                "Expect not-None evaluations to always contain elements."
+            )
             return
 
         raise RuntimeError(
@@ -271,7 +272,7 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(task_id)
 
         X, y = task.get_X_and_y()
-        assert np.count_nonzero(np.isnan(X)) == n_missing_vals
+        assert X.isna().sum().sum() == n_missing_vals
         run = openml.runs.run_flow_on_task(
             flow=flow,
             task=task,
@@ -306,7 +307,7 @@ class TestRun(TestBase):
             flow_server = self.extension.model_to_flow(clf_server)
 
             if flow.class_name not in classes_without_random_state:
-                error_msg = "Flow class %s (id=%d) does not have a random " "state parameter" % (
+                error_msg = "Flow class %s (id=%d) does not have a random state parameter" % (
                     flow.class_name,
                     flow.flow_id,
                 )
@@ -400,7 +401,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     def test_run_regression_on_classif_task(self):
-        task_id = 115  # diabetes; crossvalidation
+        task_id = 259  # collins; crossvalidation; has numeric targets
 
         clf = LinearRegression()
         task = openml.tasks.get_task(task_id)
@@ -413,7 +414,6 @@ class TestRun(TestBase):
                 model=clf,
                 task=task,
                 avoid_duplicate_runs=False,
-                dataset_format="array",
             )
 
     @pytest.mark.sklearn()
@@ -480,7 +480,7 @@ class TestRun(TestBase):
                     grid_iterations += determine_grid_size(sub_grid)
                 return grid_iterations
             else:
-                raise TypeError("Param Grid should be of type list " "(GridSearch only) or dict")
+                raise TypeError("Param Grid should be of type list (GridSearch only) or dict")
 
         run = self._perform_run(
             task_id,
@@ -1287,7 +1287,7 @@ class TestRun(TestBase):
         flow_new = self.extension.model_to_flow(clf)
 
         flow_new.flow_id = -1
-        expected_message_regex = "Local flow_id does not match server flow_id: " "'-1' vs '[0-9]+'"
+        expected_message_regex = "Local flow_id does not match server flow_id: '-1' vs '[0-9]+'"
         with pytest.raises(openml.exceptions.PyOpenMLError, match=expected_message_regex):
             openml.runs.run_flow_on_task(
                 task=task,
@@ -1327,7 +1327,7 @@ class TestRun(TestBase):
         run.to_filesystem(cache_path)
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 
-        expected_message_regex = "Local flow_id does not match server flow_id: " "'-1' vs '[0-9]+'"
+        expected_message_regex = "Local flow_id does not match server flow_id: '-1' vs '[0-9]+'"
         self.assertRaisesRegex(
             openml.exceptions.PyOpenMLError,
             expected_message_regex,
@@ -1355,7 +1355,6 @@ class TestRun(TestBase):
             model=clf,
             task=task,
             add_local_measures=True,
-            dataset_format="dataframe",
         )
         arff_datacontent, trace, fold_evaluations, _ = res
         # predictions
@@ -1436,25 +1435,21 @@ class TestRun(TestBase):
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
-        runs = openml.runs.list_runs(id=[2], show_errors=True, output_format="dataframe")
+        runs = openml.runs.list_runs(id=[2], display_errors=True)
         assert len(runs) == 1
         for run in runs.to_dict(orient="index").values():
             self._check_run(run)
 
     def test_list_runs_empty(self):
-        runs = openml.runs.list_runs(task=[0], output_format="dataframe")
+        runs = openml.runs.list_runs(task=[0])
         assert runs.empty
-
-    def test_list_runs_output_format(self):
-        runs = openml.runs.list_runs(size=1000, output_format="dataframe")
-        assert isinstance(runs, pd.DataFrame)
 
     @pytest.mark.production()
     def test_get_runs_list_by_task(self):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
         task_ids = [20]
-        runs = openml.runs.list_runs(task=task_ids, output_format="dataframe")
+        runs = openml.runs.list_runs(task=task_ids)
         assert len(runs) >= 590
         for run in runs.to_dict(orient="index").values():
             assert run["task_id"] in task_ids
@@ -1462,7 +1457,7 @@ class TestRun(TestBase):
         num_runs = len(runs)
 
         task_ids.append(21)
-        runs = openml.runs.list_runs(task=task_ids, output_format="dataframe")
+        runs = openml.runs.list_runs(task=task_ids)
         assert len(runs) >= num_runs + 1
         for run in runs.to_dict(orient="index").values():
             assert run["task_id"] in task_ids
@@ -1475,7 +1470,7 @@ class TestRun(TestBase):
         # 29 is Dominik Kirchhoff
         uploader_ids = [29]
 
-        runs = openml.runs.list_runs(uploader=uploader_ids, output_format="dataframe")
+        runs = openml.runs.list_runs(uploader=uploader_ids)
         assert len(runs) >= 2
         for run in runs.to_dict(orient="index").values():
             assert run["uploader"] in uploader_ids
@@ -1484,7 +1479,7 @@ class TestRun(TestBase):
 
         uploader_ids.append(274)
 
-        runs = openml.runs.list_runs(uploader=uploader_ids, output_format="dataframe")
+        runs = openml.runs.list_runs(uploader=uploader_ids)
         assert len(runs) >= num_runs + 1
         for run in runs.to_dict(orient="index").values():
             assert run["uploader"] in uploader_ids
@@ -1495,7 +1490,7 @@ class TestRun(TestBase):
         # TODO: comes from live, no such lists on test
         openml.config.server = self.production_server
         flow_ids = [1154]
-        runs = openml.runs.list_runs(flow=flow_ids, output_format="dataframe")
+        runs = openml.runs.list_runs(flow=flow_ids)
         assert len(runs) >= 1
         for run in runs.to_dict(orient="index").values():
             assert run["flow_id"] in flow_ids
@@ -1503,7 +1498,7 @@ class TestRun(TestBase):
         num_runs = len(runs)
 
         flow_ids.append(1069)
-        runs = openml.runs.list_runs(flow=flow_ids, output_format="dataframe")
+        runs = openml.runs.list_runs(flow=flow_ids)
         assert len(runs) >= num_runs + 1
         for run in runs.to_dict(orient="index").values():
             assert run["flow_id"] in flow_ids
@@ -1517,12 +1512,7 @@ class TestRun(TestBase):
         size = 10
         max = 100
         for i in range(0, max, size):
-            runs = openml.runs.list_runs(
-                offset=i,
-                size=size,
-                uploader=uploader_ids,
-                output_format="dataframe",
-            )
+            runs = openml.runs.list_runs(offset=i, size=size, uploader=uploader_ids)
             assert size >= len(runs)
             for run in runs.to_dict(orient="index").values():
                 assert run["uploader"] in uploader_ids
@@ -1545,23 +1535,22 @@ class TestRun(TestBase):
         # self.assertRaises(openml.exceptions.OpenMLServerError,
         # openml.runs.list_runs)
 
-        runs = openml.runs.list_runs(id=ids, output_format="dataframe")
+        runs = openml.runs.list_runs(id=ids)
         assert len(runs) == 2
 
-        runs = openml.runs.list_runs(task=tasks, output_format="dataframe")
+        runs = openml.runs.list_runs(task=tasks)
         assert len(runs) >= 2
 
-        runs = openml.runs.list_runs(uploader=uploaders_2, output_format="dataframe")
+        runs = openml.runs.list_runs(uploader=uploaders_2)
         assert len(runs) >= 10
 
-        runs = openml.runs.list_runs(flow=flows, output_format="dataframe")
+        runs = openml.runs.list_runs(flow=flows)
         assert len(runs) >= 100
 
         runs = openml.runs.list_runs(
             id=ids,
             task=tasks,
             uploader=uploaders_1,
-            output_format="dataframe",
         )
         assert len(runs) == 2
 
@@ -1570,7 +1559,7 @@ class TestRun(TestBase):
         # TODO: comes from live, no such lists on test
         # Unit test works on production server only
         openml.config.server = self.production_server
-        runs = openml.runs.list_runs(tag="curves", output_format="dataframe")
+        runs = openml.runs.list_runs(tag="curves")
         assert len(runs) >= 1
 
     @pytest.mark.sklearn()
@@ -1601,7 +1590,6 @@ class TestRun(TestBase):
             task=task,
             extension=self.extension,
             add_local_measures=True,
-            dataset_format="dataframe",
         )
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
@@ -1645,7 +1633,6 @@ class TestRun(TestBase):
             task=task,
             extension=self.extension,
             add_local_measures=True,
-            dataset_format="array",  # diff test_run_on_dataset_with_missing_labels_dataframe()
         )
         # 2 folds, 5 repeats; keep in mind that this task comes from the test
         # server, the task on the live server is different
@@ -1767,11 +1754,28 @@ class TestRun(TestBase):
     def test__run_task_get_arffcontent_2(self, parallel_mock):
         """Tests if a run executed in parallel is collated correctly."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
-        x, y = task.get_X_and_y(dataset_format="dataframe")
+        x, y = task.get_X_and_y()
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
         loss = "log" if Version(sklearn.__version__) < Version("1.3") else "log_loss"
-        clf = SGDClassifier(loss=loss, random_state=1)
+        clf = sklearn.pipeline.Pipeline(
+            [
+                (
+                    "cat_handling",
+                    ColumnTransformer(
+                        transformers=[
+                            (
+                                "cat",
+                                OneHotEncoder(handle_unknown="ignore"),
+                                x.select_dtypes(include=["object", "category"]).columns,
+                            )
+                        ],
+                        remainder="passthrough",
+                    ),
+                ),
+                ("clf", SGDClassifier(loss=loss, random_state=1)),
+            ]
+        )
         n_jobs = 2
         backend = "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"
         with parallel_backend(backend, n_jobs=n_jobs):
@@ -1780,7 +1784,6 @@ class TestRun(TestBase):
                 model=clf,
                 task=task,
                 add_local_measures=True,
-                dataset_format="array",  # "dataframe" would require handling of categoricals
                 n_jobs=n_jobs,
             )
         # This unit test will fail if joblib is unable to distribute successfully since the
@@ -1797,16 +1800,16 @@ class TestRun(TestBase):
         assert len(res[2]) == 7
         assert len(res[3]) == 7
         expected_scores = [
-            0.965625,
-            0.94375,
-            0.946875,
+            0.9625,
             0.953125,
-            0.96875,
             0.965625,
-            0.9435736677115988,
-            0.9467084639498433,
-            0.9749216300940439,
-            0.9655172413793104,
+            0.9125,
+            0.98125,
+            0.975,
+            0.9247648902821317,
+            0.9404388714733543,
+            0.9780564263322884,
+            0.9623824451410659,
         ]
         scores = [v for k, v in res[2]["predictive_accuracy"][0].items()]
         np.testing.assert_array_almost_equal(
@@ -1825,7 +1828,7 @@ class TestRun(TestBase):
     def test_joblib_backends(self, parallel_mock):
         """Tests evaluation of a run using various joblib backends and n_jobs."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
-        x, y = task.get_X_and_y(dataset_format="dataframe")
+        x, y = task.get_X_and_y()
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
 
@@ -1841,14 +1844,31 @@ class TestRun(TestBase):
             (1, "sequential", 40),
         ]:
             clf = sklearn.model_selection.RandomizedSearchCV(
-                estimator=sklearn.ensemble.RandomForestClassifier(n_estimators=5),
+                estimator=sklearn.pipeline.Pipeline(
+                    [
+                        (
+                            "cat_handling",
+                            ColumnTransformer(
+                                transformers=[
+                                    (
+                                        "cat",
+                                        OneHotEncoder(handle_unknown="ignore"),
+                                        x.select_dtypes(include=["object", "category"]).columns,
+                                    )
+                                ],
+                                remainder="passthrough",
+                            ),
+                        ),
+                        ("clf", sklearn.ensemble.RandomForestClassifier(n_estimators=5)),
+                    ]
+                ),
                 param_distributions={
-                    "max_depth": [3, None],
-                    "max_features": [1, 2, 3, 4],
-                    "min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
-                    "min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                    "bootstrap": [True, False],
-                    "criterion": ["gini", "entropy"],
+                    "clf__max_depth": [3, None],
+                    "clf__max_features": [1, 2, 3, 4],
+                    "clf__min_samples_split": [2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    "clf__min_samples_leaf": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    "clf__bootstrap": [True, False],
+                    "clf__criterion": ["gini", "entropy"],
                 },
                 random_state=1,
                 cv=sklearn.model_selection.StratifiedKFold(
@@ -1865,7 +1885,6 @@ class TestRun(TestBase):
                     model=clf,
                     task=task,
                     add_local_measures=True,
-                    dataset_format="array",  # "dataframe" would require handling of categoricals
                     n_jobs=n_jobs,
                 )
             assert type(res[0]) == list
