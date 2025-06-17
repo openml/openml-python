@@ -191,7 +191,7 @@ def _list_datasets(
             if value is not None:
                 api_call += f"/{operator}/{value}"
     if data_id is not None:
-        api_call += f"/data_id/{','.join([str(int(i)}" for i in data_id]))
+        api_call += f"/data_id/{','.join([str(int(i)) for i in data_id])}"
     return __list_datasets(api_call=api_call)
 
 
