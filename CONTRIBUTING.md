@@ -135,13 +135,9 @@ following rules before you submit a pull request:
     - When creating a multi-line expression with binary operators, break before the operator.
     - Add type hints to all function signatures.
     (note: not all functions have type hints yet, this is work in progress.)
-    - Use the [`str.format`](https://docs.python.org/3/library/stdtypes.html#str.format) over [`printf`](https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting) style formatting.
-     E.g. use `"{} {}".format('hello', 'world')` not `"%s %s" % ('hello', 'world')`.
-     (note: old code may still use `printf`-formatting, this is work in progress.)
-     Try to use [`f-strings`](https://docs.python.org/3/library/stdtypes.html#formatted-string-literals-f-strings) if you can. You can use [flynt](https://github.com/ikamensh/flynt) to make sure your contributed code uses f-strings.
+    - Use [`f-strings`](https://docs.python.org/3/library/stdtypes.html#formatted-string-literals-f-strings) for text interpolation. You can use [flynt](https://github.com/ikamensh/flynt) to make sure your contributed code uses f-strings.
    ```python
    flynt {source_file_or_directory}
-   ```
 
 -  If your pull request addresses an issue, please use the pull request title
    to describe the issue and mention the issue number in the pull request description. This will make sure a link back to the original issue is
