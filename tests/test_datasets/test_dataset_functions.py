@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import requests
+import requests_mock
 import scipy.sparse
 from oslo_concurrency import lockutils
 
@@ -1505,16 +1506,6 @@ class TestOpenMLDataset(TestBase):
             data_id=999999,
         )
 
-    @pytest.mark.production()
-    def test_get_dataset_parquet(self):
-        # Parquet functionality is disabled on the test server
-        # There is no parquet-copy of the test server yet.
-        openml.config.server = self.production_server
-        dataset = openml.datasets.get_dataset(61, download_data=True)
-        assert dataset._parquet_url is not None
-        assert dataset.parquet_file is not None
-        assert os.path.isfile(dataset.parquet_file)
-        assert dataset.data_file is None  # is alias for arff path
 
     @pytest.mark.production()
     def test_list_datasets_with_high_size_parameter(self):
@@ -1960,3 +1951,17 @@ def test_read_features_from_xml_with_whitespace() -> None:
     features_file = Path(__file__).parent.parent / "files" / "misc" / "features_with_whitespaces.xml"
     dict = _read_features(features_file)
     assert dict[1].nominal_values == [" - 50000.", " 50000+."]
+
+
+def test_get_dataset_parquet(requests_mock, test_files_directory):
+    # Parquet functionality is disabled on the test server
+    # There is no parquet-copy of the test server yet.
+    content_file = (
+            test_files_directory / "mock_responses" / "datasets" / "data_description_61.xml"
+    )
+    requests_mock.get("https://www.openml.org/api/v1/xml/data/61", text=content_file.read_text())
+    dataset = openml.datasets.get_dataset(61, download_data=True)
+    assert dataset._parquet_url is not None
+    assert dataset.parquet_file is not None
+    assert os.path.isfile(dataset.parquet_file)
+    assert dataset.data_file is None  # is alias for arff path
