@@ -101,20 +101,20 @@ class TestFlow(TestBase):
                 assert subflow.flow_id == sub_flow_id
 
     def test_tagging(self):
-        flows = openml.flows.list_flows(size=1, output_format="dataframe")
+        flows = openml.flows.list_flows(size=1)
         flow_id = flows["id"].iloc[0]
         flow = openml.flows.get_flow(flow_id)
         # tags can be at most 64 alphanumeric (+ underscore) chars
         unique_indicator = str(time.time()).replace(".", "")
         tag = f"test_tag_TestFlow_{unique_indicator}"
-        flows = openml.flows.list_flows(tag=tag, output_format="dataframe")
+        flows = openml.flows.list_flows(tag=tag)
         assert len(flows) == 0
         flow.push_tag(tag)
-        flows = openml.flows.list_flows(tag=tag, output_format="dataframe")
+        flows = openml.flows.list_flows(tag=tag)
         assert len(flows) == 1
         assert flow_id in flows["id"]
         flow.remove_tag(tag)
-        flows = openml.flows.list_flows(tag=tag, output_format="dataframe")
+        flows = openml.flows.list_flows(tag=tag)
         assert len(flows) == 0
 
     def test_from_xml_to_xml(self):
@@ -156,7 +156,9 @@ class TestFlow(TestBase):
     @pytest.mark.sklearn()
     def test_to_xml_from_xml(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
-        estimator_name = "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        estimator_name = (
+            "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        )
         boosting = sklearn.ensemble.AdaBoostClassifier(
             **{estimator_name: sklearn.tree.DecisionTreeClassifier()},
         )
@@ -269,12 +271,14 @@ class TestFlow(TestBase):
         # TODO: Test if parameters are set correctly!
         # should not throw error as it contains two differentiable forms of
         # Bagging i.e., Bagging(Bagging(J48)) and Bagging(J48)
-        estimator_name = "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        estimator_name = (
+            "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        )
         semi_legal = sklearn.ensemble.BaggingClassifier(
             **{
                 estimator_name: sklearn.ensemble.BaggingClassifier(
                     **{
-                        estimator_name:sklearn.tree.DecisionTreeClassifier(),
+                        estimator_name: sklearn.tree.DecisionTreeClassifier(),
                     }
                 )
             }
@@ -428,7 +432,9 @@ class TestFlow(TestBase):
             percentile=30,
         )
         fu = sklearn.pipeline.FeatureUnion(transformer_list=[("pca", pca), ("fs", fs)])
-        estimator_name = "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        estimator_name = (
+            "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+        )
         boosting = sklearn.ensemble.AdaBoostClassifier(
             **{estimator_name: sklearn.tree.DecisionTreeClassifier()},
         )
@@ -499,7 +505,9 @@ class TestFlow(TestBase):
         assert new_flow is not flow
 
         # OneHotEncoder was moved to _encoders module in 0.20
-        module_name_encoder = "_encoders" if Version(sklearn.__version__) >= Version("0.20") else "data"
+        module_name_encoder = (
+            "_encoders" if Version(sklearn.__version__) >= Version("0.20") else "data"
+        )
         if Version(sklearn.__version__) < Version("0.22"):
             fixture_name = (
                 f"{sentinel}sklearn.model_selection._search.RandomizedSearchCV("
