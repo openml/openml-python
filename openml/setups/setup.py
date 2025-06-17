@@ -7,7 +7,6 @@ import openml.config
 import openml.flows
 
 
-# TODO(eddiebergman): All functionality handled by dataclass
 class OpenMLSetup:
     """Setup object (a.k.a. Configuration).
 
