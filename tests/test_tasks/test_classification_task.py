@@ -1,7 +1,7 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import numpy as np
+import pandas as pd
 
 from openml.tasks import TaskType, get_task
 
@@ -20,10 +20,10 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
     def test_get_X_and_Y(self):
         X, Y = super().test_get_X_and_Y()
         assert X.shape == (768, 8)
-        assert isinstance(X, np.ndarray)
+        assert isinstance(X, pd.DataFrame)
         assert Y.shape == (768,)
-        assert isinstance(Y, np.ndarray)
-        assert Y.dtype == int
+        assert isinstance(Y, pd.Series)
+        assert pd.api.types.is_categorical_dtype(Y)
 
     def test_download_task(self):
         task = super().test_download_task()

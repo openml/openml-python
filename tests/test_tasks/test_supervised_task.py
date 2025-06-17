@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import unittest
 
-import numpy as np
+import pandas as pd
 
 from openml.tasks import get_task
 
@@ -27,7 +27,7 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
     def setUp(self, n_levels: int = 1):
         super().setUp()
 
-    def test_get_X_and_Y(self) -> tuple[np.ndarray, np.ndarray]:
+    def test_get_X_and_Y(self) -> tuple[pd.DataFrame, pd.Series]:
         task = get_task(self.task_id)
         X, Y = task.get_X_and_y()
         return X, Y
