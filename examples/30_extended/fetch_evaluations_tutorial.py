@@ -94,7 +94,7 @@ def plot_cdf(values, metric="predictive_accuracy"):
     plt.minorticks_on()
     plt.grid(visible=True, which="minor", linestyle="--")
     plt.axvline(max_val, linestyle="--", color="gray")
-    plt.text(max_val, 0, "%.3f" % max_val, fontsize=9)
+    plt.text(max_val, 0, f"{max_val:.3f}", fontsize=9)
     plt.show()
 
 

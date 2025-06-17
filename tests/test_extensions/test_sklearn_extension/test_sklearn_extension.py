@@ -837,7 +837,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         structure = serialized.get_structure("name")
         # OneHotEncoder was moved to _encoders module in 0.20
         module_name_encoder = "_encoders" if Version(sklearn.__version__) >= Version("0.20") else "data"
-        ohe_name = "sklearn.preprocessing.%s.OneHotEncoder" % module_name_encoder
+        ohe_name = f"sklearn.preprocessing.{module_name_encoder}.OneHotEncoder"
         scaler_name = "sklearn.preprocessing.{}.StandardScaler".format(
             "data" if Version(sklearn.__version__) < Version("0.22") else "_data",
         )
@@ -855,7 +855,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             boosting_name,
         )
         fixture_name = (
-            "sklearn.model_selection._search.RandomizedSearchCV" "(estimator=%s)" % pipeline_name
+            f"sklearn.model_selection._search.RandomizedSearchCV(estimator={pipeline_name})"
         )
         fixture_structure = {
             ohe_name: ["estimator", "ohe"],
@@ -1542,7 +1542,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
         run = openml.runs.run_flow_on_task(flow, task)
         run = run.publish()
         TestBase._mark_entity_for_removal("run", run.run_id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], run.run_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {run.run_id}")
         run = openml.runs.get_run(run.run_id)
         setup = openml.setups.get_setup(run.setup_id)
 
@@ -2105,7 +2105,7 @@ class TestSklearnExtensionRunFunctions(TestBase):
             assert len(trace_iteration.parameters) == len(param_grid)
             for param in param_grid:
                 # Prepend with the "parameter_" prefix
-                param_in_trace = "parameter_%s" % param
+                param_in_trace = f"parameter_{param}"
                 assert param_in_trace in trace_iteration.parameters
                 param_value = json.loads(trace_iteration.parameters[param_in_trace])
                 assert param_value in param_grid[param]

@@ -207,15 +207,15 @@ def _list_evaluations(
         for operator, value in kwargs.items():
             api_call += f"/{operator}/{value}"
     if tasks is not None:
-        api_call += "/task/{}".format(",".join([str(int(i)) for i in tasks]))
+        api_call += f"/task/{','.join([str(int(i)) for i in tasks])}"
     if setups is not None:
-        api_call += "/setup/{}".format(",".join([str(int(i)) for i in setups]))
+        api_call += f"/setup/{','.join([str(int(i)) for i in setups])}"
     if flows is not None:
-        api_call += "/flow/{}".format(",".join([str(int(i)) for i in flows]))
+        api_call += f"/flow/{','.join([str(int(i)) for i in flows])}"
     if runs is not None:
-        api_call += "/run/{}".format(",".join([str(int(i)) for i in runs]))
+        api_call += f"/run/{','.join([str(int(i)) for i in runs])}"
     if uploaders is not None:
-        api_call += "/uploader/{}".format(",".join([str(int(i)) for i in uploaders]))
+        api_call += f"/uploader/{','.join([str(int(i)) for i in uploaders])}"
     if study is not None:
         api_call += "/study/%d" % study
     if sort_order is not None:

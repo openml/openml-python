@@ -80,7 +80,7 @@ class OpenMLEvaluation:
 
     def __repr__(self) -> str:
         header = "OpenML Evaluation"
-        header = "{}\n{}\n".format(header, "=" * len(header))
+        header = f"{header}\n{'=' * len(header)}\n"
 
         fields = {
             "Upload Date": self.upload_time,

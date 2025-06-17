@@ -528,7 +528,7 @@ def _create_task_from_xml(xml: str) -> OpenMLTask:
         TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
     }.get(task_type)
     if cls is None:
-        raise NotImplementedError("Task type {} not supported.".format(common_kwargs["task_type"]))
+        raise NotImplementedError(f"Task type {common_kwargs['task_type']} not supported.")
     return cls(**common_kwargs)  # type: ignore
 
 

@@ -53,7 +53,7 @@ class OpenMLTaskTest(TestBase):
                 task.publish()
                 TestBase._mark_entity_for_removal("task", task.id)
                 TestBase.logger.info(
-                    "collected from {}: {}".format(__file__.split("/")[-1], task.id),
+                    f"collected from {__file__.split('/')[-1]}: {task.id}",
                 )
                 # success
                 break

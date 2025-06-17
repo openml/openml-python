@@ -206,7 +206,7 @@ X, y = create_table_from_evaluations(eval_df, task_ids=[task_id], flow_type="svm
 model.fit(X, y)
 y_pred = model.predict(X)
 
-print("Training RMSE : {:.5}".format(mean_squared_error(y, y_pred)))
+print(f"Training RMSE : {mean_squared_error(y, y_pred):.5}")
 
 
 #############################################################################

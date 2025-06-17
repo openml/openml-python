@@ -36,7 +36,7 @@ class OpenMLSetup:
 
     def __repr__(self) -> str:
         header = "OpenML Setup"
-        header = "{}\n{}\n".format(header, "=" * len(header))
+        header = f"{header}\n{'=' * len(header)}\n"
 
         fields = {
             "Setup ID": self.setup_id,
@@ -104,7 +104,7 @@ class OpenMLParameter:
 
     def __repr__(self) -> str:
         header = "OpenML Parameter"
-        header = "{}\n{}\n".format(header, "=" * len(header))
+        header = f"{header}\n{'=' * len(header)}\n"
 
         fields = {
             "ID": self.id,
@@ -116,7 +116,7 @@ class OpenMLParameter:
         }
         # indented prints for parameter attributes
         # indention = 2 spaces + 1 | + 2 underscores
-        indent = "{}|{}".format(" " * 2, "_" * 2)
+        indent = f"{' ' * 2}|{'_' * 2}"
         parameter_data_type = f"{indent}Data Type"
         fields[parameter_data_type] = self.data_type
         parameter_default = f"{indent}Default"

@@ -78,7 +78,7 @@ class OpenMLBase(ABC):
             self.__class__.__name__[len("OpenML") :],
         )
         header_text = f"OpenML {name_with_spaces}"
-        header = "{}\n{}\n".format(header_text, "=" * len(header_text))
+        header = f"{header_text}\n{'=' * len(header_text)}\n"
 
         _body_fields: list[tuple[str, str | int | list[str]]] = [
             (k, "None" if v is None else v) for k, v in body_fields

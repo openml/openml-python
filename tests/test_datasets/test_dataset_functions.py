@@ -61,7 +61,7 @@ class TestOpenMLDataset(TestBase):
         self.lock_path = os.path.join(openml.config.get_cache_directory(), "locks")
         for did in ["-1", "2"]:
             with lockutils.external_lock(
-                name="datasets.functions.get_dataset:%s" % did,
+                name=f"datasets.functions.get_dataset:{did}",
                 lock_path=self.lock_path,
             ):
                 pickle_path = os.path.join(
@@ -531,7 +531,7 @@ class TestOpenMLDataset(TestBase):
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.dataset_id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], dataset.dataset_id),
+            f"collected from {__file__.split('/')[-1]}: {dataset.dataset_id}",
         )
         assert isinstance(dataset.dataset_id, int)
 
@@ -553,7 +553,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
-            "%s-UploadTestWithURL" % self._get_sentinel(),
+            f"{self._get_sentinel()}-UploadTestWithURL",
             "test",
             data_format="arff",
             version=1,
@@ -562,7 +562,7 @@ class TestOpenMLDataset(TestBase):
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.dataset_id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], dataset.dataset_id),
+            f"collected from {__file__.split('/')[-1]}: {dataset.dataset_id}",
         )
         assert isinstance(dataset.dataset_id, int)
 
@@ -583,7 +583,7 @@ class TestOpenMLDataset(TestBase):
     @pytest.mark.flaky()
     def test_data_status(self):
         dataset = OpenMLDataset(
-            "%s-UploadTestWithURL" % self._get_sentinel(),
+            f"{self._get_sentinel()}-UploadTestWithURL",
             "test",
             "ARFF",
             version=1,
@@ -591,7 +591,7 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         did = dataset.id
 
         # admin key for test server (only adminds can activate datasets.
@@ -678,7 +678,7 @@ class TestOpenMLDataset(TestBase):
         attributes = [(f"col_{i}", "REAL") for i in range(data.shape[1])]
 
         dataset = create_dataset(
-            name="%s-NumPy_testing_dataset" % self._get_sentinel(),
+            name=f"{self._get_sentinel()}-NumPy_testing_dataset",
             description="Synthetic dataset created from a NumPy array",
             creator="OpenML tester",
             contributor=None,
@@ -698,7 +698,7 @@ class TestOpenMLDataset(TestBase):
 
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
 
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
@@ -733,7 +733,7 @@ class TestOpenMLDataset(TestBase):
         ]
 
         dataset = create_dataset(
-            name="%s-ModifiedWeather" % self._get_sentinel(),
+            name=f"{self._get_sentinel()}-ModifiedWeather",
             description=("Testing dataset upload when the data is a list of lists"),
             creator="OpenML test",
             contributor=None,
@@ -753,7 +753,7 @@ class TestOpenMLDataset(TestBase):
 
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
         ), "Uploaded ARFF does not match original one"
@@ -775,7 +775,7 @@ class TestOpenMLDataset(TestBase):
         ]
 
         xor_dataset = create_dataset(
-            name="%s-XOR" % self._get_sentinel(),
+            name=f"{self._get_sentinel()}-XOR",
             description="Dataset representing the XOR operation",
             creator=None,
             contributor=None,
@@ -794,7 +794,7 @@ class TestOpenMLDataset(TestBase):
         xor_dataset.publish()
         TestBase._mark_entity_for_removal("data", xor_dataset.id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], xor_dataset.id),
+            f"collected from {__file__.split('/')[-1]}: {xor_dataset.id}",
         )
         assert (
             _get_online_dataset_arff(xor_dataset.id) == xor_dataset._dataset
@@ -807,7 +807,7 @@ class TestOpenMLDataset(TestBase):
         sparse_data = [{0: 0.0}, {1: 1.0, 2: 1.0}, {0: 1.0, 2: 1.0}, {0: 1.0, 1: 1.0}]
 
         xor_dataset = create_dataset(
-            name="%s-XOR" % self._get_sentinel(),
+            name=f"{self._get_sentinel()}-XOR",
             description="Dataset representing the XOR operation",
             creator=None,
             contributor=None,
@@ -826,7 +826,7 @@ class TestOpenMLDataset(TestBase):
         xor_dataset.publish()
         TestBase._mark_entity_for_removal("data", xor_dataset.id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], xor_dataset.id),
+            f"collected from {__file__.split('/')[-1]}: {xor_dataset.id}",
         )
         assert (
             _get_online_dataset_arff(xor_dataset.id) == xor_dataset._dataset
@@ -925,7 +925,7 @@ class TestOpenMLDataset(TestBase):
         df["windy"] = df["windy"].astype("bool")
         df["play"] = df["play"].astype("category")
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -954,7 +954,7 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
         ), "Uploaded ARFF does not match original one"
@@ -990,7 +990,7 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
         ), "Uploaded ARFF does not match original one"
@@ -1022,7 +1022,7 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         downloaded_data = _get_online_dataset_arff(dataset.id)
         assert downloaded_data == dataset._dataset, "Uploaded ARFF does not match original one"
         assert "@ATTRIBUTE rnd_str {a, b, c, d, e, f, g}" in downloaded_data
@@ -1049,7 +1049,7 @@ class TestOpenMLDataset(TestBase):
         df["windy"] = df["windy"].astype("bool")
         df["play"] = df["play"].astype("category")
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1150,7 +1150,7 @@ class TestOpenMLDataset(TestBase):
         df["windy"] = df["windy"].astype("bool")
         df["play"] = df["play"].astype("category")
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1185,7 +1185,7 @@ class TestOpenMLDataset(TestBase):
         # publish dataset
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         # test if publish was successful
         assert isinstance(dataset.id, int)
 
@@ -1209,7 +1209,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_create_dataset_row_id_attribute_error(self):
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1247,7 +1247,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_create_dataset_row_id_attribute_inference(self):
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1291,7 +1291,7 @@ class TestOpenMLDataset(TestBase):
             dataset.publish()
             TestBase._mark_entity_for_removal("data", dataset.id)
             TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], dataset.id),
+                f"collected from {__file__.split('/')[-1]}: {dataset.id}",
             )
             arff_dataset = arff.loads(_get_online_dataset_arff(dataset.id))
             arff_data = np.array(arff_dataset["data"], dtype=object)
@@ -1667,7 +1667,7 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
         df["windy"] = df["windy"].astype("bool")
         df["play"] = df["play"].astype("category")
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"

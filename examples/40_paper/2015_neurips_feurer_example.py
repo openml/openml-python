@@ -68,7 +68,7 @@ tasks = tasks.query('estimation_procedure == "33% Holdout set"')
 
 task_ids = []
 for did in dataset_ids:
-    tasks_ = list(tasks.query("did == {}".format(did)).tid)
+    tasks_ = list(tasks.query(f"did == {did}").tid)
     if len(tasks_) >= 1:  # if there are multiple task, take the one with lowest ID (oldest).
         task_id = min(tasks_)
     else:

@@ -253,7 +253,7 @@ def _list_datasets(
         for operator, value in kwargs.items():
             api_call += f"/{operator}/{value}"
     if data_id is not None:
-        api_call += "/data_id/{}".format(",".join([str(int(i)) for i in data_id]))
+        api_call += f"/data_id/{','.join([str(int(i)) for i in data_id])}"
     return __list_datasets(api_call=api_call, output_format=output_format)
 
 

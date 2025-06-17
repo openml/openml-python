@@ -212,7 +212,7 @@ def _list_setups(
     """
     api_call = "setup/list"
     if setup is not None:
-        api_call += "/setup/{}".format(",".join([str(int(i)) for i in setup]))
+        api_call += f"/setup/{','.join([str(int(i)) for i in setup])}"
     if kwargs is not None:
         for operator, value in kwargs.items():
             api_call += f"/{operator}/{value}"

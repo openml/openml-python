@@ -196,7 +196,7 @@ class TestFlow(TestBase):
 
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
         assert isinstance(flow.flow_id, int)
 
     @pytest.mark.sklearn()
@@ -211,7 +211,7 @@ class TestFlow(TestBase):
 
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id),
+            f"collected from {__file__.split('/')[-1]}: {flow.flow_id}",
         )
 
     @pytest.mark.sklearn()
@@ -223,7 +223,7 @@ class TestFlow(TestBase):
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
         # For a flow where both components are published together, the upload
         # date should be equal
         assert flow.upload_date == flow.components["lr"].upload_date, (
@@ -238,7 +238,7 @@ class TestFlow(TestBase):
         flow1, sentinel = self._add_sentinel_to_flow_name(flow1, None)
         flow1.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow1.flow_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow1.flow_id}")
 
         # In order to assign different upload times to the flows!
         time.sleep(1)
@@ -250,7 +250,7 @@ class TestFlow(TestBase):
         flow2, _ = self._add_sentinel_to_flow_name(flow2, sentinel)
         flow2.publish()
         TestBase._mark_entity_for_removal("flow", flow2.flow_id, flow2.name)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow2.flow_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow2.flow_id}")
         # If one component was published before the other, the components in
         # the flow should have different upload dates
         assert flow2.upload_date != flow2.components["dt"].upload_date
@@ -262,7 +262,7 @@ class TestFlow(TestBase):
         # correctly on the server should thus not check the child's parameters!
         flow3.publish()
         TestBase._mark_entity_for_removal("flow", flow3.flow_id, flow3.name)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow3.flow_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow3.flow_id}")
 
     @pytest.mark.sklearn()
     def test_semi_legal_flow(self):
@@ -284,7 +284,7 @@ class TestFlow(TestBase):
 
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
 
     @pytest.mark.sklearn()
     @mock.patch("openml.flows.functions.get_flow")
@@ -337,7 +337,7 @@ class TestFlow(TestBase):
 
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id),
+            f"collected from {__file__.split('/')[-1]}: {flow.flow_id}",
         )
 
         assert get_flow_mock.call_count == 2
@@ -362,7 +362,7 @@ class TestFlow(TestBase):
             md5 = hashlib.md5()
             md5.update(str(time.time()).encode("utf-8"))
             sentinel = md5.hexdigest()[:10]
-            return "TEST%s" % sentinel
+            return f"TEST{sentinel}"
 
         name = get_sentinel() + get_sentinel()
         version = get_sentinel()
@@ -397,7 +397,7 @@ class TestFlow(TestBase):
             flow = flow.publish()
             TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
             TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id),
+                f"collected from {__file__.split('/')[-1]}: {flow.flow_id}",
             )
             # redownload the flow
             flow = openml.flows.get_flow(flow.flow_id)
@@ -460,7 +460,7 @@ class TestFlow(TestBase):
 
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
         assert isinstance(flow.flow_id, int)
 
         # Check whether we can load the flow again

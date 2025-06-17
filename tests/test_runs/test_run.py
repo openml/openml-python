@@ -149,7 +149,7 @@ class TestRun(TestBase):
         run_prime.publish()
         TestBase._mark_entity_for_removal("run", run_prime.run_id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], run_prime.run_id),
+            f"collected from {__file__.split('/')[-1]}: {run_prime.run_id}",
         )
 
     @pytest.mark.sklearn()
@@ -185,7 +185,7 @@ class TestRun(TestBase):
         run_prime.publish()
         TestBase._mark_entity_for_removal("run", run_prime.run_id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], run_prime.run_id),
+            f"collected from {__file__.split('/')[-1]}: {run_prime.run_id}",
         )
 
     @pytest.mark.sklearn()
@@ -308,7 +308,7 @@ class TestRun(TestBase):
             # Clean up
             TestBase._mark_entity_for_removal("run", loaded_run.run_id)
             TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], loaded_run.run_id),
+                f"collected from {__file__.split('/')[-1]}: {loaded_run.run_id}",
             )
 
             # make sure the flow is published as part of publishing the run.
@@ -355,7 +355,7 @@ class TestRun(TestBase):
                 # Clean up
                 TestBase._mark_entity_for_removal("run", run.run_id)
                 TestBase.logger.info(
-                    "collected from {}: {}".format(__file__.split("/")[-1], loaded_run.run_id),
+                    f"collected from {__file__.split('/')[-1]}: {loaded_run.run_id}",
                 )
 
     def test_run_setup_string_included_in_xml(self):
