@@ -45,7 +45,7 @@ To contribute to the openml-python package, follow these steps:
 0. Determine how you want to contribute (see above).
 1. Set up your local development environment.
    1. Fork and clone the `openml-python` repository. Then, create a new branch from the ``develop`` branch. If you are new to `git`, see our [detailed documentation](#basic-git-workflow), or rely on your favorite IDE.   
-   2. [Install the local dependencies](#install-local-dependencies) to run the tests your contribution.
+   2. [Install the local dependencies](#install-local-dependencies) to run the tests for your contribution.
    3. [Test your installation](#testing-your-installation) to ensure everything is set up correctly.
 4. Implement your contribution. If contributing to the documentation, see [here](#contributing-to-the-documentation).
 5. [Create a pull request](#pull-request-checklist). 
