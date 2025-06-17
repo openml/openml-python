@@ -316,8 +316,8 @@ def _list_all(  # noqa: C901
             # check if the number of required results has been achieved
             # always do a 'bigger than' check,
             # in case of bugs to prevent infinite loops
-            n_recieved = sum(len(result) for result in results)
-            if n_recieved >= LIMIT:
+            n_received = sum(len(result) for result in results)
+            if n_received >= LIMIT:
                 break
 
             # check if there are enough results to fulfill a batch
