@@ -482,9 +482,7 @@ class SklearnExtension(Extension):
             )
         else:
             raise TypeError(o)
-        logger.info(
-            f"-{'-' * recursion_depth} flow_to_sklearn END   o={o}, rval={rval}"
-        )
+        logger.info(f"-{'-' * recursion_depth} flow_to_sklearn END   o={o}, rval={rval}")
         return rval
 
     def model_to_flow(self, model: Any) -> OpenMLFlow:
@@ -1168,9 +1166,7 @@ class SklearnExtension(Extension):
 
         for name in parameters:
             value = parameters.get(name)
-            logger.info(
-                f"--{'-' * recursion_depth} flow_parameter={name}, value={value}"
-            )
+            logger.info(f"--{'-' * recursion_depth} flow_parameter={name}, value={value}")
             rval = self._deserialize_sklearn(
                 value,
                 components=components_,
@@ -1186,9 +1182,7 @@ class SklearnExtension(Extension):
             if name not in components_:
                 continue
             value = components[name]
-            logger.info(
-                f"--{'-' * recursion_depth} flow_component={name}, value={value}"
-            )
+            logger.info(f"--{'-' * recursion_depth} flow_component={name}, value={value}")
             rval = self._deserialize_sklearn(
                 value,
                 recursion_depth=recursion_depth + 1,
