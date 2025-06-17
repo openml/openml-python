@@ -321,8 +321,8 @@ def _list_all(  # noqa: C901
                 break
 
             # check if there are enough results to fulfill a batch
-            if LIMIT - n_recieved < BATCH_SIZE_ORIG:
-                batch_size = LIMIT - n_recieved
+            if LIMIT - n_received < BATCH_SIZE_ORIG:
+                batch_size = LIMIT - n_received
 
     return results
 
