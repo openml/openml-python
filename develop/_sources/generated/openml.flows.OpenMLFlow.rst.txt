@@ -1,8 +1,0 @@
-﻿:orphan:
-
-:mod:`openml.flows`.OpenMLFlow
-=====================================
-
-.. currentmodule:: openml.flows
-
-.. autoclass:: OpenMLFlow

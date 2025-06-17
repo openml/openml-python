@@ -1,8 +1,0 @@
-﻿:orphan:
-
-:mod:`openml.tasks`.OpenMLClassificationTask
-===================================================
-
-.. currentmodule:: openml.tasks
-
-.. autoclass:: OpenMLClassificationTask
