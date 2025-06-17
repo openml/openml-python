@@ -207,7 +207,7 @@ def _list_setups(
     if offset is not None:
         api_call += f"/offset/{offset}"
     if setup is not None:
-        api_call += f"/setup/{','.join([str(int(i)}" for i in setup]))
+        api_call += f"/setup/{','.join([str(int(i)) for i in setup])}"
     if flow is not None:
         api_call += f"/flow/{flow}"
     if tag is not None:
