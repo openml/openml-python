@@ -89,7 +89,7 @@ def plot_cdf(values, metric="predictive_accuracy"):
     plt.minorticks_on()
     plt.grid(visible=True, which="minor", linestyle="--")
     plt.axvline(max_val, linestyle="--", color="gray")
-    plt.text(max_val, 0, "%.3f" % max_val, fontsize=9)
+    plt.text(max_val, 0, f"{max_val:.3f}", fontsize=9)
     plt.show()
 
 
@@ -164,7 +164,10 @@ for i in range(top_n):
 
 # %%
 evals_setups = openml.evaluations.list_evaluations_setups(
-    function="predictive_accuracy", tasks=[31], size=100, sort_order="desc"
+    function="predictive_accuracy",
+    tasks=[31],
+    size=100,
+    sort_order="desc",
 )
 
 print(evals_setups.head())

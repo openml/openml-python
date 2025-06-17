@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 import unittest.mock
 import pytest
-import shutil
 import openml
 from openml.testing import _check_dataset
 
@@ -34,7 +33,7 @@ def min_number_setups_on_test_server() -> int:
 
 @pytest.fixture()
 def min_number_runs_on_test_server() -> int:
-    """After a reset at least 50 runs are on the test server"""
+    """After a reset at least 21 runs are on the test server"""
     return 21
 
 
@@ -52,19 +51,11 @@ def _mocked_perform_api_call(call, request_method):
 @pytest.mark.server()
 def test_list_all():
     openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
-    openml.utils._list_all(
-        listing_call=openml.tasks.functions._list_tasks,
-        list_output_format="dataframe",
-    )
 
 
 @pytest.mark.server()
 def test_list_all_for_tasks(min_number_tasks_on_test_server):
-    tasks = openml.tasks.list_tasks(
-        batch_size=1000,
-        size=min_number_tasks_on_test_server,
-        output_format="dataframe",
-    )
+    tasks = openml.tasks.list_tasks(size=min_number_tasks_on_test_server)
     assert min_number_tasks_on_test_server == len(tasks)
 
 
@@ -73,20 +64,18 @@ def test_list_all_with_multiple_batches(min_number_tasks_on_test_server):
     # By setting the batch size one lower than the minimum we guarantee at least two
     # batches and at the same time do as few batches (roundtrips) as possible.
     batch_size = min_number_tasks_on_test_server - 1
-    res = openml.utils._list_all(
+    batches = openml.utils._list_all(
         listing_call=openml.tasks.functions._list_tasks,
-        list_output_format="dataframe",
         batch_size=batch_size,
     )
-    assert min_number_tasks_on_test_server <= len(res)
+    assert len(batches) >= 2
+    assert min_number_tasks_on_test_server <= sum(len(batch) for batch in batches)
 
 
 @pytest.mark.server()
 def test_list_all_for_datasets(min_number_datasets_on_test_server):
     datasets = openml.datasets.list_datasets(
-        batch_size=100,
         size=min_number_datasets_on_test_server,
-        output_format="dataframe",
     )
 
     assert min_number_datasets_on_test_server == len(datasets)
@@ -96,11 +85,7 @@ def test_list_all_for_datasets(min_number_datasets_on_test_server):
 
 @pytest.mark.server()
 def test_list_all_for_flows(min_number_flows_on_test_server):
-    flows = openml.flows.list_flows(
-        batch_size=25,
-        size=min_number_flows_on_test_server,
-        output_format="dataframe",
-    )
+    flows = openml.flows.list_flows(size=min_number_flows_on_test_server)
     assert min_number_flows_on_test_server == len(flows)
 
 
@@ -115,7 +100,7 @@ def test_list_all_for_setups(min_number_setups_on_test_server):
 @pytest.mark.server()
 @pytest.mark.flaky()  # Other tests might need to upload runs first
 def test_list_all_for_runs(min_number_runs_on_test_server):
-    runs = openml.runs.list_runs(batch_size=25, size=min_number_runs_on_test_server)
+    runs = openml.runs.list_runs(size=min_number_runs_on_test_server)
     assert min_number_runs_on_test_server == len(runs)
 
 
@@ -133,12 +118,7 @@ def test_list_all_for_evaluations(min_number_evaluations_on_test_server):
 @pytest.mark.server()
 @unittest.mock.patch("openml._api_calls._perform_api_call", side_effect=_mocked_perform_api_call)
 def test_list_all_few_results_available(_perform_api_call):
-    datasets = openml.datasets.list_datasets(
-        size=1000,
-        data_name="iris",
-        data_version=1,
-        output_format="dataframe",
-    )
+    datasets = openml.datasets.list_datasets(size=1000, data_name="iris", data_version=1)
     assert len(datasets) == 1, "only one iris dataset version 1 should be present"
     assert _perform_api_call.call_count == 1, "expect just one call to get one dataset"
 
@@ -171,4 +151,4 @@ def test_correct_test_server_download_state():
     """
     task = openml.tasks.get_task(119)
     dataset = task.get_dataset()
-    assert len(dataset.features) == dataset.get_data(dataset_format="dataframe")[0].shape[1]
+    assert len(dataset.features) == dataset.get_data()[0].shape[1]

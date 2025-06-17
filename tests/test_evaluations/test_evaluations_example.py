@@ -18,14 +18,12 @@ class TestEvaluationsExample(unittest.TestCase):
         ):
             import matplotlib.pyplot as plt
             import numpy as np
-
             import openml
 
             df = openml.evaluations.list_evaluations_setups(
                 "predictive_accuracy",
                 flows=[8353],
                 tasks=[6],
-                output_format="dataframe",
                 parameters_in_separate_columns=True,
             )  # Choose an SVM flow, for example 8353, and a task.
 

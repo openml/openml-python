@@ -2,25 +2,35 @@
 # # Datasets
 # How to list and download datasets.
 
+<<<<<<< docs/mkdoc -- Incoming Change
 # %%
 import openml
+=======
+>>>>>>> develop -- Current Change
 import pandas as pd
+
+import openml
 from openml.datasets import edit_dataset, fork_dataset, get_dataset
 
 # %% [markdown]
 # ## Exercise 0
 #
+<<<<<<< docs/mkdoc -- Incoming Change
 # * List datasets
 
 # %%
 datalist = openml.datasets.list_datasets(output_format="dataframe")
+=======
+# * List datasets and return a dataframe
+datalist = openml.datasets.list_datasets()
+>>>>>>> develop -- Current Change
 datalist = datalist[["did", "name", "NumberOfInstances", "NumberOfFeatures", "NumberOfClasses"]]
 
 print(f"First 10 of {len(datalist)} datasets...")
 datalist.head(n=10)
 
 # The same can be done with lesser lines of code
-openml_df = openml.datasets.list_datasets(output_format="dataframe")
+openml_df = openml.datasets.list_datasets()
 openml_df.head(n=10)
 
 # %% [markdown]

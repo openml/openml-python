@@ -13,8 +13,8 @@
 
 # %%
 import matplotlib.pyplot as plt
+
 import openml
-import pandas as pd
 
 # %% [markdown]
 # A basic step for each data-mining or machine learning task is to determine
@@ -44,13 +44,17 @@ class_values = ["non-linear better", "linear better", "equal"]
 
 # Downloads all evaluation records related to this study
 evaluations = openml.evaluations.list_evaluations(
-    measure, size=None, flows=flow_ids, study=study_id, output_format="dataframe"
+    measure,
+    size=None,
+    flows=flow_ids,
+    study=study_id,
+    output_format="dataframe",
 )
 # gives us a table with columns data_id, flow1_value, flow2_value
 evaluations = evaluations.pivot(index="data_id", columns="flow_id", values="value").dropna()
 # downloads all data qualities (for scatter plot)
 data_qualities = openml.datasets.list_datasets(
-    data_id=list(evaluations.index.values), output_format="dataframe"
+    data_id=list(evaluations.index.values),
 )
 # removes irrelevant data qualities
 data_qualities = data_qualities[meta_features]
@@ -84,10 +88,9 @@ plt.show()
 def determine_class(val_lin, val_nonlin):
     if val_lin < val_nonlin:
         return class_values[0]
-    elif val_nonlin < val_lin:
+    if val_nonlin < val_lin:
         return class_values[1]
-    else:
-        return class_values[2]
+    return class_values[2]
 
 
 evaluations["class"] = evaluations.apply(

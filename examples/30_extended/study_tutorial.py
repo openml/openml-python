@@ -55,8 +55,8 @@ print(study.runs)
 # %%
 evaluations = openml.evaluations.list_evaluations(
     function="predictive_accuracy",
-    output_format="dataframe",
     study=study.study_id,
+    output_format="dataframe",
 )
 print(evaluations.head())
 
@@ -86,7 +86,7 @@ tasks = [115, 259, 307]
 # To verify
 # https://test.openml.org/api/v1/study/1
 suite = openml.study.get_suite("OpenML100")
-print(all([t_id in suite.tasks for t_id in tasks]))
+print(all(t_id in suite.tasks for t_id in tasks))
 
 run_ids = []
 for task_id in tasks:

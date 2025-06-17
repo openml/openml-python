@@ -47,16 +47,19 @@ print(dataset.description[:500])
 
 # %%
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    dataset_format="dataframe", target=dataset.default_target_attribute
+    target=dataset.default_target_attribute
 )
 
 # %% [markdown]
 # Visualize the dataset
 
+<<<<<<< docs/mkdoc -- Incoming Change
 # %%
+=======
+import matplotlib.pyplot as plt
+>>>>>>> develop -- Current Change
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 sns.set_style("darkgrid")
 

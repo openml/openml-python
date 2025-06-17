@@ -6,11 +6,10 @@ import shutil
 import warnings
 from functools import wraps
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Mapping, TypeVar, overload
+from typing import TYPE_CHECKING, Any, Callable, Mapping, Sized, TypeVar, overload
 from typing_extensions import Literal, ParamSpec
 
 import numpy as np
-import pandas as pd
 import xmltodict
 from minio.helpers import ProgressType
 from tqdm import tqdm
@@ -27,6 +26,7 @@ if TYPE_CHECKING:
 
     P = ParamSpec("P")
     R = TypeVar("R")
+    _SizedT = TypeVar("_SizedT", bound=Sized)
 
 
 @overload
@@ -237,39 +237,13 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
         raise e
 
 
-@overload
-def _list_all(
-    listing_call: Callable[P, Any],
-    list_output_format: Literal["dict"] = ...,
-    *args: P.args,
-    **filters: P.kwargs,
-) -> dict: ...
-
-
-@overload
-def _list_all(
-    listing_call: Callable[P, Any],
-    list_output_format: Literal["object"],
-    *args: P.args,
-    **filters: P.kwargs,
-) -> dict: ...
-
-
-@overload
-def _list_all(
-    listing_call: Callable[P, Any],
-    list_output_format: Literal["dataframe"],
-    *args: P.args,
-    **filters: P.kwargs,
-) -> pd.DataFrame: ...
-
-
-def _list_all(  # noqa: C901, PLR0912
-    listing_call: Callable[P, Any],
-    list_output_format: Literal["dict", "dataframe", "object"] = "dict",
-    *args: P.args,
-    **filters: P.kwargs,
-) -> dict | pd.DataFrame:
+def _list_all(  # noqa: C901
+    listing_call: Callable[[int, int], _SizedT],
+    *,
+    limit: int | None = None,
+    offset: int | None = None,
+    batch_size: int | None = 10_000,
+) -> list[_SizedT]:
     """Helper to handle paged listing requests.
 
     Example usage:
@@ -279,44 +253,44 @@ def _list_all(  # noqa: C901, PLR0912
     Parameters
     ----------
     listing_call : callable
-        Call listing, e.g. list_evaluations.
-    list_output_format : str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
-        - If 'object' the output is a dict of objects (only for some `listing_call`)
-    *args : Variable length argument list
-        Any required arguments for the listing call.
-    **filters : Arbitrary keyword arguments
-        Any filters that can be applied to the listing function.
-        additionally, the batch_size can be specified. This is
-        useful for testing purposes.
+        Call listing, e.g. list_evaluations. Takes two positional
+        arguments: batch_size and offset.
+    batch_size : int, optional
+        The batch size to use for the listing call.
+    offset : int, optional
+        The initial offset to use for the listing call.
+    limit : int, optional
+        The total size of the listing. If not provided, the function will
+        request the first batch and then continue until no more results are
+        returned
 
     Returns
     -------
-    dict or dataframe
+    List of types returned from type of the listing call
     """
-    # eliminate filters that have a None value
-    active_filters = {key: value for key, value in filters.items() if value is not None}
     page = 0
-    result = pd.DataFrame() if list_output_format == "dataframe" else {}
+    results: list[_SizedT] = []
+
+    offset = offset if offset is not None else 0
+    batch_size = batch_size if batch_size is not None else 10_000
+
+    LIMIT = limit
+    BATCH_SIZE_ORIG = batch_size
 
     # Default batch size per paging.
     # This one can be set in filters (batch_size), but should not be
     # changed afterwards. The derived batch_size can be changed.
-    BATCH_SIZE_ORIG = active_filters.pop("batch_size", 10000)
     if not isinstance(BATCH_SIZE_ORIG, int):
         raise ValueError(f"'batch_size' should be an integer but got {BATCH_SIZE_ORIG}")
 
-    # max number of results to be shown
-    LIMIT: int | float | None = active_filters.pop("size", None)  # type: ignore
     if (LIMIT is not None) and (not isinstance(LIMIT, int)) and (not np.isinf(LIMIT)):
         raise ValueError(f"'limit' should be an integer or inf but got {LIMIT}")
 
+    # If our batch size is larger than the limit, we should only
+    # request one batch of size of LIMIT
     if LIMIT is not None and BATCH_SIZE_ORIG > LIMIT:
         BATCH_SIZE_ORIG = LIMIT
 
-    offset = active_filters.pop("offset", 0)
     if not isinstance(offset, int):
         raise ValueError(f"'offset' should be an integer but got {offset}")
 
@@ -324,26 +298,16 @@ def _list_all(  # noqa: C901, PLR0912
     while True:
         try:
             current_offset = offset + BATCH_SIZE_ORIG * page
-            new_batch = listing_call(
-                *args,
-                output_format=list_output_format,  # type: ignore
-                **{**active_filters, "limit": batch_size, "offset": current_offset},  # type: ignore
-            )
+            new_batch = listing_call(batch_size, current_offset)
         except openml.exceptions.OpenMLServerNoResult:
-            # we want to return an empty dict in this case
             # NOTE: This above statement may not actually happen, but we could just return here
             # to enforce it...
             break
 
-        if list_output_format == "dataframe":
-            if len(result) == 0:
-                result = new_batch
-            else:
-                result = pd.concat([result, new_batch], ignore_index=True)
-        else:
-            # For output_format = 'dict' (or catch all)
-            result.update(new_batch)
+        results.append(new_batch)
 
+        # If the batch is less than our requested batch_size, that's the last batch
+        # and we can bail out.
         if len(new_batch) < batch_size:
             break
 
@@ -352,14 +316,15 @@ def _list_all(  # noqa: C901, PLR0912
             # check if the number of required results has been achieved
             # always do a 'bigger than' check,
             # in case of bugs to prevent infinite loops
-            if len(result) >= LIMIT:
+            n_received = sum(len(result) for result in results)
+            if n_received >= LIMIT:
                 break
 
             # check if there are enough results to fulfill a batch
-            if LIMIT - len(result) < BATCH_SIZE_ORIG:
-                batch_size = LIMIT - len(result)
+            if LIMIT - n_received < BATCH_SIZE_ORIG:
+                batch_size = LIMIT - n_received
 
-    return result
+    return results
 
 
 def _get_cache_dir_for_key(key: str) -> Path:

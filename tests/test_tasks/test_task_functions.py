@@ -57,7 +57,7 @@ class TestTask(TestBase):
     def test_list_clustering_task(self):
         # as shown by #383, clustering tasks can give list/dict casting problems
         openml.config.server = self.production_server
-        openml.tasks.list_tasks(task_type=TaskType.CLUSTERING, size=10, output_format="dataframe")
+        openml.tasks.list_tasks(task_type=TaskType.CLUSTERING, size=10)
         # the expected outcome is that it doesn't crash. No assertions.
 
     def _check_task(self, task):
@@ -72,34 +72,30 @@ class TestTask(TestBase):
     def test_list_tasks_by_type(self):
         num_curves_tasks = 198  # number is flexible, check server if fails
         ttid = TaskType.LEARNING_CURVE
-        tasks = openml.tasks.list_tasks(task_type=ttid, output_format="dataframe")
+        tasks = openml.tasks.list_tasks(task_type=ttid)
         assert len(tasks) >= num_curves_tasks
         for task in tasks.to_dict(orient="index").values():
             assert ttid == task["ttid"]
             self._check_task(task)
 
-    def test_list_tasks_output_format(self):
+    def test_list_tasks_length(self):
         ttid = TaskType.LEARNING_CURVE
-        tasks = openml.tasks.list_tasks(task_type=ttid, output_format="dataframe")
-        assert isinstance(tasks, pd.DataFrame)
+        tasks = openml.tasks.list_tasks(task_type=ttid)
         assert len(tasks) > 100
 
     def test_list_tasks_empty(self):
-        tasks = cast(
-            pd.DataFrame,
-            openml.tasks.list_tasks(tag="NoOneWillEverUseThisTag", output_format="dataframe"),
-        )
+        tasks = openml.tasks.list_tasks(tag="NoOneWillEverUseThisTag")
         assert tasks.empty
 
     def test_list_tasks_by_tag(self):
         num_basic_tasks = 100  # number is flexible, check server if fails
-        tasks = openml.tasks.list_tasks(tag="OpenML100", output_format="dataframe")
+        tasks = openml.tasks.list_tasks(tag="OpenML100")
         assert len(tasks) >= num_basic_tasks
         for task in tasks.to_dict(orient="index").values():
             self._check_task(task)
 
     def test_list_tasks(self):
-        tasks = openml.tasks.list_tasks(output_format="dataframe")
+        tasks = openml.tasks.list_tasks()
         assert len(tasks) >= 900
         for task in tasks.to_dict(orient="index").values():
             self._check_task(task)
@@ -108,7 +104,7 @@ class TestTask(TestBase):
         size = 10
         max = 100
         for i in range(0, max, size):
-            tasks = openml.tasks.list_tasks(offset=i, size=size, output_format="dataframe")
+            tasks = openml.tasks.list_tasks(offset=i, size=size)
             assert size >= len(tasks)
             for task in tasks.to_dict(orient="index").values():
                 self._check_task(task)
@@ -123,12 +119,7 @@ class TestTask(TestBase):
         ]
         for j in task_types:
             for i in range(0, max, size):
-                tasks = openml.tasks.list_tasks(
-                    task_type=j,
-                    offset=i,
-                    size=size,
-                    output_format="dataframe",
-                )
+                tasks = openml.tasks.list_tasks(task_type=j, offset=i, size=size)
                 assert size >= len(tasks)
                 for task in tasks.to_dict(orient="index").values():
                     assert j == task["ttid"]

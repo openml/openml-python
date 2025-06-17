@@ -6,6 +6,7 @@
 import openml
 from sklearn import compose, ensemble, impute, neighbors, preprocessing, pipeline, tree
 
+import openml
 
 # %% [markdown]
 # We'll use the test server for the rest of this tutorial.

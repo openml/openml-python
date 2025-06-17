@@ -5,7 +5,6 @@
 # %%
 import openml
 from openml.tasks import TaskType
-import pandas as pd
 
 # %% [markdown]
 #
@@ -194,7 +193,7 @@ except openml.exceptions.OpenMLServerException as e:
     # Error code for 'task already exists'
     if e.code == 614:
         # Lookup task
-        tasks = openml.tasks.list_tasks(data_id=128, output_format="dataframe")
+        tasks = openml.tasks.list_tasks(data_id=128)
         tasks = tasks.query(
             'task_type == "Supervised Classification" '
             'and estimation_procedure == "10-fold Crossvalidation" '
