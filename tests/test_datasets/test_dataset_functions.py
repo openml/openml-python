@@ -124,7 +124,6 @@ class TestOpenMLDataset(TestBase):
             datasets = openml.datasets.list_datasets(offset=i, size=size)
             assert len(datasets) == size
             assert len(datasets.columns) >= 2
-            # Maybe index?
             assert "did" in datasets.columns
             assert datasets["did"].dtype == int
             assert "status" in datasets.columns
