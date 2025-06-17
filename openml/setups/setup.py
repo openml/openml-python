@@ -66,7 +66,6 @@ class OpenMLSetup:
         return header + body
 
 
-# TODO(eddiebergman): All functionality handled by dataclass
 class OpenMLParameter:
     """Parameter object (used in setup).
 
