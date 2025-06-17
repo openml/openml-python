@@ -47,7 +47,7 @@ To contribute to the openml-python package, follow these steps:
    1. Fork and clone the `openml-python` repository. Then, create a new branch from the ``develop`` branch. If you are new to `git`, see our [detailed documentation](#basic-git-workflow), or rely on your favorite IDE.   
    2. [Install the local dependencies](#install-local-dependencies) to run the tests your contribution.
    3. [Test your installation](#testing-your-installation) to ensure everything is set up correctly.
-4. Implement your contribution. If contributing to the documentation, see [here](.
+4. Implement your contribution. If contributing to the documentation, see [here](#contributing-to-the-documentation).
 5. [Create a pull request](#pull-request-checklist). 
 
 ### Install Local Dependencies
@@ -93,7 +93,7 @@ pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest::test_get_data
 
 To test your new contribution, add [unit tests](https://github.com/openml/openml-python/tree/develop/tests), and, if needed, [examples](https://github.com/openml/openml-python/tree/develop/examples) for any new functionality being introduced. Some notes on unit tests and examples:
 * If a unit test contains an upload to the test server, please ensure that it is followed by a file collection for deletion, to prevent the test server from bulking up. For example, `TestBase._mark_entity_for_removal('data', dataset.dataset_id)`, `TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))`.
-* Please ensure that the example is run on the test server by beginning with the call to `openml.config.start_using_configuration_for_example()`.
+* Please ensure that the example is run on the test server by beginning with the call to `openml.config.start_using_configuration_for_example()`, which is done by default for tests derived from `TestBase`.
 * Add the `@pytest.mark.sklearn` marker to your unit tests if they have a dependency on scikit-learn.
 
 ### Pull Request Checklist
