@@ -85,8 +85,10 @@ class TestRun(TestBase):
             "target_name": "class",
         },
     }
+
+    # TODO: requires to double check the test server setup script.
     TEST_SERVER_TASK_REGRESSION = {
-        "task_id": 1605,
+        "task_id": 1605, # FIXME: the task ID is wrong, and would need to be static.
         "n_missing_vals": 0,
         "n_test_obs": 2178,
         "nominal_indices": [],
@@ -640,28 +642,6 @@ class TestRun(TestBase):
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
         task_id = self.TEST_SERVER_TASK_REGRESSION["task_id"]
-
-        task_meta_data = self.TEST_SERVER_TASK_REGRESSION["task_meta_data"]
-        _task_id = check_task_existence(**task_meta_data)
-        if _task_id is not None:
-            task_id = _task_id
-        else:
-            new_task = openml.tasks.create_task(**task_meta_data)
-            # publishes the new task
-            try:
-                new_task = new_task.publish()
-                task_id = new_task.task_id
-            except OpenMLServerException as e:
-                if e.code == 614:  # Task already exists
-                    # the exception message contains the task_id that was matched in the format
-                    # 'Task already exists. - matched id(s): [xxxx]'
-                    task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
-                else:
-                    raise Exception(repr(e))
-            # mark to remove the uploaded task
-            TestBase._mark_entity_for_removal("task", task_id)
-            TestBase.logger.info(f"collected from test_run_functions: {task_id}")
-
         n_missing_vals = self.TEST_SERVER_TASK_REGRESSION["n_missing_vals"]
         n_test_obs = self.TEST_SERVER_TASK_REGRESSION["n_test_obs"]
         self._run_and_upload_regression(lr, task_id, n_missing_vals, n_test_obs, "62501")
@@ -1719,27 +1699,7 @@ class TestRun(TestBase):
             format_prediction(learning_curve, *ignored_input, sample=None, proba=probabilities)
 
     def test_format_prediction_task_regression(self):
-        task_meta_data = self.TEST_SERVER_TASK_REGRESSION["task_meta_data"]
-        _task_id = check_task_existence(**task_meta_data)
-        if _task_id is not None:
-            task_id = _task_id
-        else:
-            new_task = openml.tasks.create_task(**task_meta_data)
-            # publishes the new task
-            try:
-                new_task = new_task.publish()
-                task_id = new_task.task_id
-            except OpenMLServerException as e:
-                if e.code == 614:  # Task already exists
-                    # the exception message contains the task_id that was matched in the format
-                    # 'Task already exists. - matched id(s): [xxxx]'
-                    task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
-                else:
-                    raise Exception(repr(e))
-            # mark to remove the uploaded task
-            TestBase._mark_entity_for_removal("task", task_id)
-            TestBase.logger.info(f"collected from test_run_functions: {task_id}")
-
+        task_id = self.TEST_SERVER_TASK_REGRESSION["task_id"]
         regression = openml.tasks.get_task(task_id, download_data=False)
         ignored_input = [0] * 5
         res = format_prediction(regression, *ignored_input)
