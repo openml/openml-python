@@ -87,7 +87,7 @@ class TestStudyFunctions(TestBase):
         )
         study.publish()
         TestBase._mark_entity_for_removal("study", study.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], study.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
 
         assert study.id > 0
 
@@ -134,7 +134,7 @@ class TestStudyFunctions(TestBase):
 
         study.publish()
         TestBase._mark_entity_for_removal("study", study.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], study.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
 
         assert study.id > 0
         study_downloaded = openml.study.get_study(study.id)
@@ -169,7 +169,7 @@ class TestStudyFunctions(TestBase):
         )
         study.publish()
         TestBase._mark_entity_for_removal("study", study.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], study.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
         assert study.id > 0
         study_downloaded = openml.study.get_study(study.id)
         assert study_downloaded.alias == fixt_alias
@@ -232,7 +232,7 @@ class TestStudyFunctions(TestBase):
         )
         study.publish()
         TestBase._mark_entity_for_removal("study", study.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], study.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
         study_original = openml.study.get_study(study.id)
 
         with pytest.raises(

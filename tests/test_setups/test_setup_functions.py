@@ -24,7 +24,7 @@ def get_sentinel():
     md5 = hashlib.md5()
     md5.update(str(time.time()).encode("utf-8"))
     sentinel = md5.hexdigest()[:10]
-    return "TEST%s" % sentinel
+    return f"TEST{sentinel}"
 
 
 class TestSetupFunctions(TestBase):
@@ -44,7 +44,7 @@ class TestSetupFunctions(TestBase):
         flow.name = f"TEST{sentinel}{flow.name}"
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
 
         # although the flow exists (created as of previous statement),
         # we can be sure there are no setups (yet) as it was just created
@@ -57,7 +57,7 @@ class TestSetupFunctions(TestBase):
         flow.name = f"TEST{get_sentinel()}{flow.name}"
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
 
         # although the flow exists, we can be sure there are no
         # setups (yet) as it hasn't been ran
@@ -73,7 +73,7 @@ class TestSetupFunctions(TestBase):
         run.flow_id = flow.flow_id
         run.publish()
         TestBase._mark_entity_for_removal("run", run.run_id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], run.run_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {run.run_id}")
         # download the run, as it contains the right setup id
         run = openml.runs.get_run(run.run_id)
 

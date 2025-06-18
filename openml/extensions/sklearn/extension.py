@@ -223,7 +223,7 @@ class SklearnExtension(Extension):
             # then the pipeline steps are formatted e.g.:
             # step1name=sklearn.submodule.ClassName,step2name...
             components = [component.split(".")[-1] for component in pipeline.split(",")]
-            pipeline = "{}({})".format(pipeline_class, ",".join(components))
+            pipeline = f"{pipeline_class}({','.join(components)})"
             if len(short_name.format(pipeline)) > extra_trim_length:
                 pipeline = f"{pipeline_class}(...,{components[-1]})"
         else:
@@ -482,9 +482,7 @@ class SklearnExtension(Extension):
             )
         else:
             raise TypeError(o)
-        logger.info(
-            "-{} flow_to_sklearn END   o={}, rval={}".format("-" * recursion_depth, o, rval)
-        )
+        logger.info(f"-{'-' * recursion_depth} flow_to_sklearn END   o={o}, rval={rval}")
         return rval
 
     def model_to_flow(self, model: Any) -> OpenMLFlow:
@@ -574,7 +572,7 @@ class SklearnExtension(Extension):
         import sklearn
 
         major, minor, micro, _, _ = sys.version_info
-        python_version = "Python_{}.".format(".".join([str(major), str(minor), str(micro)]))
+        python_version = f"Python_{'.'.join([str(major), str(minor), str(micro)])}."
         sklearn_version = f"Sklearn_{sklearn.__version__}."
         numpy_version = f"NumPy_{numpy.__version__}."  # type: ignore
         scipy_version = f"SciPy_{scipy.__version__}."
@@ -628,7 +626,7 @@ class SklearnExtension(Extension):
         """
 
         def match_format(s):
-            return "{}\n{}\n".format(s, len(s) * "-")
+            return f"{s}\n{len(s) * '-'}\n"
 
         s = inspect.getdoc(model)
         if s is None:
@@ -680,7 +678,7 @@ class SklearnExtension(Extension):
         """
 
         def match_format(s):
-            return "{}\n{}\n".format(s, len(s) * "-")
+            return f"{s}\n{len(s) * '-'}\n"
 
         s = inspect.getdoc(model)
         if s is None:
@@ -689,7 +687,7 @@ class SklearnExtension(Extension):
             index1 = s.index(match_format("Parameters"))
         except ValueError as e:
             # when sklearn docstring has no 'Parameters' section
-            logger.warning("{} {}".format(match_format("Parameters"), e))
+            logger.warning(f"{match_format('Parameters')} {e}")
             return None
 
         headings = ["Attributes", "Notes", "See also", "Note", "References"]
@@ -1151,7 +1149,7 @@ class SklearnExtension(Extension):
         recursion_depth: int,
         strict_version: bool = True,  # noqa: FBT002, FBT001
     ) -> Any:
-        logger.info("-{} deserialize {}".format("-" * recursion_depth, flow.name))
+        logger.info(f"-{'-' * recursion_depth} deserialize {flow.name}")
         model_name = flow.class_name
         self._check_dependencies(flow.dependencies, strict_version=strict_version)
 
@@ -1168,9 +1166,7 @@ class SklearnExtension(Extension):
 
         for name in parameters:
             value = parameters.get(name)
-            logger.info(
-                "--{} flow_parameter={}, value={}".format("-" * recursion_depth, name, value)
-            )
+            logger.info(f"--{'-' * recursion_depth} flow_parameter={name}, value={value}")
             rval = self._deserialize_sklearn(
                 value,
                 components=components_,
@@ -1186,9 +1182,7 @@ class SklearnExtension(Extension):
             if name not in components_:
                 continue
             value = components[name]
-            logger.info(
-                "--{} flow_component={}, value={}".format("-" * recursion_depth, name, value)
-            )
+            logger.info(f"--{'-' * recursion_depth} flow_component={name}, value={value}")
             rval = self._deserialize_sklearn(
                 value,
                 recursion_depth=recursion_depth + 1,

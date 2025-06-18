@@ -1669,7 +1669,7 @@ class TestRun(TestBase):
 
         run.publish()
         TestBase._mark_entity_for_removal("run", run.run_id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], run.run_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {run.run_id}")
 
     @pytest.mark.production()
     def test_format_prediction_non_supervised(self):

@@ -168,6 +168,7 @@ to create a pull request from your fork.
 (If any of the above seems like magic to you, please look up the
 [Git documentation](https://git-scm.com/documentation) on the web, or ask a friend or another contributor for help.)
 
+
 ## Pre-commit Details
 [Pre-commit](https://pre-commit.com/) is used for various style checking and code formatting.
 Before each commit, it will automatically run:

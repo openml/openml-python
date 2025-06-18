@@ -109,7 +109,7 @@ def delete_remote_files(tracker, flow_names) -> None:
 
     # deleting all collected entities published to test server
     # 'run's are deleted first to prevent dependency issue of entities on deletion
-    logger.info("Entity Types: {}".format(["run", "data", "flow", "task", "study"]))
+    logger.info(f"Entity Types: {['run', 'data', 'flow', 'task', 'study']}")
     for entity_type in ["run", "data", "flow", "task", "study"]:
         logger.info(f"Deleting {entity_type}s...")
         for _i, entity in enumerate(tracker[entity_type]):

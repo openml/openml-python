@@ -292,7 +292,7 @@ class TestFlowFunctions(TestBase):
         self._add_sentinel_to_flow_name(flow)
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
         # Test deserialization works
         server_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
         assert server_flow.parameters["categories"] == "[[0, 1], [0, 1]]"
@@ -313,7 +313,7 @@ class TestFlowFunctions(TestBase):
         flow = extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
         assert isinstance(downloaded_flow.model, sklearn.ensemble.RandomForestClassifier)
@@ -398,7 +398,7 @@ class TestFlowFunctions(TestBase):
             flow = openml.extensions.get_extension_by_model(clf).model_to_flow(clf).publish()
             TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
             TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], flow.flow_id),
+                f"collected from {__file__.split('/')[-1]}: {flow.flow_id}",
             )
 
             assert openml.flows.get_flow_id(model=clf, exact_version=True) == flow.flow_id
