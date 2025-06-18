@@ -68,7 +68,7 @@ class TestRun(TestBase):
         "task_meta_data": {
             "task_type": TaskType.SUPERVISED_CLASSIFICATION,
             "dataset_id": 16,  # credit-a
-            "estimation_procedure_id": 1,
+            "estimation_procedure_id": 6,
             "target_name": "class",
         },
     }
@@ -81,7 +81,7 @@ class TestRun(TestBase):
         "task_meta_data": {
             "task_type": TaskType.SUPERVISED_CLASSIFICATION,
             "dataset_id": 20,  # diabetes
-            "estimation_procedure_id": 1,
+            "estimation_procedure_id": 5,
             "target_name": "class",
         },
     }
