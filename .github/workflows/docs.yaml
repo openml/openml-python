@@ -60,5 +60,10 @@ jobs:
         git config --global user.name 'Github Actions'
         git config --global user.email 'not@mail.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        git commit -am "$last_commit"
-        git diff --quiet @{u} HEAD || git push
+        # Only commit and push if there are changes
+        if ! git diff --cached --quiet; then
+          git commit -m "$last_commit"
+          git push
+        else
+          echo "Branch is up to date with origin/gh-pages, no need to update docs. Skipping."
+        fi
