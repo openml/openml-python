@@ -7,9 +7,9 @@ A simple tutorial on how to train/run a model and how to upload the results.
 
 # License: BSD 3-Clause
 
-import openml
 from sklearn import ensemble, neighbors
 
+import openml
 
 ############################################################################
 # .. warning::

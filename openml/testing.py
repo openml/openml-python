@@ -12,7 +12,6 @@ import unittest
 from pathlib import Path
 from typing import ClassVar
 
-import pandas as pd
 import requests
 
 import openml
@@ -101,7 +100,7 @@ class TestBase(unittest.TestCase):
 
         self.cached = True
         openml.config.apikey = TestBase.apikey
-        self.production_server = "https://openml.org/api/v1/xml"
+        self.production_server = "https://www.openml.org/api/v1/xml"
         openml.config.server = TestBase.test_server
         openml.config.avoid_duplicate_runs = False
         openml.config.set_root_cache_directory(str(self.workdir))
@@ -286,8 +285,7 @@ def check_task_existence(
     int, None
     """
     return_val = None
-    tasks = openml.tasks.list_tasks(task_type=task_type, output_format="dataframe")
-    assert isinstance(tasks, pd.DataFrame)
+    tasks = openml.tasks.list_tasks(task_type=task_type)
     if len(tasks) == 0:
         return None
     tasks = tasks.loc[tasks["did"] == dataset_id]

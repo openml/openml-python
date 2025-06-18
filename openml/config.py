@@ -23,6 +23,7 @@ console_handler: logging.StreamHandler | None = None
 file_handler: logging.handlers.RotatingFileHandler | None = None
 
 OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
+OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
 
 
 class _Config(TypedDict):
@@ -163,13 +164,15 @@ server = _defaults["server"]
 def get_server_base_url() -> str:
     """Return the base URL of the currently configured server.
 
-    Turns ``"https://www.openml.org/api/v1/xml"`` in ``"https://www.openml.org/"``
+    Turns ``"https://api.openml.org/api/v1/xml"`` in ``"https://www.openml.org/"``
+    and ``"https://test.openml.org/api/v1/xml"`` in ``"https://test.openml.org/"``
 
     Returns
     -------
     str
     """
-    return server.split("/api")[0]
+    domain, path = server.split("/api", maxsplit=1)
+    return domain.replace("api", "www")
 
 
 apikey: str = _defaults["apikey"]
@@ -399,10 +402,9 @@ def set_field_in_config_file(field: str, value: Any) -> None:
             # There doesn't seem to be a way to avoid writing defaults to file with configparser,
             # because it is impossible to distinguish from an explicitly set value that matches
             # the default value, to one that was set to its default because it was omitted.
-            value = config.get("FAKE_SECTION", f)  # type: ignore
-            if f == field:
-                value = globals()[f]
-            fh.write(f"{f} = {value}\n")
+            value = globals()[f] if f == field else config.get(f)  # type: ignore
+            if value is not None:
+                fh.write(f"{f} = {value}\n")
 
 
 def _parse_config(config_file: str | Path) -> _Config:

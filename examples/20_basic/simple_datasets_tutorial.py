@@ -19,7 +19,7 @@ import openml
 # List datasets
 # =============
 
-datasets_df = openml.datasets.list_datasets(output_format="dataframe")
+datasets_df = openml.datasets.list_datasets()
 print(datasets_df.head(n=10))
 
 ############################################################################
@@ -48,7 +48,7 @@ print(dataset.description[:500])
 # attribute_names - the names of the features for the examples (X) and
 # target feature (y)
 X, y, categorical_indicator, attribute_names = dataset.get_data(
-    dataset_format="dataframe", target=dataset.default_target_attribute
+    target=dataset.default_target_attribute
 )
 
 ############################################################################
@@ -63,9 +63,9 @@ openml.config.show_progress = True
 # Visualize the dataset
 # =====================
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 sns.set_style("darkgrid")
 

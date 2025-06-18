@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import requests
+import requests_mock
 import scipy.sparse
 from oslo_concurrency import lockutils
 
@@ -113,9 +114,8 @@ class TestOpenMLDataset(TestBase):
         all_tags = _tag_entity("data", 1, tag, untag=True)
         assert tag not in all_tags
 
-    def test_list_datasets_output_format(self):
-        datasets = openml.datasets.list_datasets(output_format="dataframe")
-        assert isinstance(datasets, pd.DataFrame)
+    def test_list_datasets_length(self):
+        datasets = openml.datasets.list_datasets()
         assert len(datasets) >= 100
 
     def test_list_datasets_paginate(self):
@@ -123,14 +123,17 @@ class TestOpenMLDataset(TestBase):
         max = 100
         for i in range(0, max, size):
             datasets = openml.datasets.list_datasets(offset=i, size=size)
-            assert size == len(datasets)
-            self._check_datasets(datasets)
+            assert len(datasets) == size
+            assert len(datasets.columns) >= 2
+            assert "did" in datasets.columns
+            assert datasets["did"].dtype == int
+            assert "status" in datasets.columns
+            assert datasets["status"].dtype == pd.CategoricalDtype(
+                categories=["in_preparation", "active", "deactivated"],
+            )
 
     def test_list_datasets_empty(self):
-        datasets = openml.datasets.list_datasets(
-            tag="NoOneWouldUseThisTagAnyway",
-            output_format="dataframe",
-        )
+        datasets = openml.datasets.list_datasets(tag="NoOneWouldUseThisTagAnyway")
         assert datasets.empty
 
     @pytest.mark.production()
@@ -308,8 +311,9 @@ class TestOpenMLDataset(TestBase):
 
     def test_get_dataset_sparse(self):
         dataset = openml.datasets.get_dataset(102)
-        X, *_ = dataset.get_data(dataset_format="array")
-        assert isinstance(X, scipy.sparse.csr_matrix)
+        X, *_ = dataset.get_data()
+        assert isinstance(X, pd.DataFrame)
+        assert all(isinstance(col, pd.SparseDtype) for col in X.dtypes)
 
     def test_download_rowid(self):
         # Smoke test which checks that the dataset has the row-id set correctly
@@ -335,14 +339,14 @@ class TestOpenMLDataset(TestBase):
             FileNotFoundError,
             r"Object at .* does not exist",
             _download_minio_file,
-            source="http://openml1.win.tue.nl/dataset20/i_do_not_exist.pq",
+            source="http://data.openml.org/dataset20/i_do_not_exist.pq",
             destination=self.workdir,
             exists_ok=True,
         )
 
     def test__download_minio_file_to_directory(self):
         _download_minio_file(
-            source="http://openml1.win.tue.nl/dataset20/dataset_20.pq",
+            source="http://data.openml.org/dataset20/dataset_20.pq",
             destination=self.workdir,
             exists_ok=True,
         )
@@ -353,7 +357,7 @@ class TestOpenMLDataset(TestBase):
     def test__download_minio_file_to_path(self):
         file_destination = os.path.join(self.workdir, "custom.pq")
         _download_minio_file(
-            source="http://openml1.win.tue.nl/dataset20/dataset_20.pq",
+            source="http://data.openml.org/dataset20/dataset_20.pq",
             destination=file_destination,
             exists_ok=True,
         )
@@ -368,7 +372,7 @@ class TestOpenMLDataset(TestBase):
         self.assertRaises(
             FileExistsError,
             _download_minio_file,
-            source="http://openml1.win.tue.nl/dataset20/dataset_20.pq",
+            source="http://data.openml.org/dataset20/dataset_20.pq",
             destination=str(file_destination),
             exists_ok=False,
         )
@@ -376,7 +380,7 @@ class TestOpenMLDataset(TestBase):
     def test__download_minio_file_works_with_bucket_subdirectory(self):
         file_destination = Path(self.workdir, "custom.pq")
         _download_minio_file(
-            source="http://openml1.win.tue.nl/dataset61/dataset_61.pq",
+            source="http://data.openml.org/dataset61/dataset_61.pq",
             destination=file_destination,
             exists_ok=True,
         )
@@ -384,14 +388,6 @@ class TestOpenMLDataset(TestBase):
             file_destination
         ), "_download_minio_file can download from subdirectories"
 
-    def test__get_dataset_parquet_not_cached(self):
-        description = {
-            "oml:parquet_url": "http://openml1.win.tue.nl/dataset20/dataset_20.pq",
-            "oml:id": "20",
-        }
-        path = _get_dataset_parquet(description, cache_directory=self.workdir)
-        assert isinstance(path, Path), "_get_dataset_parquet returns a path"
-        assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
     @mock.patch("openml._api_calls._download_minio_file")
     def test__get_dataset_parquet_is_cached(self, patch):
@@ -400,7 +396,7 @@ class TestOpenMLDataset(TestBase):
             "_download_parquet_url should not be called when loading from cache",
         )
         description = {
-            "oml:parquet_url": "http://openml1.win.tue.nl/dataset30/dataset_30.pq",
+            "oml:parquet_url": "http://data.openml.org/dataset30/dataset_30.pq",
             "oml:id": "30",
         }
         path = _get_dataset_parquet(description, cache_directory=None)
@@ -409,7 +405,7 @@ class TestOpenMLDataset(TestBase):
 
     def test__get_dataset_parquet_file_does_not_exist(self):
         description = {
-            "oml:parquet_url": "http://openml1.win.tue.nl/dataset20/does_not_exist.pq",
+            "oml:parquet_url": "http://data.openml.org/dataset20/does_not_exist.pq",
             "oml:id": "20",
         }
         path = _get_dataset_parquet(description, cache_directory=self.workdir)
@@ -569,11 +565,7 @@ class TestOpenMLDataset(TestBase):
     def _assert_status_of_dataset(self, *, did: int, status: str):
         """Asserts there is exactly one dataset with id `did` and its current status is `status`"""
         # need to use listing fn, as this is immune to cache
-        result = openml.datasets.list_datasets(
-            data_id=[did],
-            status="all",
-            output_format="dataframe",
-        )
+        result = openml.datasets.list_datasets(data_id=[did], status="all")
         result = result.to_dict(orient="index")
         # I think we should drop the test that one result is returned,
         # the server should never return multiple results?
@@ -1505,24 +1497,14 @@ class TestOpenMLDataset(TestBase):
             data_id=999999,
         )
 
-    @pytest.mark.production()
-    def test_get_dataset_parquet(self):
-        # Parquet functionality is disabled on the test server
-        # There is no parquet-copy of the test server yet.
-        openml.config.server = self.production_server
-        dataset = openml.datasets.get_dataset(61, download_data=True)
-        assert dataset._parquet_url is not None
-        assert dataset.parquet_file is not None
-        assert os.path.isfile(dataset.parquet_file)
-        assert dataset.data_file is None  # is alias for arff path
 
     @pytest.mark.production()
     def test_list_datasets_with_high_size_parameter(self):
         # Testing on prod since concurrent deletion of uploded datasets make the test fail
         openml.config.server = self.production_server
 
-        datasets_a = openml.datasets.list_datasets(output_format="dataframe")
-        datasets_b = openml.datasets.list_datasets(output_format="dataframe", size=np.inf)
+        datasets_a = openml.datasets.list_datasets()
+        datasets_b = openml.datasets.list_datasets(size=np.inf)
 
         # Reverting to test server
         openml.config.server = self.test_server
@@ -1791,7 +1773,7 @@ def _assert_datasets_have_id_and_valid_status(datasets: pd.DataFrame):
 
 @pytest.fixture(scope="module")
 def all_datasets():
-    return openml.datasets.list_datasets(output_format="dataframe")
+    return openml.datasets.list_datasets()
 
 
 def test_list_datasets(all_datasets: pd.DataFrame):
@@ -1803,49 +1785,37 @@ def test_list_datasets(all_datasets: pd.DataFrame):
 
 
 def test_list_datasets_by_tag(all_datasets: pd.DataFrame):
-    tag_datasets = openml.datasets.list_datasets(tag="study_14", output_format="dataframe")
+    tag_datasets = openml.datasets.list_datasets(tag="study_14")
     assert 0 < len(tag_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(tag_datasets)
 
 
 def test_list_datasets_by_size():
-    datasets = openml.datasets.list_datasets(size=5, output_format="dataframe")
+    datasets = openml.datasets.list_datasets(size=5)
     assert len(datasets) == 5
     _assert_datasets_have_id_and_valid_status(datasets)
 
 
 def test_list_datasets_by_number_instances(all_datasets: pd.DataFrame):
-    small_datasets = openml.datasets.list_datasets(
-        number_instances="5..100",
-        output_format="dataframe",
-    )
+    small_datasets = openml.datasets.list_datasets(number_instances="5..100")
     assert 0 < len(small_datasets) <= len(all_datasets)
     _assert_datasets_have_id_and_valid_status(small_datasets)
 
 
 def test_list_datasets_by_number_features(all_datasets: pd.DataFrame):
-    wide_datasets = openml.datasets.list_datasets(
-        number_features="50..100",
-        output_format="dataframe",
-    )
+    wide_datasets = openml.datasets.list_datasets(number_features="50..100")
     assert 8 <= len(wide_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(wide_datasets)
 
 
 def test_list_datasets_by_number_classes(all_datasets: pd.DataFrame):
-    five_class_datasets = openml.datasets.list_datasets(
-        number_classes="5",
-        output_format="dataframe",
-    )
+    five_class_datasets = openml.datasets.list_datasets(number_classes="5")
     assert 3 <= len(five_class_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(five_class_datasets)
 
 
 def test_list_datasets_by_number_missing_values(all_datasets: pd.DataFrame):
-    na_datasets = openml.datasets.list_datasets(
-        number_missing_values="5..100",
-        output_format="dataframe",
-    )
+    na_datasets = openml.datasets.list_datasets(number_missing_values="5..100")
     assert 5 <= len(na_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(na_datasets)
 
@@ -1855,7 +1825,6 @@ def test_list_datasets_combined_filters(all_datasets: pd.DataFrame):
         tag="study_14",
         number_instances="100..1000",
         number_missing_values="800..1000",
-        output_format="dataframe",
     )
     assert 1 <= len(combined_filter_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(combined_filter_datasets)
@@ -1955,8 +1924,36 @@ def test_get_dataset_with_invalid_id() -> None:
         openml.datasets.get_dataset(INVALID_ID)
         assert e.value.code == 111
 
+
+def test__get_dataset_parquet_not_cached():
+    description = {
+        "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
+        "oml:id": "20",
+    }
+    path = _get_dataset_parquet(description, cache_directory=Path(openml.config.get_cache_directory()))
+    assert isinstance(path, Path), "_get_dataset_parquet returns a path"
+    assert path.is_file(), "_get_dataset_parquet returns path to real file"
+
+
 def test_read_features_from_xml_with_whitespace() -> None:
     from openml.datasets.dataset import _read_features
-    features_file = Path(__file__).parent.parent / "files" / "misc" / "features_with_whitespaces.xml"
+
+    features_file = (
+        Path(__file__).parent.parent / "files" / "misc" / "features_with_whitespaces.xml"
+    )
     dict = _read_features(features_file)
     assert dict[1].nominal_values == [" - 50000.", " 50000+."]
+
+
+def test_get_dataset_parquet(requests_mock, test_files_directory):
+    # Parquet functionality is disabled on the test server
+    # There is no parquet-copy of the test server yet.
+    content_file = (
+            test_files_directory / "mock_responses" / "datasets" / "data_description_61.xml"
+    )
+    requests_mock.get("https://www.openml.org/api/v1/xml/data/61", text=content_file.read_text())
+    dataset = openml.datasets.get_dataset(61, download_data=True)
+    assert dataset._parquet_url is not None
+    assert dataset.parquet_file is not None
+    assert os.path.isfile(dataset.parquet_file)
+    assert dataset.data_file is None  # is alias for arff path

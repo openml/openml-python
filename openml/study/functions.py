@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any, overload
-from typing_extensions import Literal
+from functools import partial
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 import xmltodict
@@ -298,7 +298,7 @@ def update_study_status(study_id: int, status: str) -> None:
     """
     legal_status = {"active", "deactivated"}
     if status not in legal_status:
-        raise ValueError("Illegal status value. " f"Legal values: {legal_status}")
+        raise ValueError(f"Illegal status value. Legal values: {legal_status}")
     data = {"study_id": study_id, "status": status}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call("study/status/update", "post", data=data)
     result = xmltodict.parse(result_xml)
@@ -433,33 +433,12 @@ def detach_from_study(study_id: int, run_ids: list[int]) -> int:
     return int(result["oml:linked_entities"])
 
 
-@overload
-def list_suites(
-    offset: int | None = ...,
-    size: int | None = ...,
-    status: str | None = ...,
-    uploader: list[int] | None = ...,
-    output_format: Literal["dict"] = "dict",
-) -> dict: ...
-
-
-@overload
-def list_suites(
-    offset: int | None = ...,
-    size: int | None = ...,
-    status: str | None = ...,
-    uploader: list[int] | None = ...,
-    output_format: Literal["dataframe"] = "dataframe",
-) -> pd.DataFrame: ...
-
-
 def list_suites(
     offset: int | None = None,
     size: int | None = None,
     status: str | None = None,
     uploader: list[int] | None = None,
-    output_format: Literal["dict", "dataframe"] = "dict",
-) -> dict | pd.DataFrame:
+) -> pd.DataFrame:
     """
     Return a list of all suites which are on OpenML.
 
@@ -474,78 +453,30 @@ def list_suites(
         suites are returned.
     uploader : list (int), optional
         Result filter. Will only return suites created by these users.
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
 
     Returns
     -------
-    datasets : dict of dicts, or dataframe
-        - If output_format='dict'
-            Every suite is represented by a dictionary containing the following information:
-            - id
-            - alias (optional)
-            - name
-            - main_entity_type
-            - status
-            - creator
-            - creation_date
-
-        - If output_format='dataframe'
-            Every row is represented by a dictionary containing the following information:
-            - id
-            - alias (optional)
-            - name
-            - main_entity_type
-            - status
-            - creator
-            - creation_date
+    datasets : dataframe
+        Every row is represented by a dictionary containing the following information:
+        - id
+        - alias (optional)
+        - name
+        - main_entity_type
+        - status
+        - creator
+        - creation_date
     """
-    if output_format not in ["dataframe", "dict"]:
-        raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable.",
-        )
-    # TODO: [0.15]
-    if output_format == "dict":
-        msg = (
-            "Support for `output_format` of 'dict' will be removed in 0.15 "
-            "and pandas dataframes will be returned instead. To ensure your code "
-            "will continue to work, use `output_format`='dataframe'."
-        )
-        warnings.warn(msg, category=FutureWarning, stacklevel=2)
-
-    return openml.utils._list_all(  # type: ignore
-        list_output_format=output_format,  # type: ignore
-        listing_call=_list_studies,
-        offset=offset,
-        size=size,
+    listing_call = partial(
+        _list_studies,
         main_entity_type="task",
         status=status,
         uploader=uploader,
     )
+    batches = openml.utils._list_all(listing_call, limit=size, offset=offset)
+    if len(batches) == 0:
+        return pd.DataFrame()
 
-
-@overload
-def list_studies(
-    offset: int | None = ...,
-    size: int | None = ...,
-    status: str | None = ...,
-    uploader: list[str] | None = ...,
-    benchmark_suite: int | None = ...,
-    output_format: Literal["dict"] = "dict",
-) -> dict: ...
-
-
-@overload
-def list_studies(
-    offset: int | None = ...,
-    size: int | None = ...,
-    status: str | None = ...,
-    uploader: list[str] | None = ...,
-    benchmark_suite: int | None = ...,
-    output_format: Literal["dataframe"] = "dataframe",
-) -> pd.DataFrame: ...
+    return pd.concat(batches)
 
 
 def list_studies(
@@ -554,8 +485,7 @@ def list_studies(
     status: str | None = None,
     uploader: list[str] | None = None,
     benchmark_suite: int | None = None,
-    output_format: Literal["dict", "dataframe"] = "dict",
-) -> dict | pd.DataFrame:
+) -> pd.DataFrame:
     """
     Return a list of all studies which are on OpenML.
 
@@ -571,111 +501,66 @@ def list_studies(
     uploader : list (int), optional
         Result filter. Will only return studies created by these users.
     benchmark_suite : int, optional
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
 
     Returns
     -------
-    datasets : dict of dicts, or dataframe
-        - If output_format='dict'
-            Every dataset is represented by a dictionary containing
-            the following information:
-            - id
-            - alias (optional)
-            - name
-            - benchmark_suite (optional)
-            - status
-            - creator
-            - creation_date
-            If qualities are calculated for the dataset, some of
-            these are also returned.
-
-        - If output_format='dataframe'
-            Every dataset is represented by a dictionary containing
-            the following information:
-            - id
-            - alias (optional)
-            - name
-            - benchmark_suite (optional)
-            - status
-            - creator
-            - creation_date
-            If qualities are calculated for the dataset, some of
-            these are also returned.
+    datasets : dataframe
+        Every dataset is represented by a dictionary containing
+        the following information:
+        - id
+        - alias (optional)
+        - name
+        - benchmark_suite (optional)
+        - status
+        - creator
+        - creation_date
+        If qualities are calculated for the dataset, some of
+        these are also returned.
     """
-    if output_format not in ["dataframe", "dict"]:
-        raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable.",
-        )
-    # TODO: [0.15]
-    if output_format == "dict":
-        msg = (
-            "Support for `output_format` of 'dict' will be removed in 0.15 "
-            "and pandas dataframes will be returned instead. To ensure your code "
-            "will continue to work, use `output_format`='dataframe'."
-        )
-        warnings.warn(msg, category=FutureWarning, stacklevel=2)
-
-    return openml.utils._list_all(  # type: ignore
-        list_output_format=output_format,  # type: ignore
-        listing_call=_list_studies,
-        offset=offset,
-        size=size,
+    listing_call = partial(
+        _list_studies,
         main_entity_type="run",
         status=status,
         uploader=uploader,
         benchmark_suite=benchmark_suite,
     )
+    batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
+    if len(batches) == 0:
+        return pd.DataFrame()
+
+    return pd.concat(batches)
 
 
-@overload
-def _list_studies(output_format: Literal["dict"] = "dict", **kwargs: Any) -> dict: ...
-
-
-@overload
-def _list_studies(output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame: ...
-
-
-def _list_studies(
-    output_format: Literal["dict", "dataframe"] = "dict", **kwargs: Any
-) -> dict | pd.DataFrame:
-    """
-    Perform api call to return a list of studies.
+def _list_studies(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
+    """Perform api call to return a list of studies.
 
     Parameters
     ----------
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
+    limit: int
+        The maximum number of studies to return.
+    offset: int
+        The number of studies to skip, starting from the first.
     kwargs : dict, optional
         Legal filter operators (keys in the dict):
-        status, limit, offset, main_entity_type, uploader
+        status, main_entity_type, uploader, benchmark_suite
 
     Returns
     -------
-    studies : dict of dicts
+    studies : dataframe
     """
     api_call = "study/list"
+    if limit is not None:
+        api_call += f"/limit/{limit}"
+    if offset is not None:
+        api_call += f"/offset/{offset}"
     if kwargs is not None:
         for operator, value in kwargs.items():
-            api_call += f"/{operator}/{value}"
-    return __list_studies(api_call=api_call, output_format=output_format)
+            if value is not None:
+                api_call += f"/{operator}/{value}"
+    return __list_studies(api_call=api_call)
 
 
-@overload
-def __list_studies(api_call: str, output_format: Literal["dict"] = "dict") -> dict: ...
-
-
-@overload
-def __list_studies(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame: ...
-
-
-def __list_studies(
-    api_call: str, output_format: Literal["dict", "dataframe"] = "dict"
-) -> dict | pd.DataFrame:
+def __list_studies(api_call: str) -> pd.DataFrame:
     """Retrieves the list of OpenML studies and
     returns it in a dictionary or a Pandas DataFrame.
 
@@ -683,15 +568,11 @@ def __list_studies(
     ----------
     api_call : str
         The API call for retrieving the list of OpenML studies.
-    output_format : str in {"dict", "dataframe"}
-        Format of the output, either 'object' for a dictionary
-        or 'dataframe' for a Pandas DataFrame.
 
     Returns
     -------
-    Union[Dict, pd.DataFrame]
-        A dictionary or Pandas DataFrame of OpenML studies,
-        depending on the value of 'output_format'.
+    pd.DataFrame
+        A Pandas DataFrame of OpenML studies
     """
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     study_dict = xmltodict.parse(xml_string, force_list=("oml:study",))
@@ -725,6 +606,4 @@ def __list_studies(
         current_study["id"] = int(current_study["id"])
         studies[study_id] = current_study
 
-    if output_format == "dataframe":
-        studies = pd.DataFrame.from_dict(studies, orient="index")
-    return studies
+    return pd.DataFrame.from_dict(studies, orient="index")
