@@ -101,7 +101,7 @@ jobs:
       run: |
         if [ ${{ matrix.code-cov }} ]; then codecov='--cov=openml --long  --cov-report=xml'; fi
         # Most of the time, running only the scikit-learn tests is sufficient
-        if [ ${{ matrix.sklearn-only }} = 'true' ]; then marks='-m "not production and sklearn"'; else marks='-m "not production"'; fi
+        if [ ${{ matrix.sklearn-only }} = 'true' ]; then marks='-m sklearn'; else marks=''; fi
         echo pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true $marks
         pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true $marks
     - name: Run tests on Ubuntu Production
@@ -109,7 +109,7 @@ jobs:
       run: |
         if [ ${{ matrix.code-cov }} ]; then codecov='--cov=openml --long  --cov-report=xml'; fi
         # Most of the time, running only the scikit-learn tests is sufficient
-        if [ ${{ matrix.sklearn-only }} = 'true' ]; then marks='-m "production and sklearn"'; else marks='-m production'; fi
+        if [ ${{ matrix.sklearn-only }} = 'true' ]; then marks='-m "sklearn"'; else marks=''; fi
         echo pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true $marks
         pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true $marks
     - name: Run tests on Windows
