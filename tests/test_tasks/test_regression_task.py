@@ -18,11 +18,11 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
 
     def setUp(self, n_levels: int = 1):
         super().setUp()
-
+        self.estimation_procedure = 9
         task_meta_data = {
             "task_type": TaskType.SUPERVISED_REGRESSION,
             "dataset_id": 105,  # wisconsin
-            "estimation_procedure_id": 7,
+            "estimation_procedure_id": self.estimation_procedure, # non default value to test estimation procedure id
             "target_name": "time",
         }
         _task_id = check_task_existence(**task_meta_data)
@@ -46,7 +46,7 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
                     raise Exception(repr(e))
         self.task_id = task_id
         self.task_type = TaskType.SUPERVISED_REGRESSION
-        self.estimation_procedure = 7
+
 
     def test_get_X_and_Y(self):
         X, Y = super().test_get_X_and_Y()
@@ -61,3 +61,4 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
         assert task.task_id == self.task_id
         assert task.task_type_id == TaskType.SUPERVISED_REGRESSION
         assert task.dataset_id == 105
+        assert task.estimation_procedure_id == self.estimation_procedure

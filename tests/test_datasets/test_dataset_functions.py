@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import requests
+import requests_mock
 import scipy.sparse
 from oslo_concurrency import lockutils
 
@@ -387,14 +388,6 @@ class TestOpenMLDataset(TestBase):
             file_destination
         ), "_download_minio_file can download from subdirectories"
 
-    def test__get_dataset_parquet_not_cached(self):
-        description = {
-            "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
-            "oml:id": "20",
-        }
-        path = _get_dataset_parquet(description, cache_directory=self.workdir)
-        assert isinstance(path, Path), "_get_dataset_parquet returns a path"
-        assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
     @mock.patch("openml._api_calls._download_minio_file")
     def test__get_dataset_parquet_is_cached(self, patch):
@@ -1504,16 +1497,6 @@ class TestOpenMLDataset(TestBase):
             data_id=999999,
         )
 
-    @pytest.mark.production()
-    def test_get_dataset_parquet(self):
-        # Parquet functionality is disabled on the test server
-        # There is no parquet-copy of the test server yet.
-        openml.config.server = self.production_server
-        dataset = openml.datasets.get_dataset(61, download_data=True)
-        assert dataset._parquet_url is not None
-        assert dataset.parquet_file is not None
-        assert os.path.isfile(dataset.parquet_file)
-        assert dataset.data_file is None  # is alias for arff path
 
     @pytest.mark.production()
     def test_list_datasets_with_high_size_parameter(self):
@@ -1942,6 +1925,16 @@ def test_get_dataset_with_invalid_id() -> None:
         assert e.value.code == 111
 
 
+def test__get_dataset_parquet_not_cached():
+    description = {
+        "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
+        "oml:id": "20",
+    }
+    path = _get_dataset_parquet(description, cache_directory=Path(openml.config.get_cache_directory()))
+    assert isinstance(path, Path), "_get_dataset_parquet returns a path"
+    assert path.is_file(), "_get_dataset_parquet returns path to real file"
+
+
 def test_read_features_from_xml_with_whitespace() -> None:
     from openml.datasets.dataset import _read_features
 
@@ -1950,3 +1943,17 @@ def test_read_features_from_xml_with_whitespace() -> None:
     )
     dict = _read_features(features_file)
     assert dict[1].nominal_values == [" - 50000.", " 50000+."]
+
+
+def test_get_dataset_parquet(requests_mock, test_files_directory):
+    # Parquet functionality is disabled on the test server
+    # There is no parquet-copy of the test server yet.
+    content_file = (
+            test_files_directory / "mock_responses" / "datasets" / "data_description_61.xml"
+    )
+    requests_mock.get("https://www.openml.org/api/v1/xml/data/61", text=content_file.read_text())
+    dataset = openml.datasets.get_dataset(61, download_data=True)
+    assert dataset._parquet_url is not None
+    assert dataset.parquet_file is not None
+    assert os.path.isfile(dataset.parquet_file)
+    assert dataset.data_file is None  # is alias for arff path
