@@ -79,6 +79,7 @@ test=[
     "pytest-rerunfailures",
     "mypy",
     "ruff",
+    "requests-mock",
 ]
 examples=[
     "matplotlib",
