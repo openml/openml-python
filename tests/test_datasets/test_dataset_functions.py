@@ -387,14 +387,6 @@ class TestOpenMLDataset(TestBase):
             file_destination
         ), "_download_minio_file can download from subdirectories"
 
-    def test__get_dataset_parquet_not_cached(self):
-        description = {
-            "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
-            "oml:id": "20",
-        }
-        path = _get_dataset_parquet(description, cache_directory=self.workdir)
-        assert isinstance(path, Path), "_get_dataset_parquet returns a path"
-        assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
     @mock.patch("openml._api_calls._download_minio_file")
     def test__get_dataset_parquet_is_cached(self, patch):
@@ -1940,6 +1932,16 @@ def test_get_dataset_with_invalid_id() -> None:
     with pytest.raises(OpenMLServerNoResult, match="Unknown dataset") as e:
         openml.datasets.get_dataset(INVALID_ID)
         assert e.value.code == 111
+
+
+def test__get_dataset_parquet_not_cached():
+    description = {
+        "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
+        "oml:id": "20",
+    }
+    path = _get_dataset_parquet(description, cache_directory=Path(openml.config.get_cache_directory()))
+    assert isinstance(path, Path), "_get_dataset_parquet returns a path"
+    assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
 
 def test_read_features_from_xml_with_whitespace() -> None:
