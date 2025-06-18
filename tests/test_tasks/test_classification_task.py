@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import pandas as pd
+import pytest
 
 from openml.tasks import TaskType, get_task
 
@@ -17,14 +18,6 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
         self.task_type = TaskType.SUPERVISED_CLASSIFICATION
         self.estimation_procedure = 5
 
-    def test_get_X_and_Y(self):
-        X, Y = super().test_get_X_and_Y()
-        assert X.shape == (768, 8)
-        assert isinstance(X, pd.DataFrame)
-        assert Y.shape == (768,)
-        assert isinstance(Y, pd.Series)
-        assert pd.api.types.is_categorical_dtype(Y)
-
     def test_download_task(self):
         task = super().test_download_task()
         assert task.task_id == self.task_id
@@ -35,3 +28,14 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
     def test_class_labels(self):
         task = get_task(self.task_id)
         assert task.class_labels == ["tested_negative", "tested_positive"]
+
+
+@pytest.mark.server()
+def test_get_X_and_Y():
+    task = get_task(119)
+    X, Y = task.get_X_and_y()
+    assert X.shape == (768, 8)
+    assert isinstance(X, pd.DataFrame)
+    assert Y.shape == (768,)
+    assert isinstance(Y, pd.Series)
+    assert pd.api.types.is_categorical_dtype(Y)
