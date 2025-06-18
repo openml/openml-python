@@ -904,7 +904,7 @@ class TestSklearnExtensionFlowFunctions(TestBase):
             boosting_name,
         )
         fixture_name = (
-            f"sklearn.model_selection._search.RandomizedSearchCV(estimator={pipeline_name}"
+            f"sklearn.model_selection._search.RandomizedSearchCV(estimator={pipeline_name})"
         )
         fixture_structure = {
             ohe_name: ["estimator", "ohe"],
