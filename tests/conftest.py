@@ -268,10 +268,14 @@ def as_robot() -> Iterator[None]:
     yield
     openml.config.set_retry_policy(policy, n_retries)
 
-
-@pytest.fixture()
-def with_test_server():
-    openml.config.start_using_configuration_for_example()
+@pytest.fixture(autouse=True)
+def with_server(request):
+    if "production" in request.keywords:
+        openml.config.server = "https://www.openml.org/api/v1/xml"
+        yield
+        return
+    openml.config.server = "https://test.openml.org/api/v1/xml"
+    openml.config.apikey = "c0c42819af31e706efe1f4b88c23c6c1"
     yield
 
 

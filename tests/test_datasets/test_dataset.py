@@ -389,7 +389,7 @@ class OpenMLDatasetTestSparse(TestBase):
 
 
 
-
+@pytest.mark.production
 def test_get_sparse_dataset_dataframe_with_target(requests_mock, test_files_directory):
     
     content_file = (
