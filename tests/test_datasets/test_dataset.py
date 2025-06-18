@@ -15,6 +15,7 @@ from openml.datasets import OpenMLDataFeature, OpenMLDataset
 from openml.exceptions import PyOpenMLError
 from openml.testing import TestBase
 
+import requests_mock
 
 @pytest.mark.production()
 class OpenMLDatasetTest(TestBase):
@@ -347,18 +348,6 @@ class OpenMLDatasetTestSparse(TestBase):
 
         self.sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
 
-    def test_get_sparse_dataset_dataframe_with_target(self):
-        X, y, _, attribute_names = self.sparse_dataset.get_data(target="class")
-        assert isinstance(X, pd.DataFrame)
-        assert isinstance(X.dtypes[0], pd.SparseDtype)
-        assert X.shape == (600, 20000)
-
-        assert isinstance(y, pd.Series)
-        assert isinstance(y.dtypes, pd.SparseDtype)
-        assert y.shape == (600,)
-
-        assert len(attribute_names) == 20000
-        assert "class" not in attribute_names
 
     def test_get_sparse_dataset_dataframe(self):
         rval, *_ = self.sparse_dataset.get_data()
@@ -389,6 +378,7 @@ class OpenMLDatasetTestSparse(TestBase):
 
     def test_get_sparse_categorical_data_id_395(self):
         dataset = openml.datasets.get_dataset(395, download_data=True)
+        # breakpoint()
         feature = dataset.features[3758]
         assert isinstance(dataset, OpenMLDataset)
         assert isinstance(feature, OpenMLDataFeature)
@@ -396,6 +386,37 @@ class OpenMLDatasetTestSparse(TestBase):
         assert feature.name == "CLASS_LABEL"
         assert feature.data_type == "nominal"
         assert len(feature.nominal_values) == 25
+
+
+
+
+def test_get_sparse_dataset_dataframe_with_target(requests_mock, test_files_directory):
+    
+    content_file = (
+        test_files_directory / "mock_responses" / "datasets" / "sparse_dataset" /"data_description.xml"
+    )
+    requests_mock.get("https://www.openml.org/api/v1/xml/data/4136", text=content_file.read_text())
+    sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
+    
+    sparse_arff_file = (
+        test_files_directory / "mock_responses" / "datasets" / "sparse_dataset" /"sparse_arff.arff"
+    )
+    requests_mock.get("https://api.openml.org/data/v1/download/1681111/Dexter.sparse_arff", text = sparse_arff_file.read_text())
+    
+    X, y, _, attribute_names = sparse_dataset.get_data(target="class")
+
+    assert isinstance(X, pd.DataFrame)
+    assert isinstance(X.dtypes[0], pd.SparseDtype)
+    assert X.shape == (10, 10)
+
+    assert isinstance(y, pd.Series)
+    assert isinstance(y.dtypes, pd.SparseDtype)
+    assert y.shape == (10,)
+
+    assert len(attribute_names) == 10
+    assert "class" not in attribute_names
+               
+
 
 
 class OpenMLDatasetFunctionTest(TestBase):

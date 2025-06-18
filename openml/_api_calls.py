@@ -274,7 +274,6 @@ def _download_text_file(
     start = time.time()
     response = __read_url(source, request_method="get", md5_checksum=md5_checksum)
     downloaded_file = response.text
-
     if output_path is None:
         logging.info(
             "%.7fs taken for [%s] request for the URL %s",
