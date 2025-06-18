@@ -80,6 +80,7 @@ test=[
     "mypy",
     "ruff",
     "requests-mock",
+    "pytest-mock",
 ]
 examples=[
     "matplotlib",
