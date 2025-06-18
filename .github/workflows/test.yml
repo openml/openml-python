@@ -102,7 +102,7 @@ jobs:
         if [ ${{ matrix.code-cov }} ]; then codecov='--cov=openml --long  --cov-report=xml'; fi
         # Most of the time, running only the scikit-learn tests is sufficient
         if [ ${{ matrix.sklearn-only }} = 'true' ]; then marks='sklearn and not production'; else marks='not production'; fi
-        echo pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true $marks
+        echo pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
         pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
     - name: Run tests on Ubuntu Production
       if: matrix.os == 'ubuntu-latest'

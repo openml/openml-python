@@ -274,7 +274,8 @@ def with_server(request):
         openml.config.server = "https://www.openml.org/api/v1/xml"
         yield
         return
-    openml.config.start_using_configuration_for_example()
+    openml.config.server = "https://test.openml.org/api/v1/xml"
+    openml.config.apikey = "c0c42819af31e706efe1f4b88c23c6c1"
     yield
 
 

@@ -1951,7 +1951,8 @@ def test_get_dataset_parquet(requests_mock, test_files_directory):
     content_file = (
             test_files_directory / "mock_responses" / "datasets" / "data_description_61.xml"
     )
-    requests_mock.get("https://www.openml.org/api/v1/xml/data/61", text=content_file.read_text())
+    # While the mocked example is from production, unit tests by default connect to the test server.
+    requests_mock.get("https://test.openml.org/api/v1/xml/data/61", text=content_file.read_text())
     dataset = openml.datasets.get_dataset(61, download_data=True)
     assert dataset._parquet_url is not None
     assert dataset.parquet_file is not None
