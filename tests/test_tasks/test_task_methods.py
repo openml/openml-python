@@ -20,14 +20,14 @@ class OpenMLTaskMethodsTest(TestBase):
         # tags can be at most 64 alphanumeric (+ underscore) chars
         unique_indicator = str(time()).replace(".", "")
         tag = f"test_tag_OpenMLTaskMethodsTest_{unique_indicator}"
-        tasks = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
+        tasks = openml.tasks.list_tasks(tag=tag)
         assert len(tasks) == 0
         task.push_tag(tag)
-        tasks = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
+        tasks = openml.tasks.list_tasks(tag=tag)
         assert len(tasks) == 1
         assert 1 in tasks["tid"]
         task.remove_tag(tag)
-        tasks = openml.tasks.list_tasks(tag=tag, output_format="dataframe")
+        tasks = openml.tasks.list_tasks(tag=tag)
         assert len(tasks) == 0
 
     def test_get_train_and_test_split_indices(self):

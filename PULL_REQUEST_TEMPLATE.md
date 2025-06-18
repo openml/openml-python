@@ -4,8 +4,8 @@ the contribution guidelines: https://github.com/openml/openml-python/blob/main/C
 
 Please make sure that:
 
+* the title of the pull request is descriptive
 * this pull requests is against the `develop` branch
-* you updated all docs, this includes the changelog (doc/progress.rst)
 * for any new function or class added, please add it to doc/api.rst
     * the list of classes and functions should be alphabetical 
 * for any new functionality, consider adding a relevant example
@@ -14,15 +14,20 @@ Please make sure that:
 * add the BSD 3-Clause license to any new file created
 -->
 
-#### Reference Issue
-<!-- Example: Fixes #1234 -->
+#### Metadata
+* Reference Issue: <!-- Example: Fixes #1234 or NA-->
+* New Tests Added: <!-- Yes/No/NA -->
+* Documentation Updated: <!-- Yes/No/NA -->
+* Change Log Entry: <!-- Short String, example: "Add new function `foo()` to module `bar`"; or "Fixes a bug with `bar`" -->
 
 
-#### What does this PR implement/fix? Explain your changes.
+#### Details 
+<!--
+if necessary, please share the following:
 
-
-#### How should this PR be tested?
-
-
-#### Any other comments?
+* What does this PR implement/fix? Explain your changes.
+* Why is this change necessary? What is the problem it solves?
+* How can I reproduce the issue this PR is solving and its solution?
+* Any other comments?
+-->
 

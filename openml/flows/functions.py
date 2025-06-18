@@ -3,10 +3,9 @@ from __future__ import annotations
 
 import os
 import re
-import warnings
 from collections import OrderedDict
-from typing import Any, Dict, overload
-from typing_extensions import Literal
+from functools import partial
+from typing import Any, Dict
 
 import dateutil.parser
 import pandas as pd
@@ -67,7 +66,7 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
             return _create_flow_from_xml(fh.read())
     except OSError as e:
         openml.utils._remove_cache_dir_for_id(FLOWS_CACHE_DIR_NAME, fid_cache_dir)
-        raise OpenMLCacheException("Flow file for fid %d not " "cached" % fid) from e
+        raise OpenMLCacheException("Flow file for fid %d not cached" % fid) from e
 
 
 @openml.utils.thread_safe_if_oslo_installed
@@ -133,44 +132,12 @@ def _get_flow_description(flow_id: int) -> OpenMLFlow:
         return _create_flow_from_xml(flow_xml)
 
 
-@overload
-def list_flows(
-    offset: int | None = ...,
-    size: int | None = ...,
-    tag: str | None = ...,
-    output_format: Literal["dict"] = "dict",
-    **kwargs: Any,
-) -> dict: ...
-
-
-@overload
-def list_flows(
-    offset: int | None = ...,
-    size: int | None = ...,
-    tag: str | None = ...,
-    *,
-    output_format: Literal["dataframe"],
-    **kwargs: Any,
-) -> pd.DataFrame: ...
-
-
-@overload
-def list_flows(
-    offset: int | None,
-    size: int | None,
-    tag: str | None,
-    output_format: Literal["dataframe"],
-    **kwargs: Any,
-) -> pd.DataFrame: ...
-
-
 def list_flows(
     offset: int | None = None,
     size: int | None = None,
     tag: str | None = None,
-    output_format: Literal["dict", "dataframe"] = "dict",
-    **kwargs: Any,
-) -> dict | pd.DataFrame:
+    uploader: str | None = None,
+) -> pd.DataFrame:
     """
     Return a list of all flows which are on OpenML.
     (Supports large amount of results)
@@ -183,29 +150,12 @@ def list_flows(
         the maximum number of flows to return
     tag : str, optional
         the tag to include
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
     kwargs: dict, optional
         Legal filter operators: uploader.
 
     Returns
     -------
-    flows : dict of dicts, or dataframe
-        - If output_format='dict'
-            A mapping from flow_id to a dict giving a brief overview of the
-            respective flow.
-            Every flow is represented by a dictionary containing
-            the following information:
-            - flow id
-            - full name
-            - name
-            - version
-            - external version
-            - uploader
-
-        - If output_format='dataframe'
+    flows : dataframe
             Each row maps to a dataset
             Each column contains the following information:
             - flow id
@@ -215,69 +165,44 @@ def list_flows(
             - external version
             - uploader
     """
-    if output_format not in ["dataframe", "dict"]:
-        raise ValueError(
-            "Invalid output format selected. " "Only 'dict' or 'dataframe' applicable.",
-        )
+    listing_call = partial(_list_flows, tag=tag, uploader=uploader)
+    batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
+    if len(batches) == 0:
+        return pd.DataFrame()
 
-    # TODO: [0.15]
-    if output_format == "dict":
-        msg = (
-            "Support for `output_format` of 'dict' will be removed in 0.15 "
-            "and pandas dataframes will be returned instead. To ensure your code "
-            "will continue to work, use `output_format`='dataframe'."
-        )
-        warnings.warn(msg, category=FutureWarning, stacklevel=2)
-
-    return openml.utils._list_all(
-        list_output_format=output_format,
-        listing_call=_list_flows,
-        offset=offset,
-        size=size,
-        tag=tag,
-        **kwargs,
-    )
+    return pd.concat(batches)
 
 
-@overload
-def _list_flows(output_format: Literal["dict"] = ..., **kwargs: Any) -> dict: ...
-
-
-@overload
-def _list_flows(*, output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame: ...
-
-
-@overload
-def _list_flows(output_format: Literal["dataframe"], **kwargs: Any) -> pd.DataFrame: ...
-
-
-def _list_flows(
-    output_format: Literal["dict", "dataframe"] = "dict", **kwargs: Any
-) -> dict | pd.DataFrame:
+def _list_flows(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
     """
     Perform the api call that return a list of all flows.
 
     Parameters
     ----------
-    output_format: str, optional (default='dict')
-        The parameter decides the format of the output.
-        - If 'dict' the output is a dict of dict
-        - If 'dataframe' the output is a pandas DataFrame
-
+    limit : int
+        the maximum number of flows to return
+    offset : int
+        the number of flows to skip, starting from the first
     kwargs: dict, optional
-        Legal filter operators: uploader, tag, limit, offset.
+        Legal filter operators: uploader, tag
 
     Returns
     -------
-    flows : dict, or dataframe
+    flows : dataframe
     """
     api_call = "flow/list"
 
+    if limit is not None:
+        api_call += f"/limit/{limit}"
+    if offset is not None:
+        api_call += f"/offset/{offset}"
+
     if kwargs is not None:
         for operator, value in kwargs.items():
-            api_call += f"/{operator}/{value}"
+            if value is not None:
+                api_call += f"/{operator}/{value}"
 
-    return __list_flows(api_call=api_call, output_format=output_format)
+    return __list_flows(api_call=api_call)
 
 
 def flow_exists(name: str, external_version: str) -> int | bool:
@@ -378,23 +303,12 @@ def get_flow_id(
             raise ValueError("exact_version should be False if model is None!")
         return flow_exists(name=flow_name, external_version=external_version)
 
-    flows = list_flows(output_format="dataframe")
-    assert isinstance(flows, pd.DataFrame)  # Make mypy happy
+    flows = list_flows()
     flows = flows.query(f'name == "{flow_name}"')
     return flows["id"].to_list()  # type: ignore[no-any-return]
 
 
-@overload
-def __list_flows(api_call: str, output_format: Literal["dict"] = "dict") -> dict: ...
-
-
-@overload
-def __list_flows(api_call: str, output_format: Literal["dataframe"]) -> pd.DataFrame: ...
-
-
-def __list_flows(
-    api_call: str, output_format: Literal["dict", "dataframe"] = "dict"
-) -> dict | pd.DataFrame:
+def __list_flows(api_call: str) -> pd.DataFrame:
     """Retrieve information about flows from OpenML API
     and parse it to a dictionary or a Pandas DataFrame.
 
@@ -402,8 +316,6 @@ def __list_flows(
     ----------
     api_call: str
         Retrieves the information about flows.
-    output_format: str in {"dict", "dataframe"}
-        The output format.
 
     Returns
     -------
@@ -431,10 +343,7 @@ def __list_flows(
         }
         flows[fid] = flow
 
-    if output_format == "dataframe":
-        flows = pd.DataFrame.from_dict(flows, orient="index")
-
-    return flows
+    return pd.DataFrame.from_dict(flows, orient="index")
 
 
 def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
@@ -514,11 +423,11 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
             for name in set(attr1.keys()).union(attr2.keys()):
                 if name not in attr1:
                     raise ValueError(
-                        f"Component {name} only available in " "argument2, but not in argument1.",
+                        f"Component {name} only available in argument2, but not in argument1.",
                     )
                 if name not in attr2:
                     raise ValueError(
-                        f"Component {name} only available in " "argument2, but not in argument1.",
+                        f"Component {name} only available in argument2, but not in argument1.",
                     )
                 assert_flows_equal(
                     attr1[name],
@@ -579,7 +488,7 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
                 params2 = set(flow2.parameters_meta_info)
                 if params1 != params2:
                     raise ValueError(
-                        "Parameter list in meta info for parameters differ " "in the two flows.",
+                        "Parameter list in meta info for parameters differ in the two flows.",
                     )
                 # iterating over the parameter's meta info list
                 for param in params1:

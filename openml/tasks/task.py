@@ -8,7 +8,7 @@ from abc import ABC
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Sequence
-from typing_extensions import Literal, TypedDict, overload
+from typing_extensions import TypedDict
 
 import openml._api_calls
 import openml.config
@@ -21,7 +21,6 @@ from .split import OpenMLSplit
 if TYPE_CHECKING:
     import numpy as np
     import pandas as pd
-    import scipy.sparse
 
 
 # TODO(eddiebergman): Should use `auto()` but might be too late if these numbers are used
@@ -277,52 +276,14 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
 
         self.target_name = target_name
 
-    @overload
-    def get_X_and_y(
-        self, dataset_format: Literal["array"] = "array"
-    ) -> tuple[
-        np.ndarray | scipy.sparse.spmatrix,
-        np.ndarray | None,
-    ]: ...
-
-    @overload
-    def get_X_and_y(
-        self, dataset_format: Literal["dataframe"]
-    ) -> tuple[
-        pd.DataFrame,
-        pd.Series | pd.DataFrame | None,
-    ]: ...
-
-    # TODO(eddiebergman): Do all OpenMLSupervisedTask have a `y`?
-    def get_X_and_y(
-        self, dataset_format: Literal["dataframe", "array"] = "array"
-    ) -> tuple[
-        np.ndarray | pd.DataFrame | scipy.sparse.spmatrix,
-        np.ndarray | pd.Series | pd.DataFrame | None,
-    ]:
+    def get_X_and_y(self) -> tuple[pd.DataFrame, pd.Series | pd.DataFrame | None]:
         """Get data associated with the current task.
-
-        Parameters
-        ----------
-        dataset_format : str
-            Data structure of the returned data. See :meth:`openml.datasets.OpenMLDataset.get_data`
-            for possible options.
 
         Returns
         -------
         tuple - X and y
 
         """
-        # TODO: [0.15]
-        if dataset_format == "array":
-            warnings.warn(
-                "Support for `dataset_format='array'` will be removed in 0.15,"
-                "start using `dataset_format='dataframe' to ensure your code "
-                "will continue to work. You can use the dataframe's `to_numpy` "
-                "function to continue using numpy arrays.",
-                category=FutureWarning,
-                stacklevel=2,
-            )
         dataset = self.get_dataset()
         if self.task_type_id not in (
             TaskType.SUPERVISED_CLASSIFICATION,
@@ -331,10 +292,7 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         ):
             raise NotImplementedError(self.task_type)
 
-        X, y, _, _ = dataset.get_data(
-            dataset_format=dataset_format,
-            target=self.target_name,
-        )
+        X, y, _, _ = dataset.get_data(target=self.target_name)
         return X, y
 
     def _to_dict(self) -> dict[str, dict]:
@@ -536,34 +494,15 @@ class OpenMLClusteringTask(OpenMLTask):
 
         self.target_name = target_name
 
-    @overload
-    def get_X(
-        self,
-        dataset_format: Literal["array"] = "array",
-    ) -> np.ndarray | scipy.sparse.spmatrix: ...
-
-    @overload
-    def get_X(self, dataset_format: Literal["dataframe"]) -> pd.DataFrame: ...
-
-    def get_X(
-        self,
-        dataset_format: Literal["array", "dataframe"] = "array",
-    ) -> np.ndarray | pd.DataFrame | scipy.sparse.spmatrix:
+    def get_X(self) -> pd.DataFrame:
         """Get data associated with the current task.
-
-        Parameters
-        ----------
-        dataset_format : str
-            Data structure of the returned data. See :meth:`openml.datasets.OpenMLDataset.get_data`
-            for possible options.
 
         Returns
         -------
-        tuple - X and y
-
+        The X data as a dataframe
         """
         dataset = self.get_dataset()
-        data, *_ = dataset.get_data(dataset_format=dataset_format, target=None)
+        data, *_ = dataset.get_data(target=None)
         return data
 
     def _to_dict(self) -> dict[str, dict[str, int | str | list[dict[str, Any]]]]:
