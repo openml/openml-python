@@ -101,7 +101,6 @@ class TestBase(unittest.TestCase):
         self.cached = True
         openml.config.apikey = TestBase.apikey
         self.production_server = "https://www.openml.org/api/v1/xml"
-        openml.config.server = TestBase.test_server
         openml.config.avoid_duplicate_runs = False
         openml.config.set_root_cache_directory(str(self.workdir))
 
@@ -120,7 +119,6 @@ class TestBase(unittest.TestCase):
                 # one of the files may still be used by another process
                 raise e
 
-        openml.config.server = self.production_server
         openml.config.connection_n_retries = self.connection_n_retries
         openml.config.retry_policy = self.retry_policy
 
