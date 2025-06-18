@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import pandas as pd
+import pytest
 
 from openml.tasks import TaskType, get_task
 
@@ -29,6 +30,7 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
         assert task.class_labels == ["tested_negative", "tested_positive"]
 
 
+@pytest.mark.server()
 def test_get_X_and_Y():
     task = get_task(119)
     X, Y = task.get_X_and_y()
