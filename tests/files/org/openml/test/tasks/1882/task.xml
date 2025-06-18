@@ -9,6 +9,7 @@
 </oml:data_set>  </oml:input>
 	      <oml:input name="estimation_procedure">
     <oml:estimation_procedure>
+        <oml:id>3</oml:id>
 <oml:type>crossvalidation</oml:type>
 <oml:data_splits_url>http://capa.win.tue.nl/api_splits/get/1882/Task_1882_splits.arff</oml:data_splits_url>
 <oml:parameter name="number_repeats">10</oml:parameter>
