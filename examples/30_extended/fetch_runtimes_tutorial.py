@@ -111,7 +111,7 @@ print(
 )
 for repeat, val1 in measures["predictive_accuracy"].items():
     for fold, val2 in val1.items():
-        print("Repeat #{}-Fold #{}: {:.4f}".format(repeat, fold, val2))
+        print(f"Repeat #{repeat}-Fold #{fold}: {val2:.4f}")
     print()
 
 # %% [markdown]
@@ -240,7 +240,7 @@ print_compare_runtimes(measures)
 
 # %%
 # We earlier extracted the number of repeats and folds for this task:
-print("# repeats: {}\n# folds: {}".format(n_repeats, n_folds))
+print(f"# repeats: {n_repeats}\n# folds: {n_folds}")
 
 # To extract the training runtime of the first repeat, first fold:
 print(run4.fold_evaluations["wall_clock_time_millis_training"][0][0])

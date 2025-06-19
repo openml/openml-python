@@ -1154,15 +1154,15 @@ def _list_runs(  # noqa: PLR0913, C901
     if offset is not None:
         api_call += f"/offset/{offset}"
     if id is not None:
-        api_call += "/run/{}".format(",".join([str(int(i)) for i in id]))
+        api_call += f"/run/{','.join([str(int(i)) for i in id])}"
     if task is not None:
-        api_call += "/task/{}".format(",".join([str(int(i)) for i in task]))
+        api_call += f"/task/{','.join([str(int(i)) for i in task])}"
     if setup is not None:
-        api_call += "/setup/{}".format(",".join([str(int(i)) for i in setup]))
+        api_call += f"/setup/{','.join([str(int(i)) for i in setup])}"
     if flow is not None:
-        api_call += "/flow/{}".format(",".join([str(int(i)) for i in flow]))
+        api_call += f"/flow/{','.join([str(int(i)) for i in flow])}"
     if uploader is not None:
-        api_call += "/uploader/{}".format(",".join([str(int(i)) for i in uploader]))
+        api_call += f"/uploader/{','.join([str(int(i)) for i in uploader])}"
     if study is not None:
         api_call += "/study/%d" % study
     if display_errors:

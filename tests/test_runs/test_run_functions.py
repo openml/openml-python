@@ -68,7 +68,7 @@ class TestRun(TestBase):
         "task_meta_data": {
             "task_type": TaskType.SUPERVISED_CLASSIFICATION,
             "dataset_id": 16,  # credit-a
-            "estimation_procedure_id": 1,
+            "estimation_procedure_id": 6,
             "target_name": "class",
         },
     }
@@ -81,7 +81,7 @@ class TestRun(TestBase):
         "task_meta_data": {
             "task_type": TaskType.SUPERVISED_CLASSIFICATION,
             "dataset_id": 20,  # diabetes
-            "estimation_procedure_id": 1,
+            "estimation_procedure_id": 5,
             "target_name": "class",
         },
     }
@@ -1669,7 +1669,7 @@ class TestRun(TestBase):
 
         run.publish()
         TestBase._mark_entity_for_removal("run", run.run_id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], run.run_id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {run.run_id}")
 
     @pytest.mark.production()
     def test_format_prediction_non_supervised(self):

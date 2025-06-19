@@ -454,15 +454,17 @@ class OpenMLDatasetFunctionTest(TestBase):
         assert pickle_mock.load.call_count == 0
         assert pickle_mock.dump.call_count == 1
 
-    def test__check_qualities(self):
-        qualities = [{"oml:name": "a", "oml:value": "0.5"}]
-        qualities = openml.datasets.dataset._check_qualities(qualities)
-        assert qualities["a"] == 0.5
 
-        qualities = [{"oml:name": "a", "oml:value": "null"}]
-        qualities = openml.datasets.dataset._check_qualities(qualities)
-        assert qualities["a"] != qualities["a"]
 
-        qualities = [{"oml:name": "a", "oml:value": None}]
-        qualities = openml.datasets.dataset._check_qualities(qualities)
-        assert qualities["a"] != qualities["a"]
+def test__check_qualities():
+    qualities = [{"oml:name": "a", "oml:value": "0.5"}]
+    qualities = openml.datasets.dataset._check_qualities(qualities)
+    assert qualities["a"] == 0.5
+
+    qualities = [{"oml:name": "a", "oml:value": "null"}]
+    qualities = openml.datasets.dataset._check_qualities(qualities)
+    assert qualities["a"] != qualities["a"]
+
+    qualities = [{"oml:name": "a", "oml:value": None}]
+    qualities = openml.datasets.dataset._check_qualities(qualities)
+    assert qualities["a"] != qualities["a"]

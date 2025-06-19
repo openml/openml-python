@@ -72,6 +72,6 @@ class TestStudyFunctions(TestBase):
             run.publish()  # publish the experiment on OpenML (optional)
             TestBase._mark_entity_for_removal("run", run.run_id)
             TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], run.run_id),
+                f"collected from {__file__.split('/')[-1]}: {run.run_id}",
             )
             TestBase.logger.info("URL for run: %s/run/%d" % (openml.config.server, run.run_id))

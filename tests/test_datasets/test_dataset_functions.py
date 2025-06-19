@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import requests
+import requests_mock
 import scipy.sparse
 from oslo_concurrency import lockutils
 
@@ -61,7 +62,7 @@ class TestOpenMLDataset(TestBase):
         self.lock_path = os.path.join(openml.config.get_cache_directory(), "locks")
         for did in ["-1", "2"]:
             with lockutils.external_lock(
-                name="datasets.functions.get_dataset:%s" % did,
+                name=f"datasets.functions.get_dataset:{did}",
                 lock_path=self.lock_path,
             ):
                 pickle_path = os.path.join(
@@ -387,14 +388,6 @@ class TestOpenMLDataset(TestBase):
             file_destination
         ), "_download_minio_file can download from subdirectories"
 
-    def test__get_dataset_parquet_not_cached(self):
-        description = {
-            "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
-            "oml:id": "20",
-        }
-        path = _get_dataset_parquet(description, cache_directory=self.workdir)
-        assert isinstance(path, Path), "_get_dataset_parquet returns a path"
-        assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
     @mock.patch("openml._api_calls._download_minio_file")
     def test__get_dataset_parquet_is_cached(self, patch):
@@ -534,7 +527,7 @@ class TestOpenMLDataset(TestBase):
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.dataset_id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], dataset.dataset_id),
+            f"collected from {__file__.split('/')[-1]}: {dataset.dataset_id}",
         )
         assert isinstance(dataset.dataset_id, int)
 
@@ -556,7 +549,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
-            "%s-UploadTestWithURL" % self._get_sentinel(),
+            f"{self._get_sentinel()}-UploadTestWithURL",
             "test",
             data_format="arff",
             version=1,
@@ -565,7 +558,7 @@ class TestOpenMLDataset(TestBase):
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.dataset_id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], dataset.dataset_id),
+            f"collected from {__file__.split('/')[-1]}: {dataset.dataset_id}",
         )
         assert isinstance(dataset.dataset_id, int)
 
@@ -582,7 +575,7 @@ class TestOpenMLDataset(TestBase):
     @pytest.mark.flaky()
     def test_data_status(self):
         dataset = OpenMLDataset(
-            "%s-UploadTestWithURL" % self._get_sentinel(),
+            f"{self._get_sentinel()}-UploadTestWithURL",
             "test",
             "ARFF",
             version=1,
@@ -590,7 +583,7 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         did = dataset.id
 
         # admin key for test server (only adminds can activate datasets.
@@ -677,7 +670,7 @@ class TestOpenMLDataset(TestBase):
         attributes = [(f"col_{i}", "REAL") for i in range(data.shape[1])]
 
         dataset = create_dataset(
-            name="%s-NumPy_testing_dataset" % self._get_sentinel(),
+            name=f"{self._get_sentinel()}-NumPy_testing_dataset",
             description="Synthetic dataset created from a NumPy array",
             creator="OpenML tester",
             contributor=None,
@@ -697,7 +690,7 @@ class TestOpenMLDataset(TestBase):
 
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
 
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
@@ -732,7 +725,7 @@ class TestOpenMLDataset(TestBase):
         ]
 
         dataset = create_dataset(
-            name="%s-ModifiedWeather" % self._get_sentinel(),
+            name=f"{self._get_sentinel()}-ModifiedWeather",
             description=("Testing dataset upload when the data is a list of lists"),
             creator="OpenML test",
             contributor=None,
@@ -752,7 +745,7 @@ class TestOpenMLDataset(TestBase):
 
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
         ), "Uploaded ARFF does not match original one"
@@ -774,7 +767,7 @@ class TestOpenMLDataset(TestBase):
         ]
 
         xor_dataset = create_dataset(
-            name="%s-XOR" % self._get_sentinel(),
+            name=f"{self._get_sentinel()}-XOR",
             description="Dataset representing the XOR operation",
             creator=None,
             contributor=None,
@@ -793,7 +786,7 @@ class TestOpenMLDataset(TestBase):
         xor_dataset.publish()
         TestBase._mark_entity_for_removal("data", xor_dataset.id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], xor_dataset.id),
+            f"collected from {__file__.split('/')[-1]}: {xor_dataset.id}",
         )
         assert (
             _get_online_dataset_arff(xor_dataset.id) == xor_dataset._dataset
@@ -806,7 +799,7 @@ class TestOpenMLDataset(TestBase):
         sparse_data = [{0: 0.0}, {1: 1.0, 2: 1.0}, {0: 1.0, 2: 1.0}, {0: 1.0, 1: 1.0}]
 
         xor_dataset = create_dataset(
-            name="%s-XOR" % self._get_sentinel(),
+            name=f"{self._get_sentinel()}-XOR",
             description="Dataset representing the XOR operation",
             creator=None,
             contributor=None,
@@ -825,7 +818,7 @@ class TestOpenMLDataset(TestBase):
         xor_dataset.publish()
         TestBase._mark_entity_for_removal("data", xor_dataset.id)
         TestBase.logger.info(
-            "collected from {}: {}".format(__file__.split("/")[-1], xor_dataset.id),
+            f"collected from {__file__.split('/')[-1]}: {xor_dataset.id}",
         )
         assert (
             _get_online_dataset_arff(xor_dataset.id) == xor_dataset._dataset
@@ -924,7 +917,7 @@ class TestOpenMLDataset(TestBase):
         df["windy"] = df["windy"].astype("bool")
         df["play"] = df["play"].astype("category")
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -953,7 +946,7 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
         ), "Uploaded ARFF does not match original one"
@@ -989,7 +982,7 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
         ), "Uploaded ARFF does not match original one"
@@ -1021,7 +1014,7 @@ class TestOpenMLDataset(TestBase):
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         downloaded_data = _get_online_dataset_arff(dataset.id)
         assert downloaded_data == dataset._dataset, "Uploaded ARFF does not match original one"
         assert "@ATTRIBUTE rnd_str {a, b, c, d, e, f, g}" in downloaded_data
@@ -1048,7 +1041,7 @@ class TestOpenMLDataset(TestBase):
         df["windy"] = df["windy"].astype("bool")
         df["play"] = df["play"].astype("category")
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1149,7 +1142,7 @@ class TestOpenMLDataset(TestBase):
         df["windy"] = df["windy"].astype("bool")
         df["play"] = df["play"].astype("category")
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1184,7 +1177,7 @@ class TestOpenMLDataset(TestBase):
         # publish dataset
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.id)
-        TestBase.logger.info("collected from {}: {}".format(__file__.split("/")[-1], dataset.id))
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         # test if publish was successful
         assert isinstance(dataset.id, int)
 
@@ -1208,7 +1201,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_create_dataset_row_id_attribute_error(self):
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1246,7 +1239,7 @@ class TestOpenMLDataset(TestBase):
 
     def test_create_dataset_row_id_attribute_inference(self):
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1290,7 +1283,7 @@ class TestOpenMLDataset(TestBase):
             dataset.publish()
             TestBase._mark_entity_for_removal("data", dataset.id)
             TestBase.logger.info(
-                "collected from {}: {}".format(__file__.split("/")[-1], dataset.id),
+                f"collected from {__file__.split('/')[-1]}: {dataset.id}",
             )
             arff_dataset = arff.loads(_get_online_dataset_arff(dataset.id))
             arff_data = np.array(arff_dataset["data"], dtype=object)
@@ -1504,16 +1497,6 @@ class TestOpenMLDataset(TestBase):
             data_id=999999,
         )
 
-    @pytest.mark.production()
-    def test_get_dataset_parquet(self):
-        # Parquet functionality is disabled on the test server
-        # There is no parquet-copy of the test server yet.
-        openml.config.server = self.production_server
-        dataset = openml.datasets.get_dataset(61, download_data=True)
-        assert dataset._parquet_url is not None
-        assert dataset.parquet_file is not None
-        assert os.path.isfile(dataset.parquet_file)
-        assert dataset.data_file is None  # is alias for arff path
 
     @pytest.mark.production()
     def test_list_datasets_with_high_size_parameter(self):
@@ -1666,7 +1649,7 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
         df["windy"] = df["windy"].astype("bool")
         df["play"] = df["play"].astype("category")
         # meta-information
-        name = "%s-pandas_testing_dataset" % self._get_sentinel()
+        name = f"{self._get_sentinel()}-pandas_testing_dataset"
         description = "Synthetic dataset created from a Pandas DataFrame"
         creator = "OpenML tester"
         collection_date = "01-01-2018"
@@ -1942,6 +1925,16 @@ def test_get_dataset_with_invalid_id() -> None:
         assert e.value.code == 111
 
 
+def test__get_dataset_parquet_not_cached():
+    description = {
+        "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
+        "oml:id": "20",
+    }
+    path = _get_dataset_parquet(description, cache_directory=Path(openml.config.get_cache_directory()))
+    assert isinstance(path, Path), "_get_dataset_parquet returns a path"
+    assert path.is_file(), "_get_dataset_parquet returns path to real file"
+
+
 def test_read_features_from_xml_with_whitespace() -> None:
     from openml.datasets.dataset import _read_features
 
@@ -1950,3 +1943,18 @@ def test_read_features_from_xml_with_whitespace() -> None:
     )
     dict = _read_features(features_file)
     assert dict[1].nominal_values == [" - 50000.", " 50000+."]
+
+
+def test_get_dataset_parquet(requests_mock, test_files_directory):
+    # Parquet functionality is disabled on the test server
+    # There is no parquet-copy of the test server yet.
+    content_file = (
+            test_files_directory / "mock_responses" / "datasets" / "data_description_61.xml"
+    )
+    # While the mocked example is from production, unit tests by default connect to the test server.
+    requests_mock.get("https://test.openml.org/api/v1/xml/data/61", text=content_file.read_text())
+    dataset = openml.datasets.get_dataset(61, download_data=True)
+    assert dataset._parquet_url is not None
+    assert dataset.parquet_file is not None
+    assert os.path.isfile(dataset.parquet_file)
+    assert dataset.data_file is None  # is alias for arff path

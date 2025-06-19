@@ -94,3 +94,4 @@ dmypy.sock
 
 # Tests
 .pytest_cache
+.venv
