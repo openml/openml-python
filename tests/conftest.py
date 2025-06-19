@@ -320,3 +320,42 @@ def workdir(tmp_path):
     os.chdir(tmp_path)
     yield tmp_path
     os.chdir(original_cwd)
+    
+@pytest.fixture
+def mock_sparse_categorical_395(requests_mock, test_files_directory):
+    base_path = test_files_directory / "mock_responses" / "datasets" / "sparse_categorical_395"
+    
+    description_file = base_path / "description.xml"
+    requests_mock.get(
+        "https://www.openml.org/api/v1/xml/data/395",
+        text=description_file.read_text()
+    )
+    
+    data_file = base_path / "dataset.arff"
+    requests_mock.get(
+        "https://api.openml.org/data/v1/download/52507/re1.wc.sparse_arff",
+        text=data_file.read_text()
+    )
+    
+    feature_file = base_path / "features.xml"
+    requests_mock.get(
+        "https://www.openml.org/api/v1/xml/data/features/395",
+        text=feature_file.read_text()
+    )
+    yield
+    
+@pytest.fixture
+def mock_sparse_dataset(requests_mock, test_files_directory):
+    content_file = (
+        test_files_directory / "mock_responses" / "datasets" / "sparse_dataset" /"data_description.xml"
+    )
+    requests_mock.get("https://www.openml.org/api/v1/xml/data/4136", text=content_file.read_text())
+    
+    sparse_arff_file = (
+        test_files_directory / "mock_responses" / "datasets" / "sparse_dataset" /"sparse_arff.arff"
+    )
+    requests_mock.get("https://api.openml.org/data/v1/download/1681111/Dexter.sparse_arff", text = sparse_arff_file.read_text())
+    
+    
+    yield
+

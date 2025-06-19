@@ -340,21 +340,7 @@ class OpenMLDatasetTestOnTestServer(TestBase):
 
 
 @pytest.mark.production        
-def test_get_sparse_categorical_data_id_395(test_files_directory, requests_mock):
-    description_file = (
-        test_files_directory / "mock_responses" / "datasets" / "sparse_categorical_395" / "description.xml"
-    )
-    requests_mock.get("https://www.openml.org/api/v1/xml/data/395", text=description_file.read_text())
-    
-    data_file = (
-        test_files_directory / "mock_responses" / "datasets" / "sparse_categorical_395" / "dataset.arff"
-    )
-    requests_mock.get("https://api.openml.org/data/v1/download/52507/re1.wc.sparse_arff", text=data_file.read_text())
-    
-    feature_file = (
-        test_files_directory / "mock_responses" / "datasets" / "sparse_categorical_395" / "features.xml"
-    )
-    requests_mock.get("https://www.openml.org/api/v1/xml/data/features/395", text=feature_file.read_text())
+def test_get_sparse_categorical_data_id_395(mock_sparse_categorical_395):
     
     dataset = openml.datasets.get_dataset(395, download_data=True)
     feature = dataset.features[3758]
@@ -366,21 +352,13 @@ def test_get_sparse_categorical_data_id_395(test_files_directory, requests_mock)
     assert len(feature.nominal_values) == 25
 
 @pytest.mark.production
-def test_get_sparse_dataset_rowid_and_ignore_and_target(requests_mock, test_files_directory):
-    content_file = (
-        test_files_directory / "mock_responses" / "datasets" / "sparse_dataset" /"data_description.xml"
-    )
-    requests_mock.get("https://www.openml.org/api/v1/xml/data/4136", text=content_file.read_text())
+def test_get_sparse_dataset_rowid_and_ignore_and_target(mock_sparse_dataset):
+    
     sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
     
     # TODO: re-add row_id and ignore attributes
     sparse_dataset.ignore_attribute = ["V2"]
     sparse_dataset.row_id_attribute = ["V5"]
-    
-    sparse_arff_file = (
-        test_files_directory / "mock_responses" / "datasets" / "sparse_dataset" /"sparse_arff.arff"
-    )
-    requests_mock.get("https://api.openml.org/data/v1/download/1681111/Dexter.sparse_arff", text = sparse_arff_file.read_text())
     
     X, y, categorical, _ = sparse_dataset.get_data(
         target="class",
@@ -397,17 +375,10 @@ def test_get_sparse_dataset_rowid_and_ignore_and_target(requests_mock, test_file
     assert y.shape == (10,)
 
 @pytest.mark.production
-def test_get_sparse_dataset_dataframe(requests_mock, test_files_directory):
-    content_file = (
-        test_files_directory / "mock_responses" / "datasets" / "sparse_dataset" /"data_description.xml"
-    )
-    requests_mock.get("https://www.openml.org/api/v1/xml/data/4136", text=content_file.read_text())
+def test_get_sparse_dataset_dataframe(mock_sparse_dataset):
+   
     sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
     
-    sparse_arff_file = (
-        test_files_directory / "mock_responses" / "datasets" / "sparse_dataset" /"sparse_arff.arff"
-    )
-    requests_mock.get("https://api.openml.org/data/v1/download/1681111/Dexter.sparse_arff", text = sparse_arff_file.read_text())
     rval, *_ = sparse_dataset.get_data()
     
     assert isinstance(rval, pd.DataFrame)
@@ -418,18 +389,9 @@ def test_get_sparse_dataset_dataframe(requests_mock, test_files_directory):
     assert rval.shape == (10, 11)
     
 @pytest.mark.production
-def test_get_sparse_dataset_dataframe_with_target(requests_mock, test_files_directory):
+def test_get_sparse_dataset_dataframe_with_target(mock_sparse_dataset):
     
-    content_file = (
-        test_files_directory / "mock_responses" / "datasets" / "sparse_dataset" /"data_description.xml"
-    )
-    requests_mock.get("https://www.openml.org/api/v1/xml/data/4136", text=content_file.read_text())
     sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
-    
-    sparse_arff_file = (
-        test_files_directory / "mock_responses" / "datasets" / "sparse_dataset" /"sparse_arff.arff"
-    )
-    requests_mock.get("https://api.openml.org/data/v1/download/1681111/Dexter.sparse_arff", text = sparse_arff_file.read_text())
     
     X, y, _, attribute_names = sparse_dataset.get_data(target="class")
 
