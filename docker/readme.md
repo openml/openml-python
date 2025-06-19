@@ -44,10 +44,10 @@ docker run -v PATH/TO/FILE:/openml/MY_SCRIPT.py openml/openml-python MY_SCRIPT.p
 You can run the unit tests by passing `test` as the first argument.
 It also requires a local or remote repository to be specified, which is explained 
 [below]((#using-local-or-remote-code). For this example, we specify to test the
-`develop` branch:
+`my-feature` branch:
 
 ```text
-docker run openml/openml-python test develop
+docker run openml/openml-python test my-feature 
 ```
 
 ### Building documentation
@@ -56,16 +56,16 @@ You can build the documentation by passing `doc` as the first argument,
 you should [mount]((https://docs.docker.com/storage/bind-mounts/#start-a-container-with-a-bind-mount)) 
 an output directory in which the docs will be stored. You also need to provide a remote
 or local repository as explained in [the section below]((#using-local-or-remote-code).
-In this example, we build documentation for the `develop` branch.
+In this example, we build documentation for the `my-feature` branch.
 On Windows:
 
 ```text
-    docker run --mount type=bind,source="E:\\files/output",destination="/output" openml/openml-python doc develop
+    docker run --mount type=bind,source="E:\\files/output",destination="/output" openml/openml-python doc my-feature 
 ```
 
 on Linux:
 ```text
-    docker run --mount type=bind,source="./output",destination="/output" openml/openml-python doc develop
+    docker run --mount type=bind,source="./output",destination="/output" openml/openml-python doc my-feature 
 ```
     
 see [the section below]((#using-local-or-remote-code) for running against local changes
