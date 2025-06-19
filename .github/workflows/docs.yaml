@@ -43,6 +43,7 @@ jobs:
           # mkdocs gh-deploy --force
           git config user.name doc-bot
           git config user.email doc-bot@openml.com
+          git fetch --tags
           current_version=$(git tag | sort --version-sort | tail -n 1)
           # This block will rename previous retitled versions
           retitled_versions=$(mike list -j | jq ".[] | select(.title != .version) | .version" | tr -d '"')
