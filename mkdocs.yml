@@ -1,0 +1,45 @@
+site_name: openml-python
+theme:
+  name: material
+  features:
+    - content.code.copy
+  palette:
+    - scheme: default
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - index.md
+  - Code Reference: reference/
+  - Examples: examples/
+  - Usage: usage.md
+  - Contributing: contributing.md
+  - Extensions: extensions.md
+  - Changelog: progress.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.snippets
+  - attr_list
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search
+  - autorefs
+  - section-index
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+  - gen-files:
+      scripts:
+        - scripts/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - mkdocs-jupyter:
+      theme: light

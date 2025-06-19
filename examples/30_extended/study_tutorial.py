@@ -1,50 +1,58 @@
-"""
-=================
-Benchmark studies
-=================
-How to list, download and upload benchmark studies.
-In contrast to `benchmark suites <https://docs.openml.org/benchmark/#benchmarking-suites>`_ which
-hold a list of tasks, studies hold a list of runs. As runs contain all information on flows and
-tasks, all required information about a study can be retrieved.
-"""
-############################################################################
+# %% [markdown]
+# # Benchmark studies
+# How to list, download and upload benchmark studies.
+# In contrast to
+# [benchmark suites](https://docs.openml.org/benchmark/#benchmarking-suites) which
+# hold a list of tasks, studies hold a list of runs. As runs contain all information on flows and
+# tasks, all required information about a study can be retrieved.
 
-# License: BSD 3-Clause
-
+# %%
 import uuid
 
 from sklearn.ensemble import RandomForestClassifier
 
 import openml
 
-############################################################################
-# Listing studies
-# ***************
 
-studies = openml.study.list_studies(status="all")
+# %% [markdown]
+# ##  Listing studies
+#
+# * Use the output_format parameter to select output type
+# * Default gives ``dict``, but we'll use ``dataframe`` to obtain an
+#   easier-to-work-with data structure
+
+# %%
+studies = openml.study.list_studies(output_format="dataframe", status="all")
 print(studies.head(n=10))
 
 
-############################################################################
-# Downloading studies
-# ===================
+# %% [markdown]
+# ## Downloading studies
 
-############################################################################
+# %% [markdown]
 # This is done based on the study ID.
+
+# %%
 study = openml.study.get_study(123)
 print(study)
 
-############################################################################
+# %% [markdown]
 # Studies also features a description:
+
+# %%
 print(study.description)
 
-############################################################################
+# %% [markdown]
 # Studies are a container for runs:
+
+# %%
 print(study.runs)
 
-############################################################################
+# %% [markdown]
 # And we can use the evaluation listing functionality to learn more about
 # the evaluations available for the conducted runs:
+
+# %%
 evaluations = openml.evaluations.list_evaluations(
     function="predictive_accuracy",
     study=study.study_id,
@@ -52,21 +60,23 @@ evaluations = openml.evaluations.list_evaluations(
 )
 print(evaluations.head())
 
-############################################################################
+# %% [markdown]
 # We'll use the test server for the rest of this tutorial.
 #
 # .. warning::
 #    .. include:: ../../test_server_usage_warning.txt
+
+# %%
 openml.config.start_using_configuration_for_example()
 
-############################################################################
-# Uploading studies
-# =================
+# %% [markdown]
+# ## Uploading studies
 #
 # Creating a study is as simple as creating any kind of other OpenML entity.
 # In this examples we'll create a few runs for the OpenML-100 benchmark
 # suite which is available on the OpenML test server.
 
+# %%
 # Model to be used
 clf = RandomForestClassifier()
 
@@ -100,5 +110,6 @@ new_study.publish()
 print(new_study)
 
 
-############################################################################
+# %%
 openml.config.stop_using_configuration_for_example()
+# License: BSD 3-Clause

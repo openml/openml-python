@@ -1,32 +1,28 @@
-"""
-Perrone et al. (2018)
-=====================
+# %% [markdown]
+# # Perrone et al. (2018)
+#
+# A tutorial on how to build a surrogate model based on OpenML data as done for *Scalable
+# Hyperparameter Transfer Learning* by Perrone et al..
+#
+# ## Publication
+#
+# | Scalable Hyperparameter Transfer Learning
+# | Valerio Perrone and Rodolphe Jenatton and Matthias Seeger and Cedric Archambeau
+# | In *Advances in Neural Information Processing Systems 31*, 2018
+# | Available at https://papers.nips.cc/paper/7917-scalable-hyperparameter-transfer-learning.pdf
+#
+# This example demonstrates how OpenML runs can be used to construct a surrogate model.
+#
+# In the following section, we shall do the following:
+#
+# * Retrieve tasks and flows as used in the experiments by Perrone et al. (2018).
+# * Build a tabular data by fetching the evaluations uploaded to OpenML.
+# * Impute missing values and handle categorical data before building a Random Forest model that
+#   maps hyperparameter values to the area under curve score.
 
-A tutorial on how to build a surrogate model based on OpenML data as done for *Scalable
-Hyperparameter Transfer Learning* by Perrone et al..
 
-Publication
-~~~~~~~~~~~
-
-| Scalable Hyperparameter Transfer Learning
-| Valerio Perrone and Rodolphe Jenatton and Matthias Seeger and Cedric Archambeau
-| In *Advances in Neural Information Processing Systems 31*, 2018
-| Available at https://papers.nips.cc/paper/7917-scalable-hyperparameter-transfer-learning.pdf
-
-This example demonstrates how OpenML runs can be used to construct a surrogate model.
-
-In the following section, we shall do the following:
-
-* Retrieve tasks and flows as used in the experiments by Perrone et al. (2018).
-* Build a tabular data by fetching the evaluations uploaded to OpenML.
-* Impute missing values and handle categorical data before building a Random Forest model that
-  maps hyperparameter values to the area under curve score.
-"""
-
-############################################################################
-
-# License: BSD 3-Clause
-
+# %%
+import openml
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -40,11 +36,13 @@ from sklearn.preprocessing import OneHotEncoder
 import openml
 
 flow_type = "svm"  # this example will use the smaller svm flow evaluations
-############################################################################
+
+# %% [markdown]
 # The subsequent functions are defined to fetch tasks, flows, evaluations and preprocess them into
 # a tabular format that can be used to build models.
 
 
+# %%
 def fetch_evaluations(run_full=False, flow_type="svm", metric="area_under_roc_curve"):
     """
     Fetch a list of evaluations based on the flows and tasks used in the experiments.
@@ -154,25 +152,26 @@ def list_categorical_attributes(flow_type="svm"):
     return ["booster"]
 
 
-#############################################################################
+# %% [markdown]
 # Fetching the data from OpenML
 # *****************************
 # Now, we read all the tasks and evaluations for them and collate into a table.
 # Here, we are reading all the tasks and evaluations for the SVM flow and
 # pre-processing all retrieved evaluations.
 
+# %%
 eval_df, task_ids, flow_id = fetch_evaluations(run_full=False, flow_type=flow_type)
 X, y = create_table_from_evaluations(eval_df, flow_type=flow_type)
 print(X.head())
 print("Y : ", y[:5])
 
-#############################################################################
-# Creating pre-processing and modelling pipelines
-# ***********************************************
+# %% [markdown]
+# ## Creating pre-processing and modelling pipelines
 # The two primary tasks are to impute the missing values, that is, account for the hyperparameters
 # that are not available with the runs from OpenML. And secondly, to handle categorical variables
 # using One-hot encoding prior to modelling.
 
+# %%
 # Separating data into categorical and non-categorical (numeric for this example) columns
 cat_cols = list_categorical_attributes(flow_type=flow_type)
 num_cols = list(set(X.columns) - set(cat_cols))
@@ -201,13 +200,13 @@ clf = RandomForestRegressor(n_estimators=50)
 model = Pipeline(steps=[("preprocess", ct), ("surrogate", clf)])
 
 
-#############################################################################
-# Building a surrogate model on a task's evaluation
-# *************************************************
+# %% [markdown]
+# ## Building a surrogate model on a task's evaluation
 # The same set of functions can be used for a single task to retrieve a singular table which can
 # be used for the surrogate model construction. We shall use the SVM flow here to keep execution
 # time simple and quick.
 
+# %%
 # Selecting a task for the surrogate
 task_id = task_ids[-1]
 print("Task ID : ", task_id)
@@ -218,10 +217,8 @@ y_pred = model.predict(X)
 
 print(f"Training RMSE : {mean_squared_error(y, y_pred):.5}")
 
-
-#############################################################################
-# Evaluating the surrogate model
-# ******************************
+# %% [markdown]
+# ## Evaluating the surrogate model
 # The surrogate model built from a task's evaluations fetched from OpenML will be put into
 # trivial action here, where we shall randomly sample configurations and observe the trajectory
 # of the area under curve (auc) we can obtain from the surrogate we've built.
@@ -229,6 +226,7 @@ print(f"Training RMSE : {mean_squared_error(y, y_pred):.5}")
 # NOTE: This section is written exclusively for the SVM flow
 
 
+# %%
 # Sampling random configurations
 def random_sample_configurations(num_samples=100):
     colnames = ["cost", "degree", "gamma", "kernel"]
@@ -251,7 +249,7 @@ def random_sample_configurations(num_samples=100):
 configs = random_sample_configurations(num_samples=1000)
 print(configs)
 
-#############################################################################
+# %%
 preds = model.predict(configs)
 
 # tracking the maximum AUC obtained over the functions evaluations
@@ -264,3 +262,4 @@ plt.plot(regret)
 plt.title("AUC regret for Random Search on surrogate")
 plt.xlabel("Numbe of function evaluations")
 plt.ylabel("Regret")
+# License: BSD 3-Clause
