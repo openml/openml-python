@@ -191,22 +191,16 @@ Make sure to do this at least once before your first commit to check your setup 
 
 ## Contributing to the Documentation
 
-We are glad to accept any sort of documentation: function docstrings,
-reStructuredText documents, tutorials, etc.
-reStructuredText documents live in the source code repository under the
-doc/ directory.
+We welcome all forms of documentation contributions — whether it's Markdown docstrings, tutorials, guides, or general improvements.
 
-You can edit the documentation using any text editor and then generate
-the HTML output by typing ``make html`` from the doc/ directory.
-The resulting HTML files will be placed in ``build/html/`` and are viewable in
-a web browser. See the ``README`` file in the ``doc/`` directory for more
-information.
+Our documentation is written either in Markdown or as a jupyter notebook and lives in the docs/ and examples/ directories of the source code repository.
 
-For building the documentation, you will need to install a few additional dependencies:
+To preview the documentation locally, you will need to install a few additional dependencies:
 ```bash
 uv pip install -e .[examples,docs]
 ```
 When dependencies are installed, run
 ```bash
-sphinx-build -b html doc YOUR_PREFERRED_OUTPUT_DIRECTORY
+mkdocs serve
 ```
+This will open a preview of the website.
