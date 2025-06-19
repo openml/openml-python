@@ -278,65 +278,64 @@ class OpenMLDatasetTest(TestBase):
         self.assertNotEqual(self.titanic, "Wrong_object")
 
 
-class OpenMLDatasetTestOnTestServer(TestBase):
-    def setUp(self):
-        super().setUp()
-        # longley, really small dataset
-        self.dataset = openml.datasets.get_dataset(125, download_data=False)
+def test_tagging():
+    dataset = openml.datasets.get_dataset(125, download_data=False)
 
-    def test_tagging(self):
-        # tags can be at most 64 alphanumeric (+ underscore) chars
-        unique_indicator = str(time()).replace(".", "")
-        tag = f"test_tag_OpenMLDatasetTestOnTestServer_{unique_indicator}"
-        datasets = openml.datasets.list_datasets(tag=tag)
-        assert datasets.empty
-        self.dataset.push_tag(tag)
-        datasets = openml.datasets.list_datasets(tag=tag)
-        assert len(datasets) == 1
-        assert 125 in datasets["did"]
-        self.dataset.remove_tag(tag)
-        datasets = openml.datasets.list_datasets(tag=tag)
-        assert datasets.empty
+    # tags can be at most 64 alphanumeric (+ underscore) chars
+    unique_indicator = str(time()).replace(".", "")
+    tag = f"test_tag_OpenMLDatasetTestOnTestServer_{unique_indicator}"
+    datasets = openml.datasets.list_datasets(tag=tag)
+    assert datasets.empty
+    dataset.push_tag(tag)
+    datasets = openml.datasets.list_datasets(tag=tag)
+    assert len(datasets) == 1
+    assert 125 in datasets["did"]
+    dataset.remove_tag(tag)
+    datasets = openml.datasets.list_datasets(tag=tag)
+    assert datasets.empty
 
-    def test_get_feature_with_ontology_data_id_11(self):
-        # test on car dataset, which has built-in ontology references
-        dataset = openml.datasets.get_dataset(11)
-        assert len(dataset.features) == 7
-        assert len(dataset.features[1].ontologies) >= 2
-        assert len(dataset.features[2].ontologies) >= 1
-        assert len(dataset.features[3].ontologies) >= 1
+def test_get_feature_with_ontology_data_id_11():
+    # test on car dataset, which has built-in ontology references
+    dataset = openml.datasets.get_dataset(11)
+    assert len(dataset.features) == 7
+    assert len(dataset.features[1].ontologies) >= 2
+    assert len(dataset.features[2].ontologies) >= 1
+    assert len(dataset.features[3].ontologies) >= 1   
 
-    def test_add_remove_ontology_to_dataset(self):
-        did = 1
-        feature_index = 1
-        ontology = "https://www.openml.org/unittest/" + str(time())
-        openml.datasets.functions.data_feature_add_ontology(did, feature_index, ontology)
-        openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)
+def test_add_remove_ontology_to_dataset():
+    did = 1
+    feature_index = 1
+    ontology = "https://www.openml.org/unittest/" + str(time())
+    openml.datasets.functions.data_feature_add_ontology(did, feature_index, ontology)
+    openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)    
 
-    def test_add_same_ontology_multiple_features(self):
-        did = 1
-        ontology = "https://www.openml.org/unittest/" + str(time())
+def test_add_same_ontology_multiple_features():
+    did = 1
+    ontology = "https://www.openml.org/unittest/" + str(time())
 
-        for i in range(3):
-            openml.datasets.functions.data_feature_add_ontology(did, i, ontology)
+    for i in range(3):
+        openml.datasets.functions.data_feature_add_ontology(did, i, ontology)    
 
-    def test_add_illegal_long_ontology(self):
-        did = 1
-        ontology = "http://www.google.com/" + ("a" * 257)
-        try:
-            openml.datasets.functions.data_feature_add_ontology(did, 1, ontology)
-            assert False
-        except openml.exceptions.OpenMLServerException as e:
-            assert e.code == 1105
 
-    def test_add_illegal_url_ontology(self):
-        did = 1
-        ontology = "not_a_url" + str(time())
-        try:
-            openml.datasets.functions.data_feature_add_ontology(did, 1, ontology)
-            assert False
-        except openml.exceptions.OpenMLServerException as e:
-            assert e.code == 1106
+def test_add_illegal_long_ontology():
+    did = 1
+    ontology = "http://www.google.com/" + ("a" * 257)
+    try:
+        openml.datasets.functions.data_feature_add_ontology(did, 1, ontology)
+        assert False
+    except openml.exceptions.OpenMLServerException as e:
+        assert e.code == 1105
+    
+
+
+def test_add_illegal_url_ontology():
+    did = 1
+    ontology = "not_a_url" + str(time())
+    try:
+        openml.datasets.functions.data_feature_add_ontology(did, 1, ontology)
+        assert False
+    except openml.exceptions.OpenMLServerException as e:
+        assert e.code == 1106
 
 
 @pytest.mark.production()
