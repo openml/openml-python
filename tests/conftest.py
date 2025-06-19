@@ -38,6 +38,7 @@ import openml_sklearn
 import openml
 from openml.testing import TestBase
 
+import inspect
 
 # creating logger for unit test file deletion status
 logger = logging.getLogger("unit_tests")
@@ -293,3 +294,17 @@ def with_test_cache(test_files_directory, request):
     openml.config.set_root_cache_directory(_root_cache_directory)
     if tmp_cache.exists():
         shutil.rmtree(tmp_cache)
+        
+        
+
+@pytest.fixture
+def static_cache_dir():
+    
+    return Path(__file__).parent / "files" 
+
+@pytest.fixture
+def workdir(tmp_path):
+    original_cwd = Path.cwd()
+    os.chdir(tmp_path)
+    yield tmp_path
+    os.chdir(original_cwd)

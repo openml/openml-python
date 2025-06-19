@@ -7,27 +7,44 @@ In this tutorial, we walk through how to conduct hyperparameter optimization exp
 """
 ############################################################################
 # Please make sure to install the dependencies with:
-# ``pip install openml optunahub hebo`` and ``pip install --upgrade pymoo``
+# ``pip install "openml>=0.15.1" plotly``
 # Then we import all the necessary modules.
 
 # License: BSD 3-Clause
 
+import logging
+
+import optuna
+
 import openml
 from openml.extensions.sklearn import cat
 from openml.extensions.sklearn import cont
-import optuna
-import optunahub
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
-# Set your openml api key if you want to publish the run
+
+logger = logging.Logger(name="Experiment Logger", level=1)
+
+# Set your openml api key if you want to upload your results to OpenML (eg:
+# https://openml.org/search?type=run&sort=date) . To get one, simply make an
+# account (you don't need one for anything else, just to upload your results),
+# go to your profile and select the API-KEY.
+# Or log in, and navigate to https://www.openml.org/auth/api-key
 openml.config.apikey = ""
 ############################################################################
 # Prepare for preprocessors and an OpenML task
 # ============================================
+
+# OpenML contains several key concepts which it needs to make machine learning research shareable.
+# A machine learning experiment consists of one or several runs, which describe the performance of
+# an algorithm (called a flow in OpenML), its hyperparameter settings (called a setup) on a task.
+# A Task is the combination of a dataset, a split and an evaluation metric We choose a dataset from
+# OpenML, (https://www.openml.org/d/1464) and a subsequent task (https://www.openml.org/t/10101) To
+# make your own dataset and task, please refer to
+# https://openml.github.io/openml-python/main/examples/30_extended/create_upload_tutorial.html
 
 # https://www.openml.org/search?type=study&study_type=task&id=218
 task_id = 10101
@@ -41,13 +58,19 @@ numerical_preproc = ("numerical", SimpleImputer(strategy="median"), cont)
 preproc = ColumnTransformer([categorical_preproc, numerical_preproc])
 
 ############################################################################
-# Define a pipeline for the hyperparameter optimization
+# Define a pipeline for the hyperparameter optimization (this is standark for Optuna)
 # =====================================================
 
-# Since we use `OptunaHub <https://hub.optuna.org/>`__ for the benchmarking of hyperparameter optimization,
+# Optuna explanation
 # we follow the `Optuna <https://github.com/optuna/optuna/>`__ search space design.
-# We can simply pass the parametrized classifier to `run_model_on_task` to obtain the performance of the pipeline
+
+# OpenML runs
+# We can simply pass the parametrized classifier to `run_model_on_task` to obtain the performance
+# of the pipeline
 # on the specified OpenML task.
+# Do you want to share your results along with an easily reproducible pipeline, you can set an API
+# key and just upload your results.
+# You can find more examples on https://www.openml.org/
 
 
 def objective(trial: optuna.Trial) -> Pipeline:
@@ -57,47 +80,37 @@ def objective(trial: optuna.Trial) -> Pipeline:
         random_state=seed,
     )
     pipe = Pipeline(steps=[("preproc", preproc), ("model", clf)])
+    logger.log(1, f"Running pipeline - {pipe}")
     run = openml.runs.run_model_on_task(pipe, task=task_id, avoid_duplicate_runs=False)
+
+    logger.log(1, f"Model has been trained - {run}")
     if openml.config.apikey != "":
         try:
             run.publish()
+
+            logger.log(1, f"Run was uploaded to - {run.openml_url}")
         except Exception as e:
-            print(f"Could not publish run - {e}")
+            logger.log(1, f"Could not publish run - {e}")
     else:
-        print(
-            "If you want to publish your results to OpenML, please set an apikey using `openml.config.apikey = ''`"
+        logger.log(
+            0,
+            "If you want to publish your results to OpenML, please set an apikey",
         )
     accuracy = max(run.fold_evaluations["predictive_accuracy"][0].values())
+    logger.log(0, f"Accuracy {accuracy}")
+
     return accuracy
 
 
 ############################################################################
-# Load a sampler from OptunaHub
-# =============================
-
-# OptunaHub is a feature-sharing plotform for hyperparameter optimization methods.
-# For example, we load a state-of-the-art algorithm (`HEBO <https://github.com/huawei-noah/HEBO/tree/master/HEBO>`__
-# , the winning solution of `NeurIPS 2020 Black-Box Optimisation Challenge <https://bbochallenge.com/leaderboard/>`__)
-# from OptunaHub here.
-
-sampler = optunahub.load_module("samplers/hebo").HEBOSampler(seed=seed)
-
-############################################################################
 # Optimize the pipeline
 # =====================
-
-# We now run the optimization. For more details about Optuna API,
-# please visit `the API reference <https://optuna.readthedocs.io/en/stable/reference/index.html>`__.
-
-study = optuna.create_study(direction="maximize", sampler=sampler)
+study = optuna.create_study(direction="maximize")
+logger.log(0, f"Study {study}")
 study.optimize(objective, n_trials=15)
 
 ############################################################################
 # Visualize the optimization history
 # ==================================
-
-# It is very simple to visualize the result by the Optuna visualization module.
-# For more details, please check `the API reference <https://optuna.readthedocs.io/en/stable/reference/visualization/index.html>`__.
-
 fig = optuna.visualization.plot_optimization_history(study)
 fig.show()

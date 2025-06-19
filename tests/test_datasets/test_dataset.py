@@ -15,6 +15,8 @@ from openml.datasets import OpenMLDataFeature, OpenMLDataset
 from openml.exceptions import PyOpenMLError
 from openml.testing import TestBase
 
+import pytest
+
 
 @pytest.mark.production()
 class OpenMLDatasetTest(TestBase):
@@ -398,61 +400,63 @@ class OpenMLDatasetTestSparse(TestBase):
         assert len(feature.nominal_values) == 25
 
 
-class OpenMLDatasetFunctionTest(TestBase):
-    @unittest.mock.patch("openml.datasets.dataset.pickle")
-    @unittest.mock.patch("openml.datasets.dataset._get_features_pickle_file")
-    def test__read_features(self, filename_mock, pickle_mock):
-        """Test we read the features from the xml if no cache pickle is available.
+def test__read_features(mocker, workdir, static_cache_dir):
+    """Test we read the features from the xml if no cache pickle is available.
+    This test also does some simple checks to verify that the features are read correctly
+    """
+    filename_mock = mocker.patch("openml.datasets.dataset._get_features_pickle_file")
+    pickle_mock = mocker.patch("openml.datasets.dataset.pickle")
 
-        This test also does some simple checks to verify that the features are read correctly
-        """
-        filename_mock.return_value = os.path.join(self.workdir, "features.xml.pkl")
-        pickle_mock.load.side_effect = FileNotFoundError
-        features = openml.datasets.dataset._read_features(
-            os.path.join(
-                self.static_cache_dir,
-                "org",
-                "openml",
-                "test",
-                "datasets",
-                "2",
-                "features.xml",
-            ),
-        )
-        assert isinstance(features, dict)
-        assert len(features) == 39
-        assert isinstance(features[0], OpenMLDataFeature)
-        assert features[0].name == "family"
-        assert len(features[0].nominal_values) == 9
-        # pickle.load is never called because the features pickle file didn't exist
-        assert pickle_mock.load.call_count == 0
-        assert pickle_mock.dump.call_count == 1
+    filename_mock.return_value = os.path.join(workdir, "features.xml.pkl")
+    pickle_mock.load.side_effect = FileNotFoundError
 
-    @unittest.mock.patch("openml.datasets.dataset.pickle")
-    @unittest.mock.patch("openml.datasets.dataset._get_qualities_pickle_file")
-    def test__read_qualities(self, filename_mock, pickle_mock):
-        """Test we read the qualities from the xml if no cache pickle is available.
+    features = openml.datasets.dataset._read_features(
+        os.path.join(
+            static_cache_dir,
+            "org",
+            "openml",
+            "test",
+            "datasets",
+            "2",
+            "features.xml",
+        ),
+    )
+    assert isinstance(features, dict)
+    assert len(features) == 39
+    assert isinstance(features[0], OpenMLDataFeature)
+    assert features[0].name == "family"
+    assert len(features[0].nominal_values) == 9
+    # pickle.load is never called because the features pickle file didn't exist
+    assert pickle_mock.load.call_count == 0
+    assert pickle_mock.dump.call_count == 1
 
-        This test also does some minor checks to ensure that the qualities are read correctly.
-        """
-        filename_mock.return_value = os.path.join(self.workdir, "qualities.xml.pkl")
-        pickle_mock.load.side_effect = FileNotFoundError
-        qualities = openml.datasets.dataset._read_qualities(
-            os.path.join(
-                self.static_cache_dir,
-                "org",
-                "openml",
-                "test",
-                "datasets",
-                "2",
-                "qualities.xml",
-            ),
-        )
-        assert isinstance(qualities, dict)
-        assert len(qualities) == 106
-        # pickle.load is never called because the qualities pickle file didn't exist
-        assert pickle_mock.load.call_count == 0
-        assert pickle_mock.dump.call_count == 1
+
+def test__read_qualities(static_cache_dir, workdir, mocker):
+    """Test we read the qualities from the xml if no cache pickle is available.
+    This test also does some minor checks to ensure that the qualities are read correctly.
+    """
+
+    filename_mock = mocker.patch("openml.datasets.dataset._get_qualities_pickle_file")
+    pickle_mock = mocker.patch("openml.datasets.dataset.pickle")
+
+    filename_mock.return_value=os.path.join(workdir, "qualities.xml.pkl")
+    pickle_mock.load.side_effect = FileNotFoundError
+
+    qualities = openml.datasets.dataset._read_qualities(
+        os.path.join(
+            static_cache_dir,
+            "org",
+            "openml",
+            "test",
+            "datasets",
+            "2",
+            "qualities.xml",
+        ),
+    )
+    assert isinstance(qualities, dict)
+    assert len(qualities) == 106
+    assert pickle_mock.load.call_count == 0
+    assert pickle_mock.dump.call_count == 1
 
 
 
