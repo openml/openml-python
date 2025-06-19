@@ -1,45 +1,54 @@
 # OpenML
 
-**Collaborative Machine Learning in Python**
+**The Python API for a World of Data and More**
 
 Welcome to the documentation of the OpenML Python API, a connector to
 the collaborative machine learning platform
-[OpenML.org](https://www.openml.org). The OpenML Python package allows
-to use datasets and tasks from OpenML together with scikit-learn and
-share the results online.
+[OpenML.org](https://www.openml.org). 
+OpenML-Python can download or upload data from OpenML, such as datasets
+and machine learning experiment results.
 
-## Example
+## :joystick: Minimal Examples
+
+Use the following code to get the [credit-g](https://www.openml.org/search?type=data&sort=runs&status=active&id=31) [dataset](https://docs.openml.org/concepts/data/):
 
 ```python
 import openml
-from sklearn import impute, tree, pipeline
 
-# Define a scikit-learn classifier or pipeline
-clf = pipeline.Pipeline(
-    steps=[
-        ('imputer', impute.SimpleImputer()),
-        ('estimator', tree.DecisionTreeClassifier())
-    ]
-)
-# Download the OpenML task for the pendigits dataset with 10-fold
-# cross-validation.
-task = openml.tasks.get_task(32)
-# Run the scikit-learn model on the task.
-run = openml.runs.run_model_on_task(clf, task)
-# Publish the experiment on OpenML (optional, requires an API key.
-# You can get your own API key by signing up to OpenML.org)
-run.publish()
-print(f'View the run online: {run.openml_url}')
+dataset = openml.datasets.get_dataset("credit-g") # or by ID get_dataset(31)
+X, y, categorical_indicator, attribute_names = dataset.get_data(target="class")
 ```
 
-Find more examples in the sidebar on the left.
+Get a [task](https://docs.openml.org/concepts/tasks/) for [supervised classification on credit-g](https://www.openml.org/search?type=task&id=31&source_data.data_id=31):
 
-## How to get OpenML for python
+```python
+import openml
 
-You can install the OpenML package via `pip` (we recommend using a virtual environment):
+task = openml.tasks.get_task(31)
+dataset = task.get_dataset()
+X, y, categorical_indicator, attribute_names = dataset.get_data(target=task.target_name)
+# get splits for the first fold of 10-fold cross-validation
+train_indices, test_indices = task.get_train_test_split_indices(fold=0)
+```
+
+Use an [OpenML benchmarking suite](https://docs.openml.org/concepts/benchmarking/) to get a curated list of machine-learning tasks:
+```python
+import openml
+
+suite = openml.study.get_suite("amlb-classification-all")  # Get a curated list of tasks for classification
+for task_id in suite.tasks:
+    task = openml.tasks.get_task(task_id)
+```
+Find more examples in the navbar at the top.
+
+## :magic_wand: Installation
+
+OpenML-Python is supported on Python 3.8 - 3.13 and is available on Linux, MacOS, and Windows.
+
+You can install OpenML-Python with:
 
 ```bash
-python -m pip install openml
+pip install openml
 ```
 
 For more advanced installation information, please see the
@@ -50,7 +59,7 @@ For more advanced installation information, please see the
 
 -   [OpenML documentation](https://docs.openml.org/)
 -   [OpenML client APIs](https://docs.openml.org/APIs/)
--   [OpenML developer guide](https://docs.openml.org/Contributing/)
+-   [OpenML developer guide](https://docs.openml.org/contributing/)
 -   [Contact information](https://www.openml.org/contact)
 -   [Citation request](https://www.openml.org/cite)
 -   [OpenML blog](https://medium.com/open-machine-learning)
@@ -59,7 +68,7 @@ For more advanced installation information, please see the
 ## Contributing
 
 Contribution to the OpenML package is highly appreciated. Please see the
-["Contributing"][contributing] page for more information.
+["Contributing"](contributing) page for more information.
 
 ## Citing OpenML-Python
 
