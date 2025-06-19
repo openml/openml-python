@@ -72,65 +72,11 @@ class OpenMLDatasetTest(TestBase):
         data = openml.datasets.OpenMLDataset(name="somename", description="a description")
         str(data)
 
-    def test_init_string_validation(self):
-        with pytest.raises(ValueError, match="Invalid symbols ' ' in name"):
-            openml.datasets.OpenMLDataset(name="some name", description="a description")
 
-        with pytest.raises(ValueError, match="Invalid symbols 'ï' in description"):
-            openml.datasets.OpenMLDataset(name="somename", description="a descriptïon")
 
-        with pytest.raises(ValueError, match="Invalid symbols 'ü' in citation"):
-            openml.datasets.OpenMLDataset(
-                name="somename",
-                description="a description",
-                citation="Something by Müller",
-            )
 
-    def test__unpack_categories_with_nan_likes(self):
-        # unpack_categories decodes numeric categorical values according to the header
-        # Containing a 'non' category in the header shouldn't lead to failure.
-        categories = ["a", "b", None, float("nan"), np.nan]
-        series = pd.Series([0, 1, None, float("nan"), np.nan, 1, 0])
-        clean_series = OpenMLDataset._unpack_categories(series, categories)
 
-        expected_values = ["a", "b", np.nan, np.nan, np.nan, "b", "a"]
-        self.assertListEqual(list(clean_series.values), expected_values)
-        self.assertListEqual(list(clean_series.cat.categories.values), list("ab"))
 
-    def test_get_data_pandas(self):
-        data, _, _, _ = self.titanic.get_data()
-        assert isinstance(data, pd.DataFrame)
-        assert data.shape[1] == len(self.titanic.features)
-        assert data.shape[0] == 1309
-        col_dtype = {
-            "pclass": "uint8",
-            "survived": "category",
-            "name": "object",
-            "sex": "category",
-            "age": "float64",
-            "sibsp": "uint8",
-            "parch": "uint8",
-            "ticket": "object",
-            "fare": "float64",
-            "cabin": "object",
-            "embarked": "category",
-            "boat": "object",
-            "body": "float64",
-            "home.dest": "object",
-        }
-        for col_name in data.columns:
-            assert data[col_name].dtype.name == col_dtype[col_name]
-
-        X, y, _, _ = self.titanic.get_data(
-            target=self.titanic.default_target_attribute,
-        )
-        assert isinstance(X, pd.DataFrame)
-        assert isinstance(y, pd.Series)
-        assert X.shape == (1309, 13)
-        assert y.shape == (1309,)
-        for col_name in X.columns:
-            assert X[col_name].dtype.name == col_dtype[col_name]
-        assert y.dtype.name == col_dtype["survived"]
 
     @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
     def test_get_data_boolean_pandas(self):
@@ -143,139 +89,224 @@ class OpenMLDatasetTest(TestBase):
         data, _, _, _ = self.pc4.get_data()
         assert data["c"].dtype.name == "category"
         assert set(data["c"].cat.categories) == {True, False}
+        
+        
+@pytest.mark.production        
+def test_init_string_validation():
+    with pytest.raises(ValueError, match="Invalid symbols ' ' in name"):
+        openml.datasets.OpenMLDataset(name="some name", description="a description")
 
-    def _check_expected_type(self, dtype, is_cat, col):
-        if is_cat:
-            expected_type = "category"
-        elif not col.isna().any() and (col.astype("uint8") == col).all():
-            expected_type = "uint8"
-        else:
-            expected_type = "float64"
+    with pytest.raises(ValueError, match="Invalid symbols 'ï' in description"):
+        openml.datasets.OpenMLDataset(name="somename", description="a descriptïon")
 
-        assert dtype.name == expected_type
-
-    @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
-    def test_get_data_with_rowid(self):
-        self.dataset.row_id_attribute = "condition"
-        rval, _, categorical, _ = self.dataset.get_data(include_row_id=True)
-        assert isinstance(rval, pd.DataFrame)
-        for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
-            self._check_expected_type(dtype, is_cat, rval[col])
-        assert rval.shape == (898, 39)
-        assert len(categorical) == 39
-
-        rval, _, categorical, _ = self.dataset.get_data()
-        assert isinstance(rval, pd.DataFrame)
-        for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
-            self._check_expected_type(dtype, is_cat, rval[col])
-        assert rval.shape == (898, 38)
-        assert len(categorical) == 38
-
-    @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
-    def test_get_data_with_target_pandas(self):
-        X, y, categorical, attribute_names = self.dataset.get_data(target="class")
-        assert isinstance(X, pd.DataFrame)
-        for dtype, is_cat, col in zip(X.dtypes, categorical, X):
-            self._check_expected_type(dtype, is_cat, X[col])
-        assert isinstance(y, pd.Series)
-        assert y.dtype.name == "category"
-
-        assert X.shape == (898, 38)
-        assert len(attribute_names) == 38
-        assert y.shape == (898,)
-
-        assert "class" not in attribute_names
-
-    def test_get_data_rowid_and_ignore_and_target(self):
-        self.dataset.ignore_attribute = ["condition"]
-        self.dataset.row_id_attribute = ["hardness"]
-        X, y, categorical, names = self.dataset.get_data(target="class")
-        assert X.shape == (898, 36)
-        assert len(categorical) == 36
-        cats = [True] * 3 + [False, True, True, False] + [True] * 23 + [False] * 3 + [True] * 3
-        self.assertListEqual(categorical, cats)
-        assert y.shape == (898,)
-
-    @pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
-    def test_get_data_with_ignore_attributes(self):
-        self.dataset.ignore_attribute = ["condition"]
-        rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=True)
-        for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
-            self._check_expected_type(dtype, is_cat, rval[col])
-        assert rval.shape == (898, 39)
-        assert len(categorical) == 39
-
-        rval, _, categorical, _ = self.dataset.get_data(include_ignore_attribute=False)
-        for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
-            self._check_expected_type(dtype, is_cat, rval[col])
-        assert rval.shape == (898, 38)
-        assert len(categorical) == 38
-
-    def test_get_data_with_nonexisting_class(self):
-        # This class is using the anneal dataset with labels [1, 2, 3, 4, 5, 'U']. However,
-        # label 4 does not exist and we test that the features 5 and 'U' are correctly mapped to
-        # indices 4 and 5, and that nothing is mapped to index 3.
-        _, y, _, _ = self.dataset.get_data("class")
-        assert list(y.dtype.categories) == ["1", "2", "3", "4", "5", "U"]
-
-    def test_get_data_corrupt_pickle(self):
-        # Lazy loaded dataset, populate cache.
-        self.iris.get_data()
-        # Corrupt pickle file, overwrite as empty.
-        with open(self.iris.data_pickle_file, "w") as fh:
-            fh.write("")
-        # Despite the corrupt file, the data should be loaded from the ARFF file.
-        # A warning message is written to the python logger.
-        xy, _, _, _ = self.iris.get_data()
-        assert isinstance(xy, pd.DataFrame)
-        assert xy.shape == (150, 5)
-
-    def test_lazy_loading_metadata(self):
-        # Initial Setup
-        did_cache_dir = openml.utils._create_cache_directory_for_id(
-            openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
-            2,
+    with pytest.raises(ValueError, match="Invalid symbols 'ü' in citation"):
+        openml.datasets.OpenMLDataset(
+            name="somename",
+            description="a description",
+            citation="Something by Müller",
         )
-        _compare_dataset = openml.datasets.get_dataset(
-            2,
-            download_data=False,
-            download_features_meta_data=True,
-            download_qualities=True,
-        )
-        change_time = os.stat(did_cache_dir).st_mtime
+        
+@pytest.mark.production        
+def test__unpack_categories_with_nan_likes():
+    # unpack_categories decodes numeric categorical values according to the header
+    # Containing a 'non' category in the header shouldn't lead to failure.
+    categories = ["a", "b", None, float("nan"), np.nan]
+    series = pd.Series([0, 1, None, float("nan"), np.nan, 1, 0])
+    clean_series = OpenMLDataset._unpack_categories(series, categories)
 
-        # Test with cache
-        _dataset = openml.datasets.get_dataset(
-            2,
-            download_data=False,
-            download_features_meta_data=False,
-            download_qualities=False,
-        )
-        assert change_time == os.stat(did_cache_dir).st_mtime
-        assert _dataset.features == _compare_dataset.features
-        assert _dataset.qualities == _compare_dataset.qualities
+    expected_values = ["a", "b", np.nan, np.nan, np.nan, "b", "a"]
+    assert list(clean_series.values) == expected_values
+    assert list(clean_series.cat.categories.values) == list("ab")
+    
 
-        # -- Test without cache
-        openml.utils._remove_cache_dir_for_id(
-            openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
-            did_cache_dir,
-        )
+@pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
+@pytest.mark.production
+def test_get_data_with_rowid():
+    dataset = openml.datasets.get_dataset(2, download_data=False)
+    dataset.row_id_attribute = "condition"
+    rval, _, categorical, _ = dataset.get_data(include_row_id=True)
+    assert isinstance(rval, pd.DataFrame)
+    for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
+        _check_expected_type(dtype, is_cat, rval[col])
+    assert rval.shape == (898, 39)
+    assert len(categorical) == 39
 
-        _dataset = openml.datasets.get_dataset(
-            2,
-            download_data=False,
-            download_features_meta_data=False,
-            download_qualities=False,
-        )
-        assert ["description.xml"] == os.listdir(did_cache_dir)
-        assert change_time != os.stat(did_cache_dir).st_mtime
-        assert _dataset.features == _compare_dataset.features
-        assert _dataset.qualities == _compare_dataset.qualities
+    rval, _, categorical, _ = dataset.get_data()
+    assert isinstance(rval, pd.DataFrame)
+    for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
+        _check_expected_type(dtype, is_cat, rval[col])
+    assert rval.shape == (898, 38)
+    assert len(categorical) == 38
 
-    def test_equality_comparison(self):
-        self.assertEqual(self.iris, self.iris)
-        self.assertNotEqual(self.iris, self.titanic)
-        self.assertNotEqual(self.titanic, "Wrong_object")
+@pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
+@pytest.mark.production
+def test_get_data_with_target_pandas():
+    dataset = openml.datasets.get_dataset(2, download_data=False)
+    X, y, categorical, attribute_names = dataset.get_data(target="class")
+    assert isinstance(X, pd.DataFrame)
+    for dtype, is_cat, col in zip(X.dtypes, categorical, X):
+        _check_expected_type(dtype, is_cat, X[col])
+    assert isinstance(y, pd.Series)
+    assert y.dtype.name == "category"
+
+    assert X.shape == (898, 38)
+    assert len(attribute_names) == 38
+    assert y.shape == (898,)
+
+    assert "class" not in attribute_names
+
+def _check_expected_type(dtype, is_cat, col):
+    if is_cat:
+        expected_type = "category"
+    elif not col.isna().any() and (col.astype("uint8") == col).all():
+        expected_type = "uint8"
+    else:
+        expected_type = "float64"
+
+    assert dtype.name == expected_type
+
+@pytest.mark.skip("https://github.com/openml/openml-python/issues/1157")
+@pytest.mark.production
+def test_get_data_with_ignore_attributes():
+    dataset = openml.datasets.get_dataset(2, download_data=False)
+    dataset.ignore_attribute = ["condition"]
+    rval, _, categorical, _ = dataset.get_data(include_ignore_attribute=True)
+    for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
+        _check_expected_type(dtype, is_cat, rval[col])
+    assert rval.shape == (898, 39)
+    assert len(categorical) == 39
+
+    rval, _, categorical, _ = dataset.get_data(include_ignore_attribute=False)
+    for dtype, is_cat, col in zip(rval.dtypes, categorical, rval):
+        _check_expected_type(dtype, is_cat, rval[col])
+    assert rval.shape == (898, 38)
+    assert len(categorical) == 38
+        
+        
+@pytest.mark.production 
+def test_get_data_pandas():
+    titanic = openml.datasets.get_dataset(40945, download_data=False)
+    data, _, _, _ = titanic.get_data()
+    assert isinstance(data, pd.DataFrame)
+    assert data.shape[1] == len(titanic.features)
+    assert data.shape[0] == 1309
+    col_dtype = {
+        "pclass": "uint8",
+        "survived": "category",
+        "name": "object",
+        "sex": "category",
+        "age": "float64",
+        "sibsp": "uint8",
+        "parch": "uint8",
+        "ticket": "object",
+        "fare": "float64",
+        "cabin": "object",
+        "embarked": "category",
+        "boat": "object",
+        "body": "float64",
+        "home.dest": "object",
+    }
+    for col_name in data.columns:
+        assert data[col_name].dtype.name == col_dtype[col_name]
+    
+    X, y, _, _ = titanic.get_data(
+        target=titanic.default_target_attribute,
+    )
+    assert isinstance(X, pd.DataFrame)
+    assert isinstance(y, pd.Series)
+    assert X.shape == (1309, 13)
+    assert y.shape == (1309,)
+    for col_name in X.columns:
+        assert X[col_name].dtype.name == col_dtype[col_name]
+    assert y.dtype.name == col_dtype["survived"]
+               
+@pytest.mark.production        
+def test_get_data_rowid_and_ignore_and_target():
+    dataset = openml.datasets.get_dataset(2, download_data=False)
+    dataset.ignore_attribute = ["condition"]
+    dataset.row_id_attribute = ["hardness"]
+    X, y, categorical, names = dataset.get_data(target="class")
+    assert X.shape == (898, 36)
+    assert len(categorical) == 36
+    cats = [True] * 3 + [False, True, True, False] + [True] * 23 + [False] * 3 + [True] * 3
+    assert categorical == cats
+    assert y.shape == (898,)        
+    
+@pytest.mark.production
+def test_get_data_with_nonexisting_class():
+    # This class is using the anneal dataset with labels [1, 2, 3, 4, 5, 'U']. However,
+    # label 4 does not exist and we test that the features 5 and 'U' are correctly mapped to
+    # indices 4 and 5, and that nothing is mapped to index 3.
+    dataset = openml.datasets.get_dataset(2, download_data=False)
+    _, y, _, _ = dataset.get_data("class")
+    assert list(y.dtype.categories) == ["1", "2", "3", "4", "5", "U"]
+    
+    
+@pytest.mark.production
+def test_get_data_corrupt_pickle():
+    # Lazy loaded dataset, populate cache.
+    iris = openml.datasets.get_dataset(61, download_data=False)
+    iris.get_data()
+    # Corrupt pickle file, overwrite as empty.
+    with open(iris.data_pickle_file, "w") as fh:
+        fh.write("")
+    # Despite the corrupt file, the data should be loaded from the ARFF file.
+    # A warning message is written to the python logger.
+    xy, _, _, _ = iris.get_data()
+    assert isinstance(xy, pd.DataFrame)
+    assert xy.shape == (150, 5)
+    
+@pytest.mark.production 
+def test_lazy_loading_metadata():
+    # Initial Setup
+    did_cache_dir = openml.utils._create_cache_directory_for_id(
+        openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
+        2,
+    )
+    _compare_dataset = openml.datasets.get_dataset(
+        2,
+        download_data=False,
+        download_features_meta_data=True,
+        download_qualities=True,
+    )
+    change_time = os.stat(did_cache_dir).st_mtime
+
+    # Test with cache
+    _dataset = openml.datasets.get_dataset(
+        2,
+        download_data=False,
+        download_features_meta_data=False,
+        download_qualities=False,
+    )
+    assert change_time == os.stat(did_cache_dir).st_mtime
+    assert _dataset.features == _compare_dataset.features
+    assert _dataset.qualities == _compare_dataset.qualities
+
+    # -- Test without cache
+    openml.utils._remove_cache_dir_for_id(
+        openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
+        did_cache_dir,
+    )
+
+    _dataset = openml.datasets.get_dataset(
+        2,
+        download_data=False,
+        download_features_meta_data=False,
+        download_qualities=False,
+    )
+    assert ["description.xml"] == os.listdir(did_cache_dir)
+    assert change_time != os.stat(did_cache_dir).st_mtime
+    assert _dataset.features == _compare_dataset.features
+    assert _dataset.qualities == _compare_dataset.qualities
+
+@pytest.mark.production 
+def test_equality_comparison(mock_iris_dataset, mock_titanic_dataset):
+    
+    iris = openml.datasets.get_dataset(61, download_data=False)
+    titanic = openml.datasets.get_dataset(40945, download_data=False)
+    assert iris == iris
+    assert iris != titanic
+    assert titanic != "Wrong_object"
 
 
 def test_tagging():

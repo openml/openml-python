@@ -308,3 +308,23 @@ def workdir(tmp_path):
     os.chdir(tmp_path)
     yield tmp_path
     os.chdir(original_cwd)
+    
+@pytest.fixture
+def mock_iris_dataset(requests_mock, test_files_directory):
+    """Fixture to provide the iris dataset."""
+    content_file = (
+        test_files_directory / "mock_responses" / "datasets" / "61" / "description.xml"
+    )
+    requests_mock.get("https://www.openml.org/api/v1/xml/data/61", text=content_file.read_text())
+    
+    yield
+    
+@pytest.fixture
+def mock_titanic_dataset(requests_mock, test_files_directory):
+    """Fixture to provide the titanic dataset."""
+    content_file = (
+        test_files_directory / "mock_responses" / "datasets" / "40945" / "description.xml"
+    )
+    requests_mock.get("https://www.openml.org/api/v1/xml/data/40945", text=content_file.read_text())
+    
+    yield
