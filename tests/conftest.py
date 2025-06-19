@@ -291,29 +291,15 @@ def with_test_cache(test_files_directory, request):
         shutil.rmtree(tmp_cache)
         
         
-def find_test_files_dir(start_path: Path, max_levels: int = 1) -> Path:
-    """
-    Starting from start_path, climb up to max_levels parents looking for 'files' directory.
-    Returns the Path to the 'files' directory if found.
-    Raises FileNotFoundError if not found within max_levels parents.
-    """
-    current = start_path.resolve()
-    for _ in range(max_levels):
-        candidate = current / "files"
-        if candidate.is_dir():
-            return candidate
-        current = current.parent
-    raise FileNotFoundError(f"Cannot find 'files' directory within {max_levels} levels up from {start_path}")
 
 @pytest.fixture
 def static_cache_dir():
-
-    start_path = Path(__file__).parent
-    return find_test_files_dir(start_path)
+    
+    return Path(__file__).parent / "files" 
 
 @pytest.fixture
 def workdir(tmp_path):
-    original_cwd = os.getcwd()
+    original_cwd = Path.cwd()
     os.chdir(tmp_path)
     yield tmp_path
     os.chdir(original_cwd)
