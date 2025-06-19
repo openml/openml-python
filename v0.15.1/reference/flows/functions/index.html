@@ -1,0 +1,3956 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../flow/">
+      
+      
+        <link rel="next" href="../../runs/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>functions - openml-python</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#openml.flows.functions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="openml-python" class="md-header__button md-logo" aria-label="openml-python" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            openml-python
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              functions
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="openml-python" class="md-nav__button md-logo" aria-label="openml-python" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    openml-python
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenML
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Code Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Code Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    openml
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            openml
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../__version__/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    __version__
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../_api_calls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    _api_calls
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    base
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    cli
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    config
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_6" id="__nav_2_1_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    datasets
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            datasets
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../datasets/data_feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    data_feature
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../datasets/dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    dataset
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../datasets/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_7" id="__nav_2_1_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    evaluations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_7">
+            <span class="md-nav__icon md-icon"></span>
+            evaluations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../evaluations/evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    evaluation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../evaluations/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_9" id="__nav_2_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    extensions
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            extensions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../extensions/extension_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    extension_interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../extensions/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_9_3" id="__nav_2_1_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    sklearn
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_1_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            sklearn
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../extensions/sklearn/extension/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    extension
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_10" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_10" id="__nav_2_1_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    flows
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_10_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_1_10">
+            <span class="md-nav__icon md-icon"></span>
+            flows
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    flow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      functions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.__list_flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      __list_flows
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.assert_flows_equal" class="md-nav__link">
+    <span class="md-ellipsis">
+      assert_flows_equal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.delete_flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete_flow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.flow_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      flow_exists
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.get_flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_flow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.get_flow_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_flow_id
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.list_flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      list_flows
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_11" id="__nav_2_1_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    runs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_11">
+            <span class="md-nav__icon md-icon"></span>
+            runs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../runs/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../runs/run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    run
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../runs/trace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    trace
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_12" id="__nav_2_1_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    setups
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_12">
+            <span class="md-nav__icon md-icon"></span>
+            setups
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setups/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setups/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_13" id="__nav_2_1_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    study
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_13">
+            <span class="md-nav__icon md-icon"></span>
+            study
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../study/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../study/study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    study
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_14" id="__nav_2_1_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    tasks
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_14">
+            <span class="md-nav__icon md-icon"></span>
+            tasks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/split/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    split
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/task/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    task
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    utils
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Examples
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    20_basic
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            20_basic
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/20_basic/introduction_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction tutorial &amp; Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/20_basic/simple_datasets_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Datasets
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/20_basic/simple_flows_and_runs_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Flows and Runs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/20_basic/simple_suites_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark suites
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    30_extended
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            30_extended
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/benchmark_with_optunahub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Prepare for preprocessors and an OpenML task
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/configure_logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/create_upload_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dataset upload tutorial
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/custom_flow_/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Creating and Using a Custom Flow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/datasets_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Datasets
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/fetch_evaluations_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Fetching Evaluations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/fetch_runtimes_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Preparing tasks and scikit-learn models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/flow_id_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Obtaining Flow IDs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/flows_and_runs_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Flows and Runs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/plot_svm_hyperparameters_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Plotting hyperparameter surfaces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/run_setup_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Run Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/study_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark studies
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/suites_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark suites
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/task_manual_iteration_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tasks: retrieving splits
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/30_extended/tasks_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tasks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    40_paper
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            40_paper
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/40_paper/2015_neurips_feurer_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Feurer et al. (2015)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/40_paper/2018_ida_strang_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Strang et al. (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/40_paper/2018_kdd_rijn_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    van Rijn and Hutter (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/40_paper/2018_neurips_perrone_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Perrone et al. (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../extensions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Extensions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../progress/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      functions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.__list_flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      __list_flows
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.assert_flows_equal" class="md-nav__link">
+    <span class="md-ellipsis">
+      assert_flows_equal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.delete_flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete_flow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.flow_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      flow_exists
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.get_flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_flow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.get_flow_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_flow_id
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.flows.functions.list_flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      list_flows
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>functions</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="openml.flows.functions"></a>
+    <div class="doc doc-contents first">
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.flows.functions.__list_flows" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">__list_flows</span><span class="p">(</span><span class="n">api_call</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Retrieve information about flows from OpenML API
+and parse it to a dictionary or a Pandas DataFrame.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>api_call</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Retrieves the information about flows.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>    The flows information in the specified output format.</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/flows/functions.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span>
+<span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span>
+<span class="normal"><a href="#__codelineno-0-330">330</a></span>
+<span class="normal"><a href="#__codelineno-0-331">331</a></span>
+<span class="normal"><a href="#__codelineno-0-332">332</a></span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span>
+<span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span>
+<span class="normal"><a href="#__codelineno-0-338">338</a></span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span>
+<span class="normal"><a href="#__codelineno-0-342">342</a></span>
+<span class="normal"><a href="#__codelineno-0-343">343</a></span>
+<span class="normal"><a href="#__codelineno-0-344">344</a></span>
+<span class="normal"><a href="#__codelineno-0-345">345</a></span>
+<span class="normal"><a href="#__codelineno-0-346">346</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="k">def</span><span class="w"> </span><span class="nf">__list_flows</span><span class="p">(</span><span class="n">api_call</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve information about flows from OpenML API</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    and parse it to a dictionary or a Pandas DataFrame.</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    api_call: str</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        Retrieves the information about flows.</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        The flows information in the specified output format.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="n">xml_string</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span><span class="n">api_call</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="n">flows_dict</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_string</span><span class="p">,</span> <span class="n">force_list</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;oml:flow&quot;</span><span class="p">,))</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="c1"># Minimalistic check if the XML is useful</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flows_dict</span><span class="p">[</span><span class="s2">&quot;oml:flows&quot;</span><span class="p">][</span><span class="s2">&quot;oml:flow&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">flows_dict</span><span class="p">[</span><span class="s2">&quot;oml:flows&quot;</span><span class="p">])</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">assert</span> <span class="n">flows_dict</span><span class="p">[</span><span class="s2">&quot;oml:flows&quot;</span><span class="p">][</span><span class="s2">&quot;@xmlns:oml&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;http://openml.org/openml&quot;</span><span class="p">,</span> <span class="n">flows_dict</span><span class="p">[</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="s2">&quot;oml:flows&quot;</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="p">][</span><span class="s2">&quot;@xmlns:oml&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="n">flows</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="k">for</span> <span class="n">flow_</span> <span class="ow">in</span> <span class="n">flows_dict</span><span class="p">[</span><span class="s2">&quot;oml:flows&quot;</span><span class="p">][</span><span class="s2">&quot;oml:flow&quot;</span><span class="p">]:</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="n">fid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">flow_</span><span class="p">[</span><span class="s2">&quot;oml:id&quot;</span><span class="p">])</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="n">flow</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">fid</span><span class="p">,</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>            <span class="s2">&quot;full_name&quot;</span><span class="p">:</span> <span class="n">flow_</span><span class="p">[</span><span class="s2">&quot;oml:full_name&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">flow_</span><span class="p">[</span><span class="s2">&quot;oml:name&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">flow_</span><span class="p">[</span><span class="s2">&quot;oml:version&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>            <span class="s2">&quot;external_version&quot;</span><span class="p">:</span> <span class="n">flow_</span><span class="p">[</span><span class="s2">&quot;oml:external_version&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="s2">&quot;uploader&quot;</span><span class="p">:</span> <span class="n">flow_</span><span class="p">[</span><span class="s2">&quot;oml:uploader&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="p">}</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="n">flows</span><span class="p">[</span><span class="n">fid</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">flows</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.flows.functions.assert_flows_equal" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">assert_flows_equal</span><span class="p">(</span><span class="n">flow1</span><span class="p">,</span> <span class="n">flow2</span><span class="p">,</span> <span class="n">ignore_parameter_values_on_older_children</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ignore_parameter_values</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ignore_custom_name_if_none</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check_description</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Check equality of two flows.</p>
+<p>Two flows are equal if their all keys which are not set by the server
+are equal, as well as all their parameters and components.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>flow1</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="openml.flows.OpenMLFlow" href="../#openml.flows.OpenMLFlow">OpenMLFlow</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flow2</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="openml.flows.OpenMLFlow" href="../#openml.flows.OpenMLFlow">OpenMLFlow</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>ignore_parameter_values_on_older_children</code></td>
+            <td>
+                  <code>str(optional)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If set to <code>OpenMLFlow.upload_date</code>, ignores parameters in a child
+flow if it's upload date predates the upload date of the parent flow.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>ignore_parameter_values</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to ignore parameter values when comparing flows.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>ignore_custom_name_if_none</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to ignore the custom name field if either flow has <code>custom_name</code> equal to <code>None</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>check_description</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to ignore matching of flow descriptions.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/flows/functions.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-363">363</a></span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span>
+<span class="normal"><a href="#__codelineno-0-366">366</a></span>
+<span class="normal"><a href="#__codelineno-0-367">367</a></span>
+<span class="normal"><a href="#__codelineno-0-368">368</a></span>
+<span class="normal"><a href="#__codelineno-0-369">369</a></span>
+<span class="normal"><a href="#__codelineno-0-370">370</a></span>
+<span class="normal"><a href="#__codelineno-0-371">371</a></span>
+<span class="normal"><a href="#__codelineno-0-372">372</a></span>
+<span class="normal"><a href="#__codelineno-0-373">373</a></span>
+<span class="normal"><a href="#__codelineno-0-374">374</a></span>
+<span class="normal"><a href="#__codelineno-0-375">375</a></span>
+<span class="normal"><a href="#__codelineno-0-376">376</a></span>
+<span class="normal"><a href="#__codelineno-0-377">377</a></span>
+<span class="normal"><a href="#__codelineno-0-378">378</a></span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span>
+<span class="normal"><a href="#__codelineno-0-380">380</a></span>
+<span class="normal"><a href="#__codelineno-0-381">381</a></span>
+<span class="normal"><a href="#__codelineno-0-382">382</a></span>
+<span class="normal"><a href="#__codelineno-0-383">383</a></span>
+<span class="normal"><a href="#__codelineno-0-384">384</a></span>
+<span class="normal"><a href="#__codelineno-0-385">385</a></span>
+<span class="normal"><a href="#__codelineno-0-386">386</a></span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span>
+<span class="normal"><a href="#__codelineno-0-388">388</a></span>
+<span class="normal"><a href="#__codelineno-0-389">389</a></span>
+<span class="normal"><a href="#__codelineno-0-390">390</a></span>
+<span class="normal"><a href="#__codelineno-0-391">391</a></span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span>
+<span class="normal"><a href="#__codelineno-0-393">393</a></span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span>
+<span class="normal"><a href="#__codelineno-0-395">395</a></span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span>
+<span class="normal"><a href="#__codelineno-0-397">397</a></span>
+<span class="normal"><a href="#__codelineno-0-398">398</a></span>
+<span class="normal"><a href="#__codelineno-0-399">399</a></span>
+<span class="normal"><a href="#__codelineno-0-400">400</a></span>
+<span class="normal"><a href="#__codelineno-0-401">401</a></span>
+<span class="normal"><a href="#__codelineno-0-402">402</a></span>
+<span class="normal"><a href="#__codelineno-0-403">403</a></span>
+<span class="normal"><a href="#__codelineno-0-404">404</a></span>
+<span class="normal"><a href="#__codelineno-0-405">405</a></span>
+<span class="normal"><a href="#__codelineno-0-406">406</a></span>
+<span class="normal"><a href="#__codelineno-0-407">407</a></span>
+<span class="normal"><a href="#__codelineno-0-408">408</a></span>
+<span class="normal"><a href="#__codelineno-0-409">409</a></span>
+<span class="normal"><a href="#__codelineno-0-410">410</a></span>
+<span class="normal"><a href="#__codelineno-0-411">411</a></span>
+<span class="normal"><a href="#__codelineno-0-412">412</a></span>
+<span class="normal"><a href="#__codelineno-0-413">413</a></span>
+<span class="normal"><a href="#__codelineno-0-414">414</a></span>
+<span class="normal"><a href="#__codelineno-0-415">415</a></span>
+<span class="normal"><a href="#__codelineno-0-416">416</a></span>
+<span class="normal"><a href="#__codelineno-0-417">417</a></span>
+<span class="normal"><a href="#__codelineno-0-418">418</a></span>
+<span class="normal"><a href="#__codelineno-0-419">419</a></span>
+<span class="normal"><a href="#__codelineno-0-420">420</a></span>
+<span class="normal"><a href="#__codelineno-0-421">421</a></span>
+<span class="normal"><a href="#__codelineno-0-422">422</a></span>
+<span class="normal"><a href="#__codelineno-0-423">423</a></span>
+<span class="normal"><a href="#__codelineno-0-424">424</a></span>
+<span class="normal"><a href="#__codelineno-0-425">425</a></span>
+<span class="normal"><a href="#__codelineno-0-426">426</a></span>
+<span class="normal"><a href="#__codelineno-0-427">427</a></span>
+<span class="normal"><a href="#__codelineno-0-428">428</a></span>
+<span class="normal"><a href="#__codelineno-0-429">429</a></span>
+<span class="normal"><a href="#__codelineno-0-430">430</a></span>
+<span class="normal"><a href="#__codelineno-0-431">431</a></span>
+<span class="normal"><a href="#__codelineno-0-432">432</a></span>
+<span class="normal"><a href="#__codelineno-0-433">433</a></span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span>
+<span class="normal"><a href="#__codelineno-0-435">435</a></span>
+<span class="normal"><a href="#__codelineno-0-436">436</a></span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span>
+<span class="normal"><a href="#__codelineno-0-438">438</a></span>
+<span class="normal"><a href="#__codelineno-0-439">439</a></span>
+<span class="normal"><a href="#__codelineno-0-440">440</a></span>
+<span class="normal"><a href="#__codelineno-0-441">441</a></span>
+<span class="normal"><a href="#__codelineno-0-442">442</a></span>
+<span class="normal"><a href="#__codelineno-0-443">443</a></span>
+<span class="normal"><a href="#__codelineno-0-444">444</a></span>
+<span class="normal"><a href="#__codelineno-0-445">445</a></span>
+<span class="normal"><a href="#__codelineno-0-446">446</a></span>
+<span class="normal"><a href="#__codelineno-0-447">447</a></span>
+<span class="normal"><a href="#__codelineno-0-448">448</a></span>
+<span class="normal"><a href="#__codelineno-0-449">449</a></span>
+<span class="normal"><a href="#__codelineno-0-450">450</a></span>
+<span class="normal"><a href="#__codelineno-0-451">451</a></span>
+<span class="normal"><a href="#__codelineno-0-452">452</a></span>
+<span class="normal"><a href="#__codelineno-0-453">453</a></span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span>
+<span class="normal"><a href="#__codelineno-0-455">455</a></span>
+<span class="normal"><a href="#__codelineno-0-456">456</a></span>
+<span class="normal"><a href="#__codelineno-0-457">457</a></span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span>
+<span class="normal"><a href="#__codelineno-0-459">459</a></span>
+<span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span>
+<span class="normal"><a href="#__codelineno-0-464">464</a></span>
+<span class="normal"><a href="#__codelineno-0-465">465</a></span>
+<span class="normal"><a href="#__codelineno-0-466">466</a></span>
+<span class="normal"><a href="#__codelineno-0-467">467</a></span>
+<span class="normal"><a href="#__codelineno-0-468">468</a></span>
+<span class="normal"><a href="#__codelineno-0-469">469</a></span>
+<span class="normal"><a href="#__codelineno-0-470">470</a></span>
+<span class="normal"><a href="#__codelineno-0-471">471</a></span>
+<span class="normal"><a href="#__codelineno-0-472">472</a></span>
+<span class="normal"><a href="#__codelineno-0-473">473</a></span>
+<span class="normal"><a href="#__codelineno-0-474">474</a></span>
+<span class="normal"><a href="#__codelineno-0-475">475</a></span>
+<span class="normal"><a href="#__codelineno-0-476">476</a></span>
+<span class="normal"><a href="#__codelineno-0-477">477</a></span>
+<span class="normal"><a href="#__codelineno-0-478">478</a></span>
+<span class="normal"><a href="#__codelineno-0-479">479</a></span>
+<span class="normal"><a href="#__codelineno-0-480">480</a></span>
+<span class="normal"><a href="#__codelineno-0-481">481</a></span>
+<span class="normal"><a href="#__codelineno-0-482">482</a></span>
+<span class="normal"><a href="#__codelineno-0-483">483</a></span>
+<span class="normal"><a href="#__codelineno-0-484">484</a></span>
+<span class="normal"><a href="#__codelineno-0-485">485</a></span>
+<span class="normal"><a href="#__codelineno-0-486">486</a></span>
+<span class="normal"><a href="#__codelineno-0-487">487</a></span>
+<span class="normal"><a href="#__codelineno-0-488">488</a></span>
+<span class="normal"><a href="#__codelineno-0-489">489</a></span>
+<span class="normal"><a href="#__codelineno-0-490">490</a></span>
+<span class="normal"><a href="#__codelineno-0-491">491</a></span>
+<span class="normal"><a href="#__codelineno-0-492">492</a></span>
+<span class="normal"><a href="#__codelineno-0-493">493</a></span>
+<span class="normal"><a href="#__codelineno-0-494">494</a></span>
+<span class="normal"><a href="#__codelineno-0-495">495</a></span>
+<span class="normal"><a href="#__codelineno-0-496">496</a></span>
+<span class="normal"><a href="#__codelineno-0-497">497</a></span>
+<span class="normal"><a href="#__codelineno-0-498">498</a></span>
+<span class="normal"><a href="#__codelineno-0-499">499</a></span>
+<span class="normal"><a href="#__codelineno-0-500">500</a></span>
+<span class="normal"><a href="#__codelineno-0-501">501</a></span>
+<span class="normal"><a href="#__codelineno-0-502">502</a></span>
+<span class="normal"><a href="#__codelineno-0-503">503</a></span>
+<span class="normal"><a href="#__codelineno-0-504">504</a></span>
+<span class="normal"><a href="#__codelineno-0-505">505</a></span>
+<span class="normal"><a href="#__codelineno-0-506">506</a></span>
+<span class="normal"><a href="#__codelineno-0-507">507</a></span>
+<span class="normal"><a href="#__codelineno-0-508">508</a></span>
+<span class="normal"><a href="#__codelineno-0-509">509</a></span>
+<span class="normal"><a href="#__codelineno-0-510">510</a></span>
+<span class="normal"><a href="#__codelineno-0-511">511</a></span>
+<span class="normal"><a href="#__codelineno-0-512">512</a></span>
+<span class="normal"><a href="#__codelineno-0-513">513</a></span>
+<span class="normal"><a href="#__codelineno-0-514">514</a></span>
+<span class="normal"><a href="#__codelineno-0-515">515</a></span>
+<span class="normal"><a href="#__codelineno-0-516">516</a></span>
+<span class="normal"><a href="#__codelineno-0-517">517</a></span>
+<span class="normal"><a href="#__codelineno-0-518">518</a></span>
+<span class="normal"><a href="#__codelineno-0-519">519</a></span>
+<span class="normal"><a href="#__codelineno-0-520">520</a></span>
+<span class="normal"><a href="#__codelineno-0-521">521</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="k">def</span><span class="w"> </span><span class="nf">assert_flows_equal</span><span class="p">(</span>  <span class="c1"># noqa: C901, PLR0912, PLR0913, PLR0915</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="n">flow1</span><span class="p">:</span> <span class="n">OpenMLFlow</span><span class="p">,</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="n">flow2</span><span class="p">:</span> <span class="n">OpenMLFlow</span><span class="p">,</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>    <span class="n">ignore_parameter_values_on_older_children</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="n">ignore_parameter_values</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT001, FBT002</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="n">ignore_custom_name_if_none</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa:  FBT001, FBT002</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>    <span class="n">check_description</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># noqa:  FBT001, FBT002</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Check equality of two flows.</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">    Two flows are equal if their all keys which are not set by the server</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    are equal, as well as all their parameters and components.</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    flow1 : OpenMLFlow</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    flow2 : OpenMLFlow</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    ignore_parameter_values_on_older_children : str (optional)</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        If set to ``OpenMLFlow.upload_date``, ignores parameters in a child</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        flow if it&#39;s upload date predates the upload date of the parent flow.</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    ignore_parameter_values : bool</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        Whether to ignore parameter values when comparing flows.</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    ignore_custom_name_if_none : bool</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        Whether to ignore the custom name field if either flow has `custom_name` equal to `None`.</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    check_description : bool</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        Whether to ignore matching of flow descriptions.</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow1</span><span class="p">,</span> <span class="n">OpenMLFlow</span><span class="p">):</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Argument 1 must be of type OpenMLFlow, but is </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">flow1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow2</span><span class="p">,</span> <span class="n">OpenMLFlow</span><span class="p">):</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Argument 2 must be of type OpenMLFlow, but is </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">flow2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>    <span class="c1"># TODO as they are actually now saved during publish, it might be good to</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>    <span class="c1"># check for the equality of these as well.</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>    <span class="n">generated_by_the_server</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>        <span class="s2">&quot;flow_id&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>        <span class="s2">&quot;uploader&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>        <span class="s2">&quot;version&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>        <span class="s2">&quot;upload_date&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>        <span class="c1"># Tags aren&#39;t directly created by the server,</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="c1"># but the uploader has no control over them!</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="s2">&quot;tags&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>    <span class="p">]</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>    <span class="n">ignored_by_python_api</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;binary_url&quot;</span><span class="p">,</span> <span class="s2">&quot;binary_format&quot;</span><span class="p">,</span> <span class="s2">&quot;binary_md5&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="s2">&quot;_entity_id&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">flow1</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">flow2</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">generated_by_the_server</span> <span class="o">+</span> <span class="n">ignored_by_python_api</span><span class="p">:</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>            <span class="k">continue</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="n">attr1</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">flow1</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="n">attr2</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">flow2</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;components&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">attr1</span><span class="p">,</span> <span class="n">Dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attr2</span><span class="p">,</span> <span class="n">Dict</span><span class="p">)):</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot compare components because they are not dictionary.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">attr1</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">attr2</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>                <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attr1</span><span class="p">:</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>                        <span class="sa">f</span><span class="s2">&quot;Component </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> only available in argument2, but not in argument1.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>                <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attr2</span><span class="p">:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>                        <span class="sa">f</span><span class="s2">&quot;Component </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> only available in argument2, but not in argument1.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>                <span class="n">assert_flows_equal</span><span class="p">(</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>                    <span class="n">attr1</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>                    <span class="n">attr2</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>                    <span class="n">ignore_parameter_values_on_older_children</span><span class="p">,</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>                    <span class="n">ignore_parameter_values</span><span class="p">,</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>                    <span class="n">ignore_custom_name_if_none</span><span class="p">,</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>                <span class="p">)</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;_extension&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="k">continue</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="k">elif</span> <span class="n">check_description</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>            <span class="c1"># to ignore matching of descriptions since sklearn based flows may have</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="c1"># altering docstrings and is not guaranteed to be consistent</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>            <span class="k">continue</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;parameters&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>                <span class="k">if</span> <span class="n">ignore_parameter_values</span> <span class="ow">or</span> <span class="n">ignore_parameter_values_on_older_children</span><span class="p">:</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>                    <span class="n">params_flow_1</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">flow1</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>                    <span class="n">params_flow_2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">flow2</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>                    <span class="n">symmetric_difference</span> <span class="o">=</span> <span class="n">params_flow_1</span> <span class="o">^</span> <span class="n">params_flow_2</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">symmetric_difference</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>                            <span class="sa">f</span><span class="s2">&quot;Flow </span><span class="si">{</span><span class="n">flow1</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: parameter set of flow &quot;</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>                            <span class="s2">&quot;differs from the parameters stored &quot;</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>                            <span class="s2">&quot;on the server.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>                        <span class="p">)</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>                <span class="k">if</span> <span class="n">ignore_parameter_values_on_older_children</span><span class="p">:</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>                    <span class="k">assert</span> <span class="p">(</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>                        <span class="n">flow1</span><span class="o">.</span><span class="n">upload_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>                    <span class="p">),</span> <span class="s2">&quot;Flow1 has no upload date that allows us to compare age of children.&quot;</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>                    <span class="n">upload_date_current_flow</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">flow1</span><span class="o">.</span><span class="n">upload_date</span><span class="p">)</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>                    <span class="n">upload_date_parent_flow</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>                        <span class="n">ignore_parameter_values_on_older_children</span><span class="p">,</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>                    <span class="k">if</span> <span class="n">upload_date_current_flow</span> <span class="o">&lt;</span> <span class="n">upload_date_parent_flow</span><span class="p">:</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>                        <span class="k">continue</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>                <span class="k">if</span> <span class="n">ignore_parameter_values</span><span class="p">:</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>                    <span class="c1"># Continue needs to be done here as the first if</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>                    <span class="c1"># statement triggers in both special cases</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>                    <span class="k">continue</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>            <span class="k">elif</span> <span class="p">(</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>                <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;custom_name&quot;</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>                <span class="ow">and</span> <span class="n">ignore_custom_name_if_none</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>                <span class="ow">and</span> <span class="p">(</span><span class="n">attr1</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">attr2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>            <span class="p">):</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>                <span class="c1"># If specified, we allow `custom_name` inequality if one flow&#39;s name is None.</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>                <span class="c1"># Helps with backwards compatibility as `custom_name` is now auto-generated, but</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>                <span class="c1"># before it used to be `None`.</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a>                <span class="k">continue</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;parameters_meta_info&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>                <span class="c1"># this value is a dictionary where each key is a parameter name, containing another</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>                <span class="c1"># dictionary with keys specifying the parameter&#39;s &#39;description&#39; and &#39;data_type&#39;</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>                <span class="c1"># checking parameter descriptions can be ignored since that might change</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>                <span class="c1"># data type check can also be ignored if one of them is not defined, i.e., None</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>                <span class="n">params1</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">flow1</span><span class="o">.</span><span class="n">parameters_meta_info</span><span class="p">)</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>                <span class="n">params2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">flow2</span><span class="o">.</span><span class="n">parameters_meta_info</span><span class="p">)</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>                <span class="k">if</span> <span class="n">params1</span> <span class="o">!=</span> <span class="n">params2</span><span class="p">:</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>                        <span class="s2">&quot;Parameter list in meta info for parameters differ in the two flows.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>                <span class="c1"># iterating over the parameter&#39;s meta info list</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>                <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params1</span><span class="p">:</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>                    <span class="k">if</span> <span class="p">(</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow1</span><span class="o">.</span><span class="n">parameters_meta_info</span><span class="p">[</span><span class="n">param</span><span class="p">],</span> <span class="n">Dict</span><span class="p">)</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>                        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow2</span><span class="o">.</span><span class="n">parameters_meta_info</span><span class="p">[</span><span class="n">param</span><span class="p">],</span> <span class="n">Dict</span><span class="p">)</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>                        <span class="ow">and</span> <span class="s2">&quot;data_type&quot;</span> <span class="ow">in</span> <span class="n">flow1</span><span class="o">.</span><span class="n">parameters_meta_info</span><span class="p">[</span><span class="n">param</span><span class="p">]</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>                        <span class="ow">and</span> <span class="s2">&quot;data_type&quot;</span> <span class="ow">in</span> <span class="n">flow2</span><span class="o">.</span><span class="n">parameters_meta_info</span><span class="p">[</span><span class="n">param</span><span class="p">]</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>                    <span class="p">):</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>                        <span class="n">value1</span> <span class="o">=</span> <span class="n">flow1</span><span class="o">.</span><span class="n">parameters_meta_info</span><span class="p">[</span><span class="n">param</span><span class="p">][</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>                        <span class="n">value2</span> <span class="o">=</span> <span class="n">flow2</span><span class="o">.</span><span class="n">parameters_meta_info</span><span class="p">[</span><span class="n">param</span><span class="p">][</span><span class="s2">&quot;data_type&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>                    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>                        <span class="n">value1</span> <span class="o">=</span> <span class="n">flow1</span><span class="o">.</span><span class="n">parameters_meta_info</span><span class="p">[</span><span class="n">param</span><span class="p">]</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>                        <span class="n">value2</span> <span class="o">=</span> <span class="n">flow2</span><span class="o">.</span><span class="n">parameters_meta_info</span><span class="p">[</span><span class="n">param</span><span class="p">]</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>                    <span class="k">if</span> <span class="n">value1</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">value2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>                        <span class="k">continue</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>                    <span class="k">if</span> <span class="n">value1</span> <span class="o">!=</span> <span class="n">value2</span><span class="p">:</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>                            <span class="sa">f</span><span class="s2">&quot;Flow </span><span class="si">{</span><span class="n">flow1</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: data type for parameter </span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> differ &quot;</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>                            <span class="sa">f</span><span class="s2">&quot;as </span><span class="si">{</span><span class="n">value1</span><span class="si">}</span><span class="se">\n</span><span class="s2">vs</span><span class="se">\n</span><span class="si">{</span><span class="n">value2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>                        <span class="p">)</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>                <span class="c1"># the continue is to avoid the &#39;attr != attr2&#39; check at end of function</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>                <span class="k">continue</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>            <span class="k">if</span> <span class="n">attr1</span> <span class="o">!=</span> <span class="n">attr2</span><span class="p">:</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a>                    <span class="sa">f</span><span class="s2">&quot;Flow </span><span class="si">{</span><span class="n">flow1</span><span class="o">.</span><span class="n">name</span><span class="si">!s}</span><span class="s2">: values for attribute &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">!s}</span><span class="s2">&#39; differ: &quot;</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>                    <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">attr1</span><span class="si">!s}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">vs</span><span class="se">\n</span><span class="s2">&#39;</span><span class="si">{</span><span class="n">attr2</span><span class="si">!s}</span><span class="s2">&#39;.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a>                <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.flows.functions.delete_flow" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">delete_flow</span><span class="p">(</span><span class="n">flow_id</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Delete flow with id <code>flow_id</code> from the OpenML server.</p>
+<p>You can only delete flows which you uploaded and which
+which are not linked to runs.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>flow_id</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>OpenML id of the flow</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True if the deletion was successful. False otherwise.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/flows/functions.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-538">538</a></span>
+<span class="normal"><a href="#__codelineno-0-539">539</a></span>
+<span class="normal"><a href="#__codelineno-0-540">540</a></span>
+<span class="normal"><a href="#__codelineno-0-541">541</a></span>
+<span class="normal"><a href="#__codelineno-0-542">542</a></span>
+<span class="normal"><a href="#__codelineno-0-543">543</a></span>
+<span class="normal"><a href="#__codelineno-0-544">544</a></span>
+<span class="normal"><a href="#__codelineno-0-545">545</a></span>
+<span class="normal"><a href="#__codelineno-0-546">546</a></span>
+<span class="normal"><a href="#__codelineno-0-547">547</a></span>
+<span class="normal"><a href="#__codelineno-0-548">548</a></span>
+<span class="normal"><a href="#__codelineno-0-549">549</a></span>
+<span class="normal"><a href="#__codelineno-0-550">550</a></span>
+<span class="normal"><a href="#__codelineno-0-551">551</a></span>
+<span class="normal"><a href="#__codelineno-0-552">552</a></span>
+<span class="normal"><a href="#__codelineno-0-553">553</a></span>
+<span class="normal"><a href="#__codelineno-0-554">554</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-538" name="__codelineno-0-538"></a><span class="k">def</span><span class="w"> </span><span class="nf">delete_flow</span><span class="p">(</span><span class="n">flow_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete flow with id `flow_id` from the OpenML server.</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="sd">    You can only delete flows which you uploaded and which</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a><span class="sd">    which are not linked to runs.</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="sd">    flow_id : int</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a><span class="sd">        OpenML id of the flow</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">    bool</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="sd">        True if the deletion was successful. False otherwise.</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a>    <span class="k">return</span> <span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_delete_entity</span><span class="p">(</span><span class="s2">&quot;flow&quot;</span><span class="p">,</span> <span class="n">flow_id</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.flows.functions.flow_exists" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">flow_exists</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">external_version</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Retrieves the flow id.</p>
+<p>A flow is uniquely identified by name + external_version.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code>string</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the flow</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>external_version</code></td>
+            <td>
+                  <code>string</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Version information associated with flow.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>flow_exist</code></td>            <td>
+                  <code>int or bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>flow id iff exists, False otherwise</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>see https://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version</p>
+</details>
+            <details class="quote">
+              <summary>Source code in <code>openml/flows/functions.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-208">208</a></span>
+<span class="normal"><a href="#__codelineno-0-209">209</a></span>
+<span class="normal"><a href="#__codelineno-0-210">210</a></span>
+<span class="normal"><a href="#__codelineno-0-211">211</a></span>
+<span class="normal"><a href="#__codelineno-0-212">212</a></span>
+<span class="normal"><a href="#__codelineno-0-213">213</a></span>
+<span class="normal"><a href="#__codelineno-0-214">214</a></span>
+<span class="normal"><a href="#__codelineno-0-215">215</a></span>
+<span class="normal"><a href="#__codelineno-0-216">216</a></span>
+<span class="normal"><a href="#__codelineno-0-217">217</a></span>
+<span class="normal"><a href="#__codelineno-0-218">218</a></span>
+<span class="normal"><a href="#__codelineno-0-219">219</a></span>
+<span class="normal"><a href="#__codelineno-0-220">220</a></span>
+<span class="normal"><a href="#__codelineno-0-221">221</a></span>
+<span class="normal"><a href="#__codelineno-0-222">222</a></span>
+<span class="normal"><a href="#__codelineno-0-223">223</a></span>
+<span class="normal"><a href="#__codelineno-0-224">224</a></span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span>
+<span class="normal"><a href="#__codelineno-0-226">226</a></span>
+<span class="normal"><a href="#__codelineno-0-227">227</a></span>
+<span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span>
+<span class="normal"><a href="#__codelineno-0-232">232</a></span>
+<span class="normal"><a href="#__codelineno-0-233">233</a></span>
+<span class="normal"><a href="#__codelineno-0-234">234</a></span>
+<span class="normal"><a href="#__codelineno-0-235">235</a></span>
+<span class="normal"><a href="#__codelineno-0-236">236</a></span>
+<span class="normal"><a href="#__codelineno-0-237">237</a></span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span>
+<span class="normal"><a href="#__codelineno-0-239">239</a></span>
+<span class="normal"><a href="#__codelineno-0-240">240</a></span>
+<span class="normal"><a href="#__codelineno-0-241">241</a></span>
+<span class="normal"><a href="#__codelineno-0-242">242</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="k">def</span><span class="w"> </span><span class="nf">flow_exists</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">external_version</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieves the flow id.</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    A flow is uniquely identified by name + external_version.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    name : string</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        Name of the flow</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    external_version : string</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">        Version information associated with flow.</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">    flow_exist : int or bool</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        flow id iff exists, False otherwise</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">    Notes</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    -----</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    see https://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;name&#39; should be a non-empty string&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">external_version</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;version&#39; should be a non-empty string&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="n">xml_response</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="s2">&quot;flow/exists&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>        <span class="s2">&quot;post&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;external_version&quot;</span><span class="p">:</span> <span class="n">external_version</span><span class="p">},</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="p">)</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="n">result_dict</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_response</span><span class="p">)</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>    <span class="n">flow_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">result_dict</span><span class="p">[</span><span class="s2">&quot;oml:flow_exists&quot;</span><span class="p">][</span><span class="s2">&quot;oml:id&quot;</span><span class="p">])</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>    <span class="k">return</span> <span class="n">flow_id</span> <span class="k">if</span> <span class="n">flow_id</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.flows.functions.get_flow" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_flow</span><span class="p">(</span><span class="n">flow_id</span><span class="p">,</span> <span class="n">reinstantiate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">strict_version</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Download the OpenML flow for a given flow ID.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>flow_id</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The OpenML flow id.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>reinstantiate</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to reinstantiate the flow to a model instance.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>strict_version</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to fail if version requirements are not fulfilled.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>flow</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" title="openml.flows.OpenMLFlow" href="../#openml.flows.OpenMLFlow">OpenMLFlow</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the flow</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/flows/functions.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-72"> 72</a></span>
+<span class="normal"><a href="#__codelineno-0-73"> 73</a></span>
+<span class="normal"><a href="#__codelineno-0-74"> 74</a></span>
+<span class="normal"><a href="#__codelineno-0-75"> 75</a></span>
+<span class="normal"><a href="#__codelineno-0-76"> 76</a></span>
+<span class="normal"><a href="#__codelineno-0-77"> 77</a></span>
+<span class="normal"><a href="#__codelineno-0-78"> 78</a></span>
+<span class="normal"><a href="#__codelineno-0-79"> 79</a></span>
+<span class="normal"><a href="#__codelineno-0-80"> 80</a></span>
+<span class="normal"><a href="#__codelineno-0-81"> 81</a></span>
+<span class="normal"><a href="#__codelineno-0-82"> 82</a></span>
+<span class="normal"><a href="#__codelineno-0-83"> 83</a></span>
+<span class="normal"><a href="#__codelineno-0-84"> 84</a></span>
+<span class="normal"><a href="#__codelineno-0-85"> 85</a></span>
+<span class="normal"><a href="#__codelineno-0-86"> 86</a></span>
+<span class="normal"><a href="#__codelineno-0-87"> 87</a></span>
+<span class="normal"><a href="#__codelineno-0-88"> 88</a></span>
+<span class="normal"><a href="#__codelineno-0-89"> 89</a></span>
+<span class="normal"><a href="#__codelineno-0-90"> 90</a></span>
+<span class="normal"><a href="#__codelineno-0-91"> 91</a></span>
+<span class="normal"><a href="#__codelineno-0-92"> 92</a></span>
+<span class="normal"><a href="#__codelineno-0-93"> 93</a></span>
+<span class="normal"><a href="#__codelineno-0-94"> 94</a></span>
+<span class="normal"><a href="#__codelineno-0-95"> 95</a></span>
+<span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
+<span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
+<span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
+<span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
+<span class="normal"><a href="#__codelineno-0-100">100</a></span>
+<span class="normal"><a href="#__codelineno-0-101">101</a></span>
+<span class="normal"><a href="#__codelineno-0-102">102</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="nd">@openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">thread_safe_if_oslo_installed</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_flow</span><span class="p">(</span><span class="n">flow_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">reinstantiate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">strict_version</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLFlow</span><span class="p">:</span>  <span class="c1"># noqa: FBT001, FBT002</span>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download the OpenML flow for a given flow ID.</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    flow_id : int</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">        The OpenML flow id.</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    reinstantiate: bool</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">        Whether to reinstantiate the flow to a model instance.</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    strict_version : bool, default=True</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">        Whether to fail if version requirements are not fulfilled.</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    flow : OpenMLFlow</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">        the flow</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a>    <span class="n">flow_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">flow_id</span><span class="p">)</span>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a>    <span class="n">flow</span> <span class="o">=</span> <span class="n">_get_flow_description</span><span class="p">(</span><span class="n">flow_id</span><span class="p">)</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a>    <span class="k">if</span> <span class="n">reinstantiate</span><span class="p">:</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a>        <span class="n">flow</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">extension</span><span class="o">.</span><span class="n">flow_to_model</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">strict_version</span><span class="o">=</span><span class="n">strict_version</span><span class="p">)</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">strict_version</span><span class="p">:</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a>            <span class="c1"># check if we need to return a new flow b/c of version mismatch</span>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a>            <span class="n">new_flow</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">extension</span><span class="o">.</span><span class="n">model_to_flow</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a>            <span class="k">if</span> <span class="n">new_flow</span><span class="o">.</span><span class="n">dependencies</span> <span class="o">!=</span> <span class="n">flow</span><span class="o">.</span><span class="n">dependencies</span><span class="p">:</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a>                <span class="k">return</span> <span class="n">new_flow</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="k">return</span> <span class="n">flow</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.flows.functions.get_flow_id" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_flow_id</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exact_version</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Retrieves the flow id for a model or a flow name.</p>
+<p>Provide either a model or a name to this function. Depending on the input, it does</p>
+<ul>
+<li><code>model</code> and <code>exact_version == True</code>: This helper function first queries for the necessary
+  extension. Second, it uses that extension to convert the model into a flow. Third, it
+  executes <code>flow_exists</code> to potentially obtain the flow id the flow is published to the
+  server.</li>
+<li><code>model</code> and <code>exact_version == False</code>: This helper function first queries for the
+  necessary extension. Second, it uses that extension to convert the model into a flow. Third
+  it calls <code>list_flows</code> and filters the returned values based on the flow name.</li>
+<li><code>name</code>: Ignores <code>exact_version</code> and calls <code>list_flows</code>, then filters the returned
+  values based on the flow name.</li>
+</ul>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>model</code></td>
+            <td>
+                  <code>object</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Any model. Must provide either <code>model</code> or <code>name</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the flow. Must provide either <code>model</code> or <code>name</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>exact_version</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to return the flow id of the exact version or all flow ids where the name
+of the flow matches. This is only taken into account for a model where a version number
+is available (requires <code>model</code> to be set).</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>(int or bool, List)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>flow id iff exists, <code>False</code> otherwise, List if <code>exact_version is False</code></p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/flows/functions.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-245">245</a></span>
+<span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+<span class="normal"><a href="#__codelineno-0-249">249</a></span>
+<span class="normal"><a href="#__codelineno-0-250">250</a></span>
+<span class="normal"><a href="#__codelineno-0-251">251</a></span>
+<span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span>
+<span class="normal"><a href="#__codelineno-0-258">258</a></span>
+<span class="normal"><a href="#__codelineno-0-259">259</a></span>
+<span class="normal"><a href="#__codelineno-0-260">260</a></span>
+<span class="normal"><a href="#__codelineno-0-261">261</a></span>
+<span class="normal"><a href="#__codelineno-0-262">262</a></span>
+<span class="normal"><a href="#__codelineno-0-263">263</a></span>
+<span class="normal"><a href="#__codelineno-0-264">264</a></span>
+<span class="normal"><a href="#__codelineno-0-265">265</a></span>
+<span class="normal"><a href="#__codelineno-0-266">266</a></span>
+<span class="normal"><a href="#__codelineno-0-267">267</a></span>
+<span class="normal"><a href="#__codelineno-0-268">268</a></span>
+<span class="normal"><a href="#__codelineno-0-269">269</a></span>
+<span class="normal"><a href="#__codelineno-0-270">270</a></span>
+<span class="normal"><a href="#__codelineno-0-271">271</a></span>
+<span class="normal"><a href="#__codelineno-0-272">272</a></span>
+<span class="normal"><a href="#__codelineno-0-273">273</a></span>
+<span class="normal"><a href="#__codelineno-0-274">274</a></span>
+<span class="normal"><a href="#__codelineno-0-275">275</a></span>
+<span class="normal"><a href="#__codelineno-0-276">276</a></span>
+<span class="normal"><a href="#__codelineno-0-277">277</a></span>
+<span class="normal"><a href="#__codelineno-0-278">278</a></span>
+<span class="normal"><a href="#__codelineno-0-279">279</a></span>
+<span class="normal"><a href="#__codelineno-0-280">280</a></span>
+<span class="normal"><a href="#__codelineno-0-281">281</a></span>
+<span class="normal"><a href="#__codelineno-0-282">282</a></span>
+<span class="normal"><a href="#__codelineno-0-283">283</a></span>
+<span class="normal"><a href="#__codelineno-0-284">284</a></span>
+<span class="normal"><a href="#__codelineno-0-285">285</a></span>
+<span class="normal"><a href="#__codelineno-0-286">286</a></span>
+<span class="normal"><a href="#__codelineno-0-287">287</a></span>
+<span class="normal"><a href="#__codelineno-0-288">288</a></span>
+<span class="normal"><a href="#__codelineno-0-289">289</a></span>
+<span class="normal"><a href="#__codelineno-0-290">290</a></span>
+<span class="normal"><a href="#__codelineno-0-291">291</a></span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span>
+<span class="normal"><a href="#__codelineno-0-294">294</a></span>
+<span class="normal"><a href="#__codelineno-0-295">295</a></span>
+<span class="normal"><a href="#__codelineno-0-296">296</a></span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span>
+<span class="normal"><a href="#__codelineno-0-302">302</a></span>
+<span class="normal"><a href="#__codelineno-0-303">303</a></span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
+<span class="normal"><a href="#__codelineno-0-305">305</a></span>
+<span class="normal"><a href="#__codelineno-0-306">306</a></span>
+<span class="normal"><a href="#__codelineno-0-307">307</a></span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_flow_id</span><span class="p">(</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="n">model</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>    <span class="n">exact_version</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># noqa: FBT001, FBT002</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieves the flow id for a model or a flow name.</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    Provide either a model or a name to this function. Depending on the input, it does</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    * ``model`` and ``exact_version == True``: This helper function first queries for the necessary</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">      extension. Second, it uses that extension to convert the model into a flow. Third, it</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">      executes ``flow_exists`` to potentially obtain the flow id the flow is published to the</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">      server.</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">    * ``model`` and ``exact_version == False``: This helper function first queries for the</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">      necessary extension. Second, it uses that extension to convert the model into a flow. Third</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">      it calls ``list_flows`` and filters the returned values based on the flow name.</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">    * ``name``: Ignores ``exact_version`` and calls ``list_flows``, then filters the returned</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">      values based on the flow name.</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    model : object</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        Any model. Must provide either ``model`` or ``name``.</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    name : str</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="sd">        Name of the flow. Must provide either ``model`` or ``name``.</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="sd">    exact_version : bool</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="sd">        Whether to return the flow id of the exact version or all flow ids where the name</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="sd">        of the flow matches. This is only taken into account for a model where a version number</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">        is available (requires ``model`` to be set).</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    int or bool, List</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">        flow id iff exists, ``False`` otherwise, List if ``exact_version is False``</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must provide either argument `model` or argument `name`, but not both.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="n">extension</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">get_extension_by_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">raise_if_no_extension</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="k">if</span> <span class="n">extension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>            <span class="c1"># This should never happen and is only here to please mypy will be gone soon once the</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>            <span class="c1"># whole function is removed</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="n">flow</span> <span class="o">=</span> <span class="n">extension</span><span class="o">.</span><span class="n">model_to_flow</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>        <span class="n">flow_name</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">name</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="n">external_version</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">external_version</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="k">elif</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="n">flow_name</span> <span class="o">=</span> <span class="n">name</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="n">exact_version</span> <span class="o">=</span> <span class="kc">False</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="n">external_version</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="s2">&quot;Need to provide either argument `model` or argument `name`, but both are `None`.&quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="k">if</span> <span class="n">exact_version</span><span class="p">:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="k">if</span> <span class="n">external_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;exact_version should be False if model is None!&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="k">return</span> <span class="n">flow_exists</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">flow_name</span><span class="p">,</span> <span class="n">external_version</span><span class="o">=</span><span class="n">external_version</span><span class="p">)</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="n">flows</span> <span class="o">=</span> <span class="n">list_flows</span><span class="p">()</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="n">flows</span> <span class="o">=</span> <span class="n">flows</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;name == &quot;</span><span class="si">{</span><span class="n">flow_name</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="k">return</span> <span class="n">flows</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>  <span class="c1"># type: ignore[no-any-return]</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.flows.functions.list_flows" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">list_flows</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">uploader</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a list of all flows which are on OpenML.
+(Supports large amount of results)</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>offset</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the number of flows to skip, starting from the first</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the maximum number of flows to return</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tag</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the tag to include</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>kwargs</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Legal filter operators: uploader.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>flows</code></td>            <td>
+                  <code>dataframe</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Each row maps to a dataset
+Each column contains the following information:
+- flow id
+- full name
+- name
+- version
+- external version
+- uploader</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/flows/functions.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-135">135</a></span>
+<span class="normal"><a href="#__codelineno-0-136">136</a></span>
+<span class="normal"><a href="#__codelineno-0-137">137</a></span>
+<span class="normal"><a href="#__codelineno-0-138">138</a></span>
+<span class="normal"><a href="#__codelineno-0-139">139</a></span>
+<span class="normal"><a href="#__codelineno-0-140">140</a></span>
+<span class="normal"><a href="#__codelineno-0-141">141</a></span>
+<span class="normal"><a href="#__codelineno-0-142">142</a></span>
+<span class="normal"><a href="#__codelineno-0-143">143</a></span>
+<span class="normal"><a href="#__codelineno-0-144">144</a></span>
+<span class="normal"><a href="#__codelineno-0-145">145</a></span>
+<span class="normal"><a href="#__codelineno-0-146">146</a></span>
+<span class="normal"><a href="#__codelineno-0-147">147</a></span>
+<span class="normal"><a href="#__codelineno-0-148">148</a></span>
+<span class="normal"><a href="#__codelineno-0-149">149</a></span>
+<span class="normal"><a href="#__codelineno-0-150">150</a></span>
+<span class="normal"><a href="#__codelineno-0-151">151</a></span>
+<span class="normal"><a href="#__codelineno-0-152">152</a></span>
+<span class="normal"><a href="#__codelineno-0-153">153</a></span>
+<span class="normal"><a href="#__codelineno-0-154">154</a></span>
+<span class="normal"><a href="#__codelineno-0-155">155</a></span>
+<span class="normal"><a href="#__codelineno-0-156">156</a></span>
+<span class="normal"><a href="#__codelineno-0-157">157</a></span>
+<span class="normal"><a href="#__codelineno-0-158">158</a></span>
+<span class="normal"><a href="#__codelineno-0-159">159</a></span>
+<span class="normal"><a href="#__codelineno-0-160">160</a></span>
+<span class="normal"><a href="#__codelineno-0-161">161</a></span>
+<span class="normal"><a href="#__codelineno-0-162">162</a></span>
+<span class="normal"><a href="#__codelineno-0-163">163</a></span>
+<span class="normal"><a href="#__codelineno-0-164">164</a></span>
+<span class="normal"><a href="#__codelineno-0-165">165</a></span>
+<span class="normal"><a href="#__codelineno-0-166">166</a></span>
+<span class="normal"><a href="#__codelineno-0-167">167</a></span>
+<span class="normal"><a href="#__codelineno-0-168">168</a></span>
+<span class="normal"><a href="#__codelineno-0-169">169</a></span>
+<span class="normal"><a href="#__codelineno-0-170">170</a></span>
+<span class="normal"><a href="#__codelineno-0-171">171</a></span>
+<span class="normal"><a href="#__codelineno-0-172">172</a></span>
+<span class="normal"><a href="#__codelineno-0-173">173</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_flows</span><span class="p">(</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a>    <span class="n">uploader</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    Return a list of all flows which are on OpenML.</span>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">    (Supports large amount of results)</span>
+<a id="__codelineno-0-144" name="__codelineno-0-144"></a>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a><span class="sd">    offset : int, optional</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">        the number of flows to skip, starting from the first</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">    size : int, optional</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">        the maximum number of flows to return</span>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    tag : str, optional</span>
+<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">        the tag to include</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">    kwargs: dict, optional</span>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">        Legal filter operators: uploader.</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a><span class="sd">    flows : dataframe</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a><span class="sd">            Each row maps to a dataset</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a><span class="sd">            Each column contains the following information:</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a><span class="sd">            - flow id</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a><span class="sd">            - full name</span>
+<a id="__codelineno-0-163" name="__codelineno-0-163"></a><span class="sd">            - name</span>
+<a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="sd">            - version</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="sd">            - external version</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="sd">            - uploader</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a>    <span class="n">listing_call</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">_list_flows</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="n">uploader</span><span class="o">=</span><span class="n">uploader</span><span class="p">)</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a>    <span class="n">batches</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_list_all</span><span class="p">(</span><span class="n">listing_call</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["content.code.copy"], "search": "../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

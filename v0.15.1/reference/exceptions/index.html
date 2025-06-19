@@ -1,0 +1,3062 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../evaluations/functions/">
+      
+      
+        <link rel="next" href="../extensions/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>exceptions - openml-python</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#openml.exceptions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="openml-python" class="md-header__button md-logo" aria-label="openml-python" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            openml-python
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              exceptions
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="openml-python" class="md-nav__button md-logo" aria-label="openml-python" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    openml-python
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenML
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Code Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Code Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    openml
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            openml
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../__version__/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    __version__
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../_api_calls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    _api_calls
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    base
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    cli
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    config
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_6" id="__nav_2_1_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    datasets
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            datasets
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/data_feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    data_feature
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    dataset
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_7" id="__nav_2_1_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    evaluations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_7">
+            <span class="md-nav__icon md-icon"></span>
+            evaluations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluations/evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    evaluation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluations/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    exceptions
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    exceptions
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      exceptions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.ObjectNotPublishedError" class="md-nav__link">
+    <span class="md-ellipsis">
+      ObjectNotPublishedError
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLCacheException" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLCacheException
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLHashException" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLHashException
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLNotAuthorizedError" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLNotAuthorizedError
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLPrivateDatasetError" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLPrivateDatasetError
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLRunsExistError" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLRunsExistError
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLServerError" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLServerError
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLServerException" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLServerException
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLServerNoResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLServerNoResult
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.PyOpenMLError" class="md-nav__link">
+    <span class="md-ellipsis">
+      PyOpenMLError
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_9" id="__nav_2_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    extensions
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            extensions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extensions/extension_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    extension_interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extensions/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_9_3" id="__nav_2_1_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    sklearn
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_1_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            sklearn
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extensions/sklearn/extension/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    extension
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_10" id="__nav_2_1_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    flows
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_10">
+            <span class="md-nav__icon md-icon"></span>
+            flows
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flows/flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    flow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flows/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_11" id="__nav_2_1_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    runs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_11">
+            <span class="md-nav__icon md-icon"></span>
+            runs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../runs/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../runs/run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    run
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../runs/trace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    trace
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_12" id="__nav_2_1_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    setups
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_12">
+            <span class="md-nav__icon md-icon"></span>
+            setups
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setups/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setups/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_13" id="__nav_2_1_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    study
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_13">
+            <span class="md-nav__icon md-icon"></span>
+            study
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../study/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../study/study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    study
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_14" id="__nav_2_1_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    tasks
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_14">
+            <span class="md-nav__icon md-icon"></span>
+            tasks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tasks/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tasks/split/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    split
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tasks/task/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    task
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    utils
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Examples
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    20_basic
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            20_basic
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/20_basic/introduction_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction tutorial &amp; Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/20_basic/simple_datasets_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Datasets
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/20_basic/simple_flows_and_runs_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Flows and Runs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/20_basic/simple_suites_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark suites
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    30_extended
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            30_extended
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/benchmark_with_optunahub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Prepare for preprocessors and an OpenML task
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/configure_logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/create_upload_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dataset upload tutorial
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/custom_flow_/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Creating and Using a Custom Flow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/datasets_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Datasets
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/fetch_evaluations_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Fetching Evaluations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/fetch_runtimes_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Preparing tasks and scikit-learn models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/flow_id_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Obtaining Flow IDs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/flows_and_runs_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Flows and Runs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/plot_svm_hyperparameters_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Plotting hyperparameter surfaces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/run_setup_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Run Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/study_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark studies
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/suites_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark suites
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/task_manual_iteration_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tasks: retrieving splits
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/tasks_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tasks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    40_paper
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            40_paper
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/40_paper/2015_neurips_feurer_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Feurer et al. (2015)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/40_paper/2018_ida_strang_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Strang et al. (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/40_paper/2018_kdd_rijn_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    van Rijn and Hutter (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/40_paper/2018_neurips_perrone_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Perrone et al. (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../extensions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Extensions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../progress/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      exceptions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.ObjectNotPublishedError" class="md-nav__link">
+    <span class="md-ellipsis">
+      ObjectNotPublishedError
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLCacheException" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLCacheException
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLHashException" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLHashException
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLNotAuthorizedError" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLNotAuthorizedError
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLPrivateDatasetError" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLPrivateDatasetError
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLRunsExistError" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLRunsExistError
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLServerError" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLServerError
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLServerException" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLServerException
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.OpenMLServerNoResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      OpenMLServerNoResult
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.exceptions.PyOpenMLError" class="md-nav__link">
+    <span class="md-ellipsis">
+      PyOpenMLError
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>exceptions</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="openml.exceptions"></a>
+    <div class="doc doc-contents first">
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openml.exceptions.ObjectNotPublishedError" class="doc doc-heading">
+            <code>ObjectNotPublishedError</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="openml.exceptions.PyOpenMLError" href="#openml.exceptions.PyOpenMLError">PyOpenMLError</a></code></p>
+
+
+        <p>Indicates an object has not been published yet.</p>
+
+              <details class="quote">
+                <summary>Source code in <code>openml/exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-66">66</a></span>
+<span class="normal"><a href="#__codelineno-0-67">67</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="k">class</span><span class="w"> </span><span class="nc">ObjectNotPublishedError</span><span class="p">(</span><span class="n">PyOpenMLError</span><span class="p">):</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates an object has not been published yet.&quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openml.exceptions.OpenMLCacheException" class="doc doc-heading">
+            <code>OpenMLCacheException</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="openml.exceptions.PyOpenMLError" href="#openml.exceptions.PyOpenMLError">PyOpenMLError</a></code></p>
+
+
+        <p>Dataset / task etc not found in cache</p>
+
+              <details class="quote">
+                <summary>Source code in <code>openml/exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-40">40</a></span>
+<span class="normal"><a href="#__codelineno-0-41">41</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenMLCacheException</span><span class="p">(</span><span class="n">PyOpenMLError</span><span class="p">):</span>  <span class="c1"># noqa: N818</span>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset / task etc not found in cache&quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openml.exceptions.OpenMLHashException" class="doc doc-heading">
+            <code>OpenMLHashException</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="openml.exceptions.PyOpenMLError" href="#openml.exceptions.PyOpenMLError">PyOpenMLError</a></code></p>
+
+
+        <p>Locally computed hash is different than hash announced by the server.</p>
+
+              <details class="quote">
+                <summary>Source code in <code>openml/exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-44">44</a></span>
+<span class="normal"><a href="#__codelineno-0-45">45</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenMLHashException</span><span class="p">(</span><span class="n">PyOpenMLError</span><span class="p">):</span>  <span class="c1"># noqa: N818</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Locally computed hash is different than hash announced by the server.&quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openml.exceptions.OpenMLNotAuthorizedError" class="doc doc-heading">
+            <code>OpenMLNotAuthorizedError</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="openml.exceptions.OpenMLServerError" href="#openml.exceptions.OpenMLServerError">OpenMLServerError</a></code></p>
+
+
+        <p>Indicates an authenticated user is not authorized to execute the requested action.</p>
+
+              <details class="quote">
+                <summary>Source code in <code>openml/exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-62">62</a></span>
+<span class="normal"><a href="#__codelineno-0-63">63</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenMLNotAuthorizedError</span><span class="p">(</span><span class="n">OpenMLServerError</span><span class="p">):</span>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates an authenticated user is not authorized to execute the requested action.&quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openml.exceptions.OpenMLPrivateDatasetError" class="doc doc-heading">
+            <code>OpenMLPrivateDatasetError</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="openml.exceptions.PyOpenMLError" href="#openml.exceptions.PyOpenMLError">PyOpenMLError</a></code></p>
+
+
+        <p>Exception thrown when the user has no rights to access the dataset.</p>
+
+              <details class="quote">
+                <summary>Source code in <code>openml/exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-48">48</a></span>
+<span class="normal"><a href="#__codelineno-0-49">49</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenMLPrivateDatasetError</span><span class="p">(</span><span class="n">PyOpenMLError</span><span class="p">):</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception thrown when the user has no rights to access the dataset.&quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openml.exceptions.OpenMLRunsExistError" class="doc doc-heading">
+            <code>OpenMLRunsExistError</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="openml.exceptions.PyOpenMLError" href="#openml.exceptions.PyOpenMLError">PyOpenMLError</a></code></p>
+
+
+        <p>Indicates run(s) already exists on the server when they should not be duplicated.</p>
+
+              <details class="quote">
+                <summary>Source code in <code>openml/exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-52">52</a></span>
+<span class="normal"><a href="#__codelineno-0-53">53</a></span>
+<span class="normal"><a href="#__codelineno-0-54">54</a></span>
+<span class="normal"><a href="#__codelineno-0-55">55</a></span>
+<span class="normal"><a href="#__codelineno-0-56">56</a></span>
+<span class="normal"><a href="#__codelineno-0-57">57</a></span>
+<span class="normal"><a href="#__codelineno-0-58">58</a></span>
+<span class="normal"><a href="#__codelineno-0-59">59</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenMLRunsExistError</span><span class="p">(</span><span class="n">PyOpenMLError</span><span class="p">):</span>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Indicates run(s) already exists on the server when they should not be duplicated.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_ids</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">run_ids</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Set of run ids must be non-empty.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">run_ids</span> <span class="o">=</span> <span class="n">run_ids</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openml.exceptions.OpenMLServerError" class="doc doc-heading">
+            <code>OpenMLServerError</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="openml.exceptions.PyOpenMLError" href="#openml.exceptions.PyOpenMLError">PyOpenMLError</a></code></p>
+
+
+        <p>class for when something is really wrong on the server
+(result did not parse to dict), contains unparsed error.</p>
+
+              <details class="quote">
+                <summary>Source code in <code>openml/exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-13">13</a></span>
+<span class="normal"><a href="#__codelineno-0-14">14</a></span>
+<span class="normal"><a href="#__codelineno-0-15">15</a></span>
+<span class="normal"><a href="#__codelineno-0-16">16</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenMLServerError</span><span class="p">(</span><span class="n">PyOpenMLError</span><span class="p">):</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;class for when something is really wrong on the server</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="sd">    (result did not parse to dict), contains unparsed error.</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="sd">    &quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openml.exceptions.OpenMLServerException" class="doc doc-heading">
+            <code>OpenMLServerException</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="openml.exceptions.OpenMLServerError" href="#openml.exceptions.OpenMLServerError">OpenMLServerError</a></code></p>
+
+
+        <p>exception for when the result of the server was
+not 200 (e.g., listing call w/o results).</p>
+
+              <details class="quote">
+                <summary>Source code in <code>openml/exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-19">19</a></span>
+<span class="normal"><a href="#__codelineno-0-20">20</a></span>
+<span class="normal"><a href="#__codelineno-0-21">21</a></span>
+<span class="normal"><a href="#__codelineno-0-22">22</a></span>
+<span class="normal"><a href="#__codelineno-0-23">23</a></span>
+<span class="normal"><a href="#__codelineno-0-24">24</a></span>
+<span class="normal"><a href="#__codelineno-0-25">25</a></span>
+<span class="normal"><a href="#__codelineno-0-26">26</a></span>
+<span class="normal"><a href="#__codelineno-0-27">27</a></span>
+<span class="normal"><a href="#__codelineno-0-28">28</a></span>
+<span class="normal"><a href="#__codelineno-0-29">29</a></span>
+<span class="normal"><a href="#__codelineno-0-30">30</a></span>
+<span class="normal"><a href="#__codelineno-0-31">31</a></span>
+<span class="normal"><a href="#__codelineno-0-32">32</a></span>
+<span class="normal"><a href="#__codelineno-0-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenMLServerException</span><span class="p">(</span><span class="n">OpenMLServerError</span><span class="p">):</span>  <span class="c1"># noqa: N818</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;exception for when the result of the server was</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="sd">    not 200 (e.g., listing call w/o results).</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23"></a>
+<a id="__codelineno-0-24" name="__codelineno-0-24"></a>    <span class="c1"># Code needs to be optional to allow the exception to be picklable:</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25"></a>    <span class="c1"># https://stackoverflow.com/questions/16244923/how-to-make-a-custom-exception-class-with-multiple-init-args-pickleable  # noqa: E501</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31"></a>
+<a id="__codelineno-0-32" name="__codelineno-0-32"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33"></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> returned code </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openml.exceptions.OpenMLServerNoResult" class="doc doc-heading">
+            <code>OpenMLServerNoResult</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="openml.exceptions.OpenMLServerException" href="#openml.exceptions.OpenMLServerException">OpenMLServerException</a></code></p>
+
+
+        <p>Exception for when the result of the server is empty.</p>
+
+              <details class="quote">
+                <summary>Source code in <code>openml/exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-36">36</a></span>
+<span class="normal"><a href="#__codelineno-0-37">37</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenMLServerNoResult</span><span class="p">(</span><span class="n">OpenMLServerException</span><span class="p">):</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception for when the result of the server is empty.&quot;&quot;&quot;</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openml.exceptions.PyOpenMLError" class="doc doc-heading">
+            <code>PyOpenMLError</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code>Exception</code></p>
+
+
+        <p>Base class for all exceptions in OpenML-Python.</p>
+
+              <details class="quote">
+                <summary>Source code in <code>openml/exceptions.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-0-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-0-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-0-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-0-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-0-10">10</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="k">class</span><span class="w"> </span><span class="nc">PyOpenMLError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for all exceptions in OpenML-Python.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.copy"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

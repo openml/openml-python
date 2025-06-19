@@ -1,0 +1,3288 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../cli/">
+      
+      
+        <link rel="next" href="../datasets/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>config - openml-python</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#openml.config" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="openml-python" class="md-header__button md-logo" aria-label="openml-python" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            openml-python
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              config
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="openml-python" class="md-nav__button md-logo" aria-label="openml-python" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    openml-python
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenML
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Code Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Code Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    openml
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            openml
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../__version__/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    __version__
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../_api_calls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    _api_calls
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    base
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    cli
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    config
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    config
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config" class="md-nav__link">
+    <span class="md-ellipsis">
+      config
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.ConfigurationForExamples" class="md-nav__link">
+    <span class="md-ellipsis">
+      ConfigurationForExamples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ConfigurationForExamples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openml.config.ConfigurationForExamples.start_using_configuration_for_example" class="md-nav__link">
+    <span class="md-ellipsis">
+      start_using_configuration_for_example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openml.config.ConfigurationForExamples.stop_using_configuration_for_example" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop_using_configuration_for_example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.get_cache_directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_cache_directory
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_cache_directory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openml.config.get_cache_directory--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.get_server_base_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_server_base_url
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.overwrite_config_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      overwrite_config_context
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.set_console_log_level" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_console_log_level
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.set_field_in_config_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_field_in_config_file
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.set_file_log_level" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_file_log_level
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.set_root_cache_directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_root_cache_directory
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_6" id="__nav_2_1_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    datasets
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            datasets
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/data_feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    data_feature
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    dataset
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_7" id="__nav_2_1_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    evaluations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_7">
+            <span class="md-nav__icon md-icon"></span>
+            evaluations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluations/evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    evaluation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluations/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_9" id="__nav_2_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    extensions
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            extensions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extensions/extension_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    extension_interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extensions/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_9_3" id="__nav_2_1_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    sklearn
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_1_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            sklearn
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extensions/sklearn/extension/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    extension
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_10" id="__nav_2_1_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    flows
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_10">
+            <span class="md-nav__icon md-icon"></span>
+            flows
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flows/flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    flow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flows/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_11" id="__nav_2_1_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    runs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_11">
+            <span class="md-nav__icon md-icon"></span>
+            runs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../runs/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../runs/run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    run
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../runs/trace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    trace
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_12" id="__nav_2_1_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    setups
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_12">
+            <span class="md-nav__icon md-icon"></span>
+            setups
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setups/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setups/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_13" id="__nav_2_1_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    study
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_13">
+            <span class="md-nav__icon md-icon"></span>
+            study
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../study/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../study/study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    study
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_14" id="__nav_2_1_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    tasks
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_14">
+            <span class="md-nav__icon md-icon"></span>
+            tasks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tasks/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tasks/split/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    split
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tasks/task/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    task
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    utils
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Examples
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    20_basic
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            20_basic
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/20_basic/introduction_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction tutorial &amp; Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/20_basic/simple_datasets_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Datasets
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/20_basic/simple_flows_and_runs_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Flows and Runs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/20_basic/simple_suites_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark suites
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    30_extended
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            30_extended
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/benchmark_with_optunahub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Prepare for preprocessors and an OpenML task
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/configure_logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/create_upload_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dataset upload tutorial
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/custom_flow_/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Creating and Using a Custom Flow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/datasets_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Datasets
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/fetch_evaluations_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Fetching Evaluations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/fetch_runtimes_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Preparing tasks and scikit-learn models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/flow_id_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Obtaining Flow IDs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/flows_and_runs_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Flows and Runs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/plot_svm_hyperparameters_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Plotting hyperparameter surfaces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/run_setup_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Run Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/study_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark studies
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/suites_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark suites
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/task_manual_iteration_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tasks: retrieving splits
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/30_extended/tasks_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tasks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    40_paper
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            40_paper
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/40_paper/2015_neurips_feurer_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Feurer et al. (2015)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/40_paper/2018_ida_strang_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Strang et al. (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/40_paper/2018_kdd_rijn_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    van Rijn and Hutter (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/40_paper/2018_neurips_perrone_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Perrone et al. (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../extensions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Extensions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../progress/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config" class="md-nav__link">
+    <span class="md-ellipsis">
+      config
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.ConfigurationForExamples" class="md-nav__link">
+    <span class="md-ellipsis">
+      ConfigurationForExamples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ConfigurationForExamples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openml.config.ConfigurationForExamples.start_using_configuration_for_example" class="md-nav__link">
+    <span class="md-ellipsis">
+      start_using_configuration_for_example
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openml.config.ConfigurationForExamples.stop_using_configuration_for_example" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop_using_configuration_for_example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.get_cache_directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_cache_directory
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_cache_directory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openml.config.get_cache_directory--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.get_server_base_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_server_base_url
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.overwrite_config_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      overwrite_config_context
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.set_console_log_level" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_console_log_level
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.set_field_in_config_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_field_in_config_file
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.set_file_log_level" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_file_log_level
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openml.config.set_root_cache_directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_root_cache_directory
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>config</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="openml.config"></a>
+    <div class="doc doc-contents first">
+
+        <p>Store module level information like the API key, cache directory and the server</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openml.config.ConfigurationForExamples" class="doc doc-heading">
+            <code>ConfigurationForExamples</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+        <p>Allows easy switching to and from a test configuration, used for examples.</p>
+
+              <details class="quote">
+                <summary>Source code in <code>openml/config.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-208">208</a></span>
+<span class="normal"><a href="#__codelineno-0-209">209</a></span>
+<span class="normal"><a href="#__codelineno-0-210">210</a></span>
+<span class="normal"><a href="#__codelineno-0-211">211</a></span>
+<span class="normal"><a href="#__codelineno-0-212">212</a></span>
+<span class="normal"><a href="#__codelineno-0-213">213</a></span>
+<span class="normal"><a href="#__codelineno-0-214">214</a></span>
+<span class="normal"><a href="#__codelineno-0-215">215</a></span>
+<span class="normal"><a href="#__codelineno-0-216">216</a></span>
+<span class="normal"><a href="#__codelineno-0-217">217</a></span>
+<span class="normal"><a href="#__codelineno-0-218">218</a></span>
+<span class="normal"><a href="#__codelineno-0-219">219</a></span>
+<span class="normal"><a href="#__codelineno-0-220">220</a></span>
+<span class="normal"><a href="#__codelineno-0-221">221</a></span>
+<span class="normal"><a href="#__codelineno-0-222">222</a></span>
+<span class="normal"><a href="#__codelineno-0-223">223</a></span>
+<span class="normal"><a href="#__codelineno-0-224">224</a></span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span>
+<span class="normal"><a href="#__codelineno-0-226">226</a></span>
+<span class="normal"><a href="#__codelineno-0-227">227</a></span>
+<span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span>
+<span class="normal"><a href="#__codelineno-0-232">232</a></span>
+<span class="normal"><a href="#__codelineno-0-233">233</a></span>
+<span class="normal"><a href="#__codelineno-0-234">234</a></span>
+<span class="normal"><a href="#__codelineno-0-235">235</a></span>
+<span class="normal"><a href="#__codelineno-0-236">236</a></span>
+<span class="normal"><a href="#__codelineno-0-237">237</a></span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span>
+<span class="normal"><a href="#__codelineno-0-239">239</a></span>
+<span class="normal"><a href="#__codelineno-0-240">240</a></span>
+<span class="normal"><a href="#__codelineno-0-241">241</a></span>
+<span class="normal"><a href="#__codelineno-0-242">242</a></span>
+<span class="normal"><a href="#__codelineno-0-243">243</a></span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span>
+<span class="normal"><a href="#__codelineno-0-245">245</a></span>
+<span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+<span class="normal"><a href="#__codelineno-0-249">249</a></span>
+<span class="normal"><a href="#__codelineno-0-250">250</a></span>
+<span class="normal"><a href="#__codelineno-0-251">251</a></span>
+<span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span>
+<span class="normal"><a href="#__codelineno-0-258">258</a></span>
+<span class="normal"><a href="#__codelineno-0-259">259</a></span>
+<span class="normal"><a href="#__codelineno-0-260">260</a></span>
+<span class="normal"><a href="#__codelineno-0-261">261</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="k">class</span><span class="w"> </span><span class="nc">ConfigurationForExamples</span><span class="p">:</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Allows easy switching to and from a test configuration, used for examples.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a>    <span class="n">_last_used_server</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>    <span class="n">_last_used_key</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>    <span class="n">_start_last_called</span> <span class="o">=</span> <span class="kc">False</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>    <span class="n">_test_server</span> <span class="o">=</span> <span class="s2">&quot;https://test.openml.org/api/v1/xml&quot;</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="n">_test_apikey</span> <span class="o">=</span> <span class="s2">&quot;c0c42819af31e706efe1f4b88c23c6c1&quot;</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">start_using_configuration_for_example</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the configuration to connect to the test server with valid apikey.</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        To configuration as was before this call is stored, and can be recovered</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        by using the `stop_use_example_configuration` method.</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="k">global</span> <span class="n">server</span>  <span class="c1"># noqa: PLW0603</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="k">global</span> <span class="n">apikey</span>  <span class="c1"># noqa: PLW0603</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_start_last_called</span> <span class="ow">and</span> <span class="n">server</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_test_server</span> <span class="ow">and</span> <span class="n">apikey</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_test_apikey</span><span class="p">:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>            <span class="c1"># Method is called more than once in a row without modifying the server or apikey.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>            <span class="c1"># We don&#39;t want to save the current test configuration as a last used configuration.</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>            <span class="k">return</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>        <span class="bp">cls</span><span class="o">.</span><span class="n">_last_used_server</span> <span class="o">=</span> <span class="n">server</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="bp">cls</span><span class="o">.</span><span class="n">_last_used_key</span> <span class="o">=</span> <span class="n">apikey</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>        <span class="bp">cls</span><span class="o">.</span><span class="n">_start_last_called</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>        <span class="c1"># Test server key for examples</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="n">server</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_test_server</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="n">apikey</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_test_apikey</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>            <span class="sa">f</span><span class="s2">&quot;Switching to the test server </span><span class="si">{</span><span class="n">server</span><span class="si">}</span><span class="s2"> to not upload results to the live server. &quot;</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>            <span class="s2">&quot;Using the test server may result in reduced performance of the API!&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>        <span class="p">)</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">stop_using_configuration_for_example</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return to configuration as it was before `start_use_example_configuration`.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_start_last_called</span><span class="p">:</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>            <span class="c1"># We don&#39;t want to allow this because it will (likely) result in the `server` and</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>            <span class="c1"># `apikey` variables being set to None.</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>                <span class="s2">&quot;`stop_use_example_configuration` called without a saved config.&quot;</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>                <span class="s2">&quot;`start_use_example_configuration` must be called first.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>            <span class="p">)</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>        <span class="k">global</span> <span class="n">server</span>  <span class="c1"># noqa: PLW0603</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>        <span class="k">global</span> <span class="n">apikey</span>  <span class="c1"># noqa: PLW0603</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="n">server</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_last_used_server</span><span class="p">)</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>        <span class="n">apikey</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_last_used_key</span><span class="p">)</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>        <span class="bp">cls</span><span class="o">.</span><span class="n">_start_last_called</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="openml.config.ConfigurationForExamples.start_using_configuration_for_example" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">start_using_configuration_for_example</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Sets the configuration to connect to the test server with valid apikey.</p>
+<p>To configuration as was before this call is stored, and can be recovered
+by using the <code>stop_use_example_configuration</code> method.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/config.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-217">217</a></span>
+<span class="normal"><a href="#__codelineno-0-218">218</a></span>
+<span class="normal"><a href="#__codelineno-0-219">219</a></span>
+<span class="normal"><a href="#__codelineno-0-220">220</a></span>
+<span class="normal"><a href="#__codelineno-0-221">221</a></span>
+<span class="normal"><a href="#__codelineno-0-222">222</a></span>
+<span class="normal"><a href="#__codelineno-0-223">223</a></span>
+<span class="normal"><a href="#__codelineno-0-224">224</a></span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span>
+<span class="normal"><a href="#__codelineno-0-226">226</a></span>
+<span class="normal"><a href="#__codelineno-0-227">227</a></span>
+<span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span>
+<span class="normal"><a href="#__codelineno-0-232">232</a></span>
+<span class="normal"><a href="#__codelineno-0-233">233</a></span>
+<span class="normal"><a href="#__codelineno-0-234">234</a></span>
+<span class="normal"><a href="#__codelineno-0-235">235</a></span>
+<span class="normal"><a href="#__codelineno-0-236">236</a></span>
+<span class="normal"><a href="#__codelineno-0-237">237</a></span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span>
+<span class="normal"><a href="#__codelineno-0-239">239</a></span>
+<span class="normal"><a href="#__codelineno-0-240">240</a></span>
+<span class="normal"><a href="#__codelineno-0-241">241</a></span>
+<span class="normal"><a href="#__codelineno-0-242">242</a></span>
+<span class="normal"><a href="#__codelineno-0-243">243</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="k">def</span><span class="w"> </span><span class="nf">start_using_configuration_for_example</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sets the configuration to connect to the test server with valid apikey.</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">    To configuration as was before this call is stored, and can be recovered</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">    by using the `stop_use_example_configuration` method.</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="k">global</span> <span class="n">server</span>  <span class="c1"># noqa: PLW0603</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="k">global</span> <span class="n">apikey</span>  <span class="c1"># noqa: PLW0603</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_start_last_called</span> <span class="ow">and</span> <span class="n">server</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_test_server</span> <span class="ow">and</span> <span class="n">apikey</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_test_apikey</span><span class="p">:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>        <span class="c1"># Method is called more than once in a row without modifying the server or apikey.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="c1"># We don&#39;t want to save the current test configuration as a last used configuration.</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>        <span class="k">return</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>    <span class="bp">cls</span><span class="o">.</span><span class="n">_last_used_server</span> <span class="o">=</span> <span class="n">server</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>    <span class="bp">cls</span><span class="o">.</span><span class="n">_last_used_key</span> <span class="o">=</span> <span class="n">apikey</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="bp">cls</span><span class="o">.</span><span class="n">_start_last_called</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="c1"># Test server key for examples</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="n">server</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_test_server</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="n">apikey</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_test_apikey</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>        <span class="sa">f</span><span class="s2">&quot;Switching to the test server </span><span class="si">{</span><span class="n">server</span><span class="si">}</span><span class="s2"> to not upload results to the live server. &quot;</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>        <span class="s2">&quot;Using the test server may result in reduced performance of the API!&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="openml.config.ConfigurationForExamples.stop_using_configuration_for_example" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">stop_using_configuration_for_example</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return to configuration as it was before <code>start_use_example_configuration</code>.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/config.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-245">245</a></span>
+<span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+<span class="normal"><a href="#__codelineno-0-249">249</a></span>
+<span class="normal"><a href="#__codelineno-0-250">250</a></span>
+<span class="normal"><a href="#__codelineno-0-251">251</a></span>
+<span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span>
+<span class="normal"><a href="#__codelineno-0-258">258</a></span>
+<span class="normal"><a href="#__codelineno-0-259">259</a></span>
+<span class="normal"><a href="#__codelineno-0-260">260</a></span>
+<span class="normal"><a href="#__codelineno-0-261">261</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="k">def</span><span class="w"> </span><span class="nf">stop_using_configuration_for_example</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return to configuration as it was before `start_use_example_configuration`.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_start_last_called</span><span class="p">:</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>        <span class="c1"># We don&#39;t want to allow this because it will (likely) result in the `server` and</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="c1"># `apikey` variables being set to None.</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>            <span class="s2">&quot;`stop_use_example_configuration` called without a saved config.&quot;</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>            <span class="s2">&quot;`start_use_example_configuration` must be called first.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="p">)</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="k">global</span> <span class="n">server</span>  <span class="c1"># noqa: PLW0603</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="k">global</span> <span class="n">apikey</span>  <span class="c1"># noqa: PLW0603</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="n">server</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_last_used_server</span><span class="p">)</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="n">apikey</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_last_used_key</span><span class="p">)</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="bp">cls</span><span class="o">.</span><span class="n">_start_last_called</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.config.get_cache_directory" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_cache_directory</span><span class="p">()</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Get the current cache directory.</p>
+<p>This gets the cache directory for the current server relative
+to the root cache directory that can be set via
+<code>set_root_cache_directory()</code>. The cache directory is the
+<code>root_cache_directory</code> with additional information on which
+subdirectory to use based on the server name. By default it is
+<code>root_cache_directory / org / openml / www</code> for the standard
+OpenML.org server and is defined as
+<code>root_cache_directory / top-level domain / second-level domain /
+hostname</code>
+```</p>
+<h4 id="openml.config.get_cache_directory--returns">Returns</h4>
+<p>cachedir : string
+    The current cache directory.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/config.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-449">449</a></span>
+<span class="normal"><a href="#__codelineno-0-450">450</a></span>
+<span class="normal"><a href="#__codelineno-0-451">451</a></span>
+<span class="normal"><a href="#__codelineno-0-452">452</a></span>
+<span class="normal"><a href="#__codelineno-0-453">453</a></span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span>
+<span class="normal"><a href="#__codelineno-0-455">455</a></span>
+<span class="normal"><a href="#__codelineno-0-456">456</a></span>
+<span class="normal"><a href="#__codelineno-0-457">457</a></span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span>
+<span class="normal"><a href="#__codelineno-0-459">459</a></span>
+<span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span>
+<span class="normal"><a href="#__codelineno-0-464">464</a></span>
+<span class="normal"><a href="#__codelineno-0-465">465</a></span>
+<span class="normal"><a href="#__codelineno-0-466">466</a></span>
+<span class="normal"><a href="#__codelineno-0-467">467</a></span>
+<span class="normal"><a href="#__codelineno-0-468">468</a></span>
+<span class="normal"><a href="#__codelineno-0-469">469</a></span>
+<span class="normal"><a href="#__codelineno-0-470">470</a></span>
+<span class="normal"><a href="#__codelineno-0-471">471</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_cache_directory</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the current cache directory.</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">    This gets the cache directory for the current server relative</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">    to the root cache directory that can be set via</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">    ``set_root_cache_directory()``. The cache directory is the</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">    ``root_cache_directory`` with additional information on which</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">    subdirectory to use based on the server name. By default it is</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">    ``root_cache_directory / org / openml / www`` for the standard</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">    OpenML.org server and is defined as</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">    ``root_cache_directory / top-level domain / second-level domain /</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="sd">    hostname``</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="sd">    ```</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    cachedir : string</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="sd">        The current cache directory.</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>    <span class="n">url_suffix</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">server</span><span class="p">)</span><span class="o">.</span><span class="n">netloc</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>    <span class="n">reversed_url_suffix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">url_suffix</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># noqa: PTH118</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_root_cache_directory</span><span class="p">,</span> <span class="n">reversed_url_suffix</span><span class="p">)</span>  <span class="c1"># noqa: PTH118</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.config.get_server_base_url" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_server_base_url</span><span class="p">()</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the base URL of the currently configured server.</p>
+<p>Turns <code>"https://api.openml.org/api/v1/xml"</code> in <code>"https://www.openml.org/"</code>
+and <code>"https://test.openml.org/api/v1/xml"</code> in <code>"https://test.openml.org/"</code></p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/config.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-164">164</a></span>
+<span class="normal"><a href="#__codelineno-0-165">165</a></span>
+<span class="normal"><a href="#__codelineno-0-166">166</a></span>
+<span class="normal"><a href="#__codelineno-0-167">167</a></span>
+<span class="normal"><a href="#__codelineno-0-168">168</a></span>
+<span class="normal"><a href="#__codelineno-0-169">169</a></span>
+<span class="normal"><a href="#__codelineno-0-170">170</a></span>
+<span class="normal"><a href="#__codelineno-0-171">171</a></span>
+<span class="normal"><a href="#__codelineno-0-172">172</a></span>
+<span class="normal"><a href="#__codelineno-0-173">173</a></span>
+<span class="normal"><a href="#__codelineno-0-174">174</a></span>
+<span class="normal"><a href="#__codelineno-0-175">175</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-164" name="__codelineno-0-164"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_server_base_url</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-165" name="__codelineno-0-165"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the base URL of the currently configured server.</span>
+<a id="__codelineno-0-166" name="__codelineno-0-166"></a>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="sd">    Turns ``&quot;https://api.openml.org/api/v1/xml&quot;`` in ``&quot;https://www.openml.org/&quot;``</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="sd">    and ``&quot;https://test.openml.org/api/v1/xml&quot;`` in ``&quot;https://test.openml.org/&quot;``</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    str</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a>    <span class="n">domain</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/api&quot;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a>    <span class="k">return</span> <span class="n">domain</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;api&quot;</span><span class="p">,</span> <span class="s2">&quot;www&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.config.overwrite_config_context" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">overwrite_config_context</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>A context manager to temporarily override variables in the configuration.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/config.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-503">503</a></span>
+<span class="normal"><a href="#__codelineno-0-504">504</a></span>
+<span class="normal"><a href="#__codelineno-0-505">505</a></span>
+<span class="normal"><a href="#__codelineno-0-506">506</a></span>
+<span class="normal"><a href="#__codelineno-0-507">507</a></span>
+<span class="normal"><a href="#__codelineno-0-508">508</a></span>
+<span class="normal"><a href="#__codelineno-0-509">509</a></span>
+<span class="normal"><a href="#__codelineno-0-510">510</a></span>
+<span class="normal"><a href="#__codelineno-0-511">511</a></span>
+<span class="normal"><a href="#__codelineno-0-512">512</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="nd">@contextmanager</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="k">def</span><span class="w"> </span><span class="nf">overwrite_config_context</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">_Config</span><span class="p">]:</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A context manager to temporarily override variables in the configuration.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>    <span class="n">existing_config</span> <span class="o">=</span> <span class="n">get_config_as_dict</span><span class="p">()</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>    <span class="n">merged_config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">existing_config</span><span class="p">,</span> <span class="o">**</span><span class="n">config</span><span class="p">}</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="n">_setup</span><span class="p">(</span><span class="n">merged_config</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>    <span class="k">yield</span> <span class="n">merged_config</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>    <span class="n">_setup</span><span class="p">(</span><span class="n">existing_config</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.config.set_console_log_level" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">set_console_log_level</span><span class="p">(</span><span class="n">console_output_level</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Set console output to the desired level and register it with openml logger if needed.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/config.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-93">93</a></span>
+<span class="normal"><a href="#__codelineno-0-94">94</a></span>
+<span class="normal"><a href="#__codelineno-0-95">95</a></span>
+<span class="normal"><a href="#__codelineno-0-96">96</a></span>
+<span class="normal"><a href="#__codelineno-0-97">97</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_console_log_level</span><span class="p">(</span><span class="n">console_output_level</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Set console output to the desired level and register it with openml logger if needed.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a>    <span class="k">global</span> <span class="n">console_handler</span>  <span class="c1"># noqa: PLW0602</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a>    <span class="k">assert</span> <span class="n">console_handler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a>    <span class="n">_set_level_register_and_store</span><span class="p">(</span><span class="n">console_handler</span><span class="p">,</span> <span class="n">console_output_level</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.config.set_field_in_config_file" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">set_field_in_config_file</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Overwrites the <code>field</code> in the configuration file with the new <code>value</code>.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/config.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-389">389</a></span>
+<span class="normal"><a href="#__codelineno-0-390">390</a></span>
+<span class="normal"><a href="#__codelineno-0-391">391</a></span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span>
+<span class="normal"><a href="#__codelineno-0-393">393</a></span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span>
+<span class="normal"><a href="#__codelineno-0-395">395</a></span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span>
+<span class="normal"><a href="#__codelineno-0-397">397</a></span>
+<span class="normal"><a href="#__codelineno-0-398">398</a></span>
+<span class="normal"><a href="#__codelineno-0-399">399</a></span>
+<span class="normal"><a href="#__codelineno-0-400">400</a></span>
+<span class="normal"><a href="#__codelineno-0-401">401</a></span>
+<span class="normal"><a href="#__codelineno-0-402">402</a></span>
+<span class="normal"><a href="#__codelineno-0-403">403</a></span>
+<span class="normal"><a href="#__codelineno-0-404">404</a></span>
+<span class="normal"><a href="#__codelineno-0-405">405</a></span>
+<span class="normal"><a href="#__codelineno-0-406">406</a></span>
+<span class="normal"><a href="#__codelineno-0-407">407</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_field_in_config_file</span><span class="p">(</span><span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Overwrites the `field` in the configuration file with the new `value`.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>    <span class="k">if</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_defaults</span><span class="p">:</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Field &#39;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">&#39; is not valid and must be one of &#39;</span><span class="si">{</span><span class="n">_defaults</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="c1"># TODO(eddiebergman): This use of globals has gone too far</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="nb">globals</span><span class="p">()[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="n">config_file</span> <span class="o">=</span> <span class="n">determine_config_file_path</span><span class="p">()</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="n">config</span> <span class="o">=</span> <span class="n">_parse_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>    <span class="k">with</span> <span class="n">config_file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">_defaults</span><span class="p">:</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>            <span class="c1"># We can&#39;t blindly set all values based on globals() because when the user</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>            <span class="c1"># sets it through config.FIELD it should not be stored to file.</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>            <span class="c1"># There doesn&#39;t seem to be a way to avoid writing defaults to file with configparser,</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>            <span class="c1"># because it is impossible to distinguish from an explicitly set value that matches</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>            <span class="c1"># the default value, to one that was set to its default because it was omitted.</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>            <span class="n">value</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">f</span><span class="p">]</span> <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="n">field</span> <span class="k">else</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>                <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.config.set_file_log_level" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">set_file_log_level</span><span class="p">(</span><span class="n">file_output_level</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Set file output to the desired level and register it with openml logger if needed.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>openml/config.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-100">100</a></span>
+<span class="normal"><a href="#__codelineno-0-101">101</a></span>
+<span class="normal"><a href="#__codelineno-0-102">102</a></span>
+<span class="normal"><a href="#__codelineno-0-103">103</a></span>
+<span class="normal"><a href="#__codelineno-0-104">104</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_file_log_level</span><span class="p">(</span><span class="n">file_output_level</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Set file output to the desired level and register it with openml logger if needed.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="k">global</span> <span class="n">file_handler</span>  <span class="c1"># noqa: PLW0602</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="k">assert</span> <span class="n">file_handler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+<a id="__codelineno-0-104" name="__codelineno-0-104"></a>    <span class="n">_set_level_register_and_store</span><span class="p">(</span><span class="n">file_handler</span><span class="p">,</span> <span class="n">file_output_level</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openml.config.set_root_cache_directory" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">set_root_cache_directory</span><span class="p">(</span><span class="n">root_cache_directory</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Set module-wide base cache directory.</p>
+<p>Sets the root cache directory, wherin the cache directories are
+created to store content from different OpenML servers. For example,
+by default, cached data for the standard OpenML.org server is stored
+at <code>root_cache_directory / org / openml / www</code>, and the general
+pattern is <code>root_cache_directory / top-level domain / second-level
+domain / hostname</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>root_cache_directory</code></td>
+            <td>
+                  <code>string</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path to use as cache directory.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="see-also" open>
+  <summary>See Also</summary>
+  <p>get_cache_directory</p>
+</details>
+            <details class="quote">
+              <summary>Source code in <code>openml/config.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-474">474</a></span>
+<span class="normal"><a href="#__codelineno-0-475">475</a></span>
+<span class="normal"><a href="#__codelineno-0-476">476</a></span>
+<span class="normal"><a href="#__codelineno-0-477">477</a></span>
+<span class="normal"><a href="#__codelineno-0-478">478</a></span>
+<span class="normal"><a href="#__codelineno-0-479">479</a></span>
+<span class="normal"><a href="#__codelineno-0-480">480</a></span>
+<span class="normal"><a href="#__codelineno-0-481">481</a></span>
+<span class="normal"><a href="#__codelineno-0-482">482</a></span>
+<span class="normal"><a href="#__codelineno-0-483">483</a></span>
+<span class="normal"><a href="#__codelineno-0-484">484</a></span>
+<span class="normal"><a href="#__codelineno-0-485">485</a></span>
+<span class="normal"><a href="#__codelineno-0-486">486</a></span>
+<span class="normal"><a href="#__codelineno-0-487">487</a></span>
+<span class="normal"><a href="#__codelineno-0-488">488</a></span>
+<span class="normal"><a href="#__codelineno-0-489">489</a></span>
+<span class="normal"><a href="#__codelineno-0-490">490</a></span>
+<span class="normal"><a href="#__codelineno-0-491">491</a></span>
+<span class="normal"><a href="#__codelineno-0-492">492</a></span>
+<span class="normal"><a href="#__codelineno-0-493">493</a></span>
+<span class="normal"><a href="#__codelineno-0-494">494</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_root_cache_directory</span><span class="p">(</span><span class="n">root_cache_directory</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Set module-wide base cache directory.</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">    Sets the root cache directory, wherin the cache directories are</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">    created to store content from different OpenML servers. For example,</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">    by default, cached data for the standard OpenML.org server is stored</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">    at ``root_cache_directory / org / openml / www``, and the general</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">    pattern is ``root_cache_directory / top-level domain / second-level</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">    domain / hostname``.</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">    root_cache_directory : string</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">         Path to use as cache directory.</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">    See Also</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">    --------</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">    get_cache_directory</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="k">global</span> <span class="n">_root_cache_directory</span>  <span class="c1"># noqa: PLW0603</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>    <span class="n">_root_cache_directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root_cache_directory</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.copy"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

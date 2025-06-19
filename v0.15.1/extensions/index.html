@@ -1,0 +1,2651 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../contributing/">
+      
+      
+        <link rel="next" href="../progress/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Extensions - openml-python</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#extensions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="openml-python" class="md-header__button md-logo" aria-label="openml-python" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            openml-python
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Extensions
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="openml-python" class="md-nav__button md-logo" aria-label="openml-python" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    openml-python
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenML
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Code Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Code Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    openml
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            openml
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/__version__/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    __version__
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/_api_calls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    _api_calls
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    base
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    cli
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    config
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_6" id="__nav_2_1_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    datasets
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            datasets
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/datasets/data_feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    data_feature
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/datasets/dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    dataset
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/datasets/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_7" id="__nav_2_1_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    evaluations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_7">
+            <span class="md-nav__icon md-icon"></span>
+            evaluations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/evaluations/evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    evaluation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/evaluations/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_9" id="__nav_2_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    extensions
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            extensions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/extensions/extension_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    extension_interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/extensions/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_9_3" id="__nav_2_1_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    sklearn
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_1_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            sklearn
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/extensions/sklearn/extension/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    extension
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_10" id="__nav_2_1_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    flows
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_10">
+            <span class="md-nav__icon md-icon"></span>
+            flows
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/flows/flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    flow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/flows/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_11" id="__nav_2_1_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    runs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_11">
+            <span class="md-nav__icon md-icon"></span>
+            runs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/runs/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/runs/run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    run
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/runs/trace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    trace
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_12" id="__nav_2_1_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    setups
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_12">
+            <span class="md-nav__icon md-icon"></span>
+            setups
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/setups/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/setups/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_13" id="__nav_2_1_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    study
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_13">
+            <span class="md-nav__icon md-icon"></span>
+            study
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/study/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/study/study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    study
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_14" id="__nav_2_1_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    tasks
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_14">
+            <span class="md-nav__icon md-icon"></span>
+            tasks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tasks/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tasks/split/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    split
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tasks/task/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    task
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    utils
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Examples
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    20_basic
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            20_basic
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/20_basic/introduction_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction tutorial &amp; Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/20_basic/simple_datasets_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Datasets
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/20_basic/simple_flows_and_runs_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Flows and Runs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/20_basic/simple_suites_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark suites
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    30_extended
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            30_extended
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/benchmark_with_optunahub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Prepare for preprocessors and an OpenML task
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/configure_logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/create_upload_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dataset upload tutorial
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/custom_flow_/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Creating and Using a Custom Flow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/datasets_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Datasets
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/fetch_evaluations_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Fetching Evaluations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/fetch_runtimes_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Preparing tasks and scikit-learn models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/flow_id_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Obtaining Flow IDs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/flows_and_runs_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Flows and Runs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/plot_svm_hyperparameters_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Plotting hyperparameter surfaces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/run_setup_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Run Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/study_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark studies
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/suites_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark suites
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/task_manual_iteration_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tasks: retrieving splits
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/tasks_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tasks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    40_paper
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            40_paper
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/40_paper/2015_neurips_feurer_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Feurer et al. (2015)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/40_paper/2018_ida_strang_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Strang et al. (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/40_paper/2018_kdd_rijn_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    van Rijn and Hutter (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/40_paper/2018_neurips_perrone_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Perrone et al. (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Extensions
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Extensions
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#list-of-extensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      List of extensions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connecting-new-machine-learning-libraries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Connecting new machine learning libraries
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Connecting new machine learning libraries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#content-of-the-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      Content of the Library
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Content of the Library">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      API
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interfacing-with-openml-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interfacing with OpenML-Python
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hosting-the-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hosting the library
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recommended
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../progress/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#list-of-extensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      List of extensions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connecting-new-machine-learning-libraries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Connecting new machine learning libraries
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Connecting new machine learning libraries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#content-of-the-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      Content of the Library
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Content of the Library">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      API
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interfacing-with-openml-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interfacing with OpenML-Python
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hosting-the-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hosting the library
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recommended
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="extensions">Extensions</h1>
+<p>OpenML-Python provides an extension interface to connect other machine
+learning libraries than scikit-learn to OpenML. Please check the
+<code class="interpreted-text" role="ref">api_extensions</code> and use the scikit-learn
+extension in
+<code>openml.extensions.sklearn.SklearnExtension</code>{.interpreted-text
+role="class"} as a starting point.</p>
+<h2 id="list-of-extensions">List of extensions</h2>
+<p>Here is a list of currently maintained OpenML extensions:</p>
+<ul>
+<li><code>openml.extensions.sklearn.SklearnExtension</code>{.interpreted-text
+    role="class"}</li>
+<li><a href="https://github.com/openml/openml-keras">openml-keras</a></li>
+<li><a href="https://github.com/openml/openml-pytorch">openml-pytorch</a></li>
+<li><a href="https://github.com/openml/openml-tensorflow">openml-tensorflow (for tensorflow
+    2+)</a></li>
+</ul>
+<h2 id="connecting-new-machine-learning-libraries">Connecting new machine learning libraries</h2>
+<h3 id="content-of-the-library">Content of the Library</h3>
+<p>To leverage support from the community and to tap in the potential of
+OpenML, interfacing with popular machine learning libraries is
+essential. The OpenML-Python package is capable of downloading meta-data
+and results (data, flows, runs), regardless of the library that was used
+to upload it. However, in order to simplify the process of uploading
+flows and runs from a specific library, an additional interface can be
+built. The OpenML-Python team does not have the capacity to develop and
+maintain such interfaces on its own. For this reason, we have built an
+extension interface to allows others to contribute back. Building a
+suitable extension for therefore requires an understanding of the
+current OpenML-Python support.</p>
+<p>The
+<code>sphx_glr_examples_20_basic_simple_flows_and_runs_tutorial.py</code>{.interpreted-text
+role="ref"} tutorial shows how scikit-learn currently works with
+OpenML-Python as an extension. The <em>sklearn</em> extension packaged with the
+<a href="https://github.com/openml/openml-python">openml-python</a> repository can
+be used as a template/benchmark to build the new extension.</p>
+<h4 id="api">API</h4>
+<ul>
+<li>The extension scripts must import the [openml]{.title-ref} package
+    and be able to interface with any function from the OpenML-Python
+    <code class="interpreted-text" role="ref">api</code>.</li>
+<li>The extension has to be defined as a Python class and must inherit
+    from <code class="interpreted-text" role="class">openml.extensions.Extension</code>.</li>
+<li>This class needs to have all the functions from [class
+    Extension]{.title-ref} overloaded as required.</li>
+<li>The redefined functions should have adequate and appropriate
+    docstrings. The [Sklearn Extension API
+    :class:`openml.extensions.sklearn.SklearnExtension.html]{.title-ref}
+    is a good example to follow.</li>
+</ul>
+<h4 id="interfacing-with-openml-python">Interfacing with OpenML-Python</h4>
+<p>Once the new extension class has been defined, the openml-python module
+to <code class="interpreted-text" role="meth">openml.extensions.register_extension</code>
+must be called to allow OpenML-Python to interface the new extension.</p>
+<p>The following methods should get implemented. Although the documentation
+in the [Extension]{.title-ref} interface should always be leading, here
+we list some additional information and best practices. The [Sklearn
+Extension API
+:class:`openml.extensions.sklearn.SklearnExtension.html]{.title-ref} is
+a good example to follow. Note that most methods are relatively simple
+and can be implemented in several lines of code.</p>
+<ul>
+<li>General setup (required)<ul>
+<li><code class="interpreted-text" role="meth">can_handle_flow</code>: Takes as
+    argument an OpenML flow, and checks whether this can be handled
+    by the current extension. The OpenML database consists of many
+    flows, from various workbenches (e.g., scikit-learn, Weka, mlr).
+    This method is called before a model is being deserialized.
+    Typically, the flow-dependency field is used to check whether
+    the specific library is present, and no unknown libraries are
+    present there.</li>
+<li><code class="interpreted-text" role="meth">can_handle_model</code>: Similar as
+    <code class="interpreted-text" role="meth">can_handle_flow</code>, except that in
+    this case a Python object is given. As such, in many cases, this
+    method can be implemented by checking whether this adheres to a
+    certain base class.</li>
+</ul>
+</li>
+<li>Serialization and De-serialization (required)<ul>
+<li><code class="interpreted-text" role="meth">flow_to_model</code>: deserializes the
+    OpenML Flow into a model (if the library can indeed handle the
+    flow). This method has an important interplay with
+    <code class="interpreted-text" role="meth">model_to_flow</code>. Running these
+    two methods in succession should result in exactly the same
+    model (or flow). This property can be used for unit testing
+    (e.g., build a model with hyperparameters, make predictions on a
+    task, serialize it to a flow, deserialize it back, make it
+    predict on the same task, and check whether the predictions are
+    exactly the same.) The example in the scikit-learn interface
+    might seem daunting, but note that here some complicated design
+    choices were made, that allow for all sorts of interesting
+    research questions. It is probably good practice to start easy.</li>
+<li><code class="interpreted-text" role="meth">model_to_flow</code>: The inverse of
+    <code class="interpreted-text" role="meth">flow_to_model</code>. Serializes a
+    model into an OpenML Flow. The flow should preserve the class,
+    the library version, and the tunable hyperparameters.</li>
+<li><code class="interpreted-text" role="meth">get_version_information</code>: Return
+    a tuple with the version information of the important libraries.</li>
+<li><code class="interpreted-text" role="meth">create_setup_string</code>: No longer
+    used, and will be deprecated soon.</li>
+</ul>
+</li>
+<li>Performing runs (required)<ul>
+<li><code class="interpreted-text" role="meth">is_estimator</code>: Gets as input a
+    class, and checks whether it has the status of estimator in the
+    library (typically, whether it has a train method and a predict
+    method).</li>
+<li><code class="interpreted-text" role="meth">seed_model</code>: Sets a random seed
+    to the model.</li>
+<li><code class="interpreted-text" role="meth">_run_model_on_fold</code>: One of the
+    main requirements for a library to generate run objects for the
+    OpenML server. Obtains a train split (with labels) and a test
+    split (without labels) and the goal is to train a model on the
+    train split and return the predictions on the test split. On top
+    of the actual predictions, also the class probabilities should
+    be determined. For classifiers that do not return class
+    probabilities, this can just be the hot-encoded predicted label.
+    The predictions will be evaluated on the OpenML server. Also,
+    additional information can be returned, for example,
+    user-defined measures (such as runtime information, as this can
+    not be inferred on the server). Additionally, information about
+    a hyperparameter optimization trace can be provided.</li>
+<li><code class="interpreted-text" role="meth">obtain_parameter_values</code>:
+    Obtains the hyperparameters of a given model and the current
+    values. Please note that in the case of a hyperparameter
+    optimization procedure (e.g., random search), you only should
+    return the hyperparameters of this procedure (e.g., the
+    hyperparameter grid, budget, etc) and that the chosen model will
+    be inferred from the optimization trace.</li>
+<li><code class="interpreted-text" role="meth">check_if_model_fitted</code>: Check
+    whether the train method of the model has been called (and as
+    such, whether the predict method can be used).</li>
+</ul>
+</li>
+<li>Hyperparameter optimization (optional)<ul>
+<li><code>instantiate_model_from_hpo_class</code>{.interpreted-text
+    role="meth"}: If a given run has recorded the hyperparameter
+    optimization trace, then this method can be used to
+    reinstantiate the model with hyperparameters of a given
+    hyperparameter optimization iteration. Has some similarities
+    with <code class="interpreted-text" role="meth">flow_to_model</code> (as this
+    method also sets the hyperparameters of a model). Note that
+    although this method is required, it is not necessary to
+    implement any logic if hyperparameter optimization is not
+    implemented. Simply raise a [NotImplementedError]{.title-ref}
+    then.</li>
+</ul>
+</li>
+</ul>
+<h3 id="hosting-the-library">Hosting the library</h3>
+<p>Each extension created should be a stand-alone repository, compatible
+with the <a href="https://github.com/openml/openml-python">OpenML-Python
+repository</a>. The extension
+repository should work off-the-shelf with <em>OpenML-Python</em> installed.</p>
+<p>Create a <a href="https://docs.github.com/en/github/getting-started-with-github/create-a-repo">public Github
+repo</a>
+with the following directory structure:</p>
+<div class="highlight"><pre><span></span><code>| [repo name]
+|    |-- [extension name]
+|    |    |-- __init__.py
+|    |    |-- extension.py
+|    |    |-- config.py (optionally)
+</code></pre></div>
+<h3 id="recommended">Recommended</h3>
+<ul>
+<li>Test cases to keep the extension up to date with the
+    [openml-python]{.title-ref} upstream changes.</li>
+<li>Documentation of the extension API, especially if any new
+    functionality added to OpenML-Python\'s extension design.</li>
+<li>Examples to show how the new extension interfaces and works with
+    OpenML-Python.</li>
+<li>Create a PR to add the new extension to the OpenML-Python API
+    documentation.</li>
+</ul>
+<p>Happy contributing!</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

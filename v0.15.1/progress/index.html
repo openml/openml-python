@@ -1,0 +1,3139 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../extensions/">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Changelog - openml-python</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#progress" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="openml-python" class="md-header__button md-logo" aria-label="openml-python" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            openml-python
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Changelog
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="openml-python" class="md-nav__button md-logo" aria-label="openml-python" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    openml-python
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenML
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Code Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Code Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    openml
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            openml
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/__version__/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    __version__
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/_api_calls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    _api_calls
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    base
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    cli
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    config
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_6" id="__nav_2_1_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    datasets
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            datasets
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/datasets/data_feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    data_feature
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/datasets/dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    dataset
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/datasets/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_7" id="__nav_2_1_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    evaluations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_7">
+            <span class="md-nav__icon md-icon"></span>
+            evaluations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/evaluations/evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    evaluation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/evaluations/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_9" id="__nav_2_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    extensions
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            extensions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/extensions/extension_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    extension_interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/extensions/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_9_3" id="__nav_2_1_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    sklearn
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_1_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            sklearn
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/extensions/sklearn/extension/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    extension
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_10" id="__nav_2_1_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    flows
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_10">
+            <span class="md-nav__icon md-icon"></span>
+            flows
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/flows/flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    flow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/flows/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_11" id="__nav_2_1_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    runs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_11">
+            <span class="md-nav__icon md-icon"></span>
+            runs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/runs/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/runs/run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    run
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/runs/trace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    trace
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_12" id="__nav_2_1_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    setups
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_12">
+            <span class="md-nav__icon md-icon"></span>
+            setups
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/setups/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/setups/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_13" id="__nav_2_1_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    study
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_13">
+            <span class="md-nav__icon md-icon"></span>
+            study
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/study/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/study/study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    study
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_14" id="__nav_2_1_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    tasks
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_14">
+            <span class="md-nav__icon md-icon"></span>
+            tasks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tasks/functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tasks/split/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    split
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tasks/task/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    task
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    utils
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Examples
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    20_basic
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            20_basic
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/20_basic/introduction_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction tutorial &amp; Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/20_basic/simple_datasets_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Datasets
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/20_basic/simple_flows_and_runs_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Flows and Runs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/20_basic/simple_suites_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark suites
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    30_extended
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            30_extended
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/benchmark_with_optunahub/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Prepare for preprocessors and an OpenML task
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/configure_logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/create_upload_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dataset upload tutorial
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/custom_flow_/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Creating and Using a Custom Flow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/datasets_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Datasets
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/fetch_evaluations_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Fetching Evaluations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/fetch_runtimes_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Preparing tasks and scikit-learn models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/flow_id_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Obtaining Flow IDs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/flows_and_runs_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Flows and Runs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/plot_svm_hyperparameters_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Plotting hyperparameter surfaces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/run_setup_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Run Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/study_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark studies
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/suites_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Benchmark suites
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/task_manual_iteration_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tasks: retrieving splits
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/30_extended/tasks_tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tasks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    40_paper
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            40_paper
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/40_paper/2015_neurips_feurer_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Feurer et al. (2015)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/40_paper/2018_ida_strang_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Strang et al. (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/40_paper/2018_kdd_rijn_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    van Rijn and Hutter (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/40_paper/2018_neurips_perrone_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Perrone et al. (2018)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extensions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Extensions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Changelog
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#next" class="md-nav__link">
+    <span class="md-ellipsis">
+      next
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0142" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.14.2
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0141" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.14.1
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0140" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.14.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0131" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.13.1
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0130" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.13.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0122" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.12.2
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0121" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.12.1
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0120" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.12.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0110" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.11.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0102" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.10.2
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0101" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.10.1
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0100" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.10.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#090" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.9.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#080" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.8.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#04-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.4.-0.7
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#030" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.3.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prior" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prior
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#next" class="md-nav__link">
+    <span class="md-ellipsis">
+      next
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0142" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.14.2
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0141" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.14.1
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0140" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.14.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0131" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.13.1
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0130" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.13.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0122" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.12.2
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0121" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.12.1
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0120" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.12.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0110" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.11.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0102" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.10.2
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0101" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.10.1
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0100" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.10.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#090" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.9.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#080" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.8.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#04-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.4.-0.7
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#030" class="md-nav__link">
+    <span class="md-ellipsis">
+      0.3.0
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prior" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prior
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="progress">Changelog</h1>
+<h2 id="next">next</h2>
+<blockquote>
+<ul>
+<li>MAINT #1340: Add Numpy 2.0 support. Update tests to work with
+    scikit-learn \&lt;= 1.5.</li>
+<li>ADD #1342: Add HTTP header to requests to indicate they are from
+    openml-python.</li>
+</ul>
+</blockquote>
+<h2 id="0142">0.14.2</h2>
+<blockquote>
+<ul>
+<li>MAINT #1280: Use the server-provided <code>parquet_url</code> instead of
+    <code>minio_url</code> to determine the location of the parquet file.</li>
+<li>ADD #716: add documentation for remaining attributes of classes
+    and functions.</li>
+<li>ADD #1261: more annotations for type hints.</li>
+<li>MAINT #1294: update tests to new tag specification.</li>
+<li>FIX #1314: Update fetching a bucket from MinIO.</li>
+<li>FIX #1315: Make class label retrieval more lenient.</li>
+<li>ADD #1316: add feature descriptions ontologies support.</li>
+<li>MAINT #1310/#1307: switch to ruff and resolve all mypy errors.</li>
+</ul>
+</blockquote>
+<h2 id="0141">0.14.1</h2>
+<blockquote>
+<ul>
+<li>FIX: Fallback on downloading ARFF when failing to download parquet
+    from MinIO due to a ServerError.</li>
+</ul>
+</blockquote>
+<h2 id="0140">0.14.0</h2>
+<p><strong>IMPORTANT:</strong> This release paves the way towards a breaking update of
+OpenML-Python. From version 0.15, functions that had the option to
+return a pandas DataFrame will return a pandas DataFrame by default.
+This version (0.14) emits a warning if you still use the old access
+functionality. More concretely:</p>
+<ul>
+<li>In 0.15 we will drop the ability to return dictionaries in listing
+    calls and only provide pandas DataFrames. To disable warnings in
+    0.14 you have to request a pandas DataFrame (using
+    <code>output_format="dataframe"</code>).</li>
+<li>In 0.15 we will drop the ability to return datasets as numpy arrays
+    and only provide pandas DataFrames. To disable warnings in 0.14 you
+    have to request a pandas DataFrame (using
+    <code>dataset_format="dataframe"</code>).</li>
+</ul>
+<p>Furthermore, from version 0.15, OpenML-Python will no longer download
+datasets and dataset metadata by default. This version (0.14) emits a
+warning if you don\'t explicitly specifiy the desired behavior.</p>
+<p>Please see the pull requests #1258 and #1260 for further information.</p>
+<ul>
+<li>ADD #1081: New flag that allows disabling downloading dataset
+    features.</li>
+<li>ADD #1132: New flag that forces a redownload of cached data.</li>
+<li>FIX #1244: Fixes a rare bug where task listing could fail when the
+    server returned invalid data.</li>
+<li>DOC #1229: Fixes a comment string for the main example.</li>
+<li>DOC #1241: Fixes a comment in an example.</li>
+<li>MAINT #1124: Improve naming of helper functions that govern the
+    cache directories.</li>
+<li>MAINT #1223, #1250: Update tools used in pre-commit to the latest
+    versions (<code>black==23.30</code>, <code>mypy==1.3.0</code>, <code>flake8==6.0.0</code>).</li>
+<li>MAINT #1253: Update the citation request to the JMLR paper.</li>
+<li>MAINT #1246: Add a warning that warns the user that checking for
+    duplicate runs on the server cannot be done without an API key.</li>
+</ul>
+<h2 id="0131">0.13.1</h2>
+<ul>
+<li>ADD #1081 #1132: Add additional options for (not) downloading
+    datasets <code>openml.datasets.get_dataset</code> and cache management.</li>
+<li>ADD #1028: Add functions to delete runs, flows, datasets, and tasks
+    (e.g., <code>openml.datasets.delete_dataset</code>).</li>
+<li>ADD #1144: Add locally computed results to the <code>OpenMLRun</code> object\'s
+    representation if the run was created locally and not downloaded
+    from the server.</li>
+<li>ADD #1180: Improve the error message when the checksum of a
+    downloaded dataset does not match the checksum provided by the API.</li>
+<li>ADD #1201: Make <code>OpenMLTraceIteration</code> a dataclass.</li>
+<li>DOC #1069: Add argument documentation for the <code>OpenMLRun</code> class.</li>
+<li>DOC #1241 #1229 #1231: Minor documentation fixes and resolve
+    documentation examples not working.</li>
+<li>FIX #1197 #559 #1131: Fix the order of ground truth and predictions
+    in the <code>OpenMLRun</code> object and in <code>format_prediction</code>.</li>
+<li>FIX #1198: Support numpy 1.24 and higher.</li>
+<li>FIX #1216: Allow unknown task types on the server. This is only
+    relevant when new task types are added to the test server.</li>
+<li>FIX #1223: Fix mypy errors for implicit optional typing.</li>
+<li>MAINT #1155: Add dependabot github action to automatically update
+    other github actions.</li>
+<li>MAINT #1199: Obtain pre-commit\'s flake8 from github.com instead of
+    gitlab.com.</li>
+<li>MAINT #1215: Support latest numpy version.</li>
+<li>MAINT #1218: Test Python3.6 on Ubuntu 20.04 instead of the latest
+    Ubuntu (which is 22.04).</li>
+<li>MAINT #1221 #1212 #1206 #1211: Update github actions to the latest
+    versions.</li>
+</ul>
+<h2 id="0130">0.13.0</h2>
+<blockquote>
+<ul>
+<li>FIX #1030: <code>pre-commit</code> hooks now no longer should issue a
+    warning.</li>
+<li>FIX #1058, #1100: Avoid <code>NoneType</code> error when printing task
+    without <code>class_labels</code> attribute.</li>
+<li>FIX #1110: Make arguments to <code>create_study</code> and <code>create_suite</code>
+    that are defined as optional by the OpenML XSD actually optional.</li>
+<li>FIX #1147: <code>openml.flow.flow_exists</code> no longer requires an API
+    key.</li>
+<li>FIX #1184: Automatically resolve proxies when downloading from
+    minio. Turn this off by setting environment variable
+    <code>no_proxy="*"</code>.</li>
+<li>MAINT #1088: Do CI for Windows on Github Actions instead of
+    Appveyor.</li>
+<li>MAINT #1104: Fix outdated docstring for <code>list_task</code>.</li>
+<li>MAINT #1146: Update the pre-commit dependencies.</li>
+<li>ADD #1103: Add a <code>predictions</code> property to OpenMLRun for easy
+    accessibility of prediction data.</li>
+<li>ADD #1188: EXPERIMENTAL. Allow downloading all files from a minio
+    bucket with <code>download_all_files=True</code> for <code>get_dataset</code>.</li>
+</ul>
+</blockquote>
+<h2 id="0122">0.12.2</h2>
+<ul>
+<li>ADD #1065: Add a <code>retry_policy</code> configuration option that determines
+    the frequency and number of times to attempt to retry server
+    requests.</li>
+<li>ADD #1075: A docker image is now automatically built on a push to
+    develop. It can be used to build docs or run tests in an isolated
+    environment.</li>
+<li>ADD: You can now avoid downloading \'qualities\' meta-data when
+    downloading a task with the <code>download_qualities</code> parameter of
+    <code>openml.tasks.get_task[s]</code> functions.</li>
+<li>DOC: Fixes a few broken links in the documentation.</li>
+<li>DOC #1061: Improve examples to always show a warning when they
+    switch to the test server.</li>
+<li>DOC #1067: Improve documentation on the scikit-learn extension
+    interface.</li>
+<li>DOC #1068: Create dedicated extensions page.</li>
+<li>FIX #1075: Correctly convert [y]{.title-ref} to a pandas series when
+    downloading sparse data.</li>
+<li>MAINT: Rename [master]{.title-ref} brach to [ main]{.title-ref}
+    branch.</li>
+<li>MAINT/DOC: Automatically check for broken external links when
+    building the documentation.</li>
+<li>MAINT/DOC: Fail documentation building on warnings. This will make
+    the documentation building fail if a reference cannot be found (i.e.
+    an internal link is broken).</li>
+</ul>
+<h2 id="0121">0.12.1</h2>
+<ul>
+<li>ADD #895/#1038: Measure runtimes of scikit-learn runs also for
+    models which are parallelized via the joblib.</li>
+<li>DOC #1050: Refer to the webpage instead of the XML file in the main
+    example.</li>
+<li>DOC #1051: Document existing extensions to OpenML-Python besides the
+    shipped scikit-learn extension.</li>
+<li>FIX #1035: Render class attributes and methods again.</li>
+<li>ADD #1049: Add a command line tool for configuration openml-python.</li>
+<li>FIX #1042: Fixes a rare concurrency issue with OpenML-Python and
+    joblib which caused the joblib worker pool to fail.</li>
+<li>FIX #1053: Fixes a bug which could prevent importing the package in
+    a docker container.</li>
+</ul>
+<h2 id="0120">0.12.0</h2>
+<ul>
+<li>ADD #964: Validate <code>ignore_attribute</code>, <code>default_target_attribute</code>,
+    <code>row_id_attribute</code> are set to attributes that exist on the dataset
+    when calling <code>create_dataset</code>.</li>
+<li>ADD #979: Dataset features and qualities are now also cached in
+    pickle format.</li>
+<li>ADD #982: Add helper functions for column transformers.</li>
+<li>ADD #989: <code>run_model_on_task</code> will now warn the user the the model
+    passed has already been fitted.</li>
+<li>ADD #1009 : Give possibility to not download the dataset qualities.
+    The cached version is used even so download attribute is false.</li>
+<li>ADD #1016: Add scikit-learn 0.24 support.</li>
+<li>ADD #1020: Add option to parallelize evaluation of tasks with
+    joblib.</li>
+<li>ADD #1022: Allow minimum version of dependencies to be listed for a
+    flow, use more accurate minimum versions for scikit-learn
+    dependencies.</li>
+<li>ADD #1023: Add admin-only calls for adding topics to datasets.</li>
+<li>ADD #1029: Add support for fetching dataset from a minio server in
+    parquet format.</li>
+<li>ADD #1031: Generally improve runtime measurements, add them for some
+    previously unsupported flows (e.g. BaseSearchCV derived flows).</li>
+<li>DOC #973 : Change the task used in the welcome page example so it no
+    longer fails using numerical dataset.</li>
+<li>MAINT #671: Improved the performance of <code>check_datasets_active</code> by
+    only querying the given list of datasets in contrast to querying all
+    datasets. Modified the corresponding unit test.</li>
+<li>MAINT #891: Changed the way that numerical features are stored.
+    Numerical features that range from 0 to 255 are now stored as uint8,
+    which reduces the storage space required as well as storing and
+    loading times.</li>
+<li>MAINT #975, #988: Add CI through Github Actions.</li>
+<li>MAINT #977: Allow <code>short</code> and <code>long</code> scenarios for unit tests.
+    Reduce the workload for some unit tests.</li>
+<li>MAINT #985, #1000: Improve unit test stability and output
+    readability, and adds load balancing.</li>
+<li>MAINT #1018: Refactor data loading and storage. Data is now
+    compressed on the first call to [get_data]{.title-ref}.</li>
+<li>MAINT #1024: Remove flaky decorator for study unit test.</li>
+<li>FIX #883 #884 #906 #972: Various improvements to the caching system.</li>
+<li>FIX #980: Speed up <code>check_datasets_active</code>.</li>
+<li>FIX #984: Add a retry mechanism when the server encounters a
+    database issue.</li>
+<li>FIX #1004: Fixed an issue that prevented installation on some
+    systems (e.g. Ubuntu).</li>
+<li>FIX #1013: Fixes a bug where <code>OpenMLRun.setup_string</code> was not
+    uploaded to the server, prepares for <code>run_details</code> being sent from
+    the server.</li>
+<li>FIX #1021: Fixes an issue that could occur when running unit tests
+    and openml-python was not in PATH.</li>
+<li>FIX #1037: Fixes a bug where a dataset could not be loaded if a
+    categorical value had listed nan-like as a possible category.</li>
+</ul>
+<h2 id="0110">0.11.0</h2>
+<ul>
+<li>ADD #753: Allows uploading custom flows to OpenML via OpenML-Python.</li>
+<li>ADD #777: Allows running a flow on pandas dataframes (in addition to
+    numpy arrays).</li>
+<li>ADD #888: Allow passing a [task_id]{.title-ref} to
+    [run_model_on_task]{.title-ref}.</li>
+<li>ADD #894: Support caching of datasets using feather format as an
+    option.</li>
+<li>ADD #929: Add <code>edit_dataset</code> and <code>fork_dataset</code> to allow editing and
+    forking of uploaded datasets.</li>
+<li>ADD #866, #943: Add support for scikit-learn\'s
+    [passthrough]{.title-ref} and [drop]{.title-ref} when uploading
+    flows to OpenML.</li>
+<li>ADD #879: Add support for scikit-learn\'s MLP hyperparameter
+    [layer_sizes]{.title-ref}.</li>
+<li>ADD #894: Support caching of datasets using feather format as an
+    option.</li>
+<li>ADD #945: PEP 561 compliance for distributing Type information.</li>
+<li>DOC #660: Remove nonexistent argument from docstring.</li>
+<li>DOC #901: The API reference now documents the config file and its
+    options.</li>
+<li>DOC #912: API reference now shows [create_task]{.title-ref}.</li>
+<li>DOC #954: Remove TODO text from documentation.</li>
+<li>DOC #960: document how to upload multiple ignore attributes.</li>
+<li>FIX #873: Fixes an issue which resulted in incorrect URLs when
+    printing OpenML objects after switching the server.</li>
+<li>FIX #885: Logger no longer registered by default. Added utility
+    functions to easily register logging to console and file.</li>
+<li>FIX #890: Correct the scaling of data in the SVM example.</li>
+<li>MAINT #371: <code>list_evaluations</code> default <code>size</code> changed from <code>None</code> to
+    <code>10_000</code>.</li>
+<li>MAINT #767: Source distribution installation is now unit-tested.</li>
+<li>MAINT #781: Add pre-commit and automated code formatting with black.</li>
+<li>MAINT #804: Rename arguments of list_evaluations to indicate they
+    expect lists of ids.</li>
+<li>MAINT #836: OpenML supports only pandas version 1.0.0 or above.</li>
+<li>MAINT #865: OpenML no longer bundles test files in the source
+    distribution.</li>
+<li>MAINT #881: Improve the error message for too-long URIs.</li>
+<li>MAINT #897: Dropping support for Python 3.5.</li>
+<li>MAINT #916: Adding support for Python 3.8.</li>
+<li>MAINT #920: Improve error messages for dataset upload.</li>
+<li>MAINT #921: Improve hangling of the OpenML server URL in the config
+    file.</li>
+<li>MAINT #925: Improve error handling and error message when loading
+    datasets.</li>
+<li>MAINT #928: Restructures the contributing documentation.</li>
+<li>MAINT #936: Adding support for scikit-learn 0.23.X.</li>
+<li>MAINT #945: Make OpenML-Python PEP562 compliant.</li>
+<li>MAINT #951: Converts TaskType class to a TaskType enum.</li>
+</ul>
+<h2 id="0102">0.10.2</h2>
+<ul>
+<li>ADD #857: Adds task type ID to list_runs</li>
+<li>DOC #862: Added license BSD 3-Clause to each of the source files.</li>
+</ul>
+<h2 id="0101">0.10.1</h2>
+<ul>
+<li>ADD #175: Automatically adds the docstring of scikit-learn objects
+    to flow and its parameters.</li>
+<li>ADD #737: New evaluation listing call that includes the
+    hyperparameter settings.</li>
+<li>ADD #744: It is now possible to only issue a warning and not raise
+    an exception if the package versions for a flow are not met when
+    deserializing it.</li>
+<li>ADD #783: The URL to download the predictions for a run is now
+    stored in the run object.</li>
+<li>ADD #790: Adds the uploader name and id as new filtering options for
+    <code>list_evaluations</code>.</li>
+<li>ADD #792: New convenience function <code>openml.flow.get_flow_id</code>.</li>
+<li>ADD #861: Debug-level log information now being written to a file in
+    the cache directory (at most 2 MB).</li>
+<li>DOC #778: Introduces instructions on how to publish an extension to
+    support other libraries than scikit-learn.</li>
+<li>DOC #785: The examples section is completely restructured into
+    simple simple examples, advanced examples and examples showcasing
+    the use of OpenML-Python to reproduce papers which were done with
+    OpenML-Python.</li>
+<li>DOC #788: New example on manually iterating through the split of a
+    task.</li>
+<li>DOC #789: Improve the usage of dataframes in the examples.</li>
+<li>DOC #791: New example for the paper <em>Efficient and Robust Automated
+    Machine Learning</em> by Feurer et al. (2015).</li>
+<li>DOC #803: New example for the paper <em>Don't Rule Out Simple Models
+    Prematurely: A Large Scale Benchmark Comparing Linear and Non-linear
+    Classifiers in OpenML</em> by Benjamin Strang et al. (2018).</li>
+<li>DOC #808: New example demonstrating basic use cases of a dataset.</li>
+<li>DOC #810: New example demonstrating the use of benchmarking studies
+    and suites.</li>
+<li>DOC #832: New example for the paper <em>Scalable Hyperparameter
+    Transfer Learning</em> by Valerio Perrone et al. (2019)</li>
+<li>DOC #834: New example showing how to plot the loss surface for a
+    support vector machine.</li>
+<li>FIX #305: Do not require the external version in the flow XML when
+    loading an object.</li>
+<li>FIX #734: Better handling of <em>\"old\"</em> flows.</li>
+<li>FIX #736: Attach a StreamHandler to the openml logger instead of the
+    root logger.</li>
+<li>FIX #758: Fixes an error which made the client API crash when
+    loading a sparse data with categorical variables.</li>
+<li>FIX #779: Do not fail on corrupt pickle</li>
+<li>FIX #782: Assign the study id to the correct class attribute.</li>
+<li>FIX #819: Automatically convert column names to type string when
+    uploading a dataset.</li>
+<li>FIX #820: Make <code>__repr__</code> work for datasets which do not have an id.</li>
+<li>MAINT #796: Rename an argument to make the function
+    <code>list_evaluations</code> more consistent.</li>
+<li>MAINT #811: Print the full error message given by the server.</li>
+<li>MAINT #828: Create base class for OpenML entity classes.</li>
+<li>MAINT #829: Reduce the number of data conversion warnings.</li>
+<li>MAINT #831: Warn if there\'s an empty flow description when
+    publishing a flow.</li>
+<li>MAINT #837: Also print the flow XML if a flow fails to validate.</li>
+<li>FIX #838: Fix list_evaluations_setups to work when evaluations are
+    not a 100 multiple.</li>
+<li>FIX #847: Fixes an issue where the client API would crash when
+    trying to download a dataset when there are no qualities available
+    on the server.</li>
+<li>MAINT #849: Move logic of most different <code>publish</code> functions into
+    the base class.</li>
+<li>MAINt #850: Remove outdated test code.</li>
+</ul>
+<h2 id="0100">0.10.0</h2>
+<ul>
+<li>ADD #737: Add list_evaluations_setups to return hyperparameters
+    along with list of evaluations.</li>
+<li>FIX #261: Test server is cleared of all files uploaded during unit
+    testing.</li>
+<li>FIX #447: All files created by unit tests no longer persist in
+    local.</li>
+<li>FIX #608: Fixing dataset_id referenced before assignment error in
+    get_run function.</li>
+<li>FIX #447: All files created by unit tests are deleted after the
+    completion of all unit tests.</li>
+<li>FIX #589: Fixing a bug that did not successfully upload the columns
+    to ignore when creating and publishing a dataset.</li>
+<li>FIX #608: Fixing dataset_id referenced before assignment error in
+    get_run function.</li>
+<li>DOC #639: More descriptive documention for function to convert array
+    format.</li>
+<li>DOC #719: Add documentation on uploading tasks.</li>
+<li>ADD #687: Adds a function to retrieve the list of evaluation
+    measures available.</li>
+<li>ADD #695: A function to retrieve all the data quality measures
+    available.</li>
+<li>ADD #412: Add a function to trim flow names for scikit-learn flows.</li>
+<li>ADD #715: [list_evaluations]{.title-ref} now has an option to sort
+    evaluations by score (value).</li>
+<li>ADD #722: Automatic reinstantiation of flow in
+    [run_model_on_task]{.title-ref}. Clearer errors if that\'s not
+    possible.</li>
+<li>ADD #412: The scikit-learn extension populates the short name field
+    for flows.</li>
+<li>MAINT #726: Update examples to remove deprecation warnings from
+    scikit-learn</li>
+<li>MAINT #752: Update OpenML-Python to be compatible with sklearn 0.21</li>
+<li>ADD #790: Add user ID and name to list_evaluations</li>
+</ul>
+<h2 id="090">0.9.0</h2>
+<ul>
+<li>ADD #560: OpenML-Python can now handle regression tasks as well.</li>
+<li>ADD #620, #628, #632, #649, #682: Full support for studies and
+    distinguishes suites from studies.</li>
+<li>ADD #607: Tasks can now be created and uploaded.</li>
+<li>ADD #647, #673: Introduced the extension interface. This provides an
+    easy way to create a hook for machine learning packages to perform
+    e.g. automated runs.</li>
+<li>ADD #548, #646, #676: Support for Pandas DataFrame and
+    SparseDataFrame</li>
+<li>ADD #662: Results of listing functions can now be returned as
+    pandas.DataFrame.</li>
+<li>ADD #59: Datasets can now also be retrieved by name.</li>
+<li>ADD #672: Add timing measurements for runs, when possible.</li>
+<li>ADD #661: Upload time and error messages now displayed with
+    [list_runs]{.title-ref}.</li>
+<li>ADD #644: Datasets can now be downloaded \'lazily\', retrieving only
+    metadata at first, and the full dataset only when necessary.</li>
+<li>ADD #659: Lazy loading of task splits.</li>
+<li>ADD #516: [run_flow_on_task]{.title-ref} flow uploading is now
+    optional.</li>
+<li>ADD #680: Adds
+    [openml.config.start_using_configuration_for_example]{.title-ref}
+    (and resp. stop) to easily connect to the test server.</li>
+<li>ADD #75, #653: Adds a pretty print for objects of the top-level
+    classes.</li>
+<li>FIX #642: [check_datasets_active]{.title-ref} now correctly also
+    returns active status of deactivated datasets.</li>
+<li>FIX #304, #636: Allow serialization of numpy datatypes and list of
+    lists of more types (e.g. bools, ints) for flows.</li>
+<li>FIX #651: Fixed a bug that would prevent openml-python from finding
+    the user\'s config file.</li>
+<li>FIX #693: OpenML-Python uses liac-arff instead of scipy.io for
+    loading task splits now.</li>
+<li>DOC #678: Better color scheme for code examples in documentation.</li>
+<li>DOC #681: Small improvements and removing list of missing functions.</li>
+<li>DOC #684: Add notice to examples that connect to the test server.</li>
+<li>DOC #688: Add new example on retrieving evaluations.</li>
+<li>DOC #691: Update contributing guidelines to use Github draft feature
+    instead of tags in title.</li>
+<li>DOC #692: All functions are documented now.</li>
+<li>MAINT #184: Dropping Python2 support.</li>
+<li>MAINT #596: Fewer dependencies for regular pip install.</li>
+<li>MAINT #652: Numpy and Scipy are no longer required before
+    installation.</li>
+<li>MAINT #655: Lazy loading is now preferred in unit tests.</li>
+<li>MAINT #667: Different tag functions now share code.</li>
+<li>MAINT #666: More descriptive error message for
+    [TypeError]{.title-ref} in [list_runs]{.title-ref}.</li>
+<li>MAINT #668: Fix some type hints.</li>
+<li>MAINT #677: [dataset.get_data]{.title-ref} now has consistent
+    behavior in its return type.</li>
+<li>MAINT #686: Adds ignore directives for several [mypy]{.title-ref}
+    folders.</li>
+<li>MAINT #629, #630: Code now adheres to single PEP8 standard.</li>
+</ul>
+<h2 id="080">0.8.0</h2>
+<ul>
+<li>ADD #440: Improved dataset upload.</li>
+<li>ADD #545, #583: Allow uploading a dataset from a pandas DataFrame.</li>
+<li>ADD #528: New functions to update the status of a dataset.</li>
+<li>ADD #523: Support for scikit-learn 0.20\'s new ColumnTransformer.</li>
+<li>ADD #459: Enhanced support to store runs on disk prior to uploading
+    them to OpenML.</li>
+<li>ADD #564: New helpers to access the structure of a flow (and find
+    its subflows).</li>
+<li>ADD #618: The software will from now on retry to connect to the
+    server if a connection failed. The number of retries can be
+    configured.</li>
+<li>FIX #538: Support loading clustering tasks.</li>
+<li>FIX #464: Fixes a bug related to listing functions (returns correct
+    listing size).</li>
+<li>FIX #580: Listing function now works properly when there are less
+    results than requested.</li>
+<li>FIX #571: Fixes an issue where tasks could not be downloaded in
+    parallel.</li>
+<li>FIX #536: Flows can now be printed when the flow name is None.</li>
+<li>FIX #504: Better support for hierarchical hyperparameters when
+    uploading scikit-learn\'s grid and random search.</li>
+<li>FIX #569: Less strict checking of flow dependencies when loading
+    flows.</li>
+<li>FIX #431: Pickle of task splits are no longer cached.</li>
+<li>DOC #540: More examples for dataset uploading.</li>
+<li>DOC #554: Remove the doubled progress entry from the docs.</li>
+<li>MAINT #613: Utilize the latest updates in OpenML evaluation
+    listings.</li>
+<li>MAINT #482: Cleaner interface for handling search traces.</li>
+<li>MAINT #557: Continuous integration works for scikit-learn 0.18-0.20.</li>
+<li>MAINT #542: Continuous integration now runs python3.7 as well.</li>
+<li>MAINT #535: Continuous integration now enforces PEP8 compliance for
+    new code.</li>
+<li>MAINT #527: Replace deprecated nose by pytest.</li>
+<li>MAINT #510: Documentation is now built by travis-ci instead of
+    circle-ci.</li>
+<li>MAINT: Completely re-designed documentation built on sphinx gallery.</li>
+<li>MAINT #462: Appveyor CI support.</li>
+<li>MAINT #477: Improve error handling for issue
+    <a href="https://github.com/openml/openml-python/pull/479">#479</a>: the OpenML
+    connector fails earlier and with a better error message when failing
+    to create a flow from the OpenML description.</li>
+<li>MAINT #561: Improve documentation on running specific unit tests.</li>
+</ul>
+<h2 id="04-07">0.4.-0.7</h2>
+<p>There is no changelog for these versions.</p>
+<h2 id="030">0.3.0</h2>
+<ul>
+<li>Add this changelog</li>
+<li>2nd example notebook PyOpenML.ipynb</li>
+<li>Pagination support for list datasets and list tasks</li>
+</ul>
+<h2 id="prior">Prior</h2>
+<p>There is no changelog for prior versions.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>
