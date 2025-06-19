@@ -23,8 +23,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -45,6 +43,7 @@ jobs:
           # mkdocs gh-deploy --force
           git config user.name doc-bot
           git config user.email doc-bot@openml.com
+          git fetch --tags
           current_version=$(git tag | sort --version-sort | tail -n 1)
           # This block will rename previous retitled versions
           retitled_versions=$(mike list -j | jq ".[] | select(.title != .version) | .version" | tr -d '"')
@@ -60,4 +59,4 @@ jobs:
             --update-aliases \
             "${current_version}" \
             "latest"\
-            -b $PAGES_BRANCH origin/$PAGES_BRANCH
+            -b $PAGES_BRANCH
