@@ -2,9 +2,35 @@ site_name: openml-python
 theme:
   name: material
   features:
+    - content.code.annotate
     - content.code.copy
+    - navigation.footer
+    - navigation.sections
+    - toc.follow
+    - toc.integrate
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - header.autohide
+    - search.suggest
+    - search.highlight
+    - search.share
   palette:
+    - scheme: slate
+      media: "(prefers-color-scheme: dark)"
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/eye-outline
+        name: Switch to light mode
+
+    # Palette toggle for light mode
     - scheme: default
+      media: "(prefers-color-scheme: light)"
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/eye
+        name: Switch to dark mode
 
 extra_css:
   - stylesheets/extra.css
@@ -22,20 +48,87 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.superfences
-  - pymdownx.snippets
   - attr_list
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: "#"
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.magiclink:
+      hide_protocol: true
+      repo_url_shortener: true
+      repo_url_shorthand: true
+      user: openml
+      repo: openml-python
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.details
   - pymdownx.tabbed:
       alternate_style: true
+  - pymdownx.superfences:
+      custom_fences:
+      - name: mermaid
+        class: mermaid
+        format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/openml
+    - icon: fontawesome/brands/twitter
+      link: https://x.com/open_ml
 
 plugins:
   - search
   - autorefs
   - section-index
+  # - mkdocstrings:
   - mkdocstrings:
+      default_handler: python
+      enable_inventory: true
       handlers:
         python:
-          options:
-            docstring_style: numpy
+          # paths: [openml]
+          options:  # https://mkdocstrings.github.io/python/usage/
+            docstring_section_style: spacy
+            docstring_options:
+              ignore_init_summary: true
+              trim_doctest_flags: true
+              returns_multiple_items: false
+            show_docstring_attributes: true
+            show_docstring_description: true
+            show_root_heading: true
+            show_root_toc_entry: true
+            show_object_full_path: false
+            show_root_members_full_path: false
+            signature_crossrefs: true
+            merge_init_into_class: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            docstring_style: google
+            inherited_members: true
+            show_if_no_docstring: false
+            show_bases: true
+            show_source: true
+            members_order: "alphabetical"
+            group_by_category: true
+            show_signature: true
+            separate_signature: true
+            show_signature_annotations: true
+            filters:
+              - "!^_[^_]"
+
   - gen-files:
       scripts:
         - scripts/gen_ref_pages.py
@@ -43,3 +136,8 @@ plugins:
       nav_file: SUMMARY.md
   - mkdocs-jupyter:
       theme: light
+  - mike:
+      version_selector: true
+      css_dir: css
+      javascript_dir: js
+      canonical_version: latest

@@ -23,6 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -51,6 +53,7 @@ jobs:
           done
 
           echo "Deploying docs for ${current_version}"
+          mike set-default latest
           mike deploy \
             --push \
             --title "${current_version} (latest)" \
