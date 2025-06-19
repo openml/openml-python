@@ -65,7 +65,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="deep-purple">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -83,12 +83,16 @@
       
     </div>
     
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
     
       
 
   
 
-<header class="md-header md-header--shadow" data-md-component="header">
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="openml-python" class="md-header__button md-logo" aria-label="openml-python" data-md-component="logo">
       
@@ -123,7 +127,21 @@
     
     
     
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="deep-purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0 9.821 9.821 0 0 0-17.64 0"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="deep-purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5 5 5 0 0 1 5-5 5 5 0 0 1 5 5 5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"/></svg>
+      </label>
     
   
 </form>
@@ -153,11 +171,18 @@
       </label>
       <nav class="md-search__options" aria-label="Search">
         
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
         <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
       </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
       
     </form>
     <div class="md-search__output">
@@ -177,13 +202,169 @@
     
   </nav>
   
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  OpenML
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../reference/" class="md-tabs__link">
+          
+  
+  
+  Code Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../examples/20_basic/introduction_tutorial/" class="md-tabs__link">
+          
+  
+  
+  Examples
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../usage/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Usage
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../extensions/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Extensions
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
-        
-          
         
       
       <main class="md-main" data-md-component="main">
@@ -197,8 +378,12 @@
                     
 
 
+  
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="openml-python" class="md-nav__button md-logo" aria-label="openml-python" data-md-component="logo">
       
@@ -243,6 +428,11 @@
     
     
     
+      
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--nested">
       
@@ -280,6 +470,11 @@
     
     
     
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
@@ -434,6 +629,11 @@
     
     
     
+      
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--nested">
       
@@ -548,6 +748,11 @@
     
     
     
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
@@ -664,6 +869,11 @@
     
     
     
+      
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--nested">
       
@@ -748,6 +958,11 @@
     
     
     
+      
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--nested">
       
@@ -824,6 +1039,11 @@
     
     
     
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
@@ -916,6 +1136,11 @@
     
     
     
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
@@ -1032,6 +1257,11 @@
     
     
     
+      
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--nested">
       
@@ -1124,6 +1354,11 @@
     
     
     
+      
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--nested">
       
@@ -1215,6 +1450,11 @@
     
     
     
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
@@ -1392,6 +1632,11 @@
     
     
     
+      
+      
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--nested">
       
@@ -1429,6 +1674,11 @@
     
     
     
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
@@ -1567,6 +1817,11 @@
     
     
     
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
@@ -1958,6 +2213,11 @@
     
     
     
+    
+      
+      
+        
+      
     
     
     <li class="md-nav__item md-nav__item--nested">
@@ -2393,194 +2653,6 @@
               </div>
             
             
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#next" class="md-nav__link">
-    <span class="md-ellipsis">
-      next
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#0142" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.14.2
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#0141" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.14.1
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#0140" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.14.0
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#0131" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.13.1
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#0130" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.13.0
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#0122" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.12.2
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#0121" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.12.1
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#0120" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.12.0
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#0110" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.11.0
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#0102" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.10.2
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#0101" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.10.1
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#0100" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.10.0
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#090" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.9.0
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#080" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.8.0
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#04-07" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.4.-0.7
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#030" class="md-nav__link">
-    <span class="md-ellipsis">
-      0.3.0
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#prior" class="md-nav__link">
-    <span class="md-ellipsis">
-      Prior
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           
             <div class="md-content" data-md-component="content">
@@ -2590,39 +2662,39 @@
 
 
 
-<h1 id="progress">Changelog</h1>
-<h2 id="next">next</h2>
+<h1 id="progress">Changelog<a class="headerlink" href="#progress" title="Permanent link">#</a></h1>
+<h2 id="next">next<a class="headerlink" href="#next" title="Permanent link">#</a></h2>
 <blockquote>
 <ul>
-<li>MAINT #1340: Add Numpy 2.0 support. Update tests to work with
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1340" title="GitHub Issue: openml/openml-python #1340">#1340</a>: Add Numpy 2.0 support. Update tests to work with
     scikit-learn \&lt;= 1.5.</li>
-<li>ADD #1342: Add HTTP header to requests to indicate they are from
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1342" title="GitHub Issue: openml/openml-python #1342">#1342</a>: Add HTTP header to requests to indicate they are from
     openml-python.</li>
 </ul>
 </blockquote>
-<h2 id="0142">0.14.2</h2>
+<h2 id="0142">0.14.2<a class="headerlink" href="#0142" title="Permanent link">#</a></h2>
 <blockquote>
 <ul>
-<li>MAINT #1280: Use the server-provided <code>parquet_url</code> instead of
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1280" title="GitHub Issue: openml/openml-python #1280">#1280</a>: Use the server-provided <code>parquet_url</code> instead of
     <code>minio_url</code> to determine the location of the parquet file.</li>
-<li>ADD #716: add documentation for remaining attributes of classes
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/716" title="GitHub Issue: openml/openml-python #716">#716</a>: add documentation for remaining attributes of classes
     and functions.</li>
-<li>ADD #1261: more annotations for type hints.</li>
-<li>MAINT #1294: update tests to new tag specification.</li>
-<li>FIX #1314: Update fetching a bucket from MinIO.</li>
-<li>FIX #1315: Make class label retrieval more lenient.</li>
-<li>ADD #1316: add feature descriptions ontologies support.</li>
-<li>MAINT #1310/#1307: switch to ruff and resolve all mypy errors.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1261" title="GitHub Issue: openml/openml-python #1261">#1261</a>: more annotations for type hints.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1294" title="GitHub Issue: openml/openml-python #1294">#1294</a>: update tests to new tag specification.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1314" title="GitHub Issue: openml/openml-python #1314">#1314</a>: Update fetching a bucket from MinIO.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1315" title="GitHub Issue: openml/openml-python #1315">#1315</a>: Make class label retrieval more lenient.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1316" title="GitHub Issue: openml/openml-python #1316">#1316</a>: add feature descriptions ontologies support.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1310" title="GitHub Issue: openml/openml-python #1310">#1310</a>/<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1307" title="GitHub Issue: openml/openml-python #1307">#1307</a>: switch to ruff and resolve all mypy errors.</li>
 </ul>
 </blockquote>
-<h2 id="0141">0.14.1</h2>
+<h2 id="0141">0.14.1<a class="headerlink" href="#0141" title="Permanent link">#</a></h2>
 <blockquote>
 <ul>
 <li>FIX: Fallback on downloading ARFF when failing to download parquet
     from MinIO due to a ServerError.</li>
 </ul>
 </blockquote>
-<h2 id="0140">0.14.0</h2>
+<h2 id="0140">0.14.0<a class="headerlink" href="#0140" title="Permanent link">#</a></h2>
 <p><strong>IMPORTANT:</strong> This release paves the way towards a breaking update of
 OpenML-Python. From version 0.15, functions that had the option to
 return a pandas DataFrame will return a pandas DataFrame by default.
@@ -2641,96 +2713,96 @@ functionality. More concretely:</p>
 <p>Furthermore, from version 0.15, OpenML-Python will no longer download
 datasets and dataset metadata by default. This version (0.14) emits a
 warning if you don\'t explicitly specifiy the desired behavior.</p>
-<p>Please see the pull requests #1258 and #1260 for further information.</p>
+<p>Please see the pull requests <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1258" title="GitHub Issue: openml/openml-python #1258">#1258</a> and <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1260" title="GitHub Issue: openml/openml-python #1260">#1260</a> for further information.</p>
 <ul>
-<li>ADD #1081: New flag that allows disabling downloading dataset
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1081" title="GitHub Issue: openml/openml-python #1081">#1081</a>: New flag that allows disabling downloading dataset
     features.</li>
-<li>ADD #1132: New flag that forces a redownload of cached data.</li>
-<li>FIX #1244: Fixes a rare bug where task listing could fail when the
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1132" title="GitHub Issue: openml/openml-python #1132">#1132</a>: New flag that forces a redownload of cached data.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1244" title="GitHub Issue: openml/openml-python #1244">#1244</a>: Fixes a rare bug where task listing could fail when the
     server returned invalid data.</li>
-<li>DOC #1229: Fixes a comment string for the main example.</li>
-<li>DOC #1241: Fixes a comment in an example.</li>
-<li>MAINT #1124: Improve naming of helper functions that govern the
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1229" title="GitHub Issue: openml/openml-python #1229">#1229</a>: Fixes a comment string for the main example.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1241" title="GitHub Issue: openml/openml-python #1241">#1241</a>: Fixes a comment in an example.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1124" title="GitHub Issue: openml/openml-python #1124">#1124</a>: Improve naming of helper functions that govern the
     cache directories.</li>
-<li>MAINT #1223, #1250: Update tools used in pre-commit to the latest
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1223" title="GitHub Issue: openml/openml-python #1223">#1223</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1250" title="GitHub Issue: openml/openml-python #1250">#1250</a>: Update tools used in pre-commit to the latest
     versions (<code>black==23.30</code>, <code>mypy==1.3.0</code>, <code>flake8==6.0.0</code>).</li>
-<li>MAINT #1253: Update the citation request to the JMLR paper.</li>
-<li>MAINT #1246: Add a warning that warns the user that checking for
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1253" title="GitHub Issue: openml/openml-python #1253">#1253</a>: Update the citation request to the JMLR paper.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1246" title="GitHub Issue: openml/openml-python #1246">#1246</a>: Add a warning that warns the user that checking for
     duplicate runs on the server cannot be done without an API key.</li>
 </ul>
-<h2 id="0131">0.13.1</h2>
+<h2 id="0131">0.13.1<a class="headerlink" href="#0131" title="Permanent link">#</a></h2>
 <ul>
-<li>ADD #1081 #1132: Add additional options for (not) downloading
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1081" title="GitHub Issue: openml/openml-python #1081">#1081</a> <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1132" title="GitHub Issue: openml/openml-python #1132">#1132</a>: Add additional options for (not) downloading
     datasets <code>openml.datasets.get_dataset</code> and cache management.</li>
-<li>ADD #1028: Add functions to delete runs, flows, datasets, and tasks
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1028" title="GitHub Issue: openml/openml-python #1028">#1028</a>: Add functions to delete runs, flows, datasets, and tasks
     (e.g., <code>openml.datasets.delete_dataset</code>).</li>
-<li>ADD #1144: Add locally computed results to the <code>OpenMLRun</code> object\'s
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1144" title="GitHub Issue: openml/openml-python #1144">#1144</a>: Add locally computed results to the <code>OpenMLRun</code> object\'s
     representation if the run was created locally and not downloaded
     from the server.</li>
-<li>ADD #1180: Improve the error message when the checksum of a
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1180" title="GitHub Issue: openml/openml-python #1180">#1180</a>: Improve the error message when the checksum of a
     downloaded dataset does not match the checksum provided by the API.</li>
-<li>ADD #1201: Make <code>OpenMLTraceIteration</code> a dataclass.</li>
-<li>DOC #1069: Add argument documentation for the <code>OpenMLRun</code> class.</li>
-<li>DOC #1241 #1229 #1231: Minor documentation fixes and resolve
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1201" title="GitHub Issue: openml/openml-python #1201">#1201</a>: Make <code>OpenMLTraceIteration</code> a dataclass.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1069" title="GitHub Issue: openml/openml-python #1069">#1069</a>: Add argument documentation for the <code>OpenMLRun</code> class.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1241" title="GitHub Issue: openml/openml-python #1241">#1241</a> <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1229" title="GitHub Issue: openml/openml-python #1229">#1229</a> <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1231" title="GitHub Issue: openml/openml-python #1231">#1231</a>: Minor documentation fixes and resolve
     documentation examples not working.</li>
-<li>FIX #1197 #559 #1131: Fix the order of ground truth and predictions
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1197" title="GitHub Issue: openml/openml-python #1197">#1197</a> <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/559" title="GitHub Issue: openml/openml-python #559">#559</a> <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1131" title="GitHub Issue: openml/openml-python #1131">#1131</a>: Fix the order of ground truth and predictions
     in the <code>OpenMLRun</code> object and in <code>format_prediction</code>.</li>
-<li>FIX #1198: Support numpy 1.24 and higher.</li>
-<li>FIX #1216: Allow unknown task types on the server. This is only
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1198" title="GitHub Issue: openml/openml-python #1198">#1198</a>: Support numpy 1.24 and higher.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1216" title="GitHub Issue: openml/openml-python #1216">#1216</a>: Allow unknown task types on the server. This is only
     relevant when new task types are added to the test server.</li>
-<li>FIX #1223: Fix mypy errors for implicit optional typing.</li>
-<li>MAINT #1155: Add dependabot github action to automatically update
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1223" title="GitHub Issue: openml/openml-python #1223">#1223</a>: Fix mypy errors for implicit optional typing.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1155" title="GitHub Issue: openml/openml-python #1155">#1155</a>: Add dependabot github action to automatically update
     other github actions.</li>
-<li>MAINT #1199: Obtain pre-commit\'s flake8 from github.com instead of
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1199" title="GitHub Issue: openml/openml-python #1199">#1199</a>: Obtain pre-commit\'s flake8 from github.com instead of
     gitlab.com.</li>
-<li>MAINT #1215: Support latest numpy version.</li>
-<li>MAINT #1218: Test Python3.6 on Ubuntu 20.04 instead of the latest
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1215" title="GitHub Issue: openml/openml-python #1215">#1215</a>: Support latest numpy version.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1218" title="GitHub Issue: openml/openml-python #1218">#1218</a>: Test Python3.6 on Ubuntu 20.04 instead of the latest
     Ubuntu (which is 22.04).</li>
-<li>MAINT #1221 #1212 #1206 #1211: Update github actions to the latest
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1221" title="GitHub Issue: openml/openml-python #1221">#1221</a> <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1212" title="GitHub Issue: openml/openml-python #1212">#1212</a> <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1206" title="GitHub Issue: openml/openml-python #1206">#1206</a> <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1211" title="GitHub Issue: openml/openml-python #1211">#1211</a>: Update github actions to the latest
     versions.</li>
 </ul>
-<h2 id="0130">0.13.0</h2>
+<h2 id="0130">0.13.0<a class="headerlink" href="#0130" title="Permanent link">#</a></h2>
 <blockquote>
 <ul>
-<li>FIX #1030: <code>pre-commit</code> hooks now no longer should issue a
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1030" title="GitHub Issue: openml/openml-python #1030">#1030</a>: <code>pre-commit</code> hooks now no longer should issue a
     warning.</li>
-<li>FIX #1058, #1100: Avoid <code>NoneType</code> error when printing task
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1058" title="GitHub Issue: openml/openml-python #1058">#1058</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1100" title="GitHub Issue: openml/openml-python #1100">#1100</a>: Avoid <code>NoneType</code> error when printing task
     without <code>class_labels</code> attribute.</li>
-<li>FIX #1110: Make arguments to <code>create_study</code> and <code>create_suite</code>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1110" title="GitHub Issue: openml/openml-python #1110">#1110</a>: Make arguments to <code>create_study</code> and <code>create_suite</code>
     that are defined as optional by the OpenML XSD actually optional.</li>
-<li>FIX #1147: <code>openml.flow.flow_exists</code> no longer requires an API
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1147" title="GitHub Issue: openml/openml-python #1147">#1147</a>: <code>openml.flow.flow_exists</code> no longer requires an API
     key.</li>
-<li>FIX #1184: Automatically resolve proxies when downloading from
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1184" title="GitHub Issue: openml/openml-python #1184">#1184</a>: Automatically resolve proxies when downloading from
     minio. Turn this off by setting environment variable
     <code>no_proxy="*"</code>.</li>
-<li>MAINT #1088: Do CI for Windows on Github Actions instead of
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1088" title="GitHub Issue: openml/openml-python #1088">#1088</a>: Do CI for Windows on Github Actions instead of
     Appveyor.</li>
-<li>MAINT #1104: Fix outdated docstring for <code>list_task</code>.</li>
-<li>MAINT #1146: Update the pre-commit dependencies.</li>
-<li>ADD #1103: Add a <code>predictions</code> property to OpenMLRun for easy
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1104" title="GitHub Issue: openml/openml-python #1104">#1104</a>: Fix outdated docstring for <code>list_task</code>.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1146" title="GitHub Issue: openml/openml-python #1146">#1146</a>: Update the pre-commit dependencies.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1103" title="GitHub Issue: openml/openml-python #1103">#1103</a>: Add a <code>predictions</code> property to OpenMLRun for easy
     accessibility of prediction data.</li>
-<li>ADD #1188: EXPERIMENTAL. Allow downloading all files from a minio
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1188" title="GitHub Issue: openml/openml-python #1188">#1188</a>: EXPERIMENTAL. Allow downloading all files from a minio
     bucket with <code>download_all_files=True</code> for <code>get_dataset</code>.</li>
 </ul>
 </blockquote>
-<h2 id="0122">0.12.2</h2>
+<h2 id="0122">0.12.2<a class="headerlink" href="#0122" title="Permanent link">#</a></h2>
 <ul>
-<li>ADD #1065: Add a <code>retry_policy</code> configuration option that determines
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1065" title="GitHub Issue: openml/openml-python #1065">#1065</a>: Add a <code>retry_policy</code> configuration option that determines
     the frequency and number of times to attempt to retry server
     requests.</li>
-<li>ADD #1075: A docker image is now automatically built on a push to
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1075" title="GitHub Issue: openml/openml-python #1075">#1075</a>: A docker image is now automatically built on a push to
     develop. It can be used to build docs or run tests in an isolated
     environment.</li>
 <li>ADD: You can now avoid downloading \'qualities\' meta-data when
     downloading a task with the <code>download_qualities</code> parameter of
     <code>openml.tasks.get_task[s]</code> functions.</li>
 <li>DOC: Fixes a few broken links in the documentation.</li>
-<li>DOC #1061: Improve examples to always show a warning when they
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1061" title="GitHub Issue: openml/openml-python #1061">#1061</a>: Improve examples to always show a warning when they
     switch to the test server.</li>
-<li>DOC #1067: Improve documentation on the scikit-learn extension
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1067" title="GitHub Issue: openml/openml-python #1067">#1067</a>: Improve documentation on the scikit-learn extension
     interface.</li>
-<li>DOC #1068: Create dedicated extensions page.</li>
-<li>FIX #1075: Correctly convert [y]{.title-ref} to a pandas series when
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1068" title="GitHub Issue: openml/openml-python #1068">#1068</a>: Create dedicated extensions page.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1075" title="GitHub Issue: openml/openml-python #1075">#1075</a>: Correctly convert [y]{.title-ref} to a pandas series when
     downloading sparse data.</li>
 <li>MAINT: Rename [master]{.title-ref} brach to [ main]{.title-ref}
     branch.</li>
@@ -2740,346 +2812,346 @@ warning if you don\'t explicitly specifiy the desired behavior.</p>
     the documentation building fail if a reference cannot be found (i.e.
     an internal link is broken).</li>
 </ul>
-<h2 id="0121">0.12.1</h2>
+<h2 id="0121">0.12.1<a class="headerlink" href="#0121" title="Permanent link">#</a></h2>
 <ul>
-<li>ADD #895/#1038: Measure runtimes of scikit-learn runs also for
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/895" title="GitHub Issue: openml/openml-python #895">#895</a>/<a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1038" title="GitHub Issue: openml/openml-python #1038">#1038</a>: Measure runtimes of scikit-learn runs also for
     models which are parallelized via the joblib.</li>
-<li>DOC #1050: Refer to the webpage instead of the XML file in the main
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1050" title="GitHub Issue: openml/openml-python #1050">#1050</a>: Refer to the webpage instead of the XML file in the main
     example.</li>
-<li>DOC #1051: Document existing extensions to OpenML-Python besides the
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1051" title="GitHub Issue: openml/openml-python #1051">#1051</a>: Document existing extensions to OpenML-Python besides the
     shipped scikit-learn extension.</li>
-<li>FIX #1035: Render class attributes and methods again.</li>
-<li>ADD #1049: Add a command line tool for configuration openml-python.</li>
-<li>FIX #1042: Fixes a rare concurrency issue with OpenML-Python and
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1035" title="GitHub Issue: openml/openml-python #1035">#1035</a>: Render class attributes and methods again.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1049" title="GitHub Issue: openml/openml-python #1049">#1049</a>: Add a command line tool for configuration openml-python.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1042" title="GitHub Issue: openml/openml-python #1042">#1042</a>: Fixes a rare concurrency issue with OpenML-Python and
     joblib which caused the joblib worker pool to fail.</li>
-<li>FIX #1053: Fixes a bug which could prevent importing the package in
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1053" title="GitHub Issue: openml/openml-python #1053">#1053</a>: Fixes a bug which could prevent importing the package in
     a docker container.</li>
 </ul>
-<h2 id="0120">0.12.0</h2>
+<h2 id="0120">0.12.0<a class="headerlink" href="#0120" title="Permanent link">#</a></h2>
 <ul>
-<li>ADD #964: Validate <code>ignore_attribute</code>, <code>default_target_attribute</code>,
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/964" title="GitHub Issue: openml/openml-python #964">#964</a>: Validate <code>ignore_attribute</code>, <code>default_target_attribute</code>,
     <code>row_id_attribute</code> are set to attributes that exist on the dataset
     when calling <code>create_dataset</code>.</li>
-<li>ADD #979: Dataset features and qualities are now also cached in
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/979" title="GitHub Issue: openml/openml-python #979">#979</a>: Dataset features and qualities are now also cached in
     pickle format.</li>
-<li>ADD #982: Add helper functions for column transformers.</li>
-<li>ADD #989: <code>run_model_on_task</code> will now warn the user the the model
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/982" title="GitHub Issue: openml/openml-python #982">#982</a>: Add helper functions for column transformers.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/989" title="GitHub Issue: openml/openml-python #989">#989</a>: <code>run_model_on_task</code> will now warn the user the the model
     passed has already been fitted.</li>
-<li>ADD #1009 : Give possibility to not download the dataset qualities.
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1009" title="GitHub Issue: openml/openml-python #1009">#1009</a> : Give possibility to not download the dataset qualities.
     The cached version is used even so download attribute is false.</li>
-<li>ADD #1016: Add scikit-learn 0.24 support.</li>
-<li>ADD #1020: Add option to parallelize evaluation of tasks with
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1016" title="GitHub Issue: openml/openml-python #1016">#1016</a>: Add scikit-learn 0.24 support.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1020" title="GitHub Issue: openml/openml-python #1020">#1020</a>: Add option to parallelize evaluation of tasks with
     joblib.</li>
-<li>ADD #1022: Allow minimum version of dependencies to be listed for a
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1022" title="GitHub Issue: openml/openml-python #1022">#1022</a>: Allow minimum version of dependencies to be listed for a
     flow, use more accurate minimum versions for scikit-learn
     dependencies.</li>
-<li>ADD #1023: Add admin-only calls for adding topics to datasets.</li>
-<li>ADD #1029: Add support for fetching dataset from a minio server in
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1023" title="GitHub Issue: openml/openml-python #1023">#1023</a>: Add admin-only calls for adding topics to datasets.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1029" title="GitHub Issue: openml/openml-python #1029">#1029</a>: Add support for fetching dataset from a minio server in
     parquet format.</li>
-<li>ADD #1031: Generally improve runtime measurements, add them for some
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1031" title="GitHub Issue: openml/openml-python #1031">#1031</a>: Generally improve runtime measurements, add them for some
     previously unsupported flows (e.g. BaseSearchCV derived flows).</li>
-<li>DOC #973 : Change the task used in the welcome page example so it no
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/973" title="GitHub Issue: openml/openml-python #973">#973</a> : Change the task used in the welcome page example so it no
     longer fails using numerical dataset.</li>
-<li>MAINT #671: Improved the performance of <code>check_datasets_active</code> by
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/671" title="GitHub Issue: openml/openml-python #671">#671</a>: Improved the performance of <code>check_datasets_active</code> by
     only querying the given list of datasets in contrast to querying all
     datasets. Modified the corresponding unit test.</li>
-<li>MAINT #891: Changed the way that numerical features are stored.
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/891" title="GitHub Issue: openml/openml-python #891">#891</a>: Changed the way that numerical features are stored.
     Numerical features that range from 0 to 255 are now stored as uint8,
     which reduces the storage space required as well as storing and
     loading times.</li>
-<li>MAINT #975, #988: Add CI through Github Actions.</li>
-<li>MAINT #977: Allow <code>short</code> and <code>long</code> scenarios for unit tests.
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/975" title="GitHub Issue: openml/openml-python #975">#975</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/988" title="GitHub Issue: openml/openml-python #988">#988</a>: Add CI through Github Actions.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/977" title="GitHub Issue: openml/openml-python #977">#977</a>: Allow <code>short</code> and <code>long</code> scenarios for unit tests.
     Reduce the workload for some unit tests.</li>
-<li>MAINT #985, #1000: Improve unit test stability and output
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/985" title="GitHub Issue: openml/openml-python #985">#985</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1000" title="GitHub Issue: openml/openml-python #1000">#1000</a>: Improve unit test stability and output
     readability, and adds load balancing.</li>
-<li>MAINT #1018: Refactor data loading and storage. Data is now
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1018" title="GitHub Issue: openml/openml-python #1018">#1018</a>: Refactor data loading and storage. Data is now
     compressed on the first call to [get_data]{.title-ref}.</li>
-<li>MAINT #1024: Remove flaky decorator for study unit test.</li>
-<li>FIX #883 #884 #906 #972: Various improvements to the caching system.</li>
-<li>FIX #980: Speed up <code>check_datasets_active</code>.</li>
-<li>FIX #984: Add a retry mechanism when the server encounters a
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1024" title="GitHub Issue: openml/openml-python #1024">#1024</a>: Remove flaky decorator for study unit test.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/883" title="GitHub Issue: openml/openml-python #883">#883</a> <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/884" title="GitHub Issue: openml/openml-python #884">#884</a> <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/906" title="GitHub Issue: openml/openml-python #906">#906</a> <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/972" title="GitHub Issue: openml/openml-python #972">#972</a>: Various improvements to the caching system.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/980" title="GitHub Issue: openml/openml-python #980">#980</a>: Speed up <code>check_datasets_active</code>.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/984" title="GitHub Issue: openml/openml-python #984">#984</a>: Add a retry mechanism when the server encounters a
     database issue.</li>
-<li>FIX #1004: Fixed an issue that prevented installation on some
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1004" title="GitHub Issue: openml/openml-python #1004">#1004</a>: Fixed an issue that prevented installation on some
     systems (e.g. Ubuntu).</li>
-<li>FIX #1013: Fixes a bug where <code>OpenMLRun.setup_string</code> was not
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1013" title="GitHub Issue: openml/openml-python #1013">#1013</a>: Fixes a bug where <code>OpenMLRun.setup_string</code> was not
     uploaded to the server, prepares for <code>run_details</code> being sent from
     the server.</li>
-<li>FIX #1021: Fixes an issue that could occur when running unit tests
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1021" title="GitHub Issue: openml/openml-python #1021">#1021</a>: Fixes an issue that could occur when running unit tests
     and openml-python was not in PATH.</li>
-<li>FIX #1037: Fixes a bug where a dataset could not be loaded if a
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/1037" title="GitHub Issue: openml/openml-python #1037">#1037</a>: Fixes a bug where a dataset could not be loaded if a
     categorical value had listed nan-like as a possible category.</li>
 </ul>
-<h2 id="0110">0.11.0</h2>
+<h2 id="0110">0.11.0<a class="headerlink" href="#0110" title="Permanent link">#</a></h2>
 <ul>
-<li>ADD #753: Allows uploading custom flows to OpenML via OpenML-Python.</li>
-<li>ADD #777: Allows running a flow on pandas dataframes (in addition to
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/753" title="GitHub Issue: openml/openml-python #753">#753</a>: Allows uploading custom flows to OpenML via OpenML-Python.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/777" title="GitHub Issue: openml/openml-python #777">#777</a>: Allows running a flow on pandas dataframes (in addition to
     numpy arrays).</li>
-<li>ADD #888: Allow passing a [task_id]{.title-ref} to
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/888" title="GitHub Issue: openml/openml-python #888">#888</a>: Allow passing a [task_id]{.title-ref} to
     [run_model_on_task]{.title-ref}.</li>
-<li>ADD #894: Support caching of datasets using feather format as an
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/894" title="GitHub Issue: openml/openml-python #894">#894</a>: Support caching of datasets using feather format as an
     option.</li>
-<li>ADD #929: Add <code>edit_dataset</code> and <code>fork_dataset</code> to allow editing and
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/929" title="GitHub Issue: openml/openml-python #929">#929</a>: Add <code>edit_dataset</code> and <code>fork_dataset</code> to allow editing and
     forking of uploaded datasets.</li>
-<li>ADD #866, #943: Add support for scikit-learn\'s
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/866" title="GitHub Issue: openml/openml-python #866">#866</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/943" title="GitHub Issue: openml/openml-python #943">#943</a>: Add support for scikit-learn\'s
     [passthrough]{.title-ref} and [drop]{.title-ref} when uploading
     flows to OpenML.</li>
-<li>ADD #879: Add support for scikit-learn\'s MLP hyperparameter
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/879" title="GitHub Issue: openml/openml-python #879">#879</a>: Add support for scikit-learn\'s MLP hyperparameter
     [layer_sizes]{.title-ref}.</li>
-<li>ADD #894: Support caching of datasets using feather format as an
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/894" title="GitHub Issue: openml/openml-python #894">#894</a>: Support caching of datasets using feather format as an
     option.</li>
-<li>ADD #945: PEP 561 compliance for distributing Type information.</li>
-<li>DOC #660: Remove nonexistent argument from docstring.</li>
-<li>DOC #901: The API reference now documents the config file and its
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/945" title="GitHub Issue: openml/openml-python #945">#945</a>: PEP 561 compliance for distributing Type information.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/660" title="GitHub Issue: openml/openml-python #660">#660</a>: Remove nonexistent argument from docstring.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/901" title="GitHub Issue: openml/openml-python #901">#901</a>: The API reference now documents the config file and its
     options.</li>
-<li>DOC #912: API reference now shows [create_task]{.title-ref}.</li>
-<li>DOC #954: Remove TODO text from documentation.</li>
-<li>DOC #960: document how to upload multiple ignore attributes.</li>
-<li>FIX #873: Fixes an issue which resulted in incorrect URLs when
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/912" title="GitHub Issue: openml/openml-python #912">#912</a>: API reference now shows [create_task]{.title-ref}.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/954" title="GitHub Issue: openml/openml-python #954">#954</a>: Remove TODO text from documentation.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/960" title="GitHub Issue: openml/openml-python #960">#960</a>: document how to upload multiple ignore attributes.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/873" title="GitHub Issue: openml/openml-python #873">#873</a>: Fixes an issue which resulted in incorrect URLs when
     printing OpenML objects after switching the server.</li>
-<li>FIX #885: Logger no longer registered by default. Added utility
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/885" title="GitHub Issue: openml/openml-python #885">#885</a>: Logger no longer registered by default. Added utility
     functions to easily register logging to console and file.</li>
-<li>FIX #890: Correct the scaling of data in the SVM example.</li>
-<li>MAINT #371: <code>list_evaluations</code> default <code>size</code> changed from <code>None</code> to
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/890" title="GitHub Issue: openml/openml-python #890">#890</a>: Correct the scaling of data in the SVM example.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/371" title="GitHub Issue: openml/openml-python #371">#371</a>: <code>list_evaluations</code> default <code>size</code> changed from <code>None</code> to
     <code>10_000</code>.</li>
-<li>MAINT #767: Source distribution installation is now unit-tested.</li>
-<li>MAINT #781: Add pre-commit and automated code formatting with black.</li>
-<li>MAINT #804: Rename arguments of list_evaluations to indicate they
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/767" title="GitHub Issue: openml/openml-python #767">#767</a>: Source distribution installation is now unit-tested.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/781" title="GitHub Issue: openml/openml-python #781">#781</a>: Add pre-commit and automated code formatting with black.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/804" title="GitHub Issue: openml/openml-python #804">#804</a>: Rename arguments of list_evaluations to indicate they
     expect lists of ids.</li>
-<li>MAINT #836: OpenML supports only pandas version 1.0.0 or above.</li>
-<li>MAINT #865: OpenML no longer bundles test files in the source
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/836" title="GitHub Issue: openml/openml-python #836">#836</a>: OpenML supports only pandas version 1.0.0 or above.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/865" title="GitHub Issue: openml/openml-python #865">#865</a>: OpenML no longer bundles test files in the source
     distribution.</li>
-<li>MAINT #881: Improve the error message for too-long URIs.</li>
-<li>MAINT #897: Dropping support for Python 3.5.</li>
-<li>MAINT #916: Adding support for Python 3.8.</li>
-<li>MAINT #920: Improve error messages for dataset upload.</li>
-<li>MAINT #921: Improve hangling of the OpenML server URL in the config
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/881" title="GitHub Issue: openml/openml-python #881">#881</a>: Improve the error message for too-long URIs.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/897" title="GitHub Issue: openml/openml-python #897">#897</a>: Dropping support for Python 3.5.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/916" title="GitHub Issue: openml/openml-python #916">#916</a>: Adding support for Python 3.8.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/920" title="GitHub Issue: openml/openml-python #920">#920</a>: Improve error messages for dataset upload.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/921" title="GitHub Issue: openml/openml-python #921">#921</a>: Improve hangling of the OpenML server URL in the config
     file.</li>
-<li>MAINT #925: Improve error handling and error message when loading
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/925" title="GitHub Issue: openml/openml-python #925">#925</a>: Improve error handling and error message when loading
     datasets.</li>
-<li>MAINT #928: Restructures the contributing documentation.</li>
-<li>MAINT #936: Adding support for scikit-learn 0.23.X.</li>
-<li>MAINT #945: Make OpenML-Python PEP562 compliant.</li>
-<li>MAINT #951: Converts TaskType class to a TaskType enum.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/928" title="GitHub Issue: openml/openml-python #928">#928</a>: Restructures the contributing documentation.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/936" title="GitHub Issue: openml/openml-python #936">#936</a>: Adding support for scikit-learn 0.23.X.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/945" title="GitHub Issue: openml/openml-python #945">#945</a>: Make OpenML-Python PEP562 compliant.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/951" title="GitHub Issue: openml/openml-python #951">#951</a>: Converts TaskType class to a TaskType enum.</li>
 </ul>
-<h2 id="0102">0.10.2</h2>
+<h2 id="0102">0.10.2<a class="headerlink" href="#0102" title="Permanent link">#</a></h2>
 <ul>
-<li>ADD #857: Adds task type ID to list_runs</li>
-<li>DOC #862: Added license BSD 3-Clause to each of the source files.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/857" title="GitHub Issue: openml/openml-python #857">#857</a>: Adds task type ID to list_runs</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/862" title="GitHub Issue: openml/openml-python #862">#862</a>: Added license BSD 3-Clause to each of the source files.</li>
 </ul>
-<h2 id="0101">0.10.1</h2>
+<h2 id="0101">0.10.1<a class="headerlink" href="#0101" title="Permanent link">#</a></h2>
 <ul>
-<li>ADD #175: Automatically adds the docstring of scikit-learn objects
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/175" title="GitHub Issue: openml/openml-python #175">#175</a>: Automatically adds the docstring of scikit-learn objects
     to flow and its parameters.</li>
-<li>ADD #737: New evaluation listing call that includes the
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/737" title="GitHub Issue: openml/openml-python #737">#737</a>: New evaluation listing call that includes the
     hyperparameter settings.</li>
-<li>ADD #744: It is now possible to only issue a warning and not raise
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/744" title="GitHub Issue: openml/openml-python #744">#744</a>: It is now possible to only issue a warning and not raise
     an exception if the package versions for a flow are not met when
     deserializing it.</li>
-<li>ADD #783: The URL to download the predictions for a run is now
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/783" title="GitHub Issue: openml/openml-python #783">#783</a>: The URL to download the predictions for a run is now
     stored in the run object.</li>
-<li>ADD #790: Adds the uploader name and id as new filtering options for
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/790" title="GitHub Issue: openml/openml-python #790">#790</a>: Adds the uploader name and id as new filtering options for
     <code>list_evaluations</code>.</li>
-<li>ADD #792: New convenience function <code>openml.flow.get_flow_id</code>.</li>
-<li>ADD #861: Debug-level log information now being written to a file in
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/792" title="GitHub Issue: openml/openml-python #792">#792</a>: New convenience function <code>openml.flow.get_flow_id</code>.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/861" title="GitHub Issue: openml/openml-python #861">#861</a>: Debug-level log information now being written to a file in
     the cache directory (at most 2 MB).</li>
-<li>DOC #778: Introduces instructions on how to publish an extension to
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/778" title="GitHub Issue: openml/openml-python #778">#778</a>: Introduces instructions on how to publish an extension to
     support other libraries than scikit-learn.</li>
-<li>DOC #785: The examples section is completely restructured into
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/785" title="GitHub Issue: openml/openml-python #785">#785</a>: The examples section is completely restructured into
     simple simple examples, advanced examples and examples showcasing
     the use of OpenML-Python to reproduce papers which were done with
     OpenML-Python.</li>
-<li>DOC #788: New example on manually iterating through the split of a
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/788" title="GitHub Issue: openml/openml-python #788">#788</a>: New example on manually iterating through the split of a
     task.</li>
-<li>DOC #789: Improve the usage of dataframes in the examples.</li>
-<li>DOC #791: New example for the paper <em>Efficient and Robust Automated
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/789" title="GitHub Issue: openml/openml-python #789">#789</a>: Improve the usage of dataframes in the examples.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/791" title="GitHub Issue: openml/openml-python #791">#791</a>: New example for the paper <em>Efficient and Robust Automated
     Machine Learning</em> by Feurer et al. (2015).</li>
-<li>DOC #803: New example for the paper <em>Don't Rule Out Simple Models
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/803" title="GitHub Issue: openml/openml-python #803">#803</a>: New example for the paper <em>Don't Rule Out Simple Models
     Prematurely: A Large Scale Benchmark Comparing Linear and Non-linear
     Classifiers in OpenML</em> by Benjamin Strang et al. (2018).</li>
-<li>DOC #808: New example demonstrating basic use cases of a dataset.</li>
-<li>DOC #810: New example demonstrating the use of benchmarking studies
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/808" title="GitHub Issue: openml/openml-python #808">#808</a>: New example demonstrating basic use cases of a dataset.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/810" title="GitHub Issue: openml/openml-python #810">#810</a>: New example demonstrating the use of benchmarking studies
     and suites.</li>
-<li>DOC #832: New example for the paper <em>Scalable Hyperparameter
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/832" title="GitHub Issue: openml/openml-python #832">#832</a>: New example for the paper <em>Scalable Hyperparameter
     Transfer Learning</em> by Valerio Perrone et al. (2019)</li>
-<li>DOC #834: New example showing how to plot the loss surface for a
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/834" title="GitHub Issue: openml/openml-python #834">#834</a>: New example showing how to plot the loss surface for a
     support vector machine.</li>
-<li>FIX #305: Do not require the external version in the flow XML when
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/305" title="GitHub Issue: openml/openml-python #305">#305</a>: Do not require the external version in the flow XML when
     loading an object.</li>
-<li>FIX #734: Better handling of <em>\"old\"</em> flows.</li>
-<li>FIX #736: Attach a StreamHandler to the openml logger instead of the
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/734" title="GitHub Issue: openml/openml-python #734">#734</a>: Better handling of <em>\"old\"</em> flows.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/736" title="GitHub Issue: openml/openml-python #736">#736</a>: Attach a StreamHandler to the openml logger instead of the
     root logger.</li>
-<li>FIX #758: Fixes an error which made the client API crash when
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/758" title="GitHub Issue: openml/openml-python #758">#758</a>: Fixes an error which made the client API crash when
     loading a sparse data with categorical variables.</li>
-<li>FIX #779: Do not fail on corrupt pickle</li>
-<li>FIX #782: Assign the study id to the correct class attribute.</li>
-<li>FIX #819: Automatically convert column names to type string when
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/779" title="GitHub Issue: openml/openml-python #779">#779</a>: Do not fail on corrupt pickle</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/782" title="GitHub Issue: openml/openml-python #782">#782</a>: Assign the study id to the correct class attribute.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/819" title="GitHub Issue: openml/openml-python #819">#819</a>: Automatically convert column names to type string when
     uploading a dataset.</li>
-<li>FIX #820: Make <code>__repr__</code> work for datasets which do not have an id.</li>
-<li>MAINT #796: Rename an argument to make the function
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/820" title="GitHub Issue: openml/openml-python #820">#820</a>: Make <code>__repr__</code> work for datasets which do not have an id.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/796" title="GitHub Issue: openml/openml-python #796">#796</a>: Rename an argument to make the function
     <code>list_evaluations</code> more consistent.</li>
-<li>MAINT #811: Print the full error message given by the server.</li>
-<li>MAINT #828: Create base class for OpenML entity classes.</li>
-<li>MAINT #829: Reduce the number of data conversion warnings.</li>
-<li>MAINT #831: Warn if there\'s an empty flow description when
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/811" title="GitHub Issue: openml/openml-python #811">#811</a>: Print the full error message given by the server.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/828" title="GitHub Issue: openml/openml-python #828">#828</a>: Create base class for OpenML entity classes.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/829" title="GitHub Issue: openml/openml-python #829">#829</a>: Reduce the number of data conversion warnings.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/831" title="GitHub Issue: openml/openml-python #831">#831</a>: Warn if there\'s an empty flow description when
     publishing a flow.</li>
-<li>MAINT #837: Also print the flow XML if a flow fails to validate.</li>
-<li>FIX #838: Fix list_evaluations_setups to work when evaluations are
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/837" title="GitHub Issue: openml/openml-python #837">#837</a>: Also print the flow XML if a flow fails to validate.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/838" title="GitHub Issue: openml/openml-python #838">#838</a>: Fix list_evaluations_setups to work when evaluations are
     not a 100 multiple.</li>
-<li>FIX #847: Fixes an issue where the client API would crash when
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/847" title="GitHub Issue: openml/openml-python #847">#847</a>: Fixes an issue where the client API would crash when
     trying to download a dataset when there are no qualities available
     on the server.</li>
-<li>MAINT #849: Move logic of most different <code>publish</code> functions into
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/849" title="GitHub Issue: openml/openml-python #849">#849</a>: Move logic of most different <code>publish</code> functions into
     the base class.</li>
-<li>MAINt #850: Remove outdated test code.</li>
+<li>MAINt <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/850" title="GitHub Issue: openml/openml-python #850">#850</a>: Remove outdated test code.</li>
 </ul>
-<h2 id="0100">0.10.0</h2>
+<h2 id="0100">0.10.0<a class="headerlink" href="#0100" title="Permanent link">#</a></h2>
 <ul>
-<li>ADD #737: Add list_evaluations_setups to return hyperparameters
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/737" title="GitHub Issue: openml/openml-python #737">#737</a>: Add list_evaluations_setups to return hyperparameters
     along with list of evaluations.</li>
-<li>FIX #261: Test server is cleared of all files uploaded during unit
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/261" title="GitHub Issue: openml/openml-python #261">#261</a>: Test server is cleared of all files uploaded during unit
     testing.</li>
-<li>FIX #447: All files created by unit tests no longer persist in
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/447" title="GitHub Issue: openml/openml-python #447">#447</a>: All files created by unit tests no longer persist in
     local.</li>
-<li>FIX #608: Fixing dataset_id referenced before assignment error in
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/608" title="GitHub Issue: openml/openml-python #608">#608</a>: Fixing dataset_id referenced before assignment error in
     get_run function.</li>
-<li>FIX #447: All files created by unit tests are deleted after the
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/447" title="GitHub Issue: openml/openml-python #447">#447</a>: All files created by unit tests are deleted after the
     completion of all unit tests.</li>
-<li>FIX #589: Fixing a bug that did not successfully upload the columns
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/589" title="GitHub Issue: openml/openml-python #589">#589</a>: Fixing a bug that did not successfully upload the columns
     to ignore when creating and publishing a dataset.</li>
-<li>FIX #608: Fixing dataset_id referenced before assignment error in
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/608" title="GitHub Issue: openml/openml-python #608">#608</a>: Fixing dataset_id referenced before assignment error in
     get_run function.</li>
-<li>DOC #639: More descriptive documention for function to convert array
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/639" title="GitHub Issue: openml/openml-python #639">#639</a>: More descriptive documention for function to convert array
     format.</li>
-<li>DOC #719: Add documentation on uploading tasks.</li>
-<li>ADD #687: Adds a function to retrieve the list of evaluation
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/719" title="GitHub Issue: openml/openml-python #719">#719</a>: Add documentation on uploading tasks.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/687" title="GitHub Issue: openml/openml-python #687">#687</a>: Adds a function to retrieve the list of evaluation
     measures available.</li>
-<li>ADD #695: A function to retrieve all the data quality measures
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/695" title="GitHub Issue: openml/openml-python #695">#695</a>: A function to retrieve all the data quality measures
     available.</li>
-<li>ADD #412: Add a function to trim flow names for scikit-learn flows.</li>
-<li>ADD #715: [list_evaluations]{.title-ref} now has an option to sort
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/412" title="GitHub Issue: openml/openml-python #412">#412</a>: Add a function to trim flow names for scikit-learn flows.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/715" title="GitHub Issue: openml/openml-python #715">#715</a>: [list_evaluations]{.title-ref} now has an option to sort
     evaluations by score (value).</li>
-<li>ADD #722: Automatic reinstantiation of flow in
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/722" title="GitHub Issue: openml/openml-python #722">#722</a>: Automatic reinstantiation of flow in
     [run_model_on_task]{.title-ref}. Clearer errors if that\'s not
     possible.</li>
-<li>ADD #412: The scikit-learn extension populates the short name field
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/412" title="GitHub Issue: openml/openml-python #412">#412</a>: The scikit-learn extension populates the short name field
     for flows.</li>
-<li>MAINT #726: Update examples to remove deprecation warnings from
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/726" title="GitHub Issue: openml/openml-python #726">#726</a>: Update examples to remove deprecation warnings from
     scikit-learn</li>
-<li>MAINT #752: Update OpenML-Python to be compatible with sklearn 0.21</li>
-<li>ADD #790: Add user ID and name to list_evaluations</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/752" title="GitHub Issue: openml/openml-python #752">#752</a>: Update OpenML-Python to be compatible with sklearn 0.21</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/790" title="GitHub Issue: openml/openml-python #790">#790</a>: Add user ID and name to list_evaluations</li>
 </ul>
-<h2 id="090">0.9.0</h2>
+<h2 id="090">0.9.0<a class="headerlink" href="#090" title="Permanent link">#</a></h2>
 <ul>
-<li>ADD #560: OpenML-Python can now handle regression tasks as well.</li>
-<li>ADD #620, #628, #632, #649, #682: Full support for studies and
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/560" title="GitHub Issue: openml/openml-python #560">#560</a>: OpenML-Python can now handle regression tasks as well.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/620" title="GitHub Issue: openml/openml-python #620">#620</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/628" title="GitHub Issue: openml/openml-python #628">#628</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/632" title="GitHub Issue: openml/openml-python #632">#632</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/649" title="GitHub Issue: openml/openml-python #649">#649</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/682" title="GitHub Issue: openml/openml-python #682">#682</a>: Full support for studies and
     distinguishes suites from studies.</li>
-<li>ADD #607: Tasks can now be created and uploaded.</li>
-<li>ADD #647, #673: Introduced the extension interface. This provides an
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/607" title="GitHub Issue: openml/openml-python #607">#607</a>: Tasks can now be created and uploaded.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/647" title="GitHub Issue: openml/openml-python #647">#647</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/673" title="GitHub Issue: openml/openml-python #673">#673</a>: Introduced the extension interface. This provides an
     easy way to create a hook for machine learning packages to perform
     e.g. automated runs.</li>
-<li>ADD #548, #646, #676: Support for Pandas DataFrame and
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/548" title="GitHub Issue: openml/openml-python #548">#548</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/646" title="GitHub Issue: openml/openml-python #646">#646</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/676" title="GitHub Issue: openml/openml-python #676">#676</a>: Support for Pandas DataFrame and
     SparseDataFrame</li>
-<li>ADD #662: Results of listing functions can now be returned as
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/662" title="GitHub Issue: openml/openml-python #662">#662</a>: Results of listing functions can now be returned as
     pandas.DataFrame.</li>
-<li>ADD #59: Datasets can now also be retrieved by name.</li>
-<li>ADD #672: Add timing measurements for runs, when possible.</li>
-<li>ADD #661: Upload time and error messages now displayed with
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/59" title="GitHub Issue: openml/openml-python #59">#59</a>: Datasets can now also be retrieved by name.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/672" title="GitHub Issue: openml/openml-python #672">#672</a>: Add timing measurements for runs, when possible.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/661" title="GitHub Issue: openml/openml-python #661">#661</a>: Upload time and error messages now displayed with
     [list_runs]{.title-ref}.</li>
-<li>ADD #644: Datasets can now be downloaded \'lazily\', retrieving only
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/644" title="GitHub Issue: openml/openml-python #644">#644</a>: Datasets can now be downloaded \'lazily\', retrieving only
     metadata at first, and the full dataset only when necessary.</li>
-<li>ADD #659: Lazy loading of task splits.</li>
-<li>ADD #516: [run_flow_on_task]{.title-ref} flow uploading is now
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/659" title="GitHub Issue: openml/openml-python #659">#659</a>: Lazy loading of task splits.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/516" title="GitHub Issue: openml/openml-python #516">#516</a>: [run_flow_on_task]{.title-ref} flow uploading is now
     optional.</li>
-<li>ADD #680: Adds
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/680" title="GitHub Issue: openml/openml-python #680">#680</a>: Adds
     [openml.config.start_using_configuration_for_example]{.title-ref}
     (and resp. stop) to easily connect to the test server.</li>
-<li>ADD #75, #653: Adds a pretty print for objects of the top-level
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/75" title="GitHub Issue: openml/openml-python #75">#75</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/653" title="GitHub Issue: openml/openml-python #653">#653</a>: Adds a pretty print for objects of the top-level
     classes.</li>
-<li>FIX #642: [check_datasets_active]{.title-ref} now correctly also
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/642" title="GitHub Issue: openml/openml-python #642">#642</a>: [check_datasets_active]{.title-ref} now correctly also
     returns active status of deactivated datasets.</li>
-<li>FIX #304, #636: Allow serialization of numpy datatypes and list of
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/304" title="GitHub Issue: openml/openml-python #304">#304</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/636" title="GitHub Issue: openml/openml-python #636">#636</a>: Allow serialization of numpy datatypes and list of
     lists of more types (e.g. bools, ints) for flows.</li>
-<li>FIX #651: Fixed a bug that would prevent openml-python from finding
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/651" title="GitHub Issue: openml/openml-python #651">#651</a>: Fixed a bug that would prevent openml-python from finding
     the user\'s config file.</li>
-<li>FIX #693: OpenML-Python uses liac-arff instead of scipy.io for
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/693" title="GitHub Issue: openml/openml-python #693">#693</a>: OpenML-Python uses liac-arff instead of scipy.io for
     loading task splits now.</li>
-<li>DOC #678: Better color scheme for code examples in documentation.</li>
-<li>DOC #681: Small improvements and removing list of missing functions.</li>
-<li>DOC #684: Add notice to examples that connect to the test server.</li>
-<li>DOC #688: Add new example on retrieving evaluations.</li>
-<li>DOC #691: Update contributing guidelines to use Github draft feature
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/678" title="GitHub Issue: openml/openml-python #678">#678</a>: Better color scheme for code examples in documentation.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/681" title="GitHub Issue: openml/openml-python #681">#681</a>: Small improvements and removing list of missing functions.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/684" title="GitHub Issue: openml/openml-python #684">#684</a>: Add notice to examples that connect to the test server.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/688" title="GitHub Issue: openml/openml-python #688">#688</a>: Add new example on retrieving evaluations.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/691" title="GitHub Issue: openml/openml-python #691">#691</a>: Update contributing guidelines to use Github draft feature
     instead of tags in title.</li>
-<li>DOC #692: All functions are documented now.</li>
-<li>MAINT #184: Dropping Python2 support.</li>
-<li>MAINT #596: Fewer dependencies for regular pip install.</li>
-<li>MAINT #652: Numpy and Scipy are no longer required before
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/692" title="GitHub Issue: openml/openml-python #692">#692</a>: All functions are documented now.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/184" title="GitHub Issue: openml/openml-python #184">#184</a>: Dropping Python2 support.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/596" title="GitHub Issue: openml/openml-python #596">#596</a>: Fewer dependencies for regular pip install.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/652" title="GitHub Issue: openml/openml-python #652">#652</a>: Numpy and Scipy are no longer required before
     installation.</li>
-<li>MAINT #655: Lazy loading is now preferred in unit tests.</li>
-<li>MAINT #667: Different tag functions now share code.</li>
-<li>MAINT #666: More descriptive error message for
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/655" title="GitHub Issue: openml/openml-python #655">#655</a>: Lazy loading is now preferred in unit tests.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/667" title="GitHub Issue: openml/openml-python #667">#667</a>: Different tag functions now share code.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/666" title="GitHub Issue: openml/openml-python #666">#666</a>: More descriptive error message for
     [TypeError]{.title-ref} in [list_runs]{.title-ref}.</li>
-<li>MAINT #668: Fix some type hints.</li>
-<li>MAINT #677: [dataset.get_data]{.title-ref} now has consistent
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/668" title="GitHub Issue: openml/openml-python #668">#668</a>: Fix some type hints.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/677" title="GitHub Issue: openml/openml-python #677">#677</a>: [dataset.get_data]{.title-ref} now has consistent
     behavior in its return type.</li>
-<li>MAINT #686: Adds ignore directives for several [mypy]{.title-ref}
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/686" title="GitHub Issue: openml/openml-python #686">#686</a>: Adds ignore directives for several [mypy]{.title-ref}
     folders.</li>
-<li>MAINT #629, #630: Code now adheres to single PEP8 standard.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/629" title="GitHub Issue: openml/openml-python #629">#629</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/630" title="GitHub Issue: openml/openml-python #630">#630</a>: Code now adheres to single PEP8 standard.</li>
 </ul>
-<h2 id="080">0.8.0</h2>
+<h2 id="080">0.8.0<a class="headerlink" href="#080" title="Permanent link">#</a></h2>
 <ul>
-<li>ADD #440: Improved dataset upload.</li>
-<li>ADD #545, #583: Allow uploading a dataset from a pandas DataFrame.</li>
-<li>ADD #528: New functions to update the status of a dataset.</li>
-<li>ADD #523: Support for scikit-learn 0.20\'s new ColumnTransformer.</li>
-<li>ADD #459: Enhanced support to store runs on disk prior to uploading
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/440" title="GitHub Issue: openml/openml-python #440">#440</a>: Improved dataset upload.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/545" title="GitHub Issue: openml/openml-python #545">#545</a>, <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/583" title="GitHub Issue: openml/openml-python #583">#583</a>: Allow uploading a dataset from a pandas DataFrame.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/528" title="GitHub Issue: openml/openml-python #528">#528</a>: New functions to update the status of a dataset.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/523" title="GitHub Issue: openml/openml-python #523">#523</a>: Support for scikit-learn 0.20\'s new ColumnTransformer.</li>
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/459" title="GitHub Issue: openml/openml-python #459">#459</a>: Enhanced support to store runs on disk prior to uploading
     them to OpenML.</li>
-<li>ADD #564: New helpers to access the structure of a flow (and find
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/564" title="GitHub Issue: openml/openml-python #564">#564</a>: New helpers to access the structure of a flow (and find
     its subflows).</li>
-<li>ADD #618: The software will from now on retry to connect to the
+<li>ADD <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/618" title="GitHub Issue: openml/openml-python #618">#618</a>: The software will from now on retry to connect to the
     server if a connection failed. The number of retries can be
     configured.</li>
-<li>FIX #538: Support loading clustering tasks.</li>
-<li>FIX #464: Fixes a bug related to listing functions (returns correct
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/538" title="GitHub Issue: openml/openml-python #538">#538</a>: Support loading clustering tasks.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/464" title="GitHub Issue: openml/openml-python #464">#464</a>: Fixes a bug related to listing functions (returns correct
     listing size).</li>
-<li>FIX #580: Listing function now works properly when there are less
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/580" title="GitHub Issue: openml/openml-python #580">#580</a>: Listing function now works properly when there are less
     results than requested.</li>
-<li>FIX #571: Fixes an issue where tasks could not be downloaded in
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/571" title="GitHub Issue: openml/openml-python #571">#571</a>: Fixes an issue where tasks could not be downloaded in
     parallel.</li>
-<li>FIX #536: Flows can now be printed when the flow name is None.</li>
-<li>FIX #504: Better support for hierarchical hyperparameters when
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/536" title="GitHub Issue: openml/openml-python #536">#536</a>: Flows can now be printed when the flow name is None.</li>
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/504" title="GitHub Issue: openml/openml-python #504">#504</a>: Better support for hierarchical hyperparameters when
     uploading scikit-learn\'s grid and random search.</li>
-<li>FIX #569: Less strict checking of flow dependencies when loading
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/569" title="GitHub Issue: openml/openml-python #569">#569</a>: Less strict checking of flow dependencies when loading
     flows.</li>
-<li>FIX #431: Pickle of task splits are no longer cached.</li>
-<li>DOC #540: More examples for dataset uploading.</li>
-<li>DOC #554: Remove the doubled progress entry from the docs.</li>
-<li>MAINT #613: Utilize the latest updates in OpenML evaluation
+<li>FIX <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/431" title="GitHub Issue: openml/openml-python #431">#431</a>: Pickle of task splits are no longer cached.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/540" title="GitHub Issue: openml/openml-python #540">#540</a>: More examples for dataset uploading.</li>
+<li>DOC <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/554" title="GitHub Issue: openml/openml-python #554">#554</a>: Remove the doubled progress entry from the docs.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/613" title="GitHub Issue: openml/openml-python #613">#613</a>: Utilize the latest updates in OpenML evaluation
     listings.</li>
-<li>MAINT #482: Cleaner interface for handling search traces.</li>
-<li>MAINT #557: Continuous integration works for scikit-learn 0.18-0.20.</li>
-<li>MAINT #542: Continuous integration now runs python3.7 as well.</li>
-<li>MAINT #535: Continuous integration now enforces PEP8 compliance for
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/482" title="GitHub Issue: openml/openml-python #482">#482</a>: Cleaner interface for handling search traces.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/557" title="GitHub Issue: openml/openml-python #557">#557</a>: Continuous integration works for scikit-learn 0.18-0.20.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/542" title="GitHub Issue: openml/openml-python #542">#542</a>: Continuous integration now runs python3.7 as well.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/535" title="GitHub Issue: openml/openml-python #535">#535</a>: Continuous integration now enforces PEP8 compliance for
     new code.</li>
-<li>MAINT #527: Replace deprecated nose by pytest.</li>
-<li>MAINT #510: Documentation is now built by travis-ci instead of
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/527" title="GitHub Issue: openml/openml-python #527">#527</a>: Replace deprecated nose by pytest.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/510" title="GitHub Issue: openml/openml-python #510">#510</a>: Documentation is now built by travis-ci instead of
     circle-ci.</li>
 <li>MAINT: Completely re-designed documentation built on sphinx gallery.</li>
-<li>MAINT #462: Appveyor CI support.</li>
-<li>MAINT #477: Improve error handling for issue
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/462" title="GitHub Issue: openml/openml-python #462">#462</a>: Appveyor CI support.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/477" title="GitHub Issue: openml/openml-python #477">#477</a>: Improve error handling for issue
     <a href="https://github.com/openml/openml-python/pull/479">#479</a>: the OpenML
     connector fails earlier and with a better error message when failing
     to create a flow from the OpenML description.</li>
-<li>MAINT #561: Improve documentation on running specific unit tests.</li>
+<li>MAINT <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/openml/openml-python/issues/561" title="GitHub Issue: openml/openml-python #561">#561</a>: Improve documentation on running specific unit tests.</li>
 </ul>
-<h2 id="04-07">0.4.-0.7</h2>
+<h2 id="04-07">0.4.-0.7<a class="headerlink" href="#04-07" title="Permanent link">#</a></h2>
 <p>There is no changelog for these versions.</p>
-<h2 id="030">0.3.0</h2>
+<h2 id="030">0.3.0<a class="headerlink" href="#030" title="Permanent link">#</a></h2>
 <ul>
 <li>Add this changelog</li>
 <li>2nd example notebook PyOpenML.ipynb</li>
 <li>Pagination support for list datasets and list tasks</li>
 </ul>
-<h2 id="prior">Prior</h2>
+<h2 id="prior">Prior<a class="headerlink" href="#prior" title="Permanent link">#</a></h2>
 <p>There is no changelog for prior versions.</p>
 
 
@@ -3105,6 +3177,30 @@ warning if you don\'t explicitly specifiy the desired behavior.</p>
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../extensions/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Extensions">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Extensions
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -3113,6 +3209,32 @@ warning if you don\'t explicitly specifiy the desired behavior.</p>
     Made with
     <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
       Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/openml" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://x.com/open_ml" target="_blank" rel="noopener" title="x.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253"/></svg>
     </a>
   
 </div>
@@ -3129,7 +3251,7 @@ warning if you don\'t explicitly specifiy the desired behavior.</p>
     
     
       
-      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.annotate", "content.code.copy", "navigation.footer", "navigation.sections", "toc.follow", "toc.integrate", "navigation.tabs", "navigation.tabs.sticky", "header.autohide", "search.suggest", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
