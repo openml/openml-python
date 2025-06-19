@@ -96,7 +96,8 @@ docs=[
     "mkdocs-literate-nav",
     "mkdocs-section-index",
     "mkdocs-jupyter",
-    "mkdocs-linkcheck"
+    "mkdocs-linkcheck",
+    "mike"
 ]
 
 [project.urls]

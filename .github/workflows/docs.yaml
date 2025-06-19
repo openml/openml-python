@@ -34,9 +34,25 @@ jobs:
         run: |
           mkdocs build
       - name: Deploy to GitHub Pages
-        if: (contains(github.ref, 'develop') || contains(github.ref, 'main')) && github.event_name == 'push'
-        run: |
-          mkdocs gh-deploy --force
         env:
           CI: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: (contains(github.ref, 'develop') || contains(github.ref, 'main')) && github.event_name == 'push'
+        run: |
+          # mkdocs gh-deploy --force
+          git config user.name doc-bot
+          git config user.email doc-bot@openml.com
+          current_version=$(git tag | sort --version-sort | tail -n 1)
+          # This block will rename previous retitled versions
+          retitled_versions=$(mike list -j | jq ".[] | select(.title != .version) | .version" | tr -d '"')
+          for version in $retitled_versions; do
+            mike retitle "${version}" "${version}"
+          done
+
+          echo "Deploying docs for ${current_version}"
+          mike deploy \
+            --push \
+            --title "${current_version} (latest)" \
+            --update-aliases \
+            "${current_version}" \
+            "latest"
