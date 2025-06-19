@@ -7,6 +7,8 @@ import random
 import time
 import unittest
 import warnings
+
+from openml_sklearn import SklearnExtension, cat, cont
 from packaging.version import Version
 from unittest import mock
 
@@ -34,7 +36,6 @@ from sklearn.compose import ColumnTransformer
 import openml
 import openml._api_calls
 import openml.exceptions
-#import openml.extensions.sklearn
 from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerException,
@@ -108,7 +109,7 @@ class TestRun(TestBase):
 
     def setUp(self):
         super().setUp()
-        self.extension = None#openml.extensions.sklearn.SklearnExtension()
+        self.extension = SklearnExtension()
 
     def _wait_for_processed_run(self, run_id, max_waiting_time_seconds):
         # it can take a while for a run to be processed on the OpenML (test)
@@ -1750,7 +1751,7 @@ class TestRun(TestBase):
         Version(sklearn.__version__) < Version("0.21"),
         reason="couldn't perform local tests successfully w/o bloating RAM",
     )
-    @mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
+    @mock.patch("openml_sklearn.SklearnExtension._prevent_optimize_n_jobs")
     def test__run_task_get_arffcontent_2(self, parallel_mock):
         """Tests if a run executed in parallel is collated correctly."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
@@ -1824,7 +1825,7 @@ class TestRun(TestBase):
         Version(sklearn.__version__) < Version("0.21"),
         reason="couldn't perform local tests successfully w/o bloating RAM",
     )
-    @mock.patch("openml.extensions.sklearn.SklearnExtension._prevent_optimize_n_jobs")
+    @mock.patch("openml_sklearn.SklearnExtension._prevent_optimize_n_jobs")
     def test_joblib_backends(self, parallel_mock):
         """Tests evaluation of a run using various joblib backends and n_jobs."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp

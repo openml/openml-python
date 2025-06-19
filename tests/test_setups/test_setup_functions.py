@@ -10,10 +10,10 @@ import pytest
 import sklearn.base
 import sklearn.naive_bayes
 import sklearn.tree
+from openml_sklearn import SklearnExtension
 
 import openml
 import openml.exceptions
-#import openml.extensions.sklearn
 from openml.testing import TestBase
 
 
@@ -31,7 +31,7 @@ class TestSetupFunctions(TestBase):
     _multiprocess_can_split_ = True
 
     def setUp(self):
-        self.extension = None# openml.extensions.sklearn.SklearnExtension()
+        self.extension = SklearnExtension()
         super().setUp()
 
     @pytest.mark.sklearn()

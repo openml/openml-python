@@ -24,12 +24,14 @@ import sklearn.preprocessing
 import sklearn.tree
 import xmltodict
 
+from openml_sklearn import SklearnExtension
+
 import openml
 import openml.exceptions
-#import openml.extensions.sklearn
 import openml.utils
 from openml._api_calls import _perform_api_call
 from openml.testing import SimpleImputer, TestBase
+
 
 
 class TestFlow(TestBase):
@@ -37,7 +39,7 @@ class TestFlow(TestBase):
 
     def setUp(self):
         super().setUp()
-        self.extension = None #openml.extensions.sklearn.SklearnExtension()
+        self.extension = SklearnExtension()
 
     def tearDown(self):
         super().tearDown()
