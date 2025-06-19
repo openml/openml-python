@@ -57,4 +57,4 @@ jobs:
             --update-aliases \
             "${current_version}" \
             "latest"\
-            -b $PAGES_BRANCH origin/$PAGES_BRANCH
+            -b $PAGES_BRANCH
