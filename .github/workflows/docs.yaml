@@ -42,7 +42,6 @@ jobs:
           PAGES_BRANCH: gh-pages
         if: (contains(github.ref, 'develop') || contains(github.ref, 'main')) && github.event_name == 'push'
         run: |
-          # mkdocs gh-deploy --force
           git config user.name doc-bot
           git config user.email doc-bot@openml.com
           current_version=$(git tag | sort --version-sort | tail -n 1)
@@ -60,4 +59,4 @@ jobs:
             --update-aliases \
             "${current_version}" \
             "latest"\
-            -b $PAGES_BRANCH origin/$PAGES_BRANCH
+            -b $PAGES_BRANCH
