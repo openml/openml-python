@@ -8,6 +8,7 @@ from time import time
 import numpy as np
 import pytest
 import xmltodict
+from openml_sklearn import SklearnExtension
 from sklearn.base import clone
 from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LinearRegression
@@ -16,7 +17,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
 
 import openml
-import openml.extensions.sklearn
 from openml import OpenMLRun
 from openml.testing import SimpleImputer, TestBase
 
@@ -299,7 +299,7 @@ class TestRun(TestBase):
         Publish a run tied to a local flow after it has first been saved to
          and loaded from disk.
         """
-        extension = openml.extensions.sklearn.SklearnExtension()
+        extension = SklearnExtension()
 
         for model, task in self._get_models_tasks_for_tests():
             # Make sure the flow does not exist on the server yet.
@@ -339,7 +339,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     def test_offline_and_online_run_identical(self):
-        extension = openml.extensions.sklearn.SklearnExtension()
+        extension = SklearnExtension()
 
         for model, task in self._get_models_tasks_for_tests():
             # Make sure the flow does not exist on the server yet.

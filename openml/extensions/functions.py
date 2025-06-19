@@ -13,6 +13,13 @@ if TYPE_CHECKING:
 
     from . import Extension
 
+SKLEARN_HINT = (
+    "But it looks related to scikit-learn. "
+    "Please install the OpenML scikit-learn extension (openml-sklearn) and try again. "
+    "For more information, see "
+    "https://github.com/openml/openml-sklearn?tab=readme-ov-file#installation"
+)
+
 
 def register_extension(extension: type[Extension]) -> None:
     """Register an extension.
@@ -57,7 +64,13 @@ def get_extension_by_flow(
             candidates.append(extension_class())
     if len(candidates) == 0:
         if raise_if_no_extension:
-            raise ValueError(f"No extension registered which can handle flow: {flow}")
+            install_instruction = ""
+            if flow.name.startswith("sklearn"):
+                install_instruction = SKLEARN_HINT
+            raise ValueError(
+                f"No extension registered which can handle flow: {flow.flow_id} ({flow.name}). "
+                f"{install_instruction}"
+            )
 
         return None
 
@@ -96,7 +109,12 @@ def get_extension_by_model(
             candidates.append(extension_class())
     if len(candidates) == 0:
         if raise_if_no_extension:
-            raise ValueError(f"No extension registered which can handle model: {model}")
+            install_instruction = ""
+            if type(model).__module__.startswith("sklearn"):
+                install_instruction = SKLEARN_HINT
+            raise ValueError(
+                f"No extension registered which can handle model: {model}. {install_instruction}"
+            )
 
         return None
 

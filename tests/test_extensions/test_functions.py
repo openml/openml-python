@@ -11,6 +11,8 @@ from openml.extensions import get_extension_by_flow, get_extension_by_model, reg
 
 class DummyFlow:
     external_version = "DummyFlow==0.1"
+    name = "Dummy Flow"
+    flow_id = 1
     dependencies = None
 
 

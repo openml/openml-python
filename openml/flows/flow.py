@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from collections import OrderedDict
 from pathlib import Path
-from typing import Any, Hashable, Sequence
+from typing import Any, Hashable, Sequence, cast
 
 import xmltodict
 
@@ -157,10 +157,7 @@ class OpenMLFlow(OpenMLBase):
         self.language = language
         self.dependencies = dependencies
         self.flow_id = flow_id
-        if extension is None:
-            self._extension = get_extension_by_flow(self)
-        else:
-            self._extension = extension
+        self._extension = extension
 
     @property
     def id(self) -> int | None:
@@ -170,12 +167,12 @@ class OpenMLFlow(OpenMLBase):
     @property
     def extension(self) -> Extension:
         """The extension of the flow (e.g., sklearn)."""
-        if self._extension is not None:
-            return self._extension
+        if self._extension is None:
+            self._extension = cast(
+                Extension, get_extension_by_flow(self, raise_if_no_extension=True)
+            )
 
-        raise RuntimeError(
-            f"No extension could be found for flow {self.flow_id}: {self.name}",
-        )
+        return self._extension
 
     def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str]]]:
         """Collect all information to display in the __repr__ body."""

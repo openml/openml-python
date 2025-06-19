@@ -20,7 +20,6 @@ dependencies = [
   "minio",
   "pyarrow",
   "tqdm",  # For MinIO download progress bars
-  "packaging",
 ]
 requires-python = ">=3.8"
 maintainers = [
@@ -80,6 +79,8 @@ test=[
     "mypy",
     "ruff",
     "requests-mock",
+    "openml-sklearn",
+    "packaging",
     "pytest-mock",
 ]
 examples=[
