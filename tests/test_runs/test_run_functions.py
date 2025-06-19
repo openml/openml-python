@@ -1900,6 +1900,7 @@ class TestRun(TestBase):
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
+    @pytest.mark.sklearn()
     def test_delete_run(self):
         rs = np.random.randint(1, 2**31 - 1)
         clf = sklearn.pipeline.Pipeline(
@@ -1928,6 +1929,7 @@ class TestRun(TestBase):
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
+    @pytest.mark.sklearn()
     def test_initialize_model_from_run_nonstrict(self):
         # We cannot guarantee that a run with an older version exists on the server.
         # Thus, we test it simply with a run that we know exists that might not be loose.

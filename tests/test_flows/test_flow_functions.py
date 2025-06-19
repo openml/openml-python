@@ -321,8 +321,8 @@ class TestFlowFunctions(TestBase):
     def test_get_flow_reinstantiate_model_no_extension(self):
         # Flow 10 is a WEKA flow
         self.assertRaisesRegex(
-            RuntimeError,
-            "No extension could be found for flow 10: weka.SMO",
+            ValueError,
+            ".* flow: 10 \(weka.SMO\). ",
             openml.flows.get_flow,
             flow_id=10,
             reinstantiate=True,
