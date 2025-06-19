@@ -1,10 +1,8 @@
-"""
-Introduction tutorial & Setup
-=============================
+# %% [markdown]
+# # Introduction tutorial & Setup
+# An example how to set up OpenML-Python followed up by a simple example.
 
-An example how to set up OpenML-Python followed up by a simple example.
-"""
-############################################################################
+# %% [markdown]
 # OpenML is an online collaboration platform for machine learning which allows
 # you to:
 #
@@ -16,22 +14,16 @@ An example how to set up OpenML-Python followed up by a simple example.
 # * Large scale benchmarking, compare to state of the art
 #
 
-############################################################################
-# Installation
-# ^^^^^^^^^^^^
+# %% [markdown]
+# # Installation
 # Installation is done via ``pip``:
 #
-# .. code:: bash
-#
-#     pip install openml
-#
-# For further information, please check out the installation guide at
-# :ref:`installation`.
-#
+# ```bash
+# pip install openml
+# ```
 
-############################################################################
-# Authentication
-# ^^^^^^^^^^^^^^
+# %% [markdown]
+# # Authentication
 #
 # The OpenML server can only be accessed by users who have signed up on the
 # OpenML platform. If you don’t have an account yet, sign up now.
@@ -55,28 +47,38 @@ An example how to set up OpenML-Python followed up by a simple example.
 # you authenticate for the duration of the python process.
 
 
-############################################################################
-
-# License: BSD 3-Clause
+# %%
 
 import openml
 from sklearn import neighbors
 
-############################################################################
-# .. warning::
-#    .. include:: ../../test_server_usage_warning.txt
-openml.config.start_using_configuration_for_example()
+# %% [markdown]
+# <div class="admonition warning">
+#     <p class="admonition-title">Warning</p>
+#     <p>
+#         This example uploads data. For that reason, this example connects to the
+#         test server at <a href="https://test.openml.org"
+#         target="_blank">test.openml.org</a>.<br>
+#         This prevents the main server from becoming overloaded with example datasets, tasks,
+#         runs, and other submissions.<br>
+#         Using this test server may affect the behavior and performance of the
+#         OpenML-Python API.
+#     </p>
+# </div>
 
-############################################################################
+# %%
+# openml.config.start_using_configuration_for_example()
+
+# %% [markdown]
 # When using the main server instead, make sure your apikey is configured.
 # This can be done with the following line of code (uncomment it!).
 # Never share your apikey with others.
 
+# %%
 # openml.config.apikey = 'YOURKEY'
 
-############################################################################
-# Caching
-# ^^^^^^^
+# %% [markdown]
+# # Caching
 # When downloading datasets, tasks, runs and flows, they will be cached to
 # retrieve them without calling the server later. As with the API key,
 # the cache directory can be either specified through the config file or
@@ -87,23 +89,27 @@ openml.config.start_using_configuration_for_example()
 #   will use **~/.openml/cache** as the cache directory.
 # * Run the code below, replacing 'YOURDIR' with the path to the cache directory.
 
+# %%
 # Uncomment and set your OpenML cache directory
 # import os
 # openml.config.cache_directory = os.path.expanduser('YOURDIR')
+openml.config.set_root_cache_directory("YOURDIR")
 
-############################################################################
-# Simple Example
-# ^^^^^^^^^^^^^^
+# %% [markdown]
+# # Simple Example
 # Download the OpenML task for the eeg-eye-state.
+
+# %%
 task = openml.tasks.get_task(403)
-data = openml.datasets.get_dataset(task.dataset_id)
 clf = neighbors.KNeighborsClassifier(n_neighbors=5)
+openml.config.start_using_configuration_for_example()
+
 run = openml.runs.run_model_on_task(clf, task, avoid_duplicate_runs=False)
 # Publish the experiment on OpenML (optional, requires an API key).
 # For this tutorial, our configuration publishes to the test server
 # as to not crowd the main server with runs created by examples.
 myrun = run.publish()
-print(f"kNN on {data.name}: {myrun.openml_url}")
 
-############################################################################
+# %%
 openml.config.stop_using_configuration_for_example()
+# License: BSD 3-Clause

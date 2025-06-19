@@ -307,6 +307,7 @@ def workdir(tmp_path):
     os.chdir(tmp_path)
     yield tmp_path
     os.chdir(original_cwd)
+
     
 @pytest.fixture
 def mock_sparse_categorical_395(requests_mock, test_files_directory):
@@ -345,4 +346,3 @@ def mock_sparse_dataset(requests_mock, test_files_directory):
     
     
     yield
-

@@ -54,7 +54,7 @@ class TestConfig(openml.testing.TestBase):
         assert not log_handler_mock.call_args_list[0][1]["create_file_handler"]
         assert openml.config._root_cache_directory == Path(td) / "something-else"
 
-    @unittest.skipIf(platform.system() != "Linux","XDG only exists for Linux systems.")
+    @unittest.skipIf(platform.system() != "Linux", "XDG only exists for Linux systems.")
     def test_XDG_directories_do_not_exist(self):
         with tempfile.TemporaryDirectory(dir=self.workdir) as td:
             # Save previous state
@@ -131,8 +131,11 @@ class TestConfigurationForExamples(openml.testing.TestBase):
         assert openml.config.server == self.production_server
 
     def test_example_configuration_stop_before_start(self):
-        """Verifies an error is raised is `stop_...` is called before `start_...`."""
+        """Verifies an error is raised if `stop_...` is called before `start_...`."""
         error_regex = ".*stop_use_example_configuration.*start_use_example_configuration.*first"
+        # Tests do not reset the state of this class. Thus, we ensure it is in
+        # the original state before the test.
+        openml.config.ConfigurationForExamples._start_last_called = False
         self.assertRaisesRegex(
             RuntimeError,
             error_regex,

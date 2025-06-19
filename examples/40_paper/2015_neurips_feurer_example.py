@@ -1,28 +1,27 @@
-"""
-Feurer et al. (2015)
-====================
+# %% [markdown]
+# # Feurer et al. (2015)
 
-A tutorial on how to get the datasets used in the paper introducing *Auto-sklearn* by Feurer et al..
+# A tutorial on how to get the datasets used in the paper introducing *Auto-sklearn* by Feurer et al..
+#
+# Auto-sklearn website: https://automl.github.io/auto-sklearn/
+#
+# ## Publication
+#
+# | Efficient and Robust Automated Machine Learning
+# | Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Springenberg, Manuel Blum and Frank Hutter
+# | In *Advances in Neural Information Processing Systems 28*, 2015
+# | Available at https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning.pdf
 
-Auto-sklearn website: https://automl.github.io/auto-sklearn/
-
-Publication
-~~~~~~~~~~~
-
-| Efficient and Robust Automated Machine Learning
-| Matthias Feurer, Aaron Klein, Katharina Eggensperger, Jost Springenberg, Manuel Blum and Frank Hutter
-| In *Advances in Neural Information Processing Systems 28*, 2015
-| Available at https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning.pdf
-"""
-
-# License: BSD 3-Clause
+# %%
+import pandas as pd
 
 import openml
 
-####################################################################################################
+# %% [markdown]
 # List of dataset IDs given in the supplementary material of Feurer et al.:
 # https://papers.nips.cc/paper/5872-efficient-and-robust-automated-machine-learning-supplemental.zip
-# fmt: off
+
+# %%
 dataset_ids = [
     3, 6, 12, 14, 16, 18, 21, 22, 23, 24, 26, 28, 30, 31, 32, 36, 38, 44, 46,
     57, 60, 179, 180, 181, 182, 184, 185, 273, 293, 300, 351, 354, 357, 389,
@@ -35,9 +34,8 @@ dataset_ids = [
     1056, 1067, 1068, 1069, 1111, 1112, 1114, 1116, 1119, 1120, 1128, 1130,
     1134, 1138, 1139, 1142, 1146, 1161, 1166,
 ]
-# fmt: on
 
-####################################################################################################
+# %% [markdown]
 # The dataset IDs could be used directly to load the dataset and split the data into a training set
 # and a test set. However, to be reproducible, we will first obtain the respective tasks from
 # OpenML, which define both the target feature and the train/test split.
@@ -50,11 +48,13 @@ dataset_ids = [
 #    Please check the `OpenML documentation of tasks <https://docs.openml.org/concepts/tasks/>`_ if you
 #    want to learn more about them.
 
-####################################################################################################
+# %% [markdown]
 # This lists both active and inactive tasks (because of ``status='all'``). Unfortunately,
 # this is necessary as some of the datasets contain issues found after the publication and became
 # deactivated, which also deactivated the tasks on them. More information on active or inactive
-# datasets can be found in the `online docs <https://docs.openml.org/concepts/data/#dataset-status>`_.
+# datasets can be found in the [online docs](https://docs.openml.org/#dataset-status).
+
+# %%
 tasks = openml.tasks.list_tasks(
     task_type=openml.tasks.TaskType.SUPERVISED_CLASSIFICATION,
     status="all",
@@ -88,3 +88,5 @@ task_ids.sort()
 
 # These are the tasks to work with:
 print(task_ids)
+
+# License: BSD 3-Clause

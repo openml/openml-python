@@ -17,6 +17,8 @@ from openml.testing import TestBase
 
 import requests_mock
 
+import pytest
+
 @pytest.mark.production()
 class OpenMLDatasetTest(TestBase):
     _multiprocess_can_split_ = True
@@ -339,6 +341,7 @@ class OpenMLDatasetTestOnTestServer(TestBase):
 
 
 
+
 @pytest.mark.production        
 def test_get_sparse_categorical_data_id_395(mock_sparse_categorical_395):
     
@@ -406,7 +409,6 @@ def test_get_sparse_dataset_dataframe_with_target(mock_sparse_dataset):
     assert len(attribute_names) == 10
     assert "class" not in attribute_names
                
-
 
 
 def test__read_features(mocker, workdir, static_cache_dir):

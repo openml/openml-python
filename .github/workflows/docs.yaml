@@ -22,43 +22,42 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.8
-    - name: Install dependencies
-      run: |
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
           pip install -e .[docs,examples]
-    - name: Make docs
-      run: |
-        cd doc
-        make html
-    - name: Check links
-      run: |
-        cd doc
-        make linkcheck
-    - name: Pull latest gh-pages
-      if: (contains(github.ref, 'develop') || contains(github.ref, 'main')) && github.event_name == 'push'
-      run: |
-        cd ..
-        git clone https://github.com/openml/openml-python.git --branch gh-pages --single-branch gh-pages
-    - name: Copy new doc into gh-pages
-      if: (contains(github.ref, 'develop') || contains(github.ref, 'main')) && github.event_name == 'push'
-      run: |
-        branch_name=${GITHUB_REF##*/}
-        cd ../gh-pages
-        rm -rf $branch_name
-        cp -r ../openml-python/doc/build/html $branch_name
-    - name: Push to gh-pages
-      if: (contains(github.ref, 'develop') || contains(github.ref, 'main')) && github.event_name == 'push'
-      run: |
-        last_commit=$(git log --pretty=format:"%an: %s")
-        cd ../gh-pages
-        branch_name=${GITHUB_REF##*/}
-        git add $branch_name/
-        git config --global user.name 'Github Actions'
-        git config --global user.email 'not@mail.com'
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        git commit -am "$last_commit"
-        git diff --quiet @{u} HEAD || git push
+      - name: Make docs
+        run: |
+          mkdocs build
+      - name: Deploy to GitHub Pages
+        env:
+          CI: false
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAGES_BRANCH: gh-pages
+        if: (contains(github.ref, 'develop') || contains(github.ref, 'main')) && github.event_name == 'push'
+        run: |
+          # mkdocs gh-deploy --force
+          git config user.name doc-bot
+          git config user.email doc-bot@openml.com
+          current_version=$(git tag | sort --version-sort | tail -n 1)
+          # This block will rename previous retitled versions
+          retitled_versions=$(mike list -j | jq ".[] | select(.title != .version) | .version" | tr -d '"')
+          for version in $retitled_versions; do
+            mike retitle "${version}" "${version}"
+          done
+
+          echo "Deploying docs for ${current_version}"
+          mike set-default latest
+          mike deploy \
+            --push \
+            --title "${current_version} (latest)" \
+            --update-aliases \
+            "${current_version}" \
+            "latest"\
+            -b $PAGES_BRANCH origin/$PAGES_BRANCH

@@ -80,6 +80,7 @@ test=[
     "mypy",
     "ruff",
     "requests-mock",
+    "pytest-mock",
 ]
 examples=[
     "matplotlib",
@@ -93,10 +94,17 @@ examples=[
     "seaborn",
 ]
 docs=[
-    "sphinx>=3",
-    "sphinx-gallery",
-    "sphinx_bootstrap_theme",
+    "mkdocs",
     "numpydoc",
+    "mkdocs-material",
+    "mkdocs-autorefs",
+    "mkdocstrings[python]",
+    "mkdocs-gen-files",
+    "mkdocs-literate-nav",
+    "mkdocs-section-index",
+    "mkdocs-jupyter",
+    "mkdocs-linkcheck",
+    "mike"
 ]
 
 [project.urls]
