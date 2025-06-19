@@ -80,6 +80,7 @@ test=[
     "mypy",
     "ruff",
     "requests-mock",
+    "openml-sklearn",
 ]
 examples=[
     "matplotlib",
