@@ -1,0 +1,30 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>61</oml:id>
+  <oml:name>iris</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: R.A. Fisher  
+**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/Iris) - 1936 - Donated by Michael Marshall  
+**Please cite**:   
+
+**Iris Plants Database**  
+This is perhaps the best known database to be found in the pattern recognition literature.  Fisher's paper is a classic in the field and is referenced frequently to this day.  (See Duda &amp; Hart, for example.)  The data set contains 3 classes of 50 instances each, where each class refers to a type of iris plant.  One class is     linearly separable from the other 2; the latter are NOT linearly separable from each other.
+
+Predicted attribute: class of iris plant.  
+This is an exceedingly simple domain.  
+ 
+### Attribute Information:
+    1. sepal length in cm
+    2. sepal width in cm
+    3. petal length in cm
+    4. petal width in cm
+    5. class: 
+       -- Iris Setosa
+       -- Iris Versicolour
+       -- Iris Virginica</oml:description>
+  <oml:description_version>4</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>R.A. Fisher</oml:creator>     <oml:collection_date>1936</oml:collection_date>  <oml:upload_date>2014-04-06T23:23:39</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/61/iris.arff</oml:url>
+  <oml:parquet_url>http://openml1.win.tue.nl/dataset61/dataset_61.pq</oml:parquet_url>  <oml:file_id>61</oml:file_id>  <oml:default_target_attribute>class</oml:default_target_attribute>      <oml:version_label>1</oml:version_label>  <oml:citation>https://archive.ics.uci.edu/ml/citation_policy.html</oml:citation>  <oml:tag>study_1</oml:tag><oml:tag>study_25</oml:tag><oml:tag>study_4</oml:tag><oml:tag>study_41</oml:tag><oml:tag>study_50</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_7</oml:tag><oml:tag>study_86</oml:tag><oml:tag>study_88</oml:tag><oml:tag>study_89</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>https://archive.ics.uci.edu/ml/datasets/Iris</oml:original_data_url>  <oml:paper_url>http://digital.library.adelaide.edu.au/dspace/handle/2440/15227</oml:paper_url>  <oml:minio_url>http://openml1.win.tue.nl/dataset61/dataset_61.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 19:02:18</oml:processing_date>      <oml:md5_checksum>ad484452702105cbf3d30f8deaba39a9</oml:md5_checksum>
+</oml:data_set_description>
