@@ -268,6 +268,7 @@ def as_robot() -> Iterator[None]:
     yield
     openml.config.set_retry_policy(policy, n_retries)
 
+
 @pytest.fixture(autouse=True)
 def with_server(request):
     if "production" in request.keywords:
@@ -293,14 +294,14 @@ def with_test_cache(test_files_directory, request):
     if tmp_cache.exists():
         shutil.rmtree(tmp_cache)
         
-pytest.fixture
+@pytest.fixture
 def static_cache_dir():
-
+    
     return Path(__file__).parent / "files" 
 
 @pytest.fixture
 def workdir(tmp_path):
-    original_cwd = os.getcwd()
+    original_cwd = Path.cwd()
     os.chdir(tmp_path)
     yield tmp_path
     os.chdir(original_cwd)
