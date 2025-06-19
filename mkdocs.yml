@@ -1,5 +1,9 @@
 site_name: openml-python
+repo_url: https://github.com/openml/openml-python
+repo_name: openml/openml-python
 theme:
+  logo: images/openml_icon.png
+  favicon: images/openml_icon.png
   name: material
   features:
     - content.code.annotate
@@ -11,6 +15,7 @@ theme:
     - navigation.tabs
     - navigation.tabs.sticky
     - header.autohide
+    - header.social
     - search.suggest
     - search.highlight
     - search.share
