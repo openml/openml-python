@@ -37,6 +37,7 @@ jobs:
         env:
           CI: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAGES_BRANCH: gh-pages
         if: (contains(github.ref, 'develop') || contains(github.ref, 'main')) && github.event_name == 'push'
         run: |
           # mkdocs gh-deploy --force
@@ -55,4 +56,5 @@ jobs:
             --title "${current_version} (latest)" \
             --update-aliases \
             "${current_version}" \
-            "latest"
+            "latest"\
+            -b $PAGES_BRANCH origin/$PAGES_BRANCH
