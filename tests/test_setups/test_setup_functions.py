@@ -13,7 +13,7 @@ import sklearn.tree
 
 import openml
 import openml.exceptions
-import openml.extensions.sklearn
+#import openml.extensions.sklearn
 from openml.testing import TestBase
 
 
@@ -31,7 +31,7 @@ class TestSetupFunctions(TestBase):
     _multiprocess_can_split_ = True
 
     def setUp(self):
-        self.extension = openml.extensions.sklearn.SklearnExtension()
+        self.extension = None# openml.extensions.sklearn.SklearnExtension()
         super().setUp()
 
     @pytest.mark.sklearn()

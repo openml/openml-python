@@ -18,7 +18,7 @@ import sklearn
 from sklearn import ensemble
 
 import openml
-import openml.extensions.sklearn
+#import openml.extensions.sklearn
 from openml.exceptions import OpenMLNotAuthorizedError, OpenMLServerException
 from openml.testing import TestBase, create_request_response
 
@@ -283,7 +283,7 @@ class TestFlowFunctions(TestBase):
         from sklearn.preprocessing import OrdinalEncoder
 
         ordinal_encoder = OrdinalEncoder(categories=[[0, 1], [0, 1]])
-        extension = openml.extensions.sklearn.SklearnExtension()
+        extension = None # openml.extensions.sklearn.SklearnExtension()
 
         # Test serialization works
         flow = extension.model_to_flow(ordinal_encoder)

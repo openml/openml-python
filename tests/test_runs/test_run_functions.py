@@ -34,12 +34,12 @@ from sklearn.compose import ColumnTransformer
 import openml
 import openml._api_calls
 import openml.exceptions
-import openml.extensions.sklearn
+#import openml.extensions.sklearn
 from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerException,
 )
-from openml.extensions.sklearn import cat, cont
+#from openml.extensions.sklearn import cat, cont
 from openml.runs.functions import (
     _run_task_get_arffcontent,
     delete_run,
@@ -108,7 +108,7 @@ class TestRun(TestBase):
 
     def setUp(self):
         super().setUp()
-        self.extension = openml.extensions.sklearn.SklearnExtension()
+        self.extension = None#openml.extensions.sklearn.SklearnExtension()
 
     def _wait_for_processed_run(self, run_id, max_waiting_time_seconds):
         # it can take a while for a run to be processed on the OpenML (test)

@@ -26,7 +26,7 @@ import xmltodict
 
 import openml
 import openml.exceptions
-import openml.extensions.sklearn
+#import openml.extensions.sklearn
 import openml.utils
 from openml._api_calls import _perform_api_call
 from openml.testing import SimpleImputer, TestBase
@@ -37,7 +37,7 @@ class TestFlow(TestBase):
 
     def setUp(self):
         super().setUp()
-        self.extension = openml.extensions.sklearn.SklearnExtension()
+        self.extension = None #openml.extensions.sklearn.SklearnExtension()
 
     def tearDown(self):
         super().tearDown()
