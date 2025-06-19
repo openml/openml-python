@@ -338,26 +338,32 @@ class OpenMLDatasetTestOnTestServer(TestBase):
             assert e.code == 1106
 
 
-@pytest.mark.production()
-class OpenMLDatasetTestSparse(TestBase):
-    _multiprocess_can_split_ = True
 
-    def setUp(self):
-        super().setUp()
-        openml.config.server = self.production_server
-
-        self.sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
-
-    def test_get_sparse_categorical_data_id_395(self):
-        dataset = openml.datasets.get_dataset(395, download_data=True)
-        # breakpoint()
-        feature = dataset.features[3758]
-        assert isinstance(dataset, OpenMLDataset)
-        assert isinstance(feature, OpenMLDataFeature)
-        assert dataset.name == "re1.wc"
-        assert feature.name == "CLASS_LABEL"
-        assert feature.data_type == "nominal"
-        assert len(feature.nominal_values) == 25
+@pytest.mark.production        
+def test_get_sparse_categorical_data_id_395(test_files_directory, requests_mock):
+    description_file = (
+        test_files_directory / "mock_responses" / "datasets" / "sparse_categorical_395" / "description.xml"
+    )
+    requests_mock.get("https://www.openml.org/api/v1/xml/data/395", text=description_file.read_text())
+    
+    data_file = (
+        test_files_directory / "mock_responses" / "datasets" / "sparse_categorical_395" / "dataset.arff"
+    )
+    requests_mock.get("https://api.openml.org/data/v1/download/52507/re1.wc.sparse_arff", text=data_file.read_text())
+    
+    feature_file = (
+        test_files_directory / "mock_responses" / "datasets" / "sparse_categorical_395" / "features.xml"
+    )
+    requests_mock.get("https://www.openml.org/api/v1/xml/data/features/395", text=feature_file.read_text())
+    
+    dataset = openml.datasets.get_dataset(395, download_data=True)
+    feature = dataset.features[3758]
+    assert isinstance(dataset, OpenMLDataset)
+    assert isinstance(feature, OpenMLDataFeature)
+    assert dataset.name == "re1.wc"
+    assert feature.name == "CLASS_LABEL"
+    assert feature.data_type == "nominal"
+    assert len(feature.nominal_values) == 25
 
 @pytest.mark.production
 def test_get_sparse_dataset_rowid_and_ignore_and_target(requests_mock, test_files_directory):
