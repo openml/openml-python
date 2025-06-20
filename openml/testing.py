@@ -101,7 +101,6 @@ class TestBase(unittest.TestCase):
         self.cached = True
         openml.config.apikey = TestBase.apikey
         self.production_server = "https://www.openml.org/api/v1/xml"
-        openml.config.avoid_duplicate_runs = False
         openml.config.set_root_cache_directory(str(self.workdir))
 
         # Increase the number of retries to avoid spurious server failures

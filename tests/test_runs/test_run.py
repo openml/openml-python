@@ -130,7 +130,6 @@ class TestRun(TestBase):
             model=model,
             task=task,
             add_local_measures=False,
-            avoid_duplicate_runs=False,
             upload_flow=True,
         )
 
@@ -174,7 +173,6 @@ class TestRun(TestBase):
             model=model,
             task=task,
             add_local_measures=False,
-            avoid_duplicate_runs=False,
         )
 
         cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
@@ -311,7 +309,6 @@ class TestRun(TestBase):
                 flow=flow,
                 task=task,
                 add_local_measures=False,
-                avoid_duplicate_runs=False,
                 upload_flow=False,
             )
 
@@ -351,7 +348,6 @@ class TestRun(TestBase):
                 flow=flow,
                 task=task,
                 add_local_measures=False,
-                avoid_duplicate_runs=False,
                 upload_flow=False,
             )
 

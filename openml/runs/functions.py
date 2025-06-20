@@ -59,7 +59,7 @@ ERROR_CODE = 512
 def run_model_on_task(  # noqa: PLR0913
     model: Any,
     task: int | str | OpenMLTask,
-    avoid_duplicate_runs: bool = True,  # noqa: FBT001, FBT002
+    avoid_duplicate_runs: bool | None = None,
     flow_tags: list[str] | None = None,
     seed: int | None = None,
     add_local_measures: bool = True,  # noqa: FBT001, FBT002
@@ -77,9 +77,10 @@ def run_model_on_task(  # noqa: PLR0913
     task : OpenMLTask or int or str
         Task to perform or Task id.
         This may be a model instead if the first argument is an OpenMLTask.
-    avoid_duplicate_runs : bool, optional (default=True)
+    avoid_duplicate_runs : bool, optional (default=None)
         If True, the run will throw an error if the setup/task combination is already present on
         the server. This feature requires an internet connection.
+        If not set, it will use the default from your openml configuration.
     flow_tags : List[str], optional (default=None)
         A list of tags that the flow should have at creation.
     seed: int, optional (default=None)
@@ -104,6 +105,8 @@ def run_model_on_task(  # noqa: PLR0913
     flow : OpenMLFlow (optional, only if `return_flow` is True).
         Flow generated from the model.
     """
+    if avoid_duplicate_runs is None:
+        avoid_duplicate_runs = openml.config.avoid_duplicate_runs
     if avoid_duplicate_runs and not config.apikey:
         warnings.warn(
             "avoid_duplicate_runs is set to True, but no API key is set. "
@@ -175,7 +178,7 @@ def run_model_on_task(  # noqa: PLR0913
 def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
     flow: OpenMLFlow,
     task: OpenMLTask,
-    avoid_duplicate_runs: bool = True,  # noqa: FBT002, FBT001
+    avoid_duplicate_runs: bool | None = None,
     flow_tags: list[str] | None = None,
     seed: int | None = None,
     add_local_measures: bool = True,  # noqa: FBT001, FBT002
@@ -198,6 +201,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
     avoid_duplicate_runs : bool, optional (default=True)
         If True, the run will throw an error if the setup/task combination is already present on
         the server. This feature requires an internet connection.
+        If not set, it will use the default from your openml configuration.
     flow_tags : List[str], optional (default=None)
         A list of tags that the flow should have at creation.
     seed: int, optional (default=None)
@@ -220,6 +224,9 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
     """
     if flow_tags is not None and not isinstance(flow_tags, list):
         raise ValueError("flow_tags should be a list")
+
+    if avoid_duplicate_runs is None:
+        avoid_duplicate_runs = openml.config.avoid_duplicate_runs
 
     # TODO: At some point in the future do not allow for arguments in old order (changed 6-2018).
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
