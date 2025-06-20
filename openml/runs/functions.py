@@ -198,7 +198,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
         all supervised estimators of scikit learn follow this definition of a model.
     task : OpenMLTask
         Task to perform. This may be an OpenMLFlow instead if the first argument is an OpenMLTask.
-    avoid_duplicate_runs : bool, optional (default=True)
+    avoid_duplicate_runs : bool, optional (default=None)
         If True, the run will throw an error if the setup/task combination is already present on
         the server. This feature requires an internet connection.
         If not set, it will use the default from your openml configuration.
