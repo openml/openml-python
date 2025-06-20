@@ -1755,8 +1755,8 @@ class TestRun(TestBase):
     def test__run_task_get_arffcontent_2(self, parallel_mock):
         """Tests if a run executed in parallel is collated correctly."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
-        return
         x, y = task.get_X_and_y()
+        return
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
         loss = "log" if Version(sklearn.__version__) < Version("1.3") else "log_loss"
