@@ -8,6 +8,10 @@ the collaborative machine learning platform
 OpenML-Python can download or upload data from OpenML, such as datasets
 and machine learning experiment results.
 
+If you are new to OpenML, we recommend checking out the [OpenML documentation](https://docs.openml.org/)
+to get familiar with the concepts and features of OpenML. In particular, we recommend 
+reading more about the [OpenML concepts](https://docs.openml.org/concepts/). 
+
 ## :joystick: Minimal Examples
 
 Use the following code to get the [credit-g](https://www.openml.org/search?type=data&sort=runs&status=active&id=31) [dataset](https://docs.openml.org/concepts/data/):
@@ -43,7 +47,7 @@ Find more examples in the navbar at the top.
 
 ## :magic_wand: Installation
 
-OpenML-Python is supported on Python 3.8 - 3.13 and is available on Linux, MacOS, and Windows.
+OpenML-Python is available on Linux, MacOS, and Windows.
 
 You can install OpenML-Python with:
 
@@ -65,9 +69,10 @@ For more advanced installation information, please see the
 -   [OpenML blog](https://medium.com/open-machine-learning)
 -   [OpenML twitter account](https://twitter.com/open_ml)
 
+
 ## Contributing
 
-Contribution to the OpenML package is highly appreciated. Please see the
+Contributing to the OpenML package is highly appreciated. Please see the
 ["Contributing"](contributing) page for more information.
 
 ## Citing OpenML-Python
