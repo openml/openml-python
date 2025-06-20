@@ -82,6 +82,7 @@ test=[
     "openml-sklearn",
     "packaging",
     "pytest-mock",
+    "openml-sklearn",
 ]
 examples=[
     "matplotlib",
