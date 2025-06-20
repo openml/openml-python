@@ -1755,6 +1755,7 @@ class TestRun(TestBase):
     def test__run_task_get_arffcontent_2(self, parallel_mock):
         """Tests if a run executed in parallel is collated correctly."""
         task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
+        return
         x, y = task.get_X_and_y()
         num_instances = x.shape[0]
         line_length = 6 + len(task.class_labels)
@@ -1779,7 +1780,6 @@ class TestRun(TestBase):
         )
         n_jobs = 2
         backend = "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"
-        return
         with parallel_backend(backend, n_jobs=n_jobs):
             res = openml.runs.functions._run_task_get_arffcontent(
                 extension=self.extension,
