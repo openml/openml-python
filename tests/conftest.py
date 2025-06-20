@@ -313,7 +313,7 @@ def workdir(tmp_path):
 def mock_iris_dataset(requests_mock, test_files_directory):
     """Fixture to provide the iris dataset."""
     content_file = (
-        test_files_directory / "mock_responses" / "datasets" / "61" / "description.xml"
+        test_files_directory / "mock_responses" / "datasets" / "data_description_61.xml"
     )
     requests_mock.get("https://www.openml.org/api/v1/xml/data/61", text=content_file.read_text())
     
@@ -323,8 +323,45 @@ def mock_iris_dataset(requests_mock, test_files_directory):
 def mock_titanic_dataset(requests_mock, test_files_directory):
     """Fixture to provide the titanic dataset."""
     content_file = (
-        test_files_directory / "mock_responses" / "datasets" / "40945" / "description.xml"
+        test_files_directory / "mock_responses" / "datasets" / "data_description_40945.xml"
     )
     requests_mock.get("https://www.openml.org/api/v1/xml/data/40945", text=content_file.read_text())
+    
+    yield
+
+
+@pytest.fixture
+def mock_dataset_id_2(requests_mock, test_files_directory):
+    """Fixture to provide the dataset ID 2."""
+    content_file = (
+        test_files_directory / "mock_responses" / "datasets" / "2" / "description.xml"
+    )
+    requests_mock.get("https://www.openml.org/api/v1/xml/data/2", text=content_file.read_text())
+    
+    data_file = (
+        test_files_directory / "mock_responses" / "datasets" / "2" / "dataset.arff"
+    )
+    requests_mock.get("https://api.openml.org/data/v1/download/1666876/anneal.arff", text=data_file.read_text())
+    
+    
+    yield
+    
+@pytest.fixture
+def mock_jm1_dataset(requests_mock, test_files_directory):
+    """Fixture to provide the JM1 dataset."""
+    content_file = (
+        test_files_directory / "mock_responses" / "datasets" / "data_description_1053.xml"
+    )
+    requests_mock.get("https://www.openml.org/api/v1/xml/data/1053", text=content_file.read_text())
+    
+    yield
+    
+@pytest.fixture
+def mock_pc4_dataset(requests_mock, test_files_directory):
+    """Fixture to provide the PC4 dataset."""
+    content_file = (
+        test_files_directory / "mock_responses" / "datasets" / "data_description_1049.xml"
+    )
+    requests_mock.get("https://www.openml.org/api/v1/xml/data/1049", text=content_file.read_text())
     
     yield
