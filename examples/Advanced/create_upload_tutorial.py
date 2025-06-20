@@ -1,5 +1,4 @@
 # %% [markdown]
-# # Dataset upload tutorial
 # A tutorial on how to create and upload a dataset to OpenML.
 
 # %%
@@ -10,10 +9,6 @@ from scipy.sparse import coo_matrix
 
 import openml
 from openml.datasets.functions import create_dataset
-
-# %% [markdown]
-# .. warning::
-#    .. include:: ../../test_server_usage_warning.txt
 
 # %%
 openml.config.start_using_configuration_for_example()
@@ -308,4 +303,3 @@ print(f"URL for dataset: {xor_dataset.openml_url}")
 
 # %%
 openml.config.stop_using_configuration_for_example()
-# License: BSD 3-Clause

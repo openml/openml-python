@@ -1,6 +1,4 @@
 # %% [markdown]
-# # Fetching Evaluations
-
 # Evaluations contain a concise summary of the results of all runs made. Each evaluation
 # provides information on the dataset used, the flow applied, the setup used, the metric
 # evaluated, and the result obtained on the metric, for each such run made. These collection
@@ -27,9 +25,7 @@ import openml
 # We shall retrieve a small set (only 10 entries) to test the listing function for evaluations
 
 # %%
-openml.evaluations.list_evaluations(
-    function="predictive_accuracy", size=10
-)
+openml.evaluations.list_evaluations(function="predictive_accuracy", size=10)
 
 # Using other evaluation metrics, 'precision' in this case
 evals = openml.evaluations.list_evaluations(
@@ -183,5 +179,3 @@ evals_setups = openml.evaluations.list_evaluations_setups(
 )
 
 print(evals_setups.head(10))
-
-# License: BSD 3-Clause

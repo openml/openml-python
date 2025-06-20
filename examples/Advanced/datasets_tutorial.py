@@ -1,5 +1,4 @@
 # %% [markdown]
-# # Datasets
 # How to list and download datasets.
 
 import pandas as pd
@@ -46,8 +45,7 @@ dataset = openml.datasets.get_dataset(dataset_id="eeg-eye-state", version=1)
 
 # Print a summary
 print(
-    f"This is dataset '{dataset.name}', the target feature is "
-    f"'{dataset.default_target_attribute}'"
+    f"This is dataset '{dataset.name}', the target feature is '{dataset.default_target_attribute}'"
 )
 print(f"URL: {dataset.url}")
 print(dataset.description[:500])
@@ -106,9 +104,6 @@ _ = pd.plotting.scatter_matrix(
 # %% [markdown]
 # ## Edit a created dataset
 # This example uses the test server, to avoid editing a dataset on the main server.
-#
-# .. warning::
-#    .. include:: ../../test_server_usage_warning.txt
 
 # %%
 openml.config.start_using_configuration_for_example()
@@ -165,4 +160,3 @@ print(f"Forked dataset ID: {data_id}")
 
 # %%
 openml.config.stop_using_configuration_for_example()
-# License: BSD 3-Clauses

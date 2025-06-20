@@ -1,11 +1,5 @@
 # %% [markdown]
-# # Benchmark suites
-#
 # How to list, download and upload benchmark suites.
-#
-# If you want to learn more about benchmark suites, check out our
-# brief introductory tutorial ["Simple suites tutorial"](../Basics/simple_suites_tutorial) or the
-# [OpenML benchmark docs](https://docs.openml.org/benchmark/#benchmarking-suites).
 
 # %%
 import uuid
@@ -13,7 +7,6 @@ import uuid
 import numpy as np
 
 import openml
-
 
 # %% [markdown]
 # ## Listing suites
@@ -23,13 +16,11 @@ import openml
 #   easier-to-work-with data structure
 
 # %%
-suites = openml.study.list_suites(output_format="dataframe", status="all")
+suites = openml.study.list_suites(status="all")
 print(suites.head(n=10))
 
 # %% [markdown]
 # ## Downloading suites
-
-# %% [markdown]
 # This is done based on the dataset ID.
 
 # %%
@@ -52,7 +43,7 @@ print(suite.tasks)
 # And we can use the task listing functionality to learn more about them:
 
 # %%
-tasks = openml.tasks.list_tasks(output_format="dataframe")
+tasks = openml.tasks.list_tasks()
 
 # %% [markdown]
 # Using ``@`` in
@@ -65,9 +56,6 @@ print(tasks.describe().transpose())
 
 # %% [markdown]
 # We'll use the test server for the rest of this tutorial.
-#
-# .. warning::
-#    .. include:: ../../test_server_usage_warning.txt
 
 # %%
 openml.config.start_using_configuration_for_example()
@@ -83,7 +71,7 @@ openml.config.start_using_configuration_for_example()
 # the test server:
 
 # %%
-all_tasks = list(openml.tasks.list_tasks(output_format="dataframe")["tid"])
+all_tasks = list(openml.tasks.list_tasks()["tid"])
 task_ids_for_suite = sorted(np.random.choice(all_tasks, replace=False, size=20))
 
 # The study needs a machine-readable and unique alias. To obtain this,
@@ -102,4 +90,3 @@ print(new_suite)
 
 # %%
 openml.config.stop_using_configuration_for_example()
-# License: BSD 3-Clause

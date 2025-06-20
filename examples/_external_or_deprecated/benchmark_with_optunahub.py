@@ -15,18 +15,29 @@ In this tutorial, we walk through how to conduct hyperparameter optimization exp
 import logging
 
 import optuna
-
-import openml
-from openml.extensions.sklearn import cat
-from openml.extensions.sklearn import cont
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
+import openml
 
 logger = logging.Logger(name="Experiment Logger", level=1)
+
+# <div class="admonition warning">
+#     <p class="admonition-title">Warning</p>
+#     <p>
+#         For the rest of this tutorial, we will require the `openml-sklearn` package.
+#         Install it with `pip install openml-sklearn`.
+#     </p>
+# </div>
+
+# %%
+# Get sklearn extension to run sklearn models easily on OpenML tasks.
+from openml_sklearn import SklearnExtension, cat, cont
+
+extension = SklearnExtension()
 
 # Set your openml api key if you want to upload your results to OpenML (eg:
 # https://openml.org/search?type=run&sort=date) . To get one, simply make an

@@ -1,5 +1,4 @@
 # %% [markdown]
-# # Logging
 # This tutorial explains openml-python logging, and shows how to configure it.
 # Openml-python uses the [Python logging module](https://docs.python.org/3/library/logging.html)
 # to provide users with log messages. Each log message is assigned a level of importance, see
@@ -49,5 +48,3 @@ openml.datasets.get_dataset("iris", version=1)
 # * 0: `logging.WARNING` and up.
 # * 1: `logging.INFO` and up.
 # * 2: `logging.DEBUG` and up (i.e. all messages).
-#
-# License: BSD 3-Clause

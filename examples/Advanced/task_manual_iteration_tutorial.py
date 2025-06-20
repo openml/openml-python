@@ -1,13 +1,5 @@
 # %% [markdown]
-# # Tasks: retrieving splits
-
-# Tasks define a target and a train/test split. Normally, they are the input to the function
-# ``openml.runs.run_model_on_task`` which automatically runs the model on all splits of the task.
-# However, sometimes it is necessary to manually split a dataset to perform experiments outside of
-# the functions provided by OpenML. One such example is in the benchmark library
-# [HPOBench](https://github.com/automl/HPOBench) which extensively uses data from OpenML,
-# but not OpenML's functionality to conduct runs.
-
+# Tasks define a target and a train/test split, which we can use for benchmarking.
 
 # %%
 import openml
@@ -45,12 +37,7 @@ n_repeats, n_folds, n_samples = task.get_split_dimensions()
 
 # %%
 print(
-    "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-        task_id,
-        n_repeats,
-        n_folds,
-        n_samples,
-    )
+    f"Task {task_id}: number of repeats: {n_repeats}, number of folds: {n_folds}, number of samples {n_samples}."
 )
 
 # %% [markdown]
@@ -72,19 +59,14 @@ print(test_indices.shape, test_indices.dtype)
 # And then split the data based on this:
 
 # %%
-X, y = task.get_X_and_y(dataset_format="dataframe")
+X, y = task.get_X_and_y()
 X_train = X.iloc[train_indices]
 y_train = y.iloc[train_indices]
 X_test = X.iloc[test_indices]
 y_test = y.iloc[test_indices]
 
 print(
-    "X_train.shape: {}, y_train.shape: {}, X_test.shape: {}, y_test.shape: {}".format(
-        X_train.shape,
-        y_train.shape,
-        X_test.shape,
-        y_test.shape,
-    )
+    f"X_train.shape: {X_train.shape}, y_train.shape: {y_train.shape}, X_test.shape: {X_test.shape}, y_test.shape: {y_test.shape}"
 )
 
 # %% [markdown]
@@ -96,12 +78,7 @@ task = openml.tasks.get_task(task_id)
 X, y = task.get_X_and_y()
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
-    "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-        task_id,
-        n_repeats,
-        n_folds,
-        n_samples,
-    )
+    f"Task {task_id}: number of repeats: {n_repeats}, number of folds: {n_folds}, number of samples {n_samples}."
 )
 
 # %% [markdown]
@@ -122,16 +99,8 @@ for repeat_idx in range(n_repeats):
             y_test = y.iloc[test_indices]
 
             print(
-                "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
-                "y_train.shape {}, X_test.shape {}, y_test.shape {}".format(
-                    repeat_idx,
-                    fold_idx,
-                    sample_idx,
-                    X_train.shape,
-                    y_train.shape,
-                    X_test.shape,
-                    y_test.shape,
-                )
+                f"Repeat #{repeat_idx}, fold #{fold_idx}, samples {sample_idx}: X_train.shape: {X_train.shape}, "
+                f"y_train.shape {y_train.shape}, X_test.shape {X_test.shape}, y_test.shape {y_test.shape}"
             )
 
 # %% [markdown]
@@ -143,12 +112,7 @@ task = openml.tasks.get_task(task_id)
 X, y = task.get_X_and_y()
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
-    "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-        task_id,
-        n_repeats,
-        n_folds,
-        n_samples,
-    )
+    f"Task {task_id}: number of repeats: {n_repeats}, number of folds: {n_folds}, number of samples {n_samples}."
 )
 
 # %% [markdown]
@@ -169,16 +133,8 @@ for repeat_idx in range(n_repeats):
             y_test = y.iloc[test_indices]
 
             print(
-                "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
-                "y_train.shape {}, X_test.shape {}, y_test.shape {}".format(
-                    repeat_idx,
-                    fold_idx,
-                    sample_idx,
-                    X_train.shape,
-                    y_train.shape,
-                    X_test.shape,
-                    y_test.shape,
-                )
+                f"Repeat #{repeat_idx}, fold #{fold_idx}, samples {sample_idx}: X_train.shape: {X_train.shape}, "
+                f"y_train.shape {y_train.shape}, X_test.shape {X_test.shape}, y_test.shape {y_test.shape}"
             )
 
 # %% [markdown]
@@ -190,12 +146,7 @@ task = openml.tasks.get_task(task_id)
 X, y = task.get_X_and_y()
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
-    "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-        task_id,
-        n_repeats,
-        n_folds,
-        n_samples,
-    )
+    f"Task {task_id}: number of repeats: {n_repeats}, number of folds: {n_folds}, number of samples {n_samples}."
 )
 
 # %% [markdown]
@@ -216,15 +167,6 @@ for repeat_idx in range(n_repeats):
             y_test = y.iloc[test_indices]
 
             print(
-                "Repeat #{}, fold #{}, samples {}: X_train.shape: {}, "
-                "y_train.shape {}, X_test.shape {}, y_test.shape {}".format(
-                    repeat_idx,
-                    fold_idx,
-                    sample_idx,
-                    X_train.shape,
-                    y_train.shape,
-                    X_test.shape,
-                    y_test.shape,
-                )
+                f"Repeat #{repeat_idx}, fold #{fold_idx}, samples {sample_idx}: X_train.shape: {X_train.shape}, "
+                f"y_train.shape {y_train.shape}, X_test.shape {X_test.shape}, y_test.shape {y_test.shape}"
             )
-# License: BSD 3-Clause

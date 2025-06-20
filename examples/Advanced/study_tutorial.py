@@ -1,5 +1,4 @@
 # %% [markdown]
-# # Benchmark studies
 # How to list, download and upload benchmark studies.
 # In contrast to
 # [benchmark suites](https://docs.openml.org/benchmark/#benchmarking-suites) which
@@ -13,7 +12,6 @@ from sklearn.ensemble import RandomForestClassifier
 
 import openml
 
-
 # %% [markdown]
 # ##  Listing studies
 #
@@ -22,14 +20,12 @@ import openml
 #   easier-to-work-with data structure
 
 # %%
-studies = openml.study.list_studies(output_format="dataframe", status="all")
+studies = openml.study.list_studies(status="all")
 print(studies.head(n=10))
 
 
 # %% [markdown]
 # ## Downloading studies
-
-# %% [markdown]
 # This is done based on the study ID.
 
 # %%
@@ -62,9 +58,6 @@ print(evaluations.head())
 
 # %% [markdown]
 # We'll use the test server for the rest of this tutorial.
-#
-# .. warning::
-#    .. include:: ../../test_server_usage_warning.txt
 
 # %%
 openml.config.start_using_configuration_for_example()
@@ -76,7 +69,20 @@ openml.config.start_using_configuration_for_example()
 # In this examples we'll create a few runs for the OpenML-100 benchmark
 # suite which is available on the OpenML test server.
 
+# <div class="admonition warning">
+#     <p class="admonition-title">Warning</p>
+#     <p>
+#         For the rest of this tutorial, we will require the `openml-sklearn` package.
+#         Install it with `pip install openml-sklearn`.
+#     </p>
+# </div>
+
 # %%
+# Get sklearn extension to run sklearn models easily on OpenML tasks.
+from openml_sklearn import SklearnExtension
+
+extension = SklearnExtension()
+
 # Model to be used
 clf = RandomForestClassifier()
 
@@ -112,4 +118,3 @@ print(new_study)
 
 # %%
 openml.config.stop_using_configuration_for_example()
-# License: BSD 3-Clause
