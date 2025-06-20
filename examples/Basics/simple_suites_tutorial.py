@@ -1,5 +1,4 @@
 # %% [markdown]
-# # Benchmark suites
 # This is a brief showcase of OpenML benchmark suites, which were introduced by
 # [Bischl et al. (2019)](https://arxiv.org/abs/1708.03731v2). Benchmark suites standardize the
 # datasets and splits to be used in an experiment or paper. They are fully integrated into OpenML
@@ -9,8 +8,7 @@
 import openml
 
 # %% [markdown]
-# OpenML-CC18
-# ===========
+# ## OpenML-CC18
 #
 # As an example we have a look at the OpenML-CC18, which is a suite of 72 classification datasets
 # from OpenML which were carefully selected to be usable by many algorithms. These are all datasets
@@ -30,8 +28,7 @@ import openml
 # In this example, we'll focus on how to use benchmark suites in practice.
 
 # %% [markdown]
-# Downloading benchmark suites
-# ============================
+# ## Downloading benchmark suites
 
 # %%
 suite = openml.study.get_suite(99)

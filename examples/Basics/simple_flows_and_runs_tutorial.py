@@ -1,5 +1,4 @@
 # %% [markdown]
-# # Flows and Runs
 # A simple tutorial on how to upload results from a machine learning experiment to OpenML.
 
 # %%
@@ -79,7 +78,7 @@ knn_flow.publish()
 print(f"knn_flow was published with the ID {knn_flow.flow_id}")
 
 # %% [markdown]
-# Second, we create a run to store the results of associated with the flow.
+# Second, we create a run to store the results associated with the flow.
 
 # %%
 

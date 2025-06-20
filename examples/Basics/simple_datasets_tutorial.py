@@ -1,5 +1,4 @@
 # %% [markdown]
-# # Datasets
 # A basic tutorial on how to list, load and visualize datasets.
 #
 # In general, we recommend working with tasks, so that the results can
@@ -34,14 +33,11 @@ print(dataset.description[:500])
 
 # %% [markdown]
 # ## Load a dataset
-# X - A dataframe where each row represents one example with
-# the corresponding feature values.
-#
-# y - the classes for each example
-#
-# categorical_indicator - a list that indicates which feature is categorical
-#
-# attribute_names - the names of the features for the examples (X) and
+# * `X` - A dataframe where each row represents one example with
+#   the corresponding feature values.
+# * `y` - the classes for each example
+# * `categorical_indicator` - a list that indicates which feature is categorical
+# * `attribute_names` - the names of the features for the examples (X) and
 # target feature (y)
 
 # %%

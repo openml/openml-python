@@ -1,9 +1,8 @@
 # %% [markdown]
-# # Introduction Tutorial & Setup
 # An example how to set up OpenML-Python followed up by a simple example.
 
 # %% [markdown]
-# # Installation
+# ## Installation
 # Installation is done via ``pip``:
 #
 # ```bash
@@ -11,7 +10,7 @@
 # ```
 
 # %% [markdown]
-# # Authentication
+# ## Authentication
 #
 # For certain functionality, such as uploading tasks or datasets, users have to
 # sing up. Only accessing the data on OpenML does not require an account!
@@ -42,7 +41,7 @@ import openml
 openml.config.apikey = "YOURKEY"
 
 # %% [markdown]
-# # Caching
+# ## Caching
 # When downloading datasets, tasks, runs and flows, they will be cached to
 # retrieve them without calling the server later. As with the API key,
 # the cache directory can be either specified through the config file or
