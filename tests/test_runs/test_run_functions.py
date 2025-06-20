@@ -181,14 +181,12 @@ class TestRun(TestBase):
             run_prime = openml.runs.run_model_on_task(
                 model=model_prime,
                 task=task,
-                avoid_duplicate_runs=False,
                 seed=seed,
             )
         else:
             run_prime = openml.runs.run_model_on_task(
                 model=model_prime,
                 task=run.task_id,
-                avoid_duplicate_runs=False,
                 seed=seed,
             )
 
@@ -278,7 +276,6 @@ class TestRun(TestBase):
             flow=flow,
             task=task,
             seed=seed,
-            avoid_duplicate_runs=openml.config.avoid_duplicate_runs,
         )
         run_ = run.publish()
         TestBase._mark_entity_for_removal("run", run.run_id)
@@ -414,7 +411,6 @@ class TestRun(TestBase):
             openml.runs.run_model_on_task(
                 model=clf,
                 task=task,
-                avoid_duplicate_runs=False,
             )
 
     @pytest.mark.sklearn()
@@ -969,7 +965,6 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(
             model=randomsearch,
             task=task,
-            avoid_duplicate_runs=False,
             seed=1,
         )
         run_ = run.publish()
@@ -1026,7 +1021,6 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(
             task,
             clf,
-            avoid_duplicate_runs=False,
             upload_flow=False,
         )
 
@@ -1055,7 +1049,6 @@ class TestRun(TestBase):
         run = openml.runs.run_flow_on_task(
             task,
             flow,
-            avoid_duplicate_runs=False,
             upload_flow=False,
         )
 
@@ -1083,7 +1076,6 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(
             model=clf,
             task=task,
-            avoid_duplicate_runs=False,
             upload_flow=False,
         )
 
@@ -1142,7 +1134,6 @@ class TestRun(TestBase):
         run = openml.runs.run_model_on_task(
             model=clf,
             task=task,
-            avoid_duplicate_runs=False,
         )
         run_ = run.publish()
         TestBase._mark_entity_for_removal("run", run_.run_id)
@@ -1251,7 +1242,6 @@ class TestRun(TestBase):
         run = openml.runs.run_flow_on_task(
             task=task,
             flow=flow,
-            avoid_duplicate_runs=False,
             upload_flow=False,
         )
 
@@ -1316,7 +1306,6 @@ class TestRun(TestBase):
         run = openml.runs.run_flow_on_task(
             task=task,
             flow=flow_new,
-            avoid_duplicate_runs=False,
             upload_flow=False,
         )
 
@@ -1664,7 +1653,6 @@ class TestRun(TestBase):
         run = openml.runs.run_flow_on_task(
             flow=downloaded_flow,
             task=task,
-            avoid_duplicate_runs=False,
             upload_flow=False,
         )
 
@@ -1913,7 +1901,7 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(32)  # diabetes; crossvalidation
 
         run = openml.runs.run_model_on_task(
-            model=clf, task=task, seed=rs, avoid_duplicate_runs=False
+            model=clf, task=task, seed=rs,
         )
         run.publish()
 
