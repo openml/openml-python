@@ -37,7 +37,7 @@ DATA_TYPE = Dict[str, Union[str, int]]
 FILE_ELEMENTS_TYPE = Dict[str, Union[str, Tuple[str, str]]]
 DATABASE_CONNECTION_ERRCODE = 107
 
-API_TOKEN_HELP_LINK = "https://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial.html#authentication"  # noqa: S105
+API_TOKEN_HELP_LINK = "https://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/#authentication"  # noqa: S105
 
 
 def _robot_delay(n: int) -> float:
@@ -519,7 +519,7 @@ def __parse_server_exception(
         msg = (
             f"The API call {url} requires authentication via an API key.\nPlease configure "
             "OpenML-Python to use your API as described in this example:"
-            "\nhttps://openml.github.io/openml-python/main/examples/Basics/introduction_tutorial.html#authentication"
+            "\nhttps://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/#authentication"
         )
         return OpenMLNotAuthorizedError(message=msg)
 
