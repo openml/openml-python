@@ -1746,79 +1746,6 @@ class TestRun(TestBase):
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
 
-    @pytest.mark.sklearn()
-    @unittest.skipIf(
-        Version(sklearn.__version__) < Version("0.21"),
-        reason="couldn't perform local tests successfully w/o bloating RAM",
-    )
-    @mock.patch("openml_sklearn.SklearnExtension._prevent_optimize_n_jobs")
-    def test__run_task_get_arffcontent_2(self, parallel_mock):
-        """Tests if a run executed in parallel is collated correctly."""
-        task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
-        x, y = task.get_X_and_y()
-        num_instances = x.shape[0]
-        line_length = 6 + len(task.class_labels)
-        loss = "log" if Version(sklearn.__version__) < Version("1.3") else "log_loss"
-        clf = sklearn.pipeline.Pipeline(
-            [
-                (
-                    "cat_handling",
-                    ColumnTransformer(
-                        transformers=[
-                            (
-                                "cat",
-                                OneHotEncoder(handle_unknown="ignore"),
-                                x.select_dtypes(include=["object", "category"]).columns,
-                            )
-                        ],
-                        remainder="passthrough",
-                    ),
-                ),
-                ("clf", SGDClassifier(loss=loss, random_state=1)),
-            ]
-        )
-        n_jobs = 2
-        backend = "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"
-        with parallel_backend(backend, n_jobs=n_jobs):
-            res = openml.runs.functions._run_task_get_arffcontent(
-                extension=self.extension,
-                model=clf,
-                task=task,
-                add_local_measures=True,
-                n_jobs=n_jobs,
-            )
-        # This unit test will fail if joblib is unable to distribute successfully since the
-        # function _run_model_on_fold is being mocked out. However, for a new spawned worker, it
-        # is not and the mock call_count should remain 0 while the subsequent check of actual
-        # results should also hold, only on successful distribution of tasks to workers.
-        # The _prevent_optimize_n_jobs() is a function executed within the _run_model_on_fold()
-        # block and mocking this function doesn't affect rest of the pipeline, but is adequately
-        # indicative if _run_model_on_fold() is being called or not.
-        assert parallel_mock.call_count == 0
-        assert isinstance(res[0], list)
-        assert len(res[0]) == num_instances
-        assert len(res[0][0]) == line_length
-        assert len(res[2]) == 7
-        assert len(res[3]) == 7
-        expected_scores = [
-            0.9625,
-            0.953125,
-            0.965625,
-            0.9125,
-            0.98125,
-            0.975,
-            0.9247648902821317,
-            0.9404388714733543,
-            0.9780564263322884,
-            0.9623824451410659,
-        ]
-        scores = [v for k, v in res[2]["predictive_accuracy"][0].items()]
-        np.testing.assert_array_almost_equal(
-            scores,
-            expected_scores,
-            decimal=2,
-            err_msg="Observed performance scores deviate from expected ones.",
-        )
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
@@ -1993,3 +1920,80 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     run_url = "https://test.openml.org/api/v1/xml/run/9999999"
     assert run_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+
+
+@pytest.mark.sklearn()
+@unittest.skipIf(
+    Version(sklearn.__version__) < Version("0.21"),
+    reason="couldn't perform local tests successfully w/o bloating RAM",
+    )
+@mock.patch("openml_sklearn.SklearnExtension._prevent_optimize_n_jobs")
+def test__run_task_get_arffcontent_2(parallel_mock):
+    """Tests if a run executed in parallel is collated correctly."""
+    task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
+    x, y = task.get_X_and_y()
+    num_instances = x.shape[0]
+    line_length = 6 + len(task.class_labels)
+    loss = "log" if Version(sklearn.__version__) < Version("1.3") else "log_loss"
+    clf = sklearn.pipeline.Pipeline(
+        [
+            (
+                "cat_handling",
+                ColumnTransformer(
+                    transformers=[
+                        (
+                            "cat",
+                            OneHotEncoder(handle_unknown="ignore"),
+                            x.select_dtypes(include=["object", "category"]).columns,
+                        )
+                    ],
+                    remainder="passthrough",
+                ),
+            ),
+            ("clf", SGDClassifier(loss=loss, random_state=1)),
+        ]
+    )
+    n_jobs = 2
+    backend = "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"
+    from openml_sklearn import SklearnExtension
+    extension = SklearnExtension()
+    with parallel_backend(backend, n_jobs=n_jobs):
+        res = openml.runs.functions._run_task_get_arffcontent(
+            extension=extension,
+            model=clf,
+            task=task,
+            add_local_measures=True,
+            n_jobs=n_jobs,
+        )
+    # This unit test will fail if joblib is unable to distribute successfully since the
+    # function _run_model_on_fold is being mocked out. However, for a new spawned worker, it
+    # is not and the mock call_count should remain 0 while the subsequent check of actual
+    # results should also hold, only on successful distribution of tasks to workers.
+    # The _prevent_optimize_n_jobs() is a function executed within the _run_model_on_fold()
+    # block and mocking this function doesn't affect rest of the pipeline, but is adequately
+    # indicative if _run_model_on_fold() is being called or not.
+    assert parallel_mock.call_count == 0
+    assert isinstance(res[0], list)
+    assert len(res[0]) == num_instances
+    assert len(res[0][0]) == line_length
+    assert len(res[2]) == 7
+    assert len(res[3]) == 7
+    expected_scores = [
+        0.9625,
+        0.953125,
+        0.965625,
+        0.9125,
+        0.98125,
+        0.975,
+        0.9247648902821317,
+        0.9404388714733543,
+        0.9780564263322884,
+        0.9623824451410659,
+    ]
+    scores = [v for k, v in res[2]["predictive_accuracy"][0].items()]
+    np.testing.assert_array_almost_equal(
+        scores,
+        expected_scores,
+        decimal=2,
+        err_msg="Observed performance scores deviate from expected ones.",
+    )
