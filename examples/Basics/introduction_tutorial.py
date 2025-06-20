@@ -1,7 +1,4 @@
 # %% [markdown]
-# An example how to set up OpenML-Python followed up by a simple example.
-
-# %% [markdown]
 # ## Installation
 # Installation is done via ``pip``:
 #
