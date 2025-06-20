@@ -72,5 +72,5 @@ will examine how to search through **datasets** in order to curate a
 list of **tasks**.
 
 A further explanation is given in the [OpenML user
-guide](https://openml.github.io/OpenML/#concepts).
+guide](https://docs.openml.org/concepts/).
 

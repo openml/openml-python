@@ -31,7 +31,7 @@ extension interface to allows others to contribute back. Building a
 suitable extension for therefore requires an understanding of the
 current OpenML-Python support.
 
-[This tutorial](../examples/20_basic/simple_flows_and_runs_tutorial) shows how the scikit-learn 
+[This tutorial](../examples/Basics/simple_flows_and_runs_tutorial) shows how the scikit-learn 
 extension works with OpenML-Python.
 
 #### API

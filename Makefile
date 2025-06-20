@@ -20,11 +20,9 @@ inplace:
 
 test-code: in
 	$(PYTEST) -s -v tests
-test-doc:
-	$(PYTEST) -s -v doc/*.rst
 
 test-coverage:
 	rm -rf coverage .coverage
 	$(PYTEST) -s -v --cov=. tests
 
-test: test-code test-sphinxext test-doc
+test: test-code

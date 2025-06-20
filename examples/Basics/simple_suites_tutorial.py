@@ -13,9 +13,8 @@ import openml
 # ===========
 #
 # As an example we have a look at the OpenML-CC18, which is a suite of 72 classification datasets
-# from OpenML which were carefully selected to be usable by many algorithms and also represent
-# datasets commonly used in machine learning research. These are all datasets from mid-2018 that
-# satisfy a large set of clear requirements for thorough yet practical benchmarking:
+# from OpenML which were carefully selected to be usable by many algorithms. These are all datasets
+# from mid-2018 that satisfy a large set of clear requirements for thorough yet practical benchmarking:
 #
 # 1. the number of observations are between 500 and 100,000 to focus on medium-sized datasets,
 # 2. the number of features does not exceed 5,000 features to keep the runtime of the algorithms
@@ -28,7 +27,7 @@ import openml
 # A full description can be found in the
 # [OpenML benchmarking docs](https://docs.openml.org/benchmark/#openml-cc18).
 #
-# In this example we'll focus on how to use benchmark suites in practice.
+# In this example, we'll focus on how to use benchmark suites in practice.
 
 # %% [markdown]
 # Downloading benchmark suites
@@ -49,19 +48,9 @@ tasks = suite.tasks
 print(tasks)
 
 # %% [markdown]
-# and iterated over for benchmarking. For speed reasons we only iterate over the first three tasks:
+# and iterated over for benchmarking. For speed reasons, we only iterate over the first three tasks:
 
 # %%
 for task_id in tasks[:3]:
     task = openml.tasks.get_task(task_id)
     print(task)
-
-# %% [markdown]
-# Further examples
-# ================
-#
-# * [Suites Tutorial](../../30_extended/suites_tutorial)
-# * [Study Tutoral](../../30_extended/study_tutorial)
-# * [Paper example: Strang et al.](../../40_paper/2018_ida_strang_example.py)
-
-# License: BSD 3-Clause

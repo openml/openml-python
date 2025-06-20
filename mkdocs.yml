@@ -42,7 +42,16 @@ extra_css:
 
 nav:
   - index.md
-  - Examples: examples/
+  - Examples:
+    - Overview: examples/introduction.py
+    - Basics:
+        - Setup: examples/Basics/introduction_tutorial.py
+        - Datasets: examples/Basics/simple_datasets_tutorial.py
+        - Tasks: examples/Basics/simple_tasks_tutorial.py
+        - Flows and Runs: examples/Basics/simple_flows_and_runs_tutorial.py
+        - Suites: examples/Basics/simple_suites_tutorial.py
+    - Extended: examples/30_extended/
+    - Paper: examples/40_paper/
   - Extensions: extensions.md
   - Details: details.md
   - API: reference/

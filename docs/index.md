@@ -56,7 +56,7 @@ pip install openml
 ```
 
 For more advanced installation information, please see the
-["Introduction"](../examples/20_basic/introduction_tutorial.py) example.
+["Introduction"](../examples/Basics/introduction_tutorial.py) example.
 
 
 ## Further information
@@ -73,7 +73,7 @@ For more advanced installation information, please see the
 ## Contributing
 
 Contributing to the OpenML package is highly appreciated. Please see the
-["Contributing"](contributing) page for more information.
+["Contributing"](contributing.md) page for more information.
 
 ## Citing OpenML-Python
 

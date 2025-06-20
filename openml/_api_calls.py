@@ -519,7 +519,7 @@ def __parse_server_exception(
         msg = (
             f"The API call {url} requires authentication via an API key.\nPlease configure "
             "OpenML-Python to use your API as described in this example:"
-            "\nhttps://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial.html#authentication"
+            "\nhttps://openml.github.io/openml-python/main/examples/Basics/introduction_tutorial.html#authentication"
         )
         return OpenMLNotAuthorizedError(message=msg)
 

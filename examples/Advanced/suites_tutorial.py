@@ -4,7 +4,7 @@
 # How to list, download and upload benchmark suites.
 #
 # If you want to learn more about benchmark suites, check out our
-# brief introductory tutorial ["Simple suites tutorial"](../20_basic/simple_suites_tutorial) or the
+# brief introductory tutorial ["Simple suites tutorial"](../Basics/simple_suites_tutorial) or the
 # [OpenML benchmark docs](https://docs.openml.org/benchmark/#benchmarking-suites).
 
 # %%

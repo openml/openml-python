@@ -9,7 +9,7 @@
 # By default, openml-python will print log messages of level `WARNING` and above to console.
 # All log messages (including `DEBUG` and `INFO`) are also saved in a file, which can be
 # found in your cache directory (see also the
-# [introduction tutorial](../20_basic/introduction_tutorial).
+# [introduction tutorial](../Basics/introduction_tutorial).
 # These file logs are automatically deleted if needed, and use at most 2MB of space.
 #
 # It is possible to configure what log levels to send to console and file.
