@@ -12,4 +12,11 @@
 # 4. [Working with collections of tasks](../Basics/simple_suites_tutorial/)
 #
 # ## Advanced
-# 1 .
+# 1. [Getting splits for datasets from tasks](../Advanced/task_manual_iteration_tutorial/)
+# 2. [Creating and uploading datasets](../Advanced/create_upload_tutorial/)
+# 3. [Searching and editing datasets](../Advanced/datasets_tutorial/)
+# 4. [Searching and creating tasks](../Advanced/task_tutorial/)
+# 5. [Listing, downloading, and uploading suites](../Advanced/suites_tutorial/)
+# 6. [Listing, downloading, and uploading studies](../Advanced/study_tutorial/)
+# 7. [Downloading evaluation results](../Advanced/fetch_evaluations_tutorial/)
+# 8. [Configuring logging](../Advanced/configure_logging/)

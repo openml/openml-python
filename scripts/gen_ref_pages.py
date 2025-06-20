@@ -5,8 +5,9 @@ but modified for lack of "src/" file structure.
 
 """
 
+from __future__ import annotations
+
 from pathlib import Path
-import shutil
 
 import mkdocs_gen_files
 
@@ -44,6 +45,8 @@ nav = mkdocs_gen_files.Nav()
 examples_dir = root / "examples"
 examples_doc_dir = root / "docs" / "examples"
 for path in sorted(examples_dir.rglob("*.py")):
+    if "_external_or_deprecated" in path.parts:
+        continue
     dest_path = Path("examples") / path.relative_to(examples_dir)
     with mkdocs_gen_files.open(dest_path, "w") as dest_file:
         print(path.read_text(), file=dest_file)
