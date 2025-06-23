@@ -5,7 +5,7 @@ the contribution guidelines: https://github.com/openml/openml-python/blob/main/C
 Please make sure that:
 
 * the title of the pull request is descriptive
-* this pull requests is against the `develop` branch
+* this pull requests is against the `main` branch
 * for any new function or class added, please add it to doc/api.rst
     * the list of classes and functions should be alphabetical 
 * for any new functionality, consider adding a relevant example
