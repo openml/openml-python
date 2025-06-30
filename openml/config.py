@@ -150,7 +150,7 @@ _defaults: _Config = {
     "apikey": "",
     "server": "https://www.openml.org/api/v1/xml",
     "cachedir": _resolve_default_cache_dir(),
-    "avoid_duplicate_runs": True,
+    "avoid_duplicate_runs": False,
     "retry_policy": "human",
     "connection_n_retries": 5,
     "show_progress": False,
