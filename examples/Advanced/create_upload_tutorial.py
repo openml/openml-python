@@ -23,8 +23,7 @@ openml.config.start_using_configuration_for_example()
 # * A pandas sparse dataframe
 
 # %% [markdown]
-# Dataset is a numpy array
-# ========================
+# ## Dataset is a numpy array
 # A numpy array can contain lists in the case of dense data or it can contain
 # OrderedDicts in the case of sparse data.
 #
@@ -61,7 +60,7 @@ citation = (
 paper_url = "https://web.stanford.edu/~hastie/Papers/LARS/LeastAngle_2002.pdf"
 
 # %% [markdown]
-# # Create the dataset object
+# ## Create the dataset object
 # The definition of all fields can be found in the XSD files describing the
 # expected format:
 #
@@ -232,8 +231,7 @@ weather_dataset.publish()
 print(f"URL for dataset: {weather_dataset.openml_url}")
 
 # %% [markdown]
-# Dataset is a sparse matrix
-# ==========================
+# ## Dataset is a sparse matrix
 
 # %%
 sparse_data = coo_matrix(
