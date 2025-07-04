@@ -52,9 +52,9 @@ nav:
         - Suites: examples/Basics/simple_suites_tutorial.py
     - Advanced:
       - Dataset Splits from Tasks: examples/Advanced/task_manual_iteration_tutorial.py
-      - Created and Uploaded Datasets: examples/Advanced/create_upload_tutorial.py
+      - Creating and Uploading Datasets: examples/Advanced/create_upload_tutorial.py
       - Searching and Editing Datasets: examples/Advanced/datasets_tutorial.py
-      - Searching and Creating Tasks: examples/Advanced/task_tutorial.py
+      - Searching and Creating Tasks: examples/Advanced/tasks_tutorial.py
       - List, Download, and Upload Suites: examples/Advanced/suites_tutorial.py
       - List, Download, and Upload Studies: examples/Advanced/study_tutorial.py
       - Downloading Evaluation Results: examples/Advanced/fetch_evaluations_tutorial.py

@@ -10,7 +10,7 @@
 # ## Authentication
 #
 # For certain functionality, such as uploading tasks or datasets, users have to
-# sing up. Only accessing the data on OpenML does not require an account!
+# sign up. Only accessing the data on OpenML does not require an account!
 #
 # If you don’t have an account yet, sign up now.
 # You will receive an API key, which will authenticate you to the server

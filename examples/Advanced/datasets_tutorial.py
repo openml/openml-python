@@ -1,6 +1,7 @@
 # %% [markdown]
 # How to list and download datasets.
 
+# %%
 import pandas as pd
 
 import openml
@@ -10,6 +11,8 @@ from openml.datasets import edit_dataset, fork_dataset, get_dataset
 # ## Exercise 0
 #
 # * List datasets and return a dataframe
+
+# %%
 datalist = openml.datasets.list_datasets()
 datalist = datalist[["did", "name", "NumberOfInstances", "NumberOfFeatures", "NumberOfClasses"]]
 
