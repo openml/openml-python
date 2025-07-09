@@ -15,8 +15,9 @@ from openml.datasets import OpenMLDataFeature, OpenMLDataset
 from openml.exceptions import PyOpenMLError
 from openml.testing import TestBase
 
-import pytest
+import requests_mock
 
+import pytest
 
 @pytest.mark.production()
 class OpenMLDatasetTest(TestBase):
@@ -338,65 +339,75 @@ def test_add_illegal_url_ontology():
         assert e.code == 1106
 
 
-@pytest.mark.production()
-class OpenMLDatasetTestSparse(TestBase):
-    _multiprocess_can_split_ = True
 
-    def setUp(self):
-        super().setUp()
-        openml.config.server = self.production_server
 
-        self.sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
+@pytest.mark.production        
+def test_get_sparse_categorical_data_id_395(mock_sparse_categorical_395):
+    
+    dataset = openml.datasets.get_dataset(395, download_data=True)
+    feature = dataset.features[3758]
+    assert isinstance(dataset, OpenMLDataset)
+    assert isinstance(feature, OpenMLDataFeature)
+    assert dataset.name == "re1.wc"
+    assert feature.name == "CLASS_LABEL"
+    assert feature.data_type == "nominal"
+    assert len(feature.nominal_values) == 25
 
-    def test_get_sparse_dataset_dataframe_with_target(self):
-        X, y, _, attribute_names = self.sparse_dataset.get_data(target="class")
-        assert isinstance(X, pd.DataFrame)
-        assert isinstance(X.dtypes[0], pd.SparseDtype)
-        assert X.shape == (600, 20000)
+@pytest.mark.production
+def test_get_sparse_dataset_rowid_and_ignore_and_target(mock_sparse_dataset):
+    
+    sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
+    
+    # TODO: re-add row_id and ignore attributes
+    sparse_dataset.ignore_attribute = ["V2"]
+    sparse_dataset.row_id_attribute = ["V5"]
+    
+    X, y, categorical, _ = sparse_dataset.get_data(
+        target="class",
+        include_row_id=False,
+        include_ignore_attribute=False,
+    )
+    assert all(dtype == pd.SparseDtype(np.float32, fill_value=0.0) for dtype in X.dtypes)
+    # array format returned dense, but now we only return sparse and let the user handle it.
+    assert isinstance(y.dtypes, pd.SparseDtype)
+    assert X.shape == (10, 8)
 
-        assert isinstance(y, pd.Series)
-        assert isinstance(y.dtypes, pd.SparseDtype)
-        assert y.shape == (600,)
+    assert len(categorical) == 8
+    assert categorical ==  [False] * 8
+    assert y.shape == (10,)
 
-        assert len(attribute_names) == 20000
-        assert "class" not in attribute_names
+@pytest.mark.production
+def test_get_sparse_dataset_dataframe(mock_sparse_dataset):
+   
+    sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
+    
+    rval, *_ = sparse_dataset.get_data()
+    
+    assert isinstance(rval, pd.DataFrame)
+    np.testing.assert_array_equal(
+        [pd.SparseDtype(np.float32, fill_value=0.0)] * len(rval.dtypes),
+        rval.dtypes,
+    )
+    assert rval.shape == (10, 11)
+    
+@pytest.mark.production
+def test_get_sparse_dataset_dataframe_with_target(mock_sparse_dataset):
+    
+    sparse_dataset = openml.datasets.get_dataset(4136, download_data=False)
+    
+    X, y, _, attribute_names = sparse_dataset.get_data(target="class")
 
-    def test_get_sparse_dataset_dataframe(self):
-        rval, *_ = self.sparse_dataset.get_data()
-        assert isinstance(rval, pd.DataFrame)
-        np.testing.assert_array_equal(
-            [pd.SparseDtype(np.float32, fill_value=0.0)] * len(rval.dtypes),
-            rval.dtypes,
-        )
-        assert rval.shape == (600, 20001)
+    assert isinstance(X, pd.DataFrame)
+    assert isinstance(X.dtypes[0], pd.SparseDtype)
+    assert X.shape == (10, 10)
 
-    def test_get_sparse_dataset_rowid_and_ignore_and_target(self):
-        # TODO: re-add row_id and ignore attributes
-        self.sparse_dataset.ignore_attribute = ["V256"]
-        self.sparse_dataset.row_id_attribute = ["V512"]
-        X, y, categorical, _ = self.sparse_dataset.get_data(
-            target="class",
-            include_row_id=False,
-            include_ignore_attribute=False,
-        )
-        assert all(dtype == pd.SparseDtype(np.float32, fill_value=0.0) for dtype in X.dtypes)
-        # array format returned dense, but now we only return sparse and let the user handle it.
-        assert isinstance(y.dtypes, pd.SparseDtype)
-        assert X.shape == (600, 19998)
+    assert isinstance(y, pd.Series)
+    assert isinstance(y.dtypes, pd.SparseDtype)
+    assert y.shape == (10,)
 
-        assert len(categorical) == 19998
-        self.assertListEqual(categorical, [False] * 19998)
-        assert y.shape == (600,)
-
-    def test_get_sparse_categorical_data_id_395(self):
-        dataset = openml.datasets.get_dataset(395, download_data=True)
-        feature = dataset.features[3758]
-        assert isinstance(dataset, OpenMLDataset)
-        assert isinstance(feature, OpenMLDataFeature)
-        assert dataset.name == "re1.wc"
-        assert feature.name == "CLASS_LABEL"
-        assert feature.data_type == "nominal"
-        assert len(feature.nominal_values) == 25
+    assert len(attribute_names) == 10
+    assert "class" not in attribute_names
+               
 
 
 def test__read_features(mocker, workdir, static_cache_dir):

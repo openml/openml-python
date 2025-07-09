@@ -1,0 +1,12 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>395</oml:id>
+  <oml:name>re1.wc</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description></oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>Sparse_ARFF</oml:format>
+        <oml:upload_date>2014-09-28T23:22:48</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/52507/re1.wc.sparse_arff</oml:url>
+    <oml:file_id>52507</oml:file_id>  <oml:default_target_attribute>CLASS_LABEL</oml:default_target_attribute>          <oml:tag>word count</oml:tag>  <oml:visibility>public</oml:visibility>        <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 20:35:48</oml:processing_date>      <oml:md5_checksum>a23c1354c88f07c54e8126eaf90021dc</oml:md5_checksum>
+</oml:data_set_description>

@@ -1,0 +1,36 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>4136</oml:id>
+  <oml:name>Dexter</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>DEXTER is a text classification problem in a bag-of-word representation. This is a two-class classification problem with sparse continuous input variables. This dataset is one of five datasets of the NIPS 2003 feature selection challenge.
+
+Source:
+
+a. Original owners 
+The original data set we used is a subset of the well-known Reuters text categorization benchmark. The data was originally collected and labeled by Carnegie Group, Inc. and Reuters, Ltd. in the course of developing the CONSTRUE text categorization system. It is hosted by the UCI KDD repository: http://kdd.ics.uci.edu/databases/reuters21578/reuters21578.html. David D. Lewis is hosting valuable resources about this data (see http://www.daviddlewis.com/resources/testcollections/reuters21578/). We used the &amp;ldquo;corporate acquisition&amp;rdquo; text classification class pre-processed by Thorsten Joachims &amp;lt;thorsten '@' joachims.org&amp;gt;. The data is one of the examples of the software package SVM-Light., see http://svmlight.joachims.org/. The example can be downloaded from ftp://ftp-ai.cs.uni-dortmund.de/pub/Users/thorsten/svm_light/examples/example1.tar.gz. 
+
+b. Donor of database 
+This version of the database was prepared for the NIPS 2003 variable and feature selection benchmark by Isabelle Guyon, 955 Creston Road, Berkeley, CA 94708, USA (isabelle '@' clopinet.com). 
+
+
+Data Set Information:
+
+The original data were formatted by Thorsten Joachims in the &amp;ldquo;bag-of-words&amp;rdquo; representation. There were 9947 features (of which 2562 are always zeros for all the examples) representing frequencies of occurrence of word stems in text. The task is to learn which Reuters articles are about 'corporate acquisitions'. We added a number of distractor feature called 'probes' having no predictive power. The order of the features and patterns were randomized. 
+
+DEXTER -- Positive ex. -- Negative ex. -- Total 
+Training set --150 -- 150 -- 300 
+Validation set -- 150 -- 150 -- 300 
+Test set -- 1000 -- 1000 -- 2000 
+All -- 1300 -- 1300 -- 2600 
+
+Number of variables/features/attributes: 
+Real: 9947 
+Probes: 10053 
+Total: 20000</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>Sparse_ARFF</oml:format>
+        <oml:upload_date>2015-11-08T01:18:07</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/1681111/Dexter.sparse_arff</oml:url>
+    <oml:file_id>1681111</oml:file_id>  <oml:default_target_attribute>class</oml:default_target_attribute>            <oml:visibility>public</oml:visibility>  <oml:original_data_url>https://archive.ics.uci.edu/ml/datasets/Dexter</oml:original_data_url>      <oml:status>active</oml:status>
+  <oml:processing_date>2018-10-03 22:07:13</oml:processing_date>      <oml:md5_checksum>46a5a2dd520048cc22c8502195d63216</oml:md5_checksum>
+</oml:data_set_description>
