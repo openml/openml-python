@@ -6,8 +6,6 @@ Please make sure that:
 
 * the title of the pull request is descriptive
 * this pull requests is against the `develop` branch
-* for any new function or class added, please add it to doc/api.rst
-    * the list of classes and functions should be alphabetical 
 * for any new functionality, consider adding a relevant example
 * add unit tests for new functionalities
     * collect files uploaded to test server using _mark_entity_for_removal()

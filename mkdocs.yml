@@ -42,12 +42,29 @@ extra_css:
 
 nav:
   - index.md
-  - Code Reference: reference/
-  - Examples: examples/
-  - Usage: usage.md
-  - Contributing: contributing.md
+  - Examples:
+    - Overview: examples/introduction.py
+    - Basics:
+        - Setup: examples/Basics/introduction_tutorial.py
+        - Datasets: examples/Basics/simple_datasets_tutorial.py
+        - Tasks: examples/Basics/simple_tasks_tutorial.py
+        - Flows and Runs: examples/Basics/simple_flows_and_runs_tutorial.py
+        - Suites: examples/Basics/simple_suites_tutorial.py
+    - Advanced:
+      - Dataset Splits from Tasks: examples/Advanced/task_manual_iteration_tutorial.py
+      - Creating and Uploading Datasets: examples/Advanced/create_upload_tutorial.py
+      - Searching and Editing Datasets: examples/Advanced/datasets_tutorial.py
+      - Searching and Creating Tasks: examples/Advanced/tasks_tutorial.py
+      - List, Download, and Upload Suites: examples/Advanced/suites_tutorial.py
+      - List, Download, and Upload Studies: examples/Advanced/study_tutorial.py
+      - Downloading Evaluation Results: examples/Advanced/fetch_evaluations_tutorial.py
+      - Configuring Logging: examples/Advanced/configure_logging.py
+
+
   - Extensions: extensions.md
-  - Changelog: progress.md
+  - Advanced User Guide: details.md
+  - API: reference/
+  - Contributing: contributing.md
 
 markdown_extensions:
   - pymdownx.highlight:
