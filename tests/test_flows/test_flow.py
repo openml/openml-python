@@ -48,7 +48,7 @@ class TestFlow(TestBase):
     def test_get_flow(self):
         # We need to use the production server here because 4024 is not the
         # test server
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         flow = openml.flows.get_flow(4024)
         assert isinstance(flow, openml.OpenMLFlow)
@@ -82,7 +82,7 @@ class TestFlow(TestBase):
         # also responsible for testing: flow.get_subflow
         # We need to use the production server here because 4024 is not the
         # test server
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         flow = openml.flows.get_flow(4024)
         flow_structure_name = flow.get_structure("name")
@@ -558,7 +558,7 @@ class TestFlow(TestBase):
 
     @pytest.mark.production()
     def test_download_non_scikit_learn_flows(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         flow = openml.flows.get_flow(6742)
         assert isinstance(flow, openml.OpenMLFlow)

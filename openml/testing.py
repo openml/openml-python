@@ -51,6 +51,7 @@ class TestBase(unittest.TestCase):
     # amueller's read/write key that he will throw away later
     apikey = "610344db6388d9ba34f6db45a3cf71de"
 
+
     # creating logger for tracking files uploaded to test server
     logger = logging.getLogger("unit_tests_published_entities")
     logger.setLevel(logging.DEBUG)
@@ -107,6 +108,10 @@ class TestBase(unittest.TestCase):
         self.retry_policy = openml.config.retry_policy
         self.connection_n_retries = openml.config.connection_n_retries
         openml.config.set_retry_policy("robot", n_retries=20)
+
+    def use_production_server(self):
+        openml.config.server = self.production_server
+        openml.config.apikey = None
 
     def tearDown(self) -> None:
         """Tear down the test"""

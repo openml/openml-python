@@ -1083,7 +1083,7 @@ class TestRun(TestBase):
 
     @pytest.mark.production()
     def test_online_run_metric_score(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         # important to use binary classification task,
         # due to assertions
@@ -1388,7 +1388,7 @@ class TestRun(TestBase):
     @pytest.mark.production()
     def test_get_run(self):
         # this run is not available on test
-        openml.config.server = self.production_server
+        self.use_production_server()
         run = openml.runs.get_run(473351)
         assert run.dataset_id == 357
         assert run.evaluations["f_measure"] == 0.841225
@@ -1424,7 +1424,7 @@ class TestRun(TestBase):
     @pytest.mark.production()
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
-        openml.config.server = self.production_server
+        self.use_production_server()
         runs = openml.runs.list_runs(id=[2], display_errors=True)
         assert len(runs) == 1
         for run in runs.to_dict(orient="index").values():
@@ -1437,7 +1437,7 @@ class TestRun(TestBase):
     @pytest.mark.production()
     def test_get_runs_list_by_task(self):
         # TODO: comes from live, no such lists on test
-        openml.config.server = self.production_server
+        self.use_production_server()
         task_ids = [20]
         runs = openml.runs.list_runs(task=task_ids)
         assert len(runs) >= 590
@@ -1456,7 +1456,7 @@ class TestRun(TestBase):
     @pytest.mark.production()
     def test_get_runs_list_by_uploader(self):
         # TODO: comes from live, no such lists on test
-        openml.config.server = self.production_server
+        self.use_production_server()
         # 29 is Dominik Kirchhoff
         uploader_ids = [29]
 
@@ -1478,7 +1478,7 @@ class TestRun(TestBase):
     @pytest.mark.production()
     def test_get_runs_list_by_flow(self):
         # TODO: comes from live, no such lists on test
-        openml.config.server = self.production_server
+        self.use_production_server()
         flow_ids = [1154]
         runs = openml.runs.list_runs(flow=flow_ids)
         assert len(runs) >= 1
@@ -1497,7 +1497,7 @@ class TestRun(TestBase):
     @pytest.mark.production()
     def test_get_runs_pagination(self):
         # TODO: comes from live, no such lists on test
-        openml.config.server = self.production_server
+        self.use_production_server()
         uploader_ids = [1]
         size = 10
         max = 100
@@ -1510,7 +1510,7 @@ class TestRun(TestBase):
     @pytest.mark.production()
     def test_get_runs_list_by_filters(self):
         # TODO: comes from live, no such lists on test
-        openml.config.server = self.production_server
+        self.use_production_server()
         ids = [505212, 6100]
         tasks = [2974, 339]
         uploaders_1 = [1, 2]
@@ -1548,7 +1548,8 @@ class TestRun(TestBase):
     def test_get_runs_list_by_tag(self):
         # TODO: comes from live, no such lists on test
         # Unit test works on production server only
-        openml.config.server = self.production_server
+
+        self.use_production_server()
         runs = openml.runs.list_runs(tag="curves")
         assert len(runs) >= 1
 
@@ -1663,7 +1664,7 @@ class TestRun(TestBase):
     @pytest.mark.production()
     def test_format_prediction_non_supervised(self):
         # non-supervised tasks don't exist on the test server
-        openml.config.server = self.production_server
+        self.use_production_server()
         clustering = openml.tasks.get_task(126033, download_data=False)
         ignored_input = [0] * 5
         with pytest.raises(

@@ -139,7 +139,7 @@ class TestOpenMLDataset(TestBase):
     @pytest.mark.production()
     def test_check_datasets_active(self):
         # Have to test on live because there is no deactivated dataset on the test server.
-        openml.config.server = self.production_server
+        self.use_production_server()
         active = openml.datasets.check_datasets_active(
             [2, 17, 79],
             raise_error_if_not_exist=False,
@@ -176,7 +176,7 @@ class TestOpenMLDataset(TestBase):
     @pytest.mark.production()
     def test__name_to_id_with_deactivated(self):
         """Check that an activated dataset is returned if an earlier deactivated one exists."""
-        openml.config.server = self.production_server
+        self.use_production_server()
         # /d/1 was deactivated
         assert openml.datasets.functions._name_to_id("anneal") == 2
         openml.config.server = self.test_server
@@ -184,19 +184,19 @@ class TestOpenMLDataset(TestBase):
     @pytest.mark.production()
     def test__name_to_id_with_multiple_active(self):
         """With multiple active datasets, retrieve the least recent active."""
-        openml.config.server = self.production_server
+        self.use_production_server()
         assert openml.datasets.functions._name_to_id("iris") == 61
 
     @pytest.mark.production()
     def test__name_to_id_with_version(self):
         """With multiple active datasets, retrieve the least recent active."""
-        openml.config.server = self.production_server
+        self.use_production_server()
         assert openml.datasets.functions._name_to_id("iris", version=3) == 969
 
     @pytest.mark.production()
     def test__name_to_id_with_multiple_active_error(self):
         """With multiple active datasets, retrieve the least recent active."""
-        openml.config.server = self.production_server
+        self.use_production_server()
         self.assertRaisesRegex(
             ValueError,
             "Multiple active datasets exist with name 'iris'.",
@@ -272,12 +272,12 @@ class TestOpenMLDataset(TestBase):
     @pytest.mark.production()
     def test_get_dataset_cannot_access_private_data(self):
         # Issue324 Properly handle private datasets when trying to access them
-        openml.config.server = self.production_server
+        self.use_production_server()
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, 45)
 
     @pytest.mark.skip("Need to find dataset name of private dataset")
     def test_dataset_by_name_cannot_access_private_data(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, "NAME_GOES_HERE")
 
     def test_get_dataset_lazy_all_functions(self):
@@ -1501,7 +1501,7 @@ class TestOpenMLDataset(TestBase):
     @pytest.mark.production()
     def test_list_datasets_with_high_size_parameter(self):
         # Testing on prod since concurrent deletion of uploded datasets make the test fail
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         datasets_a = openml.datasets.list_datasets()
         datasets_b = openml.datasets.list_datasets(size=np.inf)

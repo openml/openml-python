@@ -52,7 +52,7 @@ class TestEvaluationFunctions(TestBase):
 
     @pytest.mark.production()
     def test_evaluation_list_filter_task(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         task_id = 7312
 
@@ -72,7 +72,7 @@ class TestEvaluationFunctions(TestBase):
 
     @pytest.mark.production()
     def test_evaluation_list_filter_uploader_ID_16(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         uploader_id = 16
         evaluations = openml.evaluations.list_evaluations(
@@ -87,7 +87,7 @@ class TestEvaluationFunctions(TestBase):
 
     @pytest.mark.production()
     def test_evaluation_list_filter_uploader_ID_10(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         setup_id = 10
         evaluations = openml.evaluations.list_evaluations(
@@ -106,7 +106,7 @@ class TestEvaluationFunctions(TestBase):
 
     @pytest.mark.production()
     def test_evaluation_list_filter_flow(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         flow_id = 100
 
@@ -126,7 +126,7 @@ class TestEvaluationFunctions(TestBase):
 
     @pytest.mark.production()
     def test_evaluation_list_filter_run(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         run_id = 12
 
@@ -146,7 +146,7 @@ class TestEvaluationFunctions(TestBase):
 
     @pytest.mark.production()
     def test_evaluation_list_limit(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         evaluations = openml.evaluations.list_evaluations(
             "predictive_accuracy",
@@ -164,7 +164,7 @@ class TestEvaluationFunctions(TestBase):
 
     @pytest.mark.production()
     def test_evaluation_list_per_fold(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         size = 1000
         task_ids = [6]
         uploader_ids = [1]
@@ -202,7 +202,7 @@ class TestEvaluationFunctions(TestBase):
 
     @pytest.mark.production()
     def test_evaluation_list_sort(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         size = 10
         task_id = 6
         # Get all evaluations of the task
@@ -239,7 +239,7 @@ class TestEvaluationFunctions(TestBase):
 
     @pytest.mark.production()
     def test_list_evaluations_setups_filter_flow(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         flow_id = [405]
         size = 100
         evals = self._check_list_evaluation_setups(flows=flow_id, size=size)
@@ -257,7 +257,7 @@ class TestEvaluationFunctions(TestBase):
 
     @pytest.mark.production()
     def test_list_evaluations_setups_filter_task(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         task_id = [6]
         size = 121
         self._check_list_evaluation_setups(tasks=task_id, size=size)

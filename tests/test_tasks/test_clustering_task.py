@@ -23,14 +23,14 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
     @pytest.mark.production()
     def test_get_dataset(self):
         # no clustering tasks on test server
-        openml.config.server = self.production_server
+        self.use_production_server()
         task = openml.tasks.get_task(self.task_id)
         task.get_dataset()
 
     @pytest.mark.production()
     def test_download_task(self):
         # no clustering tasks on test server
-        openml.config.server = self.production_server
+        self.use_production_server()
         task = super().test_download_task()
         assert task.task_id == self.task_id
         assert task.task_type_id == TaskType.CLUSTERING
