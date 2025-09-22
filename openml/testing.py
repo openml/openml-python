@@ -108,6 +108,15 @@ class TestBase(unittest.TestCase):
         self.connection_n_retries = openml.config.connection_n_retries
         openml.config.set_retry_policy("robot", n_retries=20)
 
+    def use_production_server(self) -> None:
+        """
+        Use the production server for the OpenML API calls.
+
+        Please use this sparingly - it is better to use the test server.
+        """
+        openml.config.server = self.production_server
+        openml.config.apikey = ""
+
     def tearDown(self) -> None:
         """Tear down the test"""
         os.chdir(self.cwd)

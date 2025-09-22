@@ -48,7 +48,7 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.production()
     def test_list_flows(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         # We can only perform a smoke test here because we test on dynamic
         # data from the internet...
         flows = openml.flows.list_flows()
@@ -59,7 +59,7 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.production()
     def test_list_flows_output_format(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         # We can only perform a smoke test here because we test on dynamic
         # data from the internet...
         flows = openml.flows.list_flows()
@@ -68,13 +68,14 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.production()
     def test_list_flows_empty(self):
+        self.use_production_server()
         openml.config.server = self.production_server
         flows = openml.flows.list_flows(tag="NoOneEverUsesThisTag123")
         assert flows.empty
 
     @pytest.mark.production()
     def test_list_flows_by_tag(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         flows = openml.flows.list_flows(tag="weka")
         assert len(flows) >= 5
         for flow in flows.to_dict(orient="index").values():
@@ -82,7 +83,7 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.production()
     def test_list_flows_paginate(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         size = 10
         maximum = 100
         for i in range(0, maximum, size):
@@ -302,7 +303,7 @@ class TestFlowFunctions(TestBase):
     def test_get_flow1(self):
         # Regression test for issue #305
         # Basically, this checks that a flow without an external version can be loaded
-        openml.config.server = self.production_server
+        self.use_production_server()
         flow = openml.flows.get_flow(1)
         assert flow.external_version is None
 
@@ -335,7 +336,7 @@ class TestFlowFunctions(TestBase):
     )
     @pytest.mark.production()
     def test_get_flow_with_reinstantiate_strict_with_wrong_version_raises_exception(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         flow = 8175
         expected = "Trying to deserialize a model with dependency sklearn==0.19.1 not satisfied."
         self.assertRaisesRegex(
@@ -356,7 +357,7 @@ class TestFlowFunctions(TestBase):
     )
     @pytest.mark.production()
     def test_get_flow_reinstantiate_flow_not_strict_post_1(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         flow = openml.flows.get_flow(flow_id=19190, reinstantiate=True, strict_version=False)
         assert flow.flow_id is None
         assert "sklearn==1.0.0" not in flow.dependencies
@@ -370,7 +371,7 @@ class TestFlowFunctions(TestBase):
     )
     @pytest.mark.production()
     def test_get_flow_reinstantiate_flow_not_strict_023_and_024(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         flow = openml.flows.get_flow(flow_id=18587, reinstantiate=True, strict_version=False)
         assert flow.flow_id is None
         assert "sklearn==0.23.1" not in flow.dependencies
@@ -382,7 +383,7 @@ class TestFlowFunctions(TestBase):
     )
     @pytest.mark.production()
     def test_get_flow_reinstantiate_flow_not_strict_pre_023(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         flow = openml.flows.get_flow(flow_id=8175, reinstantiate=True, strict_version=False)
         assert flow.flow_id is None
         assert "sklearn==0.19.1" not in flow.dependencies

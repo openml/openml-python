@@ -134,7 +134,7 @@ class TestSetupFunctions(TestBase):
 
     @pytest.mark.production()
     def test_setup_list_filter_flow(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         flow_id = 5873
 
@@ -153,7 +153,7 @@ class TestSetupFunctions(TestBase):
 
     @pytest.mark.production()
     def test_list_setups_output_format(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         flow_id = 6794
         setups = openml.setups.list_setups(flow=flow_id, size=10)
         assert isinstance(setups, dict)

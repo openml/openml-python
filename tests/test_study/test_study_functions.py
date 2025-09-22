@@ -14,7 +14,7 @@ class TestStudyFunctions(TestBase):
 
     @pytest.mark.production()
     def test_get_study_old(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         study = openml.study.get_study(34)
         assert len(study.data) == 105
@@ -25,7 +25,7 @@ class TestStudyFunctions(TestBase):
 
     @pytest.mark.production()
     def test_get_study_new(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         study = openml.study.get_study(123)
         assert len(study.data) == 299
@@ -36,7 +36,7 @@ class TestStudyFunctions(TestBase):
 
     @pytest.mark.production()
     def test_get_openml100(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         study = openml.study.get_study("OpenML100", "tasks")
         assert isinstance(study, openml.study.OpenMLBenchmarkSuite)
@@ -46,7 +46,7 @@ class TestStudyFunctions(TestBase):
 
     @pytest.mark.production()
     def test_get_study_error(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         with pytest.raises(
             ValueError, match="Unexpected entity type 'task' reported by the server, expected 'run'"
@@ -55,7 +55,7 @@ class TestStudyFunctions(TestBase):
 
     @pytest.mark.production()
     def test_get_suite(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         study = openml.study.get_suite(99)
         assert len(study.data) == 72
@@ -66,7 +66,7 @@ class TestStudyFunctions(TestBase):
 
     @pytest.mark.production()
     def test_get_suite_error(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
 
         with pytest.raises(
             ValueError, match="Unexpected entity type 'run' reported by the server, expected 'task'"
