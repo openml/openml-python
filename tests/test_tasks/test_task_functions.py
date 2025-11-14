@@ -15,6 +15,7 @@ from openml import OpenMLSplit, OpenMLTask
 from openml.exceptions import OpenMLCacheException, OpenMLNotAuthorizedError, OpenMLServerException
 from openml.tasks import TaskType
 from openml.testing import TestBase, create_request_response
+from tests.config import TEST_SERVER, TEST_SUBDOMAIN
 
 
 class TestTask(TestBase):
@@ -56,7 +57,7 @@ class TestTask(TestBase):
     @pytest.mark.production()
     def test_list_clustering_task(self):
         # as shown by #383, clustering tasks can give list/dict casting problems
-        openml.config.server = self.production_server
+        self.use_production_server()
         openml.tasks.list_tasks(task_type=TaskType.CLUSTERING, size=10)
         # the expected outcome is that it doesn't crash. No assertions.
 
@@ -136,41 +137,43 @@ class TestTask(TestBase):
     def test__get_task_live(self):
         # Test the following task as it used to throw an Unicode Error.
         # https://github.com/openml/openml-python/issues/378
-        openml.config.server = self.production_server
+        self.use_production_server()
         openml.tasks.get_task(34536)
 
     def test_get_task(self):
         task = openml.tasks.get_task(1, download_data=True)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "task.xml")
+            os.path.join(self.workdir, "org", "openml", TEST_SUBDOMAIN, "tasks", "1", "task.xml")
         )
         assert not os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "datasplits.arff")
+            os.path.join(self.workdir, "org", "openml", TEST_SUBDOMAIN, "tasks", "1", "datasplits.arff")
         )
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "datasets", "1", "dataset.arff")
+            os.path.join(self.workdir, "org", "openml", TEST_SUBDOMAIN, "datasets", "1", "dataset.arff")
+        ) or os.path.exists(
+            os.path.join(self.workdir, "org", "openml", TEST_SUBDOMAIN, "datasets", "1", "dataset_1.pq")
         )
 
     def test_get_task_lazy(self):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "task.xml")
+            os.path.join(self.workdir, "org", "openml", TEST_SUBDOMAIN, "tasks", "2", "task.xml")
         )
         assert task.class_labels == ["1", "2", "3", "4", "5", "U"]
 
         assert not os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff")
+            os.path.join(self.workdir, "org", "openml", TEST_SUBDOMAIN, "tasks", "2", "datasplits.arff")
         )
         # Since the download_data=False is propagated to get_dataset
         assert not os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "datasets", "2", "dataset.arff")
+            os.path.join(self.workdir, "org", "openml", TEST_SUBDOMAIN, "datasets", "2", "dataset.arff")
         )
 
         task.download_split()
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff")
+            os.path.join(self.workdir, "org", "openml", TEST_SUBDOMAIN, "tasks", "2", "datasplits.arff")
         )
 
     @mock.patch("openml.tasks.functions.get_dataset")
@@ -198,7 +201,7 @@ class TestTask(TestBase):
 
     @pytest.mark.production()
     def test_get_task_different_types(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         # Regression task
         openml.tasks.functions.get_task(5001)
         # Learning curve
@@ -211,7 +214,7 @@ class TestTask(TestBase):
         split = task.download_split()
         assert type(split) == OpenMLSplit
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "datasplits.arff")
+            os.path.join(self.workdir, "org", "openml", TEST_SUBDOMAIN, "tasks", "1", "datasplits.arff")
         )
 
     def test_deletion_of_cache_dir(self):
@@ -240,7 +243,7 @@ def test_delete_task_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.tasks.delete_task(1)
 
-    task_url = "https://test.openml.org/api/v1/xml/task/1"
+    task_url = f"{TEST_SERVER}/task/1"
     assert task_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -260,7 +263,7 @@ def test_delete_task_with_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.tasks.delete_task(3496)
 
-    task_url = "https://test.openml.org/api/v1/xml/task/3496"
+    task_url = f"{TEST_SERVER}/task/3496"
     assert task_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -277,7 +280,7 @@ def test_delete_success(mock_delete, test_files_directory, test_api_key):
     success = openml.tasks.delete_task(361323)
     assert success
 
-    task_url = "https://test.openml.org/api/v1/xml/task/361323"
+    task_url = f"{TEST_SERVER}/task/361323"
     assert task_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -297,6 +300,6 @@ def test_delete_unknown_task(mock_delete, test_files_directory, test_api_key):
     ):
         openml.tasks.delete_task(9_999_999)
 
-    task_url = "https://test.openml.org/api/v1/xml/task/9999999"
+    task_url = f"{TEST_SERVER}/task/9999999"
     assert task_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")

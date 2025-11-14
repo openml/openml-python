@@ -9,6 +9,8 @@ from pathlib import Path
 from typing import Callable
 from urllib.parse import urlparse
 
+from tests.config import TEST_SERVER
+
 from openml import config
 
 
@@ -108,7 +110,7 @@ def configure_server(value: str) -> None:
 
     def replace_shorthand(server: str) -> str:
         if server == "test":
-            return "https://test.openml.org/api/v1/xml"
+            return TEST_SERVER
         if server == "production":
             return "https://www.openml.org/api/v1/xml"
         return server

@@ -25,6 +25,8 @@ from __future__ import annotations
 
 import multiprocessing
 
+from tests.config import TEST_SERVER_API_KEY, TEST_SERVER_API_KEY_ADMIN, TEST_SERVER
+
 multiprocessing.set_start_method("spawn", force=True)
 
 from collections.abc import Iterator
@@ -38,7 +40,6 @@ import openml_sklearn
 import openml
 from openml.testing import TestBase
 
-import inspect
 
 # creating logger for unit test file deletion status
 logger = logging.getLogger("unit_tests")
@@ -251,7 +252,7 @@ def test_files_directory() -> Path:
 
 @pytest.fixture(scope="session")
 def test_api_key() -> str:
-    return "c0c42819af31e706efe1f4b88c23c6c1"
+    return TEST_SERVER_API_KEY
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -276,8 +277,8 @@ def with_server(request):
         openml.config.server = "https://www.openml.org/api/v1/xml"
         yield
         return
-    openml.config.server = "https://test.openml.org/api/v1/xml"
-    openml.config.apikey = "c0c42819af31e706efe1f4b88c23c6c1"
+    openml.config.server = TEST_SERVER
+    openml.config.apikey = TEST_SERVER_API_KEY_ADMIN
     yield
 
 

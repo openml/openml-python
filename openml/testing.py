@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import ClassVar
 
 import requests
+from tests.config import TEST_SERVER, TEST_SERVER_API_KEY
 
 import openml
 from openml.exceptions import OpenMLServerException
@@ -47,9 +48,8 @@ class TestBase(unittest.TestCase):
         "user": [],
     }
     flow_name_tracker: ClassVar[list[str]] = []
-    test_server = "https://test.openml.org/api/v1/xml"
-    # amueller's read/write key that he will throw away later
-    apikey = "610344db6388d9ba34f6db45a3cf71de"
+    test_server = TEST_SERVER
+    apikey = TEST_SERVER_API_KEY
 
     # creating logger for tracking files uploaded to test server
     logger = logging.getLogger("unit_tests_published_entities")
