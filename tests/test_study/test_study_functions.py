@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import pytest
-# import unittest
 
 import openml
 import openml.study

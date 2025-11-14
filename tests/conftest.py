@@ -33,7 +33,7 @@ import os
 import shutil
 from pathlib import Path
 import pytest
-# import openml_sklearn
+import openml_sklearn
 
 import openml
 from openml.testing import TestBase
