@@ -1,0 +1,13 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+    <oml:id>-1</oml:id>
+    <oml:name>dexter</oml:name>
+    <oml:version>1</oml:version>
+    <oml:description>Test set of the dexter dataset as used
+        in the AutoWEKA paper (Thornton et al. 2013)</oml:description>
+    <oml:format>ARFF</oml:format>
+    <oml:upload_date></oml:upload_date>
+    <oml:licence>Public</oml:licence>
+    <oml:url>http://www.cs.ubc.ca/labs/beta/Projects/autoweka/datasets/dexter.zip</oml:url>
+    <oml:default_target_attribute>class</oml:default_target_attribute>
+    <oml:md5_checksum></oml:md5_checksum>
+</oml:data_set_description>
