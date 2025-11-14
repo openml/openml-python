@@ -33,7 +33,7 @@ import os
 import shutil
 from pathlib import Path
 import pytest
-import openml_sklearn
+# import openml_sklearn
 
 import openml
 from openml.testing import TestBase
@@ -45,6 +45,9 @@ logger = logging.getLogger("unit_tests")
 logger.setLevel(logging.DEBUG)
 
 file_list = []
+TEST_SERVER = "https://test.openml.org/api/v1/xml"
+PRODUCTION_SERVER = "https://www.openml.org/api/v1/xml"
+APIKEY = "610344db6388d9ba34f6db45a3cf71de"
 
 
 def worker_id() -> str:
@@ -308,3 +311,45 @@ def workdir(tmp_path):
     os.chdir(tmp_path)
     yield tmp_path
     os.chdir(original_cwd)
+
+@pytest.fixture
+def test_env(tmp_path, request):
+    # locate static cache folder
+    abspath_this_file = Path(request.node.fspath).absolute()
+    static_dir = abspath_this_file.parent.parent  # same as n_levels = 1
+
+    if "files" in os.listdir(static_dir):
+        static_cache_dir = static_dir / "files"
+    else:
+        raise ValueError(f"Cannot find test cache dir in {static_dir}")
+
+    cwd = Path.cwd()
+    workdir = tmp_path / request.node.name
+    workdir.mkdir(exist_ok=True)
+    os.chdir(workdir)
+
+    prev_retry_policy = openml.config.retry_policy
+    prev_connection_n_retries = openml.config.connection_n_retries
+
+    openml.config.apikey = APIKEY
+    openml.config.set_root_cache_directory(str(workdir))
+    openml.config.set_retry_policy("robot", n_retries=20)
+
+    try:
+        yield {
+            "workdir": workdir,
+            "cwd": cwd,
+            "static_cache_dir": static_cache_dir,
+        }
+    finally:
+        os.chdir(cwd)
+        shutil.rmtree(workdir, ignore_errors=True)
+        openml.config.connection_n_retries = prev_connection_n_retries
+        openml.config.retry_policy = prev_retry_policy
+
+@pytest.fixture
+def production_server(test_env):
+    openml.config.server = PRODUCTION_SERVER
+    openml.config.apikey = ""
+    yield
+    openml.config.server = TEST_SERVER

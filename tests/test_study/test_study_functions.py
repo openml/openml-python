@@ -2,257 +2,243 @@
 from __future__ import annotations
 
 import pytest
-import unittest
+# import unittest
 
 import openml
 import openml.study
 from openml.testing import TestBase
+_multiprocess_can_split_ = True
 
+@pytest.mark.production()
+def test_get_study_old(production_server, test_env):
 
-class TestStudyFunctions(TestBase):
-    _multiprocess_can_split_ = True
+    study = openml.study.get_study(34)
+    assert len(study.data) == 105
+    assert len(study.tasks) == 105
+    assert len(study.flows) == 27
+    assert len(study.setups) == 30
+    assert study.runs is None
 
-    @pytest.mark.production()
-    def test_get_study_old(self):
-        self.use_production_server()
+@pytest.mark.production()
+def test_get_study_new(production_server, test_env):
 
-        study = openml.study.get_study(34)
-        assert len(study.data) == 105
-        assert len(study.tasks) == 105
-        assert len(study.flows) == 27
-        assert len(study.setups) == 30
-        assert study.runs is None
+    study = openml.study.get_study(123)
+    assert len(study.data) == 299
+    assert len(study.tasks) == 299
+    assert len(study.flows) == 5
+    assert len(study.setups) == 1253
+    assert len(study.runs) == 1693
 
-    @pytest.mark.production()
-    def test_get_study_new(self):
-        self.use_production_server()
+@pytest.mark.production()
+def test_get_openml100(production_server, test_env):
 
-        study = openml.study.get_study(123)
-        assert len(study.data) == 299
-        assert len(study.tasks) == 299
-        assert len(study.flows) == 5
-        assert len(study.setups) == 1253
-        assert len(study.runs) == 1693
+    study = openml.study.get_study("OpenML100", "tasks")
+    assert isinstance(study, openml.study.OpenMLBenchmarkSuite)
+    study_2 = openml.study.get_suite("OpenML100")
+    assert isinstance(study_2, openml.study.OpenMLBenchmarkSuite)
+    assert study.study_id == study_2.study_id
 
-    @pytest.mark.production()
-    def test_get_openml100(self):
-        self.use_production_server()
+@pytest.mark.production()
+def test_get_study_error(production_server, test_env):
 
-        study = openml.study.get_study("OpenML100", "tasks")
-        assert isinstance(study, openml.study.OpenMLBenchmarkSuite)
-        study_2 = openml.study.get_suite("OpenML100")
-        assert isinstance(study_2, openml.study.OpenMLBenchmarkSuite)
-        assert study.study_id == study_2.study_id
+    with pytest.raises(
+        ValueError, match="Unexpected entity type 'task' reported by the server, expected 'run'"
+    ):
+        openml.study.get_study(99)
 
-    @pytest.mark.production()
-    def test_get_study_error(self):
-        self.use_production_server()
+@pytest.mark.production()
+def test_get_suite(production_server, test_env):
 
-        with pytest.raises(
-            ValueError, match="Unexpected entity type 'task' reported by the server, expected 'run'"
-        ):
-            openml.study.get_study(99)
+    study = openml.study.get_suite(99)
+    assert len(study.data) == 72
+    assert len(study.tasks) == 72
+    assert study.flows is None
+    assert study.runs is None
+    assert study.setups is None
 
-    @pytest.mark.production()
-    def test_get_suite(self):
-        self.use_production_server()
+@pytest.mark.production()
+def test_get_suite_error(production_server, test_env):
 
-        study = openml.study.get_suite(99)
-        assert len(study.data) == 72
-        assert len(study.tasks) == 72
-        assert study.flows is None
-        assert study.runs is None
-        assert study.setups is None
+    with pytest.raises(
+        ValueError, match="Unexpected entity type 'run' reported by the server, expected 'task'"
+    ):
+        openml.study.get_suite(123)
 
-    @pytest.mark.production()
-    def test_get_suite_error(self):
-        self.use_production_server()
+def test_publish_benchmark_suite():
+    fixture_alias = None
+    fixture_name = "unit tested benchmark suite"
+    fixture_descr = "bla"
+    fixture_task_ids = [1, 2, 3]
 
-        with pytest.raises(
-            ValueError, match="Unexpected entity type 'run' reported by the server, expected 'task'"
-        ):
-            openml.study.get_suite(123)
+    study = openml.study.create_benchmark_suite(
+        alias=fixture_alias,
+        name=fixture_name,
+        description=fixture_descr,
+        task_ids=fixture_task_ids,
+    )
+    study.publish()
+    TestBase._mark_entity_for_removal("study", study.id)
+    TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
 
-    def test_publish_benchmark_suite(self):
-        fixture_alias = None
-        fixture_name = "unit tested benchmark suite"
-        fixture_descr = "bla"
-        fixture_task_ids = [1, 2, 3]
+    assert study.id > 0
 
-        study = openml.study.create_benchmark_suite(
-            alias=fixture_alias,
-            name=fixture_name,
-            description=fixture_descr,
-            task_ids=fixture_task_ids,
-        )
-        study.publish()
-        TestBase._mark_entity_for_removal("study", study.id)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
+    # verify main meta data
+    study_downloaded = openml.study.get_suite(study.id)
+    assert study_downloaded.alias == fixture_alias
+    assert study_downloaded.name == fixture_name
+    assert study_downloaded.description == fixture_descr
+    assert study_downloaded.main_entity_type == "task"
+    # verify resources
+    assert study_downloaded.flows is None
+    assert study_downloaded.setups is None
+    assert study_downloaded.runs is None
+    assert len(study_downloaded.data) > 0
+    assert len(study_downloaded.data) <= len(fixture_task_ids)
+    assert set(study_downloaded.tasks) == set(fixture_task_ids)
 
-        assert study.id > 0
+    # attach more tasks
+    tasks_additional = [4, 5, 6]
+    openml.study.attach_to_study(study.id, tasks_additional)
+    study_downloaded = openml.study.get_suite(study.id)
+    # verify again
+    assert set(study_downloaded.tasks) == set(fixture_task_ids + tasks_additional)
+    # test detach function
+    openml.study.detach_from_study(study.id, fixture_task_ids)
+    study_downloaded = openml.study.get_suite(study.id)
+    assert set(study_downloaded.tasks) == set(tasks_additional)
 
-        # verify main meta data
-        study_downloaded = openml.study.get_suite(study.id)
-        assert study_downloaded.alias == fixture_alias
-        assert study_downloaded.name == fixture_name
-        assert study_downloaded.description == fixture_descr
-        assert study_downloaded.main_entity_type == "task"
-        # verify resources
-        assert study_downloaded.flows is None
-        assert study_downloaded.setups is None
-        assert study_downloaded.runs is None
-        assert len(study_downloaded.data) > 0
-        assert len(study_downloaded.data) <= len(fixture_task_ids)
-        self.assertSetEqual(set(study_downloaded.tasks), set(fixture_task_ids))
+    # test status update function
+    openml.study.update_suite_status(study.id, "deactivated")
+    study_downloaded = openml.study.get_suite(study.id)
+    assert study_downloaded.status == "deactivated"
+    # can't delete study, now it's not longer in preparation
 
-        # attach more tasks
-        tasks_additional = [4, 5, 6]
-        openml.study.attach_to_study(study.id, tasks_additional)
-        study_downloaded = openml.study.get_suite(study.id)
-        # verify again
-        self.assertSetEqual(set(study_downloaded.tasks), set(fixture_task_ids + tasks_additional))
-        # test detach function
-        openml.study.detach_from_study(study.id, fixture_task_ids)
-        study_downloaded = openml.study.get_suite(study.id)
-        self.assertSetEqual(set(study_downloaded.tasks), set(tasks_additional))
+@pytest.mark.parametrize("explicit", [True, False])
+def _test_publish_empty_study_is_allowed(explicit: bool):
+    runs: list[int] | None = [] if explicit else None
+    kind = "explicit" if explicit else "implicit"
 
-        # test status update function
-        openml.study.update_suite_status(study.id, "deactivated")
-        study_downloaded = openml.study.get_suite(study.id)
-        assert study_downloaded.status == "deactivated"
-        # can't delete study, now it's not longer in preparation
+    study = openml.study.create_study(
+        name=f"empty-study-{kind}",
+        description=f"a study with no runs attached {kind}ly",
+        run_ids=runs,
+    )
 
-    def _test_publish_empty_study_is_allowed(self, explicit: bool):
-        runs: list[int] | None = [] if explicit else None
-        kind = "explicit" if explicit else "implicit"
+    study.publish()
+    TestBase._mark_entity_for_removal("study", study.id)
+    TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
 
-        study = openml.study.create_study(
-            name=f"empty-study-{kind}",
-            description=f"a study with no runs attached {kind}ly",
-            run_ids=runs,
-        )
+    assert study.id > 0
+    study_downloaded = openml.study.get_study(study.id)
+    assert study_downloaded.main_entity_type == "run"
+    assert study_downloaded.runs is None
 
-        study.publish()
-        TestBase._mark_entity_for_removal("study", study.id)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
+@pytest.mark.flaky()
+def test_publish_study():
+    # get some random runs to attach
+    run_list = openml.evaluations.list_evaluations("predictive_accuracy", size=10)
+    assert len(run_list) == 10
 
-        assert study.id > 0
-        study_downloaded = openml.study.get_study(study.id)
-        assert study_downloaded.main_entity_type == "run"
-        assert study_downloaded.runs is None
+    fixt_alias = None
+    fixt_name = "unit tested study"
+    fixt_descr = "bla"
+    fixt_flow_ids = {evaluation.flow_id for evaluation in run_list.values()}
+    fixt_task_ids = {evaluation.task_id for evaluation in run_list.values()}
+    fixt_setup_ids = {evaluation.setup_id for evaluation in run_list.values()}
 
-    def test_publish_empty_study_explicit(self):
-        self._test_publish_empty_study_is_allowed(explicit=True)
+    study = openml.study.create_study(
+        alias=fixt_alias,
+        benchmark_suite=None,
+        name=fixt_name,
+        description=fixt_descr,
+        run_ids=list(run_list.keys()),
+    )
+    study.publish()
+    TestBase._mark_entity_for_removal("study", study.id)
+    TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
+    assert study.id > 0
+    study_downloaded = openml.study.get_study(study.id)
+    assert study_downloaded.alias == fixt_alias
+    assert study_downloaded.name == fixt_name
+    assert study_downloaded.description == fixt_descr
+    assert study_downloaded.main_entity_type == "run"
 
-    def test_publish_empty_study_implicit(self):
-        self._test_publish_empty_study_is_allowed(explicit=False)
+    assert set(study_downloaded.runs) == set(run_list.keys())
+    assert set(study_downloaded.setups) == set(fixt_setup_ids)
+    assert set(study_downloaded.flows) == set(fixt_flow_ids)
+    assert set(study_downloaded.tasks) == set(fixt_task_ids)
 
-    @pytest.mark.flaky()
-    def test_publish_study(self):
-        # get some random runs to attach
-        run_list = openml.evaluations.list_evaluations("predictive_accuracy", size=10)
-        assert len(run_list) == 10
+    # test whether the list run function also handles study data fine
+    run_ids = openml.runs.list_runs(study=study.id) # returns DF
+    assert set(run_ids["run_id"]) == set(study_downloaded.runs)
 
-        fixt_alias = None
-        fixt_name = "unit tested study"
-        fixt_descr = "bla"
-        fixt_flow_ids = {evaluation.flow_id for evaluation in run_list.values()}
-        fixt_task_ids = {evaluation.task_id for evaluation in run_list.values()}
-        fixt_setup_ids = {evaluation.setup_id for evaluation in run_list.values()}
+    # test whether the list evaluation function also handles study data fine
+    run_ids = openml.evaluations.list_evaluations( # returns list of objects
+        "predictive_accuracy",
+        size=None,
+        study=study.id,
+        output_format="object", # making the default explicit
+    )
+    assert set(run_ids) == set(study_downloaded.runs)
 
-        study = openml.study.create_study(
-            alias=fixt_alias,
-            benchmark_suite=None,
-            name=fixt_name,
-            description=fixt_descr,
-            run_ids=list(run_list.keys()),
-        )
-        study.publish()
-        TestBase._mark_entity_for_removal("study", study.id)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
-        assert study.id > 0
-        study_downloaded = openml.study.get_study(study.id)
-        assert study_downloaded.alias == fixt_alias
-        assert study_downloaded.name == fixt_name
-        assert study_downloaded.description == fixt_descr
-        assert study_downloaded.main_entity_type == "run"
+    # attach more runs, since we fetch 11 here, at least one is non-overlapping
+    run_list_additional = openml.runs.list_runs(size=11, offset=10)
+    run_list_additional = set(run_list_additional["run_id"]) - set(run_ids)
+    openml.study.attach_to_study(study.id, list(run_list_additional))
+    study_downloaded = openml.study.get_study(study.id)
+    # verify again
+    all_run_ids = run_list_additional | set(run_list.keys())
+    assert set(study_downloaded.runs), set(all_run_ids)
 
-        self.assertSetEqual(set(study_downloaded.runs), set(run_list.keys()))
-        self.assertSetEqual(set(study_downloaded.setups), set(fixt_setup_ids))
-        self.assertSetEqual(set(study_downloaded.flows), set(fixt_flow_ids))
-        self.assertSetEqual(set(study_downloaded.tasks), set(fixt_task_ids))
+    # test detach function
+    openml.study.detach_from_study(study.id, list(run_list.keys()))
+    study_downloaded = openml.study.get_study(study.id)
+    assert set(study_downloaded.runs) == set(run_list_additional)
 
-        # test whether the list run function also handles study data fine
-        run_ids = openml.runs.list_runs(study=study.id) # returns DF
-        self.assertSetEqual(set(run_ids["run_id"]), set(study_downloaded.runs))
+    # test status update function
+    openml.study.update_study_status(study.id, "deactivated")
+    study_downloaded = openml.study.get_study(study.id)
+    assert study_downloaded.status == "deactivated"
 
-        # test whether the list evaluation function also handles study data fine
-        run_ids = openml.evaluations.list_evaluations( # returns list of objects
-            "predictive_accuracy",
-            size=None,
-            study=study.id,
-            output_format="object", # making the default explicit
-        )
-        self.assertSetEqual(set(run_ids), set(study_downloaded.runs))
+    res = openml.study.delete_study(study.id)
+    assert res
 
-        # attach more runs, since we fetch 11 here, at least one is non-overlapping
-        run_list_additional = openml.runs.list_runs(size=11, offset=10)
-        run_list_additional = set(run_list_additional["run_id"]) - set(run_ids)
-        openml.study.attach_to_study(study.id, list(run_list_additional))
-        study_downloaded = openml.study.get_study(study.id)
-        # verify again
-        all_run_ids = run_list_additional | set(run_list.keys())
-        self.assertSetEqual(set(study_downloaded.runs), all_run_ids)
+def test_study_attach_illegal():
+    run_list = openml.runs.list_runs(size=10)
+    assert len(run_list) == 10
+    run_list_more = openml.runs.list_runs(size=20)
+    assert len(run_list_more) == 20
 
-        # test detach function
-        openml.study.detach_from_study(study.id, list(run_list.keys()))
-        study_downloaded = openml.study.get_study(study.id)
-        self.assertSetEqual(set(study_downloaded.runs), run_list_additional)
+    study = openml.study.create_study(
+        alias=None,
+        benchmark_suite=None,
+        name="study with illegal runs",
+        description="none",
+        run_ids=list(run_list["run_id"]),
+    )
+    study.publish()
+    TestBase._mark_entity_for_removal("study", study.id)
+    TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
+    study_original = openml.study.get_study(study.id)
 
-        # test status update function
-        openml.study.update_study_status(study.id, "deactivated")
-        study_downloaded = openml.study.get_study(study.id)
-        assert study_downloaded.status == "deactivated"
+    with pytest.raises(
+        openml.exceptions.OpenMLServerException,
+        match="Problem attaching entities.",
+    ):
+        # run id does not exists
+        openml.study.attach_to_study(study.id, [0])
 
-        res = openml.study.delete_study(study.id)
-        assert res
+    with pytest.raises(
+        openml.exceptions.OpenMLServerException,
+        match="Problem attaching entities.",
+    ):
+        # some runs already attached
+        openml.study.attach_to_study(study.id, list(run_list_more["run_id"]))
+    study_downloaded = openml.study.get_study(study.id)
+    assert set(study_original.runs) == set(study_downloaded.runs)
 
-    def test_study_attach_illegal(self):
-        run_list = openml.runs.list_runs(size=10)
-        assert len(run_list) == 10
-        run_list_more = openml.runs.list_runs(size=20)
-        assert len(run_list_more) == 20
-
-        study = openml.study.create_study(
-            alias=None,
-            benchmark_suite=None,
-            name="study with illegal runs",
-            description="none",
-            run_ids=list(run_list["run_id"]),
-        )
-        study.publish()
-        TestBase._mark_entity_for_removal("study", study.id)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {study.id}")
-        study_original = openml.study.get_study(study.id)
-
-        with pytest.raises(
-            openml.exceptions.OpenMLServerException,
-            match="Problem attaching entities.",
-        ):
-            # run id does not exists
-            openml.study.attach_to_study(study.id, [0])
-
-        with pytest.raises(
-            openml.exceptions.OpenMLServerException,
-            match="Problem attaching entities.",
-        ):
-            # some runs already attached
-            openml.study.attach_to_study(study.id, list(run_list_more["run_id"]))
-        study_downloaded = openml.study.get_study(study.id)
-        self.assertListEqual(study_original.runs, study_downloaded.runs)
-
-    @unittest.skip("It is unclear when we can expect the test to pass or fail.")
-    def test_study_list(self):
-        study_list = openml.study.list_studies(status="in_preparation")
-        # might fail if server is recently reset
-        assert len(study_list) >= 2
+@pytest.mark.skip(reason="It is unclear when we can expect the test to pass or fail.")
+def test_study_list():
+    study_list = openml.study.list_studies(status="in_preparation")
+    # might fail if server is recently reset
+    assert len(study_list) >= 2
