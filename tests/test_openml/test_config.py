@@ -14,6 +14,7 @@ import pytest
 
 import openml.config
 import openml.testing
+from tests.config import TEST_SERVER_API_KEY, TEST_SERVER
 
 
 @contextmanager
@@ -76,8 +77,8 @@ class TestConfig(openml.testing.TestBase):
         """Checks if the current configuration is returned accurately as a dict."""
         config = openml.config.get_config_as_dict()
         _config = {}
-        _config["apikey"] = "610344db6388d9ba34f6db45a3cf71de"
-        _config["server"] = "https://test.openml.org/api/v1/xml"
+        _config["apikey"] = TEST_SERVER_API_KEY
+        _config["server"] = TEST_SERVER
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = False
         _config["connection_n_retries"] = 20
@@ -90,8 +91,8 @@ class TestConfig(openml.testing.TestBase):
     def test_setup_with_config(self):
         """Checks if the OpenML configuration can be updated using _setup()."""
         _config = {}
-        _config["apikey"] = "610344db6388d9ba34f6db45a3cf71de"
-        _config["server"] = "https://www.openml.org/api/v1/xml"
+        _config["apikey"] = TEST_SERVER_API_KEY
+        _config["server"] = TEST_SERVER
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = True
         _config["retry_policy"] = "human"
@@ -108,13 +109,12 @@ class TestConfigurationForExamples(openml.testing.TestBase):
     @pytest.mark.production()
     def test_switch_to_example_configuration(self):
         """Verifies the test configuration is loaded properly."""
-        # Below is the default test key which would be used anyway, but just for clarity:
-        openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
-        openml.config.server = self.production_server
-
+        self.use_production_server()
+        assert not openml.config.apikey
+        assert openml.config.server == self.production_server
         openml.config.start_using_configuration_for_example()
 
-        assert openml.config.apikey == "c0c42819af31e706efe1f4b88c23c6c1"
+        assert openml.config.apikey == TEST_SERVER_API_KEY
         assert openml.config.server == self.test_server
 
     @pytest.mark.production()

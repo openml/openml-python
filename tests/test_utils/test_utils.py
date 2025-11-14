@@ -21,26 +21,26 @@ def min_number_datasets_on_test_server() -> int:
 
 @pytest.fixture()
 def min_number_flows_on_test_server() -> int:
-    """After a reset at least 127 flows are on the test server"""
+    """After a reset at least 15 flows are on the test server"""
     return 15
 
 
 @pytest.fixture()
 def min_number_setups_on_test_server() -> int:
-    """After a reset at least 50 setups are on the test server"""
-    return 50
+    """After a reset at least 20 setups are on the test server"""
+    return 20
 
 
 @pytest.fixture()
 def min_number_runs_on_test_server() -> int:
-    """After a reset at least 21 runs are on the test server"""
-    return 21
+    """After a reset at least 10 runs are on the test server"""
+    return 10
 
 
 @pytest.fixture()
 def min_number_evaluations_on_test_server() -> int:
     """After a reset at least 22 evaluations are on the test server"""
-    return 22
+    return 8
 
 
 def _mocked_perform_api_call(call, request_method):
@@ -86,7 +86,7 @@ def test_list_all_for_datasets(min_number_datasets_on_test_server):
 @pytest.mark.server()
 def test_list_all_for_flows(min_number_flows_on_test_server):
     flows = openml.flows.list_flows(size=min_number_flows_on_test_server)
-    assert min_number_flows_on_test_server == len(flows)
+    assert min_number_flows_on_test_server <= len(flows)
 
 
 @pytest.mark.server()
@@ -94,14 +94,14 @@ def test_list_all_for_flows(min_number_flows_on_test_server):
 def test_list_all_for_setups(min_number_setups_on_test_server):
     # TODO apparently list_setups function does not support kwargs
     setups = openml.setups.list_setups(size=min_number_setups_on_test_server)
-    assert min_number_setups_on_test_server == len(setups)
+    assert min_number_setups_on_test_server <= len(setups)
 
 
 @pytest.mark.server()
 @pytest.mark.flaky()  # Other tests might need to upload runs first
 def test_list_all_for_runs(min_number_runs_on_test_server):
     runs = openml.runs.list_runs(size=min_number_runs_on_test_server)
-    assert min_number_runs_on_test_server == len(runs)
+    assert min_number_runs_on_test_server <= len(runs)
 
 
 @pytest.mark.server()

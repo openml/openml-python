@@ -17,6 +17,8 @@ from typing import Any, Iterator, cast
 from typing_extensions import Literal, TypedDict
 from urllib.parse import urlparse
 
+from tests.config import TEST_SERVER, TEST_SERVER_API_KEY
+
 logger = logging.getLogger(__name__)
 openml_logger = logging.getLogger("openml")
 console_handler: logging.StreamHandler | None = None
@@ -165,7 +167,7 @@ def get_server_base_url() -> str:
     """Return the base URL of the currently configured server.
 
     Turns ``"https://api.openml.org/api/v1/xml"`` in ``"https://www.openml.org/"``
-    and ``"https://test.openml.org/api/v1/xml"`` in ``"https://test.openml.org/"``
+    and ``f"{TEST_SERVER}"`` in ``"https://test.openml.org/"``
 
     Returns
     -------
@@ -211,8 +213,8 @@ class ConfigurationForExamples:
     _last_used_server = None
     _last_used_key = None
     _start_last_called = False
-    _test_server = "https://test.openml.org/api/v1/xml"
-    _test_apikey = "c0c42819af31e706efe1f4b88c23c6c1"
+    _test_server = TEST_SERVER
+    _test_apikey = TEST_SERVER_API_KEY
 
     @classmethod
     def start_using_configuration_for_example(cls) -> None:

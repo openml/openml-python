@@ -21,6 +21,7 @@ from sklearn import ensemble
 import openml
 from openml.exceptions import OpenMLNotAuthorizedError, OpenMLServerException
 from openml.testing import TestBase, create_request_response
+from tests.config import TEST_SERVER
 
 
 @pytest.mark.usefixtures("long_version")
@@ -457,7 +458,7 @@ def test_delete_flow_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(40_000)
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/40000"
+    flow_url = f"{TEST_SERVER}/flow/40000"
     assert flow_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -477,7 +478,7 @@ def test_delete_flow_with_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(40_000)
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/40000"
+    flow_url = f"{TEST_SERVER}/flow/40000"
     assert flow_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -497,7 +498,7 @@ def test_delete_subflow(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(40_000)
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/40000"
+    flow_url = f"{TEST_SERVER}/flow/40000"
     assert flow_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -514,7 +515,7 @@ def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
     success = openml.flows.delete_flow(33364)
     assert success
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/33364"
+    flow_url = f"{TEST_SERVER}/flow/33364"
     assert flow_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -534,6 +535,6 @@ def test_delete_unknown_flow(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(9_999_999)
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/9999999"
+    flow_url = f"{TEST_SERVER}/flow/9999999"
     assert flow_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")

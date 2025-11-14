@@ -21,6 +21,7 @@ import requests_mock
 import scipy.sparse
 from oslo_concurrency import lockutils
 
+import config
 import openml
 from openml import OpenMLDataset
 from openml._api_calls import _download_minio_file
@@ -48,7 +49,8 @@ from openml.exceptions import (
 )
 from openml.tasks import TaskType, create_task
 from openml.testing import TestBase, create_request_response
-from openml.utils import _create_cache_directory_for_id, _tag_entity
+from openml.utils import _create_cache_directory_for_id, _tag_entity, _get_cache_dir_for_id
+from tests.config import TEST_SERVER_API_KEY_ADMIN, TEST_SERVER
 
 
 class TestOpenMLDataset(TestBase):
@@ -322,6 +324,7 @@ class TestOpenMLDataset(TestBase):
         assert dataset.row_id_attribute == "Counter"
 
     def test__get_dataset_description(self):
+        from openml import config
         description = _get_dataset_description(self.workdir, 2)
         assert isinstance(description, dict)
         description_xml_path = os.path.join(self.workdir, "description.xml")
@@ -503,17 +506,18 @@ class TestOpenMLDataset(TestBase):
     def test_deletion_of_cache_dir_faulty_download(self, patch):
         patch.side_effect = Exception("Boom!")
         self.assertRaisesRegex(Exception, "Boom!", openml.datasets.get_dataset, dataset_id=1)
-        datasets_cache_dir = os.path.join(self.workdir, "org", "openml", "test", "datasets")
+        datasets_cache_dir = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, 1)
         assert len(os.listdir(datasets_cache_dir)) == 0
 
     def test_publish_dataset(self):
-        # lazy loading not possible as we need the arff-file.
-        openml.datasets.get_dataset(3, download_data=True)
-        file_path = os.path.join(
-            openml.config.get_cache_directory(),
-            "datasets",
-            "3",
-            "dataset.arff",
+        file_path = (
+            self.static_cache_dir
+            / "org"
+            / "openml"
+            / "test"
+            / "datasets"
+            / "2"
+            / "dataset.arff"
         )
         dataset = OpenMLDataset(
             "anneal",
@@ -586,10 +590,9 @@ class TestOpenMLDataset(TestBase):
         TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         did = dataset.id
 
-        # admin key for test server (only adminds can activate datasets.
-        # all users can deactivate their own datasets)
-        openml.config.apikey = "d488d8afd93b32331cf6ea9d7003d4c3"
-
+        # admin key for test server (only adminds can activate datasets. all users can deactivate
+        # their own datasets)
+        openml.config.apikey = TEST_SERVER_API_KEY_ADMIN
         openml.datasets.status_update(did, "active")
         self._assert_status_of_dataset(did=did, status="active")
 
@@ -854,7 +857,7 @@ class TestOpenMLDataset(TestBase):
         self.assertRaises(ValueError, create_dataset, **param)
 
     def test_get_online_dataset_arff(self):
-        dataset_id = 100  # Australian
+        dataset_id = 55  # A dataset without parquet
         # lazy loading not used as arff file is checked.
         dataset = openml.datasets.get_dataset(dataset_id, download_data=True)
         decoder = arff.ArffDecoder()
@@ -1412,7 +1415,7 @@ class TestOpenMLDataset(TestBase):
         n_tries = 10
         # we need to wait for the edit to be reflected on the server
         for i in range(n_tries):
-            edited_dataset = openml.datasets.get_dataset(did)
+            edited_dataset = openml.datasets.get_dataset(did, force_refresh_cache=True)
             try:
                 assert edited_dataset.default_target_attribute == "shape", edited_dataset
                 assert edited_dataset.ignore_attribute == ["oil"], edited_dataset
@@ -1421,10 +1424,6 @@ class TestOpenMLDataset(TestBase):
                 if i == n_tries - 1:
                     raise e
                 time.sleep(10)
-                # Delete the cache dir to get the newer version of the dataset
-                shutil.rmtree(
-                    os.path.join(self.workdir, "org", "openml", "test", "datasets", str(did)),
-                )
 
     def test_data_edit_requires_field(self):
         # Check server exception when no field to edit is provided
@@ -1698,7 +1697,7 @@ def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_ke
     ):
         openml.datasets.delete_dataset(40_000)
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
+    dataset_url = f"{TEST_SERVER}/data/40000"
     assert dataset_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -1720,7 +1719,7 @@ def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key
     ):
         openml.datasets.delete_dataset(40_000)
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
+    dataset_url = f"{TEST_SERVER}/data/40000"
     assert dataset_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -1739,7 +1738,7 @@ def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key)
     success = openml.datasets.delete_dataset(40000)
     assert success
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
+    dataset_url = f"{TEST_SERVER}/data/40000"
     assert dataset_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -1761,7 +1760,7 @@ def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key)
     ):
         openml.datasets.delete_dataset(9_999_999)
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/9999999"
+    dataset_url = f"{TEST_SERVER}/data/9999999"
     assert dataset_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -1830,26 +1829,26 @@ def test_list_datasets_combined_filters(all_datasets: pd.DataFrame):
     _assert_datasets_have_id_and_valid_status(combined_filter_datasets)
 
 
-def _dataset_file_is_downloaded(did: int, file: str):
+def _dataset_file_is_downloaded(did: int, file_prefix: str, file_extension: str):
     cache_directory = Path(openml.config.get_cache_directory()) / "datasets" / str(did)
-    return (cache_directory / file).exists()
-
+    return any(f for f in cache_directory.iterdir() if f.name.startswith(file_prefix) and
+               f.suffix == file_extension)
 
 def _dataset_description_is_downloaded(did: int):
-    return _dataset_file_is_downloaded(did, "description.xml")
+    return _dataset_file_is_downloaded(did, "description", ".xml")
 
 
 def _dataset_qualities_is_downloaded(did: int):
-    return _dataset_file_is_downloaded(did, "qualities.xml")
+    return _dataset_file_is_downloaded(did, "qualities", ".xml")
 
 
 def _dataset_features_is_downloaded(did: int):
-    return _dataset_file_is_downloaded(did, "features.xml")
+    return _dataset_file_is_downloaded(did, "features", ".xml")
 
 
 def _dataset_data_file_is_downloaded(did: int):
-    parquet_present = _dataset_file_is_downloaded(did, "dataset.pq")
-    arff_present = _dataset_file_is_downloaded(did, "dataset.arff")
+    parquet_present = _dataset_file_is_downloaded(did, "dataset", ".pq")
+    arff_present = _dataset_file_is_downloaded(did, "dataset", ".arff")
     return parquet_present or arff_present
 
 
@@ -1952,7 +1951,7 @@ def test_get_dataset_parquet(requests_mock, test_files_directory):
             test_files_directory / "mock_responses" / "datasets" / "data_description_61.xml"
     )
     # While the mocked example is from production, unit tests by default connect to the test server.
-    requests_mock.get("https://test.openml.org/api/v1/xml/data/61", text=content_file.read_text())
+    requests_mock.get(f"{TEST_SERVER}/data/61", text=content_file.read_text())
     dataset = openml.datasets.get_dataset(61, download_data=True)
     assert dataset._parquet_url is not None
     assert dataset.parquet_file is not None
