@@ -23,7 +23,7 @@
 [Installation](https://openml.github.io/openml-python/main/#how-to-get-openml-for-python) | [Documentation](https://openml.github.io/openml-python) | [Contribution guidelines](https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md)
 </div>
 
-OpenML-Python provides an easy-to-use and straightforward Python interface for [OpenML](http://openml.org), an online platform for open science collaboration in machine learning.
+OpenML-Python provides an easy-to-use and straight forward Python interface for [OpenML](http://openml.org), an online platform for open science collaboration in machine learning.
 It can download or upload data from OpenML, such as datasets and machine learning experiment results.
 
 ## :joystick: Minimal Example
