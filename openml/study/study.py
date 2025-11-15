@@ -330,3 +330,176 @@ class OpenMLBenchmarkSuite(BaseStudy):
             runs=None,
             setups=None,
         )
+
+    @property
+    def metadata(self):
+        """
+        Return a pandas DataFrame containing dataset metadata joined with the
+        suite's task ids.
+
+        This property returns the canonical DataFrame that users can
+        format/export themselves (e.g., to LaTeX).
+        """
+        import pandas as pd
+        import openml
+        from openml.tasks import get_task
+
+        tasks = [get_task(tid, download_data=False, download_qualities=False)
+                 for tid in (self.tasks or [])]
+        dataset_ids = [t.dataset_id for t in tasks]
+
+        if not dataset_ids:
+            return pd.DataFrame(
+                columns=[
+                    "did",
+                    "name",
+                    "NumberOfInstances",
+                    "NumberOfFeatures",
+                    "NumberOfClasses",
+                    "tid",
+                ]
+            )
+
+        metadata = openml.datasets.list_datasets(data_id=dataset_ids, output_format="dataframe")
+
+        if "did" not in metadata.columns:
+            for alt in ("data_id", "id"):
+                if alt in metadata.columns:
+                    metadata = metadata.rename(columns={alt: "did"})
+                    break
+
+        if metadata.index.name == "did":
+            metadata = metadata.reset_index()
+        if "did" not in metadata.columns:
+            raise RuntimeError("expected dataset metadata to contain 'did' column")
+
+        task_rows = [(t.dataset_id, t.id) for t in tasks]
+        task_df = (
+            pd.DataFrame(task_rows, columns=["did", "tid"])
+            .drop_duplicates(subset="did")
+            .set_index("did")
+        )
+
+        metadata = metadata.set_index("did").join(task_df, how="left").reset_index()
+
+        rename_map = {
+            "NumberOfInstances": "n",
+            "NumberOfFeatures": "p",
+            "NumberOfClasses": "C",
+        }
+        rename_actual = {k: v for k, v in rename_map.items() if k in metadata.columns}
+        metadata = metadata.rename(columns=rename_actual)
+
+        for col in ("n", "p", "C"):
+            if col in metadata.columns:
+                try:
+                    metadata[col] = metadata[col].astype("Int64")
+                except Exception:
+                    pass
+
+        if "name" in metadata.columns:
+            metadata = metadata.sort_values("name", key=lambda s: s.str.lower())
+
+        return metadata.reset_index(drop=True)
+
+    def to_latex(self, filename: str, caption: str | None = None, label: str | None = None) -> str:
+        """
+        Write a LaTeX table for this benchmark suite's metadata to `filename`.
+
+        This method uses the DataFrame returned by `self.metadata`. It first tries
+        to use pandas' Styler (which requires jinja2). If jinja2 is not installed,
+        it falls back to a simple, dependency-free LaTeX table generator.
+        """
+        import html
+        import importlib
+        import pandas as pd
+
+        df = self.metadata
+
+        preferred = ["did", "tid", "name", "n", "p", "C"]
+        cols = [c for c in preferred if c in df.columns]
+        df_present = df[cols].copy()
+        rename = {"did": "Dataset ID", "tid": "Task ID", "name": "Name", "n": "n", "p": "p", "C": "C"}
+        df_present = df_present.rename(columns={k: v for k, v in rename.items() if k in df_present.columns})
+
+        # Try the nicer pandas Styler (requires jinja2). If unavailable, fallback:
+        try:
+            # Only attempt Styler if jinja2 is importable
+            if importlib.util.find_spec("jinja2") is not None:
+                styler = df_present.style.hide(axis="index")
+                latex_body = styler.to_latex() if hasattr(styler, "to_latex") else df_present.to_latex(index=False, escape=False)
+            else:
+                raise ImportError("jinja2 not present")
+        except Exception:
+            # Simple fallback generator (no jinja2 required)
+            def _escape_cell(val: object) -> str:
+                if pd.isna(val):
+                    return ""
+                s = str(val)
+                # basic LaTeX-escaping for underscore, percent, ampersand, #, $, {, }, ~, ^, \
+                replace_map = {
+                    "\\": r"\textbackslash{}",
+                    "&": r"\&",
+                    "%": r"\%",
+                    "$": r"\$",
+                    "#": r"\#",
+                    "_": r"\_",
+                    "{": r"\{",
+                    "}": r"\}",
+                    "~": r"\textasciitilde{}",
+                    "^": r"\textasciicircum{}",
+                }
+                for k, v in replace_map.items():
+                    s = s.replace(k, v)
+                # escape backslashes introduced by html escaping
+                return s
+
+            headers = list(df_present.columns)
+            # build tabular column spec: left-aligned for text, r for numbers (simple heuristic)
+            def _col_spec(col_name):
+                if pd.api.types.is_numeric_dtype(df_present[col_name]):
+                    return "r"
+                return "l"
+
+            colspec = "".join(_col_spec(c) for c in headers)
+            lines = []
+            lines.append(r"\begin{longtable}{" + colspec + "}")
+            # header row
+            header_row = " & ".join(_escape_cell(h) for h in headers) + r" \\"
+            lines.append(r"\toprule")
+            lines.append(header_row)
+            lines.append(r"\midrule")
+            lines.append(r"\endfirsthead")
+            # repeated head (simple)
+            lines.append(r"\toprule")
+            lines.append(header_row)
+            lines.append(r"\midrule")
+            lines.append(r"\endhead")
+            # body rows
+            for _, row in df_present.iterrows():
+                row_cells = [_escape_cell(row[c]) for c in headers]
+                lines.append(" & ".join(row_cells) + r" \\")
+            lines.append(r"\bottomrule")
+            lines.append(r"\end{longtable}")
+            latex_body = "\n".join(lines)
+
+        # Wrap in table environment if caption/label provided
+        if caption or label:
+            parts = ["\\begin{table}"]
+            if caption:
+                parts.append(f"\\caption{{{caption}}}")
+            if label:
+                parts.append(f"\\label{{{label}}}")
+            parts.append(latex_body)
+            parts.append("\\end{table}")
+            latex = "\n".join(parts)
+        else:
+            latex = latex_body
+
+        if not filename.endswith(".tex"):
+            filename = filename + ".tex"
+
+        with open(filename, "w", encoding="utf-8") as fh:
+            fh.write(latex)
+
+        return latex
