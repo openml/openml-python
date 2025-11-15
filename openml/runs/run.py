@@ -6,11 +6,11 @@ import time
 from collections import OrderedDict
 from pathlib import Path
 from typing import (
+    IO,
     TYPE_CHECKING,
     Any,
     Callable,
     Sequence,
-    IO,
 )
 
 import arff
