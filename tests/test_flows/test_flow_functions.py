@@ -21,12 +21,18 @@ from openml.exceptions import OpenMLNotAuthorizedError, OpenMLServerException
 from openml.testing import TestBase, create_request_response
 
 
-pytestmark = pytest.mark.usefixtures("with_test_cache", "with_server", "long_version")
+pytestmark = pytest.mark.usefixtures("with_test_cache", "with_server")
 
 
 @pytest.fixture
 def extension():
     return SklearnExtension()
+
+
+@pytest.fixture
+def long_version(request):
+    """Function-scoped fixture for long_version flag."""
+    return request.config.getoption("--long")
 
 
 def _check_flow(flow):
