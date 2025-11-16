@@ -308,7 +308,9 @@ def _handle_xdg_config_home_backwards_compatibility(
             "to the new location and delete the old file at "
             f"{backwards_compat_config_file}.",
         )
-        return backwards_compat_config_file
+        # Return the directory containing the old config file so callers can append 'config'
+        # and keep using the legacy location: `${XDG_CONFIG_HOME}/config`.
+        return Path(xdg_home)
 
 
 def determine_config_file_path() -> Path:

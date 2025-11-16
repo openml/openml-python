@@ -141,14 +141,13 @@ class TestBase(unittest.TestCase):
 
         Dictionary of lists where the keys are 'entity_type'.
         Each such dictionary is a list of integer IDs.
-        For entity_type='flow', each list element is a tuple
-        of the form (Flow ID, Flow Name).
+        For flows, names are tracked separately in `flow_name_tracker`.
         """
         if entity_type not in TestBase.publish_tracker:
             TestBase.publish_tracker[entity_type] = [entity_id]
         else:
             TestBase.publish_tracker[entity_type].append(entity_id)
-        if isinstance(entity_type, openml.flows.OpenMLFlow):
+        if entity_type == "flow":
             assert entity_name is not None
             cls.flow_name_tracker.append(entity_name)
 
