@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import os
-import unittest
 from typing import cast
 from unittest import mock
 
@@ -40,12 +39,8 @@ class TestTask(TestBase):
 
     def test__get_cached_task_not_cached(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        self.assertRaisesRegex(
-            OpenMLCacheException,
-            "Task file for tid 2 not cached",
-            openml.tasks.functions._get_cached_task,
-            2,
-        )
+        with pytest.raises(OpenMLCacheException, match="Task file for tid 2 not cached"):
+            openml.tasks.functions._get_cached_task(2)
 
     def test__get_estimation_procedure_list(self):
         estimation_procedures = openml.tasks.functions._get_estimation_procedure_list()
@@ -129,8 +124,8 @@ class TestTask(TestBase):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         openml.tasks.get_task(1882)
 
-    @unittest.skip(
-        "Please await outcome of discussion: https://github.com/openml/OpenML/issues/776",
+    @pytest.mark.skip(
+        reason="Please await outcome of discussion: https://github.com/openml/OpenML/issues/776",
     )
     @pytest.mark.production()
     def test__get_task_live(self):
