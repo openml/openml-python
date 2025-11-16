@@ -54,7 +54,7 @@ def resolve_env_proxies(url: str) -> str | None:
     """Attempt to find a suitable proxy for this url.
 
     Relies on ``requests`` internals to remain consistent. To disable this from the
-    environment, please set the enviornment varialbe ``no_proxy="*"``.
+    environment, please set the environment variable ``no_proxy="*"``.
 
     Parameters
     ----------
@@ -166,7 +166,8 @@ def _download_minio_file(
 
     proxy_client = ProxyManager(proxy) if proxy else None
 
-    client = minio.Minio(endpoint=parsed_url.netloc, secure=False, http_client=proxy_client)
+    secure = parsed_url.scheme == "https"
+    client = minio.Minio(endpoint=parsed_url.netloc, secure=secure, http_client=proxy_client)
     try:
         client.fget_object(
             bucket_name=bucket,
@@ -206,7 +207,8 @@ def _download_minio_bucket(source: str, destination: str | Path) -> None:
     _, bucket, *prefixes, _file = parsed_url.path.split("/")
     prefix = "/".join(prefixes)
 
-    client = minio.Minio(endpoint=parsed_url.netloc, secure=False)
+    secure = parsed_url.scheme == "https"
+    client = minio.Minio(endpoint=parsed_url.netloc, secure=secure)
 
     for file_object in client.list_objects(bucket, prefix=prefix, recursive=True):
         if file_object.object_name is None:
@@ -519,7 +521,7 @@ def __parse_server_exception(
         msg = (
             f"The API call {url} requires authentication via an API key.\nPlease configure "
             "OpenML-Python to use your API as described in this example:"
-            "\nhttps://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/#authentication"
+            f"\n{API_TOKEN_HELP_LINK}"
         )
         return OpenMLNotAuthorizedError(message=msg)
 

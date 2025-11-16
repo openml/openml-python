@@ -78,7 +78,7 @@ def extract_xml_tags(
         if isinstance(node[xml_tag_name], list):
             return node[xml_tag_name]
 
-        raise ValueError("Received not string and non list as tag item")
+        raise ValueError("Tag content must be a dict, str, or list")
 
     if allow_none:
         return None
@@ -266,7 +266,9 @@ def _list_all(  # noqa: C901
 
     Returns
     -------
-    List of types returned from type of the listing call
+    List
+        A list of batches returned by the listing call. Flatten or
+        concatenate as needed in the caller.
     """
     page = 0
     results: list[_SizedT] = []

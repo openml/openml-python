@@ -103,11 +103,9 @@ def delete_remote_files(tracker, flow_names) -> None:
     # reordering to delete sub flows at the end of flows
     # sub-flows have shorter names, hence, sorting by descending order of flow name length
     if "flow" in tracker:
-        to_sort = list(zip(tracker["flow"], flow_names))
-        flow_deletion_order = [
-            entity_id for entity_id, _ in sorted(to_sort, key=lambda x: len(x[1]), reverse=True)
-        ]
-        tracker["flow"] = [flow_deletion_order[1] for flow_id, _ in flow_deletion_order]
+        pairs = list(zip(tracker["flow"], flow_names))
+        sorted_pairs = sorted(pairs, key=lambda x: len(x[1]), reverse=True)
+        tracker["flow"] = [entity_id for entity_id, _ in sorted_pairs]
 
     # deleting all collected entities published to test server
     # 'run's are deleted first to prevent dependency issue of entities on deletion
