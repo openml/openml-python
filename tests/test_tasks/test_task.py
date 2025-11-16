@@ -1,7 +1,7 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import unittest
+import pytest
 from random import randint, shuffle
 
 from openml.datasets import (
@@ -24,7 +24,7 @@ class OpenMLTaskTest(TestBase):
     @classmethod
     def setUpClass(cls):
         if cls is OpenMLTaskTest:
-            raise unittest.SkipTest("Skip OpenMLTaskTest tests," " it's a base class")
+            pytest.skip("Skip OpenMLTaskTest tests, it's a base class")
         super().setUpClass()
 
     def setUp(self, n_levels: int = 1):
