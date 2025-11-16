@@ -1,0 +1,48 @@
+name: Pull Request Labeler
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  label-pr:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Label PRs based on changed file paths
+      - name: Label PRs based on file paths
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+          sync-labels: true
+
+      # Step 2: Label PRs by size
+      - name: Label PR by size
+        uses: codelytv/pr-size-labeler@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          xs_label: 'size/xs'
+          xs_max_size: 10
+          s_label: 'size/s'
+          s_max_size: 100
+          m_label: 'size/m'
+          m_max_size: 500
+          l_label: 'size/l'
+          l_max_size: 1000
+          xl_label: 'size/xl'
+          fail_if_xl: false
+          message_if_xl: >
+            ⚠️ This PR is quite large (over 1000 lines changed). 
+            Consider breaking it down into smaller, focused PRs for easier review and maintenance.
+          files_to_ignore: |
+            *.md
+            *.txt
+            *.json
+            *.lock
+            tests/**
+            docs/**
+            examples/**

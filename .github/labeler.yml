@@ -1,0 +1,155 @@
+# Configuration for automated PR labeling
+# Labels are applied based on file paths changed in pull requests
+
+# Documentation
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'docs/**/*'
+      - '**/*.md'
+      - '**/*.rst'
+      - 'README.*'
+      - 'mkdocs.yml'
+
+# Dependencies
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'pyproject.toml'
+      - 'requirements*.txt'
+      - 'setup.py'
+      - 'setup.cfg'
+      - 'Pipfile'
+      - 'Pipfile.lock'
+      - 'poetry.lock'
+
+# Frontend (if applicable)
+frontend:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'docs/**/*.css'
+      - 'docs/**/*.js'
+      - 'docs/**/*.html'
+      - 'docs/stylesheets/**/*'
+
+# Backend/Core
+backend:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'openml/**/*.py'
+      - '!openml/**/test_*.py'
+      - '!tests/**/*'
+
+# Database (data-related modules)
+database:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'openml/datasets/**/*'
+      - 'openml/tasks/**/*'
+
+# Docker
+docker:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'docker/**/*'
+      - '**/Dockerfile'
+      - '**/.dockerignore'
+      - 'docker-compose*.yml'
+
+# CI/CD
+ci-cd:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**/*'
+      - '.github/workflows/**/*'
+      - '.gitlab-ci.yml'
+      - '.circleci/**/*'
+      - 'Makefile'
+
+# API
+api:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'openml/_api_calls.py'
+      - 'openml/base.py'
+      - 'openml/**/functions.py'
+
+# Security
+security:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/security/**/*'
+      - '**/*security*.py'
+      - '.github/workflows/codeql*.yml'
+
+# Tests
+tests:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'tests/**/*'
+      - '**/test_*.py'
+      - '**/*_test.py'
+      - 'conftest.py'
+
+# Configuration
+configuration:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'openml/config.py'
+      - '**/*.cfg'
+      - '**/*.conf'
+      - '**/*.ini'
+      - '**/*.json'
+      - '**/*.yaml'
+      - '**/*.yml'
+      - '!.github/**/*'
+
+# Examples
+examples:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'examples/**/*'
+
+# Module-specific labels
+datasets:
+  - changed-files:
+    - any-glob-to-any-file: 'openml/datasets/**/*'
+
+evaluations:
+  - changed-files:
+    - any-glob-to-any-file: 'openml/evaluations/**/*'
+
+extensions:
+  - changed-files:
+    - any-glob-to-any-file: 'openml/extensions/**/*'
+
+flows:
+  - changed-files:
+    - any-glob-to-any-file: 'openml/flows/**/*'
+
+runs:
+  - changed-files:
+    - any-glob-to-any-file: 'openml/runs/**/*'
+
+setups:
+  - changed-files:
+    - any-glob-to-any-file: 'openml/setups/**/*'
+
+study:
+  - changed-files:
+    - any-glob-to-any-file: 'openml/study/**/*'
+
+tasks:
+  - changed-files:
+    - any-glob-to-any-file: 'openml/tasks/**/*'
+
+# Build and packaging
+build:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'pyproject.toml'
+      - 'setup.py'
+      - 'setup.cfg'
+      - 'MANIFEST.in'
+      - 'Makefile'
+      - '.github/workflows/dist.yaml'
