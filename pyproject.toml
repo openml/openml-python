@@ -337,3 +337,94 @@ ignore_errors = true
 #disallow_untyped_decorators = false    # Test decorators are not properly typed
 #disallow_incomplete_defs = false       # Sometimes we just want to ignore verbose types
 #disable_error_code = ["var-annotated"]
+
+# ============================================================================
+# Black Configuration (Code Formatter)
+# ============================================================================
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+# ============================================================================
+# Isort Configuration (Import Sorting)
+# ============================================================================
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+known_first_party = ["openml"]
+known_third_party = ["numpy", "pandas", "scipy", "sklearn", "pytest"]
+skip_glob = ["*/migrations/*", "*/__pycache__/*", "*/.*", "*/docs/*"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+default_section = "THIRDPARTY"
+
+# ============================================================================
+# Coverage Configuration (pytest-cov)
+# ============================================================================
+[tool.coverage.run]
+source = ["openml"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+    "*/.venv/*",
+    "*/venv/*",
+    "openml/__version__.py",
+]
+branch = true
+parallel = true
+relative_files = true
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    # Have to re-enable the standard pragma
+    "pragma: no cover",
+    # Don't complain about missing debug-only code:
+    "def __repr__",
+    "if self\\.debug",
+    # Don't complain if tests don't hit defensive assertion code:
+    "raise AssertionError",
+    "raise NotImplementedError",
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ == .__main__.:",
+    # Don't complain about type checking code
+    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
+    # Don't complain about abstract methods
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.coverage.json]
+output = "coverage.json"
+pretty_print = true
