@@ -2,7 +2,7 @@
 
 OpenML-Python provides an extension interface to connect other machine
 learning libraries than scikit-learn to OpenML. Please check the
-[`api_extensions`](../reference/extensions/extension_interface/) and use the scikit-learn
+[`api_extensions`](reference/extensions/extension_interface.md) and use the scikit-learn
 extension as a starting point.
 
 ## List of extensions
@@ -31,7 +31,7 @@ extension interface to allows others to contribute back. Building a
 suitable extension for therefore requires an understanding of the
 current OpenML-Python support.
 
-[This tutorial](../examples/Basics/simple_flows_and_runs_tutorial) shows how the scikit-learn 
+[This tutorial](examples/Basics/simple_flows_and_runs_tutorial.py) shows how the scikit-learn 
 extension works with OpenML-Python.
 
 #### API
@@ -39,7 +39,7 @@ extension works with OpenML-Python.
 -   The extension scripts must import the openml-python package
     and be able to interface with any function from the API.
 -   The extension has to be defined as a Python class and must inherit
-    from [`openml.extensions.Extension`](../reference/extensions/extension_interface/#openml.extensions.extension_interface.Extension).
+    from [`openml.extensions.Extension`](reference/extensions/extension_interface.md#openml.extensions.extension_interface.Extension).
 -   This class needs to have all the functions from `openml.extensions.Extension` overloaded as required.
 -   The redefined functions should have adequate and appropriate
     docstrings. The sklearn Extension API is a good example to follow.
@@ -47,7 +47,7 @@ extension works with OpenML-Python.
 #### Interfacing with OpenML-Python
 
 Once the new extension class has been defined, the openml-python module
-to [`openml.extensions.register_extension`](../reference/extensions/functions/#openml.extensions.functions.register_extension)
+to [`openml.extensions.register_extension`](reference/extensions/functions.md#openml.extensions.functions.register_extension)
 must be called to allow OpenML-Python to interface the new extension.
 
 The following methods should get implemented. Although the documentation
