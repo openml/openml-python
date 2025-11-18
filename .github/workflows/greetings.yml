@@ -1,0 +1,38 @@
+name: Greetings
+
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Welcome first-time contributor
+        uses: actions/first-interaction@v3
+        with:
+          issue-opened-msg: |
+            Hi @${{ github.actor }} :wave: — thank you for opening your first issue in this repository!
+            
+            **A few tips to get your issue processed quickly**
+            * Please add a minimal reproduction or example (if relevant).
+            * Link to any related issue or PR.
+            * See our contribution guide: https://github.com/openml/openml-python/blob/main/CONTRIBUTING.md
+            
+            If you're new to contributing, welcome — maintainers will review this shortly. 🙂
+          pr-opened-msg: |
+            Hi @${{ github.actor }} :tada: — thanks for your first pull request to **openml-python**!
+            
+            **To help reviewers:**
+            * Please describe the change & why it’s needed in the PR description.
+            * Add tests where appropriate and run the test suite locally (see README).
+            * Reference any related issue with `closes #<issue-number>`.
+            
+            Read our contribution guidelines here: https://github.com/openml/openml-python/blob/main/CONTRIBUTING.md
