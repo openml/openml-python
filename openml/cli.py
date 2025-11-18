@@ -1,4 +1,4 @@
-"""Command Line Interface for `openml` to configure its settings."""
+"""Command Line Interface for `openml` to configure settings and browse resources."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Callable
 from urllib.parse import urlparse
 
+import openml
 from openml import config
 
 
@@ -327,12 +328,275 @@ def configure(args: argparse.Namespace) -> None:
             set_field_function(args.value)
 
 
+def flows_list(args: argparse.Namespace) -> None:
+    """List flows from OpenML with optional filtering."""
+    try:
+        flows_df = openml.flows.list_flows(
+            offset=args.offset,
+            size=args.size,
+            tag=args.tag,
+            uploader=args.uploader,
+        )
+
+        if flows_df.empty:
+            print("No flows found matching the criteria.")
+            return
+
+        # Display flows in a readable format
+        if args.format == "table":
+            # Print as a formatted table
+            print(f"\nFound {len(flows_df)} flow(s):\n")
+            print(flows_df.to_string(index=False))
+        else:
+            # Print in a more compact format
+            print(f"\nFound {len(flows_df)} flow(s):\n")
+            for _, row in flows_df.iterrows():
+                print(f"ID: {row['id']:>6} | {row['name']:<40} | Version: {row['version']}")
+                if args.verbose:
+                    print(f"      Full Name: {row['full_name']}")
+                    print(f"      External Version: {row['external_version']}")
+                    print(f"      Uploader: {row['uploader']}")
+                    print()
+
+    except Exception as e:  # noqa: BLE001
+        print(f"Error listing flows: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def flows_info(args: argparse.Namespace) -> None:
+    """Display detailed information about a specific flow."""
+    try:
+        flow_id = int(args.flow_id)
+        flow = openml.flows.get_flow(flow_id)
+
+        # Display flow information using its __repr__ method
+        print(flow)
+
+        # Additional information
+        if flow.parameters:
+            print("\nParameters:")
+            for param_name, param_value in flow.parameters.items():
+                meta_info = flow.parameters_meta_info.get(param_name, {})
+                param_desc = meta_info.get("description", "No description")
+                param_type = meta_info.get("data_type", "unknown")
+                print(f"  {param_name}: {param_value} ({param_type})")
+                if param_desc != "No description":
+                    print(f"    Description: {param_desc}")
+
+        if flow.components:
+            print(f"\nComponents: {len(flow.components)}")
+            for comp_name, comp_flow in flow.components.items():
+                comp_id = comp_flow.flow_id if comp_flow.flow_id else "Not uploaded"
+                print(f"  {comp_name}: Flow ID {comp_id}")
+
+        if flow.tags:
+            print(f"\nTags: {', '.join(flow.tags)}")
+
+    except ValueError:
+        print(
+            f"Error: '{args.flow_id}' is not a valid flow ID. Please provide a number.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    except Exception as e:  # noqa: BLE001
+        print(f"Error retrieving flow information: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def flows_search(args: argparse.Namespace) -> None:
+    """Search for flows by name."""
+    try:
+        # Get all flows (or a reasonable subset)
+        flows_df = openml.flows.list_flows(
+            offset=0,
+            size=args.max_results if args.max_results else 1000,
+            tag=args.tag,
+        )
+
+        if flows_df.empty:
+            print("No flows found.")
+            return
+
+        # Filter by search query (case-insensitive)
+        query_lower = args.query.lower()
+        matching_flows = flows_df[
+            flows_df["name"].str.lower().str.contains(query_lower, na=False)
+            | flows_df["full_name"].str.lower().str.contains(query_lower, na=False)
+        ]
+
+        if matching_flows.empty:
+            print(f"No flows found matching '{args.query}'.")
+            return
+
+        print(f"\nFound {len(matching_flows)} flow(s) matching '{args.query}':\n")
+        for _, row in matching_flows.iterrows():
+            print(f"ID: {row['id']:>6} | {row['name']:<40} | Version: {row['version']}")
+            if args.verbose:
+                print(f"      Full Name: {row['full_name']}")
+                print(f"      External Version: {row['external_version']}")
+                print(f"      Uploader: {row['uploader']}")
+                print()
+
+    except Exception as e:  # noqa: BLE001
+        print(f"Error searching flows: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def flows(args: argparse.Namespace) -> None:
+    """Handle flow subcommands."""
+    subcommands = {
+        "list": flows_list,
+        "info": flows_info,
+        "search": flows_search,
+    }
+
+    if args.flows_subcommand in subcommands:
+        subcommands[args.flows_subcommand](args)
+    else:
+        print(f"Unknown flows subcommand: {args.flows_subcommand}")
+        sys.exit(1)
+
+
+def datasets_list(args: argparse.Namespace) -> None:
+    """List datasets from OpenML with optional filtering."""
+    try:
+        datasets_df = openml.datasets.list_datasets(
+            offset=args.offset,
+            size=args.size,
+            status=args.status,
+            tag=args.tag,
+            data_name=args.name,
+        )
+
+        if datasets_df.empty:
+            print("No datasets found matching the criteria.")
+            return
+
+        if args.format == "table":
+            print(f"\nFound {len(datasets_df)} dataset(s):\n")
+            print(datasets_df.to_string(index=False))
+        else:
+            print(f"\nFound {len(datasets_df)} dataset(s):\n")
+            for _, row in datasets_df.iterrows():
+                name = row.get("name", "unknown")
+                did = row.get("did", row.get("id", "unknown"))
+                status = row.get("status", "unknown")
+                print(f"ID: {did:>6} | {name:<40} | Status: {status}")
+                if args.verbose:
+                    format_ = row.get("format", "unknown")
+                    version = row.get("version", "unknown")
+                    print(f"      Format: {format_}")
+                    print(f"      Version: {version}")
+                    print()
+
+    except Exception as e:  # noqa: BLE001
+        print(f"Error listing datasets: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def datasets_info(args: argparse.Namespace) -> None:
+    """Display detailed information about a specific dataset."""
+    try:
+        dataset_id = int(args.dataset_id)
+        dataset = openml.datasets.get_dataset(dataset_id, download_data=False)
+
+        metadata = [
+            ("Dataset ID", dataset.dataset_id),
+            ("Name", dataset.name),
+            ("Version", dataset.version),
+            ("Format", dataset.format),
+            ("Creator", dataset.creator),
+            ("Collected", dataset.collection_date),
+            ("Citation", dataset.citation),
+        ]
+
+        for label, field_value in metadata:
+            if field_value:
+                print(f"{label:<10}: {field_value}")
+
+        if dataset.description:
+            print("\nDescription:\n")
+            print(dataset.description)
+
+        if dataset.qualities:
+            print("\nQualities:")
+            for key, quality_value in sorted(dataset.qualities.items()):
+                print(f"  {key}: {quality_value}")
+
+    except ValueError:
+        print(
+            f"Error: '{args.dataset_id}' is not a valid dataset ID. Please provide a number.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    except Exception as e:  # noqa: BLE001
+        print(f"Error retrieving dataset information: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def datasets_search(args: argparse.Namespace) -> None:
+    """Search for datasets by name."""
+    try:
+        datasets_df = openml.datasets.list_datasets(
+            offset=0,
+            size=args.max_results if args.max_results else 1000,
+            tag=args.tag,
+        )
+
+        if datasets_df.empty:
+            print("No datasets found.")
+            return
+
+        query_lower = args.query.lower()
+        name_series = datasets_df["name"].astype(str).str.lower()
+        matching = datasets_df[name_series.str.contains(query_lower, na=False)]
+
+        if matching.empty:
+            print(f"No datasets found matching '{args.query}'.")
+            return
+
+        print(f"\nFound {len(matching)} dataset(s) matching '{args.query}':\n")
+        for _, row in matching.iterrows():
+            name = row.get("name", "unknown")
+            did = row.get("did", row.get("id", "unknown"))
+            status = row.get("status", "unknown")
+            print(f"ID: {did:>6} | {name:<40} | Status: {status}")
+            if args.verbose:
+                format_ = row.get("format", "unknown")
+                version = row.get("version", "unknown")
+                print(f"      Format: {format_}")
+                print(f"      Version: {version}")
+                print()
+
+    except Exception as e:  # noqa: BLE001
+        print(f"Error searching datasets: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def datasets(args: argparse.Namespace) -> None:
+    """Handle dataset subcommands."""
+    subcommands = {
+        "list": datasets_list,
+        "info": datasets_info,
+        "search": datasets_search,
+    }
+
+    if args.datasets_subcommand in subcommands:
+        subcommands[args.datasets_subcommand](args)
+    else:
+        print(f"Unknown datasets subcommand: {args.datasets_subcommand}")
+        sys.exit(1)
+
+
 def main() -> None:
-    subroutines = {"configure": configure}
+    subroutines = {"configure": configure, "flows": flows, "datasets": datasets}
 
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(dest="subroutine")
+    parser = argparse.ArgumentParser(
+        description="OpenML Python CLI - Access OpenML datasets, tasks, flows, and more.",
+    )
+    subparsers = parser.add_subparsers(dest="subroutine", help="Available commands")
 
+    # Configure command
     parser_configure = subparsers.add_parser(
         "configure",
         description="Set or read variables in your configuration file. For more help also see "
@@ -360,8 +624,202 @@ def main() -> None:
         help="The value to set the FIELD to.",
     )
 
+    # Flows command
+    parser_flows = subparsers.add_parser(
+        "flows",
+        description="Browse and search OpenML flows.",
+    )
+
+    flows_subparsers = parser_flows.add_subparsers(
+        dest="flows_subcommand",
+        help="Available flow subcommands",
+    )
+
+    # Flows list command
+    parser_flows_list = flows_subparsers.add_parser(
+        "list",
+        description="List flows from OpenML.",
+    )
+    parser_flows_list.add_argument(
+        "--offset",
+        type=int,
+        default=None,
+        help="Number of flows to skip (for pagination).",
+    )
+    parser_flows_list.add_argument(
+        "--size",
+        type=int,
+        default=None,
+        help="Maximum number of flows to return.",
+    )
+    parser_flows_list.add_argument(
+        "--tag",
+        type=str,
+        default=None,
+        help="Filter flows by tag.",
+    )
+    parser_flows_list.add_argument(
+        "--uploader",
+        type=str,
+        default=None,
+        help="Filter flows by uploader ID.",
+    )
+    parser_flows_list.add_argument(
+        "--format",
+        type=str,
+        choices=["table", "compact"],
+        default="compact",
+        help="Output format (default: compact).",
+    )
+    parser_flows_list.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Show detailed information for each flow.",
+    )
+
+    # Flows info command
+    parser_flows_info = flows_subparsers.add_parser(
+        "info",
+        description="Display detailed information about a specific flow.",
+    )
+    parser_flows_info.add_argument(
+        "flow_id",
+        type=str,
+        help="The ID of the flow to display.",
+    )
+
+    # Flows search command
+    parser_flows_search = flows_subparsers.add_parser(
+        "search",
+        description="Search for flows by name.",
+    )
+    parser_flows_search.add_argument(
+        "query",
+        type=str,
+        help="Search query (searches in flow names).",
+    )
+    parser_flows_search.add_argument(
+        "--max-results",
+        type=int,
+        default=None,
+        help="Maximum number of results to search through (default: 1000).",
+    )
+    parser_flows_search.add_argument(
+        "--tag",
+        type=str,
+        default=None,
+        help="Filter flows by tag before searching.",
+    )
+    parser_flows_search.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Show detailed information for each flow.",
+    )
+
+    # Datasets command
+    parser_datasets = subparsers.add_parser(
+        "datasets",
+        description="Browse and search OpenML datasets.",
+    )
+
+    datasets_subparsers = parser_datasets.add_subparsers(
+        dest="datasets_subcommand",
+        help="Available dataset subcommands",
+    )
+
+    parser_datasets_list = datasets_subparsers.add_parser(
+        "list",
+        description="List datasets from OpenML.",
+    )
+    parser_datasets_list.add_argument(
+        "--offset",
+        type=int,
+        default=None,
+        help="Number of datasets to skip (for pagination).",
+    )
+    parser_datasets_list.add_argument(
+        "--size",
+        type=int,
+        default=None,
+        help="Maximum number of datasets to return.",
+    )
+    parser_datasets_list.add_argument(
+        "--status",
+        type=str,
+        default=None,
+        help="Filter datasets by status (e.g., active).",
+    )
+    parser_datasets_list.add_argument(
+        "--tag",
+        type=str,
+        default=None,
+        help="Filter datasets by tag.",
+    )
+    parser_datasets_list.add_argument(
+        "--name",
+        type=str,
+        default=None,
+        help="Filter datasets by (partial) name.",
+    )
+    parser_datasets_list.add_argument(
+        "--format",
+        type=str,
+        choices=["table", "compact"],
+        default="compact",
+        help="Output format (default: compact).",
+    )
+    parser_datasets_list.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Show detailed information for each dataset.",
+    )
+
+    parser_datasets_info = datasets_subparsers.add_parser(
+        "info",
+        description="Display detailed information about a specific dataset.",
+    )
+    parser_datasets_info.add_argument(
+        "dataset_id",
+        type=str,
+        help="The ID of the dataset to display.",
+    )
+
+    parser_datasets_search = datasets_subparsers.add_parser(
+        "search",
+        description="Search for datasets by name.",
+    )
+    parser_datasets_search.add_argument(
+        "query",
+        type=str,
+        help="Search query (searches in dataset names).",
+    )
+    parser_datasets_search.add_argument(
+        "--max-results",
+        type=int,
+        default=None,
+        help="Maximum number of results to search through (default: 1000).",
+    )
+    parser_datasets_search.add_argument(
+        "--tag",
+        type=str,
+        default=None,
+        help="Filter datasets by tag before searching.",
+    )
+    parser_datasets_search.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Show detailed information for each dataset.",
+    )
+
     args = parser.parse_args()
-    subroutines.get(args.subroutine, lambda _: parser.print_help())(args)
+    if args.subroutine:
+        subroutines.get(args.subroutine, lambda _: parser.print_help())(args)
+    else:
+        parser.print_help()
 
 
 if __name__ == "__main__":
