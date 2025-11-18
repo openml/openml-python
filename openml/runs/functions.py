@@ -1,5 +1,7 @@
 # License: BSD 3-Clause
 from __future__ import annotations
+import warnings
+import openml
 
 import itertools
 import time
@@ -107,15 +109,15 @@ def run_model_on_task(  # noqa: PLR0913
     """
     if avoid_duplicate_runs is None:
         avoid_duplicate_runs = openml.config.avoid_duplicate_runs
-    if avoid_duplicate_runs and not config.apikey:
+    if avoid_duplicate_runs and openml.config.apikey is None:
         warnings.warn(
-            "avoid_duplicate_runs is set to True, but no API key is set. "
-            "Please set your API key in the OpenML configuration file, see"
-            "https://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial"
-            ".html#authentication for more information on authentication.",
-            RuntimeWarning,
+            "The 'avoid_duplicate_runs' parameter is set to True, but no API key is configured. "
+            "Duplicate runs cannot be checked server-side without authentication. "
+            "The run will proceed, but duplicates may be created.",
+            UserWarning,
             stacklevel=2,
         )
+
 
     # TODO: At some point in the future do not allow for arguments in old order (6-2018).
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
