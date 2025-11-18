@@ -270,7 +270,6 @@ print(f"URL for dataset: {xor_dataset.openml_url}")
 # %% [markdown]
 # ## Dataset is a pandas dataframe with sparse columns
 
-# %%
 sparse_data = coo_matrix(
     ([1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0], ([0, 1, 1, 2, 2, 3, 3], [0, 1, 2, 0, 2, 0, 1]))
 )
@@ -296,6 +295,7 @@ xor_dataset = create_dataset(
 )
 
 # %%
+
 xor_dataset.publish()
 print(f"URL for dataset: {xor_dataset.openml_url}")
 

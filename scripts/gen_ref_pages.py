@@ -11,26 +11,14 @@ from pathlib import Path
 
 import mkdocs_gen_files
 
-EXCLUDED_PATH_PARTS = {
-    "Lib",
-    "Scripts",
-    "Include",
-    "site-packages",
-    "__pycache__",
-}
-
 nav = mkdocs_gen_files.Nav()
 
 root = Path(__file__).parent.parent
 src = root / "openml"
 
 for path in sorted(src.rglob("*.py")):
-    relative_path = path.relative_to(src)
-    if any(part in EXCLUDED_PATH_PARTS for part in relative_path.parts):
-        continue
-
     module_path = path.relative_to(root).with_suffix("")
-    doc_path = relative_path.with_suffix(".md")
+    doc_path = path.relative_to(src).with_suffix(".md")
     full_doc_path = Path("reference", doc_path)
 
     parts = tuple(module_path.parts)

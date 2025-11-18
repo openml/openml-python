@@ -114,6 +114,7 @@ extra:
 plugins:
   - search
   - autorefs
+  - section-index
   # - mkdocstrings:
   - mkdocstrings:
       default_handler: python
@@ -157,7 +158,6 @@ plugins:
       nav_file: SUMMARY.md
   - mkdocs-jupyter:
       theme: light
-  - section-index
   - mike:
       version_selector: true
       css_dir: css

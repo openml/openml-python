@@ -8,13 +8,18 @@ from sklearn.neighbors import KNeighborsClassifier
 import openml
 
 # %% [markdown]
-# !!! warning "Uses the OpenML test server"
-#     This example uploads data, so it connects to the
-#     [OpenML test server](https://test.openml.org) instead of production.
-#     This prevents the main server from becoming overloaded with example datasets, tasks,
-#     runs, and other submissions.
-#     Using the test server may affect the behavior and performance of the
-#     OpenML-Python API.
+# <div class="admonition warning">
+#     <p class="admonition-title">Warning</p>
+#     <p>
+#         This example uploads data. For that reason, this example connects to the
+#         test server at <a href="https://test.openml.org"
+#         target="_blank">test.openml.org</a>.<br>
+#         This prevents the main server from becoming overloaded with example datasets, tasks,
+#         runs, and other submissions.<br>
+#         Using this test server may affect the behavior and performance of the
+#         OpenML-Python API.
+#     </p>
+# </div>
 
 # %%
 openml.config.start_using_configuration_for_example()
