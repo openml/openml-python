@@ -1,7 +1,5 @@
 # License: BSD 3-Clause
 from __future__ import annotations
-import warnings
-import openml
 
 import itertools
 import time
@@ -117,7 +115,6 @@ def run_model_on_task(  # noqa: PLR0913
             UserWarning,
             stacklevel=2,
         )
-
 
     # TODO: At some point in the future do not allow for arguments in old order (6-2018).
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
