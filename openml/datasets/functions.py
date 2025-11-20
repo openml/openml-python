@@ -898,13 +898,31 @@ def edit_dataset(
     xml["oml:data_edit_parameters"] = OrderedDict()
     xml["oml:data_edit_parameters"]["@xmlns:oml"] = "http://openml.org/openml"
     xml["oml:data_edit_parameters"]["oml:description"] = description
-    xml["oml:data_edit_parameters"]["oml:creator"] = creator
-    xml["oml:data_edit_parameters"]["oml:contributor"] = contributor
+
+    # --- FIX: Ensure list-like fields conform to OpenML XML schema ---
+    if creator is not None:
+        xml["oml:data_edit_parameters"]["oml:creator"] = [creator]
+
+    if contributor is not None:
+        xml["oml:data_edit_parameters"]["oml:contributor"] = [contributor]
+
     xml["oml:data_edit_parameters"]["oml:collection_date"] = collection_date
     xml["oml:data_edit_parameters"]["oml:language"] = language
-    xml["oml:data_edit_parameters"]["oml:default_target_attribute"] = default_target_attribute
-    xml["oml:data_edit_parameters"]["oml:row_id_attribute"] = row_id_attribute
-    xml["oml:data_edit_parameters"]["oml:ignore_attribute"] = ignore_attribute
+
+    if default_target_attribute is not None:
+        xml["oml:data_edit_parameters"]["oml:default_target_attribute"] = [
+            default_target_attribute
+        ]
+
+    if row_id_attribute is not None:
+        xml["oml:data_edit_parameters"]["oml:row_id_attribute"] = row_id_attribute
+
+    if ignore_attribute is not None:
+        ignore_list = (
+            ignore_attribute if isinstance(ignore_attribute, list) else [ignore_attribute]
+        )
+        xml["oml:data_edit_parameters"]["oml:ignore_attribute"] = ignore_list
+
     xml["oml:data_edit_parameters"]["oml:citation"] = citation
     xml["oml:data_edit_parameters"]["oml:original_data_url"] = original_data_url
     xml["oml:data_edit_parameters"]["oml:paper_url"] = paper_url
