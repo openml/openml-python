@@ -24,15 +24,14 @@ jobs:
             **A few tips to get your issue processed quickly**
             * Please add a minimal reproduction or example (if relevant).
             * Link to any related issue or PR.
-            * See our contribution guide: https://github.com/openml/openml-python/blob/main/CONTRIBUTING.md
+            * See our contribution guide: http://openml.github.io/openml-python/latest/#contributing
             
-            If you're new to contributing, welcome — maintainers will review this shortly. 🙂
+            If you're new to contributing, welcome — maintainers will review this shortly.
           pr-opened-msg: |
             Hi @${{ github.actor }} :tada: — thanks for your first pull request to **openml-python**!
             
             **To help reviewers:**
-            * Please describe the change & why it’s needed in the PR description.
-            * Add tests where appropriate and run the test suite locally (see README).
-            * Reference any related issue with `closes #<issue-number>`.
+            * Please follow our Pull Request template when opening a PR.
+
             
-            Read our contribution guidelines here: https://github.com/openml/openml-python/blob/main/CONTRIBUTING.md
+            Read our contribution guidelines here: http://openml.github.io/openml-python/latest/#contributing
