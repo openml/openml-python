@@ -17,18 +17,18 @@ class PyOpenMLError(Exception):
 
 class OpenMLServerError(PyOpenMLError):
     """Base class for all server-related errors.
-    
-    Raised when communication with the OpenML server fails or 
+
+    Raised when communication with the OpenML server fails or
     the server returns an unexpected response.
     """
 
 
 class OpenMLServerException(OpenMLServerError):
     """Exception raised when the server returns a structured error response.
-    
+
     This is raised when the server returns a non-200 status code along with
     a parseable error message containing an error code and description.
-    
+
     Attributes
     ----------
     code : int | None
@@ -56,9 +56,9 @@ class OpenMLServerException(OpenMLServerError):
 
 class OpenMLURITooLongError(OpenMLServerError):
     """Exception raised when the request URI exceeds server limits.
-    
+
     HTTP Status: 414 (URI Too Long)
-    
+
     This typically occurs when trying to pass too many parameters in a GET request.
     Consider using POST or breaking the request into smaller chunks.
     """
@@ -72,9 +72,9 @@ class OpenMLURITooLongError(OpenMLServerError):
 
 class OpenMLRateLimitError(OpenMLServerError):
     """Exception raised when API rate limits are exceeded.
-    
+
     HTTP Status: 429 (Too Many Requests)
-    
+
     The user has sent too many requests in a given amount of time.
     """
 
@@ -89,17 +89,21 @@ class OpenMLRateLimitError(OpenMLServerError):
 
 class OpenMLNotFoundError(OpenMLServerError):
     """Exception raised when a requested resource does not exist.
-    
+
     HTTP Status: 404 (Not Found)
-    
+
     This can occur when requesting a dataset, task, flow, or run that doesn't exist.
     """
 
-    def __init__(self, resource_type: str | None = None, resource_id: int | None = None, 
-                 message: str | None = None):
+    def __init__(
+        self,
+        resource_type: str | None = None,
+        resource_id: int | None = None,
+        message: str | None = None,
+    ):
         self.resource_type = resource_type
         self.resource_id = resource_id
-        
+
         if message is None:
             if resource_type and resource_id:
                 message = f"{resource_type} with ID {resource_id} not found."
@@ -110,7 +114,7 @@ class OpenMLNotFoundError(OpenMLServerError):
 
 class OpenMLServerNoResult(OpenMLServerException):
     """Exception raised when the server returns an empty result set.
-    
+
     OpenML Error Codes: 111, 372, 482, 500, 512, 542, 674
     - 111: Dataset descriptions
     - 372: Datasets
@@ -119,7 +123,7 @@ class OpenMLServerNoResult(OpenMLServerException):
     - 512: Runs
     - 542: Evaluations
     - 674: Setups
-    
+
     This is different from NotFound - the request was valid but returned no results.
     """
 
@@ -131,14 +135,19 @@ class OpenMLServerNoResult(OpenMLServerException):
 
 class OpenMLValidationError(OpenMLServerException):
     """Exception raised when submitted data fails server-side validation.
-    
+
     OpenML Error Codes: 163 (flow XML validation failure), and others
-    
+
     This occurs when uploading data that doesn't meet the required format or constraints.
     """
 
-    def __init__(self, message: str, code: int | None = None, url: str | None = None,
-                 validation_details: str | None = None):
+    def __init__(
+        self,
+        message: str,
+        code: int | None = None,
+        url: str | None = None,
+        validation_details: str | None = None,
+    ):
         self.validation_details = validation_details
         super().__init__(message, code, url)
 
@@ -150,7 +159,7 @@ class OpenMLValidationError(OpenMLServerException):
 
 class OpenMLAuthenticationError(OpenMLServerError):
     """Exception raised when API authentication fails.
-    
+
     This occurs when:
     - No API key is provided when required
     - An invalid API key is provided
@@ -169,7 +178,7 @@ class OpenMLAuthenticationError(OpenMLServerError):
 
 class OpenMLNotAuthorizedError(OpenMLServerError):
     """Exception raised when an authenticated user lacks permission.
-    
+
     OpenML Error Codes: 102, 137, 310, 320, 350, 400, 460
     - 102: Flow exists (POST)
     - 137: Dataset (POST)
@@ -178,7 +187,7 @@ class OpenMLNotAuthorizedError(OpenMLServerError):
     - 350: Dataset delete
     - 400: Run delete
     - 460: Task delete
-    
+
     This is different from authentication - the user is authenticated but
     doesn't have permission to perform the requested action.
     """
@@ -191,9 +200,9 @@ class OpenMLNotAuthorizedError(OpenMLServerError):
 
 class OpenMLDatabaseConnectionError(OpenMLServerException):
     """Exception raised when the server experiences database connectivity issues.
-    
+
     OpenML Error Code: 107
-    
+
     This is typically a temporary issue on the server side. Retrying may resolve it.
     """
 
@@ -208,7 +217,7 @@ class OpenMLDatabaseConnectionError(OpenMLServerException):
 
 class OpenMLHashException(PyOpenMLError):
     """Exception raised when file hash validation fails.
-    
+
     This occurs when the locally computed hash of a downloaded file doesn't match
     the hash provided by the server, indicating potential data corruption or
     transmission errors.
@@ -222,7 +231,7 @@ class OpenMLHashException(PyOpenMLError):
 
 class OpenMLCacheException(PyOpenMLError):
     """Exception raised when requested data is not found in local cache.
-    
+
     This is typically used internally when attempting to load datasets, tasks,
     or other resources from the cache before falling back to downloading from
     the server.
@@ -236,7 +245,7 @@ class OpenMLCacheException(PyOpenMLError):
 
 class OpenMLPrivateDatasetError(PyOpenMLError):
     """Exception raised when attempting to access a private dataset.
-    
+
     This occurs when a user without proper permissions tries to access a
     dataset that is marked as private or restricted.
     """
@@ -249,9 +258,9 @@ class OpenMLPrivateDatasetError(PyOpenMLError):
 
 class OpenMLRunsExistError(PyOpenMLError):
     """Exception raised when attempting to upload runs that already exist.
-    
+
     This prevents duplicate run submissions to the server.
-    
+
     Attributes
     ----------
     run_ids : set[int]
@@ -267,7 +276,7 @@ class OpenMLRunsExistError(PyOpenMLError):
 
 class ObjectNotPublishedError(PyOpenMLError):
     """Exception raised when attempting to access an unpublished object.
-    
+
     Some objects may be uploaded but not yet published/activated on the server.
     """
 
@@ -279,9 +288,9 @@ class ObjectNotPublishedError(PyOpenMLError):
 
 class OpenMLTimeoutError(OpenMLServerError):
     """Exception raised when a request to the server times out.
-    
+
     HTTP Status: 408 (Request Timeout) or 504 (Gateway Timeout)
-    
+
     This can occur for long-running operations or poor network connectivity.
     """
 
@@ -301,9 +310,9 @@ class OpenMLTimeoutError(OpenMLServerError):
 
 class OpenMLServiceUnavailableError(OpenMLServerError):
     """Exception raised when the OpenML service is temporarily unavailable.
-    
+
     HTTP Status: 503 (Service Unavailable)
-    
+
     This typically indicates server maintenance or temporary overload.
     """
 
