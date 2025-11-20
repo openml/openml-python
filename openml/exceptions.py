@@ -23,7 +23,7 @@ class OpenMLServerError(PyOpenMLError):
     """
 
 
-class OpenMLServerException(OpenMLServerError):
+class OpenMLServerException(OpenMLServerError):  # noqa: N818
     """Exception raised when the server returns a structured error response.
 
     This is raised when the server returns a non-200 status code along with
@@ -215,7 +215,7 @@ class OpenMLDatabaseConnectionError(OpenMLServerException):
 # ============================================================================
 
 
-class OpenMLHashException(PyOpenMLError):
+class OpenMLHashException(PyOpenMLError):  # noqa: N818
     """Exception raised when file hash validation fails.
 
     This occurs when the locally computed hash of a downloaded file doesn't match
@@ -229,7 +229,7 @@ class OpenMLHashException(PyOpenMLError):
 # ============================================================================
 
 
-class OpenMLCacheException(PyOpenMLError):
+class OpenMLCacheException(PyOpenMLError):  # noqa: N818
     """Exception raised when requested data is not found in local cache.
 
     This is typically used internally when attempting to load datasets, tasks,

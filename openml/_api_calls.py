@@ -23,11 +23,19 @@ from urllib3 import ProxyManager
 from . import config
 from .__version__ import __version__
 from .exceptions import (
+    OpenMLAuthenticationError,
+    OpenMLDatabaseConnectionError,
     OpenMLHashException,
     OpenMLNotAuthorizedError,
+    OpenMLNotFoundError,
+    OpenMLRateLimitError,
     OpenMLServerError,
     OpenMLServerException,
     OpenMLServerNoResult,
+    OpenMLServiceUnavailableError,
+    OpenMLTimeoutError,
+    OpenMLURITooLongError,
+    OpenMLValidationError,
 )
 from .utils import ProgressBar
 
@@ -363,6 +371,11 @@ def _send_request(  # noqa: C901, PLR0912
     files: FILE_ELEMENTS_TYPE | None = None,
     md5_checksum: str | None = None,
 ) -> requests.Response:
+    MAX_URL_LENGTH = 2000  # Conservative limit for broad compatibility
+
+    if len(url) > MAX_URL_LENGTH:
+        raise OpenMLURITooLongError(url)
+
     n_retries = max(1, config.connection_n_retries)
 
     response: requests.Response | None = None
@@ -459,54 +472,107 @@ def __parse_server_exception(
     url: str,
     file_elements: FILE_ELEMENTS_TYPE | None,
 ) -> OpenMLServerError:
-    if response.status_code == requests.codes.URI_TOO_LONG:
-        raise OpenMLServerError(f"URI too long! ({url})")
+    """Parse server response and return the appropriate exception.
 
-    # OpenML has a sophisticated error system where information about failures is provided,
-    # in the response body itself.
-    # First, we need to parse it out.
+    This function maps HTTP status codes and OpenML error codes to specific
+    exception types, providing more granular error information to users.
+
+    Parameters
+    ----------
+    response : requests.Response
+        The HTTP response from the server
+    url : str
+        The URL that was requested
+    file_elements : FILE_ELEMENTS_TYPE | None
+        Files that were being uploaded (if any)
+
+    Returns
+    -------
+    OpenMLServerError
+        The most specific exception type based on the error
+    """
+    # ========================================================================
+    # HTTP Status Code Mapping (before parsing XML)
+    # ========================================================================
+
+    if response.status_code == requests.codes.URI_TOO_LONG:
+        return OpenMLURITooLongError(url=url)
+
+    if response.status_code == 404:
+        return OpenMLNotFoundError(message=f"Resource not found at {url}")
+
+    if response.status_code == 429:
+        retry_after = response.headers.get("Retry-After")
+        retry_seconds = int(retry_after) if retry_after else None
+        return OpenMLRateLimitError(retry_after=retry_seconds)
+
+    if response.status_code in (408, 504):
+        return OpenMLTimeoutError()
+
+    if response.status_code == 503:
+        return OpenMLServiceUnavailableError()
+
+    if response.status_code == 401:
+        return OpenMLAuthenticationError()
+
+    # ========================================================================
+    # Parse XML Response for OpenML-Specific Error Codes
+    # ========================================================================
+
     try:
         server_exception = xmltodict.parse(response.text)
     except xml.parsers.expat.ExpatError as e:
+        # If XML parsing fails, return generic server error
         raise e
     except Exception as e:
-        # If we failed to parse it out, then something has gone wrong in the body we have sent back
-        # from the server and there is little extra information we can capture.
+        # Catch-all for any other parsing issues
         raise OpenMLServerError(
             f"Unexpected server error when calling {url}. Please contact the developers!\n"
             f"Status code: {response.status_code}\n{response.text}",
         ) from e
 
-    # Now we can parse out the specific error codes that we return. These
-    # are in addition to the typical HTTP error codes, but encode more
-    # specific informtion. You can find these codes here:
-    # https://github.com/openml/OpenML/blob/develop/openml_OS/views/pages/api_new/v1/xml/pre.php
+    # Extract error information from parsed XML
     server_error = server_exception["oml:error"]
     code = int(server_error["oml:code"])
     message = server_error["oml:message"]
     additional_information = server_error.get("oml:additional_information")
-    if code in [111, 372, 512, 500, 482, 542, 674]:
-        if additional_information:
-            full_message = f"{message} - {additional_information}"
-        else:
-            full_message = message
 
-        # 512 for runs, 372 for datasets, 500 for flows
-        # 482 for tasks, 542 for evaluations, 674 for setups
-        # 111 for dataset descriptions
+    # Construct full message
+    full_message = f"{message} - {additional_information}" if additional_information else message
+
+    # ========================================================================
+    # OpenML Error Code Mapping
+    # ========================================================================
+
+    # Database Connection Error (temporary, can retry)
+    if code == DATABASE_CONNECTION_ERRCODE:  # 107
+        return OpenMLDatabaseConnectionError(message=full_message, code=code, url=url)
+
+    # No Results Found (successful query, but empty result set)
+    if code in [111, 372, 512, 500, 482, 542, 674]:
+        # 111: Dataset descriptions
+        # 372: Datasets
+        # 482: Tasks
+        # 500: Flows
+        # 512: Runs
+        # 542: Evaluations
+        # 674: Setups
         return OpenMLServerNoResult(code=code, message=full_message, url=url)
 
-    # 163: failure to validate flow XML (https://www.openml.org/api_docs#!/flow/post_flow)
-    if code in [163] and file_elements is not None and "description" in file_elements:
-        # file_elements['description'] is the XML file description of the flow
-        full_message = "\n{}\n{} - {}".format(
-            file_elements["description"],
-            message,
-            additional_information,
-        )
-    else:
-        full_message = f"{message} - {additional_information}"
+    # Validation Errors
+    if code in [163]:
+        # 163: Failure to validate flow XML
+        validation_details = None
+        if file_elements is not None and "description" in file_elements:
+            # Include the XML that failed validation for debugging
+            validation_details = str(file_elements["description"])
+            full_message = f"\n{validation_details}\n{full_message}"
 
+        return OpenMLValidationError(
+            message=full_message, code=code, url=url, validation_details=validation_details
+        )
+
+    # Authorization Errors (authenticated but not authorized)
     if code in [
         102,  # flow/exists post
         137,  # dataset post
@@ -516,11 +582,58 @@ def __parse_server_exception(
         400,  # run/42 delete
         460,  # task/42 delete
     ]:
-        msg = (
-            f"The API call {url} requires authentication via an API key.\nPlease configure "
-            "OpenML-Python to use your API as described in this example:"
-            "\nhttps://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/#authentication"
+        auth_message = (
+            f"The user is authenticated but lacks permission for the operation at {url}.\n"
+            f"OpenML error code: {code}."
         )
-        return OpenMLNotAuthorizedError(message=msg)
+        return OpenMLNotAuthorizedError(message=auth_message)
+
+    # ========================================================================
+    # Message-Based Error Detection (when error code isn't specific enough)
+    # ========================================================================
+
+    message_lower = message.lower()
+
+    # Check for authentication-related keywords
+    if any(
+        keyword in message_lower
+        for keyword in ["api key", "authentication", "authenticate", "api_key", "unauthorized"]
+    ):
+        return OpenMLAuthenticationError(message=full_message)
+
+    # Check for rate limiting keywords
+    if any(
+        keyword in message_lower
+        for keyword in ["rate limit", "too many requests", "quota exceeded"]
+    ):
+        return OpenMLRateLimitError(message=full_message)
+
+    # Check for validation keywords
+    if any(
+        keyword in message_lower
+        for keyword in ["invalid", "validation", "malformed", "incorrect format", "schema"]
+    ):
+        return OpenMLValidationError(message=full_message, code=code, url=url)
+
+    # Check for not found keywords (when error code doesn't indicate it)
+    if any(
+        keyword in message_lower
+        for keyword in ["not found", "does not exist", "unknown", "no such"]
+    ):
+        return OpenMLNotFoundError(message=full_message)
+
+    # Check for timeout keywords
+    if any(keyword in message_lower for keyword in ["timeout", "timed out", "time out"]):
+        return OpenMLTimeoutError(message=full_message)
+
+    # Check for service unavailable keywords
+    if any(
+        keyword in message_lower for keyword in ["maintenance", "unavailable", "down", "offline"]
+    ):
+        return OpenMLServiceUnavailableError(message=full_message)
+
+    # ========================================================================
+    # Default: Generic OpenMLServerException
+    # ========================================================================
 
     return OpenMLServerException(code=code, message=full_message, url=url)
