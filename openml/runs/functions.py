@@ -111,7 +111,8 @@ def run_model_on_task(  # noqa: PLR0913
         warnings.warn(
             "The 'avoid_duplicate_runs' parameter is set to True, but no API key is configured. "
             "Duplicate runs cannot be checked server-side without authentication. "
-            "Please set your API key (see http://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/). "
+            "Please set your API key "
+            "http://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/."
             "The run will proceed, but duplicates may be created.",
             UserWarning,
             stacklevel=2,
