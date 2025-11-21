@@ -69,9 +69,14 @@ openml.config.start_using_configuration_for_example()
 # In this examples we'll create a few runs for the OpenML-100 benchmark
 # suite which is available on the OpenML test server.
 
-# !!! warning "Requires the openml-sklearn extension"
-#     For the rest of this tutorial we rely on the `openml-sklearn` package.
-#     Install it with `pip install openml-sklearn`.
+# %% [markdown]
+# <div class="admonition warning">
+#     <p class="admonition-title">Warning</p>
+#     <p>
+#         For the rest of this tutorial, we will require the `openml-sklearn` package.
+#         Install it with `pip install openml-sklearn`.
+#     </p>
+# </div>
 
 # %%
 # Get sklearn extension to run sklearn models easily on OpenML tasks.
