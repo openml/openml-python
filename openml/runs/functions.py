@@ -107,14 +107,13 @@ def run_model_on_task(  # noqa: PLR0913
     """
     if avoid_duplicate_runs is None:
         avoid_duplicate_runs = openml.config.avoid_duplicate_runs
-    if avoid_duplicate_runs and openml.config.apikey is None:
+    if avoid_duplicate_runs and not config.apikey:
         warnings.warn(
-            "The 'avoid_duplicate_runs' parameter is set to True, but no API key is configured. "
-            "Duplicate runs cannot be checked server-side without authentication. "
-            "Please set your API key "
-            "http://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/."
-            "The run will proceed, but duplicates may be created.",
-            UserWarning,
+            "avoid_duplicate_runs is set to True, but no API key is set. "
+            "Please set your API key in the OpenML configuration file, see"
+            "https://openml.github.io/openml-python/main/examples/20_basic/introduction_tutorial"
+            ".html#authentication for more information on authentication.",
+            RuntimeWarning,
             stacklevel=2,
         )
 
