@@ -1,5 +1,6 @@
 # License: BSD 3-Clause
 
+from .benchmarking import run_suite_with_progress
 from .functions import (
     attach_to_study,
     attach_to_suite,
@@ -33,6 +34,7 @@ __all__ = [
     "get_suite",
     "list_studies",
     "list_suites",
+    "run_suite_with_progress",
     "update_suite_status",
     "update_study_status",
 ]
