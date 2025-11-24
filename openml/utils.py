@@ -418,7 +418,7 @@ def thread_safe_if_oslo_installed(func: Callable[P, R]) -> Callable[P, R]:
                     f"An id must be specified for {func.__name__}, was passed: ({args}, {kwargs}).",
                 )
             # The [7:] gets rid of the 'openml.' prefix
-            lock_name = f"{func.__module__[7:]}.{func.__name__}:{id_}"
+            lock_name = f"{func.__module__[7:]}.{func.__name__}-{id_}"
             with lockutils.external_lock(name=lock_name, lock_path=_create_lockfiles_dir()):
                 return func(*args, **kwargs)
 
