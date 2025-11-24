@@ -413,7 +413,7 @@ def runs_list(args: argparse.Namespace) -> None:
     args : argparse.Namespace
         Arguments containing filtering criteria: task, flow, uploader, tag, size, offset, format
     """
-    # Build filter arguments
+    # Build filter arguments, excluding None values
     kwargs = {}
     if args.task is not None:
         kwargs["task"] = [args.task]
@@ -430,7 +430,7 @@ def runs_list(args: argparse.Namespace) -> None:
 
     try:
         # Get runs from server
-        runs_df = run_functions.list_runs(**kwargs)
+        runs_df = run_functions.list_runs(**kwargs)  # type: ignore[arg-type]
 
         if runs_df.empty:
             print("No runs found matching the criteria.")
