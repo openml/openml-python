@@ -2,6 +2,7 @@
 
 from .functions import (
     delete_run,
+    delete_run_cache,
     get_run,
     get_run_trace,
     get_runs,
@@ -22,6 +23,7 @@ __all__ = [
     "run_model_on_task",
     "run_flow_on_task",
     "get_run",
+    "delete_run_cache",
     "list_runs",
     "get_runs",
     "get_run_trace",

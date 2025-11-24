@@ -552,3 +552,21 @@ def delete_flow(flow_id: int) -> bool:
         True if the deletion was successful. False otherwise.
     """
     return openml.utils._delete_entity("flow", flow_id)
+
+
+def delete_flow_cache(flow_id: int) -> None:
+    """Delete the cache directory for a specific flow.
+
+    Parameters
+    ----------
+    flow_id : int
+        Flow ID (integer).
+    """
+    if isinstance(flow_id, str):
+        try:
+            flow_id = int(flow_id)
+        except ValueError:
+            raise ValueError("Flow ID should be an integer") from None
+
+    fid_cache_dir = openml.utils._create_cache_directory_for_id(FLOWS_CACHE_DIR_NAME, flow_id)
+    openml.utils._remove_cache_dir_for_id(FLOWS_CACHE_DIR_NAME, fid_cache_dir)

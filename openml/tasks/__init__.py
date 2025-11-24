@@ -3,6 +3,7 @@
 from .functions import (
     create_task,
     delete_task,
+    delete_task_cache,
     get_task,
     get_tasks,
     list_tasks,
@@ -28,6 +29,7 @@ __all__ = [
     "create_task",
     "get_task",
     "get_tasks",
+    "delete_task_cache",
     "list_tasks",
     "OpenMLSplit",
     "TaskType",
