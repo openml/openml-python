@@ -49,7 +49,7 @@ class TestBase(unittest.TestCase):
     flow_name_tracker: ClassVar[list[str]] = []
     test_server = "https://test.openml.org/api/v1/xml"
     # amueller's read/write key that he will throw away later
-    apikey = "610344db6388d9ba34f6db45a3cf71de"
+    apikey = "abc"
 
     # creating logger for tracking files uploaded to test server
     logger = logging.getLogger("unit_tests_published_entities")
