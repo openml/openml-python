@@ -910,17 +910,13 @@ def edit_dataset(
     xml["oml:data_edit_parameters"]["oml:language"] = language
 
     if default_target_attribute is not None:
-        xml["oml:data_edit_parameters"]["oml:default_target_attribute"] = [
-            default_target_attribute
-        ]
+        xml["oml:data_edit_parameters"]["oml:default_target_attribute"] = [default_target_attribute]
 
     if row_id_attribute is not None:
         xml["oml:data_edit_parameters"]["oml:row_id_attribute"] = row_id_attribute
 
     if ignore_attribute is not None:
-        ignore_list = (
-            ignore_attribute if isinstance(ignore_attribute, list) else [ignore_attribute]
-        )
+        ignore_list = ignore_attribute if isinstance(ignore_attribute, list) else [ignore_attribute]
         xml["oml:data_edit_parameters"]["oml:ignore_attribute"] = ignore_list
 
     xml["oml:data_edit_parameters"]["oml:citation"] = citation
