@@ -6,13 +6,14 @@ import argparse
 import string
 import sys
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 from urllib.parse import urlparse
-
-import pandas as pd  # noqa: TC002  # Used at runtime for CLI output formatting
 
 from openml import config
 from openml.runs import functions as run_functions
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 def is_hex(string_: str) -> bool:
