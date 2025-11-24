@@ -155,7 +155,9 @@ class TestEvaluationFunctions(TestBase):
         )
         assert len(evaluations) == 100
 
+    @pytest.mark.production()
     def test_list_evaluations_empty(self):
+        self.use_production_server()
         evaluations = openml.evaluations.list_evaluations("unexisting_measure")
         if len(evaluations) > 0:
             raise ValueError("UnitTest Outdated, got somehow results")
@@ -232,7 +234,9 @@ class TestEvaluationFunctions(TestBase):
         test_output = sorted(unsorted_output, reverse=True)
         assert test_output[:size] == sorted_output
 
+    @pytest.mark.production()
     def test_list_evaluation_measures(self):
+        self.use_production_server()
         measures = openml.evaluations.list_evaluation_measures()
         assert isinstance(measures, list) is True
         assert all(isinstance(s, str) for s in measures) is True
