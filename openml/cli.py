@@ -6,10 +6,16 @@ import argparse
 import string
 import sys
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 from urllib.parse import urlparse
 
+import pandas as pd  # Used at runtime for CLI output formatting
+
 from openml import config
+from openml.study import functions as study_functions
+
+if TYPE_CHECKING:
+    from openml.study.study import OpenMLBenchmarkSuite, OpenMLStudy
 
 
 def is_hex(string_: str) -> bool:
@@ -327,12 +333,295 @@ def configure(args: argparse.Namespace) -> None:
             set_field_function(args.value)
 
 
+def _format_studies_output(
+    studies_df: pd.DataFrame,
+    output_format: str,
+    *,
+    verbose: bool = False,
+) -> None:
+    """Format and print studies output based on requested format.
+
+    Parameters
+    ----------
+    studies_df : pd.DataFrame
+        DataFrame containing studies information
+    output_format : str
+        Output format: 'json', 'table', or 'list'
+    verbose : bool
+        Whether to show detailed information
+    """
+    if output_format == "json":
+        # Convert to JSON format
+        output = studies_df.to_json(orient="records", indent=2)
+        print(output)
+    elif output_format == "table":
+        _format_studies_table(studies_df, verbose=verbose)
+    else:  # default: simple list
+        _format_studies_list(studies_df, verbose=verbose)
+
+
+def _format_studies_table(studies_df: pd.DataFrame, *, verbose: bool = False) -> None:
+    """Format studies as a table.
+
+    Parameters
+    ----------
+    studies_df : pd.DataFrame
+        DataFrame containing studies information
+    verbose : bool
+        Whether to show all columns
+    """
+    if verbose:
+        print(studies_df.to_string(index=False))
+    else:
+        # Show only key columns for compact view
+        columns_to_show = ["id", "name", "main_entity_type", "status", "creator", "creation_date"]
+        available_columns = [col for col in columns_to_show if col in studies_df.columns]
+        print(studies_df[available_columns].to_string(index=False))
+
+
+def _format_studies_list(studies_df: pd.DataFrame, *, verbose: bool = False) -> None:
+    """Format studies as a simple list.
+
+    Parameters
+    ----------
+    studies_df : pd.DataFrame
+        DataFrame containing studies information
+    verbose : bool
+        Whether to show detailed information
+    """
+    if verbose:
+        # Verbose: show detailed info for each study
+        for _, study in studies_df.iterrows():
+            print(f"Study ID: {study['id']}")
+            print(f"  Name: {study['name']}")
+            print(f"  Type: {study.get('main_entity_type', 'N/A')}")
+            print(f"  Status: {study.get('status', 'N/A')}")
+            print(f"  Creator: {study.get('creator', 'N/A')}")
+            if "creation_date" in study and pd.notna(study["creation_date"]):
+                print(f"  Created: {study['creation_date']}")
+            if "alias" in study and pd.notna(study["alias"]):
+                print(f"  Alias: {study['alias']}")
+            print()
+    else:
+        # Simple: just list study IDs and names
+        for _, study in studies_df.iterrows():
+            study_type = study.get("main_entity_type", "")
+            type_label = " (suite)" if study_type == "task" else ""
+            print(f"{study['id']}: {study['name']}{type_label}")
+
+
+def studies_list(args: argparse.Namespace) -> None:
+    """List studies with optional filtering.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Arguments containing filtering criteria: status, uploader, type, size, offset, format
+    """
+    # Build filter arguments, excluding None values
+    kwargs = {}
+    if args.status is not None:
+        kwargs["status"] = args.status
+    if args.uploader is not None:
+        kwargs["uploader"] = args.uploader
+    if args.size is not None:
+        kwargs["size"] = args.size
+    if args.offset is not None:
+        kwargs["offset"] = args.offset
+
+    try:
+        # Fetch based on type
+        if args.type == "all":
+            # Fetch both studies and suites
+            studies_df = study_functions.list_studies(**kwargs)
+            suites_df = study_functions.list_suites(**kwargs)
+            # Combine results
+            combined_df = pd.concat([studies_df, suites_df], ignore_index=True)
+            _format_studies_output(combined_df, args.format, verbose=args.verbose)
+        elif args.type == "study":
+            # Fetch only studies (runs)
+            studies_df = study_functions.list_studies(**kwargs)
+            _format_studies_output(studies_df, args.format, verbose=args.verbose)
+        else:  # suite
+            # Fetch only suites (tasks)
+            suites_df = study_functions.list_suites(**kwargs)
+            _format_studies_output(suites_df, args.format, verbose=args.verbose)
+    except Exception as e:  # noqa: BLE001
+        print(f"Error listing studies: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def _display_study_entity_counts(study: OpenMLStudy | OpenMLBenchmarkSuite) -> None:
+    """Display entity counts for a study.
+
+    Parameters
+    ----------
+    study : Union[OpenMLStudy, OpenMLBenchmarkSuite]
+        Study or suite object
+    """
+    print("\nEntities:")
+    if hasattr(study, "data") and study.data:
+        print(f"  Datasets: {len(study.data)}")
+    if hasattr(study, "tasks") and study.tasks:
+        print(f"  Tasks: {len(study.tasks)}")
+    if hasattr(study, "flows") and study.flows:
+        print(f"  Flows: {len(study.flows)}")
+    if hasattr(study, "runs") and study.runs:
+        print(f"  Runs: {len(study.runs)}")
+    if hasattr(study, "setups") and study.setups:
+        print(f"  Setups: {len(study.setups)}")
+
+
+def _display_study_entity_ids(study: OpenMLStudy | OpenMLBenchmarkSuite) -> None:
+    """Display first 10 entity IDs for a study.
+
+    Parameters
+    ----------
+    study : Union[OpenMLStudy, OpenMLBenchmarkSuite]
+        Study or suite object
+    """
+    if hasattr(study, "data") and study.data:
+        print(f"\nDataset IDs (first 10): {study.data[:10]}")
+    if hasattr(study, "tasks") and study.tasks:
+        print(f"Task IDs (first 10): {study.tasks[:10]}")
+    if hasattr(study, "flows") and study.flows:
+        print(f"Flow IDs (first 10): {study.flows[:10]}")
+    if hasattr(study, "runs") and study.runs:
+        print(f"Run IDs (first 10): {study.runs[:10]}")
+
+
+def studies_info(args: argparse.Namespace) -> None:
+    """Display detailed information about a specific study.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Arguments containing the study_id to fetch
+    """
+    try:
+        # Get study from server - try as study first, then as suite
+        study: OpenMLStudy | OpenMLBenchmarkSuite
+        try:
+            study = study_functions.get_study(args.study_id)
+        except Exception:  # noqa: BLE001
+            # Might be a suite (benchmark suite)
+            study = study_functions.get_suite(args.study_id)
+
+        # Display study information
+        print(f"Study ID: {study.study_id}")
+        print(f"Name: {study.name}")
+        print(f"Main Entity Type: {study.main_entity_type}")
+        print(f"Status: {study.status}")
+
+        if hasattr(study, "alias") and study.alias:
+            print(f"Alias: {study.alias}")
+
+        if study.creator:
+            print(f"Creator: {study.creator}")
+
+        if study.creation_date:
+            print(f"Creation Date: {study.creation_date}")
+
+        if hasattr(study, "benchmark_suite") and study.benchmark_suite:
+            print(f"Benchmark Suite: {study.benchmark_suite}")
+
+        # Display description
+        if study.description:
+            print("\nDescription:")
+            print(f"  {study.description}")
+
+        # Display entity counts and IDs
+        _display_study_entity_counts(study)
+
+        if args.verbose:
+            _display_study_entity_ids(study)
+
+    except Exception as e:  # noqa: BLE001
+        print(f"Error fetching study information: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def studies_search(args: argparse.Namespace) -> None:
+    """Search studies by name or alias.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Arguments containing the search query
+    """
+    try:
+        # Get all studies (both types)
+        kwargs = {}
+        if args.status:
+            kwargs["status"] = args.status
+
+        studies_df_runs = study_functions.list_studies(**kwargs)
+        studies_df_suites = study_functions.list_suites(**kwargs)
+
+        # Combine both dataframes
+        if not studies_df_runs.empty and not studies_df_suites.empty:
+            all_studies = pd.concat([studies_df_runs, studies_df_suites], ignore_index=True)
+        elif not studies_df_runs.empty:
+            all_studies = studies_df_runs
+        elif not studies_df_suites.empty:
+            all_studies = studies_df_suites
+        else:
+            print("No studies found.")
+            return
+
+        # Search by name (case-insensitive)
+        search_term = args.query.lower()
+        mask = all_studies["name"].str.lower().str.contains(search_term, na=False)
+
+        # Also search by alias if available
+        if "alias" in all_studies.columns:
+            mask |= all_studies["alias"].str.lower().str.contains(search_term, na=False)
+
+        results = all_studies[mask]
+
+        if results.empty:
+            print(f"No studies found matching '{args.query}'.")
+            return
+
+        print(f"Found {len(results)} study(ies) matching '{args.query}':\n")
+
+        # Format output
+        _format_studies_output(results, args.format, verbose=args.verbose)
+
+    except Exception as e:  # noqa: BLE001
+        print(f"Error searching studies: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def studies(args: argparse.Namespace) -> None:
+    """Route studies subcommands to the appropriate handler.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Arguments containing the subcommand and its arguments
+    """
+    subcommands = {
+        "list": studies_list,
+        "info": studies_info,
+        "search": studies_search,
+    }
+
+    handler = subcommands.get(args.studies_subcommand)
+    if handler:
+        handler(args)
+    else:
+        print(f"Unknown studies subcommand: {args.studies_subcommand}")
+        sys.exit(1)
+
+
 def main() -> None:
-    subroutines = {"configure": configure}
+    subroutines = {"configure": configure, "studies": studies}
 
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="subroutine")
 
+    # Configure subcommand
     parser_configure = subparsers.add_parser(
         "configure",
         description="Set or read variables in your configuration file. For more help also see "
@@ -358,6 +647,109 @@ def main() -> None:
         default=None,
         nargs="?",
         help="The value to set the FIELD to.",
+    )
+
+    # Studies subcommand
+    parser_studies = subparsers.add_parser(
+        "studies",
+        description="Browse and search OpenML studies and benchmark suites from the command line.",
+    )
+    studies_subparsers = parser_studies.add_subparsers(dest="studies_subcommand")
+
+    # studies list subcommand
+    parser_studies_list = studies_subparsers.add_parser(
+        "list",
+        description="List studies/suites with optional filtering.",
+        help="List studies/suites with optional filtering.",
+    )
+    parser_studies_list.add_argument(
+        "--status",
+        type=str,
+        choices=["active", "in_preparation", "deactivated", "all"],
+        help="Filter by status (default: active)",
+    )
+    parser_studies_list.add_argument(
+        "--uploader",
+        type=int,
+        help="Filter by uploader ID",
+    )
+    parser_studies_list.add_argument(
+        "--type",
+        type=str,
+        choices=["all", "study", "suite"],
+        default="all",
+        help="Type to list: all, study (runs), or suite (tasks) (default: all)",
+    )
+    parser_studies_list.add_argument(
+        "--size",
+        type=int,
+        default=10,
+        help="Number of studies to retrieve (default: 10)",
+    )
+    parser_studies_list.add_argument(
+        "--offset",
+        type=int,
+        default=0,
+        help="Offset for pagination (default: 0)",
+    )
+    parser_studies_list.add_argument(
+        "--format",
+        type=str,
+        choices=["list", "table", "json"],
+        default="list",
+        help="Output format (default: list)",
+    )
+    parser_studies_list.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show detailed information",
+    )
+
+    # studies info subcommand
+    parser_studies_info = studies_subparsers.add_parser(
+        "info",
+        description="Display detailed information about a specific study.",
+        help="Display detailed information about a specific study.",
+    )
+    parser_studies_info.add_argument(
+        "study_id",
+        type=str,
+        help="Study ID (numeric or alias) to fetch information for",
+    )
+    parser_studies_info.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show additional details including entity IDs",
+    )
+
+    # studies search subcommand
+    parser_studies_search = studies_subparsers.add_parser(
+        "search",
+        description="Search studies by name or alias.",
+        help="Search studies by name or alias.",
+    )
+    parser_studies_search.add_argument(
+        "query",
+        type=str,
+        help="Search query (case-insensitive substring match)",
+    )
+    parser_studies_search.add_argument(
+        "--status",
+        type=str,
+        choices=["active", "in_preparation", "deactivated", "all"],
+        help="Filter by status (default: active)",
+    )
+    parser_studies_search.add_argument(
+        "--format",
+        type=str,
+        choices=["list", "table", "json"],
+        default="list",
+        help="Output format (default: list)",
+    )
+    parser_studies_search.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show detailed information",
     )
 
     args = parser.parse_args()
