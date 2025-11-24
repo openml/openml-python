@@ -251,7 +251,7 @@ def test_files_directory() -> Path:
 
 @pytest.fixture(scope="session")
 def test_api_key() -> str:
-    return "c0c42819af31e706efe1f4b88c23c6c1"
+    return "normaluser"
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -277,7 +277,7 @@ def with_server(request):
         yield
         return
     openml.config.server = "https://test.openml.org/api/v1/xml"
-    openml.config.apikey = "c0c42819af31e706efe1f4b88c23c6c1"
+    openml.config.apikey = "normaluser"
     yield
 
 
