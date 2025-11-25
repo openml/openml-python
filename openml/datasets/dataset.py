@@ -271,10 +271,8 @@ class OpenMLDataset(OpenMLBase):
     def features(self) -> dict[int, OpenMLDataFeature]:
         """Get the features of this dataset."""
         if self._features is None:
-            # TODO(eddiebergman): These should return a value so we can set it to be not None
-            self._load_features()
+            self._features = self._load_features()
 
-        assert self._features is not None
         return self._features
 
     @property
@@ -794,8 +792,8 @@ class OpenMLDataset(OpenMLBase):
         assert isinstance(y, pd.Series)
         return x, y, categorical_mask, attribute_names
 
-    def _load_features(self) -> None:
-        """Load the features metadata from the server and store it in the dataset object."""
+    def _load_features(self) -> dict[int, OpenMLDataFeature]:
+        """Load the features metadata from the server and return it."""
         # Delayed Import to avoid circular imports or having to import all of dataset.functions to
         # import OpenMLDataset.
         from openml.datasets.functions import _get_dataset_features_file
@@ -807,7 +805,9 @@ class OpenMLDataset(OpenMLBase):
             )
 
         features_file = _get_dataset_features_file(None, self.dataset_id)
-        self._features = _read_features(features_file)
+        features = _read_features(features_file)
+        self._features = features
+        return features
 
     def _load_qualities(self) -> None:
         """Load qualities information from the server and store it in the dataset object."""
