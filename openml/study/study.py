@@ -352,10 +352,12 @@ class OpenMLBenchmarkSuite(BaseStudy):
             If task metadata cannot be retrieved.
         """
         try:
+            # self.tasks is guaranteed non-empty here (checked in metadata property)
+            tasks_list = self.tasks if self.tasks is not None else []
             task_df = _list_tasks(
-                limit=max(len(self.tasks), 1000),
+                limit=max(len(tasks_list), 1000),
                 offset=0,
-                task_id=self.tasks,
+                task_id=tasks_list,
             )
 
             # _list_tasks returns DataFrame with 'tid' as index (from orient="index")
@@ -376,9 +378,11 @@ class OpenMLBenchmarkSuite(BaseStudy):
             return task_df
 
         except OpenMLServerException as e:
-            raise RuntimeError(f"Failed to retrieve task metadata for suite {self.id}: {e}") from e
+            msg = f"Failed to retrieve task metadata for suite {self.id}: {e}"
+            raise RuntimeError(msg) from e
         except Exception as e:
-            raise RuntimeError(f"Unexpected error retrieving task metadata for suite {self.id}: {e}") from e
+            msg = f"Unexpected error retrieving task metadata for suite {self.id}: {e}"
+            raise RuntimeError(msg) from e
 
     def _merge_dataset_metadata(self, task_df: pd.DataFrame) -> pd.DataFrame:
         """Merge dataset metadata with task metadata.
