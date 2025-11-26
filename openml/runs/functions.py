@@ -223,7 +223,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
         Result of the run.
     """
     if flow_tags is not None and not isinstance(flow_tags, list):
-        raise ValueError("flow_tags should be a list")
+        raise ValueError("flow_tags should be a list, but received '{type(flow_tags).__name__}'. ")
 
     if avoid_duplicate_runs is None:
         avoid_duplicate_runs = openml.config.avoid_duplicate_runs
@@ -242,7 +242,9 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
         task, flow = flow, task
 
     if task.task_id is None:
-        raise ValueError("The task should be published at OpenML")
+        raise ValueError(
+            "The task should be published at OpenML" "Publish the task to OpenML before running it."
+        )
 
     if flow.model is None:
         flow.model = flow.extension.flow_to_model(flow)
@@ -257,8 +259,11 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
         if isinstance(flow.flow_id, int) and flow_id != flow.flow_id:
             if flow_id is not False:
                 raise PyOpenMLError(
-                    f"Local flow_id does not match server flow_id: '{flow.flow_id}' vs '{flow_id}'",
+                    f"Local flow_id '{flow.flow_id}' does not match the flow_id '{flow_id}' found"
+                    "on the OpenML server. Ensure your local object is the most recent version"
+                    "retrieved from OpenML or check that the correct Flow ID was provided."
                 )
+
             raise PyOpenMLError(
                 "Flow does not exist on the server, but 'flow.flow_id' is not None."
             )
@@ -648,7 +653,11 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
                 arff_datacontent.append(arff_line)
 
         else:
-            raise TypeError(type(task))
+            raise TypeError(
+                f"Unsupported task type '{type(task).__name__}'. "
+                "Expected one of: OpenMLClassificationTask, OpenMLRegressionTask, "
+                "OpenMLClusteringTask, or OpenMLLearningCurveTask."
+            )
 
         for measure in user_defined_measures_fold:
             if measure not in user_defined_measures_per_fold:
@@ -674,7 +683,9 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
     if len(traces) > 0:
         if len(traces) != len(jobs):
             raise ValueError(
-                f"Did not find enough traces (expected {len(jobs)}, found {len(traces)})",
+                "Mismatch in number of HPO traces: "
+                f"Expected {len(jobs)}, but only {len(traces)} were found."
+                "Check for incomplete model evaluations or worker failures."
             )
 
         trace = OpenMLRunTrace.merge_traces(traces)
