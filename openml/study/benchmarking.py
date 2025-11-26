@@ -82,7 +82,8 @@ def run_suite_with_progress(
     # Run benchmark on each task
     runs = []
     for task_id in task_iterator:
-        run = openml.runs.run_model_on_task(model, task=task_id, **run_kwargs)
+        result = openml.runs.run_model_on_task(model, task=task_id, **run_kwargs)
+        run = result[0] if isinstance(result, tuple) else result
         runs.append(run)
 
     return runs
