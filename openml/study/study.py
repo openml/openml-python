@@ -338,6 +338,86 @@ class OpenMLBenchmarkSuite(BaseStudy):
         # Initialize metadata cache
         self._metadata: pd.DataFrame | None = None
 
+    def _fetch_task_metadata(self) -> pd.DataFrame:
+        """Fetch task metadata for all tasks in the suite.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame with task metadata, with 'tid' as a column.
+
+        Raises
+        ------
+        RuntimeError
+            If task metadata cannot be retrieved.
+        """
+        try:
+            task_df = _list_tasks(
+                limit=max(len(self.tasks), 1000),
+                offset=0,
+                task_id=self.tasks,
+            )
+
+            # _list_tasks returns DataFrame with 'tid' as index (from orient="index")
+            # Reset index to make 'tid' a column for easier merging
+            if task_df.index.name == "tid":
+                task_df = task_df.reset_index()
+
+            # Verify we got the expected tasks
+            if len(task_df) == 0:
+                return pd.DataFrame()
+
+            # Ensure 'tid' column exists
+            if "tid" not in task_df.columns:
+                raise RuntimeError(
+                    f"Task metadata missing 'tid' column. Columns: {task_df.columns.tolist()}"
+                )
+
+            return task_df
+
+        except OpenMLServerException as e:
+            raise RuntimeError(f"Failed to retrieve task metadata for suite {self.id}: {e}") from e
+        except Exception as e:
+            raise RuntimeError(f"Unexpected error retrieving task metadata for suite {self.id}: {e}") from e
+
+    def _merge_dataset_metadata(self, task_df: pd.DataFrame) -> pd.DataFrame:
+        """Merge dataset metadata with task metadata.
+
+        Parameters
+        ----------
+        task_df : pd.DataFrame
+            DataFrame containing task metadata with 'did' column.
+
+        Returns
+        -------
+        pd.DataFrame
+            Merged DataFrame with both task and dataset metadata.
+
+        Raises
+        ------
+        RuntimeError
+            If dataset metadata cannot be retrieved.
+        """
+        if "did" not in task_df.columns or len(task_df) == 0:
+            return task_df
+
+        unique_dids = task_df["did"].unique().tolist()
+
+        try:
+            dataset_df = list_datasets(data_id=unique_dids)
+        except OpenMLServerException as e:
+            raise RuntimeError(f"Failed to retrieve dataset metadata: {e}") from e
+        except Exception as e:
+            raise RuntimeError(f"Unexpected error retrieving dataset metadata: {e}") from e
+
+        # Use DataFrame.merge() method instead of pd.merge() function
+        return task_df.merge(
+            dataset_df,
+            on="did",
+            how="left",
+            suffixes=("", "_dataset"),
+        )
+
     @property
     def metadata(self) -> pd.DataFrame:
         """
@@ -388,63 +468,11 @@ class OpenMLBenchmarkSuite(BaseStudy):
             self._metadata = pd.DataFrame()
             return self._metadata
 
-        # Step 1: Fetch Task Metadata
-        # Use internal _list_tasks because public API doesn't support task_id filtering
-        try:
-            task_df = _list_tasks(
-                limit=max(len(self.tasks), 1000),
-                offset=0,
-                task_id=self.tasks,
-            )
+        # Fetch task metadata and merge with dataset metadata
+        task_df = self._fetch_task_metadata()
+        if len(task_df) == 0:
+            self._metadata = pd.DataFrame()
+            return self._metadata
 
-            # _list_tasks returns DataFrame with 'tid' as index (from orient="index")
-            # Reset index to make 'tid' a column for easier merging
-            if task_df.index.name == "tid":
-                task_df = task_df.reset_index()
-
-            # Verify we got the expected tasks
-            if len(task_df) == 0:
-                # No tasks found - return empty DataFrame
-                self._metadata = pd.DataFrame()
-                return self._metadata
-
-            # Ensure 'tid' column exists (should after reset_index if index was named 'tid')
-            if "tid" not in task_df.columns:
-                # This shouldn't happen, but handle gracefully
-                raise RuntimeError(
-                    f"Task metadata missing 'tid' column. Columns: {task_df.columns.tolist()}"
-                )
-
-        except OpenMLServerException as e:
-            raise RuntimeError(f"Failed to retrieve task metadata for suite {self.id}: {e}") from e
-        except Exception as e:
-            raise RuntimeError(
-                f"Unexpected error retrieving task metadata for suite {self.id}: {e}"
-            ) from e
-
-        # Step 2: Extract unique dataset IDs and fetch dataset metadata
-        if "did" in task_df.columns and len(task_df) > 0:
-            unique_dids = task_df["did"].unique().tolist()
-
-            try:
-                dataset_df = list_datasets(data_id=unique_dids)
-            except OpenMLServerException as e:
-                raise RuntimeError(f"Failed to retrieve dataset metadata: {e}") from e
-            except Exception as e:
-                raise RuntimeError(f"Unexpected error retrieving dataset metadata: {e}") from e
-
-            # Step 3: Merge DataFrames
-            # Use left join to preserve all tasks (one row per task)
-            # Apply suffixes to handle column name collisions
-            self._metadata = pd.merge(
-                task_df,
-                dataset_df,
-                on="did",
-                how="left",
-                suffixes=("", "_dataset"),
-            )
-        else:
-            # Fallback: return task DataFrame only if 'did' column is missing
-            self._metadata = task_df
-
+        self._metadata = self._merge_dataset_metadata(task_df)
         return self._metadata
