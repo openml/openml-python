@@ -212,7 +212,11 @@ def download_flow_from_huggingface(
     config = get_config()
 
     if local_dir is None:
-        local_dir = config.cache_dir / repo_id.replace("/", "_")
+        cache_dir = config.cache_dir
+        if cache_dir is None:
+            raise RuntimeError("Cache directory is not configured")
+        local_dir = cache_dir / repo_id.replace("/", "_")
+
     local_dir = Path(local_dir)
     local_dir.mkdir(parents=True, exist_ok=True)
 
