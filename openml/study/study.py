@@ -378,7 +378,9 @@ class OpenMLBenchmarkSuite(BaseStudy):
         except OpenMLServerException as e:
             raise RuntimeError(f"Failed to retrieve task metadata for suite {self.id}: {e}") from e
         except Exception as e:
-            raise RuntimeError(f"Unexpected error retrieving task metadata for suite {self.id}: {e}") from e
+            raise RuntimeError(
+                f"Unexpected error retrieving task metadata for suite {self.id}: {e}"
+            ) from e
 
     def _merge_dataset_metadata(self, task_df: pd.DataFrame) -> pd.DataFrame:
         """Merge dataset metadata with task metadata.
