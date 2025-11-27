@@ -492,32 +492,29 @@ def _create_task_from_xml(xml: str) -> OpenMLTask:
         "data_set_id": inputs["source_data"]["oml:data_set"]["oml:data_set_id"],
         "evaluation_measure": evaluation_measures,
     }
-    # TODO: add OpenMLClusteringTask?
     if task_type in (
         TaskType.SUPERVISED_CLASSIFICATION,
         TaskType.SUPERVISED_REGRESSION,
         TaskType.LEARNING_CURVE,
+        TaskType.CLUSTERING,
     ):
-        # Convert some more parameters
-        for parameter in inputs["estimation_procedure"]["oml:estimation_procedure"][
-            "oml:parameter"
-        ]:
+        est_proc = inputs["estimation_procedure"]["oml:estimation_procedure"]
+        parameters = est_proc.get("oml:parameter", [])
+        if isinstance(parameters, dict):
+            parameters = [parameters]
+        for parameter in parameters:
             name = parameter["@name"]
             text = parameter.get("#text", "")
             estimation_parameters[name] = text
 
-        common_kwargs["estimation_procedure_type"] = inputs["estimation_procedure"][
-            "oml:estimation_procedure"
-        ]["oml:type"]
-        common_kwargs["estimation_procedure_id"] = int(
-            inputs["estimation_procedure"]["oml:estimation_procedure"]["oml:id"]
-        )
-
+        common_kwargs["estimation_procedure_type"] = est_proc.get("oml:type")
+        est_proc_id = est_proc.get("oml:id")
+        common_kwargs["estimation_procedure_id"] = int(est_proc_id) if est_proc_id else None
         common_kwargs["estimation_parameters"] = estimation_parameters
-        common_kwargs["target_name"] = inputs["source_data"]["oml:data_set"]["oml:target_feature"]
-        common_kwargs["data_splits_url"] = inputs["estimation_procedure"][
-            "oml:estimation_procedure"
-        ]["oml:data_splits_url"]
+        common_kwargs["target_name"] = (
+            inputs["source_data"]["oml:data_set"].get("oml:target_feature") or None
+        )
+        common_kwargs["data_splits_url"] = est_proc.get("oml:data_splits_url")
 
     cls = {
         TaskType.SUPERVISED_CLASSIFICATION: OpenMLClassificationTask,
