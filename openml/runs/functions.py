@@ -7,7 +7,7 @@ import warnings
 from collections import OrderedDict
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pandas as pd
@@ -57,11 +57,7 @@ ERROR_CODE = 512
 # NEW FUNCTION: Run suite with progress tracking
 
 
-def run_suite_with_progress(
-    suite_id: int | str,
-    model: Any,
-    **kwargs
-) -> Dict[str, Any]:
+def run_suite_with_progress(suite_id: int | str, model: Any, **kwargs) -> dict[str, Any]:
     """
     Run an entire OpenML benchmark suite with real-time progress tracking.
 
@@ -96,7 +92,7 @@ def run_suite_with_progress(
         total=total_tasks,
         desc=f"Suite {suite_id}",
         unit="task",
-        bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]'
+        bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]",
     )
 
     # Run each task with progress tracking
@@ -107,17 +103,14 @@ def run_suite_with_progress(
             task_time = time.time() - task_start
 
             results[task_id] = {
-                'run': run_result,
-                'execution_time': task_time,
-                'status': 'completed'
+                "run": run_result,
+                "execution_time": task_time,
+                "status": "completed",
             }
             completed_tasks += 1
 
         except Exception as e:
-            results[task_id] = {
-                'error': str(e),
-                'status': 'failed'
-            }
+            results[task_id] = {"error": str(e), "status": "failed"}
             failed_tasks += 1
 
         # Update progress bar
@@ -130,23 +123,21 @@ def run_suite_with_progress(
     total_time = time.time() - start_time
 
     return {
-        'suite_id': suite_id,
-        'total_tasks': total_tasks,
-        'completed_tasks': completed_tasks,
-        'failed_tasks': failed_tasks,
-        'total_time': total_time,
-        'results': results,
-        'success_rate': completed_tasks / total_tasks if total_tasks > 0 else 0
+        "suite_id": suite_id,
+        "total_tasks": total_tasks,
+        "completed_tasks": completed_tasks,
+        "failed_tasks": failed_tasks,
+        "total_time": total_time,
+        "results": results,
+        "success_rate": completed_tasks / total_tasks if total_tasks > 0 else 0,
     }
+
 
 # NEW FUNCTION: Run model on task with progress tracking
 
 
 def run_model_on_task_with_progress(
-    model: Any,
-    task: int | str | OpenMLTask,
-    progress_callback: Optional[callable] = None,
-    **kwargs
+    model: Any, task: int | str | OpenMLTask, progress_callback: callable | None = None, **kwargs
 ) -> OpenMLRun:
     """
     Run model on task with progress tracking.
@@ -165,6 +156,7 @@ def run_model_on_task_with_progress(
         progress_callback(1, 1, f"Completed task {task}")
 
     return result
+
 
 # ORIGINAL FUNCTIONS CONTINUE BELOW (NO CHANGES TO EXISTING CODE)
 # run_model_on_task
@@ -287,6 +279,7 @@ def run_model_on_task(  # noqa: PLR0913
     if return_flow:
         return run, flow
     return run
+
 
 # run_flow_on_task
 
@@ -420,8 +413,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
     )
 
     data_content, trace, fold_evaluations, sample_evaluations = res
-    fields = [*run_environment,
-              time.strftime("%c"), "Created by run_flow_on_task"]
+    fields = [*run_environment, time.strftime("%c"), "Created by run_flow_on_task"]
     generated_description = "\n".join(fields)
     run = OpenMLRun(
         task_id=task.task_id,
@@ -457,6 +449,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
 
     return run
 
+
 # ALL OTHER ORIGINAL FUNCTIONS CONTINUE EXACTLY AS THEY WERE:
 # get_run_trace, initialize_model_from_run, initialize_model_from_trace,
 # run_exists, _run_task_get_arffcontent, _run_task_get_arffcontent_parallel_helper,
@@ -479,8 +472,7 @@ def get_run_trace(run_id: int) -> OpenMLRunTrace:
     -------
     openml.runs.OpenMLTrace
     """
-    trace_xml = openml._api_calls._perform_api_call(
-        "run/trace/%d" % run_id, "get")
+    trace_xml = openml._api_calls._perform_api_call("run/trace/%d" % run_id, "get")
     return OpenMLRunTrace.trace_from_xml(trace_xml)
 
 
@@ -702,8 +694,7 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
             _pred_y=pred_y,
             _user_defined_measures_fold=user_defined_measures_fold,
         ):
-            _user_defined_measures_fold[openml_name] = sklearn_fn(
-                _test_y, _pred_y)
+            _user_defined_measures_fold[openml_name] = sklearn_fn(_test_y, _pred_y)
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
             assert test_y is not None
@@ -728,8 +719,7 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
                             if isinstance(test_y[i], (int, np.integer))
                             else test_y[i]
                         )
-                    pred_prob = proba_y.iloc[i] if isinstance(
-                        proba_y, pd.DataFrame) else proba_y[i]
+                    pred_prob = proba_y.iloc[i] if isinstance(proba_y, pd.DataFrame) else proba_y[i]
 
                     arff_line = format_prediction(
                         task=task,
@@ -755,8 +745,7 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
         elif isinstance(task, OpenMLRegressionTask):
             assert test_y is not None
             for i, _ in enumerate(test_indices):
-                truth = test_y.iloc[i] if isinstance(
-                    test_y, pd.Series) else test_y[i]
+                truth = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
                 arff_line = format_prediction(
                     task=task,
                     repeat=rep_no,
@@ -791,11 +780,9 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
             if measure not in user_defined_measures_per_sample:
                 user_defined_measures_per_sample[measure] = OrderedDict()
             if rep_no not in user_defined_measures_per_sample[measure]:
-                user_defined_measures_per_sample[measure][rep_no] = OrderedDict(
-                )
+                user_defined_measures_per_sample[measure][rep_no] = OrderedDict()
             if fold_no not in user_defined_measures_per_sample[measure][rep_no]:
-                user_defined_measures_per_sample[measure][rep_no][fold_no] = OrderedDict(
-                )
+                user_defined_measures_per_sample[measure][rep_no][fold_no] = OrderedDict()
 
             user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[
                 measure
@@ -950,8 +937,7 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    run_dir = Path(openml.utils._create_cache_directory_for_id(
-        RUNS_CACHE_DIR_NAME, run_id))
+    run_dir = Path(openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id))
     run_file = run_dir / "description.xml"
 
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -1000,8 +986,7 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
         if not from_server:
             return None
 
-        raise AttributeError(
-            "Run XML does not contain required (server) field: ", fieldname)
+        raise AttributeError("Run XML does not contain required (server) field: ", fieldname)
 
     run = xmltodict.parse(xml, force_list=["oml:file", "oml:evaluation", "oml:parameter_setting"])[
         "oml:run"
@@ -1058,12 +1043,10 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
     files: dict[str, int] = {}
     evaluations: dict[str, float | Any] = {}
     fold_evaluations: dict[str, dict[int, dict[int, float | Any]]] = {}
-    sample_evaluations: dict[str,
-                             dict[int, dict[int, dict[int, float | Any]]]] = {}
+    sample_evaluations: dict[str, dict[int, dict[int, dict[int, float | Any]]]] = {}
     if "oml:output_data" not in run:
         if from_server:
-            raise ValueError(
-                "Run does not contain output_data (OpenML server error?)")
+            raise ValueError("Run does not contain output_data (OpenML server error?)")
         predictions_url = None
     else:
         output_data = run["oml:output_data"]
@@ -1115,21 +1098,18 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
                     evaluations[key] = value
 
     if "description" not in files and from_server is True:
-        raise ValueError(
-            "No description file for run %d in run description XML" % run_id)
+        raise ValueError("No description file for run %d in run description XML" % run_id)
 
     if "predictions" not in files and from_server is True:
         task = openml.tasks.get_task(task_id)
         if task.task_type_id == TaskType.SUBGROUP_DISCOVERY:
-            raise NotImplementedError(
-                "Subgroup discovery tasks are not yet supported.")
+            raise NotImplementedError("Subgroup discovery tasks are not yet supported.")
 
         # JvR: actually, I am not sure whether this error should be raised.
         # a run can consist without predictions. But for now let's keep it
         # Matthias: yes, it should stay as long as we do not really handle
         # this stuff
-        raise ValueError(
-            "No prediction files for run %d in run description XML" % run_id)
+        raise ValueError("No prediction files for run %d in run description XML" % run_id)
 
     tags = openml.utils.extract_xml_tags("oml:tag", run)
 
@@ -1159,15 +1139,13 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
 
 def _get_cached_run(run_id: int) -> OpenMLRun:
     """Load a run from the cache."""
-    run_cache_dir = openml.utils._create_cache_directory_for_id(
-        RUNS_CACHE_DIR_NAME, run_id)
+    run_cache_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id)
     run_file = run_cache_dir / "description.xml"
     try:
         with run_file.open(encoding="utf8") as fh:
             return _create_run_from_xml(xml=fh.read())
     except OSError as e:
-        raise OpenMLCacheException(
-            f"Run file for run id {run_id} not cached") from e
+        raise OpenMLCacheException(f"Run file for run id {run_id} not cached") from e
 
 
 def list_runs(  # noqa: PLR0913
@@ -1320,8 +1298,7 @@ def _list_runs(  # noqa: PLR0913, C901
     if tag is not None:
         api_call += f"/tag/{tag}"
     if task_type is not None:
-        tvalue = task_type.value if isinstance(
-            task_type, TaskType) else task_type
+        tvalue = task_type.value if isinstance(task_type, TaskType) else task_type
         api_call += f"/task_type/{tvalue}"
     return __list_runs(api_call=api_call)
 
@@ -1332,8 +1309,7 @@ def __list_runs(api_call: str) -> pd.DataFrame:
     runs_dict = xmltodict.parse(xml_string, force_list=("oml:run",))
     # Minimalistic check if the XML is useful
     if "oml:runs" not in runs_dict:
-        raise ValueError(
-            f'Error in return XML, does not contain "oml:runs": {runs_dict}')
+        raise ValueError(f'Error in return XML, does not contain "oml:runs": {runs_dict}')
 
     if "@xmlns:oml" not in runs_dict["oml:runs"]:
         raise ValueError(
@@ -1347,8 +1323,7 @@ def __list_runs(api_call: str) -> pd.DataFrame:
             f'"http://openml.org/openml": {runs_dict}',
         )
 
-    assert isinstance(runs_dict["oml:runs"]["oml:run"],
-                      list), type(runs_dict["oml:runs"])
+    assert isinstance(runs_dict["oml:runs"]["oml:run"], list), type(runs_dict["oml:runs"])
 
     runs = {
         int(r["oml:run_id"]): {
@@ -1414,14 +1389,12 @@ def format_prediction(  # noqa: PLR0913
         if proba is None:
             raise ValueError("`proba` is required for classification task")
         if task.class_labels is None:
-            raise ValueError(
-                "The classification task must have class labels set")
+            raise ValueError("The classification task must have class labels set")
         if not set(task.class_labels) == set(proba):
             raise ValueError("Each class should have a predicted probability")
         if sample is None:
             if isinstance(task, OpenMLLearningCurveTask):
-                raise ValueError(
-                    "`sample` can not be none for LearningCurveTask")
+                raise ValueError("`sample` can not be none for LearningCurveTask")
 
             sample = 0
         probabilities = [proba[c] for c in task.class_labels]
