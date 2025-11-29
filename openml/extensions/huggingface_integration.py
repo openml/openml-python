@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any
 
 import openml
-from openml.runs import OpenMLRun
+
+if TYPE_CHECKING:
+    from openml.runs import OpenMLRun
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +31,7 @@ def push_model_to_hub_for_run(
     model: Any,
     run: OpenMLRun,
     repo_id: str,
-    token: Optional[str] = None,
+    token: str | None = None,
 ) -> OpenMLRun:
     """
     Push a Hugging Face model to the Hub and link it to an OpenML run.
@@ -83,7 +85,7 @@ def push_model_to_hub_for_run(
 
 def load_model_from_run(
     run_id: int,
-    token: Optional[str] = None,
+    token: str | None = None,
 ) -> Any:
     """
     Load a Hugging Face model linked to an OpenML run.
@@ -119,7 +121,9 @@ def load_model_from_run(
             break
 
     if not hf_uri:
-        raise ValueError(f"Run {run_id} does not have a linked Hugging Face model (no 'hf_uri' tag).")
+        raise ValueError(
+            f"Run {run_id} does not have a linked Hugging Face model (no 'hf_uri' tag)."
+        )
 
     # Parse URI: hf://{repo_id}@{commit_sha}
     # Remove hf://
@@ -130,16 +134,14 @@ def load_model_from_run(
     repo_id, commit_sha = uri_path.split("@", 1)
 
     # Load model
-    model = AutoModel.from_pretrained(repo_id, revision=commit_sha, token=token)
-
-    return model
+    return AutoModel.from_pretrained(repo_id, revision=commit_sha, token=token)
 
 
 def run_task_with_hf_sync(
     model: Any,
     task_id: int,
     repo_id: str,
-    hf_token: Optional[str] = None,
+    hf_token: str | None = None,
 ) -> OpenMLRun:
     """
     Run a task and sync the model to Hugging Face Hub.
