@@ -552,3 +552,113 @@ def delete_flow(flow_id: int) -> bool:
         True if the deletion was successful. False otherwise.
     """
     return openml.utils._delete_entity("flow", flow_id)
+
+
+def edit_flow(
+    flow_id: int,
+    custom_name: str | None = None,
+    tags: list[str] | None = None,
+    language: str | None = None,
+    description: str | None = None,
+) -> int:
+    """Edits an OpenMLFlow.
+
+    In addition to providing the flow id of the flow to edit (through flow_id),
+    you must specify a value for at least one of the optional function arguments,
+    i.e. one value for a field to edit.
+
+    This function allows editing of non-critical fields only.
+    Editable fields are: custom_name, tags, language, description.
+
+    Editing is allowed only for the owner of the flow.
+
+    Parameters
+    ----------
+    flow_id : int
+        ID of the flow.
+    custom_name : str, optional
+        Custom name for the flow.
+    tags : list[str], optional
+        Tags to associate with the flow.
+    language : str, optional
+        Language in which the flow is described.
+        Starts with 1 upper case letter, rest lower case, e.g. 'English'.
+    description : str, optional
+        Human-readable description of the flow.
+
+    Returns
+    -------
+    flow_id : int
+        The ID of the edited flow.
+
+    Raises
+    ------
+    TypeError
+        If flow_id is not an integer.
+    ValueError
+        If no fields are provided for editing.
+    OpenMLServerException
+        If the user is not authorized to edit the flow or if the flow doesn't exist.
+
+    Examples
+    --------
+    >>> import openml
+    >>> # Edit the custom name of a flow
+    >>> edited_flow_id = openml.flows.edit_flow(123, custom_name="My Custom Flow Name")
+    >>> 
+    >>> # Edit multiple fields at once
+    >>> edited_flow_id = openml.flows.edit_flow(
+    ...     456,
+    ...     custom_name="Updated Flow",
+    ...     language="English",
+    ...     description="An updated description for this flow",
+    ...     tags=["machine-learning", "classification"]
+    ... )
+    """
+    if not isinstance(flow_id, int):
+        raise TypeError(f"`flow_id` must be of type `int`, not {type(flow_id)}.")
+
+    # Check if at least one field is provided for editing
+    fields_to_edit = [custom_name, tags, language, description]
+    if all(field is None for field in fields_to_edit):
+        raise ValueError(
+            "At least one field must be provided for editing. "
+            "Available fields: custom_name, tags, language, description"
+        )
+
+    # Compose flow edit parameters as XML
+    form_data = {"flow_id": flow_id}  # type: openml._api_calls.DATA_TYPE
+    xml = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
+    xml["oml:flow_edit_parameters"] = OrderedDict()
+    xml["oml:flow_edit_parameters"]["@xmlns:oml"] = "http://openml.org/openml"
+    xml["oml:flow_edit_parameters"]["oml:custom_name"] = custom_name
+    xml["oml:flow_edit_parameters"]["oml:language"] = language
+    xml["oml:flow_edit_parameters"]["oml:description"] = description
+
+    # Handle tags - convert list to comma-separated string if provided
+    if tags is not None:
+        if isinstance(tags, list):
+            xml["oml:flow_edit_parameters"]["oml:tag"] = ",".join(tags)
+        else:
+            xml["oml:flow_edit_parameters"]["oml:tag"] = str(tags)
+    else:
+        xml["oml:flow_edit_parameters"]["oml:tag"] = None
+
+    # Remove None values from XML
+    for key in list(xml["oml:flow_edit_parameters"]):
+        if not xml["oml:flow_edit_parameters"][key]:
+            del xml["oml:flow_edit_parameters"][key]
+
+    file_elements = {
+        "edit_parameters": ("description.xml", xmltodict.unparse(xml)),
+    }  # type: openml._api_calls.FILE_ELEMENTS_TYPE
+
+    result_xml = openml._api_calls._perform_api_call(
+        "flow/edit",
+        "post",
+        data=form_data,
+        file_elements=file_elements,
+    )
+    result = xmltodict.parse(result_xml)
+    edited_flow_id = result["oml:flow_edit"]["oml:id"]
+    return int(edited_flow_id)
