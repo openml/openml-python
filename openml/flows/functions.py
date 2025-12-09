@@ -605,7 +605,7 @@ def edit_flow(
     >>> import openml
     >>> # Edit the custom name of a flow
     >>> edited_flow_id = openml.flows.edit_flow(123, custom_name="My Custom Flow Name")
-    >>> 
+    >>>
     >>> # Edit multiple fields at once
     >>> edited_flow_id = openml.flows.edit_flow(
     ...     456,
