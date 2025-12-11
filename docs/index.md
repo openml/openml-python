@@ -56,7 +56,7 @@ pip install openml
 ```
 
 For more advanced installation information, please see the
-["Introduction"](../examples/Basics/introduction_tutorial) example.
+["Introduction"](examples/Basics/introduction_tutorial.py) example.
 
 
 ## Further information

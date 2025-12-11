@@ -69,6 +69,7 @@ openml.config.start_using_configuration_for_example()
 # In this examples we'll create a few runs for the OpenML-100 benchmark
 # suite which is available on the OpenML test server.
 
+# %% [markdown]
 # <div class="admonition warning">
 #     <p class="admonition-title">Warning</p>
 #     <p>

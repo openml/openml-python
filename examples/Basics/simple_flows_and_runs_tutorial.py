@@ -20,7 +20,6 @@ import openml
 #         OpenML-Python API.
 #     </p>
 # </div>
-
 # %%
 openml.config.start_using_configuration_for_example()
 
