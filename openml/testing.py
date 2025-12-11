@@ -50,6 +50,8 @@ class TestBase(unittest.TestCase):
     test_server = "https://test.openml.org/api/v1/xml"
     # amueller's read/write key that he will throw away later
     apikey = "abc"
+    admin_key = "abc"
+    user_key = "normaluser"
 
     # creating logger for tracking files uploaded to test server
     logger = logging.getLogger("unit_tests_published_entities")

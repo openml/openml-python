@@ -69,7 +69,6 @@ class TestFlowFunctions(TestBase):
     @pytest.mark.production()
     def test_list_flows_empty(self):
         self.use_production_server()
-        openml.config.server = self.production_server
         flows = openml.flows.list_flows(tag="NoOneEverUsesThisTag123")
         assert flows.empty
 

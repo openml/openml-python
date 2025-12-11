@@ -586,9 +586,9 @@ class TestOpenMLDataset(TestBase):
         TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         did = dataset.id
 
-        # admin key for test server (only adminds can activate datasets.
+        # admin key for test server (only admins can activate datasets.
         # all users can deactivate their own datasets)
-        openml.config.apikey = "d488d8afd93b32331cf6ea9d7003d4c3"
+        openml.config.apikey = TestBase.admin_key
 
         openml.datasets.status_update(did, "active")
         self._assert_status_of_dataset(did=did, status="active")
@@ -869,6 +869,7 @@ class TestOpenMLDataset(TestBase):
         ), "ARFF files are not equal"
 
     def test_topic_api_error(self):
+        openml.config.apikey = TestBase.user_key
         # Check server exception when non-admin accessses apis
         self.assertRaisesRegex(
             OpenMLServerException,
@@ -1475,6 +1476,7 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test_edit_data_user_cannot_edit_critical_field_of_other_users_dataset(self):
+        openml.config.apikey = TestBase.user_key
         # Check server exception when a non-owner or non-admin tries to edit critical fields
         self.assertRaisesRegex(
             OpenMLServerException,

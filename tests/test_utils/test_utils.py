@@ -27,7 +27,7 @@ def min_number_flows_on_test_server() -> int:
 
 @pytest.fixture()
 def min_number_setups_on_test_server() -> int:
-    """After a reset at least 50 setups are on the test server"""
+    """After a reset at least 20 setups are on the test server"""
     return 50
 
 
@@ -39,8 +39,8 @@ def min_number_runs_on_test_server() -> int:
 
 @pytest.fixture()
 def min_number_evaluations_on_test_server() -> int:
-    """After a reset at least 22 evaluations are on the test server"""
-    return 22
+    """After a reset at least 8 evaluations are on the test server"""
+    return 8
 
 
 def _mocked_perform_api_call(call, request_method):

@@ -251,7 +251,7 @@ def test_files_directory() -> Path:
 
 @pytest.fixture(scope="session")
 def test_api_key() -> str:
-    return "normaluser"
+    return TestBase.user_key
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -274,10 +274,11 @@ def as_robot() -> Iterator[None]:
 def with_server(request):
     if "production" in request.keywords:
         openml.config.server = "https://www.openml.org/api/v1/xml"
+        openml.config.apikey = None
         yield
         return
     openml.config.server = "https://test.openml.org/api/v1/xml"
-    openml.config.apikey = "normaluser"
+    openml.config.apikey = TestBase.user_key
     yield
 
 
@@ -295,11 +296,9 @@ def with_test_cache(test_files_directory, request):
     if tmp_cache.exists():
         shutil.rmtree(tmp_cache)
         
-        
 
 @pytest.fixture
 def static_cache_dir():
-    
     return Path(__file__).parent / "files" 
 
 @pytest.fixture
