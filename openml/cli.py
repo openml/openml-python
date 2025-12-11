@@ -6,10 +6,14 @@ import argparse
 import string
 import sys
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 from urllib.parse import urlparse
 
 from openml import config
+from openml.runs import functions as run_functions
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 def is_hex(string_: str) -> bool:
@@ -327,12 +331,268 @@ def configure(args: argparse.Namespace) -> None:
             set_field_function(args.value)
 
 
+def _format_runs_output(
+    runs_df: pd.DataFrame,
+    output_format: str,
+    *,
+    verbose: bool = False,
+) -> None:
+    """Format and print runs output based on requested format.
+
+    Parameters
+    ----------
+    runs_df : pd.DataFrame
+        DataFrame containing runs information
+    output_format : str
+        Output format: 'json', 'table', or 'list'
+    verbose : bool
+        Whether to show detailed information
+    """
+    if output_format == "json":
+        # Convert to JSON format
+        output = runs_df.to_json(orient="records", indent=2)
+        print(output)
+    elif output_format == "table":
+        _format_runs_table(runs_df, verbose=verbose)
+    else:  # default: simple list
+        _format_runs_list(runs_df, verbose=verbose)
+
+
+def _format_runs_table(runs_df: pd.DataFrame, *, verbose: bool = False) -> None:
+    """Format runs as a table.
+
+    Parameters
+    ----------
+    runs_df : pd.DataFrame
+        DataFrame containing runs information
+    verbose : bool
+        Whether to show all columns
+    """
+    if verbose:
+        print(runs_df.to_string(index=False))
+    else:
+        # Show only key columns for compact view
+        columns_to_show = ["run_id", "task_id", "flow_id", "uploader", "upload_time"]
+        available_columns = [col for col in columns_to_show if col in runs_df.columns]
+        print(runs_df[available_columns].to_string(index=False))
+
+
+def _format_runs_list(runs_df: pd.DataFrame, *, verbose: bool = False) -> None:
+    """Format runs as a simple list.
+
+    Parameters
+    ----------
+    runs_df : pd.DataFrame
+        DataFrame containing runs information
+    verbose : bool
+        Whether to show detailed information
+    """
+    if verbose:
+        # Verbose: show detailed info for each run
+        for _, run in runs_df.iterrows():
+            print(f"Run ID: {run['run_id']}")
+            print(f"  Task ID: {run['task_id']}")
+            print(f"  Flow ID: {run['flow_id']}")
+            print(f"  Setup ID: {run['setup_id']}")
+            print(f"  Uploader: {run['uploader']}")
+            print(f"  Upload Time: {run['upload_time']}")
+            if run.get("error_message"):
+                print(f"  Error: {run['error_message']}")
+            print()
+    else:
+        # Simple: just list run IDs
+        for run_id in runs_df["run_id"]:
+            print(f"{run_id}: Task {runs_df[runs_df['run_id'] == run_id]['task_id'].iloc[0]}")
+
+
+def runs_list(args: argparse.Namespace) -> None:
+    """List runs with optional filtering.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Arguments containing filtering criteria: task, flow, uploader, tag, size, offset, format
+    """
+    # Build filter arguments, excluding None values
+    kwargs = {}
+    if args.task is not None:
+        kwargs["task"] = [args.task]
+    if args.flow is not None:
+        kwargs["flow"] = [args.flow]
+    if args.uploader is not None:
+        kwargs["uploader"] = [args.uploader]
+    if args.tag is not None:
+        kwargs["tag"] = args.tag
+    if args.size is not None:
+        kwargs["size"] = args.size
+    if args.offset is not None:
+        kwargs["offset"] = args.offset
+
+    try:
+        # Get runs from server
+        runs_df = run_functions.list_runs(**kwargs)  # type: ignore[arg-type]
+
+        if runs_df.empty:
+            print("No runs found matching the criteria.")
+            return
+
+        # Format output based on requested format
+        _format_runs_output(runs_df, args.format, verbose=args.verbose)
+
+    except Exception as e:  # noqa: BLE001
+        print(f"Error listing runs: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def _print_run_evaluations(run: object) -> None:
+    """Print evaluation information for a run.
+
+    Parameters
+    ----------
+    run : OpenMLRun
+        The run object containing evaluation data
+    """
+    # Display evaluations if available
+    if hasattr(run, "evaluations") and run.evaluations:
+        print("\nEvaluations:")
+        for measure, value in run.evaluations.items():
+            print(f"  {measure}: {value}")
+
+    # Display fold evaluations if available (summary)
+    if hasattr(run, "fold_evaluations") and run.fold_evaluations:
+        print("\nFold Evaluations (Summary):")
+        for measure, repeats in run.fold_evaluations.items():
+            # Calculate average across all folds and repeats
+            all_values = []
+            for repeat_dict in repeats.values():
+                all_values.extend(repeat_dict.values())
+            if all_values:
+                avg_value = sum(all_values) / len(all_values)
+                print(f"  {measure}: {avg_value:.4f} (avg over {len(all_values)} folds)")
+
+
+def runs_info(args: argparse.Namespace) -> None:
+    """Display detailed information about a specific run.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Arguments containing the run_id to fetch
+    """
+    try:
+        # Get run from server
+        run = run_functions.get_run(args.run_id)
+
+        # Display run information
+        print(f"Run ID: {run.run_id}")
+        print(f"Task ID: {run.task_id}")
+        print(f"Task Type: {run.task_type}")
+        print(f"Flow ID: {run.flow_id}")
+        print(f"Flow Name: {run.flow_name}")
+        print(f"Setup ID: {run.setup_id}")
+        print(f"Dataset ID: {run.dataset_id}")
+        print(f"Uploader: {run.uploader_name} (ID: {run.uploader})")
+
+        # Display parameter settings if available
+        if run.parameter_settings:
+            print("\nParameter Settings:")
+            for param in run.parameter_settings:
+                component = param.get("oml:component", "")
+                name = param.get("oml:name", "")
+                value = param.get("oml:value", "")
+                if component:
+                    print(f"  {component}.{name}: {value}")
+                else:
+                    print(f"  {name}: {value}")
+
+        # Display evaluations
+        _print_run_evaluations(run)
+
+        # Display tags if available
+        if run.tags:
+            print(f"\nTags: {', '.join(run.tags)}")
+
+        # Display predictions URL if available
+        if run.predictions_url:
+            print(f"\nPredictions URL: {run.predictions_url}")
+
+        # Display output files if available
+        if run.output_files:
+            print("\nOutput Files:")
+            for file_name, file_id in run.output_files.items():
+                print(f"  {file_name}: {file_id}")
+
+    except Exception as e:  # noqa: BLE001
+        print(f"Error fetching run information: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def runs_download(args: argparse.Namespace) -> None:
+    """Download a run and cache it locally.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Arguments containing the run_id to download
+    """
+    try:
+        # Get run from server (this will download and cache it)
+        run = run_functions.get_run(args.run_id, ignore_cache=True)
+
+        print(f"Successfully downloaded run {run.run_id}")
+        print(f"Task ID: {run.task_id}")
+        print(f"Flow ID: {run.flow_id}")
+        print(f"Dataset ID: {run.dataset_id}")
+
+        # Display cache location
+        cache_dir = config.get_cache_directory()
+        run_cache_dir = Path(cache_dir) / "runs" / str(run.run_id)
+        if run_cache_dir.exists():
+            print(f"\nRun cached at: {run_cache_dir}")
+            # List cached files
+            cached_files = list(run_cache_dir.iterdir())
+            if cached_files:
+                print("Cached files:")
+                for file in cached_files:
+                    print(f"  - {file.name}")
+
+        if run.predictions_url:
+            print(f"\nPredictions available at: {run.predictions_url}")
+
+    except Exception as e:  # noqa: BLE001
+        print(f"Error downloading run: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def runs(args: argparse.Namespace) -> None:
+    """Route runs subcommands to the appropriate handler.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Arguments containing the subcommand and its arguments
+    """
+    subcommands = {
+        "list": runs_list,
+        "info": runs_info,
+        "download": runs_download,
+    }
+
+    handler = subcommands.get(args.runs_subcommand)
+    if handler:
+        handler(args)
+    else:
+        print(f"Unknown runs subcommand: {args.runs_subcommand}")
+        sys.exit(1)
+
+
 def main() -> None:
-    subroutines = {"configure": configure}
+    subroutines = {"configure": configure, "runs": runs}
 
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="subroutine")
 
+    # Configure subcommand
     parser_configure = subparsers.add_parser(
         "configure",
         description="Set or read variables in your configuration file. For more help also see "
@@ -358,6 +618,88 @@ def main() -> None:
         default=None,
         nargs="?",
         help="The value to set the FIELD to.",
+    )
+
+    # Runs subcommand
+    parser_runs = subparsers.add_parser(
+        "runs",
+        description="Browse and search OpenML runs from the command line.",
+    )
+    runs_subparsers = parser_runs.add_subparsers(dest="runs_subcommand")
+
+    # runs list subcommand
+    parser_runs_list = runs_subparsers.add_parser(
+        "list",
+        description="List runs with optional filtering.",
+        help="List runs with optional filtering.",
+    )
+    parser_runs_list.add_argument(
+        "--task",
+        type=int,
+        help="Filter by task ID",
+    )
+    parser_runs_list.add_argument(
+        "--flow",
+        type=int,
+        help="Filter by flow ID",
+    )
+    parser_runs_list.add_argument(
+        "--uploader",
+        type=str,
+        help="Filter by uploader name or ID",
+    )
+    parser_runs_list.add_argument(
+        "--tag",
+        type=str,
+        help="Filter by tag",
+    )
+    parser_runs_list.add_argument(
+        "--size",
+        type=int,
+        default=10,
+        help="Number of runs to retrieve (default: 10)",
+    )
+    parser_runs_list.add_argument(
+        "--offset",
+        type=int,
+        default=0,
+        help="Offset for pagination (default: 0)",
+    )
+    parser_runs_list.add_argument(
+        "--format",
+        type=str,
+        choices=["list", "table", "json"],
+        default="list",
+        help="Output format (default: list)",
+    )
+    parser_runs_list.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show detailed information",
+    )
+
+    # runs info subcommand
+    parser_runs_info = runs_subparsers.add_parser(
+        "info",
+        description="Display detailed information about a specific run.",
+        help="Display detailed information about a specific run.",
+    )
+    parser_runs_info.add_argument(
+        "run_id",
+        type=int,
+        help="Run ID to fetch information for",
+    )
+
+    # runs download subcommand
+    parser_runs_download = runs_subparsers.add_parser(
+        "download",
+        description="Download a run and cache it locally.",
+        help="Download a run and cache it locally.",
+    )
+    parser_runs_download.add_argument(
+        "run_id",
+        type=int,
+        help="Run ID to download",
     )
 
     args = parser.parse_args()
