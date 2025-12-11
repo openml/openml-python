@@ -869,7 +869,6 @@ class TestOpenMLDataset(TestBase):
         ), "ARFF files are not equal"
 
     def test_topic_api_error(self):
-        openml.config.apikey = TestBase.user_key
         # Check server exception when non-admin accessses apis
         self.assertRaisesRegex(
             OpenMLServerException,
@@ -1476,7 +1475,6 @@ class TestOpenMLDataset(TestBase):
         )
 
     def test_edit_data_user_cannot_edit_critical_field_of_other_users_dataset(self):
-        openml.config.apikey = TestBase.user_key
         # Check server exception when a non-owner or non-admin tries to edit critical fields
         self.assertRaisesRegex(
             OpenMLServerException,

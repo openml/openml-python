@@ -48,8 +48,6 @@ class TestBase(unittest.TestCase):
     }
     flow_name_tracker: ClassVar[list[str]] = []
     test_server = "https://test.openml.org/api/v1/xml"
-    # amueller's read/write key that he will throw away later
-    apikey = "abc"
     admin_key = "abc"
     user_key = "normaluser"
 
@@ -101,7 +99,7 @@ class TestBase(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-        openml.config.apikey = TestBase.apikey
+        openml.config.apikey = TestBase.user_key
         self.production_server = "https://www.openml.org/api/v1/xml"
         openml.config.set_root_cache_directory(str(self.workdir))
 
