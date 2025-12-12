@@ -24,6 +24,7 @@ file_handler: logging.handlers.RotatingFileHandler | None = None
 
 OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
 OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
+_TEST_SERVER_NORMAL_USER_KEY = "normaluser"
 
 
 class _Config(TypedDict):
@@ -212,7 +213,7 @@ class ConfigurationForExamples:
     _last_used_key = None
     _start_last_called = False
     _test_server = "https://test.openml.org/api/v1/xml"
-    _test_apikey = "normaluser"
+    _test_apikey = _TEST_SERVER_NORMAL_USER_KEY
 
     @classmethod
     def start_using_configuration_for_example(cls) -> None:

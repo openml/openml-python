@@ -49,7 +49,7 @@ class TestBase(unittest.TestCase):
     flow_name_tracker: ClassVar[list[str]] = []
     test_server = "https://test.openml.org/api/v1/xml"
     admin_key = "abc"
-    user_key = "normaluser"
+    user_key = openml.config._TEST_SERVER_NORMAL_USER_KEY
 
     # creating logger for tracking files uploaded to test server
     logger = logging.getLogger("unit_tests_published_entities")
