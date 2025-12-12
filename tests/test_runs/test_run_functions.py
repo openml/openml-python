@@ -1545,10 +1545,9 @@ class TestRun(TestBase):
 
     @pytest.mark.production()
     def test_get_runs_list_by_tag(self):
-        # TODO: comes from live, no such lists on test
-        # Unit test works on production server only
-
+        # We don't have tagged runs on the test server
         self.use_production_server()
+        # Don't remove the size restriction: this query is too expensive without
         runs = openml.runs.list_runs(tag="curves", size=2)
         assert len(runs) >= 1
 
