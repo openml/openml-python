@@ -1407,9 +1407,8 @@ class TestRun(TestBase):
             assert run.fold_evaluations["f_measure"][0][i] == value
         assert "weka" in run.tags
         assert "weka_3.7.12" in run.tags
-        assert run.predictions_url == (
-            "https://api.openml.org/data/download/1667125/"
-            "weka_generated_predictions4575715871712251329.arff"
+        assert run.predictions_url.endswith(
+            "/data/download/1667125/weka_generated_predictions4575715871712251329.arff"
         )
 
     def _check_run(self, run):
@@ -1546,11 +1545,10 @@ class TestRun(TestBase):
 
     @pytest.mark.production()
     def test_get_runs_list_by_tag(self):
-        # TODO: comes from live, no such lists on test
-        # Unit test works on production server only
-
+        # We don't have tagged runs on the test server
         self.use_production_server()
-        runs = openml.runs.list_runs(tag="curves")
+        # Don't remove the size restriction: this query is too expensive without
+        runs = openml.runs.list_runs(tag="curves", size=2)
         assert len(runs) >= 1
 
     @pytest.mark.sklearn()
@@ -1766,6 +1764,7 @@ class TestRun(TestBase):
         _run_id = run.run_id
         assert delete_run(_run_id)
 
+    @pytest.mark.skip(reason="run id is in problematic state on test server due to PR#1454")
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",

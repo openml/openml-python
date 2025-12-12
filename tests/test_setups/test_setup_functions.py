@@ -116,9 +116,8 @@ class TestSetupFunctions(TestBase):
 
     @pytest.mark.production()
     def test_get_setup(self):
+        self.use_production_server()
         # no setups in default test server
-        openml.config.server = "https://www.openml.org/api/v1/xml/"
-
         # contains all special cases, 0 params, 1 param, n params.
         # Non scikitlearn flows.
         setups = [18, 19, 20, 118]
