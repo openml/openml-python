@@ -109,6 +109,11 @@ docs=[
     "mike"
 ]
 
+huggingface=[
+    "huggingface_hub",
+    "transformers"
+]
+
 [project.urls]
 home="https://openml.org/"
 documentation = "https://openml.github.io/openml-python/"
