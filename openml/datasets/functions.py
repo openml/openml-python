@@ -458,8 +458,11 @@ def get_dataset(  # noqa: C901, PLR0912
     if cache_format not in ["feather", "pickle"]:
         raise ValueError(
             "cache_format must be one of 'feather' or 'pickle. "
-            f"Invalid format specified: {cache_format}",
+            f"Invalid format specified: {cache_format}. Expected one of: 'pickle' or 'feather'",
         )
+
+    if isinstance(dataset_id, str) and dataset_id.strip() == "":
+        raise ValueError("dataset_id cannot be an empty string.")
 
     if isinstance(dataset_id, str):
         try:
