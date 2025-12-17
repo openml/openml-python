@@ -204,3 +204,11 @@ When dependencies are installed, run
 mkdocs serve
 ```
 This will open a preview of the website.
+
+## Zenodo Archiving
+
+This repository is configured to archive releases to Zenodo automatically.
+
+The CITATION.cff file in the root directory ensures that the JMLR paper (Feurer et al., 2021) is cited when researchers use this software.
+
+Maintainers: When creating a new release on GitHub, ensure the version tag matches the package version. Zenodo will pick this up and mint a specific DOI for that version.
