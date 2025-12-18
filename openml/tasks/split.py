@@ -56,9 +56,15 @@ class OpenMLSplit:
 
         self.repeats = len(self.split)
 
-        # TODO(eddiebergman): Better error message
-        if any(len(self.split[0]) != len(self.split[i]) for i in range(self.repeats)):
-            raise ValueError("")
+        # Ensure all repetitions have the same number of folds
+        n_folds_rep_0 = len(self.split[0])
+        for i in range(1, self.repeats):
+            if len(self.split[i]) != n_folds_rep_0:
+                raise ValueError(
+                    f"Inconsistent number of folds across repetitions. "
+                    f"Repetition 0 has {n_folds_rep_0} folds, "
+                    f"but repetition {i} has {len(self.split[i])} folds.",
+                )
 
         self.folds = len(self.split[0])
         self.samples = len(self.split[0][0])
