@@ -19,17 +19,17 @@ from .task import (
 )
 
 __all__ = [
-    "OpenMLTask",
-    "OpenMLSupervisedTask",
-    "OpenMLClusteringTask",
-    "OpenMLRegressionTask",
     "OpenMLClassificationTask",
+    "OpenMLClusteringTask",
     "OpenMLLearningCurveTask",
+    "OpenMLRegressionTask",
+    "OpenMLSplit",
+    "OpenMLSupervisedTask",
+    "OpenMLTask",
+    "TaskType",
     "create_task",
+    "delete_task",
     "get_task",
     "get_tasks",
     "list_tasks",
-    "OpenMLSplit",
-    "TaskType",
-    "delete_task",
 ]

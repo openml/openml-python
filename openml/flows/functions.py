@@ -456,9 +456,9 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
                         )
 
                 if ignore_parameter_values_on_older_children:
-                    assert (
-                        flow1.upload_date is not None
-                    ), "Flow1 has no upload date that allows us to compare age of children."
+                    assert flow1.upload_date is not None, (
+                        "Flow1 has no upload date that allows us to compare age of children."
+                    )
                     upload_date_current_flow = dateutil.parser.parse(flow1.upload_date)
                     upload_date_parent_flow = dateutil.parser.parse(
                         ignore_parameter_values_on_older_children,

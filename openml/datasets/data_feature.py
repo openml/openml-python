@@ -51,8 +51,7 @@ class OpenMLDataFeature:
         if data_type == "nominal":
             if nominal_values is None:
                 raise TypeError(
-                    "Dataset features require attribute `nominal_values` for nominal "
-                    "feature type.",
+                    "Dataset features require attribute `nominal_values` for nominal feature type.",
                 )
 
             if not isinstance(nominal_values, list):
