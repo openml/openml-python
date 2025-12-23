@@ -36,6 +36,30 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         assert task.task_type_id == TaskType.CLUSTERING
         assert task.dataset_id == 36
 
+    @pytest.mark.production()
+    def test_estimation_procedure_extraction(self):
+        # task 126033 has complete estimation procedure data
+        self.use_production_server()
+        task = openml.tasks.get_task(126033, download_data=False)
+
+        assert task.task_type_id == TaskType.CLUSTERING
+        assert task.estimation_procedure_id == 17
+
+        est_proc = task.estimation_procedure
+        assert est_proc["type"] == "testontrainingdata"
+        assert est_proc["parameters"] is not None
+        assert "number_repeats" in est_proc["parameters"]
+        assert est_proc["data_splits_url"] is not None
+
+    @pytest.mark.production()
+    def test_estimation_procedure_empty_fields(self):
+        # task 146714 has empty estimation procedure fields in XML
+        self.use_production_server()
+        task = openml.tasks.get_task(self.task_id, download_data=False)
+
+        assert task.task_type_id == TaskType.CLUSTERING
+        assert task.estimation_procedure_id == 17
+
     def test_upload_task(self):
         compatible_datasets = self._get_compatible_rand_dataset()
         for i in range(100):
