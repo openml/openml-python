@@ -18,6 +18,9 @@ In particular, this module implements a python interface for the
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import builtins
+from typing import Any, Callable, Dict
+
 from . import (
     _api_calls,
     config,
@@ -49,12 +52,74 @@ from .tasks import (
     OpenMLTask,
 )
 
+ListDispatcher = Dict[str, Callable[..., Any]]
+GetDispatcher = Dict[str, Callable[..., Any]]
+
+
+def list(object_type: str, /, **kwargs: Any) -> Any:  # noqa: A001
+    """List OpenML objects by type (e.g., datasets, tasks, flows, runs).
+
+    This is a convenience dispatcher that forwards to the existing type-specific
+    ``list_*`` functions. Existing imports remain available for backward compatibility.
+    """
+    dispatch: ListDispatcher = {
+        "dataset": datasets.functions.list_datasets,
+        "task": tasks.functions.list_tasks,
+        "flow": flows.functions.list_flows,
+        "run": runs.functions.list_runs,
+    }
+
+    try:
+        func = dispatch[object_type.lower()]
+    except KeyError as exc:  # pragma: no cover - defensive branch
+        raise ValueError(
+            "Unsupported object_type for list; expected one of 'dataset', 'task', 'flow', 'run'.",
+        ) from exc
+
+    return func(**kwargs)
+
+
+def get(object_type_or_name: Any, identifier: Any | None = None, /, **kwargs: Any) -> Any:
+    """Get an OpenML object by type and identifier, or a dataset by name.
+
+    Examples
+    --------
+    openml.get("dataset", 61)
+    openml.get("dataset", "Fashion-MNIST")
+    openml.get("task", 31)
+    openml.get("flow", 10)
+    openml.get("run", 20)
+    openml.get("Fashion-MNIST")  # dataset lookup by name (no type specified)
+    """
+    # Single-argument shortcut: treat string without type as dataset lookup.
+    if identifier is None:
+        if isinstance(object_type_or_name, str):
+            return datasets.functions.get_dataset(object_type_or_name, **kwargs)
+        raise ValueError("Please provide an object_type when identifier is not provided.")
+
+    object_type = str(object_type_or_name).lower()
+    dispatch: GetDispatcher = {
+        "dataset": datasets.functions.get_dataset,
+        "task": tasks.functions.get_task,
+        "flow": flows.functions.get_flow,
+        "run": runs.functions.get_run,
+    }
+
+    try:
+        func = dispatch[object_type]
+    except KeyError as exc:  # pragma: no cover - defensive branch
+        raise ValueError(
+            "Unsupported object_type for get; expected one of 'dataset', 'task', 'flow', 'run'.",
+        ) from exc
+
+    return func(identifier, **kwargs)
+
 
 def populate_cache(
-    task_ids: list[int] | None = None,
-    dataset_ids: list[int | str] | None = None,
-    flow_ids: list[int] | None = None,
-    run_ids: list[int] | None = None,
+    task_ids: builtins.list[int] | None = None,
+    dataset_ids: builtins.list[int | str] | None = None,
+    flow_ids: builtins.list[int] | None = None,
+    run_ids: builtins.list[int] | None = None,
 ) -> None:
     """
     Populate a cache for offline and parallel usage of the OpenML connector.
@@ -91,6 +156,8 @@ def populate_cache(
 
 
 __all__ = [
+    "list",
+    "get",
     "OpenMLDataset",
     "OpenMLDataFeature",
     "OpenMLRun",

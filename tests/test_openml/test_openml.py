@@ -41,3 +41,27 @@ class TestInit(TestBase):
         assert task_mock.call_count == 2
         for argument, fixture in zip(task_mock.call_args_list, [(1,), (2,)]):
             assert argument[0] == fixture
+
+    @mock.patch("openml.tasks.functions.list_tasks")
+    @mock.patch("openml.datasets.functions.list_datasets")
+    def test_list_dispatch(self, list_datasets_mock, list_tasks_mock):
+        openml.list("dataset", output_format="dataframe")
+        list_datasets_mock.assert_called_once_with(output_format="dataframe")
+
+        openml.list("task", size=5)
+        list_tasks_mock.assert_called_once_with(size=5)
+
+    @mock.patch("openml.tasks.functions.get_task")
+    @mock.patch("openml.datasets.functions.get_dataset")
+    def test_get_dispatch(self, get_dataset_mock, get_task_mock):
+        openml.get("dataset", 61)
+        get_dataset_mock.assert_called_with(61)
+
+        openml.get("dataset", "Fashion-MNIST", version=2)
+        get_dataset_mock.assert_called_with("Fashion-MNIST", version=2)
+
+        openml.get("Fashion-MNIST")
+        get_dataset_mock.assert_called_with("Fashion-MNIST")
+
+        openml.get("task", 31)
+        get_task_mock.assert_called_with(31)

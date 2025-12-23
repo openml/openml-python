@@ -14,15 +14,23 @@ import openml
 # ## List datasets stored on OpenML
 
 # %%
-datasets_df = openml.datasets.list_datasets()
+datasets_df = openml.list("dataset")
 print(datasets_df.head(n=10))
+
+# Legacy path still works:
+# datasets_df = openml.datasets.list_datasets()
 
 # %% [markdown]
 # ## Download a dataset
 
 # %%
 # Iris dataset https://www.openml.org/d/61
-dataset = openml.datasets.get_dataset(dataset_id=61)
+dataset = openml.get("dataset", 61)
+# You can also fetch by name:
+# dataset = openml.get("dataset", "Fashion-MNIST")
+
+# Legacy path still works:
+# dataset = openml.datasets.get_dataset(dataset_id=61)
 
 # Print a summary
 print(
