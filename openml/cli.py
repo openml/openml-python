@@ -6,10 +6,13 @@ import argparse
 import string
 import sys
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 from urllib.parse import urlparse
 
-from openml import config
+from openml import config, datasets
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 def is_hex(string_: str) -> bool:
@@ -299,6 +302,156 @@ def configure_field(  # noqa: PLR0913
     verbose_set(field, value)
 
 
+def _format_output(
+    datasets_df: pd.DataFrame,
+    format: str = "table",  # noqa: A002
+    verbose: bool = False,  # noqa: FBT001, FBT002
+) -> None:
+    """Format and print DataFrame output.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data to display
+    format : str
+        Output format: 'table' or 'json'
+    verbose : bool
+        Include all columns if True, otherwise show subset
+    """
+    if datasets_df.empty:
+        print("No results found.")
+        return
+
+    if not verbose and len(datasets_df.columns) > 6:
+        # Show only key columns for non-verbose output
+        key_cols = [
+            "did",
+            "name",
+            "status",
+            "NumberOfInstances",
+            "NumberOfFeatures",
+            "NumberOfClasses",
+        ]
+        cols_to_show = [c for c in key_cols if c in datasets_df.columns]
+        datasets_df = datasets_df[cols_to_show]
+
+    if format == "json":
+        print(datasets_df.to_json(orient="records", indent=2))
+    else:  # table format
+        print(datasets_df.to_string(index=False))
+
+
+def datasets_list(args: argparse.Namespace) -> None:
+    """List datasets with optional filtering."""
+    # Build filter parameters
+    kwargs = {}
+    if args.tag:
+        kwargs["tag"] = args.tag
+    if args.status:
+        kwargs["status"] = args.status
+    if args.data_name:
+        kwargs["data_name"] = args.data_name
+    if args.number_instances:
+        kwargs["number_instances"] = args.number_instances
+    if args.number_features:
+        kwargs["number_features"] = args.number_features
+    if args.number_classes:
+        kwargs["number_classes"] = args.number_classes
+
+    # Fetch datasets
+    try:
+        datasets_df = datasets.list_datasets(
+            offset=args.offset,
+            size=args.size,
+            **kwargs,
+        )
+        _format_output(datasets_df, format=args.format, verbose=args.verbose)
+    except Exception as e:  # noqa: BLE001
+        print(f"Error listing datasets: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def datasets_info(args: argparse.Namespace) -> None:
+    """Display detailed information about a specific dataset."""
+    try:
+        dataset = datasets.get_dataset(
+            args.dataset_id,
+            download_data=False,
+            download_qualities=True,
+            download_features_meta_data=True,
+        )
+
+        # Print basic information
+        print(f"Dataset ID: {dataset.dataset_id}")
+        print(f"Name: {dataset.name}")
+        print(f"Version: {dataset.version}")
+        print(f"Format: {dataset.format}")
+        print(f"Upload Date: {dataset.upload_date}")
+        if dataset.visibility:
+            print(f"Visibility: {dataset.visibility}")
+        description = dataset.description or "No description available"
+        if len(description) > 200:
+            print(f"Description: {description[:200]}...")
+        else:
+            print(f"Description: {description}")
+
+        # Print qualities if available
+        if dataset.qualities:
+            print("\nQualities:")
+            for key, value in dataset.qualities.items():
+                print(f"  {key}: {value}")
+
+        # Print feature information
+        if dataset.features:
+            print(f"\nFeatures ({len(dataset.features)}):")
+            for feat_name, feat in list(dataset.features.items())[:10]:  # Show first 10
+                print(f"  - {feat_name} ({feat.data_type})")
+            if len(dataset.features) > 10:
+                print(f"  ... and {len(dataset.features) - 10} more")
+
+    except Exception as e:  # noqa: BLE001
+        print(f"Error fetching dataset info: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def datasets_search(args: argparse.Namespace) -> None:
+    """Search datasets by name (case-insensitive)."""
+    try:
+        # First try exact match with the API
+        datasets_df = datasets.list_datasets(data_name=args.query, size=args.size or 100)
+
+        # If no exact match, do case-insensitive client-side filtering
+        if datasets_df.empty:
+            all_datasets = datasets.list_datasets(size=1000)  # Get more datasets
+            if "name" in all_datasets.columns:
+                mask = all_datasets["name"].str.contains(args.query, case=False, na=False)
+                datasets_df = all_datasets[mask].head(args.size or 20)
+
+        if datasets_df.empty:
+            print(f"No datasets found matching '{args.query}'")
+        else:
+            print(f"Found {len(datasets_df)} dataset(s) matching '{args.query}':\n")
+            _format_output(datasets_df, format=args.format, verbose=args.verbose)
+    except Exception as e:  # noqa: BLE001
+        print(f"Error searching datasets: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def datasets_handler(args: argparse.Namespace) -> None:
+    """Route datasets subcommands to appropriate handlers."""
+    actions = {
+        "list": datasets_list,
+        "info": datasets_info,
+        "search": datasets_search,
+    }
+    action_func = actions.get(args.datasets_action)
+    if action_func:
+        action_func(args)
+    else:
+        print("Please specify a datasets action: list, info, or search")
+        sys.exit(1)
+
+
 def configure(args: argparse.Namespace) -> None:
     """Calls the right submenu(s) to edit `args.field` in the configuration file."""
     set_functions = {
@@ -328,19 +481,18 @@ def configure(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    subroutines = {"configure": configure}
+    subroutines = {"configure": configure, "datasets": datasets_handler}
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog="openml")
     subparsers = parser.add_subparsers(dest="subroutine")
 
+    # Configure subparser (existing)
     parser_configure = subparsers.add_parser(
         "configure",
         description="Set or read variables in your configuration file. For more help also see "
         "'https://openml.github.io/openml-python/main/usage.html#configuration'.",
     )
-
     configurable_fields = [f for f in config._defaults if f not in ["max_retries"]]
-
     parser_configure.add_argument(
         "field",
         type=str,
@@ -351,13 +503,89 @@ def main() -> None:
         "Choosing 'all' lets you configure all fields one by one. "
         "Choosing 'none' will print out the current configuration.",
     )
-
     parser_configure.add_argument(
         "value",
         type=str,
         default=None,
         nargs="?",
         help="The value to set the FIELD to.",
+    )
+
+    # Datasets subparser (NEW)
+    parser_datasets = subparsers.add_parser(
+        "datasets",
+        description="Browse and search OpenML datasets from the command line.",
+    )
+    datasets_subparsers = parser_datasets.add_subparsers(dest="datasets_action")
+
+    # datasets list
+    parser_datasets_list = datasets_subparsers.add_parser(
+        "list",
+        help="List datasets with optional filtering",
+    )
+    parser_datasets_list.add_argument("--offset", type=int, help="Number of datasets to skip")
+    parser_datasets_list.add_argument("--size", type=int, help="Maximum number of datasets to show")
+    parser_datasets_list.add_argument("--tag", type=str, help="Filter by tag")
+    parser_datasets_list.add_argument(
+        "--status",
+        type=str,
+        choices=["active", "in_preparation", "deactivated"],
+        help="Filter by status",
+    )
+    parser_datasets_list.add_argument("--data-name", type=str, help="Filter by dataset name")
+    parser_datasets_list.add_argument(
+        "--number-instances",
+        type=str,
+        help="Filter by number of instances (e.g., '100..1000')",
+    )
+    parser_datasets_list.add_argument(
+        "--number-features",
+        type=str,
+        help="Filter by number of features",
+    )
+    parser_datasets_list.add_argument(
+        "--number-classes",
+        type=str,
+        help="Filter by number of classes",
+    )
+    parser_datasets_list.add_argument(
+        "--format",
+        type=str,
+        choices=["table", "json"],
+        default="table",
+        help="Output format",
+    )
+    parser_datasets_list.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show all columns",
+    )
+
+    # datasets info
+    parser_datasets_info = datasets_subparsers.add_parser(
+        "info",
+        help="Display detailed information about a specific dataset",
+    )
+    parser_datasets_info.add_argument("dataset_id", type=str, help="Dataset ID or name")
+
+    # datasets search
+    parser_datasets_search = datasets_subparsers.add_parser(
+        "search",
+        help="Search datasets by name (case-insensitive)",
+    )
+    parser_datasets_search.add_argument("query", type=str, help="Search query")
+    parser_datasets_search.add_argument("--size", type=int, help="Maximum number of results")
+    parser_datasets_search.add_argument(
+        "--format",
+        type=str,
+        choices=["table", "json"],
+        default="table",
+        help="Output format",
+    )
+    parser_datasets_search.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show all columns",
     )
 
     args = parser.parse_args()
