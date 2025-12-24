@@ -70,7 +70,7 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = True) -> OpenMLFlow:  # noqa: FBT001, FBT002
+def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = True) -> OpenMLFlow:  # noqa: FBT002
     """Download the OpenML flow for a given flow ID.
 
     Parameters
@@ -245,7 +245,7 @@ def flow_exists(name: str, external_version: str) -> int | bool:
 def get_flow_id(
     model: Any | None = None,
     name: str | None = None,
-    exact_version: bool = True,  # noqa: FBT001, FBT002
+    exact_version: bool = True,  # noqa: FBT002
 ) -> int | bool | list[int]:
     """Retrieves the flow id for a model or a flow name.
 
@@ -364,9 +364,9 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
     flow1: OpenMLFlow,
     flow2: OpenMLFlow,
     ignore_parameter_values_on_older_children: str | None = None,
-    ignore_parameter_values: bool = False,  # noqa: FBT001, FBT002
-    ignore_custom_name_if_none: bool = False,  # noqa:  FBT001, FBT002
-    check_description: bool = True,  # noqa:  FBT001, FBT002
+    ignore_parameter_values: bool = False,  # noqa: FBT002
+    ignore_custom_name_if_none: bool = False,  # noqa: FBT002
+    check_description: bool = True,  # noqa: FBT002
 ) -> None:
     """Check equality of two flows.
 

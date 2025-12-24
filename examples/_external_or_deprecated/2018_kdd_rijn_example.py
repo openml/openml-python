@@ -32,16 +32,17 @@ pip install openml[examples,docs] fanova ConfigSpace<1.0
 
 import sys
 
-if sys.platform == "win32":  # noqa
+if sys.platform == "win32":
     print(
         "The pyrfr library (requirement of fanova) can currently not be installed on Windows systems"
     )
-    exit()
+    sys.exit()
 
 # DEPRECATED EXAMPLE -- Avoid running this code in our CI/CD pipeline
 print("This example is deprecated, remove the `if False` in this code to use it manually.")
 if False:
     import json
+
     import fanova
     import matplotlib.pyplot as plt
     import pandas as pd
@@ -79,7 +80,7 @@ if False:
     # important when it is put on a log-scale. All these simplifications can be
     # addressed by defining a ConfigSpace. For a more elaborated example that uses
     # this, please see:
-    # https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdccc7b9265/examples/plot/plot_fanova_aggregates.py # noqa F401
+    # https://github.com/janvanrijn/openml-pimp/blob/d0a14f3eb480f2a90008889f00041bdccc7b9265/examples/plot/plot_fanova_aggregates.py
 
     suite = openml.study.get_suite("OpenML100")
     flow_id = 7707
@@ -96,8 +97,7 @@ if False:
         if limit_nr_tasks is not None and idx >= limit_nr_tasks:
             continue
         print(
-            "Starting with task %d (%d/%d)"
-            % (task_id, idx + 1, len(suite.tasks) if limit_nr_tasks is None else limit_nr_tasks)
+            f"Starting with task {task_id} ({idx + 1}/{len(suite.tasks) if limit_nr_tasks is None else limit_nr_tasks})"
         )
         # note that we explicitly only include tasks from the benchmark suite that was specified (as per the for-loop)
         evals = openml.evaluations.list_evaluations_setups(
@@ -126,7 +126,7 @@ if False:
                 ]
             )
         except json.decoder.JSONDecodeError as e:
-            print("Task %d error: %s" % (task_id, e))
+            print(f"Task {task_id} error: {e}")
             continue
         # apply our filters, to have only the setups that comply to the hyperparameters we want
         for filter_key, filter_value in parameter_filters.items():
@@ -155,7 +155,7 @@ if False:
             Y=setups_evals[performance_column].to_numpy(),
             n_trees=n_trees,
         )
-        for idx, pname in enumerate(parameter_names):
+        for idx, pname in enumerate(parameter_names):  # noqa: PLW2901
             try:
                 fanova_results.append(
                     {
@@ -169,7 +169,7 @@ if False:
                 # functional ANOVA sometimes crashes with a RuntimeError, e.g., on tasks where the performance is constant
                 # for all configurations (there is no variance). We will skip these tasks (like the authors did in the
                 # paper).
-                print("Task %d error: %s" % (task_id, e))
+                print(f"Task {task_id} error: {e}")
                 continue
 
     # transform ``fanova_results`` from a list of dicts into a DataFrame

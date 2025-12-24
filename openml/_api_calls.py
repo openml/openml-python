@@ -133,7 +133,7 @@ def _perform_api_call(
 def _download_minio_file(
     source: str,
     destination: str | Path,
-    exists_ok: bool = True,  # noqa: FBT001, FBT002
+    exists_ok: bool = True,  # noqa: FBT002
     proxy: str | None = "auto",
 ) -> None:
     """Download file ``source`` from a MinIO Bucket and store it at ``destination``.
@@ -239,7 +239,7 @@ def _download_text_file(
     source: str,
     output_path: str | Path | None = None,
     md5_checksum: str | None = None,
-    exists_ok: bool = True,  # noqa: FBT001, FBT002
+    exists_ok: bool = True,  # noqa: FBT002
     encoding: str = "utf8",
 ) -> str | None:
     """Download the text file at `source` and store it in `output_path`.

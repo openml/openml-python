@@ -41,7 +41,7 @@ def _ensure_dataframe(
     raise TypeError(f"Data type {type(data)} not supported.")
 
 
-class OpenMLDataset(OpenMLBase):
+class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
     """Dataset object.
 
     Allows fetching and uploading datasets to OpenML.
@@ -719,8 +719,8 @@ class OpenMLDataset(OpenMLBase):
     def get_data(  # noqa: C901
         self,
         target: list[str] | str | None = None,
-        include_row_id: bool = False,  # noqa: FBT001, FBT002
-        include_ignore_attribute: bool = False,  # noqa: FBT001, FBT002
+        include_row_id: bool = False,  # noqa: FBT002
+        include_ignore_attribute: bool = False,  # noqa: FBT002
     ) -> tuple[pd.DataFrame, pd.Series | None, list[bool], list[str]]:
         """Returns dataset content as dataframes.
 
@@ -863,8 +863,8 @@ class OpenMLDataset(OpenMLBase):
         self,
         data_type: str,
         exclude: list[str] | None = None,
-        exclude_ignore_attribute: bool = True,  # noqa: FBT002, FBT001
-        exclude_row_id_attribute: bool = True,  # noqa: FBT002, FBT001
+        exclude_ignore_attribute: bool = True,  # noqa: FBT002
+        exclude_row_id_attribute: bool = True,  # noqa: FBT002
     ) -> list[int]:
         """
         Return indices of features of a given type, e.g. all nominal features.

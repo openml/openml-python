@@ -14,10 +14,10 @@
 
 # %%
 from collections import OrderedDict
+
 import numpy as np
 
 import openml
-from openml import OpenMLClassificationTask
 from openml.runs.functions import format_prediction
 
 # %% [markdown]
@@ -43,17 +43,17 @@ openml.config.start_using_configuration_for_example()
 # version of the package/script is used. Use tags so users can find your flow easily.
 
 # %%
-general = dict(
-    name="automlbenchmark_autosklearn",
-    description=(
+general = {
+    "name": "automlbenchmark_autosklearn",
+    "description": (
         "Auto-sklearn as set up by the AutoML Benchmark"
         "Source: https://github.com/openml/automlbenchmark/releases/tag/v0.9"
     ),
-    external_version="amlb==0.9",
-    language="English",
-    tags=["amlb", "benchmark", "study_218"],
-    dependencies="amlb==0.9",
-)
+    "external_version": "amlb==0.9",
+    "language": "English",
+    "tags": ["amlb", "benchmark", "study_218"],
+    "dependencies": "amlb==0.9",
+}
 
 # %% [markdown]
 # Next we define the flow hyperparameters. We define their name and default value in `parameters`,
@@ -62,14 +62,14 @@ general = dict(
 # The use of ordered dicts is required.
 
 # %%
-flow_hyperparameters = dict(
-    parameters=OrderedDict(time="240", memory="32", cores="8"),
-    parameters_meta_info=OrderedDict(
+flow_hyperparameters = {
+    "parameters": OrderedDict(time="240", memory="32", cores="8"),
+    "parameters_meta_info": OrderedDict(
         cores=OrderedDict(description="number of available cores", data_type="int"),
         memory=OrderedDict(description="memory in gigabytes", data_type="int"),
         time=OrderedDict(description="time in minutes", data_type="int"),
     ),
-)
+}
 
 # %% [markdown]
 # It is possible to build a flow which uses other flows.
@@ -89,11 +89,11 @@ flow_hyperparameters = dict(
 
 # %%
 autosklearn_flow = openml.flows.get_flow(9313)  # auto-sklearn 0.5.1
-subflow = dict(
-    components=OrderedDict(automl_tool=autosklearn_flow),
+subflow = {
+    "components": OrderedDict(automl_tool=autosklearn_flow),
     # If you do not want to reference a subflow, you can use the following:
     # components=OrderedDict(),
-)
+}
 
 # %% [markdown]
 # With all parameters of the flow defined, we can now initialize the OpenMLFlow and publish.
@@ -172,7 +172,7 @@ all_test_indices = [
 ]
 
 # random class probabilities (Iris has 150 samples and 3 classes):
-r = np.random.rand(150 * n_repeats, 3)
+r = np.random.rand(150 * n_repeats, 3)  # noqa: NPY002
 # scale the random values so that the probabilities of each sample sum to 1:
 y_proba = r / r.sum(axis=1).reshape(-1, 1)
 y_pred = y_proba.argmax(axis=1)
@@ -194,7 +194,7 @@ for where, y, yp, proba in zip(all_test_indices, y_true, y_pred, y_proba):
         index=index,
         prediction=class_map[yp],
         truth=y,
-        proba={c: pb for (c, pb) in zip(task.class_labels, proba)},
+        proba=dict(zip(task.class_labels, proba)),
     )
     predictions.append(prediction)
 
@@ -203,7 +203,7 @@ for where, y, yp, proba in zip(all_test_indices, y_true, y_pred, y_proba):
 # We use the argument setup_string because the used flow was a script.
 
 # %%
-benchmark_command = f"python3 runbenchmark.py auto-sklearn medium -m aws -t 119"
+benchmark_command = "python3 runbenchmark.py auto-sklearn medium -m aws -t 119"
 my_run = openml.runs.OpenMLRun(
     task_id=task_id,
     flow_id=flow_id,

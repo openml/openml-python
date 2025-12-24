@@ -280,7 +280,7 @@ class OpenMLRun(OpenMLBase):
         ]
 
     @classmethod
-    def from_filesystem(cls, directory: str | Path, expect_model: bool = True) -> OpenMLRun:  # noqa: FBT001, FBT002
+    def from_filesystem(cls, directory: str | Path, expect_model: bool = True) -> OpenMLRun:  # noqa: FBT002
         """
         The inverse of the to_filesystem method. Instantiates an OpenMLRun
         object based on files stored on the file system.
@@ -302,7 +302,7 @@ class OpenMLRun(OpenMLBase):
             the re-instantiated run object
         """
         # Avoiding cyclic imports
-        import openml.runs.functions  # noqa: PLC0415
+        import openml.runs.functions
 
         directory = Path(directory)
         if not directory.is_dir():
@@ -347,7 +347,7 @@ class OpenMLRun(OpenMLBase):
     def to_filesystem(
         self,
         directory: str | Path,
-        store_model: bool = True,  # noqa: FBT001, FBT002
+        store_model: bool = True,  # noqa: FBT002
     ) -> None:
         """
         The inverse of the from_filesystem method. Serializes a run

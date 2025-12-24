@@ -94,7 +94,7 @@ def _get_cached_setup(setup_id: int) -> OpenMLSetup:
 
     except OSError as e:
         raise openml.exceptions.OpenMLCacheException(
-            "Setup file for setup id %d not cached" % setup_id,
+            f"Setup file for setup id {setup_id} not cached",
         ) from e
 
 

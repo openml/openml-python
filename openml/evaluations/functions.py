@@ -30,7 +30,7 @@ def list_evaluations(
     uploaders: list[str | int] | None = None,
     tag: str | None = None,
     study: int | None = None,
-    per_fold: bool | None = None,  # noqa: FBT001
+    per_fold: bool | None = None,
     sort_order: str | None = None,
     output_format: Literal["dataframe"] = ...,
 ) -> pd.DataFrame: ...
@@ -48,7 +48,7 @@ def list_evaluations(
     uploaders: list[str | int] | None = None,
     tag: str | None = None,
     study: int | None = None,
-    per_fold: bool | None = None,  # noqa: FBT001
+    per_fold: bool | None = None,
     sort_order: str | None = None,
     output_format: Literal["object"] = "object",
 ) -> dict[int, OpenMLEvaluation]: ...
@@ -65,7 +65,7 @@ def list_evaluations(
     uploaders: list[str | int] | None = None,
     tag: str | None = None,
     study: int | None = None,
-    per_fold: bool | None = None,  # noqa: FBT001
+    per_fold: bool | None = None,
     sort_order: str | None = None,
     output_format: Literal["object", "dataframe"] = "object",
 ) -> dict[int, OpenMLEvaluation] | pd.DataFrame:
@@ -337,9 +337,9 @@ def list_evaluations_setups(
     runs: list | None = None,
     uploaders: list | None = None,
     tag: str | None = None,
-    per_fold: bool | None = None,  # noqa: FBT001
+    per_fold: bool | None = None,
     sort_order: str | None = None,
-    parameters_in_separate_columns: bool = False,  # noqa: FBT001, FBT002
+    parameters_in_separate_columns: bool = False,  # noqa: FBT002
 ) -> pd.DataFrame:
     """List all run-evaluation pairs matching all of the given filters
     and their hyperparameter settings.

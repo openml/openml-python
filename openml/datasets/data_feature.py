@@ -79,5 +79,5 @@ class OpenMLDataFeature:  # noqa: PLW1641
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, OpenMLDataFeature) and self.__dict__ == other.__dict__
 
-    def _repr_pretty_(self, pp: pretty.PrettyPrinter, cycle: bool) -> None:  # noqa: FBT001, ARG002
+    def _repr_pretty_(self, pp: pretty.PrettyPrinter, cycle: bool) -> None:  # noqa: ARG002
         pp.text(str(self))

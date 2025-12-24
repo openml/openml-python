@@ -408,7 +408,7 @@ class OpenMLFlow(OpenMLBase):
         """Parse the id from the xml_response and assign it to self."""
         self.flow_id = int(xml_response["oml:upload_flow"]["oml:id"])
 
-    def publish(self, raise_error_if_exists: bool = False) -> OpenMLFlow:  # noqa: FBT001, FBT002
+    def publish(self, raise_error_if_exists: bool = False) -> OpenMLFlow:  # noqa: FBT002
         """Publish this flow to OpenML server.
 
         Raises a PyOpenMLError if the flow exists on the server, but
@@ -429,7 +429,7 @@ class OpenMLFlow(OpenMLBase):
         # particular, flow.py tries to import functions.py in order to call
         # get_flow(), while functions.py tries to import flow.py in order to
         # instantiate an OpenMLFlow.
-        import openml.flows.functions  # noqa: PLC0415
+        import openml.flows.functions
 
         flow_id = openml.flows.functions.flow_exists(self.name, self.external_version)
         if not flow_id:

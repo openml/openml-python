@@ -39,17 +39,16 @@
 #
 # * (Case 5) Running models that do not release the Python Global Interpreter Lock (GIL)
 
-import openml
 import numpy as np
-from matplotlib import pyplot as plt
 from joblib.parallel import parallel_backend
-
-from sklearn.naive_bayes import GaussianNB
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neural_network import MLPClassifier
+from matplotlib import pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neural_network import MLPClassifier
+from sklearn.tree import DecisionTreeClassifier
 
+import openml
 
 # %% [markdown]
 # # Preparing tasks and scikit-learn models
@@ -63,12 +62,7 @@ print(task)
 # Viewing associated data
 n_repeats, n_folds, n_samples = task.get_split_dimensions()
 print(
-    "Task {}: number of repeats: {}, number of folds: {}, number of samples {}.".format(
-        task_id,
-        n_repeats,
-        n_folds,
-        n_samples,
-    )
+    f"Task {task_id}: number of repeats: {n_repeats}, number of folds: {n_folds}, number of samples {n_samples}."
 )
 
 
@@ -101,7 +95,7 @@ run1 = openml.runs.run_model_on_task(
 measures = run1.fold_evaluations
 
 print("The timing and performance metrics available: ")
-for key in measures.keys():
+for key in measures:
     print(key)
 print()
 
@@ -206,7 +200,6 @@ print_compare_runtimes(measures)
 # included in the `wall_clock_time_millis_training` measure recorded.
 
 # %%
-from sklearn.model_selection import GridSearchCV
 
 clf = RandomForestClassifier(n_estimators=10, n_jobs=2)
 
@@ -286,21 +279,16 @@ for i in range(n_iter):
 
 
 def extract_refit_time(run, repeat, fold):
-    refit_time = (
+    return (
         run.fold_evaluations["wall_clock_time_millis"][repeat][fold]
         - run.fold_evaluations["wall_clock_time_millis_training"][repeat][fold]
         - run.fold_evaluations["wall_clock_time_millis_testing"][repeat][fold]
     )
-    return refit_time
 
 
 for repeat in range(n_repeats):
     for fold in range(n_folds):
-        print(
-            "Repeat #{}-Fold #{}: {:.4f}".format(
-                repeat, fold, extract_refit_time(run4, repeat, fold)
-            )
-        )
+        print(f"Repeat #{repeat}-Fold #{fold}: {extract_refit_time(run4, repeat, fold):.4f}")
 
 # %% [markdown]
 # Along with the GridSearchCV already used above, we demonstrate how such

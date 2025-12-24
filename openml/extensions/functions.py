@@ -40,7 +40,7 @@ def register_extension(extension: type[Extension]) -> None:
 
 def get_extension_by_flow(
     flow: OpenMLFlow,
-    raise_if_no_extension: bool = False,  # noqa: FBT001, FBT002
+    raise_if_no_extension: bool = False,  # noqa: FBT002
 ) -> Extension | None:
     """Get an extension which can handle the given flow.
 
@@ -85,7 +85,7 @@ def get_extension_by_flow(
 
 def get_extension_by_model(
     model: Any,
-    raise_if_no_extension: bool = False,  # noqa: FBT001, FBT002
+    raise_if_no_extension: bool = False,  # noqa: FBT002
 ) -> Extension | None:
     """Get an extension which can handle the given flow.
 

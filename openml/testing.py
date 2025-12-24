@@ -80,7 +80,7 @@ class TestBase(unittest.TestCase):
         for _ in range(n_levels):
             static_cache_dir = static_cache_dir.parent.absolute()
 
-        content = os.listdir(static_cache_dir)
+        content = os.listdir(static_cache_dir)  # noqa: PTH208
         if "files" in content:
             static_cache_dir = static_cache_dir / "files"
         else:
@@ -352,9 +352,9 @@ def create_request_response(
 
 
 __all__ = [
-    "TestBase",
-    "SimpleImputer",
     "CustomImputer",
+    "SimpleImputer",
+    "TestBase",
     "check_task_existence",
     "create_request_response",
 ]
