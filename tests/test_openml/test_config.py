@@ -14,6 +14,7 @@ import pytest
 
 import openml.config
 import openml.testing
+from openml.testing import TestBase
 
 
 @contextmanager
@@ -76,7 +77,7 @@ class TestConfig(openml.testing.TestBase):
         """Checks if the current configuration is returned accurately as a dict."""
         config = openml.config.get_config_as_dict()
         _config = {}
-        _config["apikey"] = "610344db6388d9ba34f6db45a3cf71de"
+        _config["apikey"] = TestBase.user_key
         _config["server"] = "https://test.openml.org/api/v1/xml"
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = False
@@ -90,7 +91,7 @@ class TestConfig(openml.testing.TestBase):
     def test_setup_with_config(self):
         """Checks if the OpenML configuration can be updated using _setup()."""
         _config = {}
-        _config["apikey"] = "610344db6388d9ba34f6db45a3cf71de"
+        _config["apikey"] = TestBase.user_key
         _config["server"] = "https://www.openml.org/api/v1/xml"
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = True
@@ -109,25 +110,25 @@ class TestConfigurationForExamples(openml.testing.TestBase):
     def test_switch_to_example_configuration(self):
         """Verifies the test configuration is loaded properly."""
         # Below is the default test key which would be used anyway, but just for clarity:
-        openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
+        openml.config.apikey = TestBase.admin_key
         openml.config.server = self.production_server
 
         openml.config.start_using_configuration_for_example()
 
-        assert openml.config.apikey == "c0c42819af31e706efe1f4b88c23c6c1"
+        assert openml.config.apikey == TestBase.user_key
         assert openml.config.server == self.test_server
 
     @pytest.mark.production()
     def test_switch_from_example_configuration(self):
         """Verifies the previous configuration is loaded after stopping."""
         # Below is the default test key which would be used anyway, but just for clarity:
-        openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
+        openml.config.apikey = TestBase.user_key
         openml.config.server = self.production_server
 
         openml.config.start_using_configuration_for_example()
         openml.config.stop_using_configuration_for_example()
 
-        assert openml.config.apikey == "610344db6388d9ba34f6db45a3cf71de"
+        assert openml.config.apikey == TestBase.user_key
         assert openml.config.server == self.production_server
 
     def test_example_configuration_stop_before_start(self):
@@ -145,14 +146,14 @@ class TestConfigurationForExamples(openml.testing.TestBase):
     @pytest.mark.production()
     def test_example_configuration_start_twice(self):
         """Checks that the original config can be returned to if `start..` is called twice."""
-        openml.config.apikey = "610344db6388d9ba34f6db45a3cf71de"
+        openml.config.apikey = TestBase.user_key
         openml.config.server = self.production_server
 
         openml.config.start_using_configuration_for_example()
         openml.config.start_using_configuration_for_example()
         openml.config.stop_using_configuration_for_example()
 
-        assert openml.config.apikey == "610344db6388d9ba34f6db45a3cf71de"
+        assert openml.config.apikey == TestBase.user_key
         assert openml.config.server == self.production_server
 
 

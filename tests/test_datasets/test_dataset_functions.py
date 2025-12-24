@@ -586,9 +586,9 @@ class TestOpenMLDataset(TestBase):
         TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         did = dataset.id
 
-        # admin key for test server (only adminds can activate datasets.
+        # admin key for test server (only admins can activate datasets.
         # all users can deactivate their own datasets)
-        openml.config.apikey = "d488d8afd93b32331cf6ea9d7003d4c3"
+        openml.config.apikey = TestBase.admin_key
 
         openml.datasets.status_update(did, "active")
         self._assert_status_of_dataset(did=did, status="active")

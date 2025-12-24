@@ -89,3 +89,14 @@ Bibtex entry:
   url     = {http://jmlr.org/papers/v22/19-920.html}
 }
 ```
+## :handshake: Contributing
+
+We welcome contributions from both new and experienced developers!
+
+If you would like to contribute to OpenML-Python, please read our  
+[Contribution Guidelines](https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md).
+
+If you are new to open-source development, a great way to get started is by
+looking at issues labeled **"good first issue"** in our GitHub issue tracker.
+These tasks are beginner-friendly and help you understand the project structure,
+development workflow, and how to submit a pull request.
