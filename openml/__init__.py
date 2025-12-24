@@ -18,6 +18,8 @@ In particular, this module implements a python interface for the
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from typing import Any, Sequence
+
 from . import (
     _api_calls,
     config,
@@ -33,6 +35,7 @@ from . import (
     utils,
 )
 from .__version__ import __version__
+from .base import OpenMLBase
 from .datasets import OpenMLDataFeature, OpenMLDataset
 from .evaluations import OpenMLEvaluation
 from .flows import OpenMLFlow
@@ -48,6 +51,37 @@ from .tasks import (
     OpenMLSupervisedTask,
     OpenMLTask,
 )
+
+
+def publish(obj: Any, *, name: str | None = None, tags: Sequence[str] | None = None) -> Any:
+    """Publish a common object (flow/model/run/dataset) with minimal friction.
+
+    If ``obj`` is already an OpenML object (``OpenMLBase``) it will call its ``publish`` method.
+    Otherwise it looks for a registered extension (e.g., scikit-learn) to convert the object
+    into an ``OpenMLFlow`` and publish it.
+    """
+    if isinstance(obj, OpenMLBase):
+        if tags is not None and hasattr(obj, "tags"):
+            existing = list(getattr(obj, "tags", []) or [])
+            merged = list(dict.fromkeys([*existing, *tags]))
+            obj.tags = merged
+        if name is not None and hasattr(obj, "name"):
+            obj.name = name
+        return obj.publish()
+
+    extension = extensions.functions.get_extension_by_model(obj, raise_if_no_extension=True)
+    if extension is None:  # defensive; should not happen with raise_if_no_extension=True
+        raise ValueError("No extension registered to handle the provided object.")
+    flow = extension.model_to_flow(obj)
+
+    if name is not None:
+        flow.name = name
+
+    if tags is not None:
+        existing_tags = list(getattr(flow, "tags", []) or [])
+        flow.tags = list(dict.fromkeys([*existing_tags, *tags]))
+
+    return flow.publish()
 
 
 def populate_cache(
@@ -91,6 +125,7 @@ def populate_cache(
 
 
 __all__ = [
+    "publish",
     "OpenMLDataset",
     "OpenMLDataFeature",
     "OpenMLRun",

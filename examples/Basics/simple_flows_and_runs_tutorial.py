@@ -48,6 +48,13 @@ knn_parameters = {
 clf = KNeighborsClassifier(**knn_parameters)
 clf.fit(X_train, y_train)
 
+# Option A: auto-publish the estimator via unified helper (requires openml-sklearn extension).
+try:
+    flow_id = openml.publish(clf)
+    print(f"Auto-published flow id: {flow_id}")
+except Exception as ex:  # pragma: no cover - example path
+    print(f"Auto-publish failed (is openml-sklearn installed?): {ex}")
+
 # Get experiment results
 y_pred = clf.predict(X_test)
 y_pred_proba = clf.predict_proba(X_test)
@@ -57,6 +64,7 @@ y_pred_proba = clf.predict_proba(X_test)
 # First, create a fow and fill it with metadata about the machine learning model.
 
 # %%
+# Option B: manually build the flow
 knn_flow = openml.flows.OpenMLFlow(
     # Metadata
     model=clf,  # or None, if you do not want to upload the model object.
