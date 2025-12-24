@@ -284,6 +284,7 @@ for i in range(n_iter):
 
 # %%
 
+
 def extract_refit_time(run, repeat, fold):
     refit_time = (
         run.fold_evaluations["wall_clock_time_millis"][repeat][fold]

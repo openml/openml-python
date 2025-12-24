@@ -275,7 +275,7 @@ ignore = [
   "S101",    # Use of assert detected.
   "W292",    # No newline at end of file
   "PLC1901", # "" can be simplified to be falsey
-  "TCH003",  # Move stdlib import into TYPE_CHECKING
+  "TC003",  # Move stdlib import into TYPE_CHECKING
   "COM812",  # Trailing comma missing (handled by linter, ruff recommend disabling if using formatter)
   "N803",    # Argument should be lowercase (but we accept things like `X`)
 

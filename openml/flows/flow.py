@@ -169,7 +169,7 @@ class OpenMLFlow(OpenMLBase):
         """The extension of the flow (e.g., sklearn)."""
         if self._extension is None:
             self._extension = cast(
-                Extension, get_extension_by_flow(self, raise_if_no_extension=True)
+                "Extension", get_extension_by_flow(self, raise_if_no_extension=True)
             )
 
         return self._extension
@@ -429,13 +429,13 @@ class OpenMLFlow(OpenMLBase):
         # particular, flow.py tries to import functions.py in order to call
         # get_flow(), while functions.py tries to import flow.py in order to
         # instantiate an OpenMLFlow.
-        import openml.flows.functions
+        import openml.flows.functions  # noqa: PLC0415
 
         flow_id = openml.flows.functions.flow_exists(self.name, self.external_version)
         if not flow_id:
             if self.flow_id:
                 raise openml.exceptions.PyOpenMLError(
-                    "Flow does not exist on the server, " "but 'flow.flow_id' is not None.",
+                    "Flow does not exist on the server, but 'flow.flow_id' is not None.",
                 )
             super().publish()
             assert self.flow_id is not None  # for mypy
@@ -445,7 +445,7 @@ class OpenMLFlow(OpenMLBase):
             raise openml.exceptions.PyOpenMLError(error_message)
         elif self.flow_id is not None and self.flow_id != flow_id:
             raise openml.exceptions.PyOpenMLError(
-                "Local flow_id does not match server flow_id: " f"'{self.flow_id}' vs '{flow_id}'",
+                f"Local flow_id does not match server flow_id: '{self.flow_id}' vs '{flow_id}'",
             )
 
         flow = openml.flows.functions.get_flow(flow_id)
@@ -517,7 +517,7 @@ class OpenMLFlow(OpenMLBase):
         sub_identifier = structure[0]
         if sub_identifier not in self.components:
             raise ValueError(
-                f"Flow {self.name} does not contain component with " f"identifier {sub_identifier}",
+                f"Flow {self.name} does not contain component with identifier {sub_identifier}",
             )
         if len(structure) == 1:
             return self.components[sub_identifier]  # type: ignore

@@ -31,7 +31,7 @@ def _get_cached_flows() -> OrderedDict:
     flows = OrderedDict()  # type: 'OrderedDict[int, OpenMLFlow]'
 
     flow_cache_dir = openml.utils._create_cache_directory(FLOWS_CACHE_DIR_NAME)
-    directory_content = os.listdir(flow_cache_dir)
+    directory_content = os.listdir(flow_cache_dir)  # noqa: PTH208
     directory_content.sort()
     # Find all flow ids for which we have downloaded
     # the flow description
@@ -66,7 +66,7 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
             return _create_flow_from_xml(fh.read())
     except OSError as e:
         openml.utils._remove_cache_dir_for_id(FLOWS_CACHE_DIR_NAME, fid_cache_dir)
-        raise OpenMLCacheException("Flow file for fid %d not cached" % fid) from e
+        raise OpenMLCacheException(f"Flow file for fid {fid} not cached") from e
 
 
 @openml.utils.thread_safe_if_oslo_installed
@@ -124,7 +124,7 @@ def _get_flow_description(flow_id: int) -> OpenMLFlow:
         xml_file = (
             openml.utils._create_cache_directory_for_id(FLOWS_CACHE_DIR_NAME, flow_id) / "flow.xml"
         )
-        flow_xml = openml._api_calls._perform_api_call("flow/%d" % flow_id, request_method="get")
+        flow_xml = openml._api_calls._perform_api_call(f"flow/{flow_id}", request_method="get")
 
         with xml_file.open("w", encoding="utf8") as fh:
             fh.write(flow_xml)
@@ -456,9 +456,9 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
                         )
 
                 if ignore_parameter_values_on_older_children:
-                    assert (
-                        flow1.upload_date is not None
-                    ), "Flow1 has no upload date that allows us to compare age of children."
+                    assert flow1.upload_date is not None, (
+                        "Flow1 has no upload date that allows us to compare age of children."
+                    )
                     upload_date_current_flow = dateutil.parser.parse(flow1.upload_date)
                     upload_date_parent_flow = dateutil.parser.parse(
                         ignore_parameter_values_on_older_children,

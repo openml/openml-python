@@ -49,7 +49,6 @@ if False:
 
     import openml
 
-
     ##############################################################################
     # With the advent of automated machine learning, automated hyperparameter
     # optimization methods are by now routinely used in data mining. However, this
@@ -121,7 +120,7 @@ if False:
                 [
                     dict(
                         **{name: json.loads(value) for name, value in setup["parameters"].items()},
-                        **{performance_column: setup[performance_column]}
+                        **{performance_column: setup[performance_column]},
                     )
                     for _, setup in evals.iterrows()
                 ]
@@ -161,7 +160,9 @@ if False:
                 fanova_results.append(
                     {
                         "hyperparameter": pname.split(".")[-1],
-                        "fanova": evaluator.quantify_importance([idx])[(idx,)]["individual importance"],
+                        "fanova": evaluator.quantify_importance([idx])[(idx,)][
+                            "individual importance"
+                        ],
                     }
                 )
             except RuntimeError as e:

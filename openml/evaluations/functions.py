@@ -30,7 +30,7 @@ def list_evaluations(
     uploaders: list[str | int] | None = None,
     tag: str | None = None,
     study: int | None = None,
-    per_fold: bool | None = None,
+    per_fold: bool | None = None,  # noqa: FBT001
     sort_order: str | None = None,
     output_format: Literal["dataframe"] = ...,
 ) -> pd.DataFrame: ...
@@ -48,7 +48,7 @@ def list_evaluations(
     uploaders: list[str | int] | None = None,
     tag: str | None = None,
     study: int | None = None,
-    per_fold: bool | None = None,
+    per_fold: bool | None = None,  # noqa: FBT001
     sort_order: str | None = None,
     output_format: Literal["object"] = "object",
 ) -> dict[int, OpenMLEvaluation]: ...
@@ -65,7 +65,7 @@ def list_evaluations(
     uploaders: list[str | int] | None = None,
     tag: str | None = None,
     study: int | None = None,
-    per_fold: bool | None = None,
+    per_fold: bool | None = None,  # noqa: FBT001
     sort_order: str | None = None,
     output_format: Literal["object", "dataframe"] = "object",
 ) -> dict[int, OpenMLEvaluation] | pd.DataFrame:
@@ -228,7 +228,7 @@ def __list_evaluations(api_call: str) -> list[OpenMLEvaluation]:
     # Minimalistic check if the XML is useful
     if "oml:evaluations" not in evals_dict:
         raise ValueError(
-            "Error in return XML, does not contain " f'"oml:evaluations": {evals_dict!s}',
+            f'Error in return XML, does not contain "oml:evaluations": {evals_dict!s}',
         )
 
     assert isinstance(evals_dict["oml:evaluations"]["oml:evaluation"], list), type(
@@ -337,7 +337,7 @@ def list_evaluations_setups(
     runs: list | None = None,
     uploaders: list | None = None,
     tag: str | None = None,
-    per_fold: bool | None = None,
+    per_fold: bool | None = None,  # noqa: FBT001
     sort_order: str | None = None,
     parameters_in_separate_columns: bool = False,  # noqa: FBT001, FBT002
 ) -> pd.DataFrame:

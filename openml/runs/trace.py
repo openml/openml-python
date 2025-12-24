@@ -149,9 +149,7 @@ class OpenMLRunTrace:
         for r, f, i in self.trace_iterations:
             if r == repeat and f == fold and self.trace_iterations[(r, f, i)].selected is True:
                 return i
-        raise ValueError(
-            "Could not find the selected iteration for rep/fold %d/%d" % (repeat, fold),
-        )
+        raise ValueError(f"Could not find the selected iteration for rep/fold {repeat}/{fold}")
 
     @classmethod
     def generate(
@@ -185,8 +183,7 @@ class OpenMLRunTrace:
             raise ValueError("Trace content is empty.")
         if len(attributes) != len(content[0]):
             raise ValueError(
-                "Trace_attributes and trace_content not compatible:"
-                f" {attributes} vs {content[0]}",
+                f"Trace_attributes and trace_content not compatible: {attributes} vs {content[0]}",
             )
 
         return cls._trace_from_arff_struct(

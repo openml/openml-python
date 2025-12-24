@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from IPython.lib import pretty
 
 
-class OpenMLDataFeature:
+class OpenMLDataFeature:  # noqa: PLW1641
     """
     Data Feature (a.k.a. Attribute) object.
 
@@ -51,8 +51,7 @@ class OpenMLDataFeature:
         if data_type == "nominal":
             if nominal_values is None:
                 raise TypeError(
-                    "Dataset features require attribute `nominal_values` for nominal "
-                    "feature type.",
+                    "Dataset features require attribute `nominal_values` for nominal feature type.",
                 )
 
             if not isinstance(nominal_values, list):
@@ -75,7 +74,7 @@ class OpenMLDataFeature:
         self.ontologies = ontologies
 
     def __repr__(self) -> str:
-        return "[%d - %s (%s)]" % (self.index, self.name, self.data_type)
+        return f"[{self.index} - {self.name} ({self.data_type})]"
 
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, OpenMLDataFeature) and self.__dict__ == other.__dict__
