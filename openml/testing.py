@@ -352,9 +352,9 @@ def create_request_response(
 
 
 __all__ = [
-    "TestBase",
-    "SimpleImputer",
     "CustomImputer",
+    "SimpleImputer",
+    "TestBase",
     "check_task_existence",
     "create_request_response",
 ]

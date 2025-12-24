@@ -1,5 +1,4 @@
 # License: BSD 3-Clause
-# ruff: noqa: PLR0913
 from __future__ import annotations
 
 import warnings
