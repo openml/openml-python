@@ -18,7 +18,6 @@ In particular, this module implements a python interface for the
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import builtins
 from typing import Any, Callable, Dict
 
 from . import (
@@ -55,71 +54,105 @@ from .tasks import (
 ListDispatcher = Dict[str, Callable[..., Any]]
 GetDispatcher = Dict[str, Callable[..., Any]]
 
+_LIST_DISPATCH: ListDispatcher = {
+    "dataset": datasets.functions.list_datasets,
+    "task": tasks.functions.list_tasks,
+    "flow": flows.functions.list_flows,
+    "run": runs.functions.list_runs,
+}
 
-def list(object_type: str, /, **kwargs: Any) -> Any:  # noqa: A001
+_GET_DISPATCH: GetDispatcher = {
+    "dataset": datasets.functions.get_dataset,
+    "task": tasks.functions.get_task,
+    "flow": flows.functions.get_flow,
+    "run": runs.functions.get_run,
+}
+
+
+def list_all(object_type: str, /, **kwargs: Any) -> Any:
     """List OpenML objects by type (e.g., datasets, tasks, flows, runs).
 
     This is a convenience dispatcher that forwards to the existing type-specific
     ``list_*`` functions. Existing imports remain available for backward compatibility.
-    """
-    dispatch: ListDispatcher = {
-        "dataset": datasets.functions.list_datasets,
-        "task": tasks.functions.list_tasks,
-        "flow": flows.functions.list_flows,
-        "run": runs.functions.list_runs,
-    }
 
-    try:
-        func = dispatch[object_type.lower()]
-    except KeyError as exc:  # pragma: no cover - defensive branch
+    Parameters
+    ----------
+    object_type : str
+        The type of object to list. Must be one of 'dataset', 'task', 'flow', 'run'.
+    **kwargs : Any
+        Additional arguments passed to the underlying list function.
+
+    Returns
+    -------
+    Any
+        The result from the type-specific list function (typically a DataFrame).
+
+    Raises
+    ------
+    ValueError
+        If object_type is not one of the supported types.
+    """
+    if not isinstance(object_type, str):
+        raise TypeError(f"object_type must be a string, got {type(object_type).__name__}")
+
+    func = _LIST_DISPATCH.get(object_type.lower())
+    if func is None:
+        valid_types = ", ".join(repr(k) for k in _LIST_DISPATCH)
         raise ValueError(
-            "Unsupported object_type for list; expected one of 'dataset', 'task', 'flow', 'run'.",
-        ) from exc
+            f"Unsupported object_type {object_type!r}; expected one of {valid_types}.",
+        )
 
     return func(**kwargs)
 
 
-def get(object_type_or_name: Any, identifier: Any | None = None, /, **kwargs: Any) -> Any:
-    """Get an OpenML object by type and identifier, or a dataset by name.
+def get(identifier: int | str, *, object_type: str = "dataset", **kwargs: Any) -> Any:
+    """Get an OpenML object by identifier.
+
+    Parameters
+    ----------
+    identifier : int | str
+        The ID or name of the object to retrieve.
+    object_type : str, default="dataset"
+        The type of object to get. Must be one of 'dataset', 'task', 'flow', 'run'.
+    **kwargs : Any
+        Additional arguments passed to the underlying get function.
+
+    Returns
+    -------
+    Any
+        The requested OpenML object.
+
+    Raises
+    ------
+    ValueError
+        If object_type is not one of the supported types.
 
     Examples
     --------
-    openml.get("dataset", 61)
-    openml.get("dataset", "Fashion-MNIST")
-    openml.get("task", 31)
-    openml.get("flow", 10)
-    openml.get("run", 20)
-    openml.get("Fashion-MNIST")  # dataset lookup by name (no type specified)
+    >>> openml.get(61)  # Get dataset 61 (default object_type="dataset")
+    >>> openml.get("Fashion-MNIST")  # Get dataset by name
+    >>> openml.get(31, object_type="task")  # Get task 31
+    >>> openml.get(10, object_type="flow")  # Get flow 10
+    >>> openml.get(20, object_type="run")  # Get run 20
     """
-    # Single-argument shortcut: treat string without type as dataset lookup.
-    if identifier is None:
-        if isinstance(object_type_or_name, str):
-            return datasets.functions.get_dataset(object_type_or_name, **kwargs)
-        raise ValueError("Please provide an object_type when identifier is not provided.")
+    if not isinstance(object_type, str):
+        raise TypeError(f"object_type must be a string, got {type(object_type).__name__}")
 
-    object_type = str(object_type_or_name).lower()
-    dispatch: GetDispatcher = {
-        "dataset": datasets.functions.get_dataset,
-        "task": tasks.functions.get_task,
-        "flow": flows.functions.get_flow,
-        "run": runs.functions.get_run,
-    }
-
-    try:
-        func = dispatch[object_type]
-    except KeyError as exc:  # pragma: no cover - defensive branch
+    func = _GET_DISPATCH.get(object_type.lower())
+    if func is None:
+        valid_types = ", ".join(repr(k) for k in _GET_DISPATCH)
         raise ValueError(
-            "Unsupported object_type for get; expected one of 'dataset', 'task', 'flow', 'run'.",
-        ) from exc
+            f"Unsupported object_type {object_type!r}; expected one of {valid_types}.",
+        )
 
     return func(identifier, **kwargs)
 
 
 def populate_cache(
-    task_ids: builtins.list[int] | None = None,
-    dataset_ids: builtins.list[int | str] | None = None,
-    flow_ids: builtins.list[int] | None = None,
-    run_ids: builtins.list[int] | None = None,
+    task_ids: list[int] | None = None,
+    dataset_ids: list[int | str] | None = None,
+    flow_ids: list[int] | None = None,
+    run_ids: list[int] | None = None,
 ) -> None:
     """
     Populate a cache for offline and parallel usage of the OpenML connector.
@@ -156,35 +189,35 @@ def populate_cache(
 
 
 __all__ = [
-    "list",
-    "get",
-    "OpenMLDataset",
-    "OpenMLDataFeature",
-    "OpenMLRun",
-    "OpenMLSplit",
-    "OpenMLEvaluation",
-    "OpenMLSetup",
-    "OpenMLParameter",
-    "OpenMLTask",
-    "OpenMLSupervisedTask",
-    "OpenMLClusteringTask",
-    "OpenMLLearningCurveTask",
-    "OpenMLRegressionTask",
-    "OpenMLClassificationTask",
-    "OpenMLFlow",
-    "OpenMLStudy",
     "OpenMLBenchmarkSuite",
+    "OpenMLClassificationTask",
+    "OpenMLClusteringTask",
+    "OpenMLDataFeature",
+    "OpenMLDataset",
+    "OpenMLEvaluation",
+    "OpenMLFlow",
+    "OpenMLLearningCurveTask",
+    "OpenMLParameter",
+    "OpenMLRegressionTask",
+    "OpenMLRun",
+    "OpenMLSetup",
+    "OpenMLSplit",
+    "OpenMLStudy",
+    "OpenMLSupervisedTask",
+    "OpenMLTask",
+    "__version__",
+    "_api_calls",
+    "config",
     "datasets",
     "evaluations",
     "exceptions",
     "extensions",
-    "config",
-    "runs",
     "flows",
-    "tasks",
+    "get",
+    "list_all",
+    "runs",
     "setups",
     "study",
+    "tasks",
     "utils",
-    "_api_calls",
-    "__version__",
 ]
