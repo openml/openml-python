@@ -1,7 +1,5 @@
 # License: BSD 3-Clause
 
-import importlib.util
-
 from .functions import (
     delete_run,
     get_run,
@@ -16,9 +14,6 @@ from .functions import (
 )
 from .run import OpenMLRun
 from .trace import OpenMLRunTrace, OpenMLTraceIteration
-
-if importlib.util.find_spec("openml_sklearn"):
-    import openml_sklearn  # noqa: F401
 
 __all__ = [
     "OpenMLRun",
