@@ -18,6 +18,7 @@ In particular, this module implements a python interface for the
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import contextlib
 from typing import Any, Sequence
 
 from . import (
@@ -56,10 +57,72 @@ from .tasks import (
 def publish(obj: Any, *, name: str | None = None, tags: Sequence[str] | None = None) -> Any:
     """Publish a common object (flow/model/run/dataset) with minimal friction.
 
-    If ``obj`` is already an OpenML object (``OpenMLBase``) it will call its ``publish`` method.
-    Otherwise it looks for a registered extension (e.g., scikit-learn) to convert the object
-    into an ``OpenMLFlow`` and publish it.
+    This function provides a unified entry point for publishing various OpenML objects.
+    It automatically detects the object type and routes to the appropriate publishing
+    mechanism:
+
+    - For OpenML objects (``OpenMLDataset``, ``OpenMLFlow``, ``OpenMLRun``, etc.),
+      it directly calls their ``publish()`` method.
+    - For external models (e.g., scikit-learn estimators), it uses registered
+      extensions to convert them to ``OpenMLFlow`` objects before publishing.
+
+    Parameters
+    ----------
+    obj : Any
+        The object to publish. Can be:
+        - An OpenML object (OpenMLDataset, OpenMLFlow, OpenMLRun, OpenMLTask)
+        - A machine learning model from a supported framework (e.g., scikit-learn)
+    name : str, optional
+        Override the default name for the published object.
+        If not provided, uses the object's default naming convention.
+    tags : Sequence[str], optional
+        Additional tags to attach to the published object.
+        Will be merged with any existing tags, removing duplicates while
+        preserving order.
+
+    Returns
+    -------
+    Any
+        The published object (typically with updated ID and metadata).
+
+    Raises
+    ------
+    ValueError
+        If no extension is registered to handle the provided model type.
+
+    Examples
+    --------
+    Publishing an OpenML dataset:
+
+    >>> dataset = openml.datasets.get_dataset(61)
+    >>> openml.publish(dataset, tags=["example"])
+
+    Publishing a scikit-learn model:
+
+    >>> from sklearn.tree import DecisionTreeClassifier
+    >>> clf = DecisionTreeClassifier(max_depth=5)
+    >>> openml.publish(clf, name="MyDecisionTree", tags=["tutorial"])
+
+    Publishing an OpenML flow directly:
+
+    >>> flow = openml.flows.OpenMLFlow(...)
+    >>> openml.publish(flow)
+
+    Publishing an OpenML run (after execution with predictions):
+
+    >>> run = openml.runs.OpenMLRun(
+    ...     task_id=1, flow_id=100, dataset_id=61,
+    ...     data_content=predictions  # predictions from model evaluation
+    ... )
+    >>> openml.publish(run, tags=["experiment"])
+
+    Notes
+    -----
+    For external models (e.g., scikit-learn), the corresponding extension must be
+    installed (e.g., ``openml-sklearn``). The extension will be automatically imported
+    if available.
     """
+    # Case 1: Object is already an OpenML entity
     if isinstance(obj, OpenMLBase):
         if tags is not None and hasattr(obj, "tags"):
             existing = list(getattr(obj, "tags", []) or [])
@@ -69,8 +132,12 @@ def publish(obj: Any, *, name: str | None = None, tags: Sequence[str] | None = N
             obj.name = name
         return obj.publish()
 
+    # Case 2: Object is an external model - use extension registry
+    # Attempt to auto-import common extensions
+    _ensure_extension_imported(obj)
+
     extension = extensions.functions.get_extension_by_model(obj, raise_if_no_extension=True)
-    if extension is None:  # defensive; should not happen with raise_if_no_extension=True
+    if extension is None:  # Defensive check (should not occur with raise_if_no_extension=True)
         raise ValueError("No extension registered to handle the provided object.")
     flow = extension.model_to_flow(obj)
 
@@ -82,6 +149,25 @@ def publish(obj: Any, *, name: str | None = None, tags: Sequence[str] | None = N
         flow.tags = list(dict.fromkeys([*existing_tags, *tags]))
 
     return flow.publish()
+
+
+def _ensure_extension_imported(obj: Any) -> None:
+    """Attempt to import the appropriate extension for common frameworks.
+
+    This is a convenience helper to automatically import extensions for
+    well-known frameworks, reducing friction for users.
+
+    Parameters
+    ----------
+    obj : Any
+        The object to check.
+    """
+    obj_module = type(obj).__module__
+
+    # Check for scikit-learn models
+    if obj_module.startswith("sklearn"):
+        with contextlib.suppress(ImportError):
+            import openml_sklearn  # noqa: F401
 
 
 def populate_cache(
@@ -125,34 +211,34 @@ def populate_cache(
 
 
 __all__ = [
-    "publish",
-    "OpenMLDataset",
-    "OpenMLDataFeature",
-    "OpenMLRun",
-    "OpenMLSplit",
-    "OpenMLEvaluation",
-    "OpenMLSetup",
-    "OpenMLParameter",
-    "OpenMLTask",
-    "OpenMLSupervisedTask",
-    "OpenMLClusteringTask",
-    "OpenMLLearningCurveTask",
-    "OpenMLRegressionTask",
-    "OpenMLClassificationTask",
-    "OpenMLFlow",
-    "OpenMLStudy",
     "OpenMLBenchmarkSuite",
+    "OpenMLClassificationTask",
+    "OpenMLClusteringTask",
+    "OpenMLDataFeature",
+    "OpenMLDataset",
+    "OpenMLEvaluation",
+    "OpenMLFlow",
+    "OpenMLLearningCurveTask",
+    "OpenMLParameter",
+    "OpenMLRegressionTask",
+    "OpenMLRun",
+    "OpenMLSetup",
+    "OpenMLSplit",
+    "OpenMLStudy",
+    "OpenMLSupervisedTask",
+    "OpenMLTask",
+    "__version__",
+    "_api_calls",
+    "config",
     "datasets",
     "evaluations",
     "exceptions",
     "extensions",
-    "config",
-    "runs",
     "flows",
-    "tasks",
+    "publish",
+    "runs",
     "setups",
     "study",
+    "tasks",
     "utils",
-    "_api_calls",
-    "__version__",
 ]
