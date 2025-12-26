@@ -94,6 +94,7 @@ class OpenMLEvaluation:
             "Task ID",
             "OpenML Task URL",
             "Flow ID",
+            "OpenML Flow URL",
             "Setup ID",
             "Data ID",
             "Data Name",
