@@ -88,12 +88,12 @@ class OpenMLEvaluation:
         }
 
         order = [
-            "Uploader Date",
+            "Upload Date",
             "Run ID",
             "OpenML Run URL",
             "Task ID",
-            "OpenML Task URLFlow ID",
-            "OpenML Flow URL",
+            "OpenML Task URL",
+            "Flow ID",
             "Setup ID",
             "Data ID",
             "Data Name",
