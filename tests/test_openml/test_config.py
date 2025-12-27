@@ -106,6 +106,10 @@ class TestConfig(openml.testing.TestBase):
 
 
 class TestConfigurationForExamples(openml.testing.TestBase):
+    @pytest.mark.skipif(
+        not os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR),
+        reason="Test requires admin key. Set OPENML_TEST_SERVER_ADMIN_KEY environment variable.",
+    )
     @pytest.mark.production()
     def test_switch_to_example_configuration(self):
         """Verifies the test configuration is loaded properly."""
