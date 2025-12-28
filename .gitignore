@@ -97,3 +97,13 @@ dmypy.sock
 # Tests
 .pytest_cache
 .venv
+
+# Virtual environments
+oenv/
+venv/
+.env/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
