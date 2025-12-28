@@ -18,6 +18,8 @@ SKLEARN_HINT = (
     "But it looks related to scikit-learn. "
     "Please install the OpenML scikit-learn extension (openml-sklearn) and try again. "
     "You can use `pip install openml-sklearn` for installation."
+    "For more information, see "
+    "https://docs.openml.org/python/extensions/"
 )
 
 
