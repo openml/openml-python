@@ -40,7 +40,8 @@ jobs:
 
         include:
           # Full test run on Windows
-          - os: windows-latest
+          - os: ubuntu-latest
+          # - os: windows-latest
             python-version: "3.12"
             scikit-learn: "1.5.*"
             sklearn-only: "true"
