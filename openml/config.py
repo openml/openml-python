@@ -1,6 +1,7 @@
 """Store module level information like the API key, cache directory and the server"""
 
 # License: BSD 3-Clause
+# ruff: noqa: PLW0603
 from __future__ import annotations
 
 import configparser
@@ -11,10 +12,11 @@ import platform
 import shutil
 import warnings
 from contextlib import contextmanager
+from dataclasses import dataclass, replace
 from io import StringIO
 from pathlib import Path
-from typing import Any, Iterator, cast
-from typing_extensions import Literal, TypedDict
+from typing import Any, Iterator
+from typing_extensions import Literal
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
@@ -27,19 +29,62 @@ OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
 _TEST_SERVER_NORMAL_USER_KEY = "normaluser"
 
 
-class _Config(TypedDict):
-    apikey: str
-    server: str
-    cachedir: Path
-    avoid_duplicate_runs: bool
-    retry_policy: Literal["human", "robot"]
-    connection_n_retries: int
-    show_progress: bool
+# Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
+_user_path = Path("~").expanduser().absolute()
+
+
+def _resolve_default_cache_dir() -> Path:
+    user_defined_cache_dir = os.environ.get(OPENML_CACHE_DIR_ENV_VAR)
+    if user_defined_cache_dir is not None:
+        return Path(user_defined_cache_dir)
+
+    if platform.system().lower() != "linux":
+        return _user_path / ".openml"
+
+    xdg_cache_home = os.environ.get("XDG_CACHE_HOME")
+    if xdg_cache_home is None:
+        return Path("~", ".cache", "openml")
+
+    # This is the proper XDG_CACHE_HOME directory, but
+    # we unfortunately had a problem where we used XDG_CACHE_HOME/org,
+    # we check heuristically if this old directory still exists and issue
+    # a warning if it does. There's too much data to move to do this for the user.
+
+    # The new cache directory exists
+    cache_dir = Path(xdg_cache_home) / "openml"
+    if cache_dir.exists():
+        return cache_dir
+
+    # The old cache directory *does not* exist
+    heuristic_dir_for_backwards_compat = Path(xdg_cache_home) / "org" / "openml"
+    if not heuristic_dir_for_backwards_compat.exists():
+        return cache_dir
+
+    root_dir_to_delete = Path(xdg_cache_home) / "org"
+    openml_logger.warning(
+        "An old cache directory was found at '%s'. This directory is no longer used by "
+        "OpenML-Python. To silence this warning you would need to delete the old cache "
+        "directory. The cached files will then be located in '%s'.",
+        root_dir_to_delete,
+        cache_dir,
+    )
+    return Path(xdg_cache_home)
+
+
+@dataclass(frozen=True)
+class OpenMLConfig:
+    apikey: str = ""
+    server: str = "https://www.openml.org/api/v1/xml"
+    cachedir: Path = _resolve_default_cache_dir()  # noqa: RUF009
+    avoid_duplicate_runs: bool = False
+    retry_policy: Literal["human", "robot"] = "human"
+    connection_n_retries: int = 5
+    show_progress: bool = False
 
 
 def _create_log_handlers(create_file_handler: bool = True) -> None:  # noqa: FBT001, FBT002
     """Creates but does not attach the log handlers."""
-    global console_handler, file_handler  # noqa: PLW0603
+    global console_handler, file_handler, _root_cache_directory  # noqa: PLW0602
     if console_handler is not None or file_handler is not None:
         logger.debug("Requested to create log handlers, but they are already created.")
         return
@@ -105,61 +150,22 @@ def set_file_log_level(file_output_level: int) -> None:
     _set_level_register_and_store(file_handler, file_output_level)
 
 
-# Default values (see also https://github.com/openml/OpenML/wiki/Client-API-Standards)
-_user_path = Path("~").expanduser().absolute()
+_config: OpenMLConfig = OpenMLConfig()
+_root_cache_directory: Path = _config.cachedir
 
 
-def _resolve_default_cache_dir() -> Path:
-    user_defined_cache_dir = os.environ.get(OPENML_CACHE_DIR_ENV_VAR)
-    if user_defined_cache_dir is not None:
-        return Path(user_defined_cache_dir)
-
-    if platform.system().lower() != "linux":
-        return _user_path / ".openml"
-
-    xdg_cache_home = os.environ.get("XDG_CACHE_HOME")
-    if xdg_cache_home is None:
-        return Path("~", ".cache", "openml")
-
-    # This is the proper XDG_CACHE_HOME directory, but
-    # we unfortunately had a problem where we used XDG_CACHE_HOME/org,
-    # we check heuristically if this old directory still exists and issue
-    # a warning if it does. There's too much data to move to do this for the user.
-
-    # The new cache directory exists
-    cache_dir = Path(xdg_cache_home) / "openml"
-    if cache_dir.exists():
-        return cache_dir
-
-    # The old cache directory *does not* exist
-    heuristic_dir_for_backwards_compat = Path(xdg_cache_home) / "org" / "openml"
-    if not heuristic_dir_for_backwards_compat.exists():
-        return cache_dir
-
-    root_dir_to_delete = Path(xdg_cache_home) / "org"
-    openml_logger.warning(
-        "An old cache directory was found at '%s'. This directory is no longer used by "
-        "OpenML-Python. To silence this warning you would need to delete the old cache "
-        "directory. The cached files will then be located in '%s'.",
-        root_dir_to_delete,
-        cache_dir,
-    )
-    return Path(xdg_cache_home)
+def __getattr__(name: str) -> Any:
+    if hasattr(_config, name):
+        return getattr(_config, name)
+    raise AttributeError(f"module 'openml.config' has no attribute '{name}'")
 
 
-_defaults: _Config = {
-    "apikey": "",
-    "server": "https://www.openml.org/api/v1/xml",
-    "cachedir": _resolve_default_cache_dir(),
-    "avoid_duplicate_runs": False,
-    "retry_policy": "human",
-    "connection_n_retries": 5,
-    "show_progress": False,
-}
-
-# Default values are actually added here in the _setup() function which is
-# called at the end of this module
-server = _defaults["server"]
+def __setattr__(name: str, value: Any) -> None:  # noqa: N807
+    global _config
+    if hasattr(_config, name):
+        _config = replace(_config, **{name: value})
+    else:
+        raise AttributeError(f"module 'openml.config' has no attribute '{name}'")
 
 
 def get_server_base_url() -> str:
@@ -172,23 +178,12 @@ def get_server_base_url() -> str:
     -------
     str
     """
-    domain, path = server.split("/api", maxsplit=1)
+    domain, _ = _config.server.split("/api", maxsplit=1)
     return domain.replace("api", "www")
 
 
-apikey: str = _defaults["apikey"]
-show_progress: bool = _defaults["show_progress"]
-# The current cache directory (without the server name)
-_root_cache_directory: Path = Path(_defaults["cachedir"])
-avoid_duplicate_runs = _defaults["avoid_duplicate_runs"]
-
-retry_policy: Literal["human", "robot"] = _defaults["retry_policy"]
-connection_n_retries: int = _defaults["connection_n_retries"]
-
-
 def set_retry_policy(value: Literal["human", "robot"], n_retries: int | None = None) -> None:
-    global retry_policy  # noqa: PLW0603
-    global connection_n_retries  # noqa: PLW0603
+    global _config
     default_retries_by_policy = {"human": 5, "robot": 50}
 
     if value not in default_retries_by_policy:
@@ -202,8 +197,11 @@ def set_retry_policy(value: Literal["human", "robot"], n_retries: int | None = N
     if isinstance(n_retries, int) and n_retries < 1:
         raise ValueError(f"`n_retries` is '{n_retries}' but must be positive.")
 
-    retry_policy = value
-    connection_n_retries = default_retries_by_policy[value] if n_retries is None else n_retries
+    _config = replace(
+        _config,
+        retry_policy=value,
+        connection_n_retries=(default_retries_by_policy[value] if n_retries is None else n_retries),
+    )
 
 
 class ConfigurationForExamples:
@@ -222,24 +220,30 @@ class ConfigurationForExamples:
         To configuration as was before this call is stored, and can be recovered
         by using the `stop_use_example_configuration` method.
         """
-        global server  # noqa: PLW0603
-        global apikey  # noqa: PLW0603
+        global _config
 
-        if cls._start_last_called and server == cls._test_server and apikey == cls._test_apikey:
+        if (
+            cls._start_last_called
+            and _config.server == cls._test_server
+            and _config.apikey == cls._test_apikey
+        ):
             # Method is called more than once in a row without modifying the server or apikey.
             # We don't want to save the current test configuration as a last used configuration.
             return
 
-        cls._last_used_server = server
-        cls._last_used_key = apikey
+        cls._last_used_server = _config.server
+        cls._last_used_key = _config.apikey
         cls._start_last_called = True
 
         # Test server key for examples
-        server = cls._test_server
-        apikey = cls._test_apikey
+        _config = replace(
+            _config,
+            server=cls._test_server,
+            apikey=cls._test_apikey,
+        )
         warnings.warn(
-            f"Switching to the test server {server} to not upload results to the live server. "
-            "Using the test server may result in reduced performance of the API!",
+            f"Switching to the test server {_config.server} to not upload results to "
+            "the live server. Using the test server may result in reduced performance of the API!",
             stacklevel=2,
         )
 
@@ -254,11 +258,9 @@ class ConfigurationForExamples:
                 "`start_use_example_configuration` must be called first.",
             )
 
-        global server  # noqa: PLW0603
-        global apikey  # noqa: PLW0603
+        global _config
+        _config = replace(_config, server=cls._test_server, apikey=cls._test_apikey)
 
-        server = cast(str, cls._last_used_server)
-        apikey = cast(str, cls._last_used_key)
         cls._start_last_called = False
 
 
@@ -327,7 +329,7 @@ def determine_config_file_path() -> Path:
     return config_dir / "config"
 
 
-def _setup(config: _Config | None = None) -> None:
+def _setup(config: dict[str, Any] | None = None) -> None:
     """Setup openml package. Called on first import.
 
     Reads the config file and sets up apikey, server, cache appropriately.
@@ -336,11 +338,8 @@ def _setup(config: _Config | None = None) -> None:
     openml.config.server = SOMESERVER
     We could also make it a property but that's less clear.
     """
-    global apikey  # noqa: PLW0603
-    global server  # noqa: PLW0603
-    global _root_cache_directory  # noqa: PLW0603
-    global avoid_duplicate_runs  # noqa: PLW0603
-    global show_progress  # noqa: PLW0603
+    global _config
+    global _root_cache_directory
 
     config_file = determine_config_file_path()
     config_dir = config_file.parent
@@ -358,19 +357,24 @@ def _setup(config: _Config | None = None) -> None:
     if config is None:
         config = _parse_config(config_file)
 
-    avoid_duplicate_runs = config["avoid_duplicate_runs"]
-    apikey = config["apikey"]
-    server = config["server"]
-    show_progress = config["show_progress"]
-    n_retries = int(config["connection_n_retries"])
+    _config = replace(
+        _config,
+        apikey=config["apikey"],
+        server=config["server"],
+        show_progress=config["show_progress"],
+        avoid_duplicate_runs=config["avoid_duplicate_runs"],
+        retry_policy=config["retry_policy"],
+        connection_n_retries=int(config["connection_n_retries"]),
+    )
 
-    set_retry_policy(config["retry_policy"], n_retries)
+    set_retry_policy(config["retry_policy"], _config.connection_n_retries)
 
     user_defined_cache_dir = os.environ.get(OPENML_CACHE_DIR_ENV_VAR)
     if user_defined_cache_dir is not None:
         short_cache_dir = Path(user_defined_cache_dir)
     else:
         short_cache_dir = Path(config["cachedir"])
+
     _root_cache_directory = short_cache_dir.expanduser().resolve()
 
     try:
@@ -389,29 +393,31 @@ def _setup(config: _Config | None = None) -> None:
 
 def set_field_in_config_file(field: str, value: Any) -> None:
     """Overwrites the `field` in the configuration file with the new `value`."""
-    if field not in _defaults:
-        raise ValueError(f"Field '{field}' is not valid and must be one of '{_defaults.keys()}'.")
+    global _config
+    if not hasattr(_config, field):
+        raise ValueError(
+            f"Field '{field}' is not valid and must be one of '{_config.__dict__.keys()}'."
+        )
 
-    # TODO(eddiebergman): This use of globals has gone too far
-    globals()[field] = value
+    _config = replace(_config, **{field: value})
     config_file = determine_config_file_path()
-    config = _parse_config(config_file)
+    existing = _parse_config(config_file)
     with config_file.open("w") as fh:
-        for f in _defaults:
+        for f in _config.__dict__:
             # We can't blindly set all values based on globals() because when the user
             # sets it through config.FIELD it should not be stored to file.
             # There doesn't seem to be a way to avoid writing defaults to file with configparser,
             # because it is impossible to distinguish from an explicitly set value that matches
             # the default value, to one that was set to its default because it was omitted.
-            value = globals()[f] if f == field else config.get(f)  # type: ignore
-            if value is not None:
-                fh.write(f"{f} = {value}\n")
+            v = value if f == field else existing.get(f)
+            if v is not None:
+                fh.write(f"{f} = {v}\n")
 
 
-def _parse_config(config_file: str | Path) -> _Config:
+def _parse_config(config_file: str | Path) -> dict[str, Any]:
     """Parse the config file, set up defaults."""
     config_file = Path(config_file)
-    config = configparser.RawConfigParser(defaults=_defaults)  # type: ignore
+    config = configparser.RawConfigParser(defaults=_config.__dict__)  # type: ignore
 
     # The ConfigParser requires a [SECTION_HEADER], which we do not expect in our config file.
     # Cheat the ConfigParser module by adding a fake section header
@@ -434,16 +440,8 @@ def _parse_config(config_file: str | Path) -> _Config:
     return configuration  # type: ignore
 
 
-def get_config_as_dict() -> _Config:
-    return {
-        "apikey": apikey,
-        "server": server,
-        "cachedir": _root_cache_directory,
-        "avoid_duplicate_runs": avoid_duplicate_runs,
-        "connection_n_retries": connection_n_retries,
-        "retry_policy": retry_policy,
-        "show_progress": show_progress,
-    }
+def get_config_as_dict() -> dict[str, Any]:
+    return _config.__dict__.copy()
 
 
 # NOTE: For backwards compatibility, we keep the `str`
@@ -467,7 +465,7 @@ def get_cache_directory() -> str:
         The current cache directory.
 
     """
-    url_suffix = urlparse(server).netloc
+    url_suffix = urlparse(_config.server).netloc
     reversed_url_suffix = os.sep.join(url_suffix.split(".")[::-1])  # noqa: PTH118
     return os.path.join(_root_cache_directory, reversed_url_suffix)  # noqa: PTH118
 
@@ -491,7 +489,7 @@ def set_root_cache_directory(root_cache_directory: str | Path) -> None:
     --------
     get_cache_directory
     """
-    global _root_cache_directory  # noqa: PLW0603
+    global _root_cache_directory
     _root_cache_directory = Path(root_cache_directory)
 
 
@@ -502,7 +500,7 @@ stop_using_configuration_for_example = ConfigurationForExamples.stop_using_confi
 
 
 @contextmanager
-def overwrite_config_context(config: dict[str, Any]) -> Iterator[_Config]:
+def overwrite_config_context(config: dict[str, Any]) -> Iterator[dict[str, Any]]:
     """A context manager to temporarily override variables in the configuration."""
     existing_config = get_config_as_dict()
     merged_config = {**existing_config, **config}
@@ -515,10 +513,10 @@ def overwrite_config_context(config: dict[str, Any]) -> Iterator[_Config]:
 
 __all__ = [
     "get_cache_directory",
+    "get_config_as_dict",
     "set_root_cache_directory",
     "start_using_configuration_for_example",
     "stop_using_configuration_for_example",
-    "get_config_as_dict",
 ]
 
 _setup()

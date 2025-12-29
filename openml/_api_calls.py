@@ -71,7 +71,7 @@ def resolve_env_proxies(url: str) -> str | None:
 
 
 def _create_url_from_endpoint(endpoint: str) -> str:
-    url = config.server
+    url = config._config.server
     if not url.endswith("/"):
         url += "/"
     url += endpoint
@@ -301,7 +301,7 @@ def _file_id_to_url(file_id: int, filename: str | None = None) -> str:
     Presents the URL how to download a given file id
     filename is optional
     """
-    openml_url = config.server.split("/api/")
+    openml_url = config._config.server.split("/api/")
     url = openml_url[0] + f"/data/download/{file_id!s}"
     if filename is not None:
         url += "/" + filename
