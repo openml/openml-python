@@ -245,6 +245,14 @@ def flow_exists(name: str, external_version: str) -> int | bool:
     flow_exist : int or bool
         flow id iff exists, False otherwise
 
+    Examples
+    --------
+    >>> import openml
+    >>> flow = openml.flows.flow_exists(name = "openml.evaluation.EuclideanDistance", \
+    >>> external_version = "1")
+    >>> print(flow)
+
+
     Notes
     -----
     see https://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
