@@ -78,16 +78,32 @@ def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = T
     flow_id : int
         The OpenML flow id.
 
-    reinstantiate: bool
+    reinstantiate: bool, optional, default=False
         Whether to reinstantiate the flow to a model instance.
 
-    strict_version : bool, default=True
+    strict_version : bool, optional, default=True
         Whether to fail if version requirements are not fulfilled.
 
     Returns
     -------
     flow : OpenMLFlow
         the flow
+
+    Examples
+    --------
+    >>> import openml
+    Download the flow with flow_id = 5
+    >>> flow_id = 5
+    >>> flow = openml.flows.get_flow()
+    >>> print(flow)
+    OpenML Flow
+    ===========
+    Flow ID.........: 5 (version 1)
+    Flow URL........: https://www.openml.org/f/5
+    Flow Name.......: openml.evaluation.average_cost
+    Flow Description: An implementation of the evaluation measure "average_cost"
+    Upload Date.....: 2014-01-16 14:12:56
+    Dependencies....: Build on top of Weka API (Jar version 3.?.?)
     """
     flow_id = int(flow_id)
     flow = _get_flow_description(flow_id)
