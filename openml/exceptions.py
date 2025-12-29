@@ -63,5 +63,28 @@ class OpenMLNotAuthorizedError(OpenMLServerError):
     """Indicates an authenticated user is not authorized to execute the requested action."""
 
 
+class OpenMLAuthenticationError(OpenMLServerError):
+    """Exception raised when API authentication fails.
+
+    This typically occurs when:
+    - No API key is configured
+    - The API key is invalid or expired
+    - The API key format is incorrect
+
+    This is different from authorization (OpenMLNotAuthorizedError), which occurs
+    when a valid API key lacks permissions for the requested operation.
+    """
+
+    def __init__(self, message: str):
+        help_text = (
+            "\n\nTo fix this:\n"
+            "1. Get your API key from https://www.openml.org/\n"
+            "   (you'll need to register for a free account if you don't have one)\n"
+            "2. Configure your API key by following the authentication guide:\n"
+            "   https://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/#authentication"
+        )
+        super().__init__(message + help_text)
+
+
 class ObjectNotPublishedError(PyOpenMLError):
     """Indicates an object has not been published yet."""
