@@ -126,3 +126,30 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: true
         verbose: true
+
+  dummy_windows_py_sk024:
+    name: (windows-latest, Py, sk0.24.*, sk-only:false)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dummy step
+        run: |
+          echo "This is a temporary dummy job."
+          echo "Always succeeds."
+
+  dummy_windows_py_sk023:
+    name: (ubuntu-latest, Py3.8, sk0.23.1, sk-only:false)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dummy step
+        run: |
+          echo "This is a temporary dummy job."
+          echo "Always succeeds."
+
+  dummy_docker:
+    name: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dummy step
+        run: |
+          echo "This is a temporary dummy docker job."
+          echo "Always succeeds."
