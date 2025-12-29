@@ -55,14 +55,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install test dependencies
+    - name: Install test dependencies and scikit-learn
       run: |
         python -m pip install --upgrade pip
-        pip install -e .[test]
-
-    - name: Install scikit-learn ${{ matrix.scikit-learn }}
-      run: |
-        pip install scikit-learn==${{ matrix.scikit-learn }}
+        pip install -e .[test] scikit-learn==${{ matrix.scikit-learn }}
 
     - name: Store repository status
       id: status-before
