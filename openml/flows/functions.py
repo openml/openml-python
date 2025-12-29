@@ -180,6 +180,13 @@ def list_flows(
             - version
             - external version
             - uploader
+
+    Examples
+    --------
+    >>> import openml
+    >>> flows = openml.flows.list_flows()
+    A df of all flows which are on openML is returned
+    [123519 rows x 6 columns]
     """
     listing_call = partial(_list_flows, tag=tag, uploader=uploader)
     batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
