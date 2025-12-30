@@ -44,13 +44,13 @@ jobs:
           - os: windows-latest
             python-version: "3.12"
             scikit-learn: "1.5.*"
-            sklearn-only: "true"
+            sklearn-only: "false"
 
           # Coverage run
           - os: ubuntu-latest
             python-version: "3.12"
             scikit-learn: "1.5.*"
-            sklearn-only: "true"
+            sklearn-only: "false"
             code-cov: true
 
     steps:
