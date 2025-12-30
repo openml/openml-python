@@ -46,7 +46,7 @@ class TestConfig(openml.testing.TestBase):
     def test_non_writable_home(self, log_handler_mock, warnings_mock):
         with tempfile.TemporaryDirectory(dir=self.workdir) as td:
             os.chmod(td, 0o444)
-            _dd = copy(openml.config.get_config_as_dict())
+            _dd = copy(openml.config.OpenMLConfig().__dict__)
             _dd["cachedir"] = Path(td) / "something-else"
             openml.config._setup(_dd)
 

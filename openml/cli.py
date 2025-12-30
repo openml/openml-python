@@ -9,6 +9,8 @@ from pathlib import Path
 from typing import Callable
 from urllib.parse import urlparse
 
+from attr import fields
+
 from openml import config
 
 
@@ -339,7 +341,9 @@ def main() -> None:
         "'https://openml.github.io/openml-python/main/usage.html#configuration'.",
     )
 
-    configurable_fields = [f for f in config.get_config_as_dict() if f not in ["max_retries"]]
+    configurable_fields = [
+        f.name for f in fields(config.OpenMLConfig) if f.name not in ["max_retries"]
+    ]
 
     parser_configure.add_argument(
         "field",
