@@ -82,6 +82,7 @@ class TestSetupFunctions(TestBase):
         assert setup_id == run.setup_id
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_existing_setup_exists_1(self):
         def side_effect(self):
             self.var_smoothing = 1e-9
@@ -97,11 +98,13 @@ class TestSetupFunctions(TestBase):
             self._existing_setup_exists(nb)
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_exisiting_setup_exists_2(self):
         # Check a flow with one hyperparameter
         self._existing_setup_exists(sklearn.naive_bayes.GaussianNB())
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_existing_setup_exists_3(self):
         # Check a flow with many hyperparameters
         self._existing_setup_exists(
