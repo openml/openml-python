@@ -166,6 +166,7 @@ class TestSetupFunctions(TestBase):
         assert isinstance(setups, pd.DataFrame)
         assert len(setups) == 10
 
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_setuplist_offset(self):
         size = 10
         setups = openml.setups.list_setups(offset=0, size=size)

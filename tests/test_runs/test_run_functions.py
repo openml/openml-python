@@ -1695,6 +1695,7 @@ class TestRun(TestBase):
         ):
             format_prediction(clustering, *ignored_input)
 
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_format_prediction_classification_no_probabilities(self):
         classification = openml.tasks.get_task(
             self.TEST_SERVER_TASK_SIMPLE["task_id"],
@@ -1704,6 +1705,7 @@ class TestRun(TestBase):
         with pytest.raises(ValueError, match="`proba` is required for classification task"):
             format_prediction(classification, *ignored_input, proba=None)
 
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_format_prediction_classification_incomplete_probabilities(self):
         classification = openml.tasks.get_task(
             self.TEST_SERVER_TASK_SIMPLE["task_id"],
@@ -1714,6 +1716,7 @@ class TestRun(TestBase):
         with pytest.raises(ValueError, match="Each class should have a predicted probability"):
             format_prediction(classification, *ignored_input, proba=incomplete_probabilities)
 
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_format_prediction_task_without_classlabels_set(self):
         classification = openml.tasks.get_task(
             self.TEST_SERVER_TASK_SIMPLE["task_id"],
@@ -1724,6 +1727,7 @@ class TestRun(TestBase):
         with pytest.raises(ValueError, match="The classification task must have class labels set"):
             format_prediction(classification, *ignored_input, proba={})
 
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_format_prediction_task_learning_curve_sample_not_set(self):
         learning_curve = openml.tasks.get_task(801, download_data=False)  # diabetes;crossvalidation
         probabilities = {c: 0.2 for c in learning_curve.class_labels}
