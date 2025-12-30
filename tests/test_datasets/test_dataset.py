@@ -230,6 +230,16 @@ class OpenMLDatasetTest(TestBase):
         assert isinstance(xy, pd.DataFrame)
         assert xy.shape == (150, 5)
 
+    def test_get_missing_summary(self):
+        dataset = openml.datasets.get_dataset(31)  # credit-g
+        summary = dataset.get_missing_summary()
+
+        assert "n_missing_total" in summary
+        assert "missing_per_column" in summary
+        assert isinstance(summary["missing_per_column"], dict)
+        assert isinstance(summary["n_missing_total"], (int, np.integer))
+        assert summary["n_missing_total"] >= 0
+
     def test_lazy_loading_metadata(self):
         # Initial Setup
         did_cache_dir = openml.utils._create_cache_directory_for_id(

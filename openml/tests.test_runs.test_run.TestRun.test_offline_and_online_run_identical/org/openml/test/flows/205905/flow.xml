@@ -1,0 +1,546 @@
+
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>205905</oml:id>
+<oml:uploader>1159</oml:uploader>
+<oml:name>TESTa8a9af7f85sklearn.pipeline.Pipeline(cat_handling=sklearn.compose._column_transformer.ColumnTransformer(cat=sklearn.preprocessing._encoders.OneHotEncoder),imp=sklearn.impute._base.SimpleImputer,classifier=sklearn.dummy.DummyClassifier)</oml:name>
+<oml:custom_name>sklearn.Pipeline(ColumnTransformer,SimpleImputer,DummyClassifier)</oml:custom_name>
+<oml:class_name>sklearn.pipeline.Pipeline</oml:class_name>
+<oml:version>1</oml:version>
+<oml:external_version>openml==0.16.0,sklearn==1.7.2</oml:external_version>
+<oml:description>A sequence of data transformers with an optional final predictor.
+
+`Pipeline` allows you to sequentially apply a list of transformers to
+preprocess the data and, if desired, conclude the sequence with a final
+:term:`predictor` for predictive modeling.
+
+Intermediate steps of the pipeline must be transformers, that is, they
+must implement `fit` and `transform` methods.
+The final :term:`estimator` only needs to implement `fit`.
+The transformers in the pipeline can be cached using ``memory`` argument.
+
+The purpose of the pipeline is to assemble several steps that can be
+cross-validated together while setting different parameters. For this, it
+enables setting parameters of the various steps using their names and the
+parameter name separated by a `'__'`, as in the example below. A step's
+estimator may be replaced entirely by setting the parameter with its name
+to another estimator, or a transformer removed by setting it to
+`'passthrough'` or `None`.
+
+For an example use case of `Pipeline` combined with
+:class:`~s...</oml:description>
+<oml:upload_date>2025-11-15T10:47:52</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==1.7.2
+numpy&gt;=1.22.0
+scipy&gt;=1.8.0
+joblib&gt;=1.2.0
+threadpoolctl&gt;=3.1.0</oml:dependencies>
+<oml:parameter>
+	<oml:name>memory</oml:name>
+	<oml:data_type>str or object with the joblib</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Used to cache the fitted transformers of the pipeline. The last step
+    will never be cached, even if it is a transformer. By default, no
+    caching is performed. If a string is given, it is the path to the
+    caching directory. Enabling caching triggers a clone of the transformers
+    before fitting. Therefore, the transformer instance given to the
+    pipeline cannot be inspected directly. Use the attribute ``named_steps``
+    or ``steps`` to inspect estimators within the pipeline. Caching the
+    transformers is advantageous when fitting is time consuming. See
+    :ref:`sphx_glr_auto_examples_neighbors_plot_caching_nearest_neighbors.py`
+    for an example on how to enable caching</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>steps</oml:name>
+	<oml:data_type>list of tuples</oml:data_type>
+	<oml:default_value>[{&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;cat_handling&quot;, &quot;step_name&quot;: &quot;cat_handling&quot;}}, {&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;imp&quot;, &quot;step_name&quot;: &quot;imp&quot;}}, {&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;classifier&quot;, &quot;step_name&quot;: &quot;classifier&quot;}}]</oml:default_value>
+	<oml:description>List of (name of step, estimator) tuples that are to be chained in
+    sequential order. To be compatible with the scikit-learn API, all steps
+    must define `fit`. All non-last steps must also define `transform`. See
+    :ref:`Combining Estimators &lt;combining_estimators&gt;` for more details</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>transform_input</oml:name>
+	<oml:data_type>list of str</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>The names of the :term:`metadata` parameters that should be transformed by the
+    pipeline before passing it to the step consuming it
+
+    This enables transforming some input arguments to ``fit`` (other than ``X``)
+    to be transformed by the steps of the pipeline up to the step which requires
+    them. Requirement is defined via :ref:`metadata routing &lt;metadata_routing&gt;`
+    For instance, this can be used to pass a validation set through the pipeline
+
+    You can only set this if metadata routing is enabled, which you
+    can enable using ``sklearn.set_config(enable_metadata_routing=True)``
+
+    .. versionadded:: 1.6</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>verbose</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description>If True, the time elapsed while fitting each step will be printed as it
+    is completed.</oml:description>
+</oml:parameter>
+<oml:component>
+  <oml:identifier>cat_handling</oml:identifier>
+	
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>205906</oml:id>
+<oml:uploader>1159</oml:uploader>
+<oml:name>TESTa8a9af7f85sklearn.compose._column_transformer.ColumnTransformer(cat=sklearn.preprocessing._encoders.OneHotEncoder)</oml:name>
+<oml:custom_name>sklearn.ColumnTransformer</oml:custom_name>
+<oml:class_name>sklearn.compose._column_transformer.ColumnTransformer</oml:class_name>
+<oml:version>1</oml:version>
+<oml:external_version>openml==0.16.0,sklearn==1.7.2</oml:external_version>
+<oml:description>Applies transformers to columns of an array or pandas DataFrame.
+
+This estimator allows different columns or column subsets of the input
+to be transformed separately and the features generated by each transformer
+will be concatenated to form a single feature space.
+This is useful for heterogeneous or columnar data, to combine several
+feature extraction mechanisms or transformations into a single transformer.</oml:description>
+<oml:upload_date>2025-11-15T10:47:52</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==1.7.2
+numpy&gt;=1.22.0
+scipy&gt;=1.8.0
+joblib&gt;=1.2.0
+threadpoolctl&gt;=3.1.0</oml:dependencies>
+<oml:parameter>
+	<oml:name>force_int_remainder_cols</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>&quot;deprecated&quot;</oml:default_value>
+	<oml:description>This parameter has no effect
+
+    .. note::
+        If you do not access the list of columns for the remainder columns
+        in the `transformers_` fitted attribute, you do not need to set
+        this parameter
+
+    .. versionadded:: 1.5
+
+    .. versionchanged:: 1.7
+       The default value for `force_int_remainder_cols` will change from
+       `True` to `False` in version 1.7
+
+    .. deprecated:: 1.7
+       `force_int_remainder_cols` is deprecated and will be removed in 1.9.</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>n_jobs</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Number of jobs to run in parallel
+    ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context
+    ``-1`` means using all processors. See :term:`Glossary &lt;n_jobs&gt;`
+    for more details</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>remainder</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;passthrough&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>sparse_threshold</oml:name>
+	<oml:data_type>float</oml:data_type>
+	<oml:default_value>0.3</oml:default_value>
+	<oml:description>If the output of the different transformers contains sparse matrices,
+    these will be stacked as a sparse matrix if the overall density is
+    lower than this value. Use ``sparse_threshold=0`` to always return
+    dense.  When the transformed output consists of all dense data, the
+    stacked result will be dense, and this keyword will be ignored</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>transformer_weights</oml:name>
+	<oml:data_type>dict</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Multiplicative weights for features per transformer. The output of the
+    transformer is multiplied by these weights. Keys are transformer names,
+    values the weights</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>transformers</oml:name>
+	<oml:data_type>list of tuples</oml:data_type>
+	<oml:default_value>[{&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;cat&quot;, &quot;step_name&quot;: &quot;cat&quot;, &quot;argument_1&quot;: {&quot;oml-python:serialized_object&quot;: &quot;function&quot;, &quot;value&quot;: &quot;tests.test_runs.test_run._cat_col_selector&quot;}}}]</oml:default_value>
+	<oml:description>List of (name, transformer, columns) tuples specifying the
+    transformer objects to be applied to subsets of the data</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>verbose</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description>If True, the time elapsed while fitting each transformer will be
+    printed as it is completed</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>verbose_feature_names_out</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>true</oml:default_value>
+	<oml:description>- If True, :meth:`ColumnTransformer.get_feature_names_out` will prefix
+      all feature names with the name of the transformer that generated that
+      feature. It is equivalent to setting
+      `verbose_feature_names_out=&quot;{transformer_name}__{feature_name}&quot;`
+    - If False, :meth:`ColumnTransformer.get_feature_names_out` will not
+      prefix any feature names and will error if feature names are not
+      unique
+    - If ``Callable[[str, str], str]``,
+      :meth:`ColumnTransformer.get_feature_names_out` will rename all the features
+      using the name of the transformer. The first argument of the callable is the
+      transformer name and the second argument is the feature name. The returned
+      string will be the new feature name
+    - If ``str``, it must be a string ready for formatting. The given string will
+      be formatted using two field names: ``transformer_name`` and ``feature_name``
+      e.g. ``&quot;{feature_name}__{transformer_name}&quot;``. See :meth:`str.format` method
+      from the standard ...</oml:description>
+</oml:parameter>
+<oml:component>
+  <oml:identifier>cat</oml:identifier>
+	
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>205907</oml:id>
+<oml:uploader>1159</oml:uploader>
+<oml:name>TESTa8a9af7f85sklearn.preprocessing._encoders.OneHotEncoder</oml:name>
+<oml:custom_name>sklearn.OneHotEncoder</oml:custom_name>
+<oml:class_name>sklearn.preprocessing._encoders.OneHotEncoder</oml:class_name>
+<oml:version>1</oml:version>
+<oml:external_version>openml==0.16.0,sklearn==1.7.2</oml:external_version>
+<oml:description>Encode categorical features as a one-hot numeric array.
+
+The input to this transformer should be an array-like of integers or
+strings, denoting the values taken on by categorical (discrete) features.
+The features are encoded using a one-hot (aka 'one-of-K' or 'dummy')
+encoding scheme. This creates a binary column for each category and
+returns a sparse matrix or dense array (depending on the ``sparse_output``
+parameter).
+
+By default, the encoder derives the categories based on the unique values
+in each feature. Alternatively, you can also specify the `categories`
+manually.
+
+This encoding is needed for feeding categorical data to many scikit-learn
+estimators, notably linear models and SVMs with the standard kernels.
+
+Note: a one-hot encoding of y labels should use a LabelBinarizer
+instead.</oml:description>
+<oml:upload_date>2025-11-15T10:47:52</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==1.7.2
+numpy&gt;=1.22.0
+scipy&gt;=1.8.0
+joblib&gt;=1.2.0
+threadpoolctl&gt;=3.1.0</oml:dependencies>
+<oml:parameter>
+	<oml:name>categories</oml:name>
+	<oml:data_type>'auto' or a list of array</oml:data_type>
+	<oml:default_value>&quot;auto&quot;</oml:default_value>
+	<oml:description>Categories (unique values) per feature:
+
+    - 'auto' : Determine categories automatically from the training data
+    - list : ``categories[i]`` holds the categories expected in the ith
+      column. The passed categories should not mix strings and numeric
+      values within a single feature, and should be sorted in case of
+      numeric values
+
+    The used categories can be found in the ``categories_`` attribute
+
+    .. versionadded:: 0.20
+
+drop : {'first', 'if_binary'} or an array-like of shape (n_features,),             default=None
+    Specifies a methodology to use to drop one of the categories per
+    feature. This is useful in situations where perfectly collinear
+    features cause problems, such as when feeding the resulting data
+    into an unregularized linear regression model
+
+    However, dropping one category breaks the symmetry of the original
+    representation and can therefore induce a bias in downstream models,
+    for instance for penalized linear classification or regression models</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>drop</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>dtype</oml:name>
+	<oml:data_type>number type</oml:data_type>
+	<oml:default_value>{&quot;oml-python:serialized_object&quot;: &quot;type&quot;, &quot;value&quot;: &quot;np.float64&quot;}</oml:default_value>
+	<oml:description>Desired dtype of output
+
+handle_unknown : {'error', 'ignore', 'infrequent_if_exist', 'warn'},                      default='error'
+    Specifies the way unknown categories are handled during :meth:`transform`
+
+    - 'error' : Raise an error if an unknown category is present during transform
+    - 'ignore' : When an unknown category is encountered during
+      transform, the resulting one-hot encoded columns for this feature
+      will be all zeros. In the inverse transform, an unknown category
+      will be denoted as None
+    - 'infrequent_if_exist' : When an unknown category is encountered
+      during transform, the resulting one-hot encoded columns for this
+      feature will map to the infrequent category if it exists. The
+      infrequent category will be mapped to the last position in the
+      encoding. During inverse transform, an unknown category will be
+      mapped to the category denoted `'infrequent'` if it exists. If the
+      `'infrequent'` category does not exist, then :meth:`transform` an...</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>feature_name_combiner</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;concat&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>handle_unknown</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;ignore&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>max_categories</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Specifies an upper limit to the number of output features for each input
+    feature when considering infrequent categories. If there are infrequent
+    categories, `max_categories` includes the category representing the
+    infrequent categories along with the frequent categories. If `None`,
+    there is no limit to the number of output features
+
+    .. versionadded:: 1.1
+        Read more in the :ref:`User Guide &lt;encoder_infrequent_categories&gt;`
+
+feature_name_combiner : &quot;concat&quot; or callable, default=&quot;concat&quot;
+    Callable with signature `def callable(input_feature, category)` that returns a
+    string. This is used to create feature names to be returned by
+    :meth:`get_feature_names_out`
+
+    `&quot;concat&quot;` concatenates encoded feature name and category with
+    `feature + &quot;_&quot; + str(category)`.E.g. feature X with values 1, 6, 7 create
+    feature names `X_1, X_6, X_7`
+
+    .. versionadded:: 1.3</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_frequency</oml:name>
+	<oml:data_type>int or float</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Specifies the minimum frequency below which a category will be
+    considered infrequent
+
+    - If `int`, categories with a smaller cardinality will be considered
+      infrequent
+
+    - If `float`, categories with a smaller cardinality than
+      `min_frequency * n_samples`  will be considered infrequent
+
+    .. versionadded:: 1.1
+        Read more in the :ref:`User Guide &lt;encoder_infrequent_categories&gt;`</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>sparse_output</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>true</oml:default_value>
+	<oml:description>When ``True``, it returns a :class:`scipy.sparse.csr_matrix`,
+    i.e. a sparse matrix in &quot;Compressed Sparse Row&quot; (CSR) format
+
+    .. versionadded:: 1.2
+       `sparse` was renamed to `sparse_output`</oml:description>
+</oml:parameter>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_1.7.2</oml:tag>
+</oml:flow>
+</oml:component>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_1.7.2</oml:tag>
+</oml:flow>
+</oml:component>
+<oml:component>
+  <oml:identifier>imp</oml:identifier>
+	
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>205908</oml:id>
+<oml:uploader>1159</oml:uploader>
+<oml:name>TESTa8a9af7f85sklearn.impute._base.SimpleImputer</oml:name>
+<oml:custom_name>sklearn.SimpleImputer</oml:custom_name>
+<oml:class_name>sklearn.impute._base.SimpleImputer</oml:class_name>
+<oml:version>1</oml:version>
+<oml:external_version>openml==0.16.0,sklearn==1.7.2</oml:external_version>
+<oml:description>Univariate imputer for completing missing values with simple strategies.
+
+Replace missing values using a descriptive statistic (e.g. mean, median, or
+most frequent) along each column, or using a constant value.</oml:description>
+<oml:upload_date>2025-11-15T10:47:52</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==1.7.2
+numpy&gt;=1.22.0
+scipy&gt;=1.8.0
+joblib&gt;=1.2.0
+threadpoolctl&gt;=3.1.0</oml:dependencies>
+<oml:parameter>
+	<oml:name>add_indicator</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description>If True, a :class:`MissingIndicator` transform will stack onto output
+    of the imputer's transform. This allows a predictive estimator
+    to account for missingness despite imputation. If a feature has no
+    missing values at fit/train time, the feature won't appear on
+    the missing indicator even if there are missing values at
+    transform/test time</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>copy</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>true</oml:default_value>
+	<oml:description>If True, a copy of X will be created. If False, imputation will
+    be done in-place whenever possible. Note that, in the following cases,
+    a new copy will always be made, even if `copy=False`:
+
+    - If `X` is not an array of floating values;
+    - If `X` is encoded as a CSR matrix;
+    - If `add_indicator=True`</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>fill_value</oml:name>
+	<oml:data_type>str or numerical value</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>When strategy == &quot;constant&quot;, `fill_value` is used to replace all
+    occurrences of missing_values. For string or object data types,
+    `fill_value` must be a string
+    If `None`, `fill_value` will be 0 when imputing numerical
+    data and &quot;missing_value&quot; for strings or object data types</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>keep_empty_features</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description>If True, features that consist exclusively of missing values when
+    `fit` is called are returned in results when `transform` is called
+    The imputed value is always `0` except when `strategy=&quot;constant&quot;`
+    in which case `fill_value` will be used instead
+
+    .. versionadded:: 1.2
+
+    .. versionchanged:: 1.6
+        Currently, when `keep_empty_feature=False` and `strategy=&quot;constant&quot;`,
+        empty features are not dropped. This behaviour will change in version
+        1.8. Set `keep_empty_feature=True` to preserve this behaviour.</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>missing_values</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>NaN</oml:default_value>
+	<oml:description>The placeholder for the missing values. All occurrences of
+    `missing_values` will be imputed. For pandas' dataframes with
+    nullable integer dtypes with missing values, `missing_values`
+    can be set to either `np.nan` or `pd.NA`</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>strategy</oml:name>
+	<oml:data_type>str or Callable</oml:data_type>
+	<oml:default_value>&quot;mean&quot;</oml:default_value>
+	<oml:description>The imputation strategy
+
+    - If &quot;mean&quot;, then replace missing values using the mean along
+      each column. Can only be used with numeric data
+    - If &quot;median&quot;, then replace missing values using the median along
+      each column. Can only be used with numeric data
+    - If &quot;most_frequent&quot;, then replace missing using the most frequent
+      value along each column. Can be used with strings or numeric data
+      If there is more than one such value, only the smallest is returned
+    - If &quot;constant&quot;, then replace missing values with fill_value. Can be
+      used with strings or numeric data
+    - If an instance of Callable, then replace missing values using the
+      scalar statistic returned by running the callable over a dense 1d
+      array containing non-missing values of each column
+
+    .. versionadded:: 0.20
+       strategy=&quot;constant&quot; for fixed value imputation
+
+    .. versionadded:: 1.5
+       strategy=callable for custom value imputation</oml:description>
+</oml:parameter>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_1.7.2</oml:tag>
+</oml:flow>
+</oml:component>
+<oml:component>
+  <oml:identifier>classifier</oml:identifier>
+	
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>205909</oml:id>
+<oml:uploader>1159</oml:uploader>
+<oml:name>TESTa8a9af7f85sklearn.dummy.DummyClassifier</oml:name>
+<oml:custom_name>sklearn.DummyClassifier</oml:custom_name>
+<oml:class_name>sklearn.dummy.DummyClassifier</oml:class_name>
+<oml:version>1</oml:version>
+<oml:external_version>openml==0.16.0,sklearn==1.7.2</oml:external_version>
+<oml:description>DummyClassifier makes predictions that ignore the input features.
+
+This classifier serves as a simple baseline to compare against other more
+complex classifiers.
+
+The specific behavior of the baseline is selected with the `strategy`
+parameter.
+
+All strategies make predictions that ignore the input feature values passed
+as the `X` argument to `fit` and `predict`. The predictions, however,
+typically depend on values observed in the `y` parameter passed to `fit`.
+
+Note that the &quot;stratified&quot; and &quot;uniform&quot; strategies lead to
+non-deterministic predictions that can be rendered deterministic by setting
+the `random_state` parameter if needed. The other strategies are naturally
+deterministic and, once fit, always return the same constant prediction
+for any value of `X`.</oml:description>
+<oml:upload_date>2025-11-15T10:47:52</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==1.7.2
+numpy&gt;=1.22.0
+scipy&gt;=1.8.0
+joblib&gt;=1.2.0
+threadpoolctl&gt;=3.1.0</oml:dependencies>
+<oml:parameter>
+	<oml:name>constant</oml:name>
+	<oml:data_type>int or str or array</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>The explicit constant as predicted by the &quot;constant&quot; strategy. This
+    parameter is useful only for the &quot;constant&quot; strategy.</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>random_state</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Controls the randomness to generate the predictions when
+    ``strategy='stratified'`` or ``strategy='uniform'``
+    Pass an int for reproducible output across multiple function calls
+    See :term:`Glossary &lt;random_state&gt;`</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>strategy</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;prior&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_1.7.2</oml:tag>
+</oml:flow>
+</oml:component>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_1.7.2</oml:tag>
+</oml:flow>
