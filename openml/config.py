@@ -261,8 +261,8 @@ class ConfigurationForExamples:
         global _config
         _config = replace(
             _config,
-            server=cast(str, cls._last_used_server),
-            apikey=cast(str, cls._last_used_key),
+            server=cast("str", cls._last_used_server),
+            apikey=cast("str", cls._last_used_key),
         )
         cls._start_last_called = False
 
@@ -421,7 +421,7 @@ def set_field_in_config_file(field: str, value: Any) -> None:
 def _parse_config(config_file: str | Path) -> dict[str, Any]:
     """Parse the config file, set up defaults."""
     config_file = Path(config_file)
-    config = configparser.RawConfigParser(defaults=_config.__dict__)  # type: ignore
+    config = configparser.RawConfigParser(defaults=OpenMLConfig().__dict__)  # type: ignore
 
     # The ConfigParser requires a [SECTION_HEADER], which we do not expect in our config file.
     # Cheat the ConfigParser module by adding a fake section header
@@ -493,8 +493,9 @@ def set_root_cache_directory(root_cache_directory: str | Path) -> None:
     --------
     get_cache_directory
     """
-    global _root_cache_directory
+    global _root_cache_directory, _config
     _root_cache_directory = Path(root_cache_directory)
+    _config = replace(_config, cachedir=_root_cache_directory)
 
 
 start_using_configuration_for_example = (
