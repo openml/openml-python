@@ -1421,23 +1421,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" get_server_base_url">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.config.get_server_base_url--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -1492,34 +1475,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" set_root_cache_directory">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.config.set_root_cache_directory--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.config.set_root_cache_directory--see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See Also
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2999,8 +2954,30 @@ hostname</code>
         <p>Return the base URL of the currently configured server.</p>
 <p>Turns <code>"https://api.openml.org/api/v1/xml"</code> in <code>"https://www.openml.org/"</code>
 and <code>"https://test.openml.org/api/v1/xml"</code> in <code>"https://test.openml.org/"</code></p>
-<h5 id="openml.config.get_server_base_url--returns">Returns<a class="headerlink" href="#openml.config.get_server_base_url--returns" title="Permanent link">#</a></h5>
-<p>str</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>str</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/config.py</code></summary>
@@ -3219,12 +3196,38 @@ by default, cached data for the standard OpenML.org server is stored
 at <code>root_cache_directory / org / openml / www</code>, and the general
 pattern is <code>root_cache_directory / top-level domain / second-level
 domain / hostname</code>.</p>
-<h5 id="openml.config.set_root_cache_directory--parameters">Parameters<a class="headerlink" href="#openml.config.set_root_cache_directory--parameters" title="Permanent link">#</a></h5>
-<p>root_cache_directory : string
-     Path to use as cache directory.</p>
-<h5 id="openml.config.set_root_cache_directory--see-also">See Also<a class="headerlink" href="#openml.config.set_root_cache_directory--see-also" title="Permanent link">#</a></h5>
-<p>get_cache_directory</p>
 
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>root_cache_directory</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Path to use as cache directory.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>string</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="see-also" open>
+  <summary>See Also</summary>
+  <p>get_cache_directory</p>
+</details>
             <details class="quote">
               <summary>Source code in <code>openml/config.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-475">475</a></span>

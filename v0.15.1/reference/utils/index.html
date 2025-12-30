@@ -2462,23 +2462,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" set_meta">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.utils.ProgressBar.set_meta--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2489,23 +2472,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" update">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.utils.ProgressBar.update--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2522,34 +2488,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" extract_xml_tags">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.utils.extract_xml_tags--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.utils.extract_xml_tags--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2709,15 +2647,47 @@
     <div class="doc doc-contents ">
 
         <p>Initializes the progress bar.</p>
-<h6 id="openml.utils.ProgressBar.set_meta--parameters">Parameters<a class="headerlink" href="#openml.utils.ProgressBar.set_meta--parameters" title="Permanent link">#</a></h6>
-<p>object_name: str
-  Not used.</p>
 
 
-<details class="total_length" open>
-  <summary>int</summary>
-  <p>File size of the object in bytes.</p>
-</details>
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>object_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Not used.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>total_length</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>File size of the object in bytes.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
             <details class="quote">
               <summary>Source code in <code>openml/utils.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-445">445</a></span>
@@ -2765,9 +2735,32 @@
     <div class="doc doc-contents ">
 
         <p>Updates the progress bar.</p>
-<h6 id="openml.utils.ProgressBar.update--parameters">Parameters<a class="headerlink" href="#openml.utils.ProgressBar.update--parameters" title="Permanent link">#</a></h6>
-<p>length: int
-  Number of bytes downloaded since last <code>update</code> call.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>length</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Number of bytes downloaded since last <code>update</code> call.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/utils.py</code></summary>
@@ -2825,23 +2818,90 @@
     <div class="doc doc-contents ">
 
         <p>Helper to extract xml tags from xmltodict.</p>
-<h5 id="openml.utils.extract_xml_tags--parameters">Parameters<a class="headerlink" href="#openml.utils.extract_xml_tags--parameters" title="Permanent link">#</a></h5>
-<p>xml_tag_name : str
-    Name of the xml tag to extract from the node.</p>
 
 
-<details class="node-" open>
-  <summary>Mapping[str, Any]</summary>
-  <p>Node object returned by <code>xmltodict</code> from which <code>xml_tag_name</code>
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>xml_tag_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Name of the xml tag to extract from the node.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>node</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Node object returned by <code>xmltodict</code> from which <code>xml_tag_name</code>
 should be extracted.</p>
-</details>
-
-<details class="allow_none-" open>
-  <summary>bool</summary>
-  <p>If <code>False</code>, the tag needs to exist in the node. Will raise a
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Mapping">Mapping</span>[str, <span title="typing.Any">Any</span>]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>allow_none</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>False</code>, the tag needs to exist in the node. Will raise a
 <code>ValueError</code> if it does not.</p>
-</details>        <h5 id="openml.utils.extract_xml_tags--returns">Returns<a class="headerlink" href="#openml.utils.extract_xml_tags--returns" title="Permanent link">#</a></h5>
-<p>object</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>object</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/utils.py</code></summary>

@@ -2437,17 +2437,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#openml.testing.TestBase--note" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Note
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#openml.testing.TestBase.setUp" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2455,23 +2444,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" setUp">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.testing.TestBase.setUp--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2510,34 +2482,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" check_task_existence">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.testing.check_task_existence--parameter" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameter
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.testing.check_task_existence--return" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Return
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2711,10 +2655,13 @@
 
 
         <p>Base class for tests</p>
-<h5 id="openml.testing.TestBase--note">Note<a class="headerlink" href="#openml.testing.TestBase--note" title="Permanent link">#</a></h5>
-<p>Currently hard-codes a read-write key.
-Hopefully soon allows using a test server, not the production server.</p>
 
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>Currently hard-codes a read-write key.
+Hopefully soon allows using a test server, not the production server.</p>
+</details>
 
 
 
@@ -2750,10 +2697,37 @@ Hopefully soon allows using a test server, not the production server.</p>
 <li>set a static API key for the test server</li>
 <li>increases the maximal number of retries</li>
 </ul>
-<h6 id="openml.testing.TestBase.setUp--parameters">Parameters<a class="headerlink" href="#openml.testing.TestBase.setUp--parameters" title="Permanent link">#</a></h6>
-<p>n_levels : int
-    Number of nested directories the test is in. Necessary to resolve the path to the
-    <code>files</code> directory, which is located directly under the <code>tests</code> directory.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>n_levels</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Number of nested directories the test is in. Necessary to resolve the path to the
+<code>files</code> directory, which is located directly under the <code>tests</code> directory.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>1</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/testing.py</code></summary>
@@ -2974,13 +2948,19 @@ Hopefully soon allows using a test server, not the production server.</p>
     <div class="doc doc-contents ">
 
         <p>Checks if any task with exists on test server that matches the meta data.</p>
-<h5 id="openml.testing.check_task_existence--parameter">Parameter<a class="headerlink" href="#openml.testing.check_task_existence--parameter" title="Permanent link">#</a></h5>
-<p>task_type : openml.tasks.TaskType
+
+
+<details class="parameter" open>
+  <summary>Parameter</summary>
+  <p>task_type : openml.tasks.TaskType
 dataset_id : int
 target_name : str</p>
-<h5 id="openml.testing.check_task_existence--return">Return<a class="headerlink" href="#openml.testing.check_task_existence--return" title="Permanent link">#</a></h5>
-<p>int, None</p>
+</details>
 
+<details class="return" open>
+  <summary>Return</summary>
+  <p>int, None</p>
+</details>
             <details class="quote">
               <summary>Source code in <code>openml/testing.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-275">275</a></span>

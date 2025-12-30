@@ -1752,34 +1752,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" get_extension_by_flow">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.extensions.functions.get_extension_by_flow--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.extensions.functions.get_extension_by_flow--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -1791,34 +1763,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" get_extension_by_model">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.extensions.functions.get_extension_by_model--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.extensions.functions.get_extension_by_model--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -1829,34 +1773,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" register_extension">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.extensions.functions.register_extension--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.extensions.functions.register_extension--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2678,15 +2594,74 @@
         <p>Get an extension which can handle the given flow.</p>
 <p>Iterates all registered extensions and checks whether they can handle the presented flow.
 Raises an exception if two extensions can handle a flow.</p>
-<h5 id="openml.extensions.functions.get_extension_by_flow--parameters">Parameters<a class="headerlink" href="#openml.extensions.functions.get_extension_by_flow--parameters" title="Permanent link">#</a></h5>
-<p>flow : OpenMLFlow</p>
 
 
-<details class="raise_if_no_extension-" open>
-  <summary>bool (optional, default=False)</summary>
-  <p>Raise an exception if no registered extension can handle the presented flow.</p>
-</details>        <h5 id="openml.extensions.functions.get_extension_by_flow--returns">Returns<a class="headerlink" href="#openml.extensions.functions.get_extension_by_flow--returns" title="Permanent link">#</a></h5>
-<p>Extension or None</p>
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>flow</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="openml.flows.OpenMLFlow" href="../../flows/#openml.flows.OpenMLFlow">OpenMLFlow</a></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>raise_if_no_extension</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Raise an exception if no registered extension can handle the presented flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool (optional</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False)</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><a class="autorefs autorefs-internal" title="openml.extensions.Extension" href="../#openml.extensions.Extension">Extension</a> or None</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/extensions/functions.py</code></summary>
@@ -2797,15 +2772,74 @@ Raises an exception if two extensions can handle a flow.</p>
         <p>Get an extension which can handle the given flow.</p>
 <p>Iterates all registered extensions and checks whether they can handle the presented model.
 Raises an exception if two extensions can handle a model.</p>
-<h5 id="openml.extensions.functions.get_extension_by_model--parameters">Parameters<a class="headerlink" href="#openml.extensions.functions.get_extension_by_model--parameters" title="Permanent link">#</a></h5>
-<p>model : Any</p>
 
 
-<details class="raise_if_no_extension-" open>
-  <summary>bool (optional, default=False)</summary>
-  <p>Raise an exception if no registered extension can handle the presented model.</p>
-</details>        <h5 id="openml.extensions.functions.get_extension_by_model--returns">Returns<a class="headerlink" href="#openml.extensions.functions.get_extension_by_model--returns" title="Permanent link">#</a></h5>
-<p>Extension or None</p>
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>model</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Any">Any</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>raise_if_no_extension</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Raise an exception if no registered extension can handle the presented model.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool (optional</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False)</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><a class="autorefs autorefs-internal" title="openml.extensions.Extension" href="../#openml.extensions.Extension">Extension</a> or None</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/extensions/functions.py</code></summary>
@@ -2914,10 +2948,56 @@ Raises an exception if two extensions can handle a model.</p>
         <p>Register an extension.</p>
 <p>Registered extensions are considered by <code>get_extension_by_flow</code> and
 <code>get_extension_by_model</code>, which are used by <code>openml.flow</code> and <code>openml.runs</code>.</p>
-<h5 id="openml.extensions.functions.register_extension--parameters">Parameters<a class="headerlink" href="#openml.extensions.functions.register_extension--parameters" title="Permanent link">#</a></h5>
-<p>extension : Type[Extension]</p>
-<h5 id="openml.extensions.functions.register_extension--returns">Returns<a class="headerlink" href="#openml.extensions.functions.register_extension--returns" title="Permanent link">#</a></h5>
-<p>None</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>extension</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Type">Type</span>[<a class="autorefs autorefs-internal" title="openml.extensions.Extension" href="../#openml.extensions.Extension">Extension</a>]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>None</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/extensions/functions.py</code></summary>

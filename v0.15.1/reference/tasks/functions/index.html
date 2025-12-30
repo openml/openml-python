@@ -2332,45 +2332,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" __list_tasks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.functions.__list_tasks--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.functions.__list_tasks--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.functions.__list_tasks--raises" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Raises
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2381,34 +2342,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" create_task">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.functions.create_task--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.functions.create_task--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2421,34 +2354,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" delete_task">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.functions.delete_task--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.functions.delete_task--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2459,34 +2364,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" get_task">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.functions.get_task--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.functions.get_task--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2499,34 +2376,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" get_tasks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.functions.get_tasks--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.functions.get_tasks--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2537,34 +2386,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" list_tasks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.functions.list_tasks--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.functions.list_tasks--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2804,18 +2625,93 @@
     <div class="doc doc-contents ">
 
         <p>Returns a Pandas DataFrame with information about OpenML tasks.</p>
-<h5 id="openml.tasks.functions.__list_tasks--parameters">Parameters<a class="headerlink" href="#openml.tasks.functions.__list_tasks--parameters" title="Permanent link">#</a></h5>
-<p>api_call : str
-    The API call specifying which tasks to return.</p>
-<h5 id="openml.tasks.functions.__list_tasks--returns">Returns<a class="headerlink" href="#openml.tasks.functions.__list_tasks--returns" title="Permanent link">#</a></h5>
-<div class="highlight"><pre><span></span><code>A Pandas DataFrame with information about OpenML tasks.
-</code></pre></div>
-<h5 id="openml.tasks.functions.__list_tasks--raises">Raises<a class="headerlink" href="#openml.tasks.functions.__list_tasks--raises" title="Permanent link">#</a></h5>
-<p>ValueError
-    If the XML returned by the OpenML API does not contain 'oml:tasks', '<a class="magiclink magiclink-github magiclink-mention" href="https://github.com/xmlns" title="GitHub User: xmlns">@xmlns</a>:oml',
-    or has an incorrect value for '<a class="magiclink magiclink-github magiclink-mention" href="https://github.com/xmlns" title="GitHub User: xmlns">@xmlns</a>:oml'.
-KeyError
-    If an invalid key is found in the XML for a task.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>api_call</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The API call specifying which tasks to return.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>    A Pandas DataFrame with information about OpenML tasks.</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RAISES</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code>ValueError</code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If the XML returned by the OpenML API does not contain 'oml:tasks', '<a class="magiclink magiclink-github magiclink-mention" href="https://github.com/xmlns" title="GitHub User: xmlns">@xmlns</a>:oml',
+or has an incorrect value for '<a class="magiclink magiclink-github magiclink-mention" href="https://github.com/xmlns" title="GitHub User: xmlns">@xmlns</a>:oml'.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code>KeyError</code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If an invalid key is found in the XML for a task.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/tasks/functions.py</code></summary>
@@ -3041,24 +2937,152 @@ More information on how the arguments (task attributes),
 relate to the different possible tasks can be found in
 the individual task objects at the openml.tasks.task
 module.</p>
-<h5 id="openml.tasks.functions.create_task--parameters">Parameters<a class="headerlink" href="#openml.tasks.functions.create_task--parameters" title="Permanent link">#</a></h5>
-<p>task_type : TaskType
-    Id of the task type.
-dataset_id : int
-    The id of the dataset for the task.
-target_name : str, optional
-    The name of the feature used as a target.
-    At the moment, only optional for the clustering tasks.
-estimation_procedure_id : int
-    The id of the estimation procedure.
-evaluation_measure : str, optional
-    The name of the evaluation measure.
-kwargs : dict, optional
-    Other task attributes that are not mandatory
-    for task upload.</p>
-<h5 id="openml.tasks.functions.create_task--returns">Returns<a class="headerlink" href="#openml.tasks.functions.create_task--returns" title="Permanent link">#</a></h5>
-<p>OpenMLClassificationTask, OpenMLRegressionTask,
-OpenMLLearningCurveTask, OpenMLClusteringTask</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>task_type</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Id of the task type.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="openml.tasks.task.TaskType" href="../task/#openml.tasks.task.TaskType">TaskType</a></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>dataset_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The id of the dataset for the task.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>target_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name of the feature used as a target.
+At the moment, only optional for the clustering tasks.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>estimation_procedure_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The id of the estimation procedure.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>evaluation_measure</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name of the evaluation measure.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>kwargs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Other task attributes that are not mandatory
+for task upload.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>dict</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>(<a class="autorefs autorefs-internal" title="openml.tasks.task.OpenMLClassificationTask" href="../task/#openml.tasks.task.OpenMLClassificationTask">OpenMLClassificationTask</a>, <a class="autorefs autorefs-internal" title="openml.tasks.task.OpenMLRegressionTask" href="../task/#openml.tasks.task.OpenMLRegressionTask">OpenMLRegressionTask</a>)</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>(<a class="autorefs autorefs-internal" title="openml.tasks.task.OpenMLLearningCurveTask" href="../task/#openml.tasks.task.OpenMLLearningCurveTask">OpenMLLearningCurveTask</a>, <a class="autorefs autorefs-internal" title="openml.tasks.task.OpenMLClusteringTask" href="../task/#openml.tasks.task.OpenMLClusteringTask">OpenMLClusteringTask</a>)</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/tasks/functions.py</code></summary>
@@ -3207,12 +3231,56 @@ OpenMLLearningCurveTask, OpenMLClusteringTask</p>
         <p>Delete task with id <code>task_id</code> from the OpenML server.</p>
 <p>You can only delete tasks which you created and have
 no runs associated with them.</p>
-<h5 id="openml.tasks.functions.delete_task--parameters">Parameters<a class="headerlink" href="#openml.tasks.functions.delete_task--parameters" title="Permanent link">#</a></h5>
-<p>task_id : int
-    OpenML id of the task</p>
-<h5 id="openml.tasks.functions.delete_task--returns">Returns<a class="headerlink" href="#openml.tasks.functions.delete_task--returns" title="Permanent link">#</a></h5>
-<p>bool
-    True if the deletion was successful. False otherwise.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>task_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>OpenML id of the task</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>bool</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>True if the deletion was successful. False otherwise.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/tasks/functions.py</code></summary>
@@ -3273,15 +3341,96 @@ no runs associated with them.</p>
 <p>Use the <code>download_splits</code> parameter to control whether the splits are downloaded.
 Moreover, you may pass additional parameter (args or kwargs) that are passed to
 :meth:<code>openml.datasets.get_dataset</code>.</p>
-<h5 id="openml.tasks.functions.get_task--parameters">Parameters<a class="headerlink" href="#openml.tasks.functions.get_task--parameters" title="Permanent link">#</a></h5>
-<p>task_id : int
-    The OpenML task id of the task to download.
-download_splits: bool (default=False)
-    Whether to download the splits as well.
-get_dataset_kwargs :
-    Args and kwargs can be used pass optional parameters to :meth:<code>openml.datasets.get_dataset</code>.</p>
-<h5 id="openml.tasks.functions.get_task--returns">Returns<a class="headerlink" href="#openml.tasks.functions.get_task--returns" title="Permanent link">#</a></h5>
-<p>task: OpenMLTask</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>task_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The OpenML task id of the task to download.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>download_splits</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Whether to download the splits as well.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>get_dataset_kwargs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Args and kwargs can be used pass optional parameters to :meth:<code>openml.datasets.get_dataset</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Any">Any</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>task</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="openml.tasks.task.OpenMLTask" href="../task/#openml.tasks.task.OpenMLTask">OpenMLTask</a></code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/tasks/functions.py</code></summary>
@@ -3403,15 +3552,92 @@ get_dataset_kwargs :
 
         <p>Download tasks.</p>
 <p>This function iterates :meth:<code>openml.tasks.get_task</code>.</p>
-<h5 id="openml.tasks.functions.get_tasks--parameters">Parameters<a class="headerlink" href="#openml.tasks.functions.get_tasks--parameters" title="Permanent link">#</a></h5>
-<p>task_ids : List[int]
-    A list of task ids to download.
-download_data : bool (default = True)
-    Option to trigger download of data along with the meta data.
-download_qualities : bool (default=True)
-    Option to download 'qualities' meta-data in addition to the minimal dataset description.</p>
-<h5 id="openml.tasks.functions.get_tasks--returns">Returns<a class="headerlink" href="#openml.tasks.functions.get_tasks--returns" title="Permanent link">#</a></h5>
-<p>list</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>task_ids</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A list of task ids to download.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>List[int]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>download_data</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Option to trigger download of data along with the meta data.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool(default=True)</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>download_qualities</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Option to download 'qualities' meta-data in addition to the minimal dataset description.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool(default=True)</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>list</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/tasks/functions.py</code></summary>
@@ -3522,33 +3748,291 @@ download_qualities : bool (default=True)
     <div class="doc doc-contents ">
 
         <p>Return a number of tasks having the given tag and task_type</p>
-<h5 id="openml.tasks.functions.list_tasks--parameters">Parameters<a class="headerlink" href="#openml.tasks.functions.list_tasks--parameters" title="Permanent link">#</a></h5>
-<p>Filter task_type is separated from the other filters because
-it is used as task_type in the task description, but it is named
-type when used as a filter in list tasks call.
-offset : int, optional
-    the number of tasks to skip, starting from the first
-task_type : TaskType, optional
-    Refers to the type of task.
-size : int, optional
-    the maximum number of tasks to show
-tag : str, optional
-    the tag to include
-data_tag : str, optional
-    the tag of the dataset
-data_id : int, optional
-status : str, optional
-data_name : str, optional
-number_instances : int, optional
-number_features : int, optional
-number_classes : int, optional
-number_missing_values : int, optional</p>
-<h5 id="openml.tasks.functions.list_tasks--returns">Returns<a class="headerlink" href="#openml.tasks.functions.list_tasks--returns" title="Permanent link">#</a></h5>
-<p>dataframe
-    All tasks having the given task_type and the give tag. Every task is
-    represented by a row in the data frame containing the following information
-    as columns: task id, dataset id, task_type and status. If qualities are
-    calculated for the associated dataset, some of these are also returned.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>Filter</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>it</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>type</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>offset</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the number of tasks to skip, starting from the first</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>task_type</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Refers to the type of task.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="openml.tasks.task.TaskType" href="../task/#openml.tasks.task.TaskType">TaskType</a></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>size</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the maximum number of tasks to show</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tag</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the tag to include</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_tag</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the tag of the dataset</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>status</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>number_instances</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>number_features</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>number_classes</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>number_missing_values</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>dataframe</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>All tasks having the given task_type and the give tag. Every task is
+represented by a row in the data frame containing the following information
+as columns: task id, dataset id, task_type and status. If qualities are
+calculated for the associated dataset, some of these are also returned.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/tasks/functions.py</code></summary>

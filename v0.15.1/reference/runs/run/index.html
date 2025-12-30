@@ -1988,17 +1988,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#openml.runs.run.OpenMLRun--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#openml.runs.run.OpenMLRun.id" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2040,34 +2029,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" from_filesystem">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.runs.run.OpenMLRun.from_filesystem--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.runs.run.OpenMLRun.from_filesystem--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2078,34 +2039,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" get_metric_fn">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.runs.run.OpenMLRun.get_metric_fn--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.runs.run.OpenMLRun.get_metric_fn--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2140,23 +2073,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" push_tag">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.runs.run.OpenMLRun.push_tag--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2168,23 +2084,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" remove_tag">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.runs.run.OpenMLRun.remove_tag--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2195,23 +2094,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" to_filesystem">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.runs.run.OpenMLRun.to_filesystem--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2818,60 +2700,459 @@
 
 
         <p>OpenML Run: result of running a model on an OpenML dataset.</p>
-<h5 id="openml.runs.run.OpenMLRun--parameters">Parameters<a class="headerlink" href="#openml.runs.run.OpenMLRun--parameters" title="Permanent link">#</a></h5>
-<p>task_id: int
-    The ID of the OpenML task associated with the run.
-flow_id: int
-    The ID of the OpenML flow associated with the run.
-dataset_id: int
-    The ID of the OpenML dataset used for the run.
-setup_string: str
-    The setup string of the run.
-output_files: Dict[str, int]
-    Specifies where each related file can be found.
-setup_id: int
-    An integer representing the ID of the setup used for the run.
-tags: List[str]
-    Representing the tags associated with the run.
-uploader: int
-    User ID of the uploader.
-uploader_name: str
-    The name of the person who uploaded the run.
-evaluations: Dict
-    Representing the evaluations of the run.
-fold_evaluations: Dict
-    The evaluations of the run for each fold.
-sample_evaluations: Dict
-    The evaluations of the run for each sample.
-data_content: List[List]
-    The predictions generated from executing this run.
-trace: OpenMLRunTrace
-    The trace containing information on internal model evaluations of this run.
-model: object
-    The untrained model that was evaluated in the run.
-task_type: str
-    The type of the OpenML task associated with the run.
-task_evaluation_measure: str
-    The evaluation measure used for the task.
-flow_name: str
-    The name of the OpenML flow associated with the run.
-parameter_settings: list[OrderedDict]
-    Representing the parameter settings used for the run.
-predictions_url: str
-    The URL of the predictions file.
-task: OpenMLTask
-    An instance of the OpenMLTask class, representing the OpenML task associated
-    with the run.
-flow: OpenMLFlow
-    An instance of the OpenMLFlow class, representing the OpenML flow associated
-    with the run.
-run_id: int
-    The ID of the run.
-description_text: str, optional
-    Description text to add to the predictions file. If left None, is set to the
-    time the arff file is generated.
-run_details: str, optional (default=None)
-    Description of the run stored in the run meta-data.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>task_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The ID of the OpenML task associated with the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flow_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The ID of the OpenML flow associated with the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>dataset_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The ID of the OpenML dataset used for the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>setup_string</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The setup string of the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>output_files</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Specifies where each related file can be found.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>dict[str, int] | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>setup_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>An integer representing the ID of the setup used for the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tags</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Representing the tags associated with the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list[str] | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>uploader</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>User ID of the uploader.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>uploader_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name of the person who uploaded the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>evaluations</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Representing the evaluations of the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>dict | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>fold_evaluations</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The evaluations of the run for each fold.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>dict | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>sample_evaluations</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The evaluations of the run for each sample.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>dict | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_content</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The predictions generated from executing this run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list[list] | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>trace</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The trace containing information on internal model evaluations of this run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="openml.runs.trace.OpenMLRunTrace" href="../trace/#openml.runs.trace.OpenMLRunTrace">OpenMLRunTrace</a> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>model</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The untrained model that was evaluated in the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>object | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>task_type</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The type of the OpenML task associated with the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>task_evaluation_measure</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The evaluation measure used for the task.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flow_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name of the OpenML flow associated with the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>parameter_settings</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Representing the parameter settings used for the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list[dict[str, <span title="typing.Any">Any</span>]] | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>predictions_url</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The URL of the predictions file.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>task</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>An instance of the OpenMLTask class, representing the OpenML task associated
+with the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="openml.tasks.OpenMLTask" href="../../tasks/#openml.tasks.OpenMLTask">OpenMLTask</a> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flow</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>An instance of the OpenMLFlow class, representing the OpenML flow associated
+with the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="openml.flows.OpenMLFlow" href="../../flows/#openml.flows.OpenMLFlow">OpenMLFlow</a> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>run_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The ID of the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>description_text</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Description text to add to the predictions file. If left None, is set to the
+time the arff file is generated.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>run_details</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Description of the run stored in the run meta-data.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
                   <details class="quote">
                     <summary>Source code in <code>openml/runs/run.py</code></summary>
@@ -3087,20 +3368,81 @@ run_details: str, optional (default=None)
 
         <p>The inverse of the to_filesystem method. Instantiates an OpenMLRun
 object based on files stored on the file system.</p>
-<h6 id="openml.runs.run.OpenMLRun.from_filesystem--parameters">Parameters<a class="headerlink" href="#openml.runs.run.OpenMLRun.from_filesystem--parameters" title="Permanent link">#</a></h6>
-<p>directory : str
-    a path leading to the folder where the results
-    are stored</p>
 
 
-<details class="expect_model-" open>
-  <summary>bool</summary>
-  <p>if True, it requires the model pickle to be present, and an error
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>directory</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a path leading to the folder where the results
+are stored</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>expect_model</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>if True, it requires the model pickle to be present, and an error
 will be thrown if not. Otherwise, the model might or might not
 be present.</p>
-</details>        <h6 id="openml.runs.run.OpenMLRun.from_filesystem--returns">Returns<a class="headerlink" href="#openml.runs.run.OpenMLRun.from_filesystem--returns" title="Permanent link">#</a></h6>
-<p>run : OpenMLRun
-    the re-instantiated run object</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>run</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>the re-instantiated run object</p>
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="openml.runs.run.OpenMLRun" href="#openml.runs.run.OpenMLRun">OpenMLRun</a></code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/runs/run.py</code></summary>
@@ -3255,15 +3597,79 @@ run has been executed locally (and contains run_data). Furthermore,
 it assumes that the 'correct' or 'truth' attribute is specified in
 the arff (which is an optional field, but always the case for
 openml-python runs)</p>
-<h6 id="openml.runs.run.OpenMLRun.get_metric_fn--parameters">Parameters<a class="headerlink" href="#openml.runs.run.OpenMLRun.get_metric_fn--parameters" title="Permanent link">#</a></h6>
-<p>sklearn_fn : function
-    a function pointer to a sklearn function that
-    accepts <code>y_true</code>, <code>y_pred</code> and <code>**kwargs</code>
-kwargs : dict
-    kwargs for the function</p>
-<h6 id="openml.runs.run.OpenMLRun.get_metric_fn--returns">Returns<a class="headerlink" href="#openml.runs.run.OpenMLRun.get_metric_fn--returns" title="Permanent link">#</a></h6>
-<p>scores : ndarray of scores of length num_folds * num_repeats
-    metric results</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>sklearn_fn</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a function pointer to a sklearn function that
+accepts <code>y_true</code>, <code>y_pred</code> and <code>**kwargs</code></p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>function</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>kwargs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>kwargs for the function</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>dict</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>scores</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>metric results</p>
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code>ndarray of scores of length num_folds * num_repeats</code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/runs/run.py</code></summary>
@@ -3630,9 +4036,32 @@ kwargs : dict
     <div class="doc doc-contents ">
 
         <p>Annotates this entity with a tag on the server.</p>
-<h6 id="openml.runs.run.OpenMLRun.push_tag--parameters">Parameters<a class="headerlink" href="#openml.runs.run.OpenMLRun.push_tag--parameters" title="Permanent link">#</a></h6>
-<p>tag : str
-    Tag to attach to the flow.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>tag</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Tag to attach to the flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/base.py</code></summary>
@@ -3673,9 +4102,32 @@ kwargs : dict
     <div class="doc doc-contents ">
 
         <p>Removes a tag from this entity on the server.</p>
-<h6 id="openml.runs.run.OpenMLRun.remove_tag--parameters">Parameters<a class="headerlink" href="#openml.runs.run.OpenMLRun.remove_tag--parameters" title="Permanent link">#</a></h6>
-<p>tag : str
-    Tag to attach to the flow.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>tag</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Tag to attach to the flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/base.py</code></summary>
@@ -3717,18 +4169,54 @@ kwargs : dict
 
         <p>The inverse of the from_filesystem method. Serializes a run
 on the filesystem, to be uploaded later.</p>
-<h6 id="openml.runs.run.OpenMLRun.to_filesystem--parameters">Parameters<a class="headerlink" href="#openml.runs.run.OpenMLRun.to_filesystem--parameters" title="Permanent link">#</a></h6>
-<p>directory : str
-    a path leading to the folder where the results
-    will be stored. Should be empty</p>
 
 
-<details class="store_model-" open>
-  <summary>bool, optional (default=True)</summary>
-  <p>if True, a model will be pickled as well. As this is the most
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>directory</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a path leading to the folder where the results
+will be stored. Should be empty</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>store_model</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>if True, a model will be pickled as well. As this is the most
 storage expensive part, it is often desirable to not store the
 model.</p>
-</details>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>(bool, optional(default=True))</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
             <details class="quote">
               <summary>Source code in <code>openml/runs/run.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-347">347</a></span>

@@ -1436,23 +1436,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" OpenMLDataFeature">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.datasets.data_feature.OpenMLDataFeature--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
       </ul>
@@ -2588,21 +2571,108 @@
 
 
         <p>Data Feature (a.k.a. Attribute) object.</p>
-<h5 id="openml.datasets.data_feature.OpenMLDataFeature--parameters">Parameters<a class="headerlink" href="#openml.datasets.data_feature.OpenMLDataFeature--parameters" title="Permanent link">#</a></h5>
-<p>index : int
-    The index of this feature
-name : str
-    Name of the feature
-data_type : str
-    can be nominal, numeric, string, date (corresponds to arff)
-nominal_values : list(str)
-    list of the possible values, in case of nominal attribute
-number_missing_values : int
-    Number of rows that have a missing value for this feature.
-ontologies : list(str)
-    list of ontologies attached to this feature. An ontology describes the
-    concept that are described in a feature. An ontology is defined by an
-    URL where the information is provided.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>index</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The index of this feature</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Name of the feature</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_type</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>can be nominal, numeric, string, date (corresponds to arff)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>nominal_values</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>list of the possible values, in case of nominal attribute</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list(str)</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>number_missing_values</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Number of rows that have a missing value for this feature.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>ontologies</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>list of ontologies attached to this feature. An ontology describes the
+concept that are described in a feature. An ontology is defined by an
+URL where the information is provided.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list(str)</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
                   <details class="quote">
                     <summary>Source code in <code>openml/datasets/data_feature.py</code></summary>

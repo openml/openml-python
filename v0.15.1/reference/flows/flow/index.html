@@ -1844,17 +1844,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#openml.flows.flow.OpenMLFlow--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#openml.flows.flow.OpenMLFlow.extension" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1907,34 +1896,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" get_structure">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.flows.flow.OpenMLFlow.get_structure--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.flows.flow.OpenMLFlow.get_structure--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -1945,34 +1906,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" get_subflow">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.flows.flow.OpenMLFlow.get_subflow--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.flows.flow.OpenMLFlow.get_subflow--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1996,34 +1929,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" publish">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.flows.flow.OpenMLFlow.publish--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.flows.flow.OpenMLFlow.publish--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2035,23 +1940,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" push_tag">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.flows.flow.OpenMLFlow.push_tag--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2062,23 +1950,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" remove_tag">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.flows.flow.OpenMLFlow.remove_tag--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2846,67 +2717,358 @@ ensures that all relevant fields are filled in.</p>
 <p>Implements <code>openml.implementation.upload.xsd
 &lt;https://github.com/openml/openml/blob/master/openml_OS/views/pages/api_new/v1/xsd/
 openml.implementation.upload.xsd&gt;</code>_.</p>
-<h5 id="openml.flows.flow.OpenMLFlow--parameters">Parameters<a class="headerlink" href="#openml.flows.flow.OpenMLFlow--parameters" title="Permanent link">#</a></h5>
-<p>name : str
-    Name of the flow. Is used together with the attribute
-    <code>external_version</code> as a unique identifier of the flow.
-description : str
-    Human-readable description of the flow (free text).
-model : object
-    ML model which is described by this flow.
-components : OrderedDict
-    Mapping from component identifier to an OpenMLFlow object. Components
-    are usually subfunctions of an algorithm (e.g. kernels), base learners
-    in ensemble algorithms (decision tree in adaboost) or building blocks
-    of a machine learning pipeline. Components are modeled as independent
-    flows and can be shared between flows (different pipelines can use
-    the same components).
-parameters : OrderedDict
-    Mapping from parameter name to the parameter default value. The
-    parameter default value must be of type <code>str</code>, so that the respective
-    toolbox plugin can take care of casting the parameter default value to
-    the correct type.
-parameters_meta_info : OrderedDict
-    Mapping from parameter name to <code>dict</code>. Stores additional information
-    for each parameter. Required keys are <code>data_type</code> and <code>description</code>.
-external_version : str
-    Version number of the software the flow is implemented in. Is used
-    together with the attribute <code>name</code> as a uniquer identifier of the flow.
-tags : list
-    List of tags. Created on the server by other API calls.
-language : str
-    Natural language the flow is described in (not the programming
-    language).
-dependencies : str
-    A list of dependencies necessary to run the flow. This field should
-    contain all libraries the flow depends on. To allow reproducibility
-    it should also specify the exact version numbers.
-class_name : str, optional
-    The development language name of the class which is described by this
-    flow.
-custom_name : str, optional
-    Custom name of the flow given by the owner.
-binary_url : str, optional
-    Url from which the binary can be downloaded. Added by the server.
-    Ignored when uploaded manually. Will not be used by the python API
-    because binaries aren't compatible across machines.
-binary_format : str, optional
-    Format in which the binary code was uploaded. Will not be used by the
-    python API because binaries aren't compatible across machines.
-binary_md5 : str, optional
-    MD5 checksum to check if the binary code was correctly downloaded. Will
-    not be used by the python API because binaries aren't compatible across
-    machines.
-uploader : str, optional
-    OpenML user ID of the uploader. Filled in by the server.
-upload_date : str, optional
-    Date the flow was uploaded. Filled in by the server.
-flow_id : int, optional
-    Flow ID. Assigned by the server.
-extension : Extension, optional
-    The extension for a flow (e.g., sklearn).
-version : str, optional
-    OpenML version of the flow. Assigned by the server.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Name of the flow. Is used together with the attribute
+<code>external_version</code> as a unique identifier of the flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>description</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Human-readable description of the flow (free text).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>model</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>ML model which is described by this flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>object</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>components</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Mapping from component identifier to an OpenMLFlow object. Components
+are usually subfunctions of an algorithm (e.g. kernels), base learners
+in ensemble algorithms (decision tree in adaboost) or building blocks
+of a machine learning pipeline. Components are modeled as independent
+flows and can be shared between flows (different pipelines can use
+the same components).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="collections.OrderedDict">OrderedDict</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>parameters</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Mapping from parameter name to the parameter default value. The
+parameter default value must be of type <code>str</code>, so that the respective
+toolbox plugin can take care of casting the parameter default value to
+the correct type.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="collections.OrderedDict">OrderedDict</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>parameters_meta_info</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Mapping from parameter name to <code>dict</code>. Stores additional information
+for each parameter. Required keys are <code>data_type</code> and <code>description</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="collections.OrderedDict">OrderedDict</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>external_version</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Version number of the software the flow is implemented in. Is used
+together with the attribute <code>name</code> as a uniquer identifier of the flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tags</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>List of tags. Created on the server by other API calls.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>language</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Natural language the flow is described in (not the programming
+language).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>dependencies</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A list of dependencies necessary to run the flow. This field should
+contain all libraries the flow depends on. To allow reproducibility
+it should also specify the exact version numbers.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>class_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The development language name of the class which is described by this
+flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>custom_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Custom name of the flow given by the owner.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>binary_url</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Url from which the binary can be downloaded. Added by the server.
+Ignored when uploaded manually. Will not be used by the python API
+because binaries aren't compatible across machines.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>binary_format</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Format in which the binary code was uploaded. Will not be used by the
+python API because binaries aren't compatible across machines.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>binary_md5</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>MD5 checksum to check if the binary code was correctly downloaded. Will
+not be used by the python API because binaries aren't compatible across
+machines.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>uploader</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>OpenML user ID of the uploader. Filled in by the server.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>upload_date</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Date the flow was uploaded. Filled in by the server.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flow_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Flow ID. Assigned by the server.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>extension</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The extension for a flow (e.g., sklearn).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="openml.extensions.Extension" href="../../extensions/#openml.extensions.Extension">Extension</a></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>version</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>OpenML version of the flow. Assigned by the server.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
                   <details class="quote">
                     <summary>Source code in <code>openml/flows/flow.py</code></summary>
@@ -3190,13 +3352,57 @@ version : str, optional
 that should be traversed to reach this component. The resulting dict
 maps a key (identifying a flow by either its id, name or fullname) to
 the parameter prefix.</p>
-<h6 id="openml.flows.flow.OpenMLFlow.get_structure--parameters">Parameters<a class="headerlink" href="#openml.flows.flow.OpenMLFlow.get_structure--parameters" title="Permanent link">#</a></h6>
-<p>key_item: str
-    The flow attribute that will be used to identify flows in the
-    structure. Allowed values {flow_id, name}</p>
-<h6 id="openml.flows.flow.OpenMLFlow.get_structure--returns">Returns<a class="headerlink" href="#openml.flows.flow.OpenMLFlow.get_structure--returns" title="Permanent link">#</a></h6>
-<p>dict[str, List[str]]
-    The flow structure</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>key_item</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The flow attribute that will be used to identify flows in the
+structure. Allowed values {flow_id, name}</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>dict[str, List[str]]</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>The flow structure</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/flows/flow.py</code></summary>
@@ -3273,12 +3479,56 @@ the parameter prefix.</p>
     <div class="doc doc-contents ">
 
         <p>Returns a subflow from the tree of dependencies.</p>
-<h6 id="openml.flows.flow.OpenMLFlow.get_subflow--parameters">Parameters<a class="headerlink" href="#openml.flows.flow.OpenMLFlow.get_subflow--parameters" title="Permanent link">#</a></h6>
-<p>structure: list[str]
-    A list of strings, indicating the location of the subflow</p>
-<h6 id="openml.flows.flow.OpenMLFlow.get_subflow--returns">Returns<a class="headerlink" href="#openml.flows.flow.OpenMLFlow.get_subflow--returns" title="Permanent link">#</a></h6>
-<p>OpenMLFlow
-    The OpenMLFlow that corresponds to the structure</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>structure</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A list of strings, indicating the location of the subflow</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list[str]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><a class="autorefs autorefs-internal" title="openml.flows.flow.OpenMLFlow" href="#openml.flows.flow.OpenMLFlow">OpenMLFlow</a></code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>The OpenMLFlow that corresponds to the structure</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/flows/flow.py</code></summary>
@@ -3399,12 +3649,65 @@ the parameter prefix.</p>
         <p>Publish this flow to OpenML server.</p>
 <p>Raises a PyOpenMLError if the flow exists on the server, but
 <code>self.flow_id</code> does not match the server known flow id.</p>
-<h6 id="openml.flows.flow.OpenMLFlow.publish--parameters">Parameters<a class="headerlink" href="#openml.flows.flow.OpenMLFlow.publish--parameters" title="Permanent link">#</a></h6>
-<p>raise_error_if_exists : bool, optional (default=False)
-    If True, raise PyOpenMLError if the flow exists on the server.
-    If False, update the local flow to match the server flow.</p>
-<h6 id="openml.flows.flow.OpenMLFlow.publish--returns">Returns<a class="headerlink" href="#openml.flows.flow.OpenMLFlow.publish--returns" title="Permanent link">#</a></h6>
-<p>self : OpenMLFlow</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>raise_error_if_exists</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If True, raise PyOpenMLError if the flow exists on the server.
+If False, update the local flow to match the server flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>(bool, optional(default=False))</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>self</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="openml.flows.flow.OpenMLFlow" href="#openml.flows.flow.OpenMLFlow">OpenMLFlow</a></code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/flows/flow.py</code></summary>
@@ -3543,9 +3846,32 @@ the parameter prefix.</p>
     <div class="doc doc-contents ">
 
         <p>Annotates this entity with a tag on the server.</p>
-<h6 id="openml.flows.flow.OpenMLFlow.push_tag--parameters">Parameters<a class="headerlink" href="#openml.flows.flow.OpenMLFlow.push_tag--parameters" title="Permanent link">#</a></h6>
-<p>tag : str
-    Tag to attach to the flow.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>tag</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Tag to attach to the flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/base.py</code></summary>
@@ -3586,9 +3912,32 @@ the parameter prefix.</p>
     <div class="doc doc-contents ">
 
         <p>Removes a tag from this entity on the server.</p>
-<h6 id="openml.flows.flow.OpenMLFlow.remove_tag--parameters">Parameters<a class="headerlink" href="#openml.flows.flow.OpenMLFlow.remove_tag--parameters" title="Permanent link">#</a></h6>
-<p>tag : str
-    Tag to attach to the flow.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>tag</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Tag to attach to the flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/base.py</code></summary>

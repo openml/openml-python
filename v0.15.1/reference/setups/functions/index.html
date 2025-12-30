@@ -2111,34 +2111,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" get_setup">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.setups.functions.get_setup--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.setups.functions.get_setup--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2149,34 +2121,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" initialize_model">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.setups.functions.initialize_model--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.setups.functions.initialize_model--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2189,34 +2133,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" list_setups">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.setups.functions.list_setups--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.setups.functions.list_setups--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2227,34 +2143,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" setup_exists">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.setups.functions.setup_exists--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.setups.functions.setup_exists--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2807,11 +2695,56 @@
 
         <p>Downloads the setup (configuration) description from OpenML
  and returns a structured object</p>
-<h5 id="openml.setups.functions.get_setup--parameters">Parameters<a class="headerlink" href="#openml.setups.functions.get_setup--parameters" title="Permanent link">#</a></h5>
-<p>setup_id : int
-    The Openml setup_id</p>
-<h5 id="openml.setups.functions.get_setup--returns">Returns<a class="headerlink" href="#openml.setups.functions.get_setup--returns" title="Permanent link">#</a></h5>
-<p>OpenMLSetup (an initialized openml setup object)</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>setup_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The Openml setup_id</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>OpenMLSetup (an initialized openml setup object)</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/setups/functions.py</code></summary>
@@ -2893,13 +2826,74 @@
 
         <p>Initialized a model based on a setup_id (i.e., using the exact
 same parameter settings)</p>
-<h5 id="openml.setups.functions.initialize_model--parameters">Parameters<a class="headerlink" href="#openml.setups.functions.initialize_model--parameters" title="Permanent link">#</a></h5>
-<p>setup_id : int
-    The Openml setup_id
-strict_version: bool (default=True)
-    See <code>flow_to_model</code> strict_version.</p>
-<h5 id="openml.setups.functions.initialize_model--returns">Returns<a class="headerlink" href="#openml.setups.functions.initialize_model--returns" title="Permanent link">#</a></h5>
-<p>model</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>setup_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The Openml setup_id</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>strict_version</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>See <code>flow_to_model</code> strict_version.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>model</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/setups/functions.py</code></summary>
@@ -2986,18 +2980,152 @@ strict_version: bool (default=True)
     <div class="doc doc-contents ">
 
         <p>List all setups matching all of the given filters.</p>
-<h5 id="openml.setups.functions.list_setups--parameters">Parameters<a class="headerlink" href="#openml.setups.functions.list_setups--parameters" title="Permanent link">#</a></h5>
-<p>offset : int, optional
-size : int, optional
-flow : int, optional
-tag : str, optional
-setup : Iterable[int], optional
-output_format: str, optional (default='object')
-    The parameter decides the format of the output.
-    - If 'dataframe' the output is a pandas DataFrame
-    - If 'object' the output is a dictionary of OpenMLSetup objects</p>
-<h5 id="openml.setups.functions.list_setups--returns">Returns<a class="headerlink" href="#openml.setups.functions.list_setups--returns" title="Permanent link">#</a></h5>
-<p>dict or dataframe</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>offset</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>size</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flow</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tag</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>setup</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Iterable">Iterable</span>[int]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>output_format</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The parameter decides the format of the output.
+- If 'dataframe' the output is a pandas DataFrame
+- If 'object' the output is a dictionary of OpenMLSetup objects</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing_extensions.Literal">Literal</span>[&#39;object&#39;, &#39;dataframe&#39;]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;object&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>dict or dataframe</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/setups/functions.py</code></summary>
@@ -3110,14 +3238,62 @@ output_format: str, optional (default='object')
     <div class="doc doc-contents ">
 
         <p>Checks whether a hyperparameter configuration already exists on the server.</p>
-<h5 id="openml.setups.functions.setup_exists--parameters">Parameters<a class="headerlink" href="#openml.setups.functions.setup_exists--parameters" title="Permanent link">#</a></h5>
-<p>flow : OpenMLFlow
-    The openml flow object. Should have flow id present for the main flow
-    and all subflows (i.e., it should be downloaded from the server by
-    means of flow.get, and not instantiated locally)</p>
-<h5 id="openml.setups.functions.setup_exists--returns">Returns<a class="headerlink" href="#openml.setups.functions.setup_exists--returns" title="Permanent link">#</a></h5>
-<p>setup_id : int
-    setup id iff exists, False otherwise</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>flow</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The openml flow object. Should have flow id present for the main flow
+and all subflows (i.e., it should be downloaded from the server by
+means of flow.get, and not instantiated locally)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="openml.flows.OpenMLFlow" href="../../flows/#openml.flows.OpenMLFlow">OpenMLFlow</a></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>setup_id</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>setup id iff exists, False otherwise</p>
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/setups/functions.py</code></summary>

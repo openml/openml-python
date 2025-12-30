@@ -2500,21 +2500,108 @@
 
 
         <p>Data Feature (a.k.a. Attribute) object.</p>
-<h5 id="openml.datasets.OpenMLDataFeature--parameters">Parameters<a class="headerlink" href="#openml.datasets.OpenMLDataFeature--parameters" title="Permanent link">#</a></h5>
-<p>index : int
-    The index of this feature
-name : str
-    Name of the feature
-data_type : str
-    can be nominal, numeric, string, date (corresponds to arff)
-nominal_values : list(str)
-    list of the possible values, in case of nominal attribute
-number_missing_values : int
-    Number of rows that have a missing value for this feature.
-ontologies : list(str)
-    list of ontologies attached to this feature. An ontology describes the
-    concept that are described in a feature. An ontology is defined by an
-    URL where the information is provided.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>index</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The index of this feature</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Name of the feature</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_type</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>can be nominal, numeric, string, date (corresponds to arff)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>nominal_values</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>list of the possible values, in case of nominal attribute</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list(str)</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>number_missing_values</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Number of rows that have a missing value for this feature.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>ontologies</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>list of ontologies attached to this feature. An ontology describes the
+concept that are described in a feature. An ontology is defined by an
+URL where the information is provided.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list(str)</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
                   <details class="quote">
                     <summary>Source code in <code>openml/datasets/data_feature.py</code></summary>
@@ -2643,80 +2730,563 @@ ontologies : list(str)
 
         <p>Dataset object.</p>
 <p>Allows fetching and uploading datasets to OpenML.</p>
-<h5 id="openml.datasets.OpenMLDataset--parameters">Parameters<a class="headerlink" href="#openml.datasets.OpenMLDataset--parameters" title="Permanent link">#</a></h5>
-<p>name : str
-    Name of the dataset.
-description : str
-    Description of the dataset.
-data_format : str
-    Format of the dataset which can be either 'arff' or 'sparse_arff'.
-cache_format : str
-    Format for caching the dataset which can be either 'feather' or 'pickle'.
-dataset_id : int, optional
-    Id autogenerated by the server.
-version : int, optional
-    Version of this dataset. '1' for original version.
-    Auto-incremented by server.
-creator : str, optional
-    The person who created the dataset.
-contributor : str, optional
-    People who contributed to the current version of the dataset.
-collection_date : str, optional
-    The date the data was originally collected, given by the uploader.
-upload_date : str, optional
-    The date-time when the dataset was uploaded, generated by server.
-language : str, optional
-    Language in which the data is represented.
-    Starts with 1 upper case letter, rest lower case, e.g. 'English'.
-licence : str, optional
-    License of the data.
-url : str, optional
-    Valid URL, points to actual data file.
-    The file can be on the OpenML server or another dataset repository.
-default_target_attribute : str, optional
-    The default target attribute, if it exists.
-    Can have multiple values, comma separated.
-row_id_attribute : str, optional
-    The attribute that represents the row-id column,
-    if present in the dataset.
-ignore_attribute : str | list, optional
-    Attributes that should be excluded in modelling,
-    such as identifiers and indexes.
-version_label : str, optional
-    Version label provided by user.
-    Can be a date, hash, or some other type of id.
-citation : str, optional
-    Reference(s) that should be cited when building on this data.
-tag : str, optional
-    Tags, describing the algorithms.
-visibility : str, optional
-    Who can see the dataset.
-    Typical values: 'Everyone','All my friends','Only me'.
-    Can also be any of the user's circles.
-original_data_url : str, optional
-    For derived data, the url to the original dataset.
-paper_url : str, optional
-    Link to a paper describing the dataset.
-update_comment : str, optional
-    An explanation for when the dataset is uploaded.
-md5_checksum : str, optional
-    MD5 checksum to check if the dataset is downloaded without corruption.
-data_file : str, optional
-    Path to where the dataset is located.
-features_file : dict, optional
-    A dictionary of dataset features,
-    which maps a feature index to a OpenMLDataFeature.
-qualities_file : dict, optional
-    A dictionary of dataset qualities,
-    which maps a quality name to a quality value.
-dataset: string, optional
-    Serialized arff dataset string.
-parquet_url: string, optional
-    This is the URL to the storage location where the dataset files are hosted.
-    This can be a MinIO bucket URL. If specified, the data will be accessed
-    from this URL when reading the files.
-parquet_file: string, optional
-    Path to the local file.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Name of the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>description</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Description of the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_format</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Format of the dataset which can be either 'arff' or 'sparse_arff'.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;arff&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>cache_format</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Format for caching the dataset which can be either 'feather' or 'pickle'.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;pickle&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>dataset_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Id autogenerated by the server.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>version</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Version of this dataset. '1' for original version.
+Auto-incremented by server.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>creator</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The person who created the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>contributor</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>People who contributed to the current version of the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>collection_date</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The date the data was originally collected, given by the uploader.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>upload_date</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The date-time when the dataset was uploaded, generated by server.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>language</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Language in which the data is represented.
+Starts with 1 upper case letter, rest lower case, e.g. 'English'.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>licence</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>License of the data.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>url</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Valid URL, points to actual data file.
+The file can be on the OpenML server or another dataset repository.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>default_target_attribute</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The default target attribute, if it exists.
+Can have multiple values, comma separated.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>row_id_attribute</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The attribute that represents the row-id column,
+if present in the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>ignore_attribute</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Attributes that should be excluded in modelling,
+such as identifiers and indexes.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | list</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>version_label</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Version label provided by user.
+Can be a date, hash, or some other type of id.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>citation</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Reference(s) that should be cited when building on this data.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tag</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Tags, describing the algorithms.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>visibility</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Who can see the dataset.
+Typical values: 'Everyone','All my friends','Only me'.
+Can also be any of the user's circles.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>original_data_url</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>For derived data, the url to the original dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>paper_url</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Link to a paper describing the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>update_comment</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>An explanation for when the dataset is uploaded.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>md5_checksum</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>MD5 checksum to check if the dataset is downloaded without corruption.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_file</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Path to where the dataset is located.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>features_file</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A dictionary of dataset features,
+which maps a feature index to a OpenMLDataFeature.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>dict</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>qualities_file</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A dictionary of dataset qualities,
+which maps a quality name to a quality value.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>dict</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>dataset</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Serialized arff dataset string.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>parquet_url</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>This is the URL to the storage location where the dataset files are hosted.
+This can be a MinIO bucket URL. If specified, the data will be accessed
+from this URL when reading the files.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>parquet_file</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Path to the local file.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
                   <details class="quote">
                     <summary>Source code in <code>openml/datasets/dataset.py</code></summary>
@@ -3126,24 +3696,150 @@ parquet_file: string, optional
     <div class="doc doc-contents ">
 
         <p>Returns dataset content as dataframes.</p>
-<h6 id="openml.datasets.OpenMLDataset.get_data--parameters">Parameters<a class="headerlink" href="#openml.datasets.OpenMLDataset.get_data--parameters" title="Permanent link">#</a></h6>
-<p>target : string, List[str] or None (default=None)
-    Name of target column to separate from the data.
-    Splitting multiple columns is currently not supported.
-include_row_id : boolean (default=False)
-    Whether to include row ids in the returned dataset.
-include_ignore_attribute : boolean (default=False)
-    Whether to include columns that are marked as "ignore"
-    on the server in the dataset.</p>
-<h6 id="openml.datasets.OpenMLDataset.get_data--returns">Returns<a class="headerlink" href="#openml.datasets.OpenMLDataset.get_data--returns" title="Permanent link">#</a></h6>
-<p>X : dataframe, shape (n_samples, n_columns)
-    Dataset, may have sparse dtypes in the columns if required.
-y : pd.Series, shape (n_samples, ) or None
-    Target column
-categorical_indicator : list[bool]
-    Mask that indicate categorical features.
-attribute_names : list[str]
-    List of attribute names.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>target</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Name of target column to separate from the data.
+Splitting multiple columns is currently not supported.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>(string, List[str] or None(default=None))</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>include_row_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Whether to include row ids in the returned dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>boolean(default=False)</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>include_ignore_attribute</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Whether to include columns that are marked as "ignore"
+on the server in the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>boolean(default=False)</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>X</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>Dataset, may have sparse dtypes in the columns if required.</p>
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code>(dataframe, shape(n_samples, n_columns))</code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>y</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>Target column</p>
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code>(<span title="pandas.Series">Series</span>, shape(n_samples) or None)</code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>categorical_indicator</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>Mask that indicate categorical features.</p>
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code>list[bool]</code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>attribute_names</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>List of attribute names.</p>
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code>list[str]</code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/dataset.py</code></summary>
@@ -3321,20 +4017,116 @@ attribute_names : list[str]
 
         <p>Return indices of features of a given type, e.g. all nominal features.
 Optional parameters to exclude various features by index or ontology.</p>
-<h6 id="openml.datasets.OpenMLDataset.get_features_by_type--parameters">Parameters<a class="headerlink" href="#openml.datasets.OpenMLDataset.get_features_by_type--parameters" title="Permanent link">#</a></h6>
-<p>data_type : str
-    The data type to return (e.g., nominal, numeric, date, string)
-exclude : list(int)
-    List of columns to exclude from the return value
-exclude_ignore_attribute : bool
-    Whether to exclude the defined ignore attributes (and adapt the
-    return values as if these indices are not present)
-exclude_row_id_attribute : bool
-    Whether to exclude the defined row id attributes (and adapt the
-    return values as if these indices are not present)</p>
-<h6 id="openml.datasets.OpenMLDataset.get_features_by_type--returns">Returns<a class="headerlink" href="#openml.datasets.OpenMLDataset.get_features_by_type--returns" title="Permanent link">#</a></h6>
-<p>result : list
-    a list of indices that have the specified data type</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>data_type</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The data type to return (e.g., nominal, numeric, date, string)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>exclude</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>List of columns to exclude from the return value</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list(int)</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>exclude_ignore_attribute</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Whether to exclude the defined ignore attributes (and adapt the
+return values as if these indices are not present)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>exclude_row_id_attribute</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Whether to exclude the defined row id attributes (and adapt the
+return values as if these indices are not present)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>result</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>a list of indices that have the specified data type</p>
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/dataset.py</code></summary>
@@ -3567,9 +4359,32 @@ exclude_row_id_attribute : bool
     <div class="doc doc-contents ">
 
         <p>Annotates this entity with a tag on the server.</p>
-<h6 id="openml.datasets.OpenMLDataset.push_tag--parameters">Parameters<a class="headerlink" href="#openml.datasets.OpenMLDataset.push_tag--parameters" title="Permanent link">#</a></h6>
-<p>tag : str
-    Tag to attach to the flow.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>tag</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Tag to attach to the flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/base.py</code></summary>
@@ -3610,9 +4425,32 @@ exclude_row_id_attribute : bool
     <div class="doc doc-contents ">
 
         <p>Removes a tag from this entity on the server.</p>
-<h6 id="openml.datasets.OpenMLDataset.remove_tag--parameters">Parameters<a class="headerlink" href="#openml.datasets.OpenMLDataset.remove_tag--parameters" title="Permanent link">#</a></h6>
-<p>tag : str
-    Tag to attach to the flow.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>tag</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Tag to attach to the flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/base.py</code></summary>
@@ -3657,11 +4495,60 @@ exclude_row_id_attribute : bool
 it returns None. Necessary because the data returned by get_data
 only contains the indices of the classes, while OpenML needs the real
 classname when uploading the results of a run.</p>
-<h6 id="openml.datasets.OpenMLDataset.retrieve_class_labels--parameters">Parameters<a class="headerlink" href="#openml.datasets.OpenMLDataset.retrieve_class_labels--parameters" title="Permanent link">#</a></h6>
-<p>target_name : str
-    Name of the target attribute</p>
-<h6 id="openml.datasets.OpenMLDataset.retrieve_class_labels--returns">Returns<a class="headerlink" href="#openml.datasets.OpenMLDataset.retrieve_class_labels--returns" title="Permanent link">#</a></h6>
-<p>list</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>target_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Name of the target attribute</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;class&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>list</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/dataset.py</code></summary>
@@ -3791,12 +4678,60 @@ classname when uploading the results of a run.</p>
     <div class="doc doc-contents ">
 
         <p>Describe attributes of the dataframe according to ARFF specification.</p>
-<h5 id="openml.datasets.attributes_arff_from_df--parameters">Parameters<a class="headerlink" href="#openml.datasets.attributes_arff_from_df--parameters" title="Permanent link">#</a></h5>
-<p>df : DataFrame, shape (n_samples, n_features)
-    The dataframe containing the data set.</p>
-<h5 id="openml.datasets.attributes_arff_from_df--returns">Returns<a class="headerlink" href="#openml.datasets.attributes_arff_from_df--returns" title="Permanent link">#</a></h5>
-<p>attributes_arff : list[str]
-    The data set attributes as required by the ARFF format.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>df</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The dataframe containing the data set.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>(DataFrame, shape(n_samples, n_features))</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>attributes_arff</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>The data set attributes as required by the ARFF format.</p>
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code>list[str]</code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/functions.py</code></summary>
@@ -3928,15 +4863,75 @@ classname when uploading the results of a run.</p>
 <p>Raises an error if a dataset_id in the given list
 of dataset_ids does not exist on the server and
 <code>raise_error_if_not_exist</code> is set to True (default).</p>
-<h5 id="openml.datasets.check_datasets_active--parameters">Parameters<a class="headerlink" href="#openml.datasets.check_datasets_active--parameters" title="Permanent link">#</a></h5>
-<p>dataset_ids : List[int]
-    A list of integers representing dataset ids.
-raise_error_if_not_exist : bool (default=True)
-    Flag that if activated can raise an error, if one or more of the
-    given dataset ids do not exist on the server.</p>
-<h5 id="openml.datasets.check_datasets_active--returns">Returns<a class="headerlink" href="#openml.datasets.check_datasets_active--returns" title="Permanent link">#</a></h5>
-<p>dict
-    A dictionary with items {did: bool}</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>dataset_ids</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A list of integers representing dataset ids.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>List[int]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>raise_error_if_not_exist</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Flag that if activated can raise an error, if one or more of the
+given dataset ids do not exist on the server.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool(default=True)</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>dict</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>A dictionary with items {did: bool}</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/functions.py</code></summary>
@@ -4024,63 +5019,334 @@ raise_error_if_not_exist : bool (default=True)
 <p>This function creates an OpenMLDataset object.
 The OpenMLDataset object contains information related to the dataset
 and the actual data file.</p>
-<h5 id="openml.datasets.create_dataset--parameters">Parameters<a class="headerlink" href="#openml.datasets.create_dataset--parameters" title="Permanent link">#</a></h5>
-<p>name : str
-    Name of the dataset.
-description : str
-    Description of the dataset.
-creator : str
-    The person who created the dataset.
-contributor : str
-    People who contributed to the current version of the dataset.
-collection_date : str
-    The date the data was originally collected, given by the uploader.
-language : str
-    Language in which the data is represented.
-    Starts with 1 upper case letter, rest lower case, e.g. 'English'.
-licence : str
-    License of the data.
-attributes : list, dict, or 'auto'
-    A list of tuples. Each tuple consists of the attribute name and type.
-    If passing a pandas DataFrame, the attributes can be automatically
-    inferred by passing <code>'auto'</code>. Specific attributes can be manually
-    specified by a passing a dictionary where the key is the name of the
-    attribute and the value is the data type of the attribute.
-data : ndarray, list, dataframe, coo_matrix, shape (n_samples, n_features)
-    An array that contains both the attributes and the targets. When
-    providing a dataframe, the attribute names and type can be inferred by
-    passing <code>attributes='auto'</code>.
-    The target feature is indicated as meta-data of the dataset.
-default_target_attribute : str
-    The default target attribute, if it exists.
-    Can have multiple values, comma separated.
-ignore_attribute : str | list
-    Attributes that should be excluded in modelling,
-    such as identifiers and indexes.
-    Can have multiple values, comma separated.
-citation : str
-    Reference(s) that should be cited when building on this data.
-version_label : str, optional
-    Version label provided by user.
-     Can be a date, hash, or some other type of id.
-row_id_attribute : str, optional
-    The attribute that represents the row-id column, if present in the
-    dataset. If <code>data</code> is a dataframe and <code>row_id_attribute</code> is not
-    specified, the index of the dataframe will be used as the
-    <code>row_id_attribute</code>. If the name of the index is <code>None</code>, it will
-    be discarded.</p>
-<div class="highlight"><pre><span></span><code>.. versionadded: 0.8
-    Inference of ``row_id_attribute`` from a dataframe.
-</code></pre></div>
-<p>original_data_url : str, optional
-    For derived data, the url to the original dataset.
-paper_url : str, optional
-    Link to a paper describing the dataset.
-update_comment : str, optional
-    An explanation for when the dataset is uploaded.</p>
-<h5 id="openml.datasets.create_dataset--returns">Returns<a class="headerlink" href="#openml.datasets.create_dataset--returns" title="Permanent link">#</a></h5>
-<p>class:<code>openml.OpenMLDataset</code>
-Dataset description.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Name of the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>description</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Description of the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>creator</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The person who created the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>contributor</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>People who contributed to the current version of the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>collection_date</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The date the data was originally collected, given by the uploader.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>language</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Language in which the data is represented.
+Starts with 1 upper case letter, rest lower case, e.g. 'English'.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>licence</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>License of the data.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>attributes</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A list of tuples. Each tuple consists of the attribute name and type.
+If passing a pandas DataFrame, the attributes can be automatically
+inferred by passing <code>'auto'</code>. Specific attributes can be manually
+specified by a passing a dictionary where the key is the name of the
+attribute and the value is the data type of the attribute.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list, dict, or &#39;auto&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>An array that contains both the attributes and the targets. When
+providing a dataframe, the attribute names and type can be inferred by
+passing <code>attributes='auto'</code>.
+The target feature is indicated as meta-data of the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>(ndarray, list, dataframe, <span title="scipy.sparse.coo_matrix">coo_matrix</span>, shape(n_samples, n_features))</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>default_target_attribute</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The default target attribute, if it exists.
+Can have multiple values, comma separated.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>ignore_attribute</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Attributes that should be excluded in modelling,
+such as identifiers and indexes.
+Can have multiple values, comma separated.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>citation</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Reference(s) that should be cited when building on this data.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>version_label</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Version label provided by user.
+ Can be a date, hash, or some other type of id.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>row_id_attribute</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The attribute that represents the row-id column, if present in the
+dataset. If <code>data</code> is a dataframe and <code>row_id_attribute</code> is not
+specified, the index of the dataframe will be used as the
+<code>row_id_attribute</code>. If the name of the index is <code>None</code>, it will
+be discarded.</p>
+<p>.. versionadded: 0.8
+    Inference of <code>row_id_attribute</code> from a dataframe.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>original_data_url</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>For derived data, the url to the original dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>paper_url</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Link to a paper describing the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>update_comment</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>An explanation for when the dataset is uploaded.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>class</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code>`openml.OpenMLDataset`</code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>Dataset description.</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/functions.py</code></summary>
@@ -4507,12 +5773,56 @@ Dataset description.</p>
         <p>Delete dataset with id <code>dataset_id</code> from the OpenML server.</p>
 <p>This can only be done if you are the owner of the dataset and
 no tasks are attached to the dataset.</p>
-<h5 id="openml.datasets.delete_dataset--parameters">Parameters<a class="headerlink" href="#openml.datasets.delete_dataset--parameters" title="Permanent link">#</a></h5>
-<p>dataset_id : int
-    OpenML id of the dataset</p>
-<h5 id="openml.datasets.delete_dataset--returns">Returns<a class="headerlink" href="#openml.datasets.delete_dataset--returns" title="Permanent link">#</a></h5>
-<p>bool
-    True if the deletion was successful. False otherwise.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>dataset_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>OpenML id of the dataset</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>bool</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>True if the deletion was successful. False otherwise.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/functions.py</code></summary>
@@ -4581,43 +5891,263 @@ Critical fields are default_target_attribute, ignore_attribute, row_id_attribute
 </ul>
 <p>If dataset has tasks or if the user is not the owner, the only way
 to edit critical fields is to use fork_dataset followed by edit_dataset.</p>
-<h5 id="openml.datasets.edit_dataset--parameters">Parameters<a class="headerlink" href="#openml.datasets.edit_dataset--parameters" title="Permanent link">#</a></h5>
-<p>data_id : int
-    ID of the dataset.
-description : str
-    Description of the dataset.
-creator : str
-    The person who created the dataset.
-contributor : str
-    People who contributed to the current version of the dataset.
-collection_date : str
-    The date the data was originally collected, given by the uploader.
-language : str
-    Language in which the data is represented.
-    Starts with 1 upper case letter, rest lower case, e.g. 'English'.
-default_target_attribute : str
-    The default target attribute, if it exists.
-    Can have multiple values, comma separated.
-ignore_attribute : str | list
-    Attributes that should be excluded in modelling,
-    such as identifiers and indexes.
-citation : str
-    Reference(s) that should be cited when building on this data.
-row_id_attribute : str, optional
-    The attribute that represents the row-id column, if present in the
-    dataset. If <code>data</code> is a dataframe and <code>row_id_attribute</code> is not
-    specified, the index of the dataframe will be used as the
-    <code>row_id_attribute</code>. If the name of the index is <code>None</code>, it will
-    be discarded.</p>
-<div class="highlight"><pre><span></span><code>.. versionadded: 0.8
-    Inference of ``row_id_attribute`` from a dataframe.
-</code></pre></div>
-<p>original_data_url : str, optional
-    For derived data, the url to the original dataset.
-paper_url : str, optional
-    Link to a paper describing the dataset.</p>
-<h5 id="openml.datasets.edit_dataset--returns">Returns<a class="headerlink" href="#openml.datasets.edit_dataset--returns" title="Permanent link">#</a></h5>
-<p>Dataset id</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>data_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>ID of the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>description</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Description of the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>creator</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The person who created the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>contributor</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>People who contributed to the current version of the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>collection_date</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The date the data was originally collected, given by the uploader.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>language</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Language in which the data is represented.
+Starts with 1 upper case letter, rest lower case, e.g. 'English'.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>default_target_attribute</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The default target attribute, if it exists.
+Can have multiple values, comma separated.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>ignore_attribute</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Attributes that should be excluded in modelling,
+such as identifiers and indexes.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str | list</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>citation</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Reference(s) that should be cited when building on this data.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>row_id_attribute</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The attribute that represents the row-id column, if present in the
+dataset. If <code>data</code> is a dataframe and <code>row_id_attribute</code> is not
+specified, the index of the dataframe will be used as the
+<code>row_id_attribute</code>. If the name of the index is <code>None</code>, it will
+be discarded.</p>
+<p>.. versionadded: 0.8
+    Inference of <code>row_id_attribute</code> from a dataframe.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>original_data_url</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>For derived data, the url to the original dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>paper_url</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Link to a paper describing the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>Dataset id</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/functions.py</code></summary>
@@ -4867,11 +6397,56 @@ paper_url : str, optional
 <p>In these two cases the only way to edit critical fields is:
         1. STEP 1: Fork the dataset using fork_dataset API
         2. STEP 2: Call edit_dataset API on the forked version.</p>
-<h5 id="openml.datasets.fork_dataset--parameters">Parameters<a class="headerlink" href="#openml.datasets.fork_dataset--parameters" title="Permanent link">#</a></h5>
-<p>data_id : int
-    id of the dataset to be forked</p>
-<h5 id="openml.datasets.fork_dataset--returns">Returns<a class="headerlink" href="#openml.datasets.fork_dataset--returns" title="Permanent link">#</a></h5>
-<p>Dataset id of the forked dataset</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>data_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>id of the dataset to be forked</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>Dataset id of the forked dataset</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/functions.py</code></summary>
@@ -4982,44 +6557,220 @@ If no version is specified and multiple versions of the dataset exist,
 the earliest version of the dataset that is still active will be returned.
 If no version is specified, multiple versions of the dataset exist and
 <code>exception_if_multiple</code> is set to <code>True</code>, this function will raise an exception.</p>
-<h5 id="openml.datasets.get_dataset--parameters">Parameters<a class="headerlink" href="#openml.datasets.get_dataset--parameters" title="Permanent link">#</a></h5>
-<p>dataset_id : int or str
-    Dataset ID (integer) or dataset name (string) of the dataset to download.
-download_data : bool (default=False)
-    If True, also download the data file. Beware that some datasets are large and it might
-    make the operation noticeably slower. Metadata is also still retrieved.
-    If False, create the OpenMLDataset and only populate it with the metadata.
-    The data may later be retrieved through the <code>OpenMLDataset.get_data</code> method.
-version : int, optional (default=None)
-    Specifies the version if <code>dataset_id</code> is specified by name.
-    If no version is specified, retrieve the least recent still active version.
-error_if_multiple : bool (default=False)
-    If <code>True</code> raise an error if multiple datasets are found with matching criteria.
-cache_format : str (default='pickle') in {'pickle', 'feather'}
-    Format for caching the dataset - may be feather or pickle
-    Note that the default 'pickle' option may load slower than feather when
-    no.of.rows is very high.
-download_qualities : bool (default=False)
-    Option to download 'qualities' meta-data in addition to the minimal dataset description.
-    If True, download and cache the qualities file.
-    If False, create the OpenMLDataset without qualities metadata. The data may later be added
-    to the OpenMLDataset through the <code>OpenMLDataset.load_metadata(qualities=True)</code> method.
-download_features_meta_data : bool (default=False)
-    Option to download 'features' meta-data in addition to the minimal dataset description.
-    If True, download and cache the features file.
-    If False, create the OpenMLDataset without features metadata. The data may later be added
-    to the OpenMLDataset through the <code>OpenMLDataset.load_metadata(features=True)</code> method.
-download_all_files: bool (default=False)
-    EXPERIMENTAL. Download all files related to the dataset that reside on the server.
-    Useful for datasets which refer to auxiliary files (e.g., meta-album).
-force_refresh_cache : bool (default=False)
-    Force the cache to refreshed by deleting the cache directory and re-downloading the data.
-    Note, if <code>force_refresh_cache</code> is True, <code>get_dataset</code> is NOT thread/multiprocessing safe,
-    because this creates a race condition to creating and deleting the cache; as in general with
-    the cache.</p>
-<h5 id="openml.datasets.get_dataset--returns">Returns<a class="headerlink" href="#openml.datasets.get_dataset--returns" title="Permanent link">#</a></h5>
-<p>dataset : :class:<code>openml.OpenMLDataset</code>
-    The downloaded dataset.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>dataset_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Dataset ID (integer) or dataset name (string) of the dataset to download.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int or str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>download_data</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If True, also download the data file. Beware that some datasets are large and it might
+make the operation noticeably slower. Metadata is also still retrieved.
+If False, create the OpenMLDataset and only populate it with the metadata.
+The data may later be retrieved through the <code>OpenMLDataset.get_data</code> method.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool(default=False)</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>version</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Specifies the version if <code>dataset_id</code> is specified by name.
+If no version is specified, retrieve the least recent still active version.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>(int, optional(default=None))</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>error_if_multiple</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If <code>True</code> raise an error if multiple datasets are found with matching criteria.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool(default=False)</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>cache_format</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Format for caching the dataset - may be feather or pickle
+Note that the default 'pickle' option may load slower than feather when
+no.of.rows is very high.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str(default=&#39;pickle&#39;) in {&#39;pickle&#39;, &#39;feather&#39;}</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;pickle&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>download_qualities</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Option to download 'qualities' meta-data in addition to the minimal dataset description.
+If True, download and cache the qualities file.
+If False, create the OpenMLDataset without qualities metadata. The data may later be added
+to the OpenMLDataset through the <code>OpenMLDataset.load_metadata(qualities=True)</code> method.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool(default=False)</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>download_features_meta_data</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Option to download 'features' meta-data in addition to the minimal dataset description.
+If True, download and cache the features file.
+If False, create the OpenMLDataset without features metadata. The data may later be added
+to the OpenMLDataset through the <code>OpenMLDataset.load_metadata(features=True)</code> method.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool(default=False)</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>download_all_files</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>EXPERIMENTAL. Download all files related to the dataset that reside on the server.
+Useful for datasets which refer to auxiliary files (e.g., meta-album).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>force_refresh_cache</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Force the cache to refreshed by deleting the cache directory and re-downloading the data.
+Note, if <code>force_refresh_cache</code> is True, <code>get_dataset</code> is NOT thread/multiprocessing safe,
+because this creates a race condition to creating and deleting the cache; as in general with
+the cache.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool(default=False)</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>dataset</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>The downloaded dataset.</p>
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code>:class:`openml.OpenMLDataset`</code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/functions.py</code></summary>
@@ -5355,20 +7106,100 @@ force_refresh_cache : bool (default=False)
 
         <p>Download datasets.</p>
 <p>This function iterates :meth:<code>openml.datasets.get_dataset</code>.</p>
-<h5 id="openml.datasets.get_datasets--parameters">Parameters<a class="headerlink" href="#openml.datasets.get_datasets--parameters" title="Permanent link">#</a></h5>
-<p>dataset_ids : iterable
-    Integers or strings representing dataset ids or dataset names.
-    If dataset names are specified, the least recent still active dataset version is returned.
-download_data : bool, optional
-    If True, also download the data file. Beware that some datasets are large and it might
-    make the operation noticeably slower. Metadata is also still retrieved.
-    If False, create the OpenMLDataset and only populate it with the metadata.
-    The data may later be retrieved through the <code>OpenMLDataset.get_data</code> method.
-download_qualities : bool, optional (default=True)
-    If True, also download qualities.xml file. If False it skip the qualities.xml.</p>
-<h5 id="openml.datasets.get_datasets--returns">Returns<a class="headerlink" href="#openml.datasets.get_datasets--returns" title="Permanent link">#</a></h5>
-<p>datasets : list of datasets
-    A list of dataset objects.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>dataset_ids</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Integers or strings representing dataset ids or dataset names.
+If dataset names are specified, the least recent still active dataset version is returned.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>iterable</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>download_data</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If True, also download the data file. Beware that some datasets are large and it might
+make the operation noticeably slower. Metadata is also still retrieved.
+If False, create the OpenMLDataset and only populate it with the metadata.
+The data may later be retrieved through the <code>OpenMLDataset.get_data</code> method.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>download_qualities</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If True, also download qualities.xml file. If False it skip the qualities.xml.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>(bool, optional(default=True))</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>datasets</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>A list of dataset objects.</p>
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code>list of datasets</code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/functions.py</code></summary>
@@ -5458,35 +7289,254 @@ download_qualities : bool, optional (default=True)
 
         <p>Return a dataframe of all dataset which are on OpenML.</p>
 <p>Supports large amount of results.</p>
-<h5 id="openml.datasets.list_datasets--parameters">Parameters<a class="headerlink" href="#openml.datasets.list_datasets--parameters" title="Permanent link">#</a></h5>
-<p>data_id : list, optional
-    A list of data ids, to specify which datasets should be
-    listed
-offset : int, optional
-    The number of datasets to skip, starting from the first.
-size : int, optional
-    The maximum number of datasets to show.
-status : str, optional
-    Should be {active, in_preparation, deactivated}. By
-    default active datasets are returned, but also datasets
-    from another status can be requested.
-tag : str, optional
-data_name : str, optional
-data_version : int, optional
-number_instances : int | str, optional
-number_features : int | str, optional
-number_classes : int | str, optional
-number_missing_values : int | str, optional</p>
-<h5 id="openml.datasets.list_datasets--returns">Returns<a class="headerlink" href="#openml.datasets.list_datasets--returns" title="Permanent link">#</a></h5>
-<p>datasets: dataframe
-    Each row maps to a dataset
-    Each column contains the following information:
-    - dataset id
-    - name
-    - format
-    - status
-    If qualities are calculated for the dataset, some of
-    these are also included as columns.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>data_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A list of data ids, to specify which datasets should be
+listed</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>offset</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The number of datasets to skip, starting from the first.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>size</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The maximum number of datasets to show.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>status</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Should be {active, in_preparation, deactivated}. By
+default active datasets are returned, but also datasets
+from another status can be requested.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tag</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_version</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>number_instances</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int | str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>number_features</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int | str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>number_classes</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int | str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>number_missing_values</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int | str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>datasets</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>Each row maps to a dataset
+Each column contains the following information:
+- dataset id
+- name
+- format
+- status
+If qualities are calculated for the dataset, some of
+these are also included as columns.</p>
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code>dataframe</code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/functions.py</code></summary>
@@ -5645,8 +7695,30 @@ number_missing_values : int | str, optional</p>
         <p>Return list of data qualities available.</p>
 <p>The function performs an API call to retrieve the entire list of
 data qualities that are computed on the datasets uploaded.</p>
-<h5 id="openml.datasets.list_qualities--returns">Returns<a class="headerlink" href="#openml.datasets.list_qualities--returns" title="Permanent link">#</a></h5>
-<p>list</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>list</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/functions.py</code></summary>
@@ -5714,11 +7786,46 @@ data qualities that are computed on the datasets uploaded.</p>
 Please see the OpenML API documentation for a description of the status
 and all legal status transitions:
 <a href="https://docs.openml.org/concepts/data/#dataset-status">docs.openml.org/concepts/data/#dataset-status</a></p>
-<h5 id="openml.datasets.status_update--parameters">Parameters<a class="headerlink" href="#openml.datasets.status_update--parameters" title="Permanent link">#</a></h5>
-<p>data_id : int
-    The data id of the dataset
-status : str,
-    'active' or 'deactivated'</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>data_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The data id of the dataset</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>status</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>'active' or 'deactivated'</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>(str)</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/datasets/functions.py</code></summary>

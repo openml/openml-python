@@ -2364,17 +2364,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#openml.tasks.split.OpenMLSplit--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#openml.tasks.split.OpenMLSplit.get" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2382,45 +2371,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" get">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.split.OpenMLSplit.get--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.split.OpenMLSplit.get--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.tasks.split.OpenMLSplit.get--raises" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Raises
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2651,14 +2601,61 @@
         <p>OpenML Split object.</p>
 <p>This class manages train-test splits for a dataset across multiple
 repetitions, folds, and samples.</p>
-<h5 id="openml.tasks.split.OpenMLSplit--parameters">Parameters<a class="headerlink" href="#openml.tasks.split.OpenMLSplit--parameters" title="Permanent link">#</a></h5>
-<p>name : int or str
-    The name or ID of the split.
-description : str
-    A description of the split.
-split : dict
-    A dictionary containing the splits organized by repetition, fold,
-    and sample.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name or ID of the split.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int or str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>description</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A description of the split.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>split</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A dictionary containing the splits organized by repetition, fold,
+and sample.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>dict</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
                   <details class="quote">
                     <summary>Source code in <code>openml/tasks/split.py</code></summary>
@@ -2744,19 +2741,120 @@ split : dict
     <div class="doc doc-contents ">
 
         <p>Returns the specified data split from the CrossValidationSplit object.</p>
-<h6 id="openml.tasks.split.OpenMLSplit.get--parameters">Parameters<a class="headerlink" href="#openml.tasks.split.OpenMLSplit.get--parameters" title="Permanent link">#</a></h6>
-<p>repeat : int
-    Index of the repeat to retrieve.
-fold : int
-    Index of the fold to retrieve.
-sample : int
-    Index of the sample to retrieve.</p>
-<h6 id="openml.tasks.split.OpenMLSplit.get--returns">Returns<a class="headerlink" href="#openml.tasks.split.OpenMLSplit.get--returns" title="Permanent link">#</a></h6>
-<p>numpy.ndarray
-    The data split for the specified repeat, fold, and sample.</p>
-<h6 id="openml.tasks.split.OpenMLSplit.get--raises">Raises<a class="headerlink" href="#openml.tasks.split.OpenMLSplit.get--raises" title="Permanent link">#</a></h6>
-<p>ValueError
-    If the specified repeat, fold, or sample is not known.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>repeat</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Index of the repeat to retrieve.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>0</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>fold</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Index of the fold to retrieve.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>0</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>sample</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Index of the sample to retrieve.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>0</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><span title="numpy.ndarray">ndarray</span></code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>The data split for the specified repeat, fold, and sample.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RAISES</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code>ValueError</code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If the specified repeat, fold, or sample is not known.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/tasks/split.py</code></summary>

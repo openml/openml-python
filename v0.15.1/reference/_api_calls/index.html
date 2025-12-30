@@ -1270,34 +1270,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" resolve_env_proxies">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml._api_calls.resolve_env_proxies--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml._api_calls.resolve_env_proxies--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
       </ul>
@@ -2598,12 +2570,56 @@
         <p>Attempt to find a suitable proxy for this url.</p>
 <p>Relies on <code>requests</code> internals to remain consistent. To disable this from the
 environment, please set the enviornment varialbe <code>no_proxy="*"</code>.</p>
-<h5 id="openml._api_calls.resolve_env_proxies--parameters">Parameters<a class="headerlink" href="#openml._api_calls.resolve_env_proxies--parameters" title="Permanent link">#</a></h5>
-<p>url : str
-    The url endpoint</p>
-<h5 id="openml._api_calls.resolve_env_proxies--returns">Returns<a class="headerlink" href="#openml._api_calls.resolve_env_proxies--returns" title="Permanent link">#</a></h5>
-<p>Optional[str]
-    The proxy url if found, else None</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>url</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The url endpoint</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>Optional[str]</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>The proxy url if found, else None</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/_api_calls.py</code></summary>

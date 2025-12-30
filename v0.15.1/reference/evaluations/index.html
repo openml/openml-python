@@ -2501,36 +2501,219 @@
 
         <p>Contains all meta-information about a run / evaluation combination,
 according to the evaluation/list function</p>
-<h5 id="openml.evaluations.OpenMLEvaluation--parameters">Parameters<a class="headerlink" href="#openml.evaluations.OpenMLEvaluation--parameters" title="Permanent link">#</a></h5>
-<p>run_id : int
-    Refers to the run.
-task_id : int
-    Refers to the task.
-setup_id : int
-    Refers to the setup.
-flow_id : int
-    Refers to the flow.
-flow_name : str
-    Name of the referred flow.
-data_id : int
-    Refers to the dataset.
-data_name : str
-    The name of the dataset.
-function : str
-    The evaluation metric of this item (e.g., accuracy).
-upload_time : str
-    The time of evaluation.
-uploader: int
-    Uploader ID (user ID)
-upload_name : str
-    Name of the uploader of this evaluation
-value : float
-    The value (score) of this evaluation.
-values : List[float]
-    The values (scores) per repeat and fold (if requested)
-array_data : str
-    list of information per class.
-    (e.g., in case of precision, auroc, recall)</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>run_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Refers to the run.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>task_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Refers to the task.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>setup_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Refers to the setup.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flow_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Refers to the flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flow_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Name of the referred flow.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Refers to the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name of the dataset.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>function</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The evaluation metric of this item (e.g., accuracy).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>upload_time</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The time of evaluation.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>uploader</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Uploader ID (user ID)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>upload_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Name of the uploader of this evaluation</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>value</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The value (score) of this evaluation.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>float</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>values</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The values (scores) per repeat and fold (if requested)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>List[float]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>array_data</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>list of information per class.
+(e.g., in case of precision, auroc, recall)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
                   <details class="quote">
                     <summary>Source code in <code>openml/evaluations/evaluation.py</code></summary>
@@ -2635,8 +2818,30 @@ array_data : str
         <p>Return list of evaluation measures available.</p>
 <p>The function performs an API call to retrieve the entire list of
 evaluation measures that are available.</p>
-<h5 id="openml.evaluations.list_evaluation_measures--returns">Returns<a class="headerlink" href="#openml.evaluations.list_evaluation_measures--returns" title="Permanent link">#</a></h5>
-<p>list</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>list</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/evaluations/functions.py</code></summary>
@@ -2704,45 +2909,275 @@ evaluation measures that are available.</p>
 
         <p>List all run-evaluation pairs matching all of the given filters.</p>
 <p>(Supports large amount of results)</p>
-<h5 id="openml.evaluations.list_evaluations--parameters">Parameters<a class="headerlink" href="#openml.evaluations.list_evaluations--parameters" title="Permanent link">#</a></h5>
-<p>function : str
-    the evaluation function. e.g., predictive_accuracy
-offset : int, optional
-    the number of runs to skip, starting from the first
-size : int, default 10000
-    The maximum number of runs to show.
-    If set to <code>None</code>, it returns all the results.</p>
 
 
-<details class="tasks-" open>
-  <summary>list[int,str], optional</summary>
-  <p>the list of task IDs</p>
-</details>        <p>setups: list[int,str], optional
-    the list of setup IDs
-flows : list[int,str], optional
-    the list of flow IDs
-runs :list[int,str], optional
-    the list of run IDs
-uploaders : list[int,str], optional
-    the list of uploader IDs
-tag : str, optional
-    filter evaluation based on given tag</p>
-<p>study : int, optional</p>
-<p>per_fold : bool, optional</p>
-
-
-<details class="sort_order-" open>
-  <summary>str, optional</summary>
-  <p>order of sorting evaluations, ascending ("asc") or descending ("desc")</p>
-</details>
-
-<details class="output_format" open>
-  <summary>str, optional (default='object')</summary>
-  <p>The parameter decides the format of the output.
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>function</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the evaluation function. e.g., predictive_accuracy</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>offset</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the number of runs to skip, starting from the first</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>size</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The maximum number of runs to show.
+If set to <code>None</code>, it returns all the results.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>10000</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tasks</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of task IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list[int, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>setups</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of setup IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list[str | int] | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flows</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of flow IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list[int, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>runs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of run IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list[str | int] | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>uploaders</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of uploader IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list[int, str]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tag</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>filter evaluation based on given tag</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>study</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>per_fold</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>sort_order</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>order of sorting evaluations, ascending ("asc") or descending ("desc")</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>output_format</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The parameter decides the format of the output.
 - If 'object' the output is a dict of OpenMLEvaluation objects
 - If 'dataframe' the output is a pandas DataFrame</p>
-</details>        <h5 id="openml.evaluations.list_evaluations--returns">Returns<a class="headerlink" href="#openml.evaluations.list_evaluations--returns" title="Permanent link">#</a></h5>
-<p>dict or dataframe</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing_extensions.Literal">Literal</span>[&#39;object&#39;, &#39;dataframe&#39;]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>&#39;object&#39;</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>dict or dataframe</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/evaluations/functions.py</code></summary>
@@ -2938,33 +3373,255 @@ tag : str, optional
 
         <p>List all run-evaluation pairs matching all of the given filters
 and their hyperparameter settings.</p>
-<h5 id="openml.evaluations.list_evaluations_setups--parameters">Parameters<a class="headerlink" href="#openml.evaluations.list_evaluations_setups--parameters" title="Permanent link">#</a></h5>
-<p>function : str
-    the evaluation function. e.g., predictive_accuracy
-offset : int, optional
-    the number of runs to skip, starting from the first
-size : int, optional
-    the maximum number of runs to show
-tasks : list[int], optional
-    the list of task IDs
-setups: list[int], optional
-    the list of setup IDs
-flows : list[int], optional
-    the list of flow IDs
-runs : list[int], optional
-    the list of run IDs
-uploaders : list[int], optional
-    the list of uploader IDs
-tag : str, optional
-    filter evaluation based on given tag
-per_fold : bool, optional
-sort_order : str, optional
-   order of sorting evaluations, ascending ("asc") or descending ("desc")
-parameters_in_separate_columns: bool, optional (default= False)
-    Returns hyperparameters in separate columns if set to True.
-    Valid only for a single flow</p>
-<h5 id="openml.evaluations.list_evaluations_setups--returns">Returns<a class="headerlink" href="#openml.evaluations.list_evaluations_setups--returns" title="Permanent link">#</a></h5>
-<p>dataframe with hyperparameter settings as a list of tuples.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>function</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the evaluation function. e.g., predictive_accuracy</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>offset</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the number of runs to skip, starting from the first</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>size</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the maximum number of runs to show</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tasks</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of task IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list[int]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>setups</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of setup IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flows</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of flow IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list[int]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>runs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of run IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list[int]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>uploaders</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of uploader IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list[int]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tag</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>filter evaluation based on given tag</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>per_fold</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>sort_order</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>order of sorting evaluations, ascending ("asc") or descending ("desc")</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>parameters_in_separate_columns</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Returns hyperparameters in separate columns if set to True.
+Valid only for a single flow</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>bool</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>dataframe with hyperparameter settings as a list of tuples.</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/evaluations/functions.py</code></summary>

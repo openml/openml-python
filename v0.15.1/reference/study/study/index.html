@@ -2248,17 +2248,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#openml.study.study.BaseStudy--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#openml.study.study.BaseStudy.id" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2353,17 +2342,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#openml.study.study.OpenMLBenchmarkSuite--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#openml.study.study.OpenMLBenchmarkSuite.id" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2456,17 +2434,6 @@
   
     <nav class="md-nav" aria-label=" OpenMLStudy">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.study.study.OpenMLStudy--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#openml.study.study.OpenMLStudy.id" class="md-nav__link">
@@ -2882,40 +2849,231 @@ creator id and a set of tags.</p>
 <p>According to this list of tags, the study object receives a list of
 OpenML object ids (datasets, flows, tasks and setups).</p>
 <p>Can be used to obtain all relevant information from a study at once.</p>
-<h5 id="openml.study.study.BaseStudy--parameters">Parameters<a class="headerlink" href="#openml.study.study.BaseStudy--parameters" title="Permanent link">#</a></h5>
-<p>study_id : int
-    the study id
-alias : str (optional)
-    a string ID, unique on server (url-friendly)
-main_entity_type : str
-    the entity type (e.g., task, run) that is core in this study.
-    only entities of this type can be added explicitly
-benchmark_suite : int (optional)
-    the benchmark suite (another study) upon which this study is ran.
-    can only be active if main entity type is runs.
-name : str
-    the name of the study (meta-info)
-description : str
-    brief description (meta-info)
-status : str
-    Whether the study is in preparation, active or deactivated
-creation_date : str
-    date of creation (meta-info)
-creator : int
-    openml user id of the owner / creator
-tags : list(dict)
-    The list of tags shows which tags are associated with the study.
-    Each tag is a dict of (tag) name, window_start and write_access.
-data : list
-    a list of data ids associated with this study
-tasks : list
-    a list of task ids associated with this study
-flows : list
-    a list of flow ids associated with this study
-runs : list
-    a list of run ids associated with this study
-setups : list
-    a list of setup ids associated with this study</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>study_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the study id</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>alias</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a string ID, unique on server (url-friendly)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str(optional)</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>main_entity_type</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the entity type (e.g., task, run) that is core in this study.
+only entities of this type can be added explicitly</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>benchmark_suite</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the benchmark suite (another study) upon which this study is ran.
+can only be active if main entity type is runs.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int(optional)</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the name of the study (meta-info)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>description</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>brief description (meta-info)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>status</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Whether the study is in preparation, active or deactivated</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>creation_date</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>date of creation (meta-info)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>creator</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>openml user id of the owner / creator</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tags</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The list of tags shows which tags are associated with the study.
+Each tag is a dict of (tag) name, window_start and write_access.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list(dict)</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a list of data ids associated with this study</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tasks</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a list of task ids associated with this study</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flows</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a list of flow ids associated with this study</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>runs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a list of run ids associated with this study</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>setups</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a list of setup ids associated with this study</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
                   <details class="quote">
                     <summary>Source code in <code>openml/study/study.py</code></summary>
@@ -3261,31 +3419,174 @@ setups : list
 creator id and the task ids.</p>
 <p>According to this list of task ids, the suite object receives a list of
 OpenML object ids (datasets).</p>
-<h5 id="openml.study.study.OpenMLBenchmarkSuite--parameters">Parameters<a class="headerlink" href="#openml.study.study.OpenMLBenchmarkSuite--parameters" title="Permanent link">#</a></h5>
-<p>suite_id : int
-    the study id
-alias : str (optional)
-    a string ID, unique on server (url-friendly)
-main_entity_type : str
-    the entity type (e.g., task, run) that is core in this study.
-    only entities of this type can be added explicitly
-name : str
-    the name of the study (meta-info)
-description : str
-    brief description (meta-info)
-status : str
-    Whether the study is in preparation, active or deactivated
-creation_date : str
-    date of creation (meta-info)
-creator : int
-    openml user id of the owner / creator
-tags : list(dict)
-    The list of tags shows which tags are associated with the study.
-    Each tag is a dict of (tag) name, window_start and write_access.
-data : list
-    a list of data ids associated with this study
-tasks : list
-    a list of task ids associated with this study</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>suite_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the study id</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>alias</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a string ID, unique on server (url-friendly)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str(optional)</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>main_entity_type</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the entity type (e.g., task, run) that is core in this study.
+only entities of this type can be added explicitly</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the name of the study (meta-info)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>description</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>brief description (meta-info)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>status</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Whether the study is in preparation, active or deactivated</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>creation_date</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>date of creation (meta-info)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>creator</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>openml user id of the owner / creator</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tags</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The list of tags shows which tags are associated with the study.
+Each tag is a dict of (tag) name, window_start and write_access.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list(dict)</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a list of data ids associated with this study</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tasks</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a list of task ids associated with this study</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
                   <details class="quote">
                     <summary>Source code in <code>openml/study/study.py</code></summary>
@@ -3625,37 +3926,216 @@ tasks : list
 creator id and a list of run ids.</p>
 <p>According to this list of run ids, the study object receives a list of
 OpenML object ids (datasets, flows, tasks and setups).</p>
-<h5 id="openml.study.study.OpenMLStudy--parameters">Parameters<a class="headerlink" href="#openml.study.study.OpenMLStudy--parameters" title="Permanent link">#</a></h5>
-<p>study_id : int
-    the study id
-alias : str (optional)
-    a string ID, unique on server (url-friendly)
-benchmark_suite : int (optional)
-    the benchmark suite (another study) upon which this study is ran.
-    can only be active if main entity type is runs.
-name : str
-    the name of the study (meta-info)
-description : str
-    brief description (meta-info)
-status : str
-    Whether the study is in preparation, active or deactivated
-creation_date : str
-    date of creation (meta-info)
-creator : int
-    openml user id of the owner / creator
-tags : list(dict)
-    The list of tags shows which tags are associated with the study.
-    Each tag is a dict of (tag) name, window_start and write_access.
-data : list
-    a list of data ids associated with this study
-tasks : list
-    a list of task ids associated with this study
-flows : list
-    a list of flow ids associated with this study
-runs : list
-    a list of run ids associated with this study
-setups : list
-    a list of setup ids associated with this study</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>study_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the study id</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>alias</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a string ID, unique on server (url-friendly)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str(optional)</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>benchmark_suite</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the benchmark suite (another study) upon which this study is ran.
+can only be active if main entity type is runs.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int(optional)</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the name of the study (meta-info)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>description</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>brief description (meta-info)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>status</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Whether the study is in preparation, active or deactivated</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>creation_date</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>date of creation (meta-info)</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>creator</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>openml user id of the owner / creator</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tags</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The list of tags shows which tags are associated with the study.
+Each tag is a dict of (tag) name, window_start and write_access.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list(dict)</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a list of data ids associated with this study</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>tasks</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a list of task ids associated with this study</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flows</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a list of flow ids associated with this study</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>runs</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a list of run ids associated with this study</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>setups</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>a list of setup ids associated with this study</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>list</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
                   <details class="quote">
                     <summary>Source code in <code>openml/study/study.py</code></summary>

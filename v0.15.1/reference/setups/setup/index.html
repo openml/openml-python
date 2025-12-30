@@ -2128,23 +2128,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" OpenMLParameter">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.setups.setup.OpenMLParameter--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -2155,23 +2138,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" OpenMLSetup">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.setups.setup.OpenMLSetup--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2616,25 +2582,124 @@
 
 
         <p>Parameter object (used in setup).</p>
-<h5 id="openml.setups.setup.OpenMLParameter--parameters">Parameters<a class="headerlink" href="#openml.setups.setup.OpenMLParameter--parameters" title="Permanent link">#</a></h5>
-<p>input_id : int
-    The input id from the openml database
-flow id : int
-    The flow to which this parameter is associated
-flow name : str
-    The name of the flow (no version number) to which this parameter
-    is associated
-full_name : str
-    The name of the flow and parameter combined
-parameter_name : str
-    The name of the parameter
-data_type : str
-    The datatype of the parameter. generally unused for sklearn flows
-default_value : str
-    The default value. For sklearn parameters, this is unknown and a
-    default value is selected arbitrarily
-value : str
-    If the parameter was set, the value that it was set to.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>input_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The input id from the openml database</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flow</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The flow to which this parameter is associated</p>
+              </div>
+              <p>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flow</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name of the flow (no version number) to which this parameter
+is associated</p>
+              </div>
+              <p>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>full_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name of the flow and parameter combined</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>parameter_name</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The name of the parameter</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>data_type</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The datatype of the parameter. generally unused for sklearn flows</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>default_value</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The default value. For sklearn parameters, this is unknown and a
+default value is selected arbitrarily</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>value</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If the parameter was set, the value that it was set to.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
                   <details class="quote">
                     <summary>Source code in <code>openml/setups/setup.py</code></summary>
@@ -2714,13 +2779,60 @@ value : str
 
 
         <p>Setup object (a.k.a. Configuration).</p>
-<h5 id="openml.setups.setup.OpenMLSetup--parameters">Parameters<a class="headerlink" href="#openml.setups.setup.OpenMLSetup--parameters" title="Permanent link">#</a></h5>
-<p>setup_id : int
-    The OpenML setup id
-flow_id : int
-    The flow that it is build upon
-parameters : dict
-    The setting of the parameters</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>setup_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The OpenML setup id</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>flow_id</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The flow that it is build upon</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>int</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>parameters</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The setting of the parameters</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>dict</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
                   <details class="quote">
                     <summary>Source code in <code>openml/setups/setup.py</code></summary>

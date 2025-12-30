@@ -1337,23 +1337,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" configure_field">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.cli.configure_field--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -1364,34 +1347,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label=" wait_until_valid_input">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#openml.cli.wait_until_valid_input--parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openml.cli.wait_until_valid_input--returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returns
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -2716,22 +2671,109 @@ then validated with <code>check_with_message</code> function.
 If the user input a wrong value in interactive mode, the user gets to input a new value.
 The new valid value is saved in the openml configuration file.
 In case an invalid <code>value</code> is supplied directly (non-interactive), no changes are made.</p>
-<h5 id="openml.cli.configure_field--parameters">Parameters<a class="headerlink" href="#openml.cli.configure_field--parameters" title="Permanent link">#</a></h5>
-<p>field: str
-    Field to set.
-value: str, None
-    Value to field to. If <code>None</code> will ask user for input.
-check_with_message: Callable[[str], str]
-    Function which validates <code>value</code> or user input, and returns either an error message if it
-    is invalid, or a False-like value if <code>value</code> is valid.
-intro_message: str
-    Message that is printed once if user input is requested (e.g. instructions).
-input_message: str
-    Message that comes with the input prompt.
-sanitize: Union[Callable[[str], str], None]
-    A function to convert user input to 'more acceptable' input, e.g. for auto-complete.
-    If no correction of user input is possible, return the original value.
-    If no function is provided, don't attempt to correct/auto-complete input.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>field</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Field to set.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>value</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Value to field to. If <code>None</code> will ask user for input.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>None | str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>check_with_message</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Function which validates <code>value</code> or user input, and returns either an error message if it
+is invalid, or a False-like value if <code>value</code> is valid.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Callable">Callable</span>[[str], str]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>intro_message</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Message that is printed once if user input is requested (e.g. instructions).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>input_message</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Message that comes with the input prompt.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>sanitize</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A function to convert user input to 'more acceptable' input, e.g. for auto-complete.
+If no correction of user input is possible, return the original value.
+If no function is provided, don't attempt to correct/auto-complete input.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Callable">Callable</span>[[str], str] | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/cli.py</code></summary>
@@ -2852,16 +2894,85 @@ sanitize: Union[Callable[[str], str], None]
     <div class="doc doc-contents ">
 
         <p>Asks <code>prompt</code> until an input is received which returns True for <code>check</code>.</p>
-<h5 id="openml.cli.wait_until_valid_input--parameters">Parameters<a class="headerlink" href="#openml.cli.wait_until_valid_input--parameters" title="Permanent link">#</a></h5>
-<p>prompt: str
-    message to display
-check: Callable[[str], str]
-    function to call with the given input, that provides an error message if the input is not
-    valid otherwise, and False-like otherwise.
-sanitize: Callable[[str], str], optional
-    A function which attempts to sanitize the user input (e.g. auto-complete).</p>
-<h5 id="openml.cli.wait_until_valid_input--returns">Returns<a class="headerlink" href="#openml.cli.wait_until_valid_input--returns" title="Permanent link">#</a></h5>
-<p>valid input</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>prompt</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>message to display</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code>str</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>check</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>function to call with the given input, that provides an error message if the input is not
+valid otherwise, and False-like otherwise.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Callable">Callable</span>[[str], str]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>sanitize</code></td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>A function which attempts to sanitize the user input (e.g. auto-complete).</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Callable">Callable</span>[[str], str] | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>valid input</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
             <details class="quote">
               <summary>Source code in <code>openml/cli.py</code></summary>
