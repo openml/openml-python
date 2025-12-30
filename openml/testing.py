@@ -99,13 +99,13 @@ class TestBase(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-        openml.config.apikey = TestBase.user_key
+        openml.config._config.apikey = TestBase.user_key
         self.production_server = "https://www.openml.org/api/v1/xml"
         openml.config.set_root_cache_directory(str(self.workdir))
 
         # Increase the number of retries to avoid spurious server failures
-        self.retry_policy = openml.config.retry_policy
-        self.connection_n_retries = openml.config.connection_n_retries
+        self.retry_policy = openml.config._config.retry_policy
+        self.connection_n_retries = openml.config._config.connection_n_retries
         openml.config.set_retry_policy("robot", n_retries=20)
 
     def use_production_server(self) -> None:
@@ -114,8 +114,8 @@ class TestBase(unittest.TestCase):
 
         Please use this sparingly - it is better to use the test server.
         """
-        openml.config.server = self.production_server
-        openml.config.apikey = ""
+        openml.config._config.server = self.production_server
+        openml.config._config.apikey = ""
 
     def tearDown(self) -> None:
         """Tear down the test"""
@@ -127,8 +127,8 @@ class TestBase(unittest.TestCase):
                 # one of the files may still be used by another process
                 raise e
 
-        openml.config.connection_n_retries = self.connection_n_retries
-        openml.config.retry_policy = self.retry_policy
+        openml.config._config.connection_n_retries = self.connection_n_retries
+        openml.config._config.retry_policy = self.retry_policy
 
     @classmethod
     def _mark_entity_for_removal(

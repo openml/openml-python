@@ -44,7 +44,7 @@ extension = SklearnExtension()
 # account (you don't need one for anything else, just to upload your results),
 # go to your profile and select the API-KEY.
 # Or log in, and navigate to https://www.openml.org/auth/api-key
-openml.config.apikey = ""
+openml.config._config.apikey = ""
 ############################################################################
 # Prepare for preprocessors and an OpenML task
 # ============================================
@@ -95,7 +95,7 @@ def objective(trial: optuna.Trial) -> Pipeline:
     run = openml.runs.run_model_on_task(pipe, task=task_id, avoid_duplicate_runs=False)
 
     logger.log(1, f"Model has been trained - {run}")
-    if openml.config.apikey != "":
+    if openml.config._config.apikey != "":
         try:
             run.publish()
 

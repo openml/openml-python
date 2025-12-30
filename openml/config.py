@@ -15,7 +15,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from io import StringIO
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any, Iterator, cast
 from typing_extensions import Literal
 from urllib.parse import urlparse
 
@@ -71,7 +71,7 @@ def _resolve_default_cache_dir() -> Path:
     return Path(xdg_cache_home)
 
 
-@dataclass(frozen=True)
+@dataclass
 class OpenMLConfig:
     apikey: str = ""
     server: str = "https://www.openml.org/api/v1/xml"
@@ -259,8 +259,11 @@ class ConfigurationForExamples:
             )
 
         global _config
-        _config = replace(_config, server=cls._test_server, apikey=cls._test_apikey)
-
+        _config = replace(
+            _config,
+            server=cast(str, cls._last_used_server),
+            apikey=cast(str, cls._last_used_key),
+        )
         cls._start_last_called = False
 
 
@@ -334,8 +337,8 @@ def _setup(config: dict[str, Any] | None = None) -> None:
 
     Reads the config file and sets up apikey, server, cache appropriately.
     key and server can be set by the user simply using
-    openml.config.apikey = THEIRKEY
-    openml.config.server = SOMESERVER
+    openml.config._config.apikey = THEIRKEY
+    openml.config._config.server = SOMESERVER
     We could also make it a property but that's less clear.
     """
     global _config
@@ -376,6 +379,7 @@ def _setup(config: dict[str, Any] | None = None) -> None:
         short_cache_dir = Path(config["cachedir"])
 
     _root_cache_directory = short_cache_dir.expanduser().resolve()
+    _config = replace(_config, cachedir=_root_cache_directory)
 
     try:
         cache_exists = _root_cache_directory.exists()

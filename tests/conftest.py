@@ -97,8 +97,8 @@ def delete_remote_files(tracker, flow_names) -> None:
     :param tracker: Dict
     :return: None
     """
-    openml.config.server = TestBase.test_server
-    openml.config.apikey = TestBase.user_key
+    openml.config._config.server = TestBase.test_server
+    openml.config._config.apikey = TestBase.user_key
 
     # reordering to delete sub flows at the end of flows
     # sub-flows have shorter names, hence, sorting by descending order of flow name length
@@ -263,8 +263,8 @@ def verify_cache_state(test_files_directory) -> Iterator[None]:
 
 @pytest.fixture(autouse=True, scope="session")
 def as_robot() -> Iterator[None]:
-    policy = openml.config.retry_policy
-    n_retries = openml.config.connection_n_retries
+    policy = openml.config._config.retry_policy
+    n_retries = openml.config._config.connection_n_retries
     openml.config.set_retry_policy("robot", n_retries=20)
     yield
     openml.config.set_retry_policy(policy, n_retries)
@@ -273,12 +273,12 @@ def as_robot() -> Iterator[None]:
 @pytest.fixture(autouse=True)
 def with_server(request):
     if "production" in request.keywords:
-        openml.config.server = "https://www.openml.org/api/v1/xml"
-        openml.config.apikey = None
+        openml.config._config.server = "https://www.openml.org/api/v1/xml"
+        openml.config._config.apikey = None
         yield
         return
-    openml.config.server = "https://test.openml.org/api/v1/xml"
-    openml.config.apikey = TestBase.user_key
+    openml.config._config.server = "https://test.openml.org/api/v1/xml"
+    openml.config._config.apikey = TestBase.user_key
     yield
 
 
