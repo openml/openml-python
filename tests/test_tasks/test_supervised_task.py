@@ -28,7 +28,6 @@ class OpenMLSupervisedTaskTest(OpenMLTaskTest):
     def setUp(self, n_levels: int = 1):
         super().setUp()
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_get_X_and_Y(self) -> tuple[pd.DataFrame, pd.Series]:
         task = get_task(self.task_id)
         X, Y = task.get_X_and_y()

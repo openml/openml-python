@@ -139,7 +139,6 @@ class TestTask(TestBase):
         # https://github.com/openml/openml-python/issues/378
         openml.tasks.get_task(34536)
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_get_task(self):
         task = openml.tasks.get_task(1, download_data=True)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
@@ -153,7 +152,6 @@ class TestTask(TestBase):
             os.path.join(self.workdir, "org", "openml", "test", "datasets", "1", "dataset.arff")
         )
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_get_task_lazy(self):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
@@ -194,7 +192,6 @@ class TestTask(TestBase):
         # Now the file should no longer exist
         assert not os.path.exists(os.path.join(os.getcwd(), "tasks", "1", "tasks.xml"))
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_get_task_with_cache(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         task = openml.tasks.get_task(1)
@@ -210,7 +207,6 @@ class TestTask(TestBase):
         # Issue 538, get_task failing with clustering task.
         openml.tasks.functions.get_task(126033)
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_download_split(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         split = task.download_split()

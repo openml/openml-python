@@ -303,7 +303,6 @@ def test_get_feature_with_ontology_data_id_11():
     assert len(dataset.features[2].ontologies) >= 1
     assert len(dataset.features[3].ontologies) >= 1   
 
-@pytest.mark.xfail(reason="failures_issue_1544")
 def test_add_remove_ontology_to_dataset():
     did = 1
     feature_index = 1
@@ -311,7 +310,6 @@ def test_add_remove_ontology_to_dataset():
     openml.datasets.functions.data_feature_add_ontology(did, feature_index, ontology)
     openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)    
 
-@pytest.mark.xfail(reason="failures_issue_1544")
 def test_add_same_ontology_multiple_features():
     did = 1
     ontology = "https://www.openml.org/unittest/" + str(time())

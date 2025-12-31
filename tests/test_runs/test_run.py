@@ -25,7 +25,6 @@ class TestRun(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take
     # less than 1 seconds
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_tagging(self):
         runs = openml.runs.list_runs(size=1)
         assert not runs.empty, "Test server state is incorrect"

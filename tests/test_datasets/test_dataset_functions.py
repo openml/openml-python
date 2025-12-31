@@ -244,7 +244,6 @@ class TestOpenMLDataset(TestBase):
         assert len(datasets) == 2
         _assert_datasets_retrieved_successfully([1, 2])
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_get_dataset_by_name(self):
         dataset = openml.datasets.get_dataset("anneal")
         assert type(dataset) == OpenMLDataset
@@ -263,7 +262,6 @@ class TestOpenMLDataset(TestBase):
         # test_get_dataset_lazy
         raise NotImplementedError
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_get_dataset_uint8_dtype(self):
         dataset = openml.datasets.get_dataset(1)
         assert type(dataset) == OpenMLDataset
@@ -282,7 +280,6 @@ class TestOpenMLDataset(TestBase):
         self.use_production_server()
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, "NAME_GOES_HERE")
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_get_dataset_lazy_all_functions(self):
         """Test that all expected functionality is available without downloading the dataset."""
         dataset = openml.datasets.get_dataset(1)
@@ -312,7 +309,6 @@ class TestOpenMLDataset(TestBase):
         assert classes == ["1", "2", "3", "4", "5", "U"]
         ensure_absence_of_real_data()
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_get_dataset_sparse(self):
         dataset = openml.datasets.get_dataset(102)
         X, *_ = dataset.get_data()
@@ -331,7 +327,6 @@ class TestOpenMLDataset(TestBase):
         description_xml_path = os.path.join(self.workdir, "description.xml")
         assert os.path.exists(description_xml_path)
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test__getarff_path_dataset_arff(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         description = _get_dataset_description(self.workdir, 2)
@@ -435,14 +430,12 @@ class TestOpenMLDataset(TestBase):
 
         openml.config.connection_n_retries = n
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test__get_dataset_features(self):
         features_file = _get_dataset_features_file(self.workdir, 2)
         assert isinstance(features_file, Path)
         features_xml_path = self.workdir / "features.xml"
         assert features_xml_path.exists()
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test__get_dataset_qualities(self):
         qualities = _get_dataset_qualities_file(self.workdir, 2)
         assert isinstance(qualities, Path)
@@ -513,7 +506,6 @@ class TestOpenMLDataset(TestBase):
         datasets_cache_dir = os.path.join(self.workdir, "org", "openml", "test", "datasets")
         assert len(os.listdir(datasets_cache_dir)) == 0
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_publish_dataset(self):
         # lazy loading not possible as we need the arff-file.
         openml.datasets.get_dataset(3, download_data=True)
@@ -861,7 +853,6 @@ class TestOpenMLDataset(TestBase):
         param["data"] = data[0]
         self.assertRaises(ValueError, create_dataset, **param)
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_get_online_dataset_arff(self):
         dataset_id = 100  # Australian
         # lazy loading not used as arff file is checked.
@@ -1341,7 +1332,6 @@ class TestOpenMLDataset(TestBase):
         assert isinstance(qualities, list) is True
         assert all(isinstance(q, str) for q in qualities) is True
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_get_dataset_cache_format_pickle(self):
         dataset = openml.datasets.get_dataset(1)
         dataset.get_data()
@@ -1357,7 +1347,6 @@ class TestOpenMLDataset(TestBase):
         assert len(categorical) == X.shape[1]
         assert len(attribute_names) == X.shape[1]
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_get_dataset_cache_format_feather(self):
         # This test crashed due to using the parquet file by default, which is downloaded
         # from minio. However, there is a mismatch between OpenML test server and minio IDs.
@@ -1390,7 +1379,6 @@ class TestOpenMLDataset(TestBase):
         assert len(categorical) == X.shape[1]
         assert len(attribute_names) == X.shape[1]
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_data_edit_non_critical_field(self):
         # Case 1
         # All users can edit non-critical fields of datasets
@@ -1412,7 +1400,6 @@ class TestOpenMLDataset(TestBase):
         edited_dataset = openml.datasets.get_dataset(did)
         assert edited_dataset.description == desc
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_data_edit_critical_field(self):
         # Case 2
         # only owners (or admin) can edit all critical fields of datasets
@@ -1461,7 +1448,6 @@ class TestOpenMLDataset(TestBase):
             description="xor operation dataset",
         )
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_data_edit_cannot_edit_critical_field_if_dataset_has_task(self):
         # Need to own a dataset to be able to edit meta-data
         # Will be creating a forked version of an existing dataset to allow the unit test user
@@ -1537,7 +1523,6 @@ class TestOpenMLDataset(TestBase):
         (None, None, ["wrong", "sunny"]),
     ],
 )
-@pytest.mark.xfail(reason="failures_issue_1544",strict=False)
 def test_invalid_attribute_validations(
     default_target_attribute,
     row_id_attribute,
@@ -1599,7 +1584,6 @@ def test_invalid_attribute_validations(
         (None, None, ["outlook", "windy"]),
     ],
 )
-@pytest.mark.xfail(reason="failures_issue_1544",strict=False)
 def test_valid_attribute_validations(default_target_attribute, row_id_attribute, ignore_attribute):
     data = [
         ["a", "sunny", 85.0, 85.0, "FALSE", "no"],
@@ -1818,7 +1802,6 @@ def test_list_datasets_by_number_instances(all_datasets: pd.DataFrame):
     _assert_datasets_have_id_and_valid_status(small_datasets)
 
 
-@pytest.mark.xfail(reason="failures_issue_1544")
 def test_list_datasets_by_number_features(all_datasets: pd.DataFrame):
     wide_datasets = openml.datasets.list_datasets(number_features="50..100")
     assert 8 <= len(wide_datasets) < len(all_datasets)
@@ -1831,14 +1814,12 @@ def test_list_datasets_by_number_classes(all_datasets: pd.DataFrame):
     _assert_datasets_have_id_and_valid_status(five_class_datasets)
 
 
-@pytest.mark.xfail(reason="failures_issue_1544")
 def test_list_datasets_by_number_missing_values(all_datasets: pd.DataFrame):
     na_datasets = openml.datasets.list_datasets(number_missing_values="5..100")
     assert 5 <= len(na_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(na_datasets)
 
 
-@pytest.mark.xfail(reason="failures_issue_1544")
 def test_list_datasets_combined_filters(all_datasets: pd.DataFrame):
     combined_filter_datasets = openml.datasets.list_datasets(
         tag="study_14",
@@ -1911,7 +1892,6 @@ def isolate_for_test():
     ("with_data", "with_qualities", "with_features"),
     itertools.product([True, False], repeat=3),
 )
-@pytest.mark.xfail(reason="failures_issue_1544")
 def test_get_dataset_lazy_behavior(
     isolate_for_test, with_data: bool, with_qualities: bool, with_features: bool
 ):

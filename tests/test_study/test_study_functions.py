@@ -148,7 +148,6 @@ class TestStudyFunctions(TestBase):
         self._test_publish_empty_study_is_allowed(explicit=False)
 
     @pytest.mark.flaky()
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_publish_study(self):
         # get some random runs to attach
         run_list = openml.evaluations.list_evaluations("predictive_accuracy", size=10)
@@ -218,7 +217,6 @@ class TestStudyFunctions(TestBase):
         res = openml.study.delete_study(study.id)
         assert res
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_study_attach_illegal(self):
         run_list = openml.runs.list_runs(size=10)
         assert len(run_list) == 10
