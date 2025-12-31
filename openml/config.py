@@ -160,14 +160,6 @@ def __getattr__(name: str) -> Any:
     raise AttributeError(f"module 'openml.config' has no attribute '{name}'")
 
 
-def __setattr__(name: str, value: Any) -> None:  # noqa: N807
-    global _config
-    if hasattr(_config, name):
-        _config = replace(_config, **{name: value})
-    else:
-        raise AttributeError(f"module 'openml.config' has no attribute '{name}'")
-
-
 def get_server_base_url() -> str:
     """Return the base URL of the currently configured server.
 
