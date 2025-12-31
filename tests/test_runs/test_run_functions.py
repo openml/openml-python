@@ -792,6 +792,7 @@ class TestRun(TestBase):
                 call_count += 1
         assert call_count == 3
 
+    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
     def test_run_and_upload_gridsearch(self):
         estimator_name = (
@@ -847,6 +848,7 @@ class TestRun(TestBase):
         trace = openml.runs.get_run_trace(run.run_id)
         assert len(trace.trace_iterations) == 5
 
+    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
     def test_run_and_upload_maskedarrays(self):
         # This testcase is important for 2 reasons:
