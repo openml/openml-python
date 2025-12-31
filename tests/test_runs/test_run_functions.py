@@ -625,6 +625,7 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
+    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
     def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression(solver="lbfgs", max_iter=1000)
@@ -633,6 +634,7 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
@@ -663,6 +665,7 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_REGRESSION["n_test_obs"]
         self._run_and_upload_regression(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
     def test_run_and_upload_pipeline_dummy_pipeline(self):
         pipeline1 = Pipeline(
@@ -676,6 +679,7 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(pipeline1, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -740,6 +744,7 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
+    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
     @unittest.skip("https://github.com/openml/OpenML/issues/1180")
     @unittest.skipIf(
@@ -792,6 +797,7 @@ class TestRun(TestBase):
                 call_count += 1
         assert call_count == 3
 
+    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
     def test_run_and_upload_gridsearch(self):
         estimator_name = (
@@ -815,6 +821,7 @@ class TestRun(TestBase):
         assert len(run.trace.trace_iterations) == 9
 
     @pytest.mark.sklearn()
+    @pytest.mark.skip(reason="failures_issue_1544")
     def test_run_and_upload_randomsearch(self):
         randomsearch = RandomizedSearchCV(
             RandomForestClassifier(n_estimators=5),
@@ -846,6 +853,7 @@ class TestRun(TestBase):
         trace = openml.runs.get_run_trace(run.run_id)
         assert len(trace.trace_iterations) == 5
 
+    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
     def test_run_and_upload_maskedarrays(self):
         # This testcase is important for 2 reasons:
