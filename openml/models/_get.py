@@ -1,0 +1,63 @@
+
+"""Model retrieval utility."""
+
+from functools import lru_cache
+
+
+def get(id: str):
+    """Retrieve model object with unique identifier.
+
+    Parameter
+    ---------
+    id : str
+        unique identifier of object to retrieve
+
+    Returns
+    -------
+    class
+        retrieved object
+
+    Raises
+    ------
+    ModuleNotFoundError
+        if dependencies of object to retrieve are not satisfied
+    """
+
+    id_lookup = _id_lookup()
+    obj = id_lookup.get(id)
+    if obj is None:
+        raise ValueError(
+            f"Error in openml.get, object with package id {id} "
+            "does not exist."
+        )
+    return obj().materialize()
+
+
+# todo: need to generalize this later to more types
+# currently intentionally retrieves only classifiers
+# todo: replace this, optionally, by database backend
+def _id_lookup(obj_type=None):
+    return _id_lookup_cached(obj_type=obj_type).copy()
+
+
+@lru_cache
+def _id_lookup_cached(obj_type=None):
+    all_objs = _all_objects(obj_type=obj_type)
+
+    # todo: generalize that pkg can contain more than one object
+    lookup_dict = {obj.get_class_tag("pkg_id"): obj for obj in all_objs}
+
+    return lookup_dict
+
+
+@lru_cache
+def _all_objects(obj_type=None):
+    from skbase.lookup import all_objects
+
+    from openml.models.apis._classifier import _ModelPkgClassifier
+
+    clses = all_objects(
+        object_types=_ModelPkgClassifier, package_name="openml", return_names=False
+    )
+
+    return clses

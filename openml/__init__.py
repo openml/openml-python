@@ -48,6 +48,7 @@ from .tasks import (
     OpenMLSupervisedTask,
     OpenMLTask,
 )
+from openml._get import get
 
 
 def populate_cache(
@@ -120,4 +121,5 @@ __all__ = [
     "utils",
     "_api_calls",
     "__version__",
+    "get",
 ]
