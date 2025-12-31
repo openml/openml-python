@@ -1,16 +1,17 @@
 """Base Packager class."""
 
+from __future__ import annotations
+
 import inspect
-from pathlib import Path
 import sys
 import textwrap
+from pathlib import Path
 
 from skbase.base import BaseObject
 from skbase.utils.dependencies import _check_estimator_deps
 
 
 class _BasePkg(BaseObject):
-
     _tags = {
         "python_dependencies": None,
         "python_version": None,
@@ -50,15 +51,11 @@ class _BasePkg(BaseObject):
 
         cls_str = cls_str.encode("utf-8")
         exec(f"import {compress_method}")
-        compressed_str = eval(f"{compress_method}.compress(cls_str)")
-
-        return compressed_str
+        return eval(f"{compress_method}.compress(cls_str)")
 
 
 def _has_source(obj) -> bool:
-    """
-    Return True if inspect.getsource(obj) should succeed.
-    """
+    """Return True if inspect.getsource(obj) should succeed."""
     module_name = getattr(obj, "__module__", None)
     if not module_name or module_name not in sys.modules:
         return False
@@ -82,7 +79,7 @@ def class_to_source(cls) -> str:
     -------
     str : complete definition of cls, as str.
         Imports are not contained or serialized.
-    """""
+    """ ""
 
     # Fast path: class has retrievable source
     if _has_source(cls):
@@ -111,7 +108,7 @@ def class_to_source(cls) -> str:
                 lines.append(f"    def {name}(self): ...")
             body_added = True
         else:
-            lines.append(f"    {name} = {repr(value)}")
+            lines.append(f"    {name} = {value!r}")
             body_added = True
 
     if not body_added:

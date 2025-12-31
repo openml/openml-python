@@ -18,6 +18,8 @@ In particular, this module implements a python interface for the
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from openml._get import get
+
 from . import (
     _api_calls,
     config,
@@ -48,7 +50,6 @@ from .tasks import (
     OpenMLSupervisedTask,
     OpenMLTask,
 )
-from openml._get import get
 
 
 def populate_cache(

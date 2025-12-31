@@ -1,5 +1,6 @@
-
 """Model retrieval utility."""
+
+from __future__ import annotations
 
 from functools import lru_cache
 
@@ -22,14 +23,10 @@ def get(id: str):
     ModuleNotFoundError
         if dependencies of object to retrieve are not satisfied
     """
-
     id_lookup = _id_lookup()
     obj = id_lookup.get(id)
     if obj is None:
-        raise ValueError(
-            f"Error in openml.get, object with package id {id} "
-            "does not exist."
-        )
+        raise ValueError(f"Error in openml.get, object with package id {id} " "does not exist.")
     return obj().materialize()
 
 
@@ -45,9 +42,7 @@ def _id_lookup_cached(obj_type=None):
     all_objs = _all_objects(obj_type=obj_type)
 
     # todo: generalize that pkg can contain more than one object
-    lookup_dict = {obj.get_class_tag("pkg_id"): obj for obj in all_objs}
-
-    return lookup_dict
+    return {obj.get_class_tag("pkg_id"): obj for obj in all_objs}
 
 
 @lru_cache
@@ -56,8 +51,4 @@ def _all_objects(obj_type=None):
 
     from openml.models.apis._classifier import _ModelPkgClassifier
 
-    clses = all_objects(
-        object_types=_ModelPkgClassifier, package_name="openml", return_names=False
-    )
-
-    return clses
+    return all_objects(object_types=_ModelPkgClassifier, package_name="openml", return_names=False)

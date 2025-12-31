@@ -1,10 +1,11 @@
 """Base model package class."""
 
+from __future__ import annotations
+
 from openml.base import _BasePkg
 
 
 class _OpenmlModelPkg(_BasePkg):
-
     _obj = None
 
     def _materialize(self):
@@ -22,10 +23,9 @@ class _OpenmlModelPkg(_BasePkg):
         if pkg_obj == "reference":
             from skbase.utils.dependencies import _safe_import
 
-            obj = _safe_import(self._obj)
-            return obj
+            return _safe_import(self._obj)
 
-        elif pkg_obj == "code":
+        if pkg_obj == "code":
             exec(self._obj)
 
             return obj
@@ -33,9 +33,8 @@ class _OpenmlModelPkg(_BasePkg):
         # elif pkg_obj == "craft":
         #    identify and call appropriate craft method
 
-        else:
-            raise ValueError(
-                'Error in package tag "pkg_obj", '
-                'must be one of "reference", "code", "craft", '
-                f'but found value {pkg_obj}, of type {type(pkg_obj)}'
-            )
+        raise ValueError(
+            'Error in package tag "pkg_obj", '
+            'must be one of "reference", "code", "craft", '
+            f"but found value {pkg_obj}, of type {type(pkg_obj)}"
+        )

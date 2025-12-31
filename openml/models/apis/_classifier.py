@@ -1,10 +1,11 @@
 """Base package for sklearn classifiers."""
 
+from __future__ import annotations
+
 from openml.models.base import _OpenmlModelPkg
 
 
 class _ModelPkgClassifier(_OpenmlModelPkg):
-
     _tags = {
         # tags specific to API type
         "pkg_obj_type": "classifier",
