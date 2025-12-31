@@ -4,6 +4,7 @@ from __future__ import annotations
 import ast
 
 import pandas as pd
+import pytest
 
 import openml
 from openml.exceptions import OpenMLServerException
