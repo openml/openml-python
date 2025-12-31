@@ -6,6 +6,7 @@ import unittest
 import pandas as pd
 
 from openml.tasks import get_task
+import pytest
 
 from .test_task import OpenMLTaskTest
 
