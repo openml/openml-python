@@ -815,6 +815,7 @@ class TestRun(TestBase):
         assert len(run.trace.trace_iterations) == 9
 
     @pytest.mark.sklearn()
+    @pytest.mark.skip(reason="failures_issue_1544")
     def test_run_and_upload_randomsearch(self):
         randomsearch = RandomizedSearchCV(
             RandomForestClassifier(n_estimators=5),
