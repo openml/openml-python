@@ -4,6 +4,8 @@ from __future__ import annotations
 import unittest
 from random import randint, shuffle
 
+import pytest
+
 from openml.datasets import (
     get_dataset,
     list_datasets,
