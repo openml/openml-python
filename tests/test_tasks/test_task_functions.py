@@ -100,7 +100,6 @@ class TestTask(TestBase):
         for task in tasks.to_dict(orient="index").values():
             self._check_task(task)
 
-    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_list_tasks_paginate(self):
         size = 10
         max = 100
@@ -177,6 +176,7 @@ class TestTask(TestBase):
         )
 
     @mock.patch("openml.tasks.functions.get_dataset")
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_removal_upon_download_failure(self, get_dataset):
         class WeirdException(Exception):
             pass

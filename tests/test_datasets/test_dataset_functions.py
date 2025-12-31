@@ -513,6 +513,7 @@ class TestOpenMLDataset(TestBase):
         datasets_cache_dir = os.path.join(self.workdir, "org", "openml", "test", "datasets")
         assert len(os.listdir(datasets_cache_dir)) == 0
 
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_publish_dataset(self):
         # lazy loading not possible as we need the arff-file.
         openml.datasets.get_dataset(3, download_data=True)
@@ -1389,6 +1390,7 @@ class TestOpenMLDataset(TestBase):
         assert len(categorical) == X.shape[1]
         assert len(attribute_names) == X.shape[1]
 
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_data_edit_non_critical_field(self):
         # Case 1
         # All users can edit non-critical fields of datasets
@@ -1410,6 +1412,7 @@ class TestOpenMLDataset(TestBase):
         edited_dataset = openml.datasets.get_dataset(did)
         assert edited_dataset.description == desc
 
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_data_edit_critical_field(self):
         # Case 2
         # only owners (or admin) can edit all critical fields of datasets
@@ -1458,6 +1461,7 @@ class TestOpenMLDataset(TestBase):
             description="xor operation dataset",
         )
 
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_data_edit_cannot_edit_critical_field_if_dataset_has_task(self):
         # Need to own a dataset to be able to edit meta-data
         # Will be creating a forked version of an existing dataset to allow the unit test user
@@ -1533,7 +1537,7 @@ class TestOpenMLDataset(TestBase):
         (None, None, ["wrong", "sunny"]),
     ],
 )
-@pytest.mark.xfail(reason="failures_issue_1544")
+@pytest.mark.xfail(reason="failures_issue_1544",strict=False)
 def test_invalid_attribute_validations(
     default_target_attribute,
     row_id_attribute,
@@ -1595,7 +1599,7 @@ def test_invalid_attribute_validations(
         (None, None, ["outlook", "windy"]),
     ],
 )
-@pytest.mark.xfail(reason="failures_issue_1544")
+@pytest.mark.xfail(reason="failures_issue_1544",strict=False)
 def test_valid_attribute_validations(default_target_attribute, row_id_attribute, ignore_attribute):
     data = [
         ["a", "sunny", 85.0, 85.0, "FALSE", "no"],

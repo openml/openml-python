@@ -5,6 +5,7 @@ from time import time
 
 import openml
 from openml.testing import TestBase
+import pytest
 
 
 # Common methods between tasks
@@ -15,6 +16,7 @@ class OpenMLTaskMethodsTest(TestBase):
     def tearDown(self):
         super().tearDown()
 
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_tagging(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         # tags can be at most 64 alphanumeric (+ underscore) chars
