@@ -72,10 +72,10 @@ class OpenMLTask(OpenMLBase):
 
     def __init__(  # noqa: PLR0913
         self,
+        task_id: int | None,
         task_type_id: TaskType,
         task_type: str,
         data_set_id: int,
-        task_id: int | None = None,
         estimation_procedure_id: int | None = None,
         estimation_procedure_type: str | None = None,
         estimation_parameters: dict[str, str] | None = None,

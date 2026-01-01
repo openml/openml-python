@@ -590,6 +590,7 @@ def create_task(
         raise NotImplementedError(f"Task type {task_type:d} not supported.")
 
     return task_cls(
+        task_id=None,
         task_type_id=task_type,
         task_type="None",  # TODO: refactor to get task type string from ID.
         data_set_id=dataset_id,
