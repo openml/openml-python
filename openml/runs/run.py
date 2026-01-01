@@ -4,12 +4,11 @@ from __future__ import annotations
 import pickle
 import time
 from collections import OrderedDict
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Sequence,
 )
 
 import arff
@@ -532,7 +531,7 @@ class OpenMLRun(OpenMLBase):
         if task.task_type_id == TaskType.SUPERVISED_REGRESSION and "truth" not in attribute_names:
             raise ValueError('Attribute "truth" should be set for regression task runs')
         if task.task_type_id != TaskType.CLUSTERING and "prediction" not in attribute_names:
-            raise ValueError('Attribute "predict" should be set for supervised task runs')
+            raise ValueError('Attribute "prediction" should be set for supervised task runs')
 
         def _attribute_list_to_dict(attribute_list):  # type: ignore
             # convenience function: Creates a mapping to map from the name of
