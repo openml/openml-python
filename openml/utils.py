@@ -4,10 +4,11 @@ from __future__ import annotations
 import contextlib
 import shutil
 import warnings
+from collections.abc import Callable, Mapping, Sized
 from functools import wraps
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Mapping, Sized, TypeVar, overload
-from typing_extensions import Literal, ParamSpec
+from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
+from typing_extensions import ParamSpec
 
 import numpy as np
 import xmltodict

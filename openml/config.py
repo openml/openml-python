@@ -10,11 +10,12 @@ import os
 import platform
 import shutil
 import warnings
+from collections.abc import Iterator
 from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
-from typing import Any, Iterator, cast
-from typing_extensions import Literal, TypedDict
+from typing import Any, Literal, cast
+from typing_extensions import TypedDict
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)

@@ -9,8 +9,7 @@ from collections import OrderedDict
 from functools import partial
 from pathlib import Path
 from pyexpat import ExpatError
-from typing import TYPE_CHECKING, Any
-from typing_extensions import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import arff
 import minio.error

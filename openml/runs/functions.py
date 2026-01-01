@@ -608,7 +608,7 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
                         index=tst_idx,
                         prediction=prediction,
                         truth=truth,
-                        proba=dict(zip(task.class_labels, pred_prob)),
+                        proba=dict(zip(task.class_labels, pred_prob, strict=False)),
                     )
                 else:
                     raise ValueError("The task has no class labels")

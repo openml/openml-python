@@ -166,7 +166,11 @@ class TestBase(unittest.TestCase):
                 delete_index = next(
                     i
                     for i, (id_, _) in enumerate(
-                        zip(TestBase.publish_tracker[entity_type], TestBase.flow_name_tracker),
+                        zip(
+                            TestBase.publish_tracker[entity_type],
+                            TestBase.flow_name_tracker,
+                            strict=False,
+                        ),
                     )
                     if id_ == entity
                 )
