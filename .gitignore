@@ -88,6 +88,8 @@ target/
 .idea
 *.swp
 .vscode
+.cursorignore
+.cursorindexingignore
 
 # MYPY
 .mypy_cache
@@ -97,3 +99,6 @@ dmypy.sock
 # Tests
 .pytest_cache
 .venv
+
+# Ruff
+.ruff-cache/

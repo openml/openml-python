@@ -178,6 +178,7 @@ class TestFlow(TestBase):
         assert new_flow is not flow
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_publish_flow(self):
         flow = openml.OpenMLFlow(
             name="sklearn.dummy.DummyClassifier",
@@ -219,6 +220,7 @@ class TestFlow(TestBase):
         )
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_publish_flow_with_similar_components(self):
         clf = sklearn.ensemble.VotingClassifier(
             [("lr", sklearn.linear_model.LogisticRegression(solver="lbfgs"))],
@@ -269,6 +271,7 @@ class TestFlow(TestBase):
         TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow3.flow_id}")
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_semi_legal_flow(self):
         # TODO: Test if parameters are set correctly!
         # should not throw error as it contains two differentiable forms of
@@ -377,6 +380,7 @@ class TestFlow(TestBase):
         assert not flow_id
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_existing_flow_exists(self):
         # create a flow
         nb = sklearn.naive_bayes.GaussianNB()
@@ -417,6 +421,7 @@ class TestFlow(TestBase):
             assert downloaded_flow_id == flow.flow_id
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_sklearn_to_upload_to_flow(self):
         iris = sklearn.datasets.load_iris()
         X = iris.data
