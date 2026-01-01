@@ -1301,3 +1301,21 @@ def delete_run(run_id: int) -> bool:
         True if the deletion was successful. False otherwise.
     """
     return openml.utils._delete_entity("run", run_id)
+
+
+def delete_run_cache(run_id: int) -> None:
+    """Delete the cache directory for a specific run.
+
+    Parameters
+    ----------
+    run_id : int
+        Run ID (integer).
+    """
+    if isinstance(run_id, str):
+        try:
+            run_id = int(run_id)
+        except ValueError:
+            raise ValueError("Run ID should be an integer") from None
+
+    run_cache_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id)
+    openml.utils._remove_cache_dir_for_id(RUNS_CACHE_DIR_NAME, run_cache_dir)

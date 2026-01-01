@@ -614,3 +614,21 @@ def delete_task(task_id: int) -> bool:
         True if the deletion was successful. False otherwise.
     """
     return openml.utils._delete_entity("task", task_id)
+
+
+def delete_task_cache(task_id: int) -> None:
+    """Delete the cache directory for a specific task.
+
+    Parameters
+    ----------
+    task_id : int
+        Task ID (integer).
+    """
+    if isinstance(task_id, str):
+        try:
+            task_id = int(task_id)
+        except ValueError:
+            raise ValueError("Task ID should be an integer") from None
+
+    tid_cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
+    openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)

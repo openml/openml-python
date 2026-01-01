@@ -1461,3 +1461,21 @@ def delete_dataset(dataset_id: int) -> bool:
         True if the deletion was successful. False otherwise.
     """
     return openml.utils._delete_entity("data", dataset_id)
+
+
+def delete_dataset_cache(dataset_id: int | str) -> None:
+    """Delete the cache directory for a specific dataset.
+
+    Parameters
+    ----------
+    dataset_id : int | str
+        Dataset ID (integer) or dataset name (string).
+    """
+    if isinstance(dataset_id, str):
+        try:
+            dataset_id = int(dataset_id)
+        except ValueError:
+            dataset_id = _name_to_id(str(dataset_id))
+
+    did_cache_dir = _get_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, dataset_id)
+    _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, did_cache_dir)
