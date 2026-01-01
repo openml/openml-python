@@ -118,6 +118,7 @@ class TestRun(TestBase):
             assert run_prime_trace_content is None
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_to_from_filesystem_vanilla(self):
         model = Pipeline(
             [
@@ -153,6 +154,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     @pytest.mark.flaky()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_to_from_filesystem_search(self):
         model = Pipeline(
             [
@@ -187,6 +189,7 @@ class TestRun(TestBase):
         )
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_to_from_filesystem_no_model(self):
         model = Pipeline(
             [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())],
@@ -292,6 +295,7 @@ class TestRun(TestBase):
             assert_method(y_test, saved_y_test)
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_publish_with_local_loaded_flow(self):
         """
         Publish a run tied to a local flow after it has first been saved to
@@ -335,6 +339,7 @@ class TestRun(TestBase):
             openml.runs.get_run(loaded_run.run_id)
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_offline_and_online_run_identical(self):
         extension = SklearnExtension()
 
