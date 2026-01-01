@@ -177,14 +177,14 @@ r = np.random.rand(150 * n_repeats, 3)  # noqa: NPY002
 y_proba = r / r.sum(axis=1).reshape(-1, 1)
 y_pred = y_proba.argmax(axis=1)
 
-class_map = dict(zip(range(3), task.class_labels))
+class_map = dict(zip(range(3), task.class_labels, strict=False))
 _, y_true = task.get_X_and_y()
 y_true = [class_map[y] for y in y_true]
 
 # We format the predictions with the utility function `format_prediction`.
 # It will organize the relevant data in the expected format/order.
 predictions = []
-for where, y, yp, proba in zip(all_test_indices, y_true, y_pred, y_proba):
+for where, y, yp, proba in zip(all_test_indices, y_true, y_pred, y_proba, strict=False):
     repeat, fold, index = where
 
     prediction = format_prediction(
@@ -194,7 +194,7 @@ for where, y, yp, proba in zip(all_test_indices, y_true, y_pred, y_proba):
         index=index,
         prediction=class_map[yp],
         truth=y,
-        proba=dict(zip(task.class_labels, proba)),
+        proba=dict(zip(task.class_labels, proba, strict=False)),
     )
     predictions.append(prediction)
 

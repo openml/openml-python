@@ -7,9 +7,9 @@ import os
 import pickle
 import re
 import warnings
+from collections.abc import Iterable, Sequence
 from pathlib import Path
-from typing import Any, Iterable, Sequence
-from typing_extensions import Literal
+from typing import Any, Literal
 
 import arff
 import numpy as np
@@ -766,8 +766,8 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
             logger.info(f"Going to remove the following attributes: {to_exclude}")
             keep = np.array([column not in to_exclude for column in attribute_names])
             data = data.drop(columns=to_exclude)
-            categorical_mask = [cat for cat, k in zip(categorical_mask, keep) if k]
-            attribute_names = [att for att, k in zip(attribute_names, keep) if k]
+            categorical_mask = [cat for cat, k in zip(categorical_mask, keep, strict=False) if k]
+            attribute_names = [att for att, k in zip(attribute_names, keep, strict=False) if k]
 
         if target is None:
             return data, None, categorical_mask, attribute_names

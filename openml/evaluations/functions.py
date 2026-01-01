@@ -5,8 +5,8 @@ from __future__ import annotations
 import json
 from functools import partial
 from itertools import chain
-from typing import Any
-from typing_extensions import Literal, overload
+from typing import Any, Literal
+from typing_extensions import overload
 
 import numpy as np
 import pandas as pd

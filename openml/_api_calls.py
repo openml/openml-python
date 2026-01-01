@@ -12,7 +12,6 @@ import urllib.parse
 import xml
 import zipfile
 from pathlib import Path
-from typing import Dict, Tuple, Union
 
 import minio
 import requests
@@ -33,8 +32,8 @@ from .utils import ProgressBar
 
 _HEADERS = {"user-agent": f"openml-python/{__version__}"}
 
-DATA_TYPE = Dict[str, Union[str, int]]
-FILE_ELEMENTS_TYPE = Dict[str, Union[str, Tuple[str, str]]]
+DATA_TYPE = dict[str, str | int]
+FILE_ELEMENTS_TYPE = dict[str, str | tuple[str, str]]
 DATABASE_CONNECTION_ERRCODE = 107
 
 API_TOKEN_HELP_LINK = "https://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/#authentication"  # noqa: S105

@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
+from collections.abc import Hashable, Sequence
 from pathlib import Path
-from typing import Any, Hashable, Sequence, cast
+from typing import Any, cast
 
 import xmltodict
 

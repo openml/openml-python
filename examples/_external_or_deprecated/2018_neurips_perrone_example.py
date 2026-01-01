@@ -235,9 +235,9 @@ def random_sample_configurations(num_samples=100):
     X = pd.DataFrame(np.nan, index=range(num_samples), columns=colnames)
     for i in range(len(colnames)):
         if len(ranges[i]) == 2:
-            col_val = np.random.uniform(low=ranges[i][0], high=ranges[i][1], size=num_samples)
+            col_val = np.random.uniform(low=ranges[i][0], high=ranges[i][1], size=num_samples)  # noqa: NPY002
         else:
-            col_val = np.random.choice(ranges[i], size=num_samples)
+            col_val = np.random.choice(ranges[i], size=num_samples)  # noqa: NPY002
         X.iloc[:, i] = col_val
     return X
 

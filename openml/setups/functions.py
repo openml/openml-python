@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+from collections.abc import Iterable
 from functools import partial
 from itertools import chain
 from pathlib import Path
-from typing import Any, Iterable
-from typing_extensions import Literal
+from typing import Any, Literal
 
 import pandas as pd
 import xmltodict

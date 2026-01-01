@@ -3,9 +3,10 @@ from __future__ import annotations
 
 import json
 from collections import OrderedDict
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import IO, Any, Iterator
+from typing import IO, Any
 from typing_extensions import Self
 
 import arff

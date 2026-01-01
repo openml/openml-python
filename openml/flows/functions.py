@@ -5,7 +5,7 @@ import os
 import re
 from collections import OrderedDict
 from functools import partial
-from typing import Any, Dict
+from typing import Any
 
 import dateutil.parser
 import pandas as pd
@@ -417,7 +417,7 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
         attr1 = getattr(flow1, key, None)
         attr2 = getattr(flow2, key, None)
         if key == "components":
-            if not (isinstance(attr1, Dict) and isinstance(attr2, Dict)):
+            if not (isinstance(attr1, dict) and isinstance(attr2, dict)):
                 raise TypeError("Cannot compare components because they are not dictionary.")
 
             for name in set(attr1.keys()).union(attr2.keys()):
@@ -493,8 +493,8 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
                 # iterating over the parameter's meta info list
                 for param in params1:
                     if (
-                        isinstance(flow1.parameters_meta_info[param], Dict)
-                        and isinstance(flow2.parameters_meta_info[param], Dict)
+                        isinstance(flow1.parameters_meta_info[param], dict)
+                        and isinstance(flow2.parameters_meta_info[param], dict)
                         and "data_type" in flow1.parameters_meta_info[param]
                         and "data_type" in flow2.parameters_meta_info[param]
                     ):
