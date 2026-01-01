@@ -276,8 +276,6 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         evaluation_measure: str | None = None,
         data_splits_url: str | None = None,
         task_id: int | None = None,
-        class_labels: list[str] | None = None,
-        cost_matrix: np.ndarray | None = None,
     ):
         resolved_estimation_procedure_id = self._resolve_estimation_procedure_id(
             estimation_procedure_id,
@@ -294,11 +292,6 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
             data_splits_url=data_splits_url,
             target_name=target_name,
         )
-
-        self.class_labels = class_labels
-        self.cost_matrix = cost_matrix
-        if cost_matrix is not None:
-            raise NotImplementedError("Costmatrix")
 
     def get_X_and_y(self) -> tuple[pd.DataFrame, pd.Series | pd.DataFrame | None]:
         """Get data associated with the current task.
@@ -349,6 +342,26 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
 
     Parameters
     ----------
+    task_id : Union[int, None]
+        ID of the Classification task (if it already exists on OpenML).
+    task_type_id : TaskType
+        ID of the Classification task type.
+    task_type : str
+        Name of the Classification task type.
+    data_set_id : int
+        ID of the OpenML dataset associated with the Classification task.
+    target_name : str
+        Name of the target variable.
+    estimation_procedure_id : int, default=1
+        ID of the estimation procedure for the Classification task.
+    estimation_procedure_type : str, default=None
+        Type of the estimation procedure.
+    estimation_parameters : dict, default=None
+        Estimation parameters for the Classification task.
+    evaluation_measure : str, default=None
+        Name of the evaluation measure.
+    data_splits_url : str, default=None
+        URL of the data splits for the Classification task.
     class_labels : List of str, default=None
         A list of class labels (for classification tasks).
     cost_matrix : array, default=None
@@ -357,12 +370,46 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
 
     DEFAULT_ESTIMATION_PROCEDURE_ID: ClassVar[int] = 1
 
+    def __init__(  # noqa: PLR0913
+        self,
+        task_type_id: TaskType,
+        task_type: str,
+        data_set_id: int,
+        target_name: str,
+        estimation_procedure_id: int | None = None,
+        estimation_procedure_type: str | None = None,
+        estimation_parameters: dict[str, str] | None = None,
+        evaluation_measure: str | None = None,
+        data_splits_url: str | None = None,
+        task_id: int | None = None,
+        class_labels: list[str] | None = None,
+        cost_matrix: np.ndarray | None = None,
+    ):
+        super().__init__(
+            task_type_id=task_type_id,
+            task_type=task_type,
+            data_set_id=data_set_id,
+            target_name=target_name,
+            estimation_procedure_id=estimation_procedure_id,
+            estimation_procedure_type=estimation_procedure_type,
+            estimation_parameters=estimation_parameters,
+            evaluation_measure=evaluation_measure,
+            data_splits_url=data_splits_url,
+            task_id=task_id,
+        )
+        self.class_labels = class_labels
+        self.cost_matrix = cost_matrix
+        if cost_matrix is not None:
+            raise NotImplementedError("Costmatrix")
+
 
 class OpenMLRegressionTask(OpenMLSupervisedTask):
     """OpenML Regression object.
 
     Parameters
     ----------
+    task_id : Union[int, None]
+        ID of the OpenML Regression task.
     task_type_id : TaskType
         Task type ID of the OpenML Regression task.
     task_type : str
@@ -371,7 +418,7 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
         ID of the OpenML dataset.
     target_name : str
         Name of the target feature used in the Regression task.
-    estimation_procedure_id : int, default=None
+    estimation_procedure_id : int, default=7
         ID of the OpenML estimation procedure.
     estimation_procedure_type : str, default=None
         Type of the OpenML estimation procedure.
@@ -379,8 +426,6 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
         Parameters used by the OpenML estimation procedure.
     data_splits_url : str, default=None
         URL of the OpenML data splits for the Regression task.
-    task_id : Union[int, None]
-        ID of the OpenML Regression task.
     evaluation_measure : str, default=None
         Evaluation measure used in the Regression task.
     """
@@ -393,16 +438,16 @@ class OpenMLClusteringTask(OpenMLTask):
 
     Parameters
     ----------
+    task_id : Union[int, None]
+        ID of the OpenML clustering task.
     task_type_id : TaskType
         Task type ID of the OpenML clustering task.
     task_type : str
         Task type of the OpenML clustering task.
     data_set_id : int
         ID of the OpenML dataset used in clustering the task.
-    estimation_procedure_id : int, default=None
+    estimation_procedure_id : int, default=17
         ID of the OpenML estimation procedure.
-    task_id : Union[int, None]
-        ID of the OpenML clustering task.
     estimation_procedure_type : str, default=None
         Type of the OpenML estimation procedure used in the clustering task.
     estimation_parameters : dict, default=None
@@ -452,6 +497,8 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
 
     Parameters
     ----------
+    task_id : Union[int, None]
+        ID of the Learning Curve task.
     task_type_id : TaskType
         ID of the Learning Curve task.
     task_type : str
@@ -460,7 +507,7 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
         ID of the dataset that this task is associated with.
     target_name : str
         Name of the target feature in the dataset.
-    estimation_procedure_id : int, default=None
+    estimation_procedure_id : int, default=13
         ID of the estimation procedure to use for evaluating models.
     estimation_procedure_type : str, default=None
         Type of the estimation procedure.
@@ -468,8 +515,6 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
         Additional parameters for the estimation procedure.
     data_splits_url : str, default=None
         URL of the file containing the data splits for Learning Curve task.
-    task_id : Union[int, None]
-        ID of the Learning Curve task.
     evaluation_measure : str, default=None
         Name of the evaluation measure to use for evaluating models.
     class_labels : list of str, default=None
