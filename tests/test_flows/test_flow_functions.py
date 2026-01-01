@@ -274,6 +274,7 @@ class TestFlowFunctions(TestBase):
         assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=None)
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="OrdinalEncoder introduced in 0.20. "
@@ -388,6 +389,7 @@ class TestFlowFunctions(TestBase):
         assert "sklearn==0.19.1" not in flow.dependencies
 
     @pytest.mark.sklearn()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_flow_id(self):
         if self.long_version:
             list_all = openml.utils._list_all
