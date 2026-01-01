@@ -420,7 +420,11 @@ class OpenMLDataset(OpenMLBase):
             file_size = filepath.stat().st_size
             if file_size > MB_120:
                 raise NotImplementedError(
-                    f"File {filename} too big for {file_size}-bit system ({bits} bytes).",
+                    f"File '{filename}' ({file_size / 1e6:.1f} MB)"
+                    f"exceeds the maximum supported size of 120 MB. "
+                    f"This limitation applies to {bits}-bit systems. "
+                    f"Large dataset handling is currently not fully supported. "
+                    f"Please consider using a smaller dataset"
                 )
 
         if format.lower() == "arff":
@@ -780,7 +784,12 @@ class OpenMLDataset(OpenMLBase):
         # All the assumptions below for the target are dependant on the number of targets being 1
         n_targets = len(target_names)
         if n_targets > 1:
-            raise NotImplementedError(f"Number of targets {n_targets} not implemented.")
+            raise NotImplementedError(
+                f"Multi-target prediction is not yet supported."
+                f"Found {n_targets} target columns: {target_names}. "
+                f"Currently, only single-target datasets are supported. "
+                f"Please select a single target column."
+            )
 
         target_name = target_names[0]
         x = data.drop(columns=[target_name])
