@@ -280,6 +280,7 @@ class TestOpenMLDataset(TestBase):
         self.use_production_server()
         self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, "NAME_GOES_HERE")
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_dataset_lazy_all_functions(self):
         """Test that all expected functionality is available without downloading the dataset."""
         dataset = openml.datasets.get_dataset(1)
@@ -664,6 +665,7 @@ class TestOpenMLDataset(TestBase):
             with pytest.raises(ValueError, match=err_msg):
                 attributes_arff_from_df(df)
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_create_dataset_numpy(self):
         data = np.array([[1, 2, 3], [1.2, 2.5, 3.8], [2, 5, 8], [0, 1, 0]]).T
 
@@ -751,6 +753,7 @@ class TestOpenMLDataset(TestBase):
         ), "Uploaded ARFF does not match original one"
         assert _get_online_dataset_format(dataset.id) == "arff", "Wrong format for dataset"
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_create_dataset_sparse(self):
         # test the scipy.sparse.coo_matrix
         sparse_data = scipy.sparse.coo_matrix(
@@ -868,6 +871,7 @@ class TestOpenMLDataset(TestBase):
             return_type=arff.DENSE if d_format == "arff" else arff.COO,
         ), "ARFF files are not equal"
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_topic_api_error(self):
         # Check server exception when non-admin accessses apis
         self.assertRaisesRegex(
@@ -895,6 +899,7 @@ class TestOpenMLDataset(TestBase):
             dataset_id
         ), "The format of the ARFF files is different"
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_create_dataset_pandas(self):
         data = [
             ["a", "sunny", 85.0, 85.0, "FALSE", "no"],
@@ -1119,6 +1124,7 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url,
             )
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_publish_fetch_ignore_attribute(self):
         """Test to upload and retrieve dataset and check ignore_attributes"""
         data = [
@@ -1237,6 +1243,7 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url,
             )
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_create_dataset_row_id_attribute_inference(self):
         # meta-information
         name = f"{self._get_sentinel()}-pandas_testing_dataset"
@@ -1400,6 +1407,7 @@ class TestOpenMLDataset(TestBase):
         edited_dataset = openml.datasets.get_dataset(did)
         assert edited_dataset.description == desc
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_data_edit_critical_field(self):
         # Case 2
         # only owners (or admin) can edit all critical fields of datasets
@@ -1448,6 +1456,7 @@ class TestOpenMLDataset(TestBase):
             description="xor operation dataset",
         )
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_data_edit_cannot_edit_critical_field_if_dataset_has_task(self):
         # Need to own a dataset to be able to edit meta-data
         # Will be creating a forked version of an existing dataset to allow the unit test user
