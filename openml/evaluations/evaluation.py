@@ -1,6 +1,8 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from dataclasses import asdict, dataclass
+
 import openml.config
 import openml.datasets
 import openml.flows
@@ -8,8 +10,7 @@ import openml.runs
 import openml.tasks
 
 
-# TODO(eddiebergman): A lot of this class is automatically
-# handled by a dataclass
+@dataclass
 class OpenMLEvaluation:
     """
     Contains all meta-information about a run / evaluation combination,
@@ -48,55 +49,23 @@ class OpenMLEvaluation:
         (e.g., in case of precision, auroc, recall)
     """
 
-    def __init__(  # noqa: PLR0913
-        self,
-        run_id: int,
-        task_id: int,
-        setup_id: int,
-        flow_id: int,
-        flow_name: str,
-        data_id: int,
-        data_name: str,
-        function: str,
-        upload_time: str,
-        uploader: int,
-        uploader_name: str,
-        value: float | None,
-        values: list[float] | None,
-        array_data: str | None = None,
-    ):
-        self.run_id = run_id
-        self.task_id = task_id
-        self.setup_id = setup_id
-        self.flow_id = flow_id
-        self.flow_name = flow_name
-        self.data_id = data_id
-        self.data_name = data_name
-        self.function = function
-        self.upload_time = upload_time
-        self.uploader = uploader
-        self.uploader_name = uploader_name
-        self.value = value
-        self.values = values
-        self.array_data = array_data
+    run_id: int
+    task_id: int
+    setup_id: int
+    flow_id: int
+    flow_name: str
+    data_id: int
+    data_name: str
+    function: str
+    upload_time: str
+    uploader: int
+    uploader_name: str
+    value: float | None
+    values: list[float] | None
+    array_data: str | None = None
 
     def _to_dict(self) -> dict:
-        return {
-            "run_id": self.run_id,
-            "task_id": self.task_id,
-            "setup_id": self.setup_id,
-            "flow_id": self.flow_id,
-            "flow_name": self.flow_name,
-            "data_id": self.data_id,
-            "data_name": self.data_name,
-            "function": self.function,
-            "upload_time": self.upload_time,
-            "uploader": self.uploader,
-            "uploader_name": self.uploader_name,
-            "value": self.value,
-            "values": self.values,
-            "array_data": self.array_data,
-        }
+        return asdict(self)
 
     def __repr__(self) -> str:
         header = "OpenML Evaluation"
@@ -119,7 +88,7 @@ class OpenMLEvaluation:
         }
 
         order = [
-            "Uploader Date",
+            "Upload Date",
             "Run ID",
             "OpenML Run URL",
             "Task ID",
