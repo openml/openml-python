@@ -1,4 +1,7 @@
 # License: BSD 3-Clause
+
+"""Base class for OpenML API connectors."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

@@ -1,4 +1,7 @@
 # License: BSD 3-Clause
+
+"""Extension registry."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
@@ -17,7 +20,7 @@ API_CONNECTOR_REGISTRY: list[type[OpenMLAPIConnector]] = [
 
 def resolve_api_connector(estimator: Any) -> OpenMLAPIConnector:
     """
-    Identifies and returns the appropriate OpenML API connector for a given estimator.
+    Identify and return the appropriate OpenML API connector for a given estimator.
 
     This function iterates through the global ``API_CONNECTOR_REGISTRY`` to find
     a connector class that supports the provided estimator object. If exactly one
@@ -41,17 +44,8 @@ def resolve_api_connector(estimator: Any) -> OpenMLAPIConnector:
         model, or if multiple connectors in the registry claim support for
         the provided model.
     """
-    candidates = [
-        connector for connector in API_CONNECTOR_REGISTRY if connector.supports(estimator)
-    ]
+    for connector_cls in API_CONNECTOR_REGISTRY:
+        if connector_cls.supports(estimator):
+            return connector_cls()
 
-    if not candidates:
-        raise PyOpenMLError("No OpenML API connector found for this estimator.")
-
-    if len(candidates) > 1:
-        names = [c.__name__ for c in candidates]
-        raise PyOpenMLError(
-            "Multiple API connectors match this estimator:\n" + "\n".join(f"- {n}" for n in names)
-        )
-
-    return candidates[0]()
+    raise PyOpenMLError("No OpenML API connector supports this estimator.")
