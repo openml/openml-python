@@ -1,15 +1,16 @@
 # License: BSD 3-Clause
+from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from openml.extensions.execution import ModelExecutor
-from openml.extensions.serialization import ModelSerializer
+if TYPE_CHECKING:
+    from openml.extensions.execution import ModelExecutor
+    from openml.extensions.serialization import ModelSerializer
+
 
 class OpenMLAPIConnector(ABC):
-    """
-    Base class for OpenML API connectors.
-    """
+    """Base class for OpenML API connectors."""
 
     @abstractmethod
     def serializer(self) -> ModelSerializer:

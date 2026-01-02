@@ -2,15 +2,19 @@
 
 """Base class for estimator executors."""
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Any
 from collections import OrderedDict
+from typing import TYPE_CHECKING, Any
 
-import numpy as np
-import scipy.sparse
+if TYPE_CHECKING:
+    import numpy as np
+    import scipy.sparse
 
-from openml.tasks.task import OpenMLTask
-from openml.runs.trace import OpenMLRunTrace
+    from openml.runs.trace import OpenMLRunTrace
+    from openml.tasks.task import OpenMLTask
+
 
 class ModelExecutor(ABC):
     """Define runtime execution semantics for a specific API type."""
