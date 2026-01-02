@@ -41,3 +41,17 @@ class TestInit(TestBase):
         assert task_mock.call_count == 2
         for argument, fixture in zip(task_mock.call_args_list, [(1,), (2,)]):
             assert argument[0] == fixture
+
+    def test_top_level_getters_aliases(self):
+        # Ensure top-level convenience aliases point to existing implementations.
+        assert openml.list_datasets is openml.datasets.functions.list_datasets
+        assert openml.get_dataset is openml.datasets.functions.get_dataset
+
+        assert openml.list_flows is openml.flows.functions.list_flows
+        assert openml.get_flow is openml.flows.functions.get_flow
+
+        assert openml.list_runs is openml.runs.functions.list_runs
+        assert openml.get_run is openml.runs.functions.get_run
+
+        assert openml.list_tasks is openml.tasks.functions.list_tasks
+        assert openml.get_task is openml.tasks.functions.get_task
