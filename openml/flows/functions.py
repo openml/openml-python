@@ -78,16 +78,32 @@ def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = T
     flow_id : int
         The OpenML flow id.
 
-    reinstantiate: bool
+    reinstantiate: bool, optional, default=False
         Whether to reinstantiate the flow to a model instance.
 
-    strict_version : bool, default=True
+    strict_version : bool, optional, default=True
         Whether to fail if version requirements are not fulfilled.
 
     Returns
     -------
     flow : OpenMLFlow
         the flow
+
+    Examples
+    --------
+    >>> import openml
+    Download the flow with flow_id = 5
+    >>> flow_id = 5
+    >>> flow = openml.flows.get_flow()
+    >>> print(flow)
+    OpenML Flow
+    ===========
+    Flow ID.........: 5 (version 1)
+    Flow URL........: https://www.openml.org/f/5
+    Flow Name.......: openml.evaluation.average_cost
+    Flow Description: An implementation of the evaluation measure "average_cost"
+    Upload Date.....: 2014-01-16 14:12:56
+    Dependencies....: Build on top of Weka API (Jar version 3.?.?)
     """
     flow_id = int(flow_id)
     flow = _get_flow_description(flow_id)
@@ -164,6 +180,13 @@ def list_flows(
             - version
             - external version
             - uploader
+
+    Examples
+    --------
+    >>> import openml
+    >>> flows = openml.flows.list_flows()
+    A df of all flows which are on openML is returned
+    [123519 rows x 6 columns]
     """
     listing_call = partial(_list_flows, tag=tag, uploader=uploader)
     batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
@@ -221,6 +244,14 @@ def flow_exists(name: str, external_version: str) -> int | bool:
     -------
     flow_exist : int or bool
         flow id iff exists, False otherwise
+
+    Examples
+    --------
+    >>> import openml
+    >>> flow = openml.flows.flow_exists(name = "openml.evaluation.EuclideanDistance", \
+    >>> external_version = "1")
+    >>> print(flow)
+
 
     Notes
     -----
