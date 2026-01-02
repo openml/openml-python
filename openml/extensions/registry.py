@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from openml_sklearn import SklearnExtension
 
-from openml.exceptions import OpenMLException
+from openml.exceptions import PyOpenMLError
 
 if TYPE_CHECKING:
     from openml.extensions.connectors import OpenMLAPIConnector
@@ -46,11 +46,11 @@ def resolve_api_connector(estimator: Any) -> OpenMLAPIConnector:
     ]
 
     if not candidates:
-        raise OpenMLException("No OpenML API connector found for this estimator.")
+        raise PyOpenMLError("No OpenML API connector found for this estimator.")
 
     if len(candidates) > 1:
         names = [c.__name__ for c in candidates]
-        raise OpenMLException(
+        raise PyOpenMLError(
             "Multiple API connectors match this estimator:\n" + "\n".join(f"- {n}" for n in names)
         )
 
