@@ -376,7 +376,8 @@ def initialize_model_from_run(run_id: int, *, strict_version: bool = True) -> An
     run = get_run(run_id)
     # TODO(eddiebergman): I imagine this is None if it's not published,
     # might need to raise an explicit error for that
-    assert run.setup_id is not None
+    if run.setup_id is None:
+        raise ValueError(f"Run {run_id} has no associated setup_id. Cannot initialize model.")
     return initialize_model(setup_id=run.setup_id, strict_version=strict_version)
 
 
@@ -416,7 +417,8 @@ def initialize_model_from_trace(
     run = get_run(run_id)
     # TODO(eddiebergman): I imagine this is None if it's not published,
     # might need to raise an explicit error for that
-    assert run.flow_id is not None
+    if run.flow_id is None:
+        raise ValueError(f"Run {run_id} has no associated flow_id. Cannot initialize model.")
 
     flow = get_flow(run.flow_id)
     run_trace = get_run_trace(run_id)
@@ -576,8 +578,10 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
             _user_defined_measures_fold[openml_name] = sklearn_fn(_test_y, _pred_y)
 
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
-            assert test_y is not None
-            assert proba_y is not None
+            if test_y is None:
+                raise ValueError("test_y cannot be None for classification tasks.")
+            if proba_y is None:
+                raise ValueError("proba_y cannot be None for classification tasks.")
 
             for i, tst_idx in enumerate(test_indices):
                 if task.class_labels is not None:
@@ -622,7 +626,8 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
                 )
 
         elif isinstance(task, OpenMLRegressionTask):
-            assert test_y is not None
+            if test_y is None:
+                raise ValueError("test_y cannot be None for regression tasks.")
             for i, _ in enumerate(test_indices):
                 truth = test_y.iloc[i] if isinstance(test_y, pd.Series) else test_y[i]
                 arff_line = format_prediction(
@@ -743,7 +748,8 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
 
     if isinstance(task, OpenMLSupervisedTask):
         x, y = task.get_X_and_y()
-        assert isinstance(y, (pd.Series, pd.DataFrame))
+        if not isinstance(y, (pd.Series, pd.DataFrame)):
+            raise TypeError(f"y must be a pandas Series or DataFrame, got {type(y).__name__}")
         train_x = x.iloc[train_indices]
         train_y = y.iloc[train_indices]
         test_x = x.iloc[test_indices]
@@ -1202,7 +1208,11 @@ def __list_runs(api_call: str) -> pd.DataFrame:
             f'"http://openml.org/openml": {runs_dict}',
         )
 
-    assert isinstance(runs_dict["oml:runs"]["oml:run"], list), type(runs_dict["oml:runs"])
+    if not isinstance(runs_dict["oml:runs"]["oml:run"], list):
+        raise TypeError(
+            f"Expected runs_dict['oml:runs']['oml:run'] to be a list, "
+            f"got {type(runs_dict['oml:runs']).__name__}"
+        )
 
     runs = {
         int(r["oml:run_id"]): {
