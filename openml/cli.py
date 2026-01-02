@@ -5,8 +5,8 @@ from __future__ import annotations
 import argparse
 import string
 import sys
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable
 from urllib.parse import urlparse
 
 from openml import config

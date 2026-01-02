@@ -7,9 +7,9 @@ import os
 import pickle
 import re
 import warnings
+from collections.abc import Iterable, Sequence
 from pathlib import Path
-from typing import Any, Iterable, Sequence
-from typing_extensions import Literal
+from typing import Any, Literal
 
 import arff
 import numpy as np
@@ -41,7 +41,7 @@ def _ensure_dataframe(
     raise TypeError(f"Data type {type(data)} not supported.")
 
 
-class OpenMLDataset(OpenMLBase):
+class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
     """Dataset object.
 
     Allows fetching and uploading datasets to OpenML.
@@ -719,8 +719,8 @@ class OpenMLDataset(OpenMLBase):
     def get_data(  # noqa: C901
         self,
         target: list[str] | str | None = None,
-        include_row_id: bool = False,  # noqa: FBT001, FBT002
-        include_ignore_attribute: bool = False,  # noqa: FBT001, FBT002
+        include_row_id: bool = False,  # noqa: FBT002
+        include_ignore_attribute: bool = False,  # noqa: FBT002
     ) -> tuple[pd.DataFrame, pd.Series | None, list[bool], list[str]]:
         """Returns dataset content as dataframes.
 
@@ -766,8 +766,8 @@ class OpenMLDataset(OpenMLBase):
             logger.info(f"Going to remove the following attributes: {to_exclude}")
             keep = np.array([column not in to_exclude for column in attribute_names])
             data = data.drop(columns=to_exclude)
-            categorical_mask = [cat for cat, k in zip(categorical_mask, keep) if k]
-            attribute_names = [att for att, k in zip(attribute_names, keep) if k]
+            categorical_mask = [cat for cat, k in zip(categorical_mask, keep, strict=False) if k]
+            attribute_names = [att for att, k in zip(attribute_names, keep, strict=False) if k]
 
         if target is None:
             return data, None, categorical_mask, attribute_names
@@ -863,8 +863,8 @@ class OpenMLDataset(OpenMLBase):
         self,
         data_type: str,
         exclude: list[str] | None = None,
-        exclude_ignore_attribute: bool = True,  # noqa: FBT002, FBT001
-        exclude_row_id_attribute: bool = True,  # noqa: FBT002, FBT001
+        exclude_ignore_attribute: bool = True,  # noqa: FBT002
+        exclude_row_id_attribute: bool = True,  # noqa: FBT002
     ) -> list[int]:
         """
         Return indices of features of a given type, e.g. all nominal features.

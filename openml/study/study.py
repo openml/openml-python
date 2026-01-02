@@ -2,7 +2,8 @@
 # TODO(eddiebergman): Begging for dataclassses to shorten this all
 from __future__ import annotations
 
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from openml.base import OpenMLBase
 from openml.config import get_server_base_url
