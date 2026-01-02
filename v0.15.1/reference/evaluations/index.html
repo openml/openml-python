@@ -2492,6 +2492,10 @@
 <code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OpenMLEvaluation</span>
 
 
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
 <a href="#openml.evaluations.OpenMLEvaluation" class="headerlink" title="Permanent link">#</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">OpenMLEvaluation</span><span class="p">(</span><span class="n">run_id</span><span class="p">:</span> <span class="n">int</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="n">int</span><span class="p">,</span> <span class="n">setup_id</span><span class="p">:</span> <span class="n">int</span><span class="p">,</span> <span class="n">flow_id</span><span class="p">:</span> <span class="n">int</span><span class="p">,</span> <span class="n">flow_name</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">data_id</span><span class="p">:</span> <span class="n">int</span><span class="p">,</span> <span class="n">data_name</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">function</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">upload_time</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">uploader</span><span class="p">:</span> <span class="n">int</span><span class="p">,</span> <span class="n">uploader_name</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">list</span><span class="p">[</span><span class="n">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">array_data</span><span class="p">:</span> <span class="n">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
@@ -2715,71 +2719,6 @@ according to the evaluation/list function</p>
       </tbody>
     </table>
 
-                  <details class="quote">
-                    <summary>Source code in <code>openml/evaluations/evaluation.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-51">51</a></span>
-<span class="normal"><a href="#__codelineno-0-52">52</a></span>
-<span class="normal"><a href="#__codelineno-0-53">53</a></span>
-<span class="normal"><a href="#__codelineno-0-54">54</a></span>
-<span class="normal"><a href="#__codelineno-0-55">55</a></span>
-<span class="normal"><a href="#__codelineno-0-56">56</a></span>
-<span class="normal"><a href="#__codelineno-0-57">57</a></span>
-<span class="normal"><a href="#__codelineno-0-58">58</a></span>
-<span class="normal"><a href="#__codelineno-0-59">59</a></span>
-<span class="normal"><a href="#__codelineno-0-60">60</a></span>
-<span class="normal"><a href="#__codelineno-0-61">61</a></span>
-<span class="normal"><a href="#__codelineno-0-62">62</a></span>
-<span class="normal"><a href="#__codelineno-0-63">63</a></span>
-<span class="normal"><a href="#__codelineno-0-64">64</a></span>
-<span class="normal"><a href="#__codelineno-0-65">65</a></span>
-<span class="normal"><a href="#__codelineno-0-66">66</a></span>
-<span class="normal"><a href="#__codelineno-0-67">67</a></span>
-<span class="normal"><a href="#__codelineno-0-68">68</a></span>
-<span class="normal"><a href="#__codelineno-0-69">69</a></span>
-<span class="normal"><a href="#__codelineno-0-70">70</a></span>
-<span class="normal"><a href="#__codelineno-0-71">71</a></span>
-<span class="normal"><a href="#__codelineno-0-72">72</a></span>
-<span class="normal"><a href="#__codelineno-0-73">73</a></span>
-<span class="normal"><a href="#__codelineno-0-74">74</a></span>
-<span class="normal"><a href="#__codelineno-0-75">75</a></span>
-<span class="normal"><a href="#__codelineno-0-76">76</a></span>
-<span class="normal"><a href="#__codelineno-0-77">77</a></span>
-<span class="normal"><a href="#__codelineno-0-78">78</a></span>
-<span class="normal"><a href="#__codelineno-0-79">79</a></span>
-<span class="normal"><a href="#__codelineno-0-80">80</a></span>
-<span class="normal"><a href="#__codelineno-0-81">81</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="n">run_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a>    <span class="n">setup_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a>    <span class="n">flow_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a>    <span class="n">flow_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a>    <span class="n">data_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a>    <span class="n">data_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a>    <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a>    <span class="n">upload_time</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a>    <span class="n">uploader</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a>    <span class="n">uploader_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>    <span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a>    <span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a>    <span class="n">array_data</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="p">):</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">run_id</span> <span class="o">=</span> <span class="n">run_id</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="o">=</span> <span class="n">task_id</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">setup_id</span> <span class="o">=</span> <span class="n">setup_id</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">flow_id</span> <span class="o">=</span> <span class="n">flow_id</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">flow_name</span> <span class="o">=</span> <span class="n">flow_name</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">data_id</span> <span class="o">=</span> <span class="n">data_id</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">data_name</span> <span class="o">=</span> <span class="n">data_name</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">upload_time</span> <span class="o">=</span> <span class="n">upload_time</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">uploader</span> <span class="o">=</span> <span class="n">uploader</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">uploader_name</span> <span class="o">=</span> <span class="n">uploader_name</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">values</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">array_data</span> <span class="o">=</span> <span class="n">array_data</span>
-</code></pre></div></td></tr></table></div>
-                  </details>
 
 
 
