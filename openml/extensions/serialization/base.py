@@ -2,11 +2,14 @@
 
 """Base class for estimator serializors."""
 
-from abc import ABC, abstractmethod
-from typing import Any
+from __future__ import annotations
 
-from openml.flows import OpenMLFlow
-from openml.runs.trace import OpenMLTraceIteration
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from openml.flows import OpenMLFlow
+    from openml.runs.trace import OpenMLTraceIteration
 
 
 class ModelSerializer(ABC):
