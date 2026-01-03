@@ -71,7 +71,7 @@ def resolve_env_proxies(url: str) -> str | None:
 
 
 def _create_url_from_endpoint(endpoint: str) -> str:
-    url = config.server
+    url = config._config.server
     if not url.endswith("/"):
         url += "/"
     url += endpoint
@@ -172,7 +172,7 @@ def _download_minio_file(
             bucket_name=bucket,
             object_name=object_name,
             file_path=str(destination),
-            progress=ProgressBar() if config.show_progress else None,
+            progress=ProgressBar() if config._config.show_progress else None,
             request_headers=_HEADERS,
         )
         if destination.is_file() and destination.suffix == ".zip":
@@ -301,7 +301,7 @@ def _file_id_to_url(file_id: int, filename: str | None = None) -> str:
     Presents the URL how to download a given file id
     filename is optional
     """
-    openml_url = config.server.split("/api/")
+    openml_url = config._config.server.split("/api/")
     url = openml_url[0] + f"/data/download/{file_id!s}"
     if filename is not None:
         url += "/" + filename
@@ -317,7 +317,7 @@ def _read_url_files(
     and sending file_elements as files
     """
     data = {} if data is None else data
-    data["api_key"] = config.apikey
+    data["api_key"] = config._config.apikey
     if file_elements is None:
         file_elements = {}
     # Using requests.post sets header 'Accept-encoding' automatically to
@@ -337,8 +337,8 @@ def __read_url(
     md5_checksum: str | None = None,
 ) -> requests.Response:
     data = {} if data is None else data
-    if config.apikey:
-        data["api_key"] = config.apikey
+    if config._config.apikey:
+        data["api_key"] = config._config.apikey
     return _send_request(
         request_method=request_method,
         url=url,
@@ -363,10 +363,10 @@ def _send_request(  # noqa: C901, PLR0912
     files: FILE_ELEMENTS_TYPE | None = None,
     md5_checksum: str | None = None,
 ) -> requests.Response:
-    n_retries = max(1, config.connection_n_retries)
+    n_retries = max(1, config._config.connection_n_retries)
 
     response: requests.Response | None = None
-    delay_method = _human_delay if config.retry_policy == "human" else _robot_delay
+    delay_method = _human_delay if config._config.retry_policy == "human" else _robot_delay
 
     # Error to raise in case of retrying too often. Will be set to the last observed exception.
     retry_raise_e: Exception | None = None

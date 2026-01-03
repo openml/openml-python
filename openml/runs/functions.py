@@ -226,7 +226,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
         raise ValueError("flow_tags should be a list")
 
     if avoid_duplicate_runs is None:
-        avoid_duplicate_runs = openml.config.avoid_duplicate_runs
+        avoid_duplicate_runs = openml.config._config.avoid_duplicate_runs
 
     # TODO: At some point in the future do not allow for arguments in old order (changed 6-2018).
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
