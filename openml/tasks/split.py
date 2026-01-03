@@ -63,6 +63,29 @@ class OpenMLSplit:
         self.folds = len(self.split[0])
         self.samples = len(self.split[0][0])
 
+    def __repr__(self) -> str:
+        header = "OpenML Split"
+        header = f"{header}\n{'=' * len(header)}\n"
+
+        fields = {
+            "Name": self.name,
+            "Description": (
+                self.description if len(self.description) <= 80 else self.description[:77] + "..."
+            ),
+            "Repeats": self.repeats,
+            "Folds": self.folds,
+            "Samples": self.samples,
+        }
+
+        order = ["Name", "Description", "Repeats", "Folds", "Samples"]
+
+        _fields = [(key, fields[key]) for key in order if key in fields]
+
+        longest_field_name_length = max(len(name) for name, _ in _fields)
+        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
+        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
+        return header + body
+
     def __eq__(self, other: Any) -> bool:
         if (
             (not isinstance(self, type(other)))
