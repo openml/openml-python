@@ -35,7 +35,7 @@
 # %%
 import openml
 
-openml.config._config.apikey = "YOURKEY"
+openml.config.apikey = "YOURKEY"
 
 # %% [markdown]
 # ## Caching

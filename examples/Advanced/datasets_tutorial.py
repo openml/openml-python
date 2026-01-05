@@ -139,7 +139,7 @@ print(f"Edited dataset ID: {data_id}")
 # only for the dataset owner. Further, critical fields cannot be edited if the dataset has any
 # tasks associated with it. To edit critical fields of a dataset (without tasks) owned by you,
 # configure the API key:
-# openml.config._config.apikey = 'FILL_IN_OPENML_API_KEY'
+# openml.config.apikey = 'FILL_IN_OPENML_API_KEY'
 # This example here only shows a failure when trying to work on a dataset not owned by you:
 
 # %%

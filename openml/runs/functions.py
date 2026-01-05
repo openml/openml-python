@@ -18,7 +18,6 @@ from joblib.parallel import Parallel, delayed
 import openml
 import openml._api_calls
 import openml.utils
-from openml import config
 from openml.exceptions import (
     OpenMLCacheException,
     OpenMLRunsExistError,
@@ -107,7 +106,7 @@ def run_model_on_task(  # noqa: PLR0913
     """
     if avoid_duplicate_runs is None:
         avoid_duplicate_runs = openml.config.avoid_duplicate_runs
-    if avoid_duplicate_runs and not config.apikey:
+    if avoid_duplicate_runs and not openml.config.apikey:
         warnings.warn(
             "avoid_duplicate_runs is set to True, but no API key is set. "
             "Please set your API key in the OpenML configuration file, see"
@@ -226,7 +225,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
         raise ValueError("flow_tags should be a list")
 
     if avoid_duplicate_runs is None:
-        avoid_duplicate_runs = openml.config._config.avoid_duplicate_runs
+        avoid_duplicate_runs = openml.config.avoid_duplicate_runs
 
     # TODO: At some point in the future do not allow for arguments in old order (changed 6-2018).
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
@@ -336,7 +335,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
         message = f"Executed Task {task.task_id} with Flow id:{run.flow_id}"
     else:
         message = f"Executed Task {task.task_id} on local Flow with name {flow.name}."
-    config.logger.info(message)
+    openml.config.logger.info(message)
 
     return run
 
@@ -528,7 +527,7 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
 
     # The forked child process may not copy the configuration state of OpenML from the parent.
     # Current configuration setup needs to be copied and passed to the child processes.
-    _config = config.get_config_as_dict()
+    _config = openml.config.get_config_as_dict()
     # Execute runs in parallel
     # assuming the same number of tasks as workers (n_jobs), the total compute time for this
     # statement will be similar to the slowest run
@@ -733,7 +732,7 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
     """
     # Sets up the OpenML instantiated in the child process to match that of the parent's
     # if configuration=None, loads the default
-    config._setup(configuration)
+    openml.config._setup(configuration)
 
     train_indices, test_indices = task.get_train_test_split_indices(
         repeat=rep_no,
@@ -757,7 +756,7 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
     else:
         raise NotImplementedError(task.task_type)
 
-    config.logger.info(
+    openml.config.logger.info(
         f"Going to run model {model!s} on "
         f"dataset {openml.datasets.get_dataset(task.dataset_id).name} "
         f"for repeat {rep_no} fold {fold_no} sample {sample_no}"
