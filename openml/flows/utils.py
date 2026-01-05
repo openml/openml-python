@@ -12,13 +12,23 @@ if TYPE_CHECKING:
     from openml.flows import OpenMLFlow
 
 
-def flow_to_estimator(flow: OpenMLFlow) -> Any:
-    """Convert an OpenML flow to an estimator instance.
+def flow_to_estimator(
+    flow: OpenMLFlow,
+    initialize_with_defaults: bool = False,  # noqa: FBT001, FBT002
+    strict_version: bool = True,  # noqa: FBT002, FBT001
+) -> Any:
+    """Instantiate a model from the flow representation.
 
     Parameters
     ----------
-    flow : openml.flows.OpenMLFlow
-        The OpenML flow to convert.
+    flow : OpenMLFlow
+
+    initialize_with_defaults : bool, optional (default=False)
+        If this flag is set, the hyperparameter values of flows will be
+        ignored and a flow with its defaults is returned.
+
+    strict_version : bool, default=True
+        Whether to fail if version requirements are not fulfilled.
 
     Returns
     -------
@@ -26,7 +36,11 @@ def flow_to_estimator(flow: OpenMLFlow) -> Any:
         The corresponding estimator instance.
     """
     connector = resolve_api_connector(flow)
-    return connector.serializer().flow_to_model(flow)
+    return connector.serializer().flow_to_model(
+        flow,
+        initialize_with_defaults=initialize_with_defaults,
+        strict_version=strict_version,
+    )
 
 
 def estimator_to_flow(estimator_instance: Any) -> OpenMLFlow:
