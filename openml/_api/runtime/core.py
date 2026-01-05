@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from openml._api.config import (
     API_V1_SERVER,
     API_V2_SERVER,
@@ -11,16 +13,18 @@ from openml._api.resources import (
     TasksV1,
     TasksV2,
 )
-from openml._api.runtime.fallback import FallbackProxy
+
+if TYPE_CHECKING:
+    from openml._api.resources.base import DatasetsAPI, TasksAPI
 
 
 class APIBackend:
-    def __init__(self, *, datasets, tasks):
+    def __init__(self, *, datasets: DatasetsAPI, tasks: TasksAPI):
         self.datasets = datasets
         self.tasks = tasks
 
 
-def build_backend(version: str, strict: bool) -> APIBackend:
+def build_backend(version: str, *, strict: bool) -> APIBackend:
     v1_http = HTTPClient(API_V1_SERVER)
     v2_http = HTTPClient(API_V2_SERVER)
 
@@ -40,19 +44,16 @@ def build_backend(version: str, strict: bool) -> APIBackend:
     if strict:
         return v2
 
-    return APIBackend(
-        datasets=FallbackProxy(v2.datasets, v1.datasets),
-        tasks=FallbackProxy(v2.tasks, v1.tasks),
-    )
+    return v1
 
 
 class APIContext:
-    def __init__(self):
+    def __init__(self) -> None:
         self._backend = build_backend("v1", strict=False)
 
-    def set_version(self, version: str, strict: bool = False):
-        self._backend = build_backend(version, strict)
+    def set_version(self, version: str, *, strict: bool = False) -> None:
+        self._backend = build_backend(version=version, strict=strict)
 
     @property
-    def backend(self):
+    def backend(self) -> APIBackend:
         return self._backend

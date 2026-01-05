@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import xmltodict
 
 from openml._api.resources.base import TasksAPI
@@ -12,12 +14,20 @@ from openml.tasks.task import (
     TaskType,
 )
 
+if TYPE_CHECKING:
+    from requests import Response
+
 
 class TasksV1(TasksAPI):
-    def get(self, id, return_response=False):
-        path = f"task/{id}"
+    def get(
+        self,
+        task_id: int,
+        *,
+        return_response: bool = False,
+    ) -> OpenMLTask | tuple[OpenMLTask, Response]:
+        path = f"task/{task_id}"
         response = self._http.get(path)
-        xml_content = response.content
+        xml_content = response.text
         task = self._create_task_from_xml(xml_content)
 
         if return_response:
@@ -109,5 +119,10 @@ class TasksV1(TasksAPI):
 
 
 class TasksV2(TasksAPI):
-    def get(self, id):
-        pass
+    def get(
+        self,
+        task_id: int,
+        *,
+        return_response: bool = False,
+    ) -> OpenMLTask | tuple[OpenMLTask, Response]:
+        raise NotImplementedError
