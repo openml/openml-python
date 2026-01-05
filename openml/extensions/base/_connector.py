@@ -8,8 +8,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from openml.extensions.execution import ModelExecutor
-    from openml.extensions.serialization import ModelSerializer
+    from openml.extensions.base import ModelExecutor, ModelSerializer
 
 
 class OpenMLAPIConnector(ABC):
@@ -25,5 +24,5 @@ class OpenMLAPIConnector(ABC):
 
     @classmethod
     @abstractmethod
-    def supports(cls, model: Any) -> bool:
-        """High-level check if this connector supports the model."""
+    def supports(cls, estimator: Any) -> bool:
+        """High-level check if this connector supports the estimator instance or flow."""

@@ -12,28 +12,13 @@ if TYPE_CHECKING:
     import numpy as np
     import scipy.sparse
 
-    from openml.runs.trace import OpenMLRunTrace
+    from openml.flows import OpenMLFlow
+    from openml.runs.trace import OpenMLRunTrace, OpenMLTraceIteration
     from openml.tasks.task import OpenMLTask
 
 
 class ModelExecutor(ABC):
     """Define runtime execution semantics for a specific API type."""
-
-    @classmethod
-    @abstractmethod
-    def can_handle_model(cls, model: Any) -> bool:
-        """Check whether a model flow can be handled by this extension.
-
-        This is typically done by checking the type of the model, or the package it belongs to.
-
-        Parameters
-        ----------
-        model : Any
-
-        Returns
-        -------
-        bool
-        """
 
     @abstractmethod
     def seed_model(self, model: Any, seed: int | None) -> Any:
@@ -111,3 +96,56 @@ class ModelExecutor(ABC):
         -------
         bool
         """
+
+    @abstractmethod
+    def obtain_parameter_values(
+        self,
+        flow: OpenMLFlow,
+        model: Any = None,
+    ) -> list[dict[str, Any]]:
+        """Extracts all parameter settings required for the flow from the model.
+
+        If no explicit model is provided, the parameters will be extracted from `flow.model`
+        instead.
+
+        Parameters
+        ----------
+        flow : OpenMLFlow
+            OpenMLFlow object (containing flow ids, i.e., it has to be downloaded from the server)
+
+        model: Any, optional (default=None)
+            The model from which to obtain the parameter values. Must match the flow signature.
+            If None, use the model specified in ``OpenMLFlow.model``.
+
+        Returns
+        -------
+        list
+            A list of dicts, where each dict has the following entries:
+            - ``oml:name`` : str: The OpenML parameter name
+            - ``oml:value`` : mixed: A representation of the parameter value
+            - ``oml:component`` : int: flow id to which the parameter belongs
+        """
+
+    # Abstract methods for hyperparameter optimization
+
+    @abstractmethod
+    def instantiate_model_from_hpo_class(
+        self,
+        model: Any,
+        trace_iteration: OpenMLTraceIteration,
+    ) -> Any:
+        """Instantiate a base model which can be searched over by the hyperparameter optimization
+        model.
+
+        Parameters
+        ----------
+        model : Any
+            A hyperparameter optimization model which defines the model to be instantiated.
+        trace_iteration : OpenMLTraceIteration
+            Describing the hyperparameter settings to instantiate.
+
+        Returns
+        -------
+        Any
+        """
+        # TODO a trace belongs to a run and therefore a flow -> simplify this part of the interface!

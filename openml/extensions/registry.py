@@ -6,15 +6,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from openml_sklearn import SklearnExtension
-
 from openml.exceptions import PyOpenMLError
+from openml.extensions.sklearn import SklearnAPIConnector
 
 if TYPE_CHECKING:
-    from openml.extensions.connectors import OpenMLAPIConnector
+    from openml.extensions.base import OpenMLAPIConnector
 
 API_CONNECTOR_REGISTRY: list[type[OpenMLAPIConnector]] = [
-    SklearnExtension,  # TODO: I need to refactor SklearnExtension
+    SklearnAPIConnector,
 ]
 
 
@@ -23,14 +22,14 @@ def resolve_api_connector(estimator: Any) -> OpenMLAPIConnector:
     Identify and return the appropriate OpenML API connector for a given estimator.
 
     This function iterates through the global ``API_CONNECTOR_REGISTRY`` to find
-    a connector class that supports the provided estimator object. If exactly one
-    matching connector is found, it is instantiated and returned.
+    a connector class that supports the provided estimator instance or OpenML flow.
+    If a matching connector is found, it is instantiated and returned.
 
     Parameters
     ----------
     estimator : Any
-        The estimator object (e.g., a scikit-learn estimator) for which an API
-        connector is required.
+        The estimator instance (e.g., a scikit-learn estimator) or OpenML flow for
+        which an API connector is required.
 
     Returns
     -------
