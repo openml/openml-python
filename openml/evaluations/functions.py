@@ -232,7 +232,7 @@ def __list_evaluations(api_call: str) -> list[OpenMLEvaluation]:
         )
 
     assert isinstance(evals_dict["oml:evaluations"]["oml:evaluation"], list), type(
-        evals_dict["oml:evaluations"],
+        evals_dict["oml:evaluations"]["oml:evaluation"],
     )
 
     uploader_ids = list(
