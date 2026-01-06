@@ -187,7 +187,7 @@ class TestTask(TestBase):
         )
 
     @mock.patch("openml.tasks.functions.get_dataset")
-    @pytest.mark.xfail(reason="failures_issue_1544")
+    @pytest.mark.uses_test_server()
     def test_removal_upon_download_failure(self, get_dataset):
         class WeirdException(Exception):
             pass
