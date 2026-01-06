@@ -25,10 +25,13 @@ class HTTPClient:
         self,
         path: str,
         data: Mapping[str, Any] | None = None,
+        json: dict | None = None,
         files: Any = None,
     ) -> Response:
         url = f"{self.base_url}/{path}"
-        return requests.post(url, data=data, files=files, headers=self.headers, timeout=10)
+        return requests.post(
+            url, data=data, json=json, files=files, headers=self.headers, timeout=10
+        )
 
     def delete(
         self,
