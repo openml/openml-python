@@ -73,6 +73,7 @@ class TestStudyFunctions(TestBase):
         ):
             openml.study.get_suite(123)
 
+    @pytest.mark.uses_test_server()
     def test_publish_benchmark_suite(self):
         fixture_alias = None
         fixture_name = "unit tested benchmark suite"
@@ -141,13 +142,16 @@ class TestStudyFunctions(TestBase):
         assert study_downloaded.main_entity_type == "run"
         assert study_downloaded.runs is None
 
+    @pytest.mark.uses_test_server()
     def test_publish_empty_study_explicit(self):
         self._test_publish_empty_study_is_allowed(explicit=True)
 
+    @pytest.mark.uses_test_server()
     def test_publish_empty_study_implicit(self):
         self._test_publish_empty_study_is_allowed(explicit=False)
 
     @pytest.mark.flaky()
+    @pytest.mark.uses_test_server()
     def test_publish_study(self):
         # get some random runs to attach
         run_list = openml.evaluations.list_evaluations("predictive_accuracy", size=10)
@@ -217,6 +221,7 @@ class TestStudyFunctions(TestBase):
         res = openml.study.delete_study(study.id)
         assert res
 
+    @pytest.mark.uses_test_server()
     def test_study_attach_illegal(self):
         run_list = openml.runs.list_runs(size=10)
         assert len(run_list) == 10
