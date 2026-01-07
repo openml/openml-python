@@ -23,7 +23,7 @@ class CacheMixin:
     def ttl(self) -> int:
         return settings.cache.ttl
 
-    def _get_cache_directory(self, url: str, params: dict[str, Any]) -> Path:
+    def _get_cache_dir(self, url: str, params: dict[str, Any]) -> Path:
         parsed_url = urlparse(url)
         netloc_parts = parsed_url.netloc.split(".")[::-1]  # reverse domain
         path_parts = parsed_url.path.strip("/").split("/")
@@ -34,10 +34,10 @@ class CacheMixin:
 
         return Path(self.dir).joinpath(*netloc_parts, *path_parts, *params_part)
 
-    def _get_cache_response(self, url: str, params: dict[str, Any]) -> Response | None:  # noqa: ARG002
-        return None
+    def _get_cache_response(self, cache_dir: Path) -> Response:  # noqa: ARG002
+        return Response()
 
-    def _set_cache_response(self, url: str, params: dict[str, Any], response: Response) -> None:  # noqa: ARG002
+    def _set_cache_response(self, cache_dir: Path, response: Response) -> None:  # noqa: ARG002
         return None
 
 
@@ -54,50 +54,98 @@ class HTTPClient(CacheMixin):
     def base_url(self) -> str:
         return self.config.base_url
 
-    def _create_url(self, path: str) -> Any:
-        return urljoin(self.server, urljoin(self.base_url, path))
+    @property
+    def key(self) -> str:
+        return self.config.key
+
+    @property
+    def timeout(self) -> int:
+        return self.config.timeout
+
+    def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        use_cache: bool = False,
+        use_api_key: bool = False,
+        **request_kwargs: Any,
+    ) -> Response:
+        url = urljoin(self.server, urljoin(self.base_url, path))
+
+        params = request_kwargs.pop("params", {})
+        params = params.copy()
+        if use_api_key:
+            params["api_key"] = self.key
+
+        headers = request_kwargs.pop("headers", {})
+        headers = headers.copy()
+        headers.update(self.headers)
+
+        timeout = request_kwargs.pop("timeout", self.timeout)
+        cache_dir = self._get_cache_dir(url, params)
+
+        if use_cache:
+            try:
+                return self._get_cache_response(cache_dir)
+            # TODO: handle ttl expired error
+            except Exception:
+                raise
+
+        response = requests.request(
+            method=method,
+            url=url,
+            params=params,
+            headers=headers,
+            timeout=timeout,
+            **request_kwargs,
+        )
+
+        if use_cache:
+            self._set_cache_response(cache_dir, response)
+
+        return response
 
     def get(
         self,
         path: str,
         *,
-        params: dict[str, Any] | None = None,
         use_cache: bool = False,
         use_api_key: bool = False,
+        **request_kwargs: Any,
     ) -> Response:
-        url = self._create_url(path)
-        params = dict(params) if params is not None else {}
-
-        if use_api_key:
-            params["api_key"] = self.config.key
-
-        if use_cache:
-            response = self._get_cache_response(url, params)
-            if response:
-                return response
-
-        response = requests.get(url, params=params, headers=self.headers, timeout=10)
-
-        if use_cache:
-            self._set_cache_response(url, params, response)
-
-        return response
+        # TODO: remove override when cache is implemented
+        use_cache = False
+        return self.request(
+            method="GET",
+            path=path,
+            use_cache=use_cache,
+            use_api_key=use_api_key,
+            **request_kwargs,
+        )
 
     def post(
         self,
         path: str,
-        *,
-        data: dict[str, Any] | None = None,
-        files: Any = None,
+        **request_kwargs: Any,
     ) -> Response:
-        url = self._create_url(path)
-        return requests.post(url, data=data, files=files, headers=self.headers, timeout=10)
+        return self.request(
+            method="POST",
+            path=path,
+            use_cache=False,
+            use_api_key=True,
+            **request_kwargs,
+        )
 
     def delete(
         self,
         path: str,
-        *,
-        params: dict[str, Any] | None = None,
+        **request_kwargs: Any,
     ) -> Response:
-        url = self._create_url(path)
-        return requests.delete(url, params=params, headers=self.headers, timeout=10)
+        return self.request(
+            method="DELETE",
+            path=path,
+            use_cache=False,
+            use_api_key=True,
+            **request_kwargs,
+        )

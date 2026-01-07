@@ -11,6 +11,7 @@ class APIConfig:
     server: str
     base_url: str
     key: str
+    timeout: int = 10  # seconds
 
 
 @dataclass
