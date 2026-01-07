@@ -398,6 +398,7 @@ class TestRun(TestBase):
                             assert evaluation < max_time_allowed
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_run_regression_on_classif_task(self):
         task_id = 259  # collins; crossvalidation; has numeric targets
 
@@ -414,6 +415,7 @@ class TestRun(TestBase):
             )
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_check_erronous_sklearn_flow_fails(self):
         task_id = 115  # diabetes; crossvalidation
         task = openml.tasks.get_task(task_id)
@@ -625,8 +627,8 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
-    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_run_and_upload_logistic_regression(self):
         lr = LogisticRegression(solver="lbfgs", max_iter=1000)
         task_id = self.TEST_SERVER_TASK_SIMPLE["task_id"]
@@ -634,8 +636,8 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
-    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_run_and_upload_linear_regression(self):
         lr = LinearRegression()
         task_id = self.TEST_SERVER_TASK_REGRESSION["task_id"]
@@ -665,8 +667,8 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_REGRESSION["n_test_obs"]
         self._run_and_upload_regression(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
-    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_run_and_upload_pipeline_dummy_pipeline(self):
         pipeline1 = Pipeline(
             steps=[
@@ -679,12 +681,12 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(pipeline1, task_id, n_missing_vals, n_test_obs, "62501")
 
-    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="columntransformer introduction in 0.20.0",
     )
+    @pytest.mark.uses_test_server()
     def test_run_and_upload_column_transformer_pipeline(self):
         import sklearn.compose
         import sklearn.impute
@@ -744,7 +746,6 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
-    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
     @unittest.skip("https://github.com/openml/OpenML/issues/1180")
     @unittest.skipIf(
@@ -797,8 +798,8 @@ class TestRun(TestBase):
                 call_count += 1
         assert call_count == 3
 
-    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_run_and_upload_gridsearch(self):
         estimator_name = (
             "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
@@ -821,7 +822,7 @@ class TestRun(TestBase):
         assert len(run.trace.trace_iterations) == 9
 
     @pytest.mark.sklearn()
-    @pytest.mark.skip(reason="failures_issue_1544")
+    @pytest.mark.uses_test_server()
     def test_run_and_upload_randomsearch(self):
         randomsearch = RandomizedSearchCV(
             RandomForestClassifier(n_estimators=5),
@@ -853,8 +854,8 @@ class TestRun(TestBase):
         trace = openml.runs.get_run_trace(run.run_id)
         assert len(trace.trace_iterations) == 5
 
-    @pytest.mark.skip(reason="failures_issue_1544")
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_run_and_upload_maskedarrays(self):
         # This testcase is important for 2 reasons:
         # 1) it verifies the correct handling of masked arrays (not all
@@ -882,6 +883,7 @@ class TestRun(TestBase):
     ##########################################################################
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_learning_curve_task_1(self):
         task_id = 801  # diabates dataset
         num_test_instances = 6144  # for learning curve
@@ -906,6 +908,7 @@ class TestRun(TestBase):
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_learning_curve_task_2(self):
         task_id = 801  # diabates dataset
         num_test_instances = 6144  # for learning curve
@@ -946,6 +949,7 @@ class TestRun(TestBase):
         Version(sklearn.__version__) < Version("0.21"),
         reason="Pipelines don't support indexing (used for the assert check)",
     )
+    @pytest.mark.uses_test_server()
     def test_initialize_cv_from_run(self):
         randomsearch = Pipeline(
             [
@@ -1020,6 +1024,7 @@ class TestRun(TestBase):
                 assert alt_scores[idx] <= 1
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_local_run_swapped_parameter_order_model(self):
         clf = DecisionTreeClassifier()
         australian_task = 595  # Australian; crossvalidation
@@ -1039,6 +1044,7 @@ class TestRun(TestBase):
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
+    @pytest.mark.uses_test_server()
     def test_local_run_swapped_parameter_order_flow(self):
         # construct sci-kit learn classifier
         clf = Pipeline(
@@ -1067,6 +1073,7 @@ class TestRun(TestBase):
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
+    @pytest.mark.uses_test_server()
     def test_local_run_metric_score(self):
         # construct sci-kit learn classifier
         clf = Pipeline(
@@ -1104,6 +1111,7 @@ class TestRun(TestBase):
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
+    @pytest.mark.uses_test_server()
     def test_initialize_model_from_run(self):
         clf = sklearn.pipeline.Pipeline(
             steps=[
@@ -1165,6 +1173,7 @@ class TestRun(TestBase):
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
+    @pytest.mark.uses_test_server()
     def test__run_exists(self):
         # would be better to not sentinel these clfs,
         # so we do not have to perform the actual runs
@@ -1220,6 +1229,7 @@ class TestRun(TestBase):
             assert run_ids, (run_ids, clf)
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_run_with_illegal_flow_id(self):
         # check the case where the user adds an illegal flow id to a
         # non-existing flo
@@ -1239,6 +1249,7 @@ class TestRun(TestBase):
             )
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_run_with_illegal_flow_id_after_load(self):
         # Same as `test_run_with_illegal_flow_id`, but test this error is also
         # caught if the run is stored to and loaded from disk first.
@@ -1270,6 +1281,7 @@ class TestRun(TestBase):
             TestBase.logger.info(f"collected from test_run_functions: {loaded_run.run_id}")
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_run_with_illegal_flow_id_1(self):
         # Check the case where the user adds an illegal flow id to an existing
         # flow. Comes to a different value error than the previous test
@@ -1295,6 +1307,7 @@ class TestRun(TestBase):
             )
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_run_with_illegal_flow_id_1_after_load(self):
         # Same as `test_run_with_illegal_flow_id_1`, but test this error is
         # also caught if the run is stored to and loaded from disk first.
@@ -1337,6 +1350,7 @@ class TestRun(TestBase):
         Version(sklearn.__version__) < Version("0.20"),
         reason="OneHotEncoder cannot handle mixed type DataFrame as input",
     )
+    @pytest.mark.uses_test_server()
     def test__run_task_get_arffcontent(self):
         task = openml.tasks.get_task(7)  # kr-vs-kp; crossvalidation
         num_instances = 3196
@@ -1437,6 +1451,7 @@ class TestRun(TestBase):
         for run in runs.to_dict(orient="index").values():
             self._check_run(run)
 
+    @pytest.mark.uses_test_server()
     def test_list_runs_empty(self):
         runs = openml.runs.list_runs(task=[0])
         assert runs.empty
@@ -1564,6 +1579,7 @@ class TestRun(TestBase):
         Version(sklearn.__version__) < Version("0.20"),
         reason="columntransformer introduction in 0.20.0",
     )
+    @pytest.mark.uses_test_server()
     def test_run_on_dataset_with_missing_labels_dataframe(self):
         # Check that _run_task_get_arffcontent works when one of the class
         # labels only declared in the arff file, but is not present in the
@@ -1600,6 +1616,7 @@ class TestRun(TestBase):
         Version(sklearn.__version__) < Version("0.20"),
         reason="columntransformer introduction in 0.20.0",
     )
+    @pytest.mark.uses_test_server()
     def test_run_on_dataset_with_missing_labels_array(self):
         # Check that _run_task_get_arffcontent works when one of the class
         # labels only declared in the arff file, but is not present in the
@@ -1638,6 +1655,7 @@ class TestRun(TestBase):
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             assert len(row) == 12
 
+    @pytest.mark.uses_test_server()
     def test_get_cached_run(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         openml.runs.functions._get_cached_run(1)
@@ -1648,6 +1666,7 @@ class TestRun(TestBase):
             openml.runs.functions._get_cached_run(10)
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_run_flow_on_task_downloaded_flow(self):
         model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
         flow = self.extension.model_to_flow(model)
@@ -1678,6 +1697,7 @@ class TestRun(TestBase):
         ):
             format_prediction(clustering, *ignored_input)
 
+    @pytest.mark.uses_test_server()
     def test_format_prediction_classification_no_probabilities(self):
         classification = openml.tasks.get_task(
             self.TEST_SERVER_TASK_SIMPLE["task_id"],
@@ -1687,6 +1707,7 @@ class TestRun(TestBase):
         with pytest.raises(ValueError, match="`proba` is required for classification task"):
             format_prediction(classification, *ignored_input, proba=None)
 
+    @pytest.mark.uses_test_server()
     def test_format_prediction_classification_incomplete_probabilities(self):
         classification = openml.tasks.get_task(
             self.TEST_SERVER_TASK_SIMPLE["task_id"],
@@ -1697,6 +1718,7 @@ class TestRun(TestBase):
         with pytest.raises(ValueError, match="Each class should have a predicted probability"):
             format_prediction(classification, *ignored_input, proba=incomplete_probabilities)
 
+    @pytest.mark.uses_test_server()
     def test_format_prediction_task_without_classlabels_set(self):
         classification = openml.tasks.get_task(
             self.TEST_SERVER_TASK_SIMPLE["task_id"],
@@ -1707,6 +1729,7 @@ class TestRun(TestBase):
         with pytest.raises(ValueError, match="The classification task must have class labels set"):
             format_prediction(classification, *ignored_input, proba={})
 
+    @pytest.mark.uses_test_server()
     def test_format_prediction_task_learning_curve_sample_not_set(self):
         learning_curve = openml.tasks.get_task(801, download_data=False)  # diabetes;crossvalidation
         probabilities = {c: 0.2 for c in learning_curve.class_labels}
@@ -1714,6 +1737,7 @@ class TestRun(TestBase):
         with pytest.raises(ValueError, match="`sample` can not be none for LearningCurveTask"):
             format_prediction(learning_curve, *ignored_input, sample=None, proba=probabilities)
 
+    @pytest.mark.uses_test_server()
     def test_format_prediction_task_regression(self):
         task_meta_data = self.TEST_SERVER_TASK_REGRESSION["task_meta_data"]
         _task_id = check_task_existence(**task_meta_data)
@@ -1748,6 +1772,7 @@ class TestRun(TestBase):
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
     )
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_delete_run(self):
         rs = np.random.randint(1, 2**31 - 1)
         clf = sklearn.pipeline.Pipeline(
@@ -1848,6 +1873,7 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     reason="couldn't perform local tests successfully w/o bloating RAM",
     )
 @mock.patch("openml_sklearn.SklearnExtension._prevent_optimize_n_jobs")
+@pytest.mark.uses_test_server()
 def test__run_task_get_arffcontent_2(parallel_mock):
     """Tests if a run executed in parallel is collated correctly."""
     task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
@@ -1938,6 +1964,7 @@ def test__run_task_get_arffcontent_2(parallel_mock):
         (-1, "threading", 10),  # the threading backend does preserve mocks even with parallelizing
     ]
 )
+@pytest.mark.uses_test_server()
 def test_joblib_backends(parallel_mock, n_jobs, backend, call_count):
     """Tests evaluation of a run using various joblib backends and n_jobs."""
     if backend is None:
