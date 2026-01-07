@@ -22,7 +22,7 @@ dependencies = [
   "tqdm",  # For MinIO download progress bars
   "scikit-base",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10,<3.15"    
 maintainers = [
   { name = "Pieter Gijsbers", email="p.gijsbers@tue.nl"},
   { name = "Lennart Purucker"},
@@ -51,12 +51,11 @@ classifiers = [
   "Operating System :: Unix",
   "Operating System :: MacOS",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
 ]
 license = { file = "LICENSE" }
 
