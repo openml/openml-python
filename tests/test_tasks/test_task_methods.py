@@ -5,6 +5,7 @@ from time import time
 
 import openml
 from openml.testing import TestBase
+import pytest
 
 
 # Common methods between tasks

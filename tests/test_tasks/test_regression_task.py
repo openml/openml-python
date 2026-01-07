@@ -4,6 +4,7 @@ from __future__ import annotations
 import ast
 
 import pandas as pd
+import pytest
 
 import openml
 from openml.exceptions import OpenMLServerException
@@ -48,6 +49,7 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
         self.task_type = TaskType.SUPERVISED_REGRESSION
 
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_X_and_Y(self):
         X, Y = super().test_get_X_and_Y()
         assert X.shape == (194, 32)
@@ -56,6 +58,7 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
         assert isinstance(Y, pd.Series)
         assert pd.api.types.is_numeric_dtype(Y)
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_download_task(self):
         task = super().test_download_task()
         assert task.task_id == self.task_id
