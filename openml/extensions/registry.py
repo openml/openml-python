@@ -7,13 +7,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from openml.exceptions import PyOpenMLError
-from openml.extensions.sklearn import SklearnAPIConnector
 
 if TYPE_CHECKING:
     from openml.extensions.base import OpenMLAPIConnector
 
 API_CONNECTOR_REGISTRY: list[type[OpenMLAPIConnector]] = [
-    SklearnAPIConnector,
+    # Add OpenMLAPIConnector subclasses here to register them
 ]
 
 
