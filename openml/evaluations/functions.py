@@ -2,11 +2,10 @@
 # ruff: noqa: PLR0913
 from __future__ import annotations
 
-import json
 from functools import partial
 from itertools import chain
-from typing import Any, Literal
-from typing_extensions import overload
+from typing import TYPE_CHECKING, Any
+from typing_extensions import Literal, overload
 
 import numpy as np
 import pandas as pd
@@ -15,7 +14,10 @@ import xmltodict
 import openml
 import openml._api_calls
 import openml.utils
-from openml.evaluations import OpenMLEvaluation
+from openml._api import api_context
+
+if TYPE_CHECKING:
+    from openml.evaluations import OpenMLEvaluation
 
 
 @overload
@@ -223,54 +225,7 @@ def _list_evaluations(  # noqa: C901
 
 def __list_evaluations(api_call: str) -> list[OpenMLEvaluation]:
     """Helper function to parse API calls which are lists of runs"""
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    evals_dict = xmltodict.parse(xml_string, force_list=("oml:evaluation",))
-    # Minimalistic check if the XML is useful
-    if "oml:evaluations" not in evals_dict:
-        raise ValueError(
-            f'Error in return XML, does not contain "oml:evaluations": {evals_dict!s}',
-        )
-
-    assert isinstance(evals_dict["oml:evaluations"]["oml:evaluation"], list), type(
-        evals_dict["oml:evaluations"],
-    )
-
-    uploader_ids = list(
-        {eval_["oml:uploader"] for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]},
-    )
-    api_users = "user/list/user_id/" + ",".join(uploader_ids)
-    xml_string_user = openml._api_calls._perform_api_call(api_users, "get")
-
-    users = xmltodict.parse(xml_string_user, force_list=("oml:user",))
-    user_dict = {user["oml:id"]: user["oml:username"] for user in users["oml:users"]["oml:user"]}
-
-    evals = []
-    for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]:
-        run_id = int(eval_["oml:run_id"])
-        value = float(eval_["oml:value"]) if "oml:value" in eval_ else None
-        values = json.loads(eval_["oml:values"]) if eval_.get("oml:values", None) else None
-        array_data = eval_.get("oml:array_data")
-
-        evals.append(
-            OpenMLEvaluation(
-                run_id=run_id,
-                task_id=int(eval_["oml:task_id"]),
-                setup_id=int(eval_["oml:setup_id"]),
-                flow_id=int(eval_["oml:flow_id"]),
-                flow_name=eval_["oml:flow_name"],
-                data_id=int(eval_["oml:data_id"]),
-                data_name=eval_["oml:data_name"],
-                function=eval_["oml:function"],
-                upload_time=eval_["oml:upload_time"],
-                uploader=int(eval_["oml:uploader"]),
-                uploader_name=user_dict[eval_["oml:uploader"]],
-                value=value,
-                values=values,
-                array_data=array_data,
-            )
-        )
-
-    return evals
+    return api_context.backend.evaluations.list(api_call)
 
 
 def list_evaluation_measures() -> list[str]:
