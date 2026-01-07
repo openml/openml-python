@@ -9,18 +9,27 @@ from openml._api.resources import (
     DatasetsV1,
     DatasetsV2,
     FallbackProxy,
+    EstimationProceduresV1,
+    EstimationProceduresV2,
     TasksV1,
     TasksV2,
 )
 
 if TYPE_CHECKING:
-    from openml._api.resources.base import DatasetsAPI, TasksAPI
+    from openml._api.resources.base import DatasetsAPI, EstimationProceduresAPI, TasksAPI
 
 
 class APIBackend:
-    def __init__(self, *, datasets: DatasetsAPI | FallbackProxy, tasks: TasksAPI | FallbackProxy):
+    def __init__(
+        self,
+        *,
+        datasets: DatasetsAPI | FallbackProxy,
+        tasks: TasksAPI | FallbackProxy,
+        estimation_procedures: EstimationProceduresAPI | FallbackProxy,
+    ):
         self.datasets = datasets
         self.tasks = tasks
+        self.estimation_procedures = estimation_procedures
 
 
 def build_backend(version: str, *, strict: bool) -> APIBackend:
@@ -50,6 +59,7 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
     v1 = APIBackend(
         datasets=DatasetsV1(v1_http_client),
         tasks=TasksV1(v1_http_client),
+        estimation_procedures=EstimationProceduresV1(v1_http_client),
     )
 
     if version == "v1":
@@ -58,6 +68,7 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
     v2 = APIBackend(
         datasets=DatasetsV2(v2_http_client),
         tasks=TasksV2(v2_http_client),
+        estimation_procedures=EstimationProceduresV2(v2_http_client),
     )
 
     if strict:
