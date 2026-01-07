@@ -1294,7 +1294,7 @@ def format_prediction(  # noqa: PLR0913
         return [repeat, fold, index, prediction, truth]
 
     raise NotImplementedError(
-        f"Formatting predictions for task type '{type(task).__name__}' is not supported. "
+        f"Formatting for {type(task)} is not supported."
         f"Supported task types: OpenMLClassificationTask, OpenMLRegressionTask,"
         f"and OpenMLLearningCurveTask. "
         f"Please ensure your task is one of these types."
