@@ -15,7 +15,7 @@
 ## The Python API for a World of Data and More :dizzy:
 
 [![Latest Release](https://img.shields.io/github/v/release/openml/openml-python)](https://github.com/openml/openml-python/releases)
-[![Python Versions](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://pypi.org/project/openml/)
+[![Python Versions](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://pypi.org/project/openml/)
 [![Downloads](https://static.pepy.tech/badge/openml)](https://pepy.tech/project/openml)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 <!-- Add green badges for CI and precommit -->
@@ -60,7 +60,7 @@ for task_id in suite.tasks:
 
 ## :magic_wand: Installation
 
-OpenML-Python is supported on Python 3.8 - 3.13 and is available on Linux, MacOS, and Windows.
+OpenML-Python is supported on Python 3.10 - 3.14 and is available on Linux, MacOS, and Windows.
 
 You can install OpenML-Python with:
 
@@ -89,3 +89,14 @@ Bibtex entry:
   url     = {http://jmlr.org/papers/v22/19-920.html}
 }
 ```
+## :handshake: Contributing
+
+We welcome contributions from both new and experienced developers!
+
+If you would like to contribute to OpenML-Python, please read our  
+[Contribution Guidelines](https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md).
+
+If you are new to open-source development, a great way to get started is by
+looking at issues labeled **"good first issue"** in our GitHub issue tracker.
+These tasks are beginner-friendly and help you understand the project structure,
+development workflow, and how to submit a pull request.

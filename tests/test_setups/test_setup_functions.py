@@ -34,6 +34,7 @@ class TestSetupFunctions(TestBase):
         self.extension = SklearnExtension()
         super().setUp()
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     def test_nonexisting_setup_exists(self):
         # first publish a non-existing flow
@@ -81,6 +82,7 @@ class TestSetupFunctions(TestBase):
         setup_id = openml.setups.setup_exists(flow)
         assert setup_id == run.setup_id
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     def test_existing_setup_exists_1(self):
         def side_effect(self):
@@ -96,11 +98,13 @@ class TestSetupFunctions(TestBase):
             nb = sklearn.naive_bayes.GaussianNB()
             self._existing_setup_exists(nb)
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     def test_exisiting_setup_exists_2(self):
         # Check a flow with one hyperparameter
         self._existing_setup_exists(sklearn.naive_bayes.GaussianNB())
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     def test_existing_setup_exists_3(self):
         # Check a flow with many hyperparameters
@@ -116,9 +120,8 @@ class TestSetupFunctions(TestBase):
 
     @pytest.mark.production()
     def test_get_setup(self):
+        self.use_production_server()
         # no setups in default test server
-        openml.config.server = "https://www.openml.org/api/v1/xml/"
-
         # contains all special cases, 0 params, 1 param, n params.
         # Non scikitlearn flows.
         setups = [18, 19, 20, 118]

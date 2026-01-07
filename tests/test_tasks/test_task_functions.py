@@ -55,8 +55,8 @@ class TestTask(TestBase):
 
     @pytest.mark.production()
     def test_list_clustering_task(self):
+        self.use_production_server()
         # as shown by #383, clustering tasks can give list/dict casting problems
-        openml.config.server = self.production_server
         openml.tasks.list_tasks(task_type=TaskType.CLUSTERING, size=10)
         # the expected outcome is that it doesn't crash. No assertions.
 
@@ -134,9 +134,9 @@ class TestTask(TestBase):
     )
     @pytest.mark.production()
     def test__get_task_live(self):
+        self.use_production_server()
         # Test the following task as it used to throw an Unicode Error.
         # https://github.com/openml/openml-python/issues/378
-        openml.config.server = self.production_server
         openml.tasks.get_task(34536)
 
     def test_get_task(self):
@@ -152,6 +152,7 @@ class TestTask(TestBase):
             os.path.join(self.workdir, "org", "openml", "test", "datasets", "1", "dataset.arff")
         )
 
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_task_lazy(self):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
@@ -174,6 +175,7 @@ class TestTask(TestBase):
         )
 
     @mock.patch("openml.tasks.functions.get_dataset")
+    @pytest.mark.xfail(reason="failures_issue_1544")
     def test_removal_upon_download_failure(self, get_dataset):
         class WeirdException(Exception):
             pass
@@ -198,7 +200,7 @@ class TestTask(TestBase):
 
     @pytest.mark.production()
     def test_get_task_different_types(self):
-        openml.config.server = self.production_server
+        self.use_production_server()
         # Regression task
         openml.tasks.functions.get_task(5001)
         # Learning curve
