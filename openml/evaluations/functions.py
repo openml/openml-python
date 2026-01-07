@@ -15,6 +15,7 @@ import xmltodict
 import openml
 import openml._api_calls
 import openml.utils
+from openml._api import api_context
 from openml.evaluations import OpenMLEvaluation
 
 
@@ -307,24 +308,7 @@ def list_estimation_procedures() -> list[str]:
     -------
     list
     """
-    api_call = "estimationprocedure/list"
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    api_results = xmltodict.parse(xml_string)
-
-    # Minimalistic check if the XML is useful
-    if "oml:estimationprocedures" not in api_results:
-        raise ValueError('Error in return XML, does not contain "oml:estimationprocedures"')
-
-    if "oml:estimationprocedure" not in api_results["oml:estimationprocedures"]:
-        raise ValueError('Error in return XML, does not contain "oml:estimationprocedure"')
-
-    if not isinstance(api_results["oml:estimationprocedures"]["oml:estimationprocedure"], list):
-        raise TypeError('Error in return XML, does not contain "oml:estimationprocedure" as a list')
-
-    return [
-        prod["oml:name"]
-        for prod in api_results["oml:estimationprocedures"]["oml:estimationprocedure"]
-    ]
+    return api_context.backend.estimation_procedures.list()
 
 
 def list_evaluations_setups(

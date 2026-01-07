@@ -29,3 +29,8 @@ class TasksAPI(ResourceAPI):
         *,
         return_response: bool = False,
     ) -> OpenMLTask | tuple[OpenMLTask, Response]: ...
+
+
+class EstimationProceduresAPI(ResourceAPI, ABC):
+    @abstractmethod
+    def list(self) -> list[str]: ...
