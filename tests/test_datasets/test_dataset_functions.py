@@ -157,7 +157,7 @@ class TestOpenMLDataset(TestBase):
             openml.datasets.check_datasets_active,
             [79],
         )
-        openml.config._config.server = self.test_server
+        openml.config.server = self.test_server
 
     @pytest.mark.uses_test_server()
     def test_illegal_character_tag(self):
@@ -185,7 +185,7 @@ class TestOpenMLDataset(TestBase):
         self.use_production_server()
         # /d/1 was deactivated
         assert openml.datasets.functions._name_to_id("anneal") == 2
-        openml.config._config.server = self.test_server
+        openml.config.server = self.test_server
 
     @pytest.mark.production()
     def test__name_to_id_with_multiple_active(self):
@@ -436,8 +436,8 @@ class TestOpenMLDataset(TestBase):
             "oml:md5_checksum": "abc",
             "oml:url": "https://www.openml.org/data/download/61",
         }
-        n = openml.config._config.connection_n_retries
-        openml.config._config.connection_n_retries = 1
+        n = openml.config.connection_n_retries
+        openml.config.connection_n_retries = 1
 
         self.assertRaisesRegex(
             OpenMLHashException,
@@ -447,7 +447,7 @@ class TestOpenMLDataset(TestBase):
             description,
         )
 
-        openml.config._config.connection_n_retries = n
+        openml.config.connection_n_retries = n
 
     @pytest.mark.uses_test_server()
     def test__get_dataset_features(self):
@@ -616,7 +616,7 @@ class TestOpenMLDataset(TestBase):
 
         # admin key for test server (only admins can activate datasets.
         # all users can deactivate their own datasets)
-        openml.config._config.apikey = TestBase.admin_key
+        openml.config.apikey = TestBase.admin_key
 
         openml.datasets.status_update(did, "active")
         self._assert_status_of_dataset(did=did, status="active")
@@ -1554,7 +1554,7 @@ class TestOpenMLDataset(TestBase):
         datasets_b = openml.datasets.list_datasets(size=np.inf)
 
         # Reverting to test server
-        openml.config._config.server = self.test_server
+        openml.config.server = self.test_server
         assert len(datasets_a) == len(datasets_b)
 
 

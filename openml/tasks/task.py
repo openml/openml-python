@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Sequence
 from typing_extensions import TypedDict
 
+import openml
 import openml._api_calls
-import openml.config
 from openml import datasets
 from openml.base import OpenMLBase
 from openml.utils import _create_cache_directory_for_id

@@ -110,26 +110,25 @@ class TestConfigurationForExamples(openml.testing.TestBase):
     def test_switch_to_example_configuration(self):
         """Verifies the test configuration is loaded properly."""
         # Below is the default test key which would be used anyway, but just for clarity:
-        openml.config._config.apikey = TestBase.admin_key
-        openml.config._config.server = self.production_server
+        openml.config.apikey = TestBase.admin_key
+        openml.config.server = self.production_server
 
         openml.config.start_using_configuration_for_example()
 
-        assert openml.config._config.apikey == TestBase.user_key
-        assert openml.config._config.server == self.test_server
+        assert openml.config.apikey == TestBase.user_key
+        assert openml.config.server == self.test_server
 
     @pytest.mark.production()
     def test_switch_from_example_configuration(self):
         """Verifies the previous configuration is loaded after stopping."""
         # Below is the default test key which would be used anyway, but just for clarity:
-        openml.config._config.apikey = TestBase.user_key
-        openml.config._config.server = self.production_server
+        openml.config.apikey = TestBase.user_key
+        openml.config.server = self.production_server
 
         openml.config.start_using_configuration_for_example()
         openml.config.stop_using_configuration_for_example()
-
-        assert openml.config._config.apikey == TestBase.user_key
-        assert openml.config._config.server == self.production_server
+        assert openml.config.apikey == TestBase.user_key
+        assert openml.config.server == self.production_server
 
     def test_example_configuration_stop_before_start(self):
         """Verifies an error is raised if `stop_...` is called before `start_...`."""
@@ -146,15 +145,15 @@ class TestConfigurationForExamples(openml.testing.TestBase):
     @pytest.mark.production()
     def test_example_configuration_start_twice(self):
         """Checks that the original config can be returned to if `start..` is called twice."""
-        openml.config._config.apikey = TestBase.user_key
-        openml.config._config.server = self.production_server
+        openml.config.apikey = TestBase.user_key
+        openml.config.server = self.production_server
 
         openml.config.start_using_configuration_for_example()
         openml.config.start_using_configuration_for_example()
         openml.config.stop_using_configuration_for_example()
 
-        assert openml.config._config.apikey == TestBase.user_key
-        assert openml.config._config.server == self.production_server
+        assert openml.config.apikey == TestBase.user_key
+        assert openml.config.server == self.production_server
 
 
 def test_configuration_file_not_overwritten_on_load():
