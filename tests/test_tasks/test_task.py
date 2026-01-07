@@ -4,6 +4,8 @@ from __future__ import annotations
 import unittest
 from random import randint, shuffle
 
+import pytest
+
 from openml.datasets import (
     get_dataset,
     list_datasets,
@@ -30,9 +32,11 @@ class OpenMLTaskTest(TestBase):
     def setUp(self, n_levels: int = 1):
         super().setUp()
 
+    @pytest.mark.uses_test_server()
     def test_download_task(self):
         return get_task(self.task_id)
 
+    @pytest.mark.uses_test_server()
     def test_upload_task(self):
         # We don't know if the task in question already exists, so we try a few times. Checking
         # beforehand would not be an option because a concurrent unit test could potentially
