@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from requests import Response
 
     from openml.datasets.dataset import OpenMLDataset
+    from openml.evaluations.evaluation import OpenMLEvaluation
     from openml.tasks.task import OpenMLTask
 
 
@@ -29,3 +30,8 @@ class TasksAPI(ResourceAPI):
         *,
         return_response: bool = False,
     ) -> OpenMLTask | tuple[OpenMLTask, Response]: ...
+
+
+class EvaluationsAPI(ResourceAPI, ABC):
+    @abstractmethod
+    def list(self, api_call: str) -> list[OpenMLEvaluation]: ...
