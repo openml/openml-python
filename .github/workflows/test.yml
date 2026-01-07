@@ -98,9 +98,9 @@ jobs:
         fi
 
         if [ "${{ matrix.sklearn-only }}" = "true" ]; then
-          marks="sklearn and not production"
+          marks="sklearn and not production and not uses_test_server"
         else
-          marks="not production"
+          marks="not production and not uses_test_server"
         fi
 
         pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
@@ -113,9 +113,9 @@ jobs:
         fi
 
         if [ "${{ matrix.sklearn-only }}" = "true" ]; then
-          marks="sklearn and production"
+          marks="sklearn and production and not uses_test_server"
         else
-          marks="production"
+          marks="production and not uses_test_server"
         fi
 
         pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
@@ -123,7 +123,7 @@ jobs:
     - name: Run tests on Windows
       if: matrix.os == 'windows-latest'
       run: |  # we need a separate step because of the bash-specific if-statement in the previous one.
-        pytest -n 4 --durations=20 --dist load -sv --reruns 5 --reruns-delay 1
+        pytest -n 4 --durations=20 --dist load -sv --reruns 5 --reruns-delay 1 -m "not uses_test_server"
 
     - name: Check for files left behind by test
       if: matrix.os != 'windows-latest' && always()
