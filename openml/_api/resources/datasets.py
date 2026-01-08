@@ -1,0 +1,20 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from openml._api.resources.base import DatasetsAPI
+
+if TYPE_CHECKING:
+    from requests import Response
+
+    from openml.datasets.dataset import OpenMLDataset
+
+
+class DatasetsV1(DatasetsAPI):
+    def get(self, dataset_id: int) -> OpenMLDataset | tuple[OpenMLDataset, Response]:
+        raise NotImplementedError
+
+
+class DatasetsV2(DatasetsAPI):
+    def get(self, dataset_id: int) -> OpenMLDataset | tuple[OpenMLDataset, Response]:
+        raise NotImplementedError
