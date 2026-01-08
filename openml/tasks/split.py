@@ -4,11 +4,13 @@ from __future__ import annotations
 import pickle
 from collections import OrderedDict
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 from typing_extensions import NamedTuple
 
 import arff  # type: ignore
 import numpy as np
+
+from openml.utils import ReprMixin
 
 
 class Split(NamedTuple):
@@ -18,7 +20,7 @@ class Split(NamedTuple):
     test: np.ndarray
 
 
-class OpenMLSplit:
+class OpenMLSplit(ReprMixin):
     """OpenML Split object.
 
     This class manages train-test splits for a dataset across multiple
@@ -63,10 +65,8 @@ class OpenMLSplit:
         self.folds = len(self.split[0])
         self.samples = len(self.split[0][0])
 
-    def __repr__(self) -> str:
-        header = "OpenML Split"
-        header = f"{header}\n{'=' * len(header)}\n"
-
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
+        """Collect all information to display in the __repr__ body."""
         fields = {
             "Name": self.name,
             "Description": (
@@ -79,12 +79,7 @@ class OpenMLSplit:
 
         order = ["Name", "Description", "Repeats", "Folds", "Samples"]
 
-        _fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, _ in _fields)
-        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
-        return header + body
+        return [(key, fields[key]) for key in order if key in fields]
 
     def __eq__(self, other: Any) -> bool:
         if (

@@ -1,25 +1,21 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import re
 import webbrowser
 from abc import ABC, abstractmethod
-from typing import Iterable, Sequence
+from typing import Sequence
 
 import xmltodict
 
 import openml._api_calls
 import openml.config
+from openml.utils import ReprMixin
 
 from .utils import _get_rest_api_type_alias, _tag_openml_base
 
 
-class OpenMLBase(ABC):
+class OpenMLBase(ReprMixin, ABC):
     """Base object for functionality that is shared across entities."""
-
-    def __repr__(self) -> str:
-        body_fields = self._get_repr_body_fields()
-        return self._apply_repr_template(body_fields)
 
     @property
     @abstractmethod
@@ -59,34 +55,6 @@ class OpenMLBase(ABC):
             If value is a List of str, then each item of the list will appear in a separate row.
         """
         # Should be implemented in the base class.
-
-    def _apply_repr_template(
-        self,
-        body_fields: Iterable[tuple[str, str | int | list[str] | None]],
-    ) -> str:
-        """Generates the header and formats the body for string representation of the object.
-
-        Parameters
-        ----------
-        body_fields: List[Tuple[str, str]]
-           A list of (name, value) pairs to display in the body of the __repr__.
-        """
-        # We add spaces between capitals, e.g. ClassificationTask -> Classification Task
-        name_with_spaces = re.sub(
-            r"(\w)([A-Z])",
-            r"\1 \2",
-            self.__class__.__name__[len("OpenML") :],
-        )
-        header_text = f"OpenML {name_with_spaces}"
-        header = f"{header_text}\n{'=' * len(header_text)}\n"
-
-        _body_fields: list[tuple[str, str | int | list[str]]] = [
-            (k, "None" if v is None else v) for k, v in body_fields
-        ]
-        longest_field_name_length = max(len(name) for name, _ in _body_fields)
-        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(field_line_format.format(name, value) for name, value in _body_fields)
-        return header + body
 
     @abstractmethod
     def _to_dict(self) -> dict[str, dict]:
