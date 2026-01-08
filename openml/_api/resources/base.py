@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from requests import Response
@@ -29,3 +29,8 @@ class TasksAPI(ResourceAPI, ABC):
         *,
         return_response: bool = False,
     ) -> OpenMLTask | tuple[OpenMLTask, Response]: ...
+
+
+class StudiesAPI(ResourceAPI, ABC):
+    @abstractmethod
+    def list(self, **kwargs: Any) -> Any: ...

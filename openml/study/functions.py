@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import warnings
 from functools import partial
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import xmltodict
@@ -12,6 +12,7 @@ import xmltodict
 import openml._api_calls
 import openml.config
 import openml.utils
+from openml._api import api_context
 from openml.study.study import OpenMLBenchmarkSuite, OpenMLStudy
 
 if TYPE_CHECKING:
@@ -483,7 +484,7 @@ def list_studies(
     offset: int | None = None,
     size: int | None = None,
     status: str | None = None,
-    uploader: list[str] | None = None,
+    uploader: list[int] | None = None,
     benchmark_suite: int | None = None,
 ) -> pd.DataFrame:
     """
@@ -531,7 +532,15 @@ def list_studies(
     return pd.concat(batches)
 
 
-def _list_studies(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
+def _list_studies(
+    limit: int,
+    offset: int,
+    *,
+    status: str | None = None,
+    main_entity_type: str | None = None,
+    uploader: list[int] | None = None,
+    benchmark_suite: int | None = None,
+) -> pd.DataFrame:
     """Perform api call to return a list of studies.
 
     Parameters
@@ -548,33 +557,59 @@ def _list_studies(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
     -------
     studies : dataframe
     """
-    api_call = "study/list"
-    if limit is not None:
-        api_call += f"/limit/{limit}"
-    if offset is not None:
-        api_call += f"/offset/{offset}"
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            if value is not None:
-                api_call += f"/{operator}/{value}"
-    return __list_studies(api_call=api_call)
+    return __list_studies(
+        limit=limit,
+        offset=offset,
+        status=status,
+        main_entity_type=main_entity_type,
+        uploader=uploader,
+        benchmark_suite=benchmark_suite,
+    )
 
 
-def __list_studies(api_call: str) -> pd.DataFrame:
+def __list_studies(
+    limit: int | None,
+    offset: int | None,
+    *,
+    status: str | None = None,
+    main_entity_type: str | None = None,
+    uploader: list[int] | None = None,
+    benchmark_suite: int | None = None,
+) -> pd.DataFrame:
     """Retrieves the list of OpenML studies and
     returns it in a dictionary or a Pandas DataFrame.
 
+    This function constructs the API call from parameters, making it
+    ready for both V1 (URL-based) and future V2 (JSON-based) APIs.
+
     Parameters
     ----------
-    api_call : str
-        The API call for retrieving the list of OpenML studies.
+    limit : int, optional
+        The maximum number of studies to return.
+    offset : int, optional
+        The number of studies to skip, starting from the first.
+    status : str, optional
+        Filter by status (active, in_preparation, deactivated, all)
+    main_entity_type : str, optional
+        Filter by main entity type (run, task)
+    uploader : list[int], optional
+        Filter by uploader IDs
+    benchmark_suite : int, optional
+        Filter by benchmark suite ID
 
     Returns
     -------
     pd.DataFrame
         A Pandas DataFrame of OpenML studies
     """
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
+    xml_string = api_context.backend.studies.list(
+        limit=limit,
+        offset=offset,
+        status=status,
+        main_entity_type=main_entity_type,
+        uploader=uploader,
+        benchmark_suite=benchmark_suite,
+    )
     study_dict = xmltodict.parse(xml_string, force_list=("oml:study",))
 
     # Minimalistic check if the XML is useful
