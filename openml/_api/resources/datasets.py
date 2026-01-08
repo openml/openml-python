@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections import OrderedDict
-from functools import partial
 from typing import TYPE_CHECKING, Any
 from typing_extensions import Literal
 
@@ -20,19 +19,10 @@ class DatasetsV1(DatasetsAPI):
     def get(
         self,
         dataset_id: int | str,
-        version: int | None = None,
-        error_if_multiple: bool = False,  # noqa: FBT002, FBT001
         *,
         return_response: bool = False,
     ) -> OpenMLDataset | tuple[OpenMLDataset, Response]:
-        if isinstance(dataset_id, int):
-            resolved_id = dataset_id
-        elif dataset_id.isdigit():
-            resolved_id = int(dataset_id)
-        else:
-            resolved_id = self._name_to_id(dataset_id, version, error_if_multiple)
-
-        path = f"data/{resolved_id}"
+        path = f"data/{dataset_id}"
         response = self._http.get(path)
         xml_content = response.text
         dataset = self._create_dataset_from_xml(xml_content)
@@ -42,74 +32,88 @@ class DatasetsV1(DatasetsAPI):
 
         return dataset
 
-    def list(  # noqa: PLR0913
+    def list(
         self,
-        data_id: list[int] | None = None,
-        offset: int | None = None,
-        size: int | None = None,
-        status: str | None = None,
-        tag: str | None = None,
-        data_name: str | None = None,
-        data_version: int | None = None,
-        number_instances: int | str | None = None,
-        number_features: int | str | None = None,
-        number_classes: int | str | None = None,
-        number_missing_values: int | str | None = None,
+        limit: int,
+        offset: int,
+        *,
+        data_id: list[int] | None = None,  # type: ignore
+        **kwargs: Any,
     ) -> pd.DataFrame:
-        """Return a dataframe of all dataset which are on OpenML.
-
-        Supports large amount of results.
+        """
+        Perform api call to return a list of all datasets.
 
         Parameters
         ----------
-        data_id : list, optional
-            A list of data ids, to specify which datasets should be
-            listed
-        offset : int, optional
-            The number of datasets to skip, starting from the first.
-        size : int, optional
+        The arguments that are lists are separated from the single value
+        ones which are put into the kwargs.
+        display_errors is also separated from the kwargs since it has a
+        default value.
+
+        limit : int
             The maximum number of datasets to show.
-        status : str, optional
-            Should be {active, in_preparation, deactivated}. By
-            default active datasets are returned, but also datasets
-            from another status can be requested.
-        tag : str, optional
-        data_name : str, optional
-        data_version : int, optional
-        number_instances : int | str, optional
-        number_features : int | str, optional
-        number_classes : int | str, optional
-        number_missing_values : int | str, optional
+        offset : int
+            The number of datasets to skip, starting from the first.
+        data_id : list, optional
+
+        kwargs : dict, optional
+            Legal filter operators (keys in the dict):
+            tag, status, limit, offset, data_name, data_version, number_instances,
+            number_features, number_classes, number_missing_values.
 
         Returns
         -------
-        datasets: dataframe
-            Each row maps to a dataset
-            Each column contains the following information:
-            - dataset id
-            - name
-            - format
-            - status
-            If qualities are calculated for the dataset, some of
-            these are also included as columns.
+        datasets : dataframe
         """
-        listing_call = partial(
-            self._list_datasets,
-            data_id=data_id,
-            status=status,
-            tag=tag,
-            data_name=data_name,
-            data_version=data_version,
-            number_instances=number_instances,
-            number_features=number_features,
-            number_classes=number_classes,
-            number_missing_values=number_missing_values,
-        )
-        batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
-        if len(batches) == 0:
-            return pd.DataFrame()
+        api_call = "data/list"
 
-        return pd.concat(batches)
+        if limit is not None:
+            api_call += f"/limit/{limit}"
+        if offset is not None:
+            api_call += f"/offset/{offset}"
+
+        if kwargs is not None:
+            for operator, value in kwargs.items():
+                if value is not None:
+                    api_call += f"/{operator}/{value}"
+        if data_id is not None:
+            api_call += f"/data_id/{','.join([str(int(i)) for i in data_id])}"
+
+        xml_string = self._http.get(api_call).text
+        datasets_dict = xmltodict.parse(xml_string, force_list=("oml:dataset",))
+
+        # Minimalistic check if the XML is useful
+        assert isinstance(datasets_dict["oml:data"]["oml:dataset"], list), type(
+            datasets_dict["oml:data"],
+        )
+        assert datasets_dict["oml:data"]["@xmlns:oml"] == "http://openml.org/openml", datasets_dict[
+            "oml:data"
+        ]["@xmlns:oml"]
+
+        datasets = {}
+        for dataset_ in datasets_dict["oml:data"]["oml:dataset"]:
+            ignore_attribute = ["oml:file_id", "oml:quality"]
+            dataset = {
+                k.replace("oml:", ""): v for (k, v) in dataset_.items() if k not in ignore_attribute
+            }
+            dataset["did"] = int(dataset["did"])
+            dataset["version"] = int(dataset["version"])
+
+            # The number of qualities can range from 0 to infinity
+            for quality in dataset_.get("oml:quality", []):
+                try:
+                    dataset[quality["@name"]] = int(quality["#text"])
+                except ValueError:
+                    dataset[quality["@name"]] = float(quality["#text"])
+            datasets[dataset["did"]] = dataset
+
+        return pd.DataFrame.from_dict(datasets, orient="index").astype(
+            {
+                "did": int,
+                "version": int,
+                "status": pd.CategoricalDtype(["active", "deactivated", "in_preparation"]),
+            }
+        )
 
     def delete(self, dataset_id: int) -> bool:
         """Delete dataset with id `dataset_id` from the OpenML server.
@@ -299,90 +303,27 @@ class DatasetsV1(DatasetsAPI):
             # This should never happen
             raise ValueError("Data id/status does not collide")
 
-    def _list_datasets(
-        self,
-        limit: int,
-        offset: int,
-        *,
-        data_id: list[int] | None = None,  # type: ignore
-        **kwargs: Any,
-    ) -> pd.DataFrame:
-        """
-        Perform api call to return a list of all datasets.
+    def list_qualities(self) -> list[str]:  # type: ignore
+        """Return list of data qualities available.
 
-        Parameters
-        ----------
-        The arguments that are lists are separated from the single value
-        ones which are put into the kwargs.
-        display_errors is also separated from the kwargs since it has a
-        default value.
-
-        limit : int
-            The maximum number of datasets to show.
-        offset : int
-            The number of datasets to skip, starting from the first.
-        data_id : list, optional
-
-        kwargs : dict, optional
-            Legal filter operators (keys in the dict):
-            tag, status, limit, offset, data_name, data_version, number_instances,
-            number_features, number_classes, number_missing_values.
+        The function performs an API call to retrieve the entire list of
+        data qualities that are computed on the datasets uploaded.
 
         Returns
         -------
-        datasets : dataframe
+        list
         """
-        api_call = "data/list"
-
-        if limit is not None:
-            api_call += f"/limit/{limit}"
-        if offset is not None:
-            api_call += f"/offset/{offset}"
-
-        if kwargs is not None:
-            for operator, value in kwargs.items():
-                if value is not None:
-                    api_call += f"/{operator}/{value}"
-        if data_id is not None:
-            api_call += f"/data_id/{','.join([str(int(i)) for i in data_id])}"
-        return self.__list_datasets(api_call=api_call)
-
-    def __list_datasets(self, api_call: str) -> pd.DataFrame:
+        api_call = "data/qualities/list"
         xml_string = self._http.get(api_call).text
-        datasets_dict = xmltodict.parse(xml_string, force_list=("oml:dataset",))
-
+        qualities = xmltodict.parse(xml_string, force_list=("oml:quality"))
         # Minimalistic check if the XML is useful
-        assert isinstance(datasets_dict["oml:data"]["oml:dataset"], list), type(
-            datasets_dict["oml:data"],
-        )
-        assert datasets_dict["oml:data"]["@xmlns:oml"] == "http://openml.org/openml", datasets_dict[
-            "oml:data"
-        ]["@xmlns:oml"]
+        if "oml:data_qualities_list" not in qualities:
+            raise ValueError('Error in return XML, does not contain "oml:data_qualities_list"')
 
-        datasets = {}
-        for dataset_ in datasets_dict["oml:data"]["oml:dataset"]:
-            ignore_attribute = ["oml:file_id", "oml:quality"]
-            dataset = {
-                k.replace("oml:", ""): v for (k, v) in dataset_.items() if k not in ignore_attribute
-            }
-            dataset["did"] = int(dataset["did"])
-            dataset["version"] = int(dataset["version"])
+        if not isinstance(qualities["oml:data_qualities_list"]["oml:quality"], list):
+            raise TypeError('Error in return XML, does not contain "oml:quality" as a list')
 
-            # The number of qualities can range from 0 to infinity
-            for quality in dataset_.get("oml:quality", []):
-                try:
-                    dataset[quality["@name"]] = int(quality["#text"])
-                except ValueError:
-                    dataset[quality["@name"]] = float(quality["#text"])
-            datasets[dataset["did"]] = dataset
-
-        return pd.DataFrame.from_dict(datasets, orient="index").astype(
-            {
-                "did": int,
-                "version": int,
-                "status": pd.CategoricalDtype(["active", "deactivated", "in_preparation"]),
-            }
-        )
+        return qualities["oml:data_qualities_list"]["oml:quality"]
 
     def _create_dataset_from_xml(self, xml: str) -> OpenMLDataset:
         """Create a dataset given a xml string.
@@ -435,24 +376,74 @@ class DatasetsV1(DatasetsAPI):
             parquet_file=str(parquet_file) if parquet_file is not None else None,
         )
 
+    def feature_add_ontology(self, data_id: int, index: int, ontology: str) -> bool:
+        """
+        An ontology describes the concept that are described in a feature. An
+        ontology is defined by an URL where the information is provided. Adds
+        an ontology (URL) to a given dataset feature (defined by a dataset id
+        and index). The dataset has to exists on OpenML and needs to have been
+        processed by the evaluation engine.
+
+        Parameters
+        ----------
+        data_id : int
+            id of the dataset to which the feature belongs
+        index : int
+            index of the feature in dataset (0-based)
+        ontology : str
+            URL to ontology (max. 256 characters)
+
+        Returns
+        -------
+        True or throws an OpenML server exception
+        """
+        upload_data: dict[str, int | str] = {
+            "data_id": data_id,
+            "index": index,
+            "ontology": ontology,
+        }
+        self._http.post("data/feature/ontology/add", data=upload_data)
+        # an error will be thrown in case the request was unsuccessful
+        return True
+
+    def feature_remove_ontology(self, data_id: int, index: int, ontology: str) -> bool:
+        """
+        Removes an existing ontology (URL) from a given dataset feature (defined
+        by a dataset id and index). The dataset has to exists on OpenML and needs
+        to have been processed by the evaluation engine. Ontology needs to be
+        attached to the specific fearure.
+
+        Parameters
+        ----------
+        data_id : int
+            id of the dataset to which the feature belongs
+        index : int
+            index of the feature in dataset (0-based)
+        ontology : str
+            URL to ontology (max. 256 characters)
+
+        Returns
+        -------
+        True or throws an OpenML server exception
+        """
+        upload_data: dict[str, int | str] = {
+            "data_id": data_id,
+            "index": index,
+            "ontology": ontology,
+        }
+        self._http.post("data/feature/ontology/remove", data=upload_data)
+        # an error will be thrown in case the request was unsuccessful
+        return True
+
 
 class DatasetsV2(DatasetsAPI):
     def get(
         self,
         dataset_id: int | str,
-        version: int | None = None,
-        error_if_multiple: bool = False,  # noqa: FBT002, FBT001
         *,
         return_response: bool = False,
     ) -> OpenMLDataset | tuple[OpenMLDataset, Response]:
-        if isinstance(dataset_id, int):
-            resolved_id = dataset_id
-        elif dataset_id.isdigit():
-            resolved_id = int(dataset_id)
-        else:
-            resolved_id = self._name_to_id(dataset_id, version, error_if_multiple)
-
-        path = f"data/{resolved_id}"
+        path = f"data/{dataset_id}"
         response = self._http.get(path)
         json_content = response.json()
         dataset = self._create_dataset_from_json(json_content)
@@ -462,74 +453,76 @@ class DatasetsV2(DatasetsAPI):
 
         return dataset
 
-    def list(  # noqa: PLR0913
+    def list(
         self,
-        data_id: list[int] | None = None,
-        offset: int | None = None,
-        size: int | None = None,
-        status: str | None = None,
-        tag: str | None = None,
-        data_name: str | None = None,
-        data_version: int | None = None,
-        number_instances: int | str | None = None,
-        number_features: int | str | None = None,
-        number_classes: int | str | None = None,
-        number_missing_values: int | str | None = None,
+        limit: int,
+        offset: int,
+        **kwargs: Any,
     ) -> pd.DataFrame:
-        """Return a dataframe of all dataset which are on OpenML.
-
-        Supports large amount of results.
+        """
+        Perform api call to return a list of all datasets.
 
         Parameters
         ----------
-        data_id : list, optional
-            A list of data ids, to specify which datasets should be
-            listed
-        offset : int, optional
-            The number of datasets to skip, starting from the first.
-        size : int, optional
+        The arguments that are lists are separated from the single value
+        ones which are put into the kwargs.
+        display_errors is also separated from the kwargs since it has a
+        default value.
+
+        limit : int
             The maximum number of datasets to show.
-        status : str, optional
-            Should be {active, in_preparation, deactivated}. By
-            default active datasets are returned, but also datasets
-            from another status can be requested.
-        tag : str, optional
-        data_name : str, optional
-        data_version : int, optional
-        number_instances : int | str, optional
-        number_features : int | str, optional
-        number_classes : int | str, optional
-        number_missing_values : int | str, optional
+        offset : int
+            The number of datasets to skip, starting from the first.
+        data_id : list, optional
+
+        kwargs : dict, optional
+            Legal filter operators (keys in the dict):
+            tag, status, limit, offset, data_name, data_version, number_instances,
+            number_features, number_classes, number_missing_values, data_id.
 
         Returns
         -------
-        datasets: dataframe
-            Each row maps to a dataset
-            Each column contains the following information:
-            - dataset id
-            - name
-            - format
-            - status
-            If qualities are calculated for the dataset, some of
-            these are also included as columns.
+        datasets : dataframe
         """
-        listing_call = partial(
-            self._list_datasets,
-            data_id=data_id,
-            status=status,
-            tag=tag,
-            data_name=data_name,
-            data_version=data_version,
-            number_instances=number_instances,
-            number_features=number_features,
-            number_classes=number_classes,
-            number_missing_values=number_missing_values,
-        )
-        batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
-        if len(batches) == 0:
-            return pd.DataFrame()
+        json: dict[str, Any] = {"pagination": {}}
 
-        return pd.concat(batches)
+        if limit is not None:
+            json["pagination"]["limit"] = limit
+        if offset is not None:
+            json["pagination"]["offset"] = offset
+
+        if kwargs is not None:
+            for operator, value in kwargs.items():
+                if value is not None:
+                    json[operator] = value
+
+        api_call = "datasets/list"
+        datasets_list = self._http.post(api_call, json=json).json()
+        # Minimalistic check if the JSON is useful
+        assert isinstance(datasets_list, list), type(datasets_list)
+
+        datasets = {}
+        for dataset_ in datasets_list:
+            ignore_attribute = ["file_id", "quality"]
+            dataset = {k: v for (k, v) in dataset_.items() if k not in ignore_attribute}
+            dataset["did"] = int(dataset["did"])
+            dataset["version"] = int(dataset["version"])
+
+            # The number of qualities can range from 0 to infinity
+            for quality in dataset_.get("quality", []):
+                try:
+                    dataset[quality["name"]] = int(quality["value"])
+                except ValueError:
+                    dataset[quality["name"]] = float(quality["value"])
+            datasets[dataset["did"]] = dataset
+
+        return pd.DataFrame.from_dict(datasets, orient="index").astype(
+            {
+                "did": int,
+                "version": int,
+                "status": pd.CategoricalDtype(["active", "deactivated", "in_preparation"]),
+            }
+        )
 
     def delete(self, dataset_id: int) -> bool:
         raise NotImplementedError()
@@ -580,79 +573,26 @@ class DatasetsV2(DatasetsAPI):
             # This should never happen
             raise ValueError("Data id/status does not collide")
 
-    def _list_datasets(
-        self,
-        limit: int,
-        offset: int,
-        **kwargs: Any,
-    ) -> pd.DataFrame:
-        """
-        Perform api call to return a list of all datasets.
+    def list_qualities(self) -> list[str]:  # type: ignore
+        """Return list of data qualities available.
 
-        Parameters
-        ----------
-        The arguments that are lists are separated from the single value
-        ones which are put into the kwargs.
-        display_errors is also separated from the kwargs since it has a
-        default value.
-
-        limit : int
-            The maximum number of datasets to show.
-        offset : int
-            The number of datasets to skip, starting from the first.
-        data_id : list, optional
-
-        kwargs : dict, optional
-            Legal filter operators (keys in the dict):
-            tag, status, limit, offset, data_name, data_version, number_instances,
-            number_features, number_classes, number_missing_values, data_id.
+        The function performs an API call to retrieve the entire list of
+        data qualities that are computed on the datasets uploaded.
 
         Returns
         -------
-        datasets : dataframe
+        list
         """
-        json: dict[str, Any] = {"pagination": {}}
+        api_call = "datasets/qualities/list"
+        qualities = self._http.get(api_call).json()
+        # Minimalistic check if the XML is useful
+        if "data_qualities_list" not in qualities:
+            raise ValueError('Error in return XML, does not contain "oml:data_qualities_list"')
 
-        if limit is not None:
-            json["pagination"]["limit"] = limit
-        if offset is not None:
-            json["pagination"]["offset"] = offset
+        if not isinstance(qualities["data_qualities_list"]["quality"], list):
+            raise TypeError('Error in return json, does not contain "quality" as a list')
 
-        if kwargs is not None:
-            for operator, value in kwargs.items():
-                if value is not None:
-                    json[operator] = value
-
-        return self.__list_datasets(json=json)
-
-    def __list_datasets(self, json: dict) -> pd.DataFrame:
-        api_call = "datasets/list"
-        datasets_list = self._http.post(api_call, json=json).json()
-        # Minimalistic check if the JSON is useful
-        assert isinstance(datasets_list, list), type(datasets_list)
-
-        datasets = {}
-        for dataset_ in datasets_list:
-            ignore_attribute = ["file_id", "quality"]
-            dataset = {k: v for (k, v) in dataset_.items() if k not in ignore_attribute}
-            dataset["did"] = int(dataset["did"])
-            dataset["version"] = int(dataset["version"])
-
-            # The number of qualities can range from 0 to infinity
-            for quality in dataset_.get("quality", []):
-                try:
-                    dataset[quality["name"]] = int(quality["value"])
-                except ValueError:
-                    dataset[quality["name"]] = float(quality["value"])
-            datasets[dataset["did"]] = dataset
-
-        return pd.DataFrame.from_dict(datasets, orient="index").astype(
-            {
-                "did": int,
-                "version": int,
-                "status": pd.CategoricalDtype(["active", "deactivated", "in_preparation"]),
-            }
-        )
+        return qualities["data_qualities_list"]["quality"]
 
     def _create_dataset_from_json(self, json_content: dict) -> OpenMLDataset:
         """Create a dataset given a json.
@@ -702,3 +642,9 @@ class DatasetsV2(DatasetsAPI):
             parquet_url=json_content.get("parquet_url"),
             parquet_file=str(parquet_file) if parquet_file is not None else None,
         )
+
+    def feature_add_ontology(self, data_id: int, index: int, ontology: str) -> bool:
+        raise NotImplementedError()
+
+    def feature_remove_ontology(self, data_id: int, index: int, ontology: str) -> bool:
+        raise NotImplementedError()
