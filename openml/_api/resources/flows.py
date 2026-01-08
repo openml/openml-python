@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
+import requests
 import xmltodict
 
 from openml._api.resources.base import FlowsAPI
@@ -183,10 +184,59 @@ class FlowsV2(FlowsAPI):
         *,
         return_response: bool = False,
     ) -> OpenMLFlow | tuple[OpenMLFlow, Response]:
-        raise NotImplementedError
+        """Get a flow from the OpenML v2 server.
+
+        Parameters
+        ----------
+        flow_id : int
+            The ID of the flow to retrieve.
+        return_response : bool, optional (default=False)
+            Whether to return the raw response object along with the flow.
+
+        Returns
+        -------
+        OpenMLFlow | tuple[OpenMLFlow, Response]
+            The retrieved flow object, and optionally the raw response.
+        """
+        response = self._http.get(f"flows/{flow_id}/")
+        flow_json = response.json()
+
+        # Convert v2 JSON to v1-compatible dict for OpenMLFlow._from_dict()
+        flow_dict = self._convert_v2_to_v1_format(flow_json)
+        flow = OpenMLFlow._from_dict(flow_dict)
+
+        if return_response:
+            return flow, response
+        return flow
 
     def exists(self, name: str, external_version: str) -> int | bool:
-        raise NotImplementedError
+        """Check if a flow exists on the OpenML v2 server.
+
+        Parameters
+        ----------
+        name : str
+            The name of the flow.
+        external_version : str
+            The external version of the flow.
+
+        Returns
+        -------
+        int | bool
+            The flow ID if the flow exists, False otherwise.
+        """
+        if not (isinstance(name, str) and len(name) > 0):
+            raise ValueError("Argument 'name' should be a non-empty string")
+        if not (isinstance(external_version, str) and len(external_version) > 0):
+            raise ValueError("Argument 'version' should be a non-empty string")
+
+        try:
+            response = self._http.get(f"flows/exists/{name}/{external_version}/")
+            result = response.json()
+            flow_id: int | bool = result.get("flow_id", False)
+            return flow_id
+        except (requests.exceptions.HTTPError, KeyError):
+            # v2 returns 404 when flow doesn't exist
+            return False
 
     def list_page(
         self,
@@ -196,10 +246,78 @@ class FlowsV2(FlowsAPI):
         tag: str | None = None,
         uploader: str | None = None,
     ) -> pd.DataFrame:
-        raise NotImplementedError
+        raise NotImplementedError("GET /flows (list) not yet implemented in v2 server")
 
     def create(self, flow: OpenMLFlow) -> OpenMLFlow:
-        raise NotImplementedError
+        raise NotImplementedError("POST /flows (create) not yet implemented in v2 server")
 
     def delete(self, flow_id: int) -> None:
-        raise NotImplementedError
+        raise NotImplementedError("DELETE /flows/{id} not yet implemented in v2 server")
+
+    @staticmethod
+    def _convert_v2_to_v1_format(v2_json: dict[str, Any]) -> dict[str, dict]:
+        """Convert v2 JSON response to v1 XML-dict format for OpenMLFlow._from_dict().
+
+        Parameters
+        ----------
+        v2_json : dict
+            The v2 JSON response from the server.
+
+        Returns
+        -------
+        dict
+            A dictionary matching the v1 XML structure expected by OpenMLFlow._from_dict().
+        """
+        # Map v2 JSON fields to v1 XML structure with oml: namespace
+        flow_dict = {
+            "oml:flow": {
+                "@xmlns:oml": "http://openml.org/openml",
+                "oml:id": str(v2_json.get("id", "")),
+                "oml:uploader": str(v2_json.get("uploader", "")),
+                "oml:name": v2_json.get("name", ""),
+                "oml:version": str(v2_json.get("version", "")),
+                "oml:external_version": v2_json.get("external_version", ""),
+                "oml:description": v2_json.get("description", ""),
+                "oml:upload_date": (
+                    v2_json.get("upload_date", "").replace("T", " ")
+                    if v2_json.get("upload_date")
+                    else ""
+                ),
+                "oml:language": v2_json.get("language", ""),
+                "oml:dependencies": v2_json.get("dependencies", ""),
+            }
+        }
+
+        # Add optional fields
+        if "class_name" in v2_json:
+            flow_dict["oml:flow"]["oml:class_name"] = v2_json["class_name"]
+        if "custom_name" in v2_json:
+            flow_dict["oml:flow"]["oml:custom_name"] = v2_json["custom_name"]
+
+        # Convert parameters from v2 array to v1 format
+        if v2_json.get("parameter"):
+            flow_dict["oml:flow"]["oml:parameter"] = [
+                {
+                    "oml:name": param.get("name", ""),
+                    "oml:data_type": param.get("data_type", ""),
+                    "oml:default_value": str(param.get("default_value", "")),
+                    "oml:description": param.get("description", ""),
+                }
+                for param in v2_json["parameter"]
+            ]
+
+        # Convert subflows from v2 to v1 components format
+        if v2_json.get("subflows"):
+            flow_dict["oml:flow"]["oml:component"] = [
+                {
+                    "oml:identifier": subflow.get("identifier", ""),
+                    "oml:flow": FlowsV2._convert_v2_to_v1_format(subflow["flow"])["oml:flow"],
+                }
+                for subflow in v2_json["subflows"]
+            ]
+
+        # Convert tags from v2 array to v1 format
+        if v2_json.get("tag"):
+            flow_dict["oml:flow"]["oml:tag"] = v2_json["tag"]
+
+        return flow_dict

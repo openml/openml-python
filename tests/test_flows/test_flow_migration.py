@@ -125,3 +125,107 @@ def test_delete_flow_delegates_to_backend(monkeypatch):
 
     assert result is True
     assert calls["flow_id"] == 999
+
+
+def test_v2_flow_exists_found(monkeypatch):
+    """Test FlowsV2.exists() when flow is found."""
+    from openml._api.resources.flows import FlowsV2
+    from openml._api.http.client import HTTPClient
+    from openml._api.config import settings
+
+    http_client = HTTPClient(settings.api.v2)
+    flows_v2 = FlowsV2(http_client)
+
+    # Mock HTTP response
+    mock_response = requests.Response()
+    mock_response.status_code = 200
+    mock_response._content = b'{"flow_id": 123}'
+
+    def fake_get(path: str):
+        assert path == "flows/exists/weka.ZeroR/Weka_3.9.0/"
+        return mock_response
+
+    monkeypatch.setattr(http_client, "get", fake_get)
+
+    result = flows_v2.exists("weka.ZeroR", "Weka_3.9.0")
+
+    assert result == 123
+
+
+def test_v2_flow_exists_not_found(monkeypatch):
+    """Test FlowsV2.exists() when flow is not found (404)."""
+    from openml._api.resources.flows import FlowsV2
+    from openml._api.http.client import HTTPClient
+    from openml._api.config import settings
+
+    http_client = HTTPClient(settings.api.v2)
+    flows_v2 = FlowsV2(http_client)
+
+    def fake_get(path: str):
+        raise requests.exceptions.HTTPError("404 Not Found")
+
+    monkeypatch.setattr(http_client, "get", fake_get)
+
+    result = flows_v2.exists("nonexistent.Flow", "v1.0.0")
+
+    assert result is False
+
+
+def test_v2_flow_get(monkeypatch, dummy_flow):
+    """Test FlowsV2.get() converts v2 JSON to OpenMLFlow."""
+    from openml._api.resources.flows import FlowsV2
+    from openml._api.http.client import HTTPClient
+    from openml._api.config import settings
+
+    http_client = HTTPClient(settings.api.v2)
+    flows_v2 = FlowsV2(http_client)
+
+    # Mock v2 JSON response
+    v2_json = {
+        "id": 1,
+        "uploader": 16,
+        "name": "weka.ZeroR",
+        "class_name": "weka.classifiers.rules.ZeroR",
+        "version": 1,
+        "external_version": "Weka_3.9.0_12024",
+        "description": "Weka implementation of ZeroR",
+        "upload_date": "2017-03-24T14:26:38",
+        "language": "English",
+        "dependencies": "Weka_3.9.0",
+        "parameter": [
+            {
+                "name": "batch-size",
+                "data_type": "option",
+                "default_value": 100,
+                "description": "Batch size for processing",
+            }
+        ],
+        "subflows": [],
+        "tag": ["weka", "OpenmlWeka"],
+    }
+
+    mock_response = requests.Response()
+    mock_response.status_code = 200
+    mock_response._content = b'{}'
+
+    def fake_json():
+        return v2_json
+
+    mock_response.json = fake_json
+
+    def fake_get(path: str):
+        assert path == "flows/1/"
+        return mock_response
+
+    monkeypatch.setattr(http_client, "get", fake_get)
+
+    flow = flows_v2.get(1)
+
+    assert isinstance(flow, OpenMLFlow)
+    assert flow.flow_id == 1
+    assert flow.name == "weka.ZeroR"
+    assert flow.external_version == "Weka_3.9.0_12024"
+    assert flow.uploader == "16"
+    assert len(flow.parameters) == 1
+    assert "batch-size" in flow.parameters
+
