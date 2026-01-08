@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from collections import OrderedDict
 from functools import partial
 from typing import TYPE_CHECKING, Any
+from typing_extensions import Literal
 
 if TYPE_CHECKING:
     from requests import Response
@@ -16,11 +18,23 @@ from openml.datasets.dataset import OpenMLDataset
 
 class DatasetsV1(DatasetsAPI):
     def get(
-        self, dataset_id: int, *, return_response: bool = False
+        self,
+        dataset_id: int | str,
+        version: int | None = None,
+        error_if_multiple: bool = False,  # noqa: FBT002, FBT001
+        *,
+        return_response: bool = False,
     ) -> OpenMLDataset | tuple[OpenMLDataset, Response]:
-        path = f"data/{dataset_id}"
+        if isinstance(dataset_id, int):
+            resolved_id = dataset_id
+        elif dataset_id.isdigit():
+            resolved_id = int(dataset_id)
+        else:
+            resolved_id = self._name_to_id(dataset_id, version, error_if_multiple)
+
+        path = f"data/{resolved_id}"
         response = self._http.get(path)
-        xml_content = response.text  # .text returns str, .content returns bytes
+        xml_content = response.text
         dataset = self._create_dataset_from_xml(xml_content)
 
         if return_response:
@@ -96,6 +110,194 @@ class DatasetsV1(DatasetsAPI):
             return pd.DataFrame()
 
         return pd.concat(batches)
+
+    def delete(self, dataset_id: int) -> bool:
+        """Delete dataset with id `dataset_id` from the OpenML server.
+
+        This can only be done if you are the owner of the dataset and
+        no tasks are attached to the dataset.
+
+        Parameters
+        ----------
+        dataset_id : int
+            OpenML id of the dataset
+
+        Returns
+        -------
+        bool
+            True if the deletion was successful. False otherwise.
+        """
+        return openml.utils._delete_entity("data", dataset_id)
+
+    def edit(  # noqa: PLR0913
+        self,
+        data_id: int,
+        description: str | None = None,
+        creator: str | None = None,
+        contributor: str | None = None,
+        collection_date: str | None = None,
+        language: str | None = None,
+        default_target_attribute: str | None = None,
+        ignore_attribute: str | list[str] | None = None,  # type: ignore
+        citation: str | None = None,
+        row_id_attribute: str | None = None,
+        original_data_url: str | None = None,
+        paper_url: str | None = None,
+    ) -> int:
+        """Edits an OpenMLDataset.
+
+        In addition to providing the dataset id of the dataset to edit (through data_id),
+        you must specify a value for at least one of the optional function arguments,
+        i.e. one value for a field to edit.
+
+        This function allows editing of both non-critical and critical fields.
+        Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.
+
+        - Editing non-critical data fields is allowed for all authenticated users.
+        - Editing critical fields is allowed only for the owner, provided there are no tasks
+        associated with this dataset.
+
+        If dataset has tasks or if the user is not the owner, the only way
+        to edit critical fields is to use fork_dataset followed by edit_dataset.
+
+        Parameters
+        ----------
+        data_id : int
+            ID of the dataset.
+        description : str
+            Description of the dataset.
+        creator : str
+            The person who created the dataset.
+        contributor : str
+            People who contributed to the current version of the dataset.
+        collection_date : str
+            The date the data was originally collected, given by the uploader.
+        language : str
+            Language in which the data is represented.
+            Starts with 1 upper case letter, rest lower case, e.g. 'English'.
+        default_target_attribute : str
+            The default target attribute, if it exists.
+            Can have multiple values, comma separated.
+        ignore_attribute : str | list
+            Attributes that should be excluded in modelling,
+            such as identifiers and indexes.
+        citation : str
+            Reference(s) that should be cited when building on this data.
+        row_id_attribute : str, optional
+            The attribute that represents the row-id column, if present in the
+            dataset. If ``data`` is a dataframe and ``row_id_attribute`` is not
+            specified, the index of the dataframe will be used as the
+            ``row_id_attribute``. If the name of the index is ``None``, it will
+            be discarded.
+
+            .. versionadded: 0.8
+                Inference of ``row_id_attribute`` from a dataframe.
+        original_data_url : str, optional
+            For derived data, the url to the original dataset.
+        paper_url : str, optional
+            Link to a paper describing the dataset.
+
+        Returns
+        -------
+        Dataset id
+        """
+        if not isinstance(data_id, int):
+            raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
+
+        # compose data edit parameters as xml
+        form_data = {"data_id": data_id}  # type: openml._api_calls.DATA_TYPE
+        xml = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
+        xml["oml:data_edit_parameters"] = OrderedDict()
+        xml["oml:data_edit_parameters"]["@xmlns:oml"] = "http://openml.org/openml"
+        xml["oml:data_edit_parameters"]["oml:description"] = description
+        xml["oml:data_edit_parameters"]["oml:creator"] = creator
+        xml["oml:data_edit_parameters"]["oml:contributor"] = contributor
+        xml["oml:data_edit_parameters"]["oml:collection_date"] = collection_date
+        xml["oml:data_edit_parameters"]["oml:language"] = language
+        xml["oml:data_edit_parameters"]["oml:default_target_attribute"] = default_target_attribute
+        xml["oml:data_edit_parameters"]["oml:row_id_attribute"] = row_id_attribute
+        xml["oml:data_edit_parameters"]["oml:ignore_attribute"] = ignore_attribute
+        xml["oml:data_edit_parameters"]["oml:citation"] = citation
+        xml["oml:data_edit_parameters"]["oml:original_data_url"] = original_data_url
+        xml["oml:data_edit_parameters"]["oml:paper_url"] = paper_url
+
+        # delete None inputs
+        for k in list(xml["oml:data_edit_parameters"]):
+            if not xml["oml:data_edit_parameters"][k]:
+                del xml["oml:data_edit_parameters"][k]
+
+        file_elements = {
+            "edit_parameters": ("description.xml", xmltodict.unparse(xml)),
+        }  # type: openml._api_calls.FILE_ELEMENTS_TYPE
+        result_xml = self._http.post("data/edit", data=form_data, files=file_elements).text
+        result = xmltodict.parse(result_xml)
+        data_id = result["oml:data_edit"]["oml:id"]
+        return int(data_id)
+
+    def fork(self, data_id: int) -> int:
+        """
+        Creates a new dataset version, with the authenticated user as the new owner.
+        The forked dataset can have distinct dataset meta-data,
+        but the actual data itself is shared with the original version.
+
+        This API is intended for use when a user is unable to edit the critical fields of a dataset
+        through the edit_dataset API.
+        (Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.)
+
+        Specifically, this happens when the user is:
+                1. Not the owner of the dataset.
+                2. User is the owner of the dataset, but the dataset has tasks.
+
+        In these two cases the only way to edit critical fields is:
+                1. STEP 1: Fork the dataset using fork_dataset API
+                2. STEP 2: Call edit_dataset API on the forked version.
+
+
+        Parameters
+        ----------
+        data_id : int
+            id of the dataset to be forked
+
+        Returns
+        -------
+        Dataset id of the forked dataset
+
+        """
+        if not isinstance(data_id, int):
+            raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
+        # compose data fork parameters
+        form_data = {"data_id": data_id}
+        result_xml = self._http.post("data/fork", data=form_data).text
+        result = xmltodict.parse(result_xml)
+        data_id = result["oml:data_fork"]["oml:id"]
+        return int(data_id)
+
+    def status_update(self, data_id: int, status: Literal["active", "deactivated"]) -> None:
+        """
+        Updates the status of a dataset to either 'active' or 'deactivated'.
+        Please see the OpenML API documentation for a description of the status
+        and all legal status transitions:
+        https://docs.openml.org/concepts/data/#dataset-status
+
+        Parameters
+        ----------
+        data_id : int
+            The data id of the dataset
+        status : str,
+            'active' or 'deactivated'
+        """
+        legal_status = {"active", "deactivated"}
+        if status not in legal_status:
+            raise ValueError(f"Illegal status value. Legal values: {legal_status}")
+
+        data: openml._api_calls.DATA_TYPE = {"data_id": data_id, "status": status}
+        result_xml = self._http.post("data/status/update", data=data).text
+        result = xmltodict.parse(result_xml)
+        server_data_id = result["oml:data_status_update"]["oml:id"]
+        server_status = result["oml:data_status_update"]["oml:status"]
+        if status != server_status or int(data_id) != int(server_data_id):
+            # This should never happen
+            raise ValueError("Data id/status does not collide")
 
     def _list_datasets(
         self,
@@ -236,9 +438,21 @@ class DatasetsV1(DatasetsAPI):
 
 class DatasetsV2(DatasetsAPI):
     def get(
-        self, dataset_id: int, *, return_response: bool = False
+        self,
+        dataset_id: int | str,
+        version: int | None = None,
+        error_if_multiple: bool = False,  # noqa: FBT002, FBT001
+        *,
+        return_response: bool = False,
     ) -> OpenMLDataset | tuple[OpenMLDataset, Response]:
-        path = f"datasets/{dataset_id}"
+        if isinstance(dataset_id, int):
+            resolved_id = dataset_id
+        elif dataset_id.isdigit():
+            resolved_id = int(dataset_id)
+        else:
+            resolved_id = self._name_to_id(dataset_id, version, error_if_multiple)
+
+        path = f"data/{resolved_id}"
         response = self._http.get(path)
         json_content = response.json()
         dataset = self._create_dataset_from_json(json_content)
@@ -317,6 +531,55 @@ class DatasetsV2(DatasetsAPI):
 
         return pd.concat(batches)
 
+    def delete(self, dataset_id: int) -> bool:
+        raise NotImplementedError()
+
+    def edit(  # noqa: PLR0913
+        self,
+        data_id: int,
+        description: str | None = None,
+        creator: str | None = None,
+        contributor: str | None = None,
+        collection_date: str | None = None,
+        language: str | None = None,
+        default_target_attribute: str | None = None,
+        ignore_attribute: str | list[str] | None = None,  # type: ignore
+        citation: str | None = None,
+        row_id_attribute: str | None = None,
+        original_data_url: str | None = None,
+        paper_url: str | None = None,
+    ) -> int:
+        raise NotImplementedError()
+
+    def fork(self, data_id: int) -> int:
+        raise NotImplementedError()
+
+    def status_update(self, data_id: int, status: Literal["active", "deactivated"]) -> None:
+        """
+        Updates the status of a dataset to either 'active' or 'deactivated'.
+        Please see the OpenML API documentation for a description of the status
+        and all legal status transitions:
+        https://docs.openml.org/concepts/data/#dataset-status
+
+        Parameters
+        ----------
+        data_id : int
+            The data id of the dataset
+        status : str,
+            'active' or 'deactivated'
+        """
+        legal_status = {"active", "deactivated"}
+        if status not in legal_status:
+            raise ValueError(f"Illegal status value. Legal values: {legal_status}")
+
+        data: openml._api_calls.DATA_TYPE = {"dataset_id": data_id, "status": status}
+        result = self._http.post("datasets/status/update", json=data).json()
+        server_data_id = result["dataset_id"]
+        server_status = result["status"]
+        if status != server_status or int(data_id) != int(server_data_id):
+            # This should never happen
+            raise ValueError("Data id/status does not collide")
+
     def _list_datasets(
         self,
         limit: int,
@@ -365,7 +628,6 @@ class DatasetsV2(DatasetsAPI):
     def __list_datasets(self, json: dict) -> pd.DataFrame:
         api_call = "datasets/list"
         datasets_list = self._http.post(api_call, json=json).json()
-
         # Minimalistic check if the JSON is useful
         assert isinstance(datasets_list, list), type(datasets_list)
 
@@ -379,9 +641,9 @@ class DatasetsV2(DatasetsAPI):
             # The number of qualities can range from 0 to infinity
             for quality in dataset_.get("quality", []):
                 try:
-                    dataset[quality["name"]] = int(quality["text"])
+                    dataset[quality["name"]] = int(quality["value"])
                 except ValueError:
-                    dataset[quality["name"]] = float(quality["text"])
+                    dataset[quality["name"]] = float(quality["value"])
             datasets[dataset["did"]] = dataset
 
         return pd.DataFrame.from_dict(datasets, orient="index").astype(

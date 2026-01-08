@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
+from typing_extensions import Literal
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -20,13 +21,18 @@ class ResourceAPI:
 class DatasetsAPI(ResourceAPI, ABC):
     @abstractmethod
     def get(
-        self, dataset_id: int, *, return_response: bool
+        self,
+        dataset_id: int | str,
+        version: int | None = None,
+        error_if_multiple: bool = False,  # noqa: FBT002, FBT001
+        *,
+        return_response: bool = False,
     ) -> OpenMLDataset | tuple[OpenMLDataset, Response]: ...
 
     @abstractmethod
     def list(  # noqa: PLR0913
         self,
-        data_id: list[int] | None = None,
+        data_id: list[int] | None = None,  # type: ignore
         offset: int | None = None,
         size: int | None = None,
         status: str | None = None,
@@ -38,6 +44,32 @@ class DatasetsAPI(ResourceAPI, ABC):
         number_classes: int | str | None = None,
         number_missing_values: int | str | None = None,
     ) -> pd.DataFrame: ...
+
+    @abstractmethod
+    def delete(self, dataset_id: int) -> bool: ...
+
+    @abstractmethod
+    def edit(  # noqa: PLR0913
+        self,
+        data_id: int,
+        description: str | None = None,
+        creator: str | None = None,
+        contributor: str | None = None,
+        collection_date: str | None = None,
+        language: str | None = None,
+        default_target_attribute: str | None = None,
+        ignore_attribute: str | list[str] | None = None,  # type: ignore
+        citation: str | None = None,
+        row_id_attribute: str | None = None,
+        original_data_url: str | None = None,
+        paper_url: str | None = None,
+    ) -> int: ...
+
+    @abstractmethod
+    def fork(self, data_id: int) -> int: ...
+
+    @abstractmethod
+    def status_update(self, data_id: int, status: Literal["active", "deactivated"]) -> None: ...
 
     def _name_to_id(
         self,
