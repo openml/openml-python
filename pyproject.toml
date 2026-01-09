@@ -20,6 +20,7 @@ dependencies = [
   "minio",
   "pyarrow",
   "tqdm",  # For MinIO download progress bars
+  "scikit-base",
 ]
 requires-python = ">=3.10,<3.15"    
 maintainers = [

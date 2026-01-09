@@ -18,6 +18,8 @@ In particular, this module implements a python interface for the
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from openml._get import get
+
 from . import (
     _api_calls,
     config,
@@ -120,4 +122,13 @@ __all__ = [
     "utils",
     "_api_calls",
     "__version__",
+    "get",
 ]
+
+
+def __getattr__(name: str):
+    if name in __all__:
+        return globals()[name]
+    if name not in __all__:
+        return get(name)
+    return None

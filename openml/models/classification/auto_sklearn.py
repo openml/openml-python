@@ -1,0 +1,15 @@
+"""Auto-sklearn classifier."""
+
+from __future__ import annotations
+
+from openml.models.apis import _ModelPkgClassifier
+
+
+class OpenmlPkg__AutoSklearnClassifier(_ModelPkgClassifier):
+    _tags = {
+        "pkg_id": "AutoSklearnClassifier",
+        "python_dependencies": "auto-sklearn",
+        "pkg_pypi_name": "auto-sklearn",
+    }
+
+    _obj = "autosklearn.classification.AutoSklearnClassifier"
