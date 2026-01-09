@@ -10,9 +10,7 @@ from typing import Any
 import pandas as pd
 import xmltodict
 
-import openml._api_calls
 import openml.utils
-from openml._api import api_context
 from openml.datasets import get_dataset
 from openml.exceptions import OpenMLCacheException
 
@@ -127,6 +125,8 @@ def _get_estimation_procedure_list() -> list[dict[str, Any]]:
     return procs
 
 
+# v2: /tasktype/{task_type_id}
+# v1: /estimationprocedure/list
 def list_tasks(  # noqa: PLR0913
     task_type: TaskType | None = None,
     offset: int | None = None,
@@ -340,6 +340,7 @@ def __list_tasks(api_call: str) -> pd.DataFrame:  # noqa: C901, PLR0912
     return pd.DataFrame.from_dict(tasks, orient="index")
 
 
+# /tasktype/list
 def get_tasks(
     task_ids: list[int],
     download_data: bool | None = None,
@@ -386,6 +387,8 @@ def get_tasks(
     return tasks
 
 
+# v1: /task/{task_id}
+# v2: /tasks/{task_id}
 @openml.utils.thread_safe_if_oslo_installed
 def get_task(
     task_id: int,
@@ -430,7 +433,7 @@ def get_task(
         # Clustering tasks do not have class labels
         # and do not offer download_split
         if download_splits and isinstance(task, OpenMLSupervisedTask):
-            task.download_split()
+            task.download_split()  # api v1 call
     except Exception as e:
         if not tid_cache_dir_existed:
             openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
@@ -445,16 +448,11 @@ def _get_task_description(task_id: int) -> OpenMLTask:
     except OpenMLCacheException:
         _cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
         xml_file = _cache_dir / "task.xml"
-        result = api_context.backend.tasks.get(task_id, return_response=True)
+        task_xml = openml._api_calls._perform_api_call("task/%d" % task_id, "get")
 
-        if isinstance(result, tuple):
-            task, response = result
-            with xml_file.open("w", encoding="utf8") as fh:
-                fh.write(response.text)
-        else:
-            task = result
-
-        return task
+        with xml_file.open("w", encoding="utf8") as fh:
+            fh.write(task_xml)
+        return _create_task_from_xml(task_xml)
 
 
 def _create_task_from_xml(xml: str) -> OpenMLTask:
@@ -603,6 +601,7 @@ def create_task(
     )
 
 
+# NOTE: not in v2
 def delete_task(task_id: int) -> bool:
     """Delete task with id `task_id` from the OpenML server.
 
