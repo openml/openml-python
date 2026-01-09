@@ -21,7 +21,6 @@ from scipy.sparse import coo_matrix
 
 import openml._api_calls
 import openml.utils
-from openml._api import api_context
 from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 from openml.exceptions import (
     OpenMLHashException,
@@ -65,6 +64,8 @@ def list_qualities() -> list[str]:
     -------
     list
     """
+    from openml._api import api_context
+
     return api_context.backend.datasets.list_qualities()
 
 
@@ -118,6 +119,8 @@ def list_datasets(
         If qualities are calculated for the dataset, some of
         these are also included as columns.
     """
+    from openml._api import api_context
+
     listing_call = partial(
         api_context.backend.datasets.list,
         data_id=data_id,
@@ -708,6 +711,8 @@ def status_update(data_id: int, status: Literal["active", "deactivated"]) -> Non
     status : str,
         'active' or 'deactivated'
     """
+    from openml._api import api_context
+
     legal_status = {"active", "deactivated"}
     if status not in legal_status:
         raise ValueError(f"Illegal status value. Legal values: {legal_status}")
@@ -786,6 +791,8 @@ def edit_dataset(
     -------
     Dataset id
     """
+    from openml._api import api_context
+
     return api_context.backend.datasets.edit(
         data_id,
         description,
@@ -831,6 +838,8 @@ def fork_dataset(data_id: int) -> int:
     Dataset id of the forked dataset
 
     """
+    from openml._api import api_context
+
     return api_context.backend.datasets.fork(data_id=data_id)
 
 
@@ -855,6 +864,8 @@ def data_feature_add_ontology(data_id: int, index: int, ontology: str) -> bool:
     -------
     True or throws an OpenML server exception
     """
+    from openml._api import api_context
+
     return api_context.backend.datasets.feature_add_ontology(data_id, index, ontology)
 
 
@@ -878,6 +889,8 @@ def data_feature_remove_ontology(data_id: int, index: int, ontology: str) -> boo
     -------
     True or throws an OpenML server exception
     """
+    from openml._api import api_context
+
     return api_context.backend.datasets.feature_remove_ontology(data_id, index, ontology)
 
 
@@ -1321,4 +1334,6 @@ def delete_dataset(dataset_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
+    from openml._api import api_context
+
     return api_context.backend.datasets.delete(dataset_id)
