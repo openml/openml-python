@@ -1,5 +1,7 @@
 """Utilities module for serializing and deserializing dicts."""
 
+from __future__ import annotations
+
 
 def serialize_dict(d, mode="eval", name="d"):
     """Serialize a dict as an executable Python code snippet.
@@ -40,13 +42,14 @@ def serialize_dict(d, mode="eval", name="d"):
     >>> deserialized_dict = eval(serialized_dict)
     >>> assert deserialized_dict == my_dict
     """
+
     def dq(s):
         # Escape backslashes and double quotes for valid Python strings
         return s.replace("\\", "\\\\").replace('"', '\\"')
 
     if mode == "eval":
         lines = ["{"]
-    else: # mode == "exec"
+    else:  # mode == "exec"
         lines = [f"{name} = {{"]
     for k, v in d.items():
         lines.append(f'    "{dq(k)}": "{dq(v)}",')

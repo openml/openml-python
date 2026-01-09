@@ -1,6 +1,8 @@
 """Registry lookup methods - scikit-learn estimators."""
+
 # adapted from the sktime utility of the same name
 # copyright: sktime developers, BSD-3-Clause License (see LICENSE file)
+from __future__ import annotations
 
 __author__ = ["fkiraly"]
 # all_estimators is also based on the sklearn utility of the same name
@@ -115,7 +117,7 @@ def _all_sklearn_estimators(
             will be the name of the column of estimator class names and the string(s)
             passed in return_tags will serve as column names for all columns of
             tags that were optionally requested.
-    """  # noqa: E501
+    """
     from sklearn.base import BaseEstimator
 
     MODULES_TO_IGNORE_SKLEARN = [
@@ -125,7 +127,7 @@ def _all_sklearn_estimators(
         "conftest",
     ]
 
-    result = all_objects(
+    return all_objects(
         object_types=BaseEstimator,
         package_name=package_name,
         modules_to_ignore=MODULES_TO_IGNORE_SKLEARN,
@@ -133,5 +135,3 @@ def _all_sklearn_estimators(
         return_names=return_names,
         suppress_import_stdout=suppress_import_stdout,
     )
-
-    return result
