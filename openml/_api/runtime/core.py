@@ -2,10 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from openml._api.config import (
-    API_V1_SERVER,
-    API_V2_SERVER,
-)
+from openml._api.config import settings
 from openml._api.http.client import HTTPClient
 from openml._api.resources import (
     DatasetsV1,
@@ -25,8 +22,8 @@ class APIBackend:
 
 
 def build_backend(version: str, *, strict: bool) -> APIBackend:
-    v1_http = HTTPClient(API_V1_SERVER)
-    v2_http = HTTPClient(API_V2_SERVER)
+    v1_http = HTTPClient(config=settings.api.v1)
+    v2_http = HTTPClient(config=settings.api.v2)
 
     v1 = APIBackend(
         datasets=DatasetsV1(v1_http),
