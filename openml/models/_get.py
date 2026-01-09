@@ -27,7 +27,7 @@ def get(id: str):
     obj = id_lookup.get(id)
     if obj is None:
         raise ValueError(f"Error in openml.get, object with package id {id} " "does not exist.")
-    return obj().materialize()
+    return obj(id).materialize()
 
 
 # todo: need to generalize this later to more types
@@ -41,8 +41,16 @@ def _id_lookup(obj_type=None):
 def _id_lookup_cached(obj_type=None):
     all_objs = _all_objects(obj_type=obj_type)
 
-    # todo: generalize that pkg can contain more than one object
-    return {obj.get_class_tag("pkg_id"): obj for obj in all_objs}
+    lookup_dict = {}
+    for obj in all_objs:
+        obj_index = obj.get_class_tag("pkg_id")
+        if obj_index != "__multiple":
+            lookup_dict[obj_index] = obj
+        else:
+            obj_all_ids = obj.contained_ids()
+            lookup_dict.update({obj_id: obj for obj_id in obj_all_ids})
+
+    return lookup_dict
 
 
 @lru_cache

@@ -7,6 +7,28 @@ from openml.base import _BasePkg
 
 class _OpenmlModelPkg(_BasePkg):
     _obj = None
+    _obj_dict = {}
+
+    def __init__(self, id=None):
+        super().__init__()
+
+        pkg_id = self.get_tag("pkg_id")
+        if pkg_id == "__multiple":
+            self._obj = self._obj_dict.get(id, None)
+
+    @classmethod
+    def contained_ids(cls):
+        """Return list of ids of objects contained in this package.
+
+        Returns
+        -------
+        ids : list of str
+            list of unique identifiers of objects contained in this package
+        """
+        pkg_id = cls.get_class_tag("pkg_id")
+        if pkg_id != "__multiple":
+            return [cls.get_class_tag("pkg_id")]
+        return list(cls._obj_dict.keys())
 
     def _materialize(self):
         pkg_obj = self.get_tag("pkg_obj")
@@ -23,7 +45,10 @@ class _OpenmlModelPkg(_BasePkg):
         if pkg_obj == "reference":
             from skbase.utils.dependencies import _safe_import
 
-            return _safe_import(self._obj)
+            obj_loc = self._obj
+            pkg_name = self.get_tag("pkg_pypi_name")
+
+            return _safe_import(obj_loc, pkg_name=pkg_name)
 
         if pkg_obj == "code":
             exec(self._obj)

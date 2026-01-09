@@ -20,6 +20,7 @@ class _BasePkg(BaseObject):
         "pkg_obj": "reference",  # or "code"
         "pkg_obj_type": None,  # openml API type
         "pkg_compression": "zlib",  # compression
+        "pkg_pypi_name": None,  # PyPI package name of objects
     }
 
     def __init__(self):
