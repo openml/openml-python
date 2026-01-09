@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 import os
 import warnings
-from collections import OrderedDict
 from functools import partial
 from pathlib import Path
 from pyexpat import ExpatError
@@ -22,6 +21,7 @@ from scipy.sparse import coo_matrix
 
 import openml._api_calls
 import openml.utils
+from openml._api import api_context
 from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 from openml.exceptions import (
     OpenMLHashException,
@@ -65,17 +65,7 @@ def list_qualities() -> list[str]:
     -------
     list
     """
-    api_call = "data/qualities/list"
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    qualities = xmltodict.parse(xml_string, force_list=("oml:quality"))
-    # Minimalistic check if the XML is useful
-    if "oml:data_qualities_list" not in qualities:
-        raise ValueError('Error in return XML, does not contain "oml:data_qualities_list"')
-
-    if not isinstance(qualities["oml:data_qualities_list"]["oml:quality"], list):
-        raise TypeError('Error in return XML, does not contain "oml:quality" as a list')
-
-    return qualities["oml:data_qualities_list"]["oml:quality"]
+    return api_context.backend.datasets.list_qualities()
 
 
 def list_datasets(
@@ -129,7 +119,7 @@ def list_datasets(
         these are also included as columns.
     """
     listing_call = partial(
-        _list_datasets,
+        api_context.backend.datasets.list,
         data_id=data_id,
         status=status,
         tag=tag,
@@ -145,92 +135,6 @@ def list_datasets(
         return pd.DataFrame()
 
     return pd.concat(batches)
-
-
-def _list_datasets(
-    limit: int,
-    offset: int,
-    *,
-    data_id: list[int] | None = None,
-    **kwargs: Any,
-) -> pd.DataFrame:
-    """
-    Perform api call to return a list of all datasets.
-
-    Parameters
-    ----------
-    The arguments that are lists are separated from the single value
-    ones which are put into the kwargs.
-    display_errors is also separated from the kwargs since it has a
-    default value.
-
-    limit : int
-        The maximum number of datasets to show.
-    offset : int
-        The number of datasets to skip, starting from the first.
-    data_id : list, optional
-
-    kwargs : dict, optional
-        Legal filter operators (keys in the dict):
-        tag, status, limit, offset, data_name, data_version, number_instances,
-        number_features, number_classes, number_missing_values.
-
-    Returns
-    -------
-    datasets : dataframe
-    """
-    api_call = "data/list"
-
-    if limit is not None:
-        api_call += f"/limit/{limit}"
-    if offset is not None:
-        api_call += f"/offset/{offset}"
-
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            if value is not None:
-                api_call += f"/{operator}/{value}"
-    if data_id is not None:
-        api_call += f"/data_id/{','.join([str(int(i)) for i in data_id])}"
-    return __list_datasets(api_call=api_call)
-
-
-def __list_datasets(api_call: str) -> pd.DataFrame:
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    datasets_dict = xmltodict.parse(xml_string, force_list=("oml:dataset",))
-
-    # Minimalistic check if the XML is useful
-    assert isinstance(datasets_dict["oml:data"]["oml:dataset"], list), type(
-        datasets_dict["oml:data"],
-    )
-    assert datasets_dict["oml:data"]["@xmlns:oml"] == "http://openml.org/openml", datasets_dict[
-        "oml:data"
-    ]["@xmlns:oml"]
-
-    datasets = {}
-    for dataset_ in datasets_dict["oml:data"]["oml:dataset"]:
-        ignore_attribute = ["oml:file_id", "oml:quality"]
-        dataset = {
-            k.replace("oml:", ""): v for (k, v) in dataset_.items() if k not in ignore_attribute
-        }
-        dataset["did"] = int(dataset["did"])
-        dataset["version"] = int(dataset["version"])
-
-        # The number of qualities can range from 0 to infinity
-        for quality in dataset_.get("oml:quality", []):
-            try:
-                dataset[quality["@name"]] = int(quality["#text"])
-            except ValueError:
-                dataset[quality["@name"]] = float(quality["#text"])
-        datasets[dataset["did"]] = dataset
-
-    return pd.DataFrame.from_dict(datasets, orient="index").astype(
-        {
-            "did": int,
-            "version": int,
-            "status": pd.CategoricalDtype(["active", "deactivated", "in_preparation"]),
-        }
-    )
 
 
 def _expand_parameter(parameter: str | list[str] | None) -> list[str]:
@@ -808,14 +712,7 @@ def status_update(data_id: int, status: Literal["active", "deactivated"]) -> Non
     if status not in legal_status:
         raise ValueError(f"Illegal status value. Legal values: {legal_status}")
 
-    data: openml._api_calls.DATA_TYPE = {"data_id": data_id, "status": status}
-    result_xml = openml._api_calls._perform_api_call("data/status/update", "post", data=data)
-    result = xmltodict.parse(result_xml)
-    server_data_id = result["oml:data_status_update"]["oml:id"]
-    server_status = result["oml:data_status_update"]["oml:status"]
-    if status != server_status or int(data_id) != int(server_data_id):
-        # This should never happen
-        raise ValueError("Data id/status does not collide")
+    api_context.backend.datasets.status_update(data_id=data_id, status=status)
 
 
 def edit_dataset(
@@ -889,43 +786,20 @@ def edit_dataset(
     -------
     Dataset id
     """
-    if not isinstance(data_id, int):
-        raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
-
-    # compose data edit parameters as xml
-    form_data = {"data_id": data_id}  # type: openml._api_calls.DATA_TYPE
-    xml = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
-    xml["oml:data_edit_parameters"] = OrderedDict()
-    xml["oml:data_edit_parameters"]["@xmlns:oml"] = "http://openml.org/openml"
-    xml["oml:data_edit_parameters"]["oml:description"] = description
-    xml["oml:data_edit_parameters"]["oml:creator"] = creator
-    xml["oml:data_edit_parameters"]["oml:contributor"] = contributor
-    xml["oml:data_edit_parameters"]["oml:collection_date"] = collection_date
-    xml["oml:data_edit_parameters"]["oml:language"] = language
-    xml["oml:data_edit_parameters"]["oml:default_target_attribute"] = default_target_attribute
-    xml["oml:data_edit_parameters"]["oml:row_id_attribute"] = row_id_attribute
-    xml["oml:data_edit_parameters"]["oml:ignore_attribute"] = ignore_attribute
-    xml["oml:data_edit_parameters"]["oml:citation"] = citation
-    xml["oml:data_edit_parameters"]["oml:original_data_url"] = original_data_url
-    xml["oml:data_edit_parameters"]["oml:paper_url"] = paper_url
-
-    # delete None inputs
-    for k in list(xml["oml:data_edit_parameters"]):
-        if not xml["oml:data_edit_parameters"][k]:
-            del xml["oml:data_edit_parameters"][k]
-
-    file_elements = {
-        "edit_parameters": ("description.xml", xmltodict.unparse(xml)),
-    }  # type: openml._api_calls.FILE_ELEMENTS_TYPE
-    result_xml = openml._api_calls._perform_api_call(
-        "data/edit",
-        "post",
-        data=form_data,
-        file_elements=file_elements,
+    return api_context.backend.datasets.edit(
+        data_id,
+        description,
+        creator,
+        contributor,
+        collection_date,
+        language,
+        default_target_attribute,
+        ignore_attribute,
+        citation,
+        row_id_attribute,
+        original_data_url,
+        paper_url,
     )
-    result = xmltodict.parse(result_xml)
-    data_id = result["oml:data_edit"]["oml:id"]
-    return int(data_id)
 
 
 def fork_dataset(data_id: int) -> int:
@@ -957,14 +831,7 @@ def fork_dataset(data_id: int) -> int:
     Dataset id of the forked dataset
 
     """
-    if not isinstance(data_id, int):
-        raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
-    # compose data fork parameters
-    form_data = {"data_id": data_id}  # type: openml._api_calls.DATA_TYPE
-    result_xml = openml._api_calls._perform_api_call("data/fork", "post", data=form_data)
-    result = xmltodict.parse(result_xml)
-    data_id = result["oml:data_fork"]["oml:id"]
-    return int(data_id)
+    return api_context.backend.datasets.fork(data_id=data_id)
 
 
 def data_feature_add_ontology(data_id: int, index: int, ontology: str) -> bool:
@@ -988,10 +855,7 @@ def data_feature_add_ontology(data_id: int, index: int, ontology: str) -> bool:
     -------
     True or throws an OpenML server exception
     """
-    upload_data: dict[str, int | str] = {"data_id": data_id, "index": index, "ontology": ontology}
-    openml._api_calls._perform_api_call("data/feature/ontology/add", "post", data=upload_data)
-    # an error will be thrown in case the request was unsuccessful
-    return True
+    return api_context.backend.datasets.feature_add_ontology(data_id, index, ontology)
 
 
 def data_feature_remove_ontology(data_id: int, index: int, ontology: str) -> bool:
@@ -1014,10 +878,7 @@ def data_feature_remove_ontology(data_id: int, index: int, ontology: str) -> boo
     -------
     True or throws an OpenML server exception
     """
-    upload_data: dict[str, int | str] = {"data_id": data_id, "index": index, "ontology": ontology}
-    openml._api_calls._perform_api_call("data/feature/ontology/remove", "post", data=upload_data)
-    # an error will be thrown in case the request was unsuccessful
-    return True
+    return api_context.backend.datasets.feature_remove_ontology(data_id, index, ontology)
 
 
 def _topic_add_dataset(data_id: int, topic: str) -> int:
@@ -1460,4 +1321,4 @@ def delete_dataset(dataset_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
-    return openml.utils._delete_entity("data", dataset_id)
+    return api_context.backend.datasets.delete(dataset_id)
