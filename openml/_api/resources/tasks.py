@@ -26,7 +26,7 @@ TASKS_CACHE_DIR_NAME = "tasks"
 
 class TasksV1(TasksAPI):
     @openml.utils.thread_safe_if_oslo_installed
-    def get_task(
+    def get(
         self,
         task_id: int,
         download_splits: bool = False,  # noqa: FBT001, FBT002
@@ -477,7 +477,7 @@ class TasksV1(TasksAPI):
     ) -> list[OpenMLTask]:
         """Download tasks.
 
-        This function iterates :meth:`openml.tasks.get_task`.
+        This function iterates :meth:`openml.tasks.get`.
 
         Parameters
         ----------
@@ -511,7 +511,7 @@ class TasksV1(TasksAPI):
         tasks = []
         for task_id in task_ids:
             tasks.append(
-                self.get_task(
+                self.get(
                     task_id, download_data=download_data, download_qualities=download_qualities
                 )
             )
@@ -606,14 +606,20 @@ class TasksV1(TasksAPI):
 
 class TasksV2(TasksAPI):
     @openml.utils.thread_safe_if_oslo_installed
-    def get_task(
+    def get(
         self,
         task_id: int,
+        download_splits: bool = False,  # noqa: FBT001, FBT002
         **get_dataset_kwargs: Any,
     ) -> OpenMLTask:
         if not isinstance(task_id, int):
             raise TypeError(f"Task id should be integer, is {type(task_id)}")
 
+        if download_splits:
+            warnings.warn(
+                "`download_splits` is not yet supported in the v2 API and will be ignored.",
+                stacklevel=2,
+            )
         task = self._get_task_description(task_id)
         dataset = get_dataset(task.dataset_id, **get_dataset_kwargs)  # Shrivaths work
         # List of class labels available in dataset description
@@ -667,3 +673,40 @@ class TasksV2(TasksAPI):
         }[task_type_id]
 
         return cls(**common_kwargs)
+
+    def list_task_types(self) -> list[dict[str, str | int | None]]:
+        response = self._http.get("tasktype")
+        payload = response.json()
+
+        return [
+            {
+                "id": int(tt["id"]),
+                "name": tt["name"],
+                "description": tt["description"] or None,
+                "creator": tt.get("creator"),
+            }
+            for tt in payload["task_types"]["task_type"]
+        ]
+
+    def get_task_type(self, task_type_id: int) -> dict[str, Any]:
+        if not isinstance(task_type_id, int):
+            raise TypeError("task_type_id must be int")
+
+        response = self._http.get(f"tasktype/{task_type_id}")
+        tt = response.json()["task_type"]
+
+        return {
+            "id": int(tt["id"]),
+            "name": tt["name"],
+            "description": tt.get("description"),
+            "creator": tt.get("creator", []),
+            "creation_date": tt.get("creation_date"),
+            "inputs": [
+                {
+                    "name": i["name"],
+                    "required": i.get("requirement") == "required",
+                    "data_type": i.get("data_type"),
+                }
+                for i in tt.get("input", [])
+            ],
+        }

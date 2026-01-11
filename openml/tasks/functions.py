@@ -340,7 +340,6 @@ def __list_tasks(api_call: str) -> pd.DataFrame:  # noqa: C901, PLR0912
     return pd.DataFrame.from_dict(tasks, orient="index")
 
 
-# /tasktype/list
 def get_tasks(
     task_ids: list[int],
     download_data: bool | None = None,
