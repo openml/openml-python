@@ -8,7 +8,6 @@ from abc import ABC
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Sequence
-from attr import dataclass
 from typing_extensions import TypedDict
 
 import openml._api_calls
