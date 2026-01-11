@@ -425,7 +425,7 @@ class TasksV1(TasksAPI):
             name, type, repeats, folds, stratified.
         """
         url_suffix = "estimationprocedure/list"
-        xml_string = self._http.get(url_suffix)
+        xml_string = self._http.get(url_suffix).text
 
         procs_dict = xmltodict.parse(xml_string)
         # Minimalistic check if the XML is useful
@@ -675,7 +675,7 @@ class TasksV2(TasksAPI):
         return cls(**common_kwargs)
 
     def list_task_types(self) -> list[dict[str, str | int | None]]:
-        response = self._http.get("tasktype")
+        response = self._http.get("tasktype/list")
         payload = response.json()
 
         return [
