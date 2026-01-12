@@ -124,7 +124,7 @@ def test_list_all_few_results_available(_perform_api_call):
 
 
 @unittest.skipIf(os.name == "nt", "https://github.com/openml/openml-python/issues/1033")
-@unittest.mock.patch("openml.config.get_cache_directory")
+@unittest.mock.patch("openml.utils.openml.config.get_cache_directory")
 def test__create_cache_directory(config_mock, tmp_path):
     config_mock.return_value = tmp_path
     openml.utils._create_cache_directory("abc")
