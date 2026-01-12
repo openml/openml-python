@@ -172,7 +172,6 @@ class TestSetupFunctions(TestBase):
     def test_setuplist_offset(self):
         size = 10
         setups = openml.setups.list_setups(offset=0, size=size)
-        
         assert len(setups) == size
         setups2 = openml.setups.list_setups(offset=size, size=size)
         assert len(setups2) == size
