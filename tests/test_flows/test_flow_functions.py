@@ -274,12 +274,12 @@ class TestFlowFunctions(TestBase):
         assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=None)
 
     @pytest.mark.sklearn()
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="OrdinalEncoder introduced in 0.20. "
         "No known models with list of lists parameters in older versions.",
     )
+    @pytest.mark.uses_test_server()
     def test_sklearn_to_flow_list_of_lists(self):
         from sklearn.preprocessing import OrdinalEncoder
 
@@ -308,6 +308,7 @@ class TestFlowFunctions(TestBase):
         assert flow.external_version is None
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_get_flow_reinstantiate_model(self):
         model = ensemble.RandomForestClassifier(n_estimators=33)
         extension = openml.extensions.get_extension_by_model(model)
@@ -319,6 +320,7 @@ class TestFlowFunctions(TestBase):
         downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
         assert isinstance(downloaded_flow.model, sklearn.ensemble.RandomForestClassifier)
 
+    @pytest.mark.uses_test_server()
     def test_get_flow_reinstantiate_model_no_extension(self):
         # Flow 10 is a WEKA flow
         self.assertRaisesRegex(
@@ -389,7 +391,7 @@ class TestFlowFunctions(TestBase):
         assert "sklearn==0.19.1" not in flow.dependencies
 
     @pytest.mark.sklearn()
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
+    @pytest.mark.uses_test_server()
     def test_get_flow_id(self):
         if self.long_version:
             list_all = openml.utils._list_all
@@ -424,6 +426,7 @@ class TestFlowFunctions(TestBase):
             pytest.skip(reason="Not sure why there should only be one version of this flow.")
             assert flow_ids_exact_version_True == flow_ids_exact_version_False
 
+    @pytest.mark.uses_test_server()
     def test_delete_flow(self):
         flow = openml.OpenMLFlow(
             name="sklearn.dummy.DummyClassifier",
