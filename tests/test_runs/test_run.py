@@ -25,6 +25,7 @@ class TestRun(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take
     # less than 1 seconds
 
+    @pytest.mark.uses_test_server()
     def test_tagging(self):
         runs = openml.runs.list_runs(size=1)
         assert not runs.empty, "Test server state is incorrect"
@@ -118,6 +119,7 @@ class TestRun(TestBase):
             assert run_prime_trace_content is None
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_to_from_filesystem_vanilla(self):
         model = Pipeline(
             [
@@ -153,6 +155,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn()
     @pytest.mark.flaky()
+    @pytest.mark.uses_test_server()
     def test_to_from_filesystem_search(self):
         model = Pipeline(
             [
@@ -187,6 +190,7 @@ class TestRun(TestBase):
         )
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_to_from_filesystem_no_model(self):
         model = Pipeline(
             [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())],
@@ -292,6 +296,7 @@ class TestRun(TestBase):
             assert_method(y_test, saved_y_test)
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_publish_with_local_loaded_flow(self):
         """
         Publish a run tied to a local flow after it has first been saved to
@@ -335,6 +340,7 @@ class TestRun(TestBase):
             openml.runs.get_run(loaded_run.run_id)
 
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_offline_and_online_run_identical(self):
         extension = SklearnExtension()
 
