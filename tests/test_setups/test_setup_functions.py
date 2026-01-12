@@ -34,8 +34,8 @@ class TestSetupFunctions(TestBase):
         self.extension = SklearnExtension()
         super().setUp()
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     def test_nonexisting_setup_exists(self):
         # first publish a non-existing flow
         sentinel = get_sentinel()
@@ -82,12 +82,8 @@ class TestSetupFunctions(TestBase):
         setup_id = openml.setups.setup_exists(flow)
         assert setup_id == run.setup_id
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
-    @pytest.mark.xfail(
-        reason="Dataset 20 has processing errors on test server - see issue #1544",
-        raises=openml.exceptions.OpenMLServerException,
-    )
+    @pytest.mark.uses_test_server()
     def test_existing_setup_exists_1(self):
         def side_effect(self):
             self.var_smoothing = 1e-9
@@ -102,22 +98,14 @@ class TestSetupFunctions(TestBase):
             nb = sklearn.naive_bayes.GaussianNB()
             self._existing_setup_exists(nb)
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
-    @pytest.mark.xfail(
-        reason="Dataset 20 has processing errors on test server - see issue #1544",
-        raises=openml.exceptions.OpenMLServerException,
-    )
+    @pytest.mark.uses_test_server()
     def test_exisiting_setup_exists_2(self):
         # Check a flow with one hyperparameter
         self._existing_setup_exists(sklearn.naive_bayes.GaussianNB())
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
-    @pytest.mark.xfail(
-        reason="Dataset 20 has processing errors on test server - see issue #1544",
-        raises=openml.exceptions.OpenMLServerException,
-    )
+    @pytest.mark.uses_test_server()
     def test_existing_setup_exists_3(self):
         # Check a flow with many hyperparameters
         self._existing_setup_exists(
@@ -159,6 +147,7 @@ class TestSetupFunctions(TestBase):
         for setup_id in setups:
             assert setups[setup_id].flow_id == flow_id
 
+    @pytest.mark.uses_test_server()
     def test_list_setups_empty(self):
         setups = openml.setups.list_setups(setup=[0])
         if len(setups) > 0:
@@ -179,6 +168,7 @@ class TestSetupFunctions(TestBase):
         assert isinstance(setups, pd.DataFrame)
         assert len(setups) == 10
 
+    @pytest.mark.uses_test_server()
     def test_setuplist_offset(self):
         size = 10
         setups = openml.setups.list_setups(offset=0, size=size)
@@ -195,6 +185,7 @@ class TestSetupFunctions(TestBase):
 
         assert len(all) == size * 2
 
+    @pytest.mark.uses_test_server()
     def test_get_cached_setup(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         openml.setups.functions._get_cached_setup(1)
