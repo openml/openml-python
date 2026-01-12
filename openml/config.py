@@ -87,6 +87,8 @@ class OpenMLConfigManager:
         self._user_path = Path("~").expanduser().absolute()
 
         self._config: OpenMLConfig = OpenMLConfig()
+        # for legacy test `test_non_writable_home`
+        self._defaults: dict[str, Any] = OpenMLConfig().__dict__.copy()
         self._root_cache_directory: Path = self._config.cachedir
 
         self.logger = logger
@@ -427,7 +429,7 @@ class OpenMLConfigManager:
 
             self._last_used_server = self._manager._config.server
             self._last_used_key = self._manager._config.apikey
-            self._start_last_called = True
+            type(self)._start_last_called = True
 
             # Test server key for examples
             self._manager._config = replace(
@@ -444,7 +446,7 @@ class OpenMLConfigManager:
 
         def stop_using_configuration_for_example(self) -> None:
             """Return to configuration as it was before `start_use_example_configuration`."""
-            if not self._start_last_called:
+            if not type(self)._start_last_called:
                 # We don't want to allow this because it will (likely) result in the `server` and
                 # `apikey` variables being set to None.
                 raise RuntimeError(
@@ -457,7 +459,7 @@ class OpenMLConfigManager:
                 server=cast("str", self._last_used_server),
                 apikey=cast("str", self._last_used_key),
             )
-            self._start_last_called = False
+            type(self)._start_last_called = False
 
 
 _config = OpenMLConfigManager()
