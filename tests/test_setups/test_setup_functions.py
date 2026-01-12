@@ -173,10 +173,6 @@ class TestSetupFunctions(TestBase):
         size = 10
         setups = openml.setups.list_setups(offset=0, size=size)
         
-        # Skip if test server has no setup data - see issue #1544
-        if len(setups) == 0:
-            pytest.skip("Test server has no setup data available")
-        
         assert len(setups) == size
         setups2 = openml.setups.list_setups(offset=size, size=size)
         assert len(setups2) == size
