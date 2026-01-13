@@ -278,6 +278,7 @@ class OpenMLDatasetTest(TestBase):
         self.assertNotEqual(self.titanic, "Wrong_object")
 
 
+@pytest.mark.uses_test_server()
 def test_tagging():
     dataset = openml.datasets.get_dataset(125, download_data=False)
 
@@ -294,7 +295,7 @@ def test_tagging():
     datasets = openml.datasets.list_datasets(tag=tag)
     assert datasets.empty
 
-@pytest.mark.xfail(reason="failures_issue_1544")
+@pytest.mark.uses_test_server()
 def test_get_feature_with_ontology_data_id_11():
     # test on car dataset, which has built-in ontology references
     dataset = openml.datasets.get_dataset(11)
@@ -303,6 +304,7 @@ def test_get_feature_with_ontology_data_id_11():
     assert len(dataset.features[2].ontologies) >= 1
     assert len(dataset.features[3].ontologies) >= 1   
 
+@pytest.mark.uses_test_server()
 def test_add_remove_ontology_to_dataset():
     did = 1
     feature_index = 1
@@ -310,6 +312,7 @@ def test_add_remove_ontology_to_dataset():
     openml.datasets.functions.data_feature_add_ontology(did, feature_index, ontology)
     openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)    
 
+@pytest.mark.uses_test_server()
 def test_add_same_ontology_multiple_features():
     did = 1
     ontology = "https://www.openml.org/unittest/" + str(time())
@@ -318,6 +321,7 @@ def test_add_same_ontology_multiple_features():
         openml.datasets.functions.data_feature_add_ontology(did, i, ontology)    
 
 
+@pytest.mark.uses_test_server()
 def test_add_illegal_long_ontology():
     did = 1
     ontology = "http://www.google.com/" + ("a" * 257)
@@ -329,6 +333,7 @@ def test_add_illegal_long_ontology():
     
 
 
+@pytest.mark.uses_test_server()
 def test_add_illegal_url_ontology():
     did = 1
     ontology = "not_a_url" + str(time())
@@ -400,6 +405,7 @@ class OpenMLDatasetTestSparse(TestBase):
         assert len(feature.nominal_values) == 25
 
 
+@pytest.mark.uses_test_server()
 def test__read_features(mocker, workdir, static_cache_dir):
     """Test we read the features from the xml if no cache pickle is available.
     This test also does some simple checks to verify that the features are read correctly
@@ -431,6 +437,7 @@ def test__read_features(mocker, workdir, static_cache_dir):
     assert pickle_mock.dump.call_count == 1
 
 
+@pytest.mark.uses_test_server()
 def test__read_qualities(static_cache_dir, workdir, mocker):
     """Test we read the qualities from the xml if no cache pickle is available.
     This test also does some minor checks to ensure that the qualities are read correctly.
