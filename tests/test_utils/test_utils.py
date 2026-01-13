@@ -174,6 +174,8 @@ def test_get_cache_size(config_mock,tmp_path):
     config_mock.return_value = tmp_path
     cache_size = openml.utils.get_cache_size()
     assert cache_size == 0
-    dataset = openml.datasets.get_dataset(dataset_id=3)
-    cache_size = openml.utils.get_cache_size()
-    assert cache_size == 2009
+    sub_dir = tmp_path / "subdir"
+    sub_dir.mkdir()
+    (sub_dir / "nested_file.txt").write_bytes(b"b" * 100)
+    
+    assert openml.utils.get_cache_size() == 100
