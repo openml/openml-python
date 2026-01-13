@@ -28,6 +28,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         task.get_dataset()
 
     @pytest.mark.production()
+    @pytest.mark.uses_test_server()
     def test_download_task(self):
         # no clustering tasks on test server
         self.use_production_server()
@@ -36,6 +37,7 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         assert task.task_type_id == TaskType.CLUSTERING
         assert task.dataset_id == 36
 
+    @pytest.mark.uses_test_server()
     def test_upload_task(self):
         compatible_datasets = self._get_compatible_rand_dataset()
         for i in range(100):
