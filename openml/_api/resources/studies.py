@@ -6,14 +6,15 @@ from openml._api.resources.base import StudiesAPI
 
 
 class StudiesV1(StudiesAPI):
-    def list(self, **kwargs: Any) -> Any:
-        limit = kwargs.get("limit")
-        offset = kwargs.get("offset")
-        status = kwargs.get("status")
-        main_entity_type = kwargs.get("main_entity_type")
-        uploader = kwargs.get("uploader")
-        benchmark_suite = kwargs.get("benchmark_suite")
-
+    def list(  # noqa: PLR0913
+        self,
+        limit: int | None = None,
+        offset: int | None = None,
+        status: str | None = None,
+        main_entity_type: str | None = None,
+        uploader: list[int] | None = None,
+        benchmark_suite: int | None = None,
+    ) -> Any:
         api_call = "study/list"
 
         if limit is not None:
@@ -35,5 +36,13 @@ class StudiesV1(StudiesAPI):
 
 
 class StudiesV2(StudiesAPI):
-    def list(self, **kwargs: Any) -> Any:
+    def list(  # noqa: PLR0913
+        self,
+        limit: int | None = None,
+        offset: int | None = None,
+        status: str | None = None,
+        main_entity_type: str | None = None,
+        uploader: list[int] | None = None,
+        benchmark_suite: int | None = None,
+    ) -> Any:
         raise NotImplementedError("V2 API implementation is not yet available")

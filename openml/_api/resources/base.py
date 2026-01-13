@@ -33,4 +33,12 @@ class TasksAPI(ResourceAPI, ABC):
 
 class StudiesAPI(ResourceAPI, ABC):
     @abstractmethod
-    def list(self, **kwargs: Any) -> Any: ...
+    def list(  # noqa: PLR0913
+        self,
+        limit: int | None = None,
+        offset: int | None = None,
+        status: str | None = None,
+        main_entity_type: str | None = None,
+        uploader: list[int] | None = None,
+        benchmark_suite: int | None = None,
+    ) -> Any: ...
