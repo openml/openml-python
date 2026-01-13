@@ -163,9 +163,7 @@ def _sync_flow_with_server(
                 flow_from_server.model = flow.model
                 setup_id = setup_exists(flow_from_server)
                 task_id = task.task_id
-                if task_id is None:
-                    raise ValueError("The task should be published at OpenML")
-                ids = run_exists(task_id, setup_id)
+                ids = run_exists(cast(int, task_id), setup_id)
                 if ids:
                     error_message = (
                         "One or more runs of this setup were already performed on the task."
