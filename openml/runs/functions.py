@@ -7,7 +7,7 @@ import warnings
 from collections import OrderedDict
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, NamedTuple
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pandas as pd
@@ -58,8 +58,7 @@ def _validate_flow_and_task_inputs(
     flow: OpenMLFlow | OpenMLTask,
     task: OpenMLTask | OpenMLFlow,
     flow_tags: list[str] | None,
-    avoid_duplicate_runs: bool | None,
-) -> tuple[OpenMLFlow, OpenMLTask, bool]:
+) -> tuple[OpenMLFlow, OpenMLTask]:
     """Validate and normalize inputs for flow and task execution.
 
     Parameters
@@ -70,13 +69,11 @@ def _validate_flow_and_task_inputs(
         The task object (may be swapped with flow for backward compatibility).
     flow_tags : List[str] or None
         A list of tags that the flow should have at creation.
-    avoid_duplicate_runs : bool or None
-        Whether to check for duplicate runs on the server.
 
     Returns
     -------
-    Tuple[OpenMLFlow, OpenMLTask, bool]
-        The validated flow, task, and avoid_duplicate_runs flag.
+    Tuple[OpenMLFlow, OpenMLTask]
+        The validated flow and task.
 
     Raises
     ------
@@ -85,9 +82,6 @@ def _validate_flow_and_task_inputs(
     """
     if flow_tags is not None and not isinstance(flow_tags, list):
         raise ValueError("flow_tags should be a list")
-
-    if avoid_duplicate_runs is None:
-        avoid_duplicate_runs = openml.config.avoid_duplicate_runs
 
     # TODO: At some point in the future do not allow for arguments in old order (changed 6-2018).
     # Flexibility currently still allowed due to code-snippet in OpenML100 paper (3-2019).
@@ -111,7 +105,7 @@ def _validate_flow_and_task_inputs(
     if task.task_id is None:
         raise ValueError("The task should be published at OpenML")
 
-    return flow, task, avoid_duplicate_runs
+    return flow, task
 
 
 def _sync_flow_with_server(
@@ -121,7 +115,7 @@ def _sync_flow_with_server(
     upload_flow: bool,
     avoid_duplicate_runs: bool,
 ) -> int | None:
-    """Synchronize flow with server and check for duplicate runs.
+    """Synchronize flow with server and check if setup/task combination is already present.
 
     Parameters
     ----------
@@ -203,23 +197,18 @@ def _prepare_run_environment(flow: OpenMLFlow) -> tuple[list[str], list[str]]:
     return tags, run_environment
 
 
-class _RunResults(NamedTuple):
-    data_content: list[list]
-    trace: OpenMLRunTrace | None
-    fold_evaluations: OrderedDict[str, OrderedDict]
-    sample_evaluations: OrderedDict[str, OrderedDict]
-
-
 def _create_run_from_results(  # noqa: PLR0913
-    *,
     task: OpenMLTask,
     flow: OpenMLFlow,
     flow_id: int | None,
-    results: _RunResults,
+    data_content: list[list],
+    trace: OpenMLRunTrace | None,
+    fold_evaluations: OrderedDict[str, OrderedDict],
+    sample_evaluations: OrderedDict[str, OrderedDict],
     tags: list[str],
     run_environment: list[str],
-    upload_flow: bool,
-    avoid_duplicate_runs: bool,
+    upload_flow: bool,  # noqa: FBT001
+    avoid_duplicate_runs: bool,  # noqa: FBT001
 ) -> OpenMLRun:
     """Create an OpenMLRun object from execution results.
 
@@ -257,19 +246,15 @@ def _create_run_from_results(  # noqa: PLR0913
     fields = [*run_environment, time.strftime("%c"), "Created by run_flow_on_task"]
     generated_description = "\n".join(fields)
 
-    task_id = task.task_id
-    if task_id is None:
-        raise ValueError("The task should be published at OpenML")
-
     run = OpenMLRun(
-        task_id=task_id,
+        task_id=cast(int, task.task_id),
         flow_id=flow_id,
         dataset_id=dataset.dataset_id,
         model=flow.model,
         flow_name=flow.name,
         tags=tags,
-        trace=results.trace,
-        data_content=results.data_content,
+        trace=trace,
+        data_content=data_content,
         flow=flow,
         setup_string=flow.extension.create_setup_string(flow.model),
         description_text=generated_description,
@@ -283,9 +268,9 @@ def _create_run_from_results(  # noqa: PLR0913
 
     # now we need to attach the detailed evaluations
     if task.task_type_id == TaskType.LEARNING_CURVE:
-        run.sample_evaluations = results.sample_evaluations
+        run.sample_evaluations = sample_evaluations
     else:
-        run.fold_evaluations = results.fold_evaluations
+        run.fold_evaluations = fold_evaluations
 
     return run
 
@@ -458,10 +443,11 @@ def run_flow_on_task(  # noqa: PLR0913
     run : OpenMLRun
         Result of the run.
     """
+    if avoid_duplicate_runs is None:
+        avoid_duplicate_runs = openml.config.avoid_duplicate_runs
+
     # 1. Validate inputs
-    flow, task, avoid_duplicate_runs = _validate_flow_and_task_inputs(
-        flow, task, flow_tags, avoid_duplicate_runs
-    )
+    flow, task = _validate_flow_and_task_inputs(flow, task, flow_tags)
 
     # 2. Prepare the model
     if flow.model is None:
@@ -496,19 +482,15 @@ def run_flow_on_task(  # noqa: PLR0913
         n_jobs=n_jobs,
     )
 
-    results = _RunResults(
-        data_content=data_content,
-        trace=trace,
-        fold_evaluations=fold_evaluations,
-        sample_evaluations=sample_evaluations,
-    )
-
     # 7. Create run from results
     run = _create_run_from_results(
         task=task,
         flow=flow,
         flow_id=flow_id,
-        results=results,
+        data_content=data_content,
+        trace=trace,
+        fold_evaluations=fold_evaluations,
+        sample_evaluations=sample_evaluations,
         tags=tags,
         run_environment=run_environment,
         upload_flow=upload_flow,
