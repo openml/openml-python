@@ -19,9 +19,10 @@ def test_cli_version_prints_package_version():
         check=False,
     )
 
-    # Ensure successful exit and version present in output
+    # Ensure successful exit and version present in stdout only
     assert result.returncode == 0
-    assert openml.__version__ in (result.stdout + result.stderr)
+    assert result.stderr == ""
+    assert openml.__version__ in result.stdout
 
 
 def test_console_script_version_prints_package_version():
@@ -39,4 +40,5 @@ def test_console_script_version_prints_package_version():
     )
 
     assert result.returncode == 0
-    assert openml.__version__ in (result.stdout + result.stderr)
+    assert result.stderr == ""
+    assert openml.__version__ in result.stdout
