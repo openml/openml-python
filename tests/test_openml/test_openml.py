@@ -47,7 +47,7 @@ class TestInit(TestBase):
     def test_list_dispatch(self, list_datasets_mock, list_tasks_mock):
         # Need to patch after import, so update dispatch dict
         with mock.patch.dict(
-            "openml._LIST_DISPATCH",
+            "openml.dispatchers._LIST_DISPATCH",
             {
                 "dataset": list_datasets_mock,
                 "task": list_tasks_mock,
@@ -64,20 +64,20 @@ class TestInit(TestBase):
     def test_get_dispatch(self, get_dataset_mock, get_task_mock):
         # Need to patch after import, so update dispatch dict
         with mock.patch.dict(
-            "openml._GET_DISPATCH",
+            "openml.dispatchers._GET_DISPATCH",
             {
                 "dataset": get_dataset_mock,
                 "task": get_task_mock,
             },
         ):
-            openml.get(61) 
+            openml.get(61)
             get_dataset_mock.assert_called_with(61)
 
-            openml.get("Fashion-MNIST", version=2) 
+            openml.get("Fashion-MNIST", version=2)
             get_dataset_mock.assert_called_with("Fashion-MNIST", version=2)
 
             openml.get("Fashion-MNIST")
             get_dataset_mock.assert_called_with("Fashion-MNIST")
 
-            openml.get(31, object_type="task") 
+            openml.get(31, object_type="task")
             get_task_mock.assert_called_with(31)
