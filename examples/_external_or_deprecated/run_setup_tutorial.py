@@ -23,15 +23,15 @@
 # %%
 
 import numpy as np
+from sklearn.compose import ColumnTransformer
+from sklearn.decomposition import TruncatedSVD
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.preprocessing import OneHotEncoder
+
 import openml
 from openml.extensions.sklearn import cat, cont
-
-from sklearn.pipeline import make_pipeline, Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import OneHotEncoder, FunctionTransformer
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.decomposition import TruncatedSVD
 
 # %% [markdown]
 # .. warning::
