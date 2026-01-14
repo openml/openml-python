@@ -1,7 +1,6 @@
 """Store module level information like the API key, cache directory and the server"""
 
 # License: BSD 3-Clause
-# ruff: noqa: PLW0603
 from __future__ import annotations
 
 import configparser
@@ -11,12 +10,12 @@ import os
 import platform
 import shutil
 import warnings
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field, replace
 from io import StringIO
 from pathlib import Path
-from typing import Any, Iterator, cast
-from typing_extensions import Literal
+from typing import Any, Literal, cast
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
@@ -140,7 +139,7 @@ class OpenMLConfigManager:
         object.__setattr__(self, name, value)
         return None
 
-    def _create_log_handlers(self, create_file_handler: bool = True) -> None:  # noqa: FBT001, FBT002
+    def _create_log_handlers(self, create_file_handler: bool = True) -> None:  # noqa: FBT002
         if self.console_handler is not None or self.file_handler is not None:
             self.logger.debug("Requested to create log handlers, but they are already created.")
             return
