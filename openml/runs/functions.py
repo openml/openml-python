@@ -163,7 +163,7 @@ def _sync_flow_with_server(
                 flow_from_server.model = flow.model
                 setup_id = setup_exists(flow_from_server)
                 task_id = task.task_id
-                ids = run_exists(cast(int, task_id), setup_id)
+                ids = run_exists(cast("int", task_id), setup_id)
                 if ids:
                     error_message = (
                         "One or more runs of this setup were already performed on the task."
@@ -205,8 +205,8 @@ def _create_run_from_results(  # noqa: PLR0913
     sample_evaluations: OrderedDict[str, OrderedDict],
     tags: list[str],
     run_environment: list[str],
-    upload_flow: bool,  # noqa: FBT001
-    avoid_duplicate_runs: bool,  # noqa: FBT001
+    upload_flow: bool,
+    avoid_duplicate_runs: bool,
 ) -> OpenMLRun:
     """Create an OpenMLRun object from execution results.
 
@@ -245,7 +245,7 @@ def _create_run_from_results(  # noqa: PLR0913
     generated_description = "\n".join(fields)
 
     run = OpenMLRun(
-        task_id=cast(int, task.task_id),
+        task_id=cast("int", task.task_id),
         flow_id=flow_id,
         dataset_id=dataset.dataset_id,
         model=flow.model,
