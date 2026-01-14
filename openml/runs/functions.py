@@ -919,7 +919,12 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
         test_x = None
         test_y = None
     else:
-        raise NotImplementedError(task.task_type)
+        raise NotImplementedError(
+            f"Task type '{task.task_type}' is not supported. "
+            f"Only OpenMLSupervisedTask and OpenMLClusteringTask are currently implemented. "
+            f"Task details: task_id={getattr(task, 'task_id', 'unknown')}, "
+            f"task_class={task.__class__.__name__}"
+        )
 
     config.logger.info(
         f"Going to run model {model!s} on "
@@ -1146,7 +1151,13 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
     if "predictions" not in files and from_server is True:
         task = openml.tasks.get_task(task_id)
         if task.task_type_id == TaskType.SUBGROUP_DISCOVERY:
-            raise NotImplementedError("Subgroup discovery tasks are not yet supported.")
+            raise NotImplementedError(
+                f"Subgroup discovery tasks are not yet supported. "
+                f"Task ID: {task_id}. Please check the OpenML documentation"
+                f"for supported task types. "
+                f"Currently supported task types: Classification, Regression,"
+                f"Clustering, and Learning Curve."
+            )
 
         # JvR: actually, I am not sure whether this error should be raised.
         # a run can consist without predictions. But for now let's keep it
@@ -1446,7 +1457,12 @@ def format_prediction(  # noqa: PLR0913
     if isinstance(task, OpenMLRegressionTask):
         return [repeat, fold, index, prediction, truth]
 
-    raise NotImplementedError(f"Formatting for {type(task)} is not supported.")
+    raise NotImplementedError(
+        f"Formatting for {type(task)} is not supported."
+        f"Supported task types: OpenMLClassificationTask, OpenMLRegressionTask,"
+        f"and OpenMLLearningCurveTask. "
+        f"Please ensure your task is one of these types."
+    )
 
 
 def delete_run(run_id: int) -> bool:
