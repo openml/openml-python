@@ -1,8 +1,6 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import os
-import re
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
@@ -147,7 +145,11 @@ def get_task(
     -------
     task: OpenMLTask
     """
-    return api_context.backend.tasks.get(task_id, download_splits=download_splits, **get_dataset_kwargs)
+    return api_context.backend.tasks.get(
+        task_id,
+        download_splits=download_splits,
+        **get_dataset_kwargs,
+    )
 
 
 # TODO(eddiebergman): overload on `task_type`

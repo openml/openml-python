@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import warnings
-from functools import partial
 from typing import Any
 
 import pandas as pd
@@ -10,7 +9,6 @@ import xmltodict
 import openml.utils
 from openml._api.resources.base import TasksAPI
 from openml.datasets import get_dataset
-from openml.exceptions import OpenMLCacheException
 from openml.tasks.task import (
     OpenMLClassificationTask,
     OpenMLClusteringTask,
