@@ -121,19 +121,7 @@ def _get_flow_description(flow_id: int) -> OpenMLFlow:
     except OpenMLCacheException:
         from openml._api import api_context
 
-        xml_file = (
-            openml.utils._create_cache_directory_for_id(FLOWS_CACHE_DIR_NAME, flow_id) / "flow.xml"
-        )
-        result = api_context.backend.flows.get(flow_id, return_response=True)
-
-        if isinstance(result, tuple):
-            flow, response = result
-            with xml_file.open("w", encoding="utf8") as fh:
-                fh.write(response.text)
-        else:
-            flow = result
-
-        return flow
+        return api_context.backend.flows.get(flow_id)
 
 
 def list_flows(
@@ -169,7 +157,9 @@ def list_flows(
             - external version
             - uploader
     """
-    listing_call = partial(_list_flows, tag=tag, uploader=uploader)
+    from openml._api import api_context
+
+    listing_call = partial(api_context.backend.flows.list, tag=tag, uploader=uploader)
     batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
     if len(batches) == 0:
         return pd.DataFrame()
@@ -196,7 +186,7 @@ def _list_flows(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
     """
     from openml._api import api_context
 
-    return api_context.backend.flows.list_page(
+    return api_context.backend.flows.list(
         limit=limit,
         offset=offset,
         tag=kwargs.get("tag"),
@@ -323,9 +313,7 @@ def __list_flows(api_call: str) -> pd.DataFrame:
         # Silently continue if parsing fails; all params default to None
         pass
 
-    return api_context.backend.flows.list_page(
-        limit=limit, offset=offset, tag=tag, uploader=uploader
-    )
+    return api_context.backend.flows.list(limit=limit, offset=offset, tag=tag, uploader=uploader)
 
 
 def _check_flow_for_server_id(flow: OpenMLFlow) -> None:

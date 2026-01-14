@@ -38,15 +38,13 @@ class FlowsAPI(ResourceAPI, ABC):
     def get(
         self,
         flow_id: int,
-        *,
-        return_response: bool = False,
-    ) -> OpenMLFlow | tuple[OpenMLFlow, Response]: ...
+    ) -> OpenMLFlow: ...
 
     @abstractmethod
     def exists(self, name: str, external_version: str) -> int | bool: ...
 
     @abstractmethod
-    def list_page(
+    def list(
         self,
         *,
         limit: int | None = None,

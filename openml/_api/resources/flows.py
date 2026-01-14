@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import pandas as pd
 import requests
@@ -9,17 +9,12 @@ import xmltodict
 from openml._api.resources.base import FlowsAPI
 from openml.flows.flow import OpenMLFlow
 
-if TYPE_CHECKING:
-    from requests import Response
-
 
 class FlowsV1(FlowsAPI):
     def get(
         self,
         flow_id: int,
-        *,
-        return_response: bool = False,
-    ) -> OpenMLFlow | tuple[OpenMLFlow, Response]:
+    ) -> OpenMLFlow:
         """Get a flow from the OpenML server.
 
         Parameters
@@ -36,10 +31,7 @@ class FlowsV1(FlowsAPI):
         """
         response = self._http.get(f"flow/{flow_id}")
         flow_xml = response.text
-        flow = OpenMLFlow._from_dict(xmltodict.parse(flow_xml))
-        if return_response:
-            return flow, response
-        return flow
+        return OpenMLFlow._from_dict(xmltodict.parse(flow_xml))
 
     def exists(self, name: str, external_version: str) -> int | bool:
         """Check if a flow exists on the OpenML server.
@@ -68,7 +60,7 @@ class FlowsV1(FlowsAPI):
         flow_id = int(result_dict["oml:flow_exists"]["oml:id"])
         return flow_id if flow_id > 0 else False
 
-    def list_page(
+    def list(
         self,
         *,
         limit: int | None = None,
@@ -181,9 +173,7 @@ class FlowsV2(FlowsAPI):
     def get(
         self,
         flow_id: int,
-        *,
-        return_response: bool = False,
-    ) -> OpenMLFlow | tuple[OpenMLFlow, Response]:
+    ) -> OpenMLFlow:
         """Get a flow from the OpenML v2 server.
 
         Parameters
@@ -203,11 +193,7 @@ class FlowsV2(FlowsAPI):
 
         # Convert v2 JSON to v1-compatible dict for OpenMLFlow._from_dict()
         flow_dict = self._convert_v2_to_v1_format(flow_json)
-        flow = OpenMLFlow._from_dict(flow_dict)
-
-        if return_response:
-            return flow, response
-        return flow
+        return OpenMLFlow._from_dict(flow_dict)
 
     def exists(self, name: str, external_version: str) -> int | bool:
         """Check if a flow exists on the OpenML v2 server.
@@ -238,7 +224,7 @@ class FlowsV2(FlowsAPI):
             # v2 returns 404 when flow doesn't exist
             return False
 
-    def list_page(
+    def list(
         self,
         *,
         limit: int | None = None,
@@ -246,7 +232,7 @@ class FlowsV2(FlowsAPI):
         tag: str | None = None,
         uploader: str | None = None,
     ) -> pd.DataFrame:
-        raise NotImplementedError("GET /flows (list) not yet implemented in v2 server")
+        raise NotImplementedError("flows (list) not yet implemented in v2 server")
 
     def create(self, flow: OpenMLFlow) -> OpenMLFlow:
         raise NotImplementedError("POST /flows (create) not yet implemented in v2 server")
