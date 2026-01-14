@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from collections import OrderedDict
 from functools import partial
-from typing import Any, Dict
+from typing import Any
 
 import dateutil.parser
 import pandas as pd
@@ -68,7 +68,7 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = True) -> OpenMLFlow:  # noqa: FBT001, FBT002
+def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = True) -> OpenMLFlow:  # noqa: FBT002
     """Download the OpenML flow for a given flow ID.
 
     Parameters
@@ -228,7 +228,7 @@ def flow_exists(name: str, external_version: str) -> int | bool:
 def get_flow_id(
     model: Any | None = None,
     name: str | None = None,
-    exact_version: bool = True,  # noqa: FBT001, FBT002
+    exact_version: bool = True,  # noqa: FBT002
 ) -> int | bool | list[int]:
     """Retrieves the flow id for a model or a flow name.
 
@@ -334,9 +334,9 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
     flow1: OpenMLFlow,
     flow2: OpenMLFlow,
     ignore_parameter_values_on_older_children: str | None = None,
-    ignore_parameter_values: bool = False,  # noqa: FBT001, FBT002
-    ignore_custom_name_if_none: bool = False,  # noqa:  FBT001, FBT002
-    check_description: bool = True,  # noqa:  FBT001, FBT002
+    ignore_parameter_values: bool = False,  # noqa: FBT002
+    ignore_custom_name_if_none: bool = False,  # noqa: FBT002
+    check_description: bool = True,  # noqa: FBT002
 ) -> None:
     """Check equality of two flows.
 
@@ -387,7 +387,7 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
         attr1 = getattr(flow1, key, None)
         attr2 = getattr(flow2, key, None)
         if key == "components":
-            if not (isinstance(attr1, Dict) and isinstance(attr2, Dict)):
+            if not (isinstance(attr1, dict) and isinstance(attr2, dict)):
                 raise TypeError("Cannot compare components because they are not dictionary.")
 
             for name in set(attr1.keys()).union(attr2.keys()):
@@ -426,9 +426,9 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
                         )
 
                 if ignore_parameter_values_on_older_children:
-                    assert (
-                        flow1.upload_date is not None
-                    ), "Flow1 has no upload date that allows us to compare age of children."
+                    assert flow1.upload_date is not None, (
+                        "Flow1 has no upload date that allows us to compare age of children."
+                    )
                     upload_date_current_flow = dateutil.parser.parse(flow1.upload_date)
                     upload_date_parent_flow = dateutil.parser.parse(
                         ignore_parameter_values_on_older_children,
@@ -463,8 +463,8 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
                 # iterating over the parameter's meta info list
                 for param in params1:
                     if (
-                        isinstance(flow1.parameters_meta_info[param], Dict)
-                        and isinstance(flow2.parameters_meta_info[param], Dict)
+                        isinstance(flow1.parameters_meta_info[param], dict)
+                        and isinstance(flow2.parameters_meta_info[param], dict)
                         and "data_type" in flow1.parameters_meta_info[param]
                         and "data_type" in flow2.parameters_meta_info[param]
                     ):

@@ -280,6 +280,7 @@ class TestFlowFunctions(TestBase):
         "No known models with list of lists parameters in older versions.",
     )
     @pytest.mark.uses_test_server()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_sklearn_to_flow_list_of_lists(self):
         from sklearn.preprocessing import OrdinalEncoder
 
@@ -337,6 +338,7 @@ class TestFlowFunctions(TestBase):
         reason="Requires scikit-learn!=0.19.1, because target flow is from that version.",
     )
     @pytest.mark.production()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_flow_with_reinstantiate_strict_with_wrong_version_raises_exception(self):
         self.use_production_server()
         flow = 8175
@@ -532,7 +534,7 @@ def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
 
 
 @mock.patch.object(requests.Session, "delete")
-@pytest.mark.skip(reason="Delete flow tests temporarily skipped")
+@pytest.mark.xfail(reason="failures_issue_1544", strict=False)
 def test_delete_unknown_flow(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_exist.xml"

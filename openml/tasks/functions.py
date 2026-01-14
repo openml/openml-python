@@ -39,7 +39,7 @@ def _get_cached_tasks() -> dict[int, OpenMLTask]:
         OpenMLTask.
     """
     task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
-    directory_content = os.listdir(task_cache_dir)
+    directory_content = os.listdir(task_cache_dir)  # noqa: PTH208
     directory_content.sort()
 
     # Find all dataset ids for which we have downloaded the dataset
@@ -330,7 +330,7 @@ def __list_tasks(api_call: str) -> pd.DataFrame:  # noqa: C901, PLR0912
         except KeyError as e:
             if tid is not None:
                 warnings.warn(
-                    "Invalid xml for task %d: %s\nFrom %s" % (tid, e, task_),
+                    f"Invalid xml for task {tid}: {e}\nFrom {task_}",
                     RuntimeWarning,
                     stacklevel=2,
                 )
@@ -389,7 +389,7 @@ def get_tasks(
 @openml.utils.thread_safe_if_oslo_installed
 def get_task(
     task_id: int,
-    download_splits: bool = False,  # noqa: FBT001, FBT002
+    download_splits: bool = False,  # noqa: FBT002
     **get_dataset_kwargs: Any,
 ) -> OpenMLTask:
     """Download OpenML task for a given task ID.
@@ -445,7 +445,7 @@ def _get_task_description(task_id: int) -> OpenMLTask:
     except OpenMLCacheException:
         _cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
         xml_file = _cache_dir / "task.xml"
-        result = api_context.backend.tasks.get(task_id, return_response=True)
+        task_xml = openml._api_calls._perform_api_call(f"task/{task_id}", "get")
 
         if isinstance(result, tuple):
             task, response = result
