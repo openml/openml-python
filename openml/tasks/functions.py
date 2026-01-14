@@ -3,71 +3,23 @@ from __future__ import annotations
 
 import os
 import re
-import warnings
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
-import xmltodict
 
 import openml.utils
 from openml._api import api_context
-from openml.datasets import get_dataset
-from openml.exceptions import OpenMLCacheException
 
-from .task import (
-    OpenMLClassificationTask,
-    OpenMLClusteringTask,
-    OpenMLLearningCurveTask,
-    OpenMLRegressionTask,
-    OpenMLSupervisedTask,
-    OpenMLTask,
-    TaskType,
-)
-
-TASKS_CACHE_DIR_NAME = "tasks"
-
-# Not being used anywhere but still used in tests
-def _get_cached_tasks() -> dict[int, OpenMLTask]:
-    """Return a dict of all the tasks which are cached locally.
-
-    Returns
-    -------
-    tasks : OrderedDict
-        A dict of all the cached tasks. Each task is an instance of
-        OpenMLTask.
-    """
-    task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
-    directory_content = os.listdir(task_cache_dir)
-    directory_content.sort()
-
-    # Find all dataset ids for which we have downloaded the dataset
-    # description
-    tids = (int(did) for did in directory_content if re.match(r"[0-9]*", did))
-    return {tid: _get_cached_task(tid) for tid in tids}
-
-
-def _get_cached_task(tid: int) -> OpenMLTask:
-    """Return a cached task based on the given id.
-
-    Parameters
-    ----------
-    tid : int
-        Id of the task.
-
-    Returns
-    -------
-    OpenMLTask
-    """
-    tid_cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, tid)
-
-    task_xml_path = tid_cache_dir / "task.xml"
-    try:
-        with task_xml_path.open(encoding="utf8") as fh:
-            return api_context.backend.tasks._create_task_from_xml(fh.read())
-    except OSError as e:
-        openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
-        raise OpenMLCacheException(f"Task file for tid {tid} not cached") from e
+if TYPE_CHECKING:
+    from .task import (
+        OpenMLClassificationTask,
+        OpenMLClusteringTask,
+        OpenMLLearningCurveTask,
+        OpenMLRegressionTask,
+        OpenMLTask,
+        TaskType,
+    )
 
 
 # v2: /tasktype/{task_type_id}
@@ -161,7 +113,7 @@ def get_tasks(
     -------
     list
     """
-    api_context.backend.tasks.get_tasks(
+    return api_context.backend.tasks.get_tasks(
         task_ids, download_data=download_data, download_qualities=download_qualities
     )
 
@@ -195,7 +147,7 @@ def get_task(
     -------
     task: OpenMLTask
     """
-    api_context.backend.tasks.get(task_id, download_splits=download_splits, **get_dataset_kwargs)
+    return api_context.backend.tasks.get(task_id, download_splits=download_splits, **get_dataset_kwargs)
 
 
 # TODO(eddiebergman): overload on `task_type`
@@ -241,7 +193,7 @@ def create_task(
     OpenMLClassificationTask, OpenMLRegressionTask,
     OpenMLLearningCurveTask, OpenMLClusteringTask
     """
-    api_context.backend.tasks.create_task(
+    return api_context.backend.tasks.create_task(
         task_type,
         dataset_id,
         estimation_procedure_id,

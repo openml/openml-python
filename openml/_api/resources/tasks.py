@@ -8,7 +8,6 @@ import pandas as pd
 import xmltodict
 
 import openml.utils
-from openml._api import api_context
 from openml._api.resources.base import TasksAPI
 from openml.datasets import get_dataset
 from openml.exceptions import OpenMLCacheException
@@ -58,66 +57,29 @@ class TasksV1(TasksAPI):
         if not isinstance(task_id, int):
             raise TypeError(f"Task id should be integer, is {type(task_id)}")
 
-        cache_key_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
-        tid_cache_dir = cache_key_dir / str(task_id)
-        tid_cache_dir_existed = tid_cache_dir.exists()
-        try:
-            task = self._get_task_description(task_id)
-            dataset = get_dataset(task.dataset_id, **get_dataset_kwargs)
-            # List of class labels available in dataset description
-            # Including class labels as part of task meta data handles
-            #   the case where data download was initially disabled
-            if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
-                task.class_labels = dataset.retrieve_class_labels(task.target_name)
-            # Clustering tasks do not have class labels
-            # and do not offer download_split
-            if download_splits and isinstance(task, OpenMLSupervisedTask):
-                task.download_split()
-        except Exception as e:
-            if not tid_cache_dir_existed:
-                openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
-            raise e
+        task = self._get_task_description(task_id)
+        dataset = get_dataset(task.dataset_id, **get_dataset_kwargs)
+        # List of class labels available in dataset description
+        # Including class labels as part of task meta data handles
+        #   the case where data download was initially disabled
+        if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
+            task.class_labels = dataset.retrieve_class_labels(task.target_name)
+        # Clustering tasks do not have class labels
+        # and do not offer download_split
+        if download_splits and isinstance(task, OpenMLSupervisedTask):
+            task.download_split()
 
         return task
 
-    def _get_cached_task(self, tid: int) -> OpenMLTask:
-        """Return a cached task based on the given id.
-
-        Parameters
-        ----------
-        tid : int
-            Id of the task.
-
-        Returns
-        -------
-        OpenMLTask
-        """
-        tid_cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, tid)
-
-        task_xml_path = tid_cache_dir / "task.xml"
-        try:
-            with task_xml_path.open(encoding="utf8") as fh:
-                return self._create_task_from_xml(fh.read())
-        except OSError as e:
-            openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
-            raise OpenMLCacheException(f"Task file for tid {tid} not cached") from e
-
     def _get_task_description(self, task_id: int) -> OpenMLTask:
-        try:
-            return self._get_cached_task(task_id)
-        except OpenMLCacheException:
-            _cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
-            xml_file = _cache_dir / "task.xml"
-            result = self._http.get(f"task/{task_id}", return_response=True)
+        result = self._http.get(f"task/{task_id}", return_response=True)
 
-            if isinstance(result, tuple):
-                task, response = result
-                with xml_file.open("w", encoding="utf8") as fh:
-                    fh.write(response.text)
-            else:
-                task = result
+        if isinstance(result, tuple):
+            task, _response = result
+        else:
+            task = result
 
-            return task
+        return task
 
     def _create_task_from_xml(self, xml: str) -> OpenMLTask:
         """Create a task given a xml string.
