@@ -479,7 +479,12 @@ class OpenMLRun(OpenMLBase):
             ]
 
         else:
-            raise NotImplementedError(f"Task type {task.task_type!s} is not yet supported.")
+            raise NotImplementedError(
+                f"Task type '{task.task_type}' is not yet supported. "
+                f"Supported task types: Classification, Regression, Clustering, Learning Curve. "
+                f"Task ID: {task.task_id}. "
+                f"Please check the OpenML documentation for supported task types."
+            )
 
         return arff_dict
 
