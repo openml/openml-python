@@ -3618,12 +3618,7 @@ accepts <code>y_true</code>, <code>y_pred</code> and <code>**kwargs</code></p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/runs/run.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-486">486</a></span>
-<span class="normal"><a href="#__codelineno-0-487">487</a></span>
-<span class="normal"><a href="#__codelineno-0-488">488</a></span>
-<span class="normal"><a href="#__codelineno-0-489">489</a></span>
-<span class="normal"><a href="#__codelineno-0-490">490</a></span>
-<span class="normal"><a href="#__codelineno-0-491">491</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-491">491</a></span>
 <span class="normal"><a href="#__codelineno-0-492">492</a></span>
 <span class="normal"><a href="#__codelineno-0-493">493</a></span>
 <span class="normal"><a href="#__codelineno-0-494">494</a></span>
@@ -3742,131 +3737,136 @@ accepts <code>y_true</code>, <code>y_pred</code> and <code>**kwargs</code></p>
 <span class="normal"><a href="#__codelineno-0-607">607</a></span>
 <span class="normal"><a href="#__codelineno-0-608">608</a></span>
 <span class="normal"><a href="#__codelineno-0-609">609</a></span>
-<span class="normal"><a href="#__codelineno-0-610">610</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_metric_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sklearn_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>  <span class="c1"># noqa: PLR0915, PLR0912, C901</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates metric scores based on predicted values. Assumes the</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">    run has been executed locally (and contains run_data). Furthermore,</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">    it assumes that the &#39;correct&#39; or &#39;truth&#39; attribute is specified in</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">    the arff (which is an optional field, but always the case for</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">    openml-python runs)</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">    sklearn_fn : function</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">        a function pointer to a sklearn function that</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        accepts ``y_true``, ``y_pred`` and ``**kwargs``</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">    kwargs : dict</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        kwargs for the function</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">    scores : ndarray of scores of length num_folds * num_repeats</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        metric results</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>    <span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span> <span class="k">if</span> <span class="n">kwargs</span> <span class="k">else</span> <span class="p">{}</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a>        <span class="n">predictions_arff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_arff_dict</span><span class="p">()</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a>    <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;predictions&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_files</span><span class="p">):</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a>        <span class="n">predictions_file_url</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_file_id_to_url</span><span class="p">(</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">output_files</span><span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>            <span class="s2">&quot;predictions.arff&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="p">)</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="n">response</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_download_text_file</span><span class="p">(</span><span class="n">predictions_file_url</span><span class="p">)</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="n">predictions_arff</span> <span class="o">=</span> <span class="n">arff</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>        <span class="c1"># TODO: make this a stream reader</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>            <span class="s2">&quot;Run should have been locally executed or contain outputfile reference.&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a>        <span class="p">)</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>    <span class="c1"># Need to know more about the task to compute scores correctly</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>    <span class="n">task</span> <span class="o">=</span> <span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="p">)</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a>    <span class="n">attribute_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">att</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">]]</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a>    <span class="k">if</span> <span class="p">(</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a>        <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="ow">in</span> <span class="p">[</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">LEARNING_CURVE</span><span class="p">]</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>        <span class="ow">and</span> <span class="s2">&quot;correct&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attribute_names</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>    <span class="p">):</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Attribute &quot;correct&quot; should be set for classification task runs&#39;</span><span class="p">)</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>    <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_REGRESSION</span> <span class="ow">and</span> <span class="s2">&quot;truth&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attribute_names</span><span class="p">:</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Attribute &quot;truth&quot; should be set for regression task runs&#39;</span><span class="p">)</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a>    <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="o">!=</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">CLUSTERING</span> <span class="ow">and</span> <span class="s2">&quot;prediction&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attribute_names</span><span class="p">:</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Attribute &quot;prediction&quot; should be set for supervised task runs&#39;</span><span class="p">)</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_attribute_list_to_dict</span><span class="p">(</span><span class="n">attribute_list</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>        <span class="c1"># convenience function: Creates a mapping to map from the name of</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>        <span class="c1"># attributes present in the arff prediction file to their index.</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>        <span class="c1"># This is necessary because the number of classes can be different</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>        <span class="c1"># for different tasks.</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a>        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">attribute_list</span><span class="p">)):</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a>            <span class="n">res</span><span class="p">[</span><span class="n">attribute_list</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">idx</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>        <span class="k">return</span> <span class="n">res</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>    <span class="n">attribute_dict</span> <span class="o">=</span> <span class="n">_attribute_list_to_dict</span><span class="p">(</span><span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">])</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a>    <span class="n">repeat_idx</span> <span class="o">=</span> <span class="n">attribute_dict</span><span class="p">[</span><span class="s2">&quot;repeat&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>    <span class="n">fold_idx</span> <span class="o">=</span> <span class="n">attribute_dict</span><span class="p">[</span><span class="s2">&quot;fold&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a>    <span class="n">predicted_idx</span> <span class="o">=</span> <span class="n">attribute_dict</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span>  <span class="c1"># Assume supervised task</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>    <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="ow">in</span> <span class="p">(</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">LEARNING_CURVE</span><span class="p">):</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a>        <span class="n">correct_idx</span> <span class="o">=</span> <span class="n">attribute_dict</span><span class="p">[</span><span class="s2">&quot;correct&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>    <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_REGRESSION</span><span class="p">:</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a>        <span class="n">correct_idx</span> <span class="o">=</span> <span class="n">attribute_dict</span><span class="p">[</span><span class="s2">&quot;truth&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>    <span class="n">has_samples</span> <span class="o">=</span> <span class="kc">False</span>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a>    <span class="k">if</span> <span class="s2">&quot;sample&quot;</span> <span class="ow">in</span> <span class="n">attribute_dict</span><span class="p">:</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a>        <span class="n">sample_idx</span> <span class="o">=</span> <span class="n">attribute_dict</span><span class="p">[</span><span class="s2">&quot;sample&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a>        <span class="n">has_samples</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>    <span class="k">if</span> <span class="p">(</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a>        <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">][</span><span class="n">predicted_idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a>        <span class="o">!=</span> <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">][</span><span class="n">correct_idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>    <span class="p">):</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>        <span class="n">pred</span> <span class="o">=</span> <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">][</span><span class="n">predicted_idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a>        <span class="n">corr</span> <span class="o">=</span> <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">][</span><span class="n">correct_idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a>            <span class="sa">f</span><span class="s2">&quot;Predicted and Correct do not have equal values: </span><span class="si">{</span><span class="n">pred</span><span class="si">!s}</span><span class="s2"> Vs. </span><span class="si">{</span><span class="n">corr</span><span class="si">!s}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>        <span class="p">)</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a>    <span class="c1"># TODO: these could be cached</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>    <span class="n">values_predict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]]</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a>    <span class="n">values_correct</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]]</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a>    <span class="k">for</span> <span class="n">_line_idx</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]):</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>        <span class="n">rep</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">repeat_idx</span><span class="p">]</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a>        <span class="n">fold</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">fold_idx</span><span class="p">]</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a>        <span class="n">samp</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">has_samples</span> <span class="k">else</span> <span class="mi">0</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>        <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="ow">in</span> <span class="p">[</span>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a>            <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a>            <span class="n">TaskType</span><span class="o">.</span><span class="n">LEARNING_CURVE</span><span class="p">,</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>        <span class="p">]:</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a>            <span class="n">prediction</span> <span class="o">=</span> <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">][</span><span class="n">predicted_idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a>                <span class="n">line</span><span class="p">[</span><span class="n">predicted_idx</span><span class="p">],</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a>            <span class="p">)</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a>            <span class="n">correct</span> <span class="o">=</span> <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">][</span><span class="n">predicted_idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">correct_idx</span><span class="p">])</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_REGRESSION</span><span class="p">:</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>            <span class="n">prediction</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">predicted_idx</span><span class="p">]</span>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a>            <span class="n">correct</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">correct_idx</span><span class="p">]</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="k">if</span> <span class="n">rep</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values_predict</span><span class="p">:</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a>            <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>            <span class="n">values_correct</span><span class="p">[</span><span class="n">rep</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a>        <span class="k">if</span> <span class="n">fold</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">]:</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a>            <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a>            <span class="n">values_correct</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a>        <span class="k">if</span> <span class="n">samp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">]:</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>            <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">][</span><span class="n">samp</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-598" name="__codelineno-0-598"></a>            <span class="n">values_correct</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">][</span><span class="n">samp</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-599" name="__codelineno-0-599"></a>
-<a id="__codelineno-0-600" name="__codelineno-0-600"></a>        <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">][</span><span class="n">samp</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a>        <span class="n">values_correct</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">][</span><span class="n">samp</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">correct</span><span class="p">)</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a>    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a>    <span class="k">for</span> <span class="n">rep</span> <span class="ow">in</span> <span class="n">values_predict</span><span class="p">:</span>  <span class="c1"># noqa: PLC0206</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>        <span class="k">for</span> <span class="n">fold</span> <span class="ow">in</span> <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">]:</span>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a>            <span class="n">last_sample</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a>            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">][</span><span class="n">last_sample</span><span class="p">]</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a>            <span class="n">y_true</span> <span class="o">=</span> <span class="n">values_correct</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">][</span><span class="n">last_sample</span><span class="p">]</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a>            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sklearn_fn</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-610">610</a></span>
+<span class="normal"><a href="#__codelineno-0-611">611</a></span>
+<span class="normal"><a href="#__codelineno-0-612">612</a></span>
+<span class="normal"><a href="#__codelineno-0-613">613</a></span>
+<span class="normal"><a href="#__codelineno-0-614">614</a></span>
+<span class="normal"><a href="#__codelineno-0-615">615</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_metric_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sklearn_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>  <span class="c1"># noqa: PLR0915, PLR0912, C901</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates metric scores based on predicted values. Assumes the</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="sd">    run has been executed locally (and contains run_data). Furthermore,</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="sd">    it assumes that the &#39;correct&#39; or &#39;truth&#39; attribute is specified in</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">    the arff (which is an optional field, but always the case for</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">    openml-python runs)</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">    sklearn_fn : function</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        a function pointer to a sklearn function that</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        accepts ``y_true``, ``y_pred`` and ``**kwargs``</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">    kwargs : dict</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        kwargs for the function</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">    scores : ndarray of scores of length num_folds * num_repeats</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">        metric results</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span> <span class="k">if</span> <span class="n">kwargs</span> <span class="k">else</span> <span class="p">{}</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="n">predictions_arff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_arff_dict</span><span class="p">()</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>    <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;predictions&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_files</span><span class="p">):</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="n">predictions_file_url</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_file_id_to_url</span><span class="p">(</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">output_files</span><span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>            <span class="s2">&quot;predictions.arff&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>        <span class="p">)</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a>        <span class="n">response</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_download_text_file</span><span class="p">(</span><span class="n">predictions_file_url</span><span class="p">)</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>        <span class="n">predictions_arff</span> <span class="o">=</span> <span class="n">arff</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a>        <span class="c1"># TODO: make this a stream reader</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a>            <span class="s2">&quot;Run should have been locally executed or contain outputfile reference.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a>        <span class="p">)</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>    <span class="c1"># Need to know more about the task to compute scores correctly</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a>    <span class="n">task</span> <span class="o">=</span> <span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="p">)</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>    <span class="n">attribute_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">att</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">]]</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>    <span class="k">if</span> <span class="p">(</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="ow">in</span> <span class="p">[</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">LEARNING_CURVE</span><span class="p">]</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>        <span class="ow">and</span> <span class="s2">&quot;correct&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attribute_names</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>    <span class="p">):</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Attribute &quot;correct&quot; should be set for classification task runs&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>    <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_REGRESSION</span> <span class="ow">and</span> <span class="s2">&quot;truth&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attribute_names</span><span class="p">:</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Attribute &quot;truth&quot; should be set for regression task runs&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>    <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="o">!=</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">CLUSTERING</span> <span class="ow">and</span> <span class="s2">&quot;prediction&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attribute_names</span><span class="p">:</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Attribute &quot;prediction&quot; should be set for supervised task runs&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_attribute_list_to_dict</span><span class="p">(</span><span class="n">attribute_list</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>        <span class="c1"># convenience function: Creates a mapping to map from the name of</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>        <span class="c1"># attributes present in the arff prediction file to their index.</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a>        <span class="c1"># This is necessary because the number of classes can be different</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>        <span class="c1"># for different tasks.</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">attribute_list</span><span class="p">)):</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>            <span class="n">res</span><span class="p">[</span><span class="n">attribute_list</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">idx</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>        <span class="k">return</span> <span class="n">res</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>    <span class="n">attribute_dict</span> <span class="o">=</span> <span class="n">_attribute_list_to_dict</span><span class="p">(</span><span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">])</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>    <span class="n">repeat_idx</span> <span class="o">=</span> <span class="n">attribute_dict</span><span class="p">[</span><span class="s2">&quot;repeat&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a>    <span class="n">fold_idx</span> <span class="o">=</span> <span class="n">attribute_dict</span><span class="p">[</span><span class="s2">&quot;fold&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a>    <span class="n">predicted_idx</span> <span class="o">=</span> <span class="n">attribute_dict</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span>  <span class="c1"># Assume supervised task</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a>    <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="ow">in</span> <span class="p">(</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">LEARNING_CURVE</span><span class="p">):</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a>        <span class="n">correct_idx</span> <span class="o">=</span> <span class="n">attribute_dict</span><span class="p">[</span><span class="s2">&quot;correct&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a>    <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_REGRESSION</span><span class="p">:</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a>        <span class="n">correct_idx</span> <span class="o">=</span> <span class="n">attribute_dict</span><span class="p">[</span><span class="s2">&quot;truth&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a>    <span class="n">has_samples</span> <span class="o">=</span> <span class="kc">False</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a>    <span class="k">if</span> <span class="s2">&quot;sample&quot;</span> <span class="ow">in</span> <span class="n">attribute_dict</span><span class="p">:</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a>        <span class="n">sample_idx</span> <span class="o">=</span> <span class="n">attribute_dict</span><span class="p">[</span><span class="s2">&quot;sample&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>        <span class="n">has_samples</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>    <span class="k">if</span> <span class="p">(</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>        <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">][</span><span class="n">predicted_idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a>        <span class="o">!=</span> <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">][</span><span class="n">correct_idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a>    <span class="p">):</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="n">pred</span> <span class="o">=</span> <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">][</span><span class="n">predicted_idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="n">corr</span> <span class="o">=</span> <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">][</span><span class="n">correct_idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a>            <span class="sa">f</span><span class="s2">&quot;Predicted and Correct do not have equal values: </span><span class="si">{</span><span class="n">pred</span><span class="si">!s}</span><span class="s2"> Vs. </span><span class="si">{</span><span class="n">corr</span><span class="si">!s}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>        <span class="p">)</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a>    <span class="c1"># TODO: these could be cached</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a>    <span class="n">values_predict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]]</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a>    <span class="n">values_correct</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]]</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a>    <span class="k">for</span> <span class="n">_line_idx</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]):</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a>        <span class="n">rep</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">repeat_idx</span><span class="p">]</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a>        <span class="n">fold</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">fold_idx</span><span class="p">]</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a>        <span class="n">samp</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">has_samples</span> <span class="k">else</span> <span class="mi">0</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>        <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="ow">in</span> <span class="p">[</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a>            <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">,</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a>            <span class="n">TaskType</span><span class="o">.</span><span class="n">LEARNING_CURVE</span><span class="p">,</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="p">]:</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a>            <span class="n">prediction</span> <span class="o">=</span> <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">][</span><span class="n">predicted_idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a>                <span class="n">line</span><span class="p">[</span><span class="n">predicted_idx</span><span class="p">],</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>            <span class="p">)</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a>            <span class="n">correct</span> <span class="o">=</span> <span class="n">predictions_arff</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">][</span><span class="n">predicted_idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">correct_idx</span><span class="p">])</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a>        <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">task_type_id</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_REGRESSION</span><span class="p">:</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a>            <span class="n">prediction</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">predicted_idx</span><span class="p">]</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>            <span class="n">correct</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">correct_idx</span><span class="p">]</span>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a>        <span class="k">if</span> <span class="n">rep</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values_predict</span><span class="p">:</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a>            <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a>            <span class="n">values_correct</span><span class="p">[</span><span class="n">rep</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>        <span class="k">if</span> <span class="n">fold</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">]:</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a>            <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>            <span class="n">values_correct</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a>        <span class="k">if</span> <span class="n">samp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">]:</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>            <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">][</span><span class="n">samp</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>            <span class="n">values_correct</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">][</span><span class="n">samp</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>        <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">][</span><span class="n">samp</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a>        <span class="n">values_correct</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">][</span><span class="n">samp</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">correct</span><span class="p">)</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a>    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-609" name="__codelineno-0-609"></a>    <span class="k">for</span> <span class="n">rep</span> <span class="ow">in</span> <span class="n">values_predict</span><span class="p">:</span>  <span class="c1"># noqa: PLC0206</span>
+<a id="__codelineno-0-610" name="__codelineno-0-610"></a>        <span class="k">for</span> <span class="n">fold</span> <span class="ow">in</span> <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">]:</span>
+<a id="__codelineno-0-611" name="__codelineno-0-611"></a>            <span class="n">last_sample</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a>            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">values_predict</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">][</span><span class="n">last_sample</span><span class="p">]</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>            <span class="n">y_true</span> <span class="o">=</span> <span class="n">values_correct</span><span class="p">[</span><span class="n">rep</span><span class="p">][</span><span class="n">fold</span><span class="p">][</span><span class="n">last_sample</span><span class="p">]</span>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a>            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sklearn_fn</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -5834,37 +5834,37 @@ If not provided, <code>setup_string</code> should be set.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/runs/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1288">1288</a></span>
-<span class="normal"><a href="#__codelineno-0-1289">1289</a></span>
-<span class="normal"><a href="#__codelineno-0-1290">1290</a></span>
-<span class="normal"><a href="#__codelineno-0-1291">1291</a></span>
-<span class="normal"><a href="#__codelineno-0-1292">1292</a></span>
-<span class="normal"><a href="#__codelineno-0-1293">1293</a></span>
-<span class="normal"><a href="#__codelineno-0-1294">1294</a></span>
-<span class="normal"><a href="#__codelineno-0-1295">1295</a></span>
-<span class="normal"><a href="#__codelineno-0-1296">1296</a></span>
-<span class="normal"><a href="#__codelineno-0-1297">1297</a></span>
-<span class="normal"><a href="#__codelineno-0-1298">1298</a></span>
-<span class="normal"><a href="#__codelineno-0-1299">1299</a></span>
-<span class="normal"><a href="#__codelineno-0-1300">1300</a></span>
-<span class="normal"><a href="#__codelineno-0-1301">1301</a></span>
-<span class="normal"><a href="#__codelineno-0-1302">1302</a></span>
-<span class="normal"><a href="#__codelineno-0-1303">1303</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1288" name="__codelineno-0-1288"></a><span class="k">def</span><span class="w"> </span><span class="nf">delete_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-1289" name="__codelineno-0-1289"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete run with id `run_id` from the OpenML server.</span>
-<a id="__codelineno-0-1290" name="__codelineno-0-1290"></a>
-<a id="__codelineno-0-1291" name="__codelineno-0-1291"></a><span class="sd">    You can only delete runs which you uploaded.</span>
-<a id="__codelineno-0-1292" name="__codelineno-0-1292"></a>
-<a id="__codelineno-0-1293" name="__codelineno-0-1293"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-1294" name="__codelineno-0-1294"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-1295" name="__codelineno-0-1295"></a><span class="sd">    run_id : int</span>
-<a id="__codelineno-0-1296" name="__codelineno-0-1296"></a><span class="sd">        OpenML id of the run</span>
-<a id="__codelineno-0-1297" name="__codelineno-0-1297"></a>
-<a id="__codelineno-0-1298" name="__codelineno-0-1298"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-1299" name="__codelineno-0-1299"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-1300" name="__codelineno-0-1300"></a><span class="sd">    bool</span>
-<a id="__codelineno-0-1301" name="__codelineno-0-1301"></a><span class="sd">        True if the deletion was successful. False otherwise.</span>
-<a id="__codelineno-0-1302" name="__codelineno-0-1302"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1303" name="__codelineno-0-1303"></a>    <span class="k">return</span> <span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_delete_entity</span><span class="p">(</span><span class="s2">&quot;run&quot;</span><span class="p">,</span> <span class="n">run_id</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1304">1304</a></span>
+<span class="normal"><a href="#__codelineno-0-1305">1305</a></span>
+<span class="normal"><a href="#__codelineno-0-1306">1306</a></span>
+<span class="normal"><a href="#__codelineno-0-1307">1307</a></span>
+<span class="normal"><a href="#__codelineno-0-1308">1308</a></span>
+<span class="normal"><a href="#__codelineno-0-1309">1309</a></span>
+<span class="normal"><a href="#__codelineno-0-1310">1310</a></span>
+<span class="normal"><a href="#__codelineno-0-1311">1311</a></span>
+<span class="normal"><a href="#__codelineno-0-1312">1312</a></span>
+<span class="normal"><a href="#__codelineno-0-1313">1313</a></span>
+<span class="normal"><a href="#__codelineno-0-1314">1314</a></span>
+<span class="normal"><a href="#__codelineno-0-1315">1315</a></span>
+<span class="normal"><a href="#__codelineno-0-1316">1316</a></span>
+<span class="normal"><a href="#__codelineno-0-1317">1317</a></span>
+<span class="normal"><a href="#__codelineno-0-1318">1318</a></span>
+<span class="normal"><a href="#__codelineno-0-1319">1319</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1304" name="__codelineno-0-1304"></a><span class="k">def</span><span class="w"> </span><span class="nf">delete_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-1305" name="__codelineno-0-1305"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete run with id `run_id` from the OpenML server.</span>
+<a id="__codelineno-0-1306" name="__codelineno-0-1306"></a>
+<a id="__codelineno-0-1307" name="__codelineno-0-1307"></a><span class="sd">    You can only delete runs which you uploaded.</span>
+<a id="__codelineno-0-1308" name="__codelineno-0-1308"></a>
+<a id="__codelineno-0-1309" name="__codelineno-0-1309"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-1310" name="__codelineno-0-1310"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-1311" name="__codelineno-0-1311"></a><span class="sd">    run_id : int</span>
+<a id="__codelineno-0-1312" name="__codelineno-0-1312"></a><span class="sd">        OpenML id of the run</span>
+<a id="__codelineno-0-1313" name="__codelineno-0-1313"></a>
+<a id="__codelineno-0-1314" name="__codelineno-0-1314"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-1315" name="__codelineno-0-1315"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-1316" name="__codelineno-0-1316"></a><span class="sd">    bool</span>
+<a id="__codelineno-0-1317" name="__codelineno-0-1317"></a><span class="sd">        True if the deletion was successful. False otherwise.</span>
+<a id="__codelineno-0-1318" name="__codelineno-0-1318"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1319" name="__codelineno-0-1319"></a>    <span class="k">return</span> <span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_delete_entity</span><span class="p">(</span><span class="s2">&quot;run&quot;</span><span class="p">,</span> <span class="n">run_id</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -5986,12 +5986,7 @@ even if the requested run is already cached.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/runs/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-800">800</a></span>
-<span class="normal"><a href="#__codelineno-0-801">801</a></span>
-<span class="normal"><a href="#__codelineno-0-802">802</a></span>
-<span class="normal"><a href="#__codelineno-0-803">803</a></span>
-<span class="normal"><a href="#__codelineno-0-804">804</a></span>
-<span class="normal"><a href="#__codelineno-0-805">805</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-805">805</a></span>
 <span class="normal"><a href="#__codelineno-0-806">806</a></span>
 <span class="normal"><a href="#__codelineno-0-807">807</a></span>
 <span class="normal"><a href="#__codelineno-0-808">808</a></span>
@@ -6021,42 +6016,47 @@ even if the requested run is already cached.</p>
 <span class="normal"><a href="#__codelineno-0-832">832</a></span>
 <span class="normal"><a href="#__codelineno-0-833">833</a></span>
 <span class="normal"><a href="#__codelineno-0-834">834</a></span>
-<span class="normal"><a href="#__codelineno-0-835">835</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="nd">@openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">thread_safe_if_oslo_installed</span>
-<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ignore_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLRun</span><span class="p">:</span>  <span class="c1"># noqa: FBT002</span>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets run corresponding to run_id.</span>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">    run_id : int</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">    ignore_cache : bool</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">        Whether to ignore the cache. If ``true`` this will download and overwrite the run xml</span>
-<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">        even if the requested run is already cached.</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a>
-<a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">    ignore_cache</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a><span class="sd">    run : OpenMLRun</span>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">        Run corresponding to ID, fetched from the server.</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a>    <span class="n">run_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_create_cache_directory_for_id</span><span class="p">(</span><span class="n">RUNS_CACHE_DIR_NAME</span><span class="p">,</span> <span class="n">run_id</span><span class="p">))</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a>    <span class="n">run_file</span> <span class="o">=</span> <span class="n">run_dir</span> <span class="o">/</span> <span class="s2">&quot;description.xml&quot;</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>    <span class="n">run_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">ignore_cache</span><span class="p">:</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a>            <span class="k">return</span> <span class="n">_get_cached_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a>        <span class="k">raise</span> <span class="n">OpenMLCacheException</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;dummy&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a>    <span class="k">except</span> <span class="n">OpenMLCacheException</span><span class="p">:</span>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a>        <span class="n">run_xml</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;run/</span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a>        <span class="k">with</span> <span class="n">run_file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a>            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">run_xml</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-835">835</a></span>
+<span class="normal"><a href="#__codelineno-0-836">836</a></span>
+<span class="normal"><a href="#__codelineno-0-837">837</a></span>
+<span class="normal"><a href="#__codelineno-0-838">838</a></span>
+<span class="normal"><a href="#__codelineno-0-839">839</a></span>
+<span class="normal"><a href="#__codelineno-0-840">840</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="nd">@openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">thread_safe_if_oslo_installed</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ignore_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLRun</span><span class="p">:</span>  <span class="c1"># noqa: FBT002</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets run corresponding to run_id.</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">    run_id : int</span>
+<a id="__codelineno-0-812" name="__codelineno-0-812"></a>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">    ignore_cache : bool</span>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">        Whether to ignore the cache. If ``true`` this will download and overwrite the run xml</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="sd">        even if the requested run is already cached.</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">    ignore_cache</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">    run : OpenMLRun</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">        Run corresponding to ID, fetched from the server.</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a>    <span class="n">run_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_create_cache_directory_for_id</span><span class="p">(</span><span class="n">RUNS_CACHE_DIR_NAME</span><span class="p">,</span> <span class="n">run_id</span><span class="p">))</span>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a>    <span class="n">run_file</span> <span class="o">=</span> <span class="n">run_dir</span> <span class="o">/</span> <span class="s2">&quot;description.xml&quot;</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a>    <span class="n">run_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">ignore_cache</span><span class="p">:</span>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a>            <span class="k">return</span> <span class="n">_get_cached_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a>        <span class="k">raise</span> <span class="n">OpenMLCacheException</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s2">&quot;dummy&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-834" name="__codelineno-0-834"></a>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="k">return</span> <span class="n">_create_run_from_xml</span><span class="p">(</span><span class="n">run_xml</span><span class="p">)</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="k">except</span> <span class="n">OpenMLCacheException</span><span class="p">:</span>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a>        <span class="n">run_xml</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;run/</span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a>        <span class="k">with</span> <span class="n">run_file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">run_xml</span><span class="p">)</span>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a>    <span class="k">return</span> <span class="n">_create_run_from_xml</span><span class="p">(</span><span class="n">run_xml</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -6240,12 +6240,7 @@ even if the requested run is already cached.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/runs/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-782">782</a></span>
-<span class="normal"><a href="#__codelineno-0-783">783</a></span>
-<span class="normal"><a href="#__codelineno-0-784">784</a></span>
-<span class="normal"><a href="#__codelineno-0-785">785</a></span>
-<span class="normal"><a href="#__codelineno-0-786">786</a></span>
-<span class="normal"><a href="#__codelineno-0-787">787</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-787">787</a></span>
 <span class="normal"><a href="#__codelineno-0-788">788</a></span>
 <span class="normal"><a href="#__codelineno-0-789">789</a></span>
 <span class="normal"><a href="#__codelineno-0-790">790</a></span>
@@ -6255,22 +6250,27 @@ even if the requested run is already cached.</p>
 <span class="normal"><a href="#__codelineno-0-794">794</a></span>
 <span class="normal"><a href="#__codelineno-0-795">795</a></span>
 <span class="normal"><a href="#__codelineno-0-796">796</a></span>
-<span class="normal"><a href="#__codelineno-0-797">797</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_runs</span><span class="p">(</span><span class="n">run_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">OpenMLRun</span><span class="p">]:</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets all runs in run_ids list.</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">    run_ids : list of ints</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">    runs : list of OpenMLRun</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">        List of runs corresponding to IDs, fetched from the server.</span>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a>    <span class="n">runs</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-795" name="__codelineno-0-795"></a>    <span class="k">for</span> <span class="n">run_id</span> <span class="ow">in</span> <span class="n">run_ids</span><span class="p">:</span>
-<a id="__codelineno-0-796" name="__codelineno-0-796"></a>        <span class="n">runs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">))</span>
-<a id="__codelineno-0-797" name="__codelineno-0-797"></a>    <span class="k">return</span> <span class="n">runs</span>
+<span class="normal"><a href="#__codelineno-0-797">797</a></span>
+<span class="normal"><a href="#__codelineno-0-798">798</a></span>
+<span class="normal"><a href="#__codelineno-0-799">799</a></span>
+<span class="normal"><a href="#__codelineno-0-800">800</a></span>
+<span class="normal"><a href="#__codelineno-0-801">801</a></span>
+<span class="normal"><a href="#__codelineno-0-802">802</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_runs</span><span class="p">(</span><span class="n">run_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">OpenMLRun</span><span class="p">]:</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets all runs in run_ids list.</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">    run_ids : list of ints</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="sd">    runs : list of OpenMLRun</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="sd">        List of runs corresponding to IDs, fetched from the server.</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a>    <span class="n">runs</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a>    <span class="k">for</span> <span class="n">run_id</span> <span class="ow">in</span> <span class="n">run_ids</span><span class="p">:</span>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a>        <span class="n">runs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">))</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a>    <span class="k">return</span> <span class="n">runs</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -6926,18 +6926,7 @@ prediction file).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/runs/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1030">1030</a></span>
-<span class="normal"><a href="#__codelineno-0-1031">1031</a></span>
-<span class="normal"><a href="#__codelineno-0-1032">1032</a></span>
-<span class="normal"><a href="#__codelineno-0-1033">1033</a></span>
-<span class="normal"><a href="#__codelineno-0-1034">1034</a></span>
-<span class="normal"><a href="#__codelineno-0-1035">1035</a></span>
-<span class="normal"><a href="#__codelineno-0-1036">1036</a></span>
-<span class="normal"><a href="#__codelineno-0-1037">1037</a></span>
-<span class="normal"><a href="#__codelineno-0-1038">1038</a></span>
-<span class="normal"><a href="#__codelineno-0-1039">1039</a></span>
-<span class="normal"><a href="#__codelineno-0-1040">1040</a></span>
-<span class="normal"><a href="#__codelineno-0-1041">1041</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1041">1041</a></span>
 <span class="normal"><a href="#__codelineno-0-1042">1042</a></span>
 <span class="normal"><a href="#__codelineno-0-1043">1043</a></span>
 <span class="normal"><a href="#__codelineno-0-1044">1044</a></span>
@@ -7001,82 +6990,93 @@ prediction file).</p>
 <span class="normal"><a href="#__codelineno-0-1102">1102</a></span>
 <span class="normal"><a href="#__codelineno-0-1103">1103</a></span>
 <span class="normal"><a href="#__codelineno-0-1104">1104</a></span>
-<span class="normal"><a href="#__codelineno-0-1105">1105</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1030" name="__codelineno-0-1030"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_runs</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
-<a id="__codelineno-0-1031" name="__codelineno-0-1031"></a>    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1032" name="__codelineno-0-1032"></a>    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1033" name="__codelineno-0-1033"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># noqa: A002</span>
-<a id="__codelineno-0-1034" name="__codelineno-0-1034"></a>    <span class="n">task</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1035" name="__codelineno-0-1035"></a>    <span class="n">setup</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1036" name="__codelineno-0-1036"></a>    <span class="n">flow</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1037" name="__codelineno-0-1037"></a>    <span class="n">uploader</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1038" name="__codelineno-0-1038"></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1039" name="__codelineno-0-1039"></a>    <span class="n">study</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1040" name="__codelineno-0-1040"></a>    <span class="n">display_errors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
-<a id="__codelineno-0-1041" name="__codelineno-0-1041"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="n">TaskType</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-1042" name="__codelineno-0-1042"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-1043" name="__codelineno-0-1043"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-1044" name="__codelineno-0-1044"></a><span class="sd">    List all runs matching all of the given filters.</span>
-<a id="__codelineno-0-1045" name="__codelineno-0-1045"></a><span class="sd">    (Supports large amount of results)</span>
-<a id="__codelineno-0-1046" name="__codelineno-0-1046"></a>
-<a id="__codelineno-0-1047" name="__codelineno-0-1047"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-1048" name="__codelineno-0-1048"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-1049" name="__codelineno-0-1049"></a><span class="sd">    offset : int, optional</span>
-<a id="__codelineno-0-1050" name="__codelineno-0-1050"></a><span class="sd">        the number of runs to skip, starting from the first</span>
-<a id="__codelineno-0-1051" name="__codelineno-0-1051"></a><span class="sd">    size : int, optional</span>
-<a id="__codelineno-0-1052" name="__codelineno-0-1052"></a><span class="sd">        the maximum number of runs to show</span>
-<a id="__codelineno-0-1053" name="__codelineno-0-1053"></a>
-<a id="__codelineno-0-1054" name="__codelineno-0-1054"></a><span class="sd">    id : list, optional</span>
-<a id="__codelineno-0-1055" name="__codelineno-0-1055"></a>
-<a id="__codelineno-0-1056" name="__codelineno-0-1056"></a><span class="sd">    task : list, optional</span>
+<span class="normal"><a href="#__codelineno-0-1105">1105</a></span>
+<span class="normal"><a href="#__codelineno-0-1106">1106</a></span>
+<span class="normal"><a href="#__codelineno-0-1107">1107</a></span>
+<span class="normal"><a href="#__codelineno-0-1108">1108</a></span>
+<span class="normal"><a href="#__codelineno-0-1109">1109</a></span>
+<span class="normal"><a href="#__codelineno-0-1110">1110</a></span>
+<span class="normal"><a href="#__codelineno-0-1111">1111</a></span>
+<span class="normal"><a href="#__codelineno-0-1112">1112</a></span>
+<span class="normal"><a href="#__codelineno-0-1113">1113</a></span>
+<span class="normal"><a href="#__codelineno-0-1114">1114</a></span>
+<span class="normal"><a href="#__codelineno-0-1115">1115</a></span>
+<span class="normal"><a href="#__codelineno-0-1116">1116</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1041" name="__codelineno-0-1041"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_runs</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
+<a id="__codelineno-0-1042" name="__codelineno-0-1042"></a>    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1043" name="__codelineno-0-1043"></a>    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1044" name="__codelineno-0-1044"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># noqa: A002</span>
+<a id="__codelineno-0-1045" name="__codelineno-0-1045"></a>    <span class="n">task</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1046" name="__codelineno-0-1046"></a>    <span class="n">setup</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1047" name="__codelineno-0-1047"></a>    <span class="n">flow</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1048" name="__codelineno-0-1048"></a>    <span class="n">uploader</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1049" name="__codelineno-0-1049"></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1050" name="__codelineno-0-1050"></a>    <span class="n">study</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1051" name="__codelineno-0-1051"></a>    <span class="n">display_errors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
+<a id="__codelineno-0-1052" name="__codelineno-0-1052"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="n">TaskType</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-1053" name="__codelineno-0-1053"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-1054" name="__codelineno-0-1054"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-1055" name="__codelineno-0-1055"></a><span class="sd">    List all runs matching all of the given filters.</span>
+<a id="__codelineno-0-1056" name="__codelineno-0-1056"></a><span class="sd">    (Supports large amount of results)</span>
 <a id="__codelineno-0-1057" name="__codelineno-0-1057"></a>
-<a id="__codelineno-0-1058" name="__codelineno-0-1058"></a><span class="sd">    setup: list, optional</span>
-<a id="__codelineno-0-1059" name="__codelineno-0-1059"></a>
-<a id="__codelineno-0-1060" name="__codelineno-0-1060"></a><span class="sd">    flow : list, optional</span>
-<a id="__codelineno-0-1061" name="__codelineno-0-1061"></a>
-<a id="__codelineno-0-1062" name="__codelineno-0-1062"></a><span class="sd">    uploader : list, optional</span>
-<a id="__codelineno-0-1063" name="__codelineno-0-1063"></a>
-<a id="__codelineno-0-1064" name="__codelineno-0-1064"></a><span class="sd">    tag : str, optional</span>
-<a id="__codelineno-0-1065" name="__codelineno-0-1065"></a>
-<a id="__codelineno-0-1066" name="__codelineno-0-1066"></a><span class="sd">    study : int, optional</span>
-<a id="__codelineno-0-1067" name="__codelineno-0-1067"></a>
-<a id="__codelineno-0-1068" name="__codelineno-0-1068"></a><span class="sd">    display_errors : bool, optional (default=None)</span>
-<a id="__codelineno-0-1069" name="__codelineno-0-1069"></a><span class="sd">        Whether to list runs which have an error (for example a missing</span>
-<a id="__codelineno-0-1070" name="__codelineno-0-1070"></a><span class="sd">        prediction file).</span>
-<a id="__codelineno-0-1071" name="__codelineno-0-1071"></a>
-<a id="__codelineno-0-1072" name="__codelineno-0-1072"></a><span class="sd">    task_type : str, optional</span>
-<a id="__codelineno-0-1073" name="__codelineno-0-1073"></a>
-<a id="__codelineno-0-1074" name="__codelineno-0-1074"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-1075" name="__codelineno-0-1075"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-1076" name="__codelineno-0-1076"></a><span class="sd">    dataframe</span>
-<a id="__codelineno-0-1077" name="__codelineno-0-1077"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-1078" name="__codelineno-0-1078"></a>    <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-<a id="__codelineno-0-1079" name="__codelineno-0-1079"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;id must be of type list.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-1080" name="__codelineno-0-1080"></a>    <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-<a id="__codelineno-0-1081" name="__codelineno-0-1081"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;task must be of type list.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-1082" name="__codelineno-0-1082"></a>    <span class="k">if</span> <span class="n">setup</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-<a id="__codelineno-0-1083" name="__codelineno-0-1083"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;setup must be of type list.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-1084" name="__codelineno-0-1084"></a>    <span class="k">if</span> <span class="n">flow</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-<a id="__codelineno-0-1085" name="__codelineno-0-1085"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;flow must be of type list.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-1086" name="__codelineno-0-1086"></a>    <span class="k">if</span> <span class="n">uploader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uploader</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
-<a id="__codelineno-0-1087" name="__codelineno-0-1087"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;uploader must be of type list.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-1088" name="__codelineno-0-1088"></a>
-<a id="__codelineno-0-1089" name="__codelineno-0-1089"></a>    <span class="n">listing_call</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
-<a id="__codelineno-0-1090" name="__codelineno-0-1090"></a>        <span class="n">_list_runs</span><span class="p">,</span>
-<a id="__codelineno-0-1091" name="__codelineno-0-1091"></a>        <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
-<a id="__codelineno-0-1092" name="__codelineno-0-1092"></a>        <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
-<a id="__codelineno-0-1093" name="__codelineno-0-1093"></a>        <span class="n">setup</span><span class="o">=</span><span class="n">setup</span><span class="p">,</span>
-<a id="__codelineno-0-1094" name="__codelineno-0-1094"></a>        <span class="n">flow</span><span class="o">=</span><span class="n">flow</span><span class="p">,</span>
-<a id="__codelineno-0-1095" name="__codelineno-0-1095"></a>        <span class="n">uploader</span><span class="o">=</span><span class="n">uploader</span><span class="p">,</span>
-<a id="__codelineno-0-1096" name="__codelineno-0-1096"></a>        <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span>
-<a id="__codelineno-0-1097" name="__codelineno-0-1097"></a>        <span class="n">study</span><span class="o">=</span><span class="n">study</span><span class="p">,</span>
-<a id="__codelineno-0-1098" name="__codelineno-0-1098"></a>        <span class="n">display_errors</span><span class="o">=</span><span class="n">display_errors</span><span class="p">,</span>
-<a id="__codelineno-0-1099" name="__codelineno-0-1099"></a>        <span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
-<a id="__codelineno-0-1100" name="__codelineno-0-1100"></a>    <span class="p">)</span>
-<a id="__codelineno-0-1101" name="__codelineno-0-1101"></a>    <span class="n">batches</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_list_all</span><span class="p">(</span><span class="n">listing_call</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
-<a id="__codelineno-0-1102" name="__codelineno-0-1102"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-1103" name="__codelineno-0-1103"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-<a id="__codelineno-0-1104" name="__codelineno-0-1104"></a>
-<a id="__codelineno-0-1105" name="__codelineno-0-1105"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span>
+<a id="__codelineno-0-1058" name="__codelineno-0-1058"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-1059" name="__codelineno-0-1059"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-1060" name="__codelineno-0-1060"></a><span class="sd">    offset : int, optional</span>
+<a id="__codelineno-0-1061" name="__codelineno-0-1061"></a><span class="sd">        the number of runs to skip, starting from the first</span>
+<a id="__codelineno-0-1062" name="__codelineno-0-1062"></a><span class="sd">    size : int, optional</span>
+<a id="__codelineno-0-1063" name="__codelineno-0-1063"></a><span class="sd">        the maximum number of runs to show</span>
+<a id="__codelineno-0-1064" name="__codelineno-0-1064"></a>
+<a id="__codelineno-0-1065" name="__codelineno-0-1065"></a><span class="sd">    id : list, optional</span>
+<a id="__codelineno-0-1066" name="__codelineno-0-1066"></a>
+<a id="__codelineno-0-1067" name="__codelineno-0-1067"></a><span class="sd">    task : list, optional</span>
+<a id="__codelineno-0-1068" name="__codelineno-0-1068"></a>
+<a id="__codelineno-0-1069" name="__codelineno-0-1069"></a><span class="sd">    setup: list, optional</span>
+<a id="__codelineno-0-1070" name="__codelineno-0-1070"></a>
+<a id="__codelineno-0-1071" name="__codelineno-0-1071"></a><span class="sd">    flow : list, optional</span>
+<a id="__codelineno-0-1072" name="__codelineno-0-1072"></a>
+<a id="__codelineno-0-1073" name="__codelineno-0-1073"></a><span class="sd">    uploader : list, optional</span>
+<a id="__codelineno-0-1074" name="__codelineno-0-1074"></a>
+<a id="__codelineno-0-1075" name="__codelineno-0-1075"></a><span class="sd">    tag : str, optional</span>
+<a id="__codelineno-0-1076" name="__codelineno-0-1076"></a>
+<a id="__codelineno-0-1077" name="__codelineno-0-1077"></a><span class="sd">    study : int, optional</span>
+<a id="__codelineno-0-1078" name="__codelineno-0-1078"></a>
+<a id="__codelineno-0-1079" name="__codelineno-0-1079"></a><span class="sd">    display_errors : bool, optional (default=None)</span>
+<a id="__codelineno-0-1080" name="__codelineno-0-1080"></a><span class="sd">        Whether to list runs which have an error (for example a missing</span>
+<a id="__codelineno-0-1081" name="__codelineno-0-1081"></a><span class="sd">        prediction file).</span>
+<a id="__codelineno-0-1082" name="__codelineno-0-1082"></a>
+<a id="__codelineno-0-1083" name="__codelineno-0-1083"></a><span class="sd">    task_type : str, optional</span>
+<a id="__codelineno-0-1084" name="__codelineno-0-1084"></a>
+<a id="__codelineno-0-1085" name="__codelineno-0-1085"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-1086" name="__codelineno-0-1086"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-1087" name="__codelineno-0-1087"></a><span class="sd">    dataframe</span>
+<a id="__codelineno-0-1088" name="__codelineno-0-1088"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-1089" name="__codelineno-0-1089"></a>    <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+<a id="__codelineno-0-1090" name="__codelineno-0-1090"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;id must be of type list.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-1091" name="__codelineno-0-1091"></a>    <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+<a id="__codelineno-0-1092" name="__codelineno-0-1092"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;task must be of type list.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-1093" name="__codelineno-0-1093"></a>    <span class="k">if</span> <span class="n">setup</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+<a id="__codelineno-0-1094" name="__codelineno-0-1094"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;setup must be of type list.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-1095" name="__codelineno-0-1095"></a>    <span class="k">if</span> <span class="n">flow</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+<a id="__codelineno-0-1096" name="__codelineno-0-1096"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;flow must be of type list.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-1097" name="__codelineno-0-1097"></a>    <span class="k">if</span> <span class="n">uploader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uploader</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+<a id="__codelineno-0-1098" name="__codelineno-0-1098"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;uploader must be of type list.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-1099" name="__codelineno-0-1099"></a>
+<a id="__codelineno-0-1100" name="__codelineno-0-1100"></a>    <span class="n">listing_call</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+<a id="__codelineno-0-1101" name="__codelineno-0-1101"></a>        <span class="n">_list_runs</span><span class="p">,</span>
+<a id="__codelineno-0-1102" name="__codelineno-0-1102"></a>        <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+<a id="__codelineno-0-1103" name="__codelineno-0-1103"></a>        <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+<a id="__codelineno-0-1104" name="__codelineno-0-1104"></a>        <span class="n">setup</span><span class="o">=</span><span class="n">setup</span><span class="p">,</span>
+<a id="__codelineno-0-1105" name="__codelineno-0-1105"></a>        <span class="n">flow</span><span class="o">=</span><span class="n">flow</span><span class="p">,</span>
+<a id="__codelineno-0-1106" name="__codelineno-0-1106"></a>        <span class="n">uploader</span><span class="o">=</span><span class="n">uploader</span><span class="p">,</span>
+<a id="__codelineno-0-1107" name="__codelineno-0-1107"></a>        <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span>
+<a id="__codelineno-0-1108" name="__codelineno-0-1108"></a>        <span class="n">study</span><span class="o">=</span><span class="n">study</span><span class="p">,</span>
+<a id="__codelineno-0-1109" name="__codelineno-0-1109"></a>        <span class="n">display_errors</span><span class="o">=</span><span class="n">display_errors</span><span class="p">,</span>
+<a id="__codelineno-0-1110" name="__codelineno-0-1110"></a>        <span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
+<a id="__codelineno-0-1111" name="__codelineno-0-1111"></a>    <span class="p">)</span>
+<a id="__codelineno-0-1112" name="__codelineno-0-1112"></a>    <span class="n">batches</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_list_all</span><span class="p">(</span><span class="n">listing_call</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+<a id="__codelineno-0-1113" name="__codelineno-0-1113"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-1114" name="__codelineno-0-1114"></a>        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<a id="__codelineno-0-1115" name="__codelineno-0-1115"></a>
+<a id="__codelineno-0-1116" name="__codelineno-0-1116"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

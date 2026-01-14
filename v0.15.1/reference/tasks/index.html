@@ -2820,12 +2820,7 @@
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>openml/tasks/task.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-355">355</a></span>
-<span class="normal"><a href="#__codelineno-0-356">356</a></span>
-<span class="normal"><a href="#__codelineno-0-357">357</a></span>
-<span class="normal"><a href="#__codelineno-0-358">358</a></span>
-<span class="normal"><a href="#__codelineno-0-359">359</a></span>
-<span class="normal"><a href="#__codelineno-0-360">360</a></span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-360">360</a></span>
 <span class="normal"><a href="#__codelineno-0-361">361</a></span>
 <span class="normal"><a href="#__codelineno-0-362">362</a></span>
 <span class="normal"><a href="#__codelineno-0-363">363</a></span>
@@ -2851,38 +2846,43 @@
 <span class="normal"><a href="#__codelineno-0-383">383</a></span>
 <span class="normal"><a href="#__codelineno-0-384">384</a></span>
 <span class="normal"><a href="#__codelineno-0-385">385</a></span>
-<span class="normal"><a href="#__codelineno-0-386">386</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="n">task_type_id</span><span class="p">:</span> <span class="n">TaskType</span><span class="p">,</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="n">data_set_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="n">estimation_procedure_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="n">estimation_procedure_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="n">estimation_parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="n">evaluation_measure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="n">data_splits_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="n">class_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="n">cost_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="p">):</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="n">task_type_id</span><span class="o">=</span><span class="n">task_type_id</span><span class="p">,</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="n">data_set_id</span><span class="o">=</span><span class="n">data_set_id</span><span class="p">,</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="n">estimation_procedure_id</span><span class="o">=</span><span class="n">estimation_procedure_id</span><span class="p">,</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">estimation_procedure_type</span><span class="o">=</span><span class="n">estimation_procedure_type</span><span class="p">,</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="n">estimation_parameters</span><span class="o">=</span><span class="n">estimation_parameters</span><span class="p">,</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="n">evaluation_measure</span><span class="o">=</span><span class="n">evaluation_measure</span><span class="p">,</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">,</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="n">data_splits_url</span><span class="o">=</span><span class="n">data_splits_url</span><span class="p">,</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>    <span class="p">)</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">class_labels</span> <span class="o">=</span> <span class="n">class_labels</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">cost_matrix</span> <span class="o">=</span> <span class="n">cost_matrix</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="k">if</span> <span class="n">cost_matrix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Costmatrix&quot;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-386">386</a></span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span>
+<span class="normal"><a href="#__codelineno-0-388">388</a></span>
+<span class="normal"><a href="#__codelineno-0-389">389</a></span>
+<span class="normal"><a href="#__codelineno-0-390">390</a></span>
+<span class="normal"><a href="#__codelineno-0-391">391</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="n">task_type_id</span><span class="p">:</span> <span class="n">TaskType</span><span class="p">,</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="n">data_set_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>    <span class="n">estimation_procedure_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="n">estimation_procedure_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="n">estimation_parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>    <span class="n">evaluation_measure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="n">data_splits_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>    <span class="n">class_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>    <span class="n">cost_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="p">):</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="n">task_type_id</span><span class="o">=</span><span class="n">task_type_id</span><span class="p">,</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="n">data_set_id</span><span class="o">=</span><span class="n">data_set_id</span><span class="p">,</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="n">estimation_procedure_id</span><span class="o">=</span><span class="n">estimation_procedure_id</span><span class="p">,</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="n">estimation_procedure_type</span><span class="o">=</span><span class="n">estimation_procedure_type</span><span class="p">,</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="n">estimation_parameters</span><span class="o">=</span><span class="n">estimation_parameters</span><span class="p">,</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="n">evaluation_measure</span><span class="o">=</span><span class="n">evaluation_measure</span><span class="p">,</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">,</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="n">data_splits_url</span><span class="o">=</span><span class="n">data_splits_url</span><span class="p">,</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">class_labels</span> <span class="o">=</span> <span class="n">class_labels</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">cost_matrix</span> <span class="o">=</span> <span class="n">cost_matrix</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>    <span class="k">if</span> <span class="n">cost_matrix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Costmatrix functionality is not yet implemented.&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -3084,7 +3084,12 @@
 <span class="normal"><a href="#__codelineno-0-294">294</a></span>
 <span class="normal"><a href="#__codelineno-0-295">295</a></span>
 <span class="normal"><a href="#__codelineno-0-296">296</a></span>
-<span class="normal"><a href="#__codelineno-0-297">297</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_X_and_y</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span>
+<span class="normal"><a href="#__codelineno-0-302">302</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_X_and_y</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get data associated with the current task.</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    Returns</span>
@@ -3098,10 +3103,15 @@
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_REGRESSION</span><span class="p">,</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="n">TaskType</span><span class="o">.</span><span class="n">LEARNING_CURVE</span><span class="p">,</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="p">):</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_type</span><span class="p">)</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">)</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>            <span class="sa">f</span><span class="s2">&quot;Task type &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task_type</span><span class="si">}</span><span class="s2">&#39; is not implemented for get_X_and_y(). &quot;</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>            <span class="sa">f</span><span class="s2">&quot;Supported types: SUPERVISED_CLASSIFICATION, SUPERVISED_REGRESSION,&quot;</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="sa">f</span><span class="s2">&quot;LEARNING_CURVE.&quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="sa">f</span><span class="s2">&quot;Task ID: </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;task_id&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">)</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3735,12 +3745,7 @@ feature set for the clustering task.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>openml/tasks/task.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-471">471</a></span>
-<span class="normal"><a href="#__codelineno-0-472">472</a></span>
-<span class="normal"><a href="#__codelineno-0-473">473</a></span>
-<span class="normal"><a href="#__codelineno-0-474">474</a></span>
-<span class="normal"><a href="#__codelineno-0-475">475</a></span>
-<span class="normal"><a href="#__codelineno-0-476">476</a></span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-476">476</a></span>
 <span class="normal"><a href="#__codelineno-0-477">477</a></span>
 <span class="normal"><a href="#__codelineno-0-478">478</a></span>
 <span class="normal"><a href="#__codelineno-0-479">479</a></span>
@@ -3760,32 +3765,37 @@ feature set for the clustering task.</p>
 <span class="normal"><a href="#__codelineno-0-493">493</a></span>
 <span class="normal"><a href="#__codelineno-0-494">494</a></span>
 <span class="normal"><a href="#__codelineno-0-495">495</a></span>
-<span class="normal"><a href="#__codelineno-0-496">496</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>    <span class="n">task_type_id</span><span class="p">:</span> <span class="n">TaskType</span><span class="p">,</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>    <span class="n">data_set_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>    <span class="n">estimation_procedure_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">17</span><span class="p">,</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a>    <span class="n">estimation_procedure_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>    <span class="n">estimation_parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>    <span class="n">data_splits_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>    <span class="n">evaluation_measure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>    <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="p">):</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a>        <span class="n">task_type_id</span><span class="o">=</span><span class="n">task_type_id</span><span class="p">,</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="n">data_set_id</span><span class="o">=</span><span class="n">data_set_id</span><span class="p">,</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>        <span class="n">evaluation_measure</span><span class="o">=</span><span class="n">evaluation_measure</span><span class="p">,</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="n">estimation_procedure_id</span><span class="o">=</span><span class="n">estimation_procedure_id</span><span class="p">,</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="n">estimation_procedure_type</span><span class="o">=</span><span class="n">estimation_procedure_type</span><span class="p">,</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="n">estimation_parameters</span><span class="o">=</span><span class="n">estimation_parameters</span><span class="p">,</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="n">data_splits_url</span><span class="o">=</span><span class="n">data_splits_url</span><span class="p">,</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>    <span class="p">)</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">target_name</span> <span class="o">=</span> <span class="n">target_name</span>
+<span class="normal"><a href="#__codelineno-0-496">496</a></span>
+<span class="normal"><a href="#__codelineno-0-497">497</a></span>
+<span class="normal"><a href="#__codelineno-0-498">498</a></span>
+<span class="normal"><a href="#__codelineno-0-499">499</a></span>
+<span class="normal"><a href="#__codelineno-0-500">500</a></span>
+<span class="normal"><a href="#__codelineno-0-501">501</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>    <span class="n">task_type_id</span><span class="p">:</span> <span class="n">TaskType</span><span class="p">,</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>    <span class="n">data_set_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a>    <span class="n">estimation_procedure_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">17</span><span class="p">,</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>    <span class="n">estimation_procedure_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>    <span class="n">estimation_parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>    <span class="n">data_splits_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>    <span class="n">evaluation_measure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>    <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="p">):</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="n">task_type_id</span><span class="o">=</span><span class="n">task_type_id</span><span class="p">,</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="n">data_set_id</span><span class="o">=</span><span class="n">data_set_id</span><span class="p">,</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="n">evaluation_measure</span><span class="o">=</span><span class="n">evaluation_measure</span><span class="p">,</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="n">estimation_procedure_id</span><span class="o">=</span><span class="n">estimation_procedure_id</span><span class="p">,</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>        <span class="n">estimation_procedure_type</span><span class="o">=</span><span class="n">estimation_procedure_type</span><span class="p">,</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>        <span class="n">estimation_parameters</span><span class="o">=</span><span class="n">estimation_parameters</span><span class="p">,</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="n">data_splits_url</span><span class="o">=</span><span class="n">data_splits_url</span><span class="p">,</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>    <span class="p">)</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">target_name</span> <span class="o">=</span> <span class="n">target_name</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -3945,25 +3955,25 @@ feature set for the clustering task.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/tasks/task.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-498">498</a></span>
-<span class="normal"><a href="#__codelineno-0-499">499</a></span>
-<span class="normal"><a href="#__codelineno-0-500">500</a></span>
-<span class="normal"><a href="#__codelineno-0-501">501</a></span>
-<span class="normal"><a href="#__codelineno-0-502">502</a></span>
-<span class="normal"><a href="#__codelineno-0-503">503</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-503">503</a></span>
 <span class="normal"><a href="#__codelineno-0-504">504</a></span>
 <span class="normal"><a href="#__codelineno-0-505">505</a></span>
 <span class="normal"><a href="#__codelineno-0-506">506</a></span>
-<span class="normal"><a href="#__codelineno-0-507">507</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_X</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get data associated with the current task.</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">    The X data as a dataframe</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>    <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">()</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>    <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>    <span class="k">return</span> <span class="n">data</span>
+<span class="normal"><a href="#__codelineno-0-507">507</a></span>
+<span class="normal"><a href="#__codelineno-0-508">508</a></span>
+<span class="normal"><a href="#__codelineno-0-509">509</a></span>
+<span class="normal"><a href="#__codelineno-0-510">510</a></span>
+<span class="normal"><a href="#__codelineno-0-511">511</a></span>
+<span class="normal"><a href="#__codelineno-0-512">512</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_X</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get data associated with the current task.</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">    The X data as a dataframe</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>    <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">()</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>    <span class="k">return</span> <span class="n">data</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4632,12 +4642,7 @@ feature set for the clustering task.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>openml/tasks/task.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-558">558</a></span>
-<span class="normal"><a href="#__codelineno-0-559">559</a></span>
-<span class="normal"><a href="#__codelineno-0-560">560</a></span>
-<span class="normal"><a href="#__codelineno-0-561">561</a></span>
-<span class="normal"><a href="#__codelineno-0-562">562</a></span>
-<span class="normal"><a href="#__codelineno-0-563">563</a></span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-563">563</a></span>
 <span class="normal"><a href="#__codelineno-0-564">564</a></span>
 <span class="normal"><a href="#__codelineno-0-565">565</a></span>
 <span class="normal"><a href="#__codelineno-0-566">566</a></span>
@@ -4660,35 +4665,40 @@ feature set for the clustering task.</p>
 <span class="normal"><a href="#__codelineno-0-583">583</a></span>
 <span class="normal"><a href="#__codelineno-0-584">584</a></span>
 <span class="normal"><a href="#__codelineno-0-585">585</a></span>
-<span class="normal"><a href="#__codelineno-0-586">586</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a>    <span class="n">task_type_id</span><span class="p">:</span> <span class="n">TaskType</span><span class="p">,</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a>    <span class="n">data_set_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a>    <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>    <span class="n">estimation_procedure_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">13</span><span class="p">,</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>    <span class="n">estimation_procedure_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a>    <span class="n">estimation_parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="n">data_splits_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a>    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>    <span class="n">evaluation_measure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a>    <span class="n">class_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a>    <span class="n">cost_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="p">):</span>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a>        <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a>        <span class="n">task_type_id</span><span class="o">=</span><span class="n">task_type_id</span><span class="p">,</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a>        <span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a>        <span class="n">data_set_id</span><span class="o">=</span><span class="n">data_set_id</span><span class="p">,</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a>        <span class="n">estimation_procedure_id</span><span class="o">=</span><span class="n">estimation_procedure_id</span><span class="p">,</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>        <span class="n">estimation_procedure_type</span><span class="o">=</span><span class="n">estimation_procedure_type</span><span class="p">,</span>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a>        <span class="n">estimation_parameters</span><span class="o">=</span><span class="n">estimation_parameters</span><span class="p">,</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a>        <span class="n">evaluation_measure</span><span class="o">=</span><span class="n">evaluation_measure</span><span class="p">,</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>        <span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">,</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a>        <span class="n">data_splits_url</span><span class="o">=</span><span class="n">data_splits_url</span><span class="p">,</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a>        <span class="n">class_labels</span><span class="o">=</span><span class="n">class_labels</span><span class="p">,</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a>        <span class="n">cost_matrix</span><span class="o">=</span><span class="n">cost_matrix</span><span class="p">,</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-586">586</a></span>
+<span class="normal"><a href="#__codelineno-0-587">587</a></span>
+<span class="normal"><a href="#__codelineno-0-588">588</a></span>
+<span class="normal"><a href="#__codelineno-0-589">589</a></span>
+<span class="normal"><a href="#__codelineno-0-590">590</a></span>
+<span class="normal"><a href="#__codelineno-0-591">591</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>    <span class="n">task_type_id</span><span class="p">:</span> <span class="n">TaskType</span><span class="p">,</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="n">data_set_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a>    <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a>    <span class="n">estimation_procedure_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">13</span><span class="p">,</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a>    <span class="n">estimation_procedure_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a>    <span class="n">estimation_parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a>    <span class="n">data_splits_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a>    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a>    <span class="n">evaluation_measure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a>    <span class="n">class_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a>    <span class="n">cost_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="p">):</span>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a>        <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a>        <span class="n">task_type_id</span><span class="o">=</span><span class="n">task_type_id</span><span class="p">,</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a>        <span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a>        <span class="n">data_set_id</span><span class="o">=</span><span class="n">data_set_id</span><span class="p">,</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a>        <span class="n">estimation_procedure_id</span><span class="o">=</span><span class="n">estimation_procedure_id</span><span class="p">,</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>        <span class="n">estimation_procedure_type</span><span class="o">=</span><span class="n">estimation_procedure_type</span><span class="p">,</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a>        <span class="n">estimation_parameters</span><span class="o">=</span><span class="n">estimation_parameters</span><span class="p">,</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a>        <span class="n">evaluation_measure</span><span class="o">=</span><span class="n">evaluation_measure</span><span class="p">,</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">,</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a>        <span class="n">data_splits_url</span><span class="o">=</span><span class="n">data_splits_url</span><span class="p">,</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a>        <span class="n">class_labels</span><span class="o">=</span><span class="n">class_labels</span><span class="p">,</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="n">cost_matrix</span><span class="o">=</span><span class="n">cost_matrix</span><span class="p">,</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -4890,7 +4900,12 @@ feature set for the clustering task.</p>
 <span class="normal"><a href="#__codelineno-0-294">294</a></span>
 <span class="normal"><a href="#__codelineno-0-295">295</a></span>
 <span class="normal"><a href="#__codelineno-0-296">296</a></span>
-<span class="normal"><a href="#__codelineno-0-297">297</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_X_and_y</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span>
+<span class="normal"><a href="#__codelineno-0-302">302</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_X_and_y</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get data associated with the current task.</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    Returns</span>
@@ -4904,10 +4919,15 @@ feature set for the clustering task.</p>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_REGRESSION</span><span class="p">,</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="n">TaskType</span><span class="o">.</span><span class="n">LEARNING_CURVE</span><span class="p">,</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="p">):</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_type</span><span class="p">)</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">)</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>            <span class="sa">f</span><span class="s2">&quot;Task type &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task_type</span><span class="si">}</span><span class="s2">&#39; is not implemented for get_X_and_y(). &quot;</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>            <span class="sa">f</span><span class="s2">&quot;Supported types: SUPERVISED_CLASSIFICATION, SUPERVISED_REGRESSION,&quot;</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="sa">f</span><span class="s2">&quot;LEARNING_CURVE.&quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="sa">f</span><span class="s2">&quot;Task ID: </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;task_id&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">)</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -5536,12 +5556,7 @@ feature set for the clustering task.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>openml/tasks/task.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-416">416</a></span>
-<span class="normal"><a href="#__codelineno-0-417">417</a></span>
-<span class="normal"><a href="#__codelineno-0-418">418</a></span>
-<span class="normal"><a href="#__codelineno-0-419">419</a></span>
-<span class="normal"><a href="#__codelineno-0-420">420</a></span>
-<span class="normal"><a href="#__codelineno-0-421">421</a></span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-421">421</a></span>
 <span class="normal"><a href="#__codelineno-0-422">422</a></span>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
 <span class="normal"><a href="#__codelineno-0-424">424</a></span>
@@ -5560,31 +5575,36 @@ feature set for the clustering task.</p>
 <span class="normal"><a href="#__codelineno-0-437">437</a></span>
 <span class="normal"><a href="#__codelineno-0-438">438</a></span>
 <span class="normal"><a href="#__codelineno-0-439">439</a></span>
-<span class="normal"><a href="#__codelineno-0-440">440</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>    <span class="n">task_type_id</span><span class="p">:</span> <span class="n">TaskType</span><span class="p">,</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="n">data_set_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>    <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="n">estimation_procedure_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="n">estimation_procedure_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>    <span class="n">estimation_parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>    <span class="n">data_splits_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>    <span class="n">evaluation_measure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="p">):</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>        <span class="n">task_type_id</span><span class="o">=</span><span class="n">task_type_id</span><span class="p">,</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="n">data_set_id</span><span class="o">=</span><span class="n">data_set_id</span><span class="p">,</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="n">estimation_procedure_id</span><span class="o">=</span><span class="n">estimation_procedure_id</span><span class="p">,</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="n">estimation_procedure_type</span><span class="o">=</span><span class="n">estimation_procedure_type</span><span class="p">,</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="n">estimation_parameters</span><span class="o">=</span><span class="n">estimation_parameters</span><span class="p">,</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="n">evaluation_measure</span><span class="o">=</span><span class="n">evaluation_measure</span><span class="p">,</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">,</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="n">data_splits_url</span><span class="o">=</span><span class="n">data_splits_url</span><span class="p">,</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-440">440</a></span>
+<span class="normal"><a href="#__codelineno-0-441">441</a></span>
+<span class="normal"><a href="#__codelineno-0-442">442</a></span>
+<span class="normal"><a href="#__codelineno-0-443">443</a></span>
+<span class="normal"><a href="#__codelineno-0-444">444</a></span>
+<span class="normal"><a href="#__codelineno-0-445">445</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="n">task_type_id</span><span class="p">:</span> <span class="n">TaskType</span><span class="p">,</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>    <span class="n">data_set_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>    <span class="n">estimation_procedure_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>    <span class="n">estimation_procedure_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>    <span class="n">estimation_parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>    <span class="n">data_splits_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>    <span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="n">evaluation_measure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="p">):</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="n">task_type_id</span><span class="o">=</span><span class="n">task_type_id</span><span class="p">,</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="n">data_set_id</span><span class="o">=</span><span class="n">data_set_id</span><span class="p">,</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="n">estimation_procedure_id</span><span class="o">=</span><span class="n">estimation_procedure_id</span><span class="p">,</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>        <span class="n">estimation_procedure_type</span><span class="o">=</span><span class="n">estimation_procedure_type</span><span class="p">,</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="n">estimation_parameters</span><span class="o">=</span><span class="n">estimation_parameters</span><span class="p">,</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>        <span class="n">evaluation_measure</span><span class="o">=</span><span class="n">evaluation_measure</span><span class="p">,</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">,</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="n">data_splits_url</span><span class="o">=</span><span class="n">data_splits_url</span><span class="p">,</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -5786,7 +5806,12 @@ feature set for the clustering task.</p>
 <span class="normal"><a href="#__codelineno-0-294">294</a></span>
 <span class="normal"><a href="#__codelineno-0-295">295</a></span>
 <span class="normal"><a href="#__codelineno-0-296">296</a></span>
-<span class="normal"><a href="#__codelineno-0-297">297</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_X_and_y</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span>
+<span class="normal"><a href="#__codelineno-0-302">302</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_X_and_y</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get data associated with the current task.</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    Returns</span>
@@ -5800,10 +5825,15 @@ feature set for the clustering task.</p>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_REGRESSION</span><span class="p">,</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="n">TaskType</span><span class="o">.</span><span class="n">LEARNING_CURVE</span><span class="p">,</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="p">):</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_type</span><span class="p">)</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">)</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>            <span class="sa">f</span><span class="s2">&quot;Task type &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task_type</span><span class="si">}</span><span class="s2">&#39; is not implemented for get_X_and_y(). &quot;</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>            <span class="sa">f</span><span class="s2">&quot;Supported types: SUPERVISED_CLASSIFICATION, SUPERVISED_REGRESSION,&quot;</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="sa">f</span><span class="s2">&quot;LEARNING_CURVE.&quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="sa">f</span><span class="s2">&quot;Task ID: </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;task_id&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">)</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -7052,7 +7082,12 @@ and sample.</p>
 <span class="normal"><a href="#__codelineno-0-294">294</a></span>
 <span class="normal"><a href="#__codelineno-0-295">295</a></span>
 <span class="normal"><a href="#__codelineno-0-296">296</a></span>
-<span class="normal"><a href="#__codelineno-0-297">297</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_X_and_y</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span>
+<span class="normal"><a href="#__codelineno-0-302">302</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_X_and_y</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get data associated with the current task.</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    Returns</span>
@@ -7066,10 +7101,15 @@ and sample.</p>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_REGRESSION</span><span class="p">,</span>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="n">TaskType</span><span class="o">.</span><span class="n">LEARNING_CURVE</span><span class="p">,</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="p">):</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_type</span><span class="p">)</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">)</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>            <span class="sa">f</span><span class="s2">&quot;Task type &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task_type</span><span class="si">}</span><span class="s2">&#39; is not implemented for get_X_and_y(). &quot;</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>            <span class="sa">f</span><span class="s2">&quot;Supported types: SUPERVISED_CLASSIFICATION, SUPERVISED_REGRESSION,&quot;</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="sa">f</span><span class="s2">&quot;LEARNING_CURVE.&quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="sa">f</span><span class="s2">&quot;Task ID: </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;task_id&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_name</span><span class="p">)</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -8471,12 +8511,7 @@ for task upload.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/tasks/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-536">536</a></span>
-<span class="normal"><a href="#__codelineno-0-537">537</a></span>
-<span class="normal"><a href="#__codelineno-0-538">538</a></span>
-<span class="normal"><a href="#__codelineno-0-539">539</a></span>
-<span class="normal"><a href="#__codelineno-0-540">540</a></span>
-<span class="normal"><a href="#__codelineno-0-541">541</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-541">541</a></span>
 <span class="normal"><a href="#__codelineno-0-542">542</a></span>
 <span class="normal"><a href="#__codelineno-0-543">543</a></span>
 <span class="normal"><a href="#__codelineno-0-544">544</a></span>
@@ -8532,68 +8567,85 @@ for task upload.</p>
 <span class="normal"><a href="#__codelineno-0-594">594</a></span>
 <span class="normal"><a href="#__codelineno-0-595">595</a></span>
 <span class="normal"><a href="#__codelineno-0-596">596</a></span>
-<span class="normal"><a href="#__codelineno-0-597">597</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-536" name="__codelineno-0-536"></a><span class="k">def</span><span class="w"> </span><span class="nf">create_task</span><span class="p">(</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="n">TaskType</span><span class="p">,</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>    <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>    <span class="n">estimation_procedure_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>    <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>    <span class="n">evaluation_measure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>    <span class="n">OpenMLClassificationTask</span> <span class="o">|</span> <span class="n">OpenMLRegressionTask</span> <span class="o">|</span> <span class="n">OpenMLLearningCurveTask</span> <span class="o">|</span> <span class="n">OpenMLClusteringTask</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a><span class="p">):</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a task based on different given attributes.</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="sd">    Builds a task object with the function arguments as</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a><span class="sd">    attributes. The type of the task object built is</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="sd">    determined from the task type id.</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="sd">    More information on how the arguments (task attributes),</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a><span class="sd">    relate to the different possible tasks can be found in</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a><span class="sd">    the individual task objects at the openml.tasks.task</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">    module.</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">    task_type : TaskType</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">        Id of the task type.</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="sd">    dataset_id : int</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">        The id of the dataset for the task.</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">    target_name : str, optional</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">        The name of the feature used as a target.</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        At the moment, only optional for the clustering tasks.</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">    estimation_procedure_id : int</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        The id of the estimation procedure.</span>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">    evaluation_measure : str, optional</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">        The name of the evaluation measure.</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">    kwargs : dict, optional</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a><span class="sd">        Other task attributes that are not mandatory</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="sd">        for task upload.</span>
-<a id="__codelineno-0-572" name="__codelineno-0-572"></a>
-<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">    OpenMLClassificationTask, OpenMLRegressionTask,</span>
-<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">    OpenMLLearningCurveTask, OpenMLClusteringTask</span>
-<a id="__codelineno-0-577" name="__codelineno-0-577"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-578" name="__codelineno-0-578"></a>    <span class="k">if</span> <span class="n">task_type</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">CLUSTERING</span><span class="p">:</span>
-<a id="__codelineno-0-579" name="__codelineno-0-579"></a>        <span class="n">task_cls</span> <span class="o">=</span> <span class="n">OpenMLClusteringTask</span>
-<a id="__codelineno-0-580" name="__codelineno-0-580"></a>    <span class="k">elif</span> <span class="n">task_type</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">LEARNING_CURVE</span><span class="p">:</span>
-<a id="__codelineno-0-581" name="__codelineno-0-581"></a>        <span class="n">task_cls</span> <span class="o">=</span> <span class="n">OpenMLLearningCurveTask</span>  <span class="c1"># type: ignore</span>
-<a id="__codelineno-0-582" name="__codelineno-0-582"></a>    <span class="k">elif</span> <span class="n">task_type</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">:</span>
-<a id="__codelineno-0-583" name="__codelineno-0-583"></a>        <span class="n">task_cls</span> <span class="o">=</span> <span class="n">OpenMLClassificationTask</span>  <span class="c1"># type: ignore</span>
-<a id="__codelineno-0-584" name="__codelineno-0-584"></a>    <span class="k">elif</span> <span class="n">task_type</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_REGRESSION</span><span class="p">:</span>
-<a id="__codelineno-0-585" name="__codelineno-0-585"></a>        <span class="n">task_cls</span> <span class="o">=</span> <span class="n">OpenMLRegressionTask</span>  <span class="c1"># type: ignore</span>
-<a id="__codelineno-0-586" name="__codelineno-0-586"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-587" name="__codelineno-0-587"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Task type </span><span class="si">{</span><span class="n">task_type</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> not supported.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-588" name="__codelineno-0-588"></a>
-<a id="__codelineno-0-589" name="__codelineno-0-589"></a>    <span class="k">return</span> <span class="n">task_cls</span><span class="p">(</span>
-<a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="n">task_type_id</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
-<a id="__codelineno-0-591" name="__codelineno-0-591"></a>        <span class="n">task_type</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span>  <span class="c1"># TODO: refactor to get task type string from ID.</span>
-<a id="__codelineno-0-592" name="__codelineno-0-592"></a>        <span class="n">data_set_id</span><span class="o">=</span><span class="n">dataset_id</span><span class="p">,</span>
-<a id="__codelineno-0-593" name="__codelineno-0-593"></a>        <span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
-<a id="__codelineno-0-594" name="__codelineno-0-594"></a>        <span class="n">estimation_procedure_id</span><span class="o">=</span><span class="n">estimation_procedure_id</span><span class="p">,</span>
-<a id="__codelineno-0-595" name="__codelineno-0-595"></a>        <span class="n">evaluation_measure</span><span class="o">=</span><span class="n">evaluation_measure</span><span class="p">,</span>
-<a id="__codelineno-0-596" name="__codelineno-0-596"></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-597">597</a></span>
+<span class="normal"><a href="#__codelineno-0-598">598</a></span>
+<span class="normal"><a href="#__codelineno-0-599">599</a></span>
+<span class="normal"><a href="#__codelineno-0-600">600</a></span>
+<span class="normal"><a href="#__codelineno-0-601">601</a></span>
+<span class="normal"><a href="#__codelineno-0-602">602</a></span>
+<span class="normal"><a href="#__codelineno-0-603">603</a></span>
+<span class="normal"><a href="#__codelineno-0-604">604</a></span>
+<span class="normal"><a href="#__codelineno-0-605">605</a></span>
+<span class="normal"><a href="#__codelineno-0-606">606</a></span>
+<span class="normal"><a href="#__codelineno-0-607">607</a></span>
+<span class="normal"><a href="#__codelineno-0-608">608</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-541" name="__codelineno-0-541"></a><span class="k">def</span><span class="w"> </span><span class="nf">create_task</span><span class="p">(</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="n">TaskType</span><span class="p">,</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>    <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a>    <span class="n">estimation_procedure_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>    <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a>    <span class="n">evaluation_measure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>    <span class="n">OpenMLClassificationTask</span> <span class="o">|</span> <span class="n">OpenMLRegressionTask</span> <span class="o">|</span> <span class="n">OpenMLLearningCurveTask</span> <span class="o">|</span> <span class="n">OpenMLClusteringTask</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a><span class="p">):</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a task based on different given attributes.</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a><span class="sd">    Builds a task object with the function arguments as</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a><span class="sd">    attributes. The type of the task object built is</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a><span class="sd">    determined from the task type id.</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a><span class="sd">    More information on how the arguments (task attributes),</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a><span class="sd">    relate to the different possible tasks can be found in</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a><span class="sd">    the individual task objects at the openml.tasks.task</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a><span class="sd">    module.</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a><span class="sd">    task_type : TaskType</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a><span class="sd">        Id of the task type.</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a><span class="sd">    dataset_id : int</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a><span class="sd">        The id of the dataset for the task.</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a><span class="sd">    target_name : str, optional</span>
+<a id="__codelineno-0-568" name="__codelineno-0-568"></a><span class="sd">        The name of the feature used as a target.</span>
+<a id="__codelineno-0-569" name="__codelineno-0-569"></a><span class="sd">        At the moment, only optional for the clustering tasks.</span>
+<a id="__codelineno-0-570" name="__codelineno-0-570"></a><span class="sd">    estimation_procedure_id : int</span>
+<a id="__codelineno-0-571" name="__codelineno-0-571"></a><span class="sd">        The id of the estimation procedure.</span>
+<a id="__codelineno-0-572" name="__codelineno-0-572"></a><span class="sd">    evaluation_measure : str, optional</span>
+<a id="__codelineno-0-573" name="__codelineno-0-573"></a><span class="sd">        The name of the evaluation measure.</span>
+<a id="__codelineno-0-574" name="__codelineno-0-574"></a><span class="sd">    kwargs : dict, optional</span>
+<a id="__codelineno-0-575" name="__codelineno-0-575"></a><span class="sd">        Other task attributes that are not mandatory</span>
+<a id="__codelineno-0-576" name="__codelineno-0-576"></a><span class="sd">        for task upload.</span>
+<a id="__codelineno-0-577" name="__codelineno-0-577"></a>
+<a id="__codelineno-0-578" name="__codelineno-0-578"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-579" name="__codelineno-0-579"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="sd">    OpenMLClassificationTask, OpenMLRegressionTask,</span>
+<a id="__codelineno-0-581" name="__codelineno-0-581"></a><span class="sd">    OpenMLLearningCurveTask, OpenMLClusteringTask</span>
+<a id="__codelineno-0-582" name="__codelineno-0-582"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-583" name="__codelineno-0-583"></a>    <span class="k">if</span> <span class="n">task_type</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">CLUSTERING</span><span class="p">:</span>
+<a id="__codelineno-0-584" name="__codelineno-0-584"></a>        <span class="n">task_cls</span> <span class="o">=</span> <span class="n">OpenMLClusteringTask</span>
+<a id="__codelineno-0-585" name="__codelineno-0-585"></a>    <span class="k">elif</span> <span class="n">task_type</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">LEARNING_CURVE</span><span class="p">:</span>
+<a id="__codelineno-0-586" name="__codelineno-0-586"></a>        <span class="n">task_cls</span> <span class="o">=</span> <span class="n">OpenMLLearningCurveTask</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-587" name="__codelineno-0-587"></a>    <span class="k">elif</span> <span class="n">task_type</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="p">:</span>
+<a id="__codelineno-0-588" name="__codelineno-0-588"></a>        <span class="n">task_cls</span> <span class="o">=</span> <span class="n">OpenMLClassificationTask</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-589" name="__codelineno-0-589"></a>    <span class="k">elif</span> <span class="n">task_type</span> <span class="o">==</span> <span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_REGRESSION</span><span class="p">:</span>
+<a id="__codelineno-0-590" name="__codelineno-0-590"></a>        <span class="n">task_cls</span> <span class="o">=</span> <span class="n">OpenMLRegressionTask</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-591" name="__codelineno-0-591"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-592" name="__codelineno-0-592"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-593" name="__codelineno-0-593"></a>            <span class="sa">f</span><span class="s2">&quot;Task type ID </span><span class="si">{</span><span class="n">task_type</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> is not supported. &quot;</span>
+<a id="__codelineno-0-594" name="__codelineno-0-594"></a>            <span class="sa">f</span><span class="s2">&quot;Supported task type IDs: </span><span class="si">{</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_CLASSIFICATION</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">,&quot;</span>
+<a id="__codelineno-0-595" name="__codelineno-0-595"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">TaskType</span><span class="o">.</span><span class="n">SUPERVISED_REGRESSION</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">, &quot;</span>
+<a id="__codelineno-0-596" name="__codelineno-0-596"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">TaskType</span><span class="o">.</span><span class="n">CLUSTERING</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">TaskType</span><span class="o">.</span><span class="n">LEARNING_CURVE</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a>            <span class="sa">f</span><span class="s2">&quot;Please refer to the TaskType enum for valid task type identifiers.&quot;</span>
+<a id="__codelineno-0-598" name="__codelineno-0-598"></a>        <span class="p">)</span>
+<a id="__codelineno-0-599" name="__codelineno-0-599"></a>
+<a id="__codelineno-0-600" name="__codelineno-0-600"></a>    <span class="k">return</span> <span class="n">task_cls</span><span class="p">(</span>
+<a id="__codelineno-0-601" name="__codelineno-0-601"></a>        <span class="n">task_type_id</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
+<a id="__codelineno-0-602" name="__codelineno-0-602"></a>        <span class="n">task_type</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span>  <span class="c1"># TODO: refactor to get task type string from ID.</span>
+<a id="__codelineno-0-603" name="__codelineno-0-603"></a>        <span class="n">data_set_id</span><span class="o">=</span><span class="n">dataset_id</span><span class="p">,</span>
+<a id="__codelineno-0-604" name="__codelineno-0-604"></a>        <span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-605" name="__codelineno-0-605"></a>        <span class="n">estimation_procedure_id</span><span class="o">=</span><span class="n">estimation_procedure_id</span><span class="p">,</span>
+<a id="__codelineno-0-606" name="__codelineno-0-606"></a>        <span class="n">evaluation_measure</span><span class="o">=</span><span class="n">evaluation_measure</span><span class="p">,</span>
+<a id="__codelineno-0-607" name="__codelineno-0-607"></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<a id="__codelineno-0-608" name="__codelineno-0-608"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -8672,39 +8724,39 @@ no runs associated with them.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/tasks/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-600">600</a></span>
-<span class="normal"><a href="#__codelineno-0-601">601</a></span>
-<span class="normal"><a href="#__codelineno-0-602">602</a></span>
-<span class="normal"><a href="#__codelineno-0-603">603</a></span>
-<span class="normal"><a href="#__codelineno-0-604">604</a></span>
-<span class="normal"><a href="#__codelineno-0-605">605</a></span>
-<span class="normal"><a href="#__codelineno-0-606">606</a></span>
-<span class="normal"><a href="#__codelineno-0-607">607</a></span>
-<span class="normal"><a href="#__codelineno-0-608">608</a></span>
-<span class="normal"><a href="#__codelineno-0-609">609</a></span>
-<span class="normal"><a href="#__codelineno-0-610">610</a></span>
-<span class="normal"><a href="#__codelineno-0-611">611</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-611">611</a></span>
 <span class="normal"><a href="#__codelineno-0-612">612</a></span>
 <span class="normal"><a href="#__codelineno-0-613">613</a></span>
 <span class="normal"><a href="#__codelineno-0-614">614</a></span>
 <span class="normal"><a href="#__codelineno-0-615">615</a></span>
-<span class="normal"><a href="#__codelineno-0-616">616</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-600" name="__codelineno-0-600"></a><span class="k">def</span><span class="w"> </span><span class="nf">delete_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-601" name="__codelineno-0-601"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete task with id `task_id` from the OpenML server.</span>
-<a id="__codelineno-0-602" name="__codelineno-0-602"></a>
-<a id="__codelineno-0-603" name="__codelineno-0-603"></a><span class="sd">    You can only delete tasks which you created and have</span>
-<a id="__codelineno-0-604" name="__codelineno-0-604"></a><span class="sd">    no runs associated with them.</span>
-<a id="__codelineno-0-605" name="__codelineno-0-605"></a>
-<a id="__codelineno-0-606" name="__codelineno-0-606"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-607" name="__codelineno-0-607"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-608" name="__codelineno-0-608"></a><span class="sd">    task_id : int</span>
-<a id="__codelineno-0-609" name="__codelineno-0-609"></a><span class="sd">        OpenML id of the task</span>
-<a id="__codelineno-0-610" name="__codelineno-0-610"></a>
-<a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-613" name="__codelineno-0-613"></a><span class="sd">    bool</span>
-<a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">        True if the deletion was successful. False otherwise.</span>
-<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-616" name="__codelineno-0-616"></a>    <span class="k">return</span> <span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_delete_entity</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="n">task_id</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-616">616</a></span>
+<span class="normal"><a href="#__codelineno-0-617">617</a></span>
+<span class="normal"><a href="#__codelineno-0-618">618</a></span>
+<span class="normal"><a href="#__codelineno-0-619">619</a></span>
+<span class="normal"><a href="#__codelineno-0-620">620</a></span>
+<span class="normal"><a href="#__codelineno-0-621">621</a></span>
+<span class="normal"><a href="#__codelineno-0-622">622</a></span>
+<span class="normal"><a href="#__codelineno-0-623">623</a></span>
+<span class="normal"><a href="#__codelineno-0-624">624</a></span>
+<span class="normal"><a href="#__codelineno-0-625">625</a></span>
+<span class="normal"><a href="#__codelineno-0-626">626</a></span>
+<span class="normal"><a href="#__codelineno-0-627">627</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-611" name="__codelineno-0-611"></a><span class="k">def</span><span class="w"> </span><span class="nf">delete_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-612" name="__codelineno-0-612"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete task with id `task_id` from the OpenML server.</span>
+<a id="__codelineno-0-613" name="__codelineno-0-613"></a>
+<a id="__codelineno-0-614" name="__codelineno-0-614"></a><span class="sd">    You can only delete tasks which you created and have</span>
+<a id="__codelineno-0-615" name="__codelineno-0-615"></a><span class="sd">    no runs associated with them.</span>
+<a id="__codelineno-0-616" name="__codelineno-0-616"></a>
+<a id="__codelineno-0-617" name="__codelineno-0-617"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-618" name="__codelineno-0-618"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-619" name="__codelineno-0-619"></a><span class="sd">    task_id : int</span>
+<a id="__codelineno-0-620" name="__codelineno-0-620"></a><span class="sd">        OpenML id of the task</span>
+<a id="__codelineno-0-621" name="__codelineno-0-621"></a>
+<a id="__codelineno-0-622" name="__codelineno-0-622"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-623" name="__codelineno-0-623"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-624" name="__codelineno-0-624"></a><span class="sd">    bool</span>
+<a id="__codelineno-0-625" name="__codelineno-0-625"></a><span class="sd">        True if the deletion was successful. False otherwise.</span>
+<a id="__codelineno-0-626" name="__codelineno-0-626"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-627" name="__codelineno-0-627"></a>    <span class="k">return</span> <span class="n">openml</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">_delete_entity</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="n">task_id</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

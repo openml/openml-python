@@ -4013,11 +4013,7 @@ on the server in the dataset.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/datasets/dataset.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-719">719</a></span>
-<span class="normal"><a href="#__codelineno-0-720">720</a></span>
-<span class="normal"><a href="#__codelineno-0-721">721</a></span>
-<span class="normal"><a href="#__codelineno-0-722">722</a></span>
-<span class="normal"><a href="#__codelineno-0-723">723</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-723">723</a></span>
 <span class="normal"><a href="#__codelineno-0-724">724</a></span>
 <span class="normal"><a href="#__codelineno-0-725">725</a></span>
 <span class="normal"><a href="#__codelineno-0-726">726</a></span>
@@ -4089,83 +4085,97 @@ on the server in the dataset.</p>
 <span class="normal"><a href="#__codelineno-0-792">792</a></span>
 <span class="normal"><a href="#__codelineno-0-793">793</a></span>
 <span class="normal"><a href="#__codelineno-0-794">794</a></span>
-<span class="normal"><a href="#__codelineno-0-795">795</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-719" name="__codelineno-0-719"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_data</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
-<a id="__codelineno-0-720" name="__codelineno-0-720"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a>    <span class="n">target</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a>    <span class="n">include_row_id</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a>    <span class="n">include_ignore_attribute</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns dataset content as dataframes.</span>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="sd">    target : string, List[str] or None (default=None)</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a><span class="sd">        Name of target column to separate from the data.</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="sd">        Splitting multiple columns is currently not supported.</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a><span class="sd">    include_row_id : boolean (default=False)</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="sd">        Whether to include row ids in the returned dataset.</span>
-<a id="__codelineno-0-734" name="__codelineno-0-734"></a><span class="sd">    include_ignore_attribute : boolean (default=False)</span>
-<a id="__codelineno-0-735" name="__codelineno-0-735"></a><span class="sd">        Whether to include columns that are marked as &quot;ignore&quot;</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a><span class="sd">        on the server in the dataset.</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a><span class="sd">    X : dataframe, shape (n_samples, n_columns)</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a><span class="sd">        Dataset, may have sparse dtypes in the columns if required.</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">    y : pd.Series, shape (n_samples, ) or None</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a><span class="sd">        Target column</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="sd">    categorical_indicator : list[bool]</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        Mask that indicate categorical features.</span>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">    attribute_names : list[str]</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">        List of attribute names.</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a>    <span class="n">data</span><span class="p">,</span> <span class="n">categorical_mask</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_data</span><span class="p">()</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a>    <span class="n">to_exclude</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">include_row_id</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-<a id="__codelineno-0-755" name="__codelineno-0-755"></a>            <span class="n">to_exclude</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span><span class="p">)</span>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a>        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a>            <span class="n">to_exclude</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span><span class="p">)</span>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">include_ignore_attribute</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a>            <span class="n">to_exclude</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span><span class="p">)</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a>        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a>            <span class="n">to_exclude</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span><span class="p">)</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_exclude</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Going to remove the following attributes: </span><span class="si">{</span><span class="n">to_exclude</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a>        <span class="n">keep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_exclude</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">attribute_names</span><span class="p">])</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a>        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">to_exclude</span><span class="p">)</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a>        <span class="n">categorical_mask</span> <span class="o">=</span> <span class="p">[</span><span class="n">cat</span> <span class="k">for</span> <span class="n">cat</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">categorical_mask</span><span class="p">,</span> <span class="n">keep</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span><span class="p">]</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a>        <span class="n">attribute_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">att</span> <span class="k">for</span> <span class="n">att</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">attribute_names</span><span class="p">,</span> <span class="n">keep</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span><span class="p">]</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>    <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a>        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">categorical_mask</span><span class="p">,</span> <span class="n">attribute_names</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>        <span class="n">target_names</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="n">target</span> <span class="k">else</span> <span class="p">[</span><span class="n">target</span><span class="p">]</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a>        <span class="n">target_names</span> <span class="o">=</span> <span class="n">target</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a>    <span class="c1"># All the assumptions below for the target are dependant on the number of targets being 1</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a>    <span class="n">n_targets</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_names</span><span class="p">)</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a>    <span class="k">if</span> <span class="n">n_targets</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of targets </span><span class="si">{</span><span class="n">n_targets</span><span class="si">}</span><span class="s2"> not implemented.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a>    <span class="n">target_name</span> <span class="o">=</span> <span class="n">target_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a>    <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">target_name</span><span class="p">])</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>    <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">target_name</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>    <span class="c1"># Finally, remove the target from the list of attributes and categorical mask</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a>    <span class="n">target_index</span> <span class="o">=</span> <span class="n">attribute_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">target_name</span><span class="p">)</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a>    <span class="n">categorical_mask</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">target_index</span><span class="p">)</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>    <span class="n">attribute_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">target_name</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-795">795</a></span>
+<span class="normal"><a href="#__codelineno-0-796">796</a></span>
+<span class="normal"><a href="#__codelineno-0-797">797</a></span>
+<span class="normal"><a href="#__codelineno-0-798">798</a></span>
+<span class="normal"><a href="#__codelineno-0-799">799</a></span>
+<span class="normal"><a href="#__codelineno-0-800">800</a></span>
+<span class="normal"><a href="#__codelineno-0-801">801</a></span>
+<span class="normal"><a href="#__codelineno-0-802">802</a></span>
+<span class="normal"><a href="#__codelineno-0-803">803</a></span>
+<span class="normal"><a href="#__codelineno-0-804">804</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-723" name="__codelineno-0-723"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_data</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+<a id="__codelineno-0-724" name="__codelineno-0-724"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a>    <span class="n">target</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a>    <span class="n">include_row_id</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a>    <span class="n">include_ignore_attribute</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns dataset content as dataframes.</span>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="sd">    target : string, List[str] or None (default=None)</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a><span class="sd">        Name of target column to separate from the data.</span>
+<a id="__codelineno-0-735" name="__codelineno-0-735"></a><span class="sd">        Splitting multiple columns is currently not supported.</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a><span class="sd">    include_row_id : boolean (default=False)</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a><span class="sd">        Whether to include row ids in the returned dataset.</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a><span class="sd">    include_ignore_attribute : boolean (default=False)</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a><span class="sd">        Whether to include columns that are marked as &quot;ignore&quot;</span>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="sd">        on the server in the dataset.</span>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a><span class="sd">    X : dataframe, shape (n_samples, n_columns)</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">        Dataset, may have sparse dtypes in the columns if required.</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">    y : pd.Series, shape (n_samples, ) or None</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">        Target column</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">    categorical_indicator : list[bool]</span>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">        Mask that indicate categorical features.</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="sd">    attribute_names : list[str]</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a><span class="sd">        List of attribute names.</span>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a>    <span class="n">data</span><span class="p">,</span> <span class="n">categorical_mask</span><span class="p">,</span> <span class="n">attribute_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_data</span><span class="p">()</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a>    <span class="n">to_exclude</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">include_row_id</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a>            <span class="n">to_exclude</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span><span class="p">)</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a>        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a>            <span class="n">to_exclude</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span><span class="p">)</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">include_ignore_attribute</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a>            <span class="n">to_exclude</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span><span class="p">)</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a>        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a>            <span class="n">to_exclude</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span><span class="p">)</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_exclude</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Going to remove the following attributes: </span><span class="si">{</span><span class="n">to_exclude</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a>        <span class="n">keep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_exclude</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">attribute_names</span><span class="p">])</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a>        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">to_exclude</span><span class="p">)</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a>        <span class="n">categorical_mask</span> <span class="o">=</span> <span class="p">[</span><span class="n">cat</span> <span class="k">for</span> <span class="n">cat</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">categorical_mask</span><span class="p">,</span> <span class="n">keep</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span><span class="p">]</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a>        <span class="n">attribute_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">att</span> <span class="k">for</span> <span class="n">att</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">attribute_names</span><span class="p">,</span> <span class="n">keep</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span><span class="p">]</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a>    <span class="k">if</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">categorical_mask</span><span class="p">,</span> <span class="n">attribute_names</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a>        <span class="n">target_names</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="n">target</span> <span class="k">else</span> <span class="p">[</span><span class="n">target</span><span class="p">]</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a>        <span class="n">target_names</span> <span class="o">=</span> <span class="n">target</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a>    <span class="c1"># All the assumptions below for the target are dependant on the number of targets being 1</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a>    <span class="n">n_targets</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_names</span><span class="p">)</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a>    <span class="k">if</span> <span class="n">n_targets</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a>            <span class="sa">f</span><span class="s2">&quot;Multi-target prediction is not yet supported.&quot;</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a>            <span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">n_targets</span><span class="si">}</span><span class="s2"> target columns: </span><span class="si">{</span><span class="n">target_names</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a>            <span class="sa">f</span><span class="s2">&quot;Currently, only single-target datasets are supported. &quot;</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a>            <span class="sa">f</span><span class="s2">&quot;Please select a single target column.&quot;</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a>        <span class="p">)</span>
 <a id="__codelineno-0-793" name="__codelineno-0-793"></a>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span>
-<a id="__codelineno-0-795" name="__codelineno-0-795"></a>    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_mask</span><span class="p">,</span> <span class="n">attribute_names</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a>    <span class="n">target_name</span> <span class="o">=</span> <span class="n">target_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a>    <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">target_name</span><span class="p">])</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a>    <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">target_name</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>    <span class="c1"># Finally, remove the target from the list of attributes and categorical mask</span>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a>    <span class="n">target_index</span> <span class="o">=</span> <span class="n">attribute_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">target_name</span><span class="p">)</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a>    <span class="n">categorical_mask</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">target_index</span><span class="p">)</span>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a>    <span class="n">attribute_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">target_name</span><span class="p">)</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a>    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">categorical_mask</span><span class="p">,</span> <span class="n">attribute_names</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4309,16 +4319,7 @@ return values as if these indices are not present)</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/datasets/dataset.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-862">862</a></span>
-<span class="normal"><a href="#__codelineno-0-863">863</a></span>
-<span class="normal"><a href="#__codelineno-0-864">864</a></span>
-<span class="normal"><a href="#__codelineno-0-865">865</a></span>
-<span class="normal"><a href="#__codelineno-0-866">866</a></span>
-<span class="normal"><a href="#__codelineno-0-867">867</a></span>
-<span class="normal"><a href="#__codelineno-0-868">868</a></span>
-<span class="normal"><a href="#__codelineno-0-869">869</a></span>
-<span class="normal"><a href="#__codelineno-0-870">870</a></span>
-<span class="normal"><a href="#__codelineno-0-871">871</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-871">871</a></span>
 <span class="normal"><a href="#__codelineno-0-872">872</a></span>
 <span class="normal"><a href="#__codelineno-0-873">873</a></span>
 <span class="normal"><a href="#__codelineno-0-874">874</a></span>
@@ -4366,64 +4367,73 @@ return values as if these indices are not present)</p>
 <span class="normal"><a href="#__codelineno-0-916">916</a></span>
 <span class="normal"><a href="#__codelineno-0-917">917</a></span>
 <span class="normal"><a href="#__codelineno-0-918">918</a></span>
-<span class="normal"><a href="#__codelineno-0-919">919</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_features_by_type</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a>    <span class="n">data_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a>    <span class="n">exclude</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a>    <span class="n">exclude_ignore_attribute</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a>    <span class="n">exclude_row_id_attribute</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">    Return indices of features of a given type, e.g. all nominal features.</span>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="sd">    Optional parameters to exclude various features by index or ontology.</span>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">    data_type : str</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="sd">        The data type to return (e.g., nominal, numeric, date, string)</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="sd">    exclude : list(int)</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a><span class="sd">        List of columns to exclude from the return value</span>
-<a id="__codelineno-0-879" name="__codelineno-0-879"></a><span class="sd">    exclude_ignore_attribute : bool</span>
-<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">        Whether to exclude the defined ignore attributes (and adapt the</span>
-<a id="__codelineno-0-881" name="__codelineno-0-881"></a><span class="sd">        return values as if these indices are not present)</span>
-<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">    exclude_row_id_attribute : bool</span>
-<a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">        Whether to exclude the defined row id attributes (and adapt the</span>
-<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">        return values as if these indices are not present)</span>
-<a id="__codelineno-0-885" name="__codelineno-0-885"></a>
-<a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-887" name="__codelineno-0-887"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-888" name="__codelineno-0-888"></a><span class="sd">    result : list</span>
-<a id="__codelineno-0-889" name="__codelineno-0-889"></a><span class="sd">        a list of indices that have the specified data type</span>
-<a id="__codelineno-0-890" name="__codelineno-0-890"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-891" name="__codelineno-0-891"></a>    <span class="k">if</span> <span class="n">data_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">OpenMLDataFeature</span><span class="o">.</span><span class="n">LEGAL_DATA_TYPES</span><span class="p">:</span>
-<a id="__codelineno-0-892" name="__codelineno-0-892"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Illegal feature type requested&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-893" name="__codelineno-0-893"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-<a id="__codelineno-0-894" name="__codelineno-0-894"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;ignore_attribute should be a list&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-895" name="__codelineno-0-895"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-<a id="__codelineno-0-896" name="__codelineno-0-896"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;row id attribute should be a str&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-897" name="__codelineno-0-897"></a>    <span class="k">if</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exclude</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-<a id="__codelineno-0-898" name="__codelineno-0-898"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Exclude should be a list&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-899" name="__codelineno-0-899"></a>        <span class="c1"># assert all(isinstance(elem, str) for elem in exclude),</span>
-<a id="__codelineno-0-900" name="__codelineno-0-900"></a>        <span class="c1">#            &quot;Exclude should be a list of strings&quot;</span>
-<a id="__codelineno-0-901" name="__codelineno-0-901"></a>    <span class="n">to_exclude</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-902" name="__codelineno-0-902"></a>    <span class="k">if</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-903" name="__codelineno-0-903"></a>        <span class="n">to_exclude</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">exclude</span><span class="p">)</span>
-<a id="__codelineno-0-904" name="__codelineno-0-904"></a>    <span class="k">if</span> <span class="n">exclude_ignore_attribute</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-905" name="__codelineno-0-905"></a>        <span class="n">to_exclude</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span><span class="p">)</span>
-<a id="__codelineno-0-906" name="__codelineno-0-906"></a>    <span class="k">if</span> <span class="n">exclude_row_id_attribute</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-907" name="__codelineno-0-907"></a>        <span class="n">to_exclude</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span><span class="p">)</span>
-<a id="__codelineno-0-908" name="__codelineno-0-908"></a>
-<a id="__codelineno-0-909" name="__codelineno-0-909"></a>    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-910" name="__codelineno-0-910"></a>    <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
-<a id="__codelineno-0-911" name="__codelineno-0-911"></a>    <span class="c1"># this function assumes that everything in to_exclude will</span>
-<a id="__codelineno-0-912" name="__codelineno-0-912"></a>    <span class="c1"># be &#39;excluded&#39; from the dataset (hence the offset)</span>
-<a id="__codelineno-0-913" name="__codelineno-0-913"></a>    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
-<a id="__codelineno-0-914" name="__codelineno-0-914"></a>        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
-<a id="__codelineno-0-915" name="__codelineno-0-915"></a>        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">to_exclude</span><span class="p">:</span>
-<a id="__codelineno-0-916" name="__codelineno-0-916"></a>            <span class="n">offset</span> <span class="o">+=</span> <span class="mi">1</span>
-<a id="__codelineno-0-917" name="__codelineno-0-917"></a>        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">data_type</span><span class="p">:</span>
-<a id="__codelineno-0-918" name="__codelineno-0-918"></a>            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span>
-<a id="__codelineno-0-919" name="__codelineno-0-919"></a>    <span class="k">return</span> <span class="n">result</span>
+<span class="normal"><a href="#__codelineno-0-919">919</a></span>
+<span class="normal"><a href="#__codelineno-0-920">920</a></span>
+<span class="normal"><a href="#__codelineno-0-921">921</a></span>
+<span class="normal"><a href="#__codelineno-0-922">922</a></span>
+<span class="normal"><a href="#__codelineno-0-923">923</a></span>
+<span class="normal"><a href="#__codelineno-0-924">924</a></span>
+<span class="normal"><a href="#__codelineno-0-925">925</a></span>
+<span class="normal"><a href="#__codelineno-0-926">926</a></span>
+<span class="normal"><a href="#__codelineno-0-927">927</a></span>
+<span class="normal"><a href="#__codelineno-0-928">928</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_features_by_type</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a>    <span class="n">data_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a>    <span class="n">exclude</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a>    <span class="n">exclude_ignore_attribute</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a>    <span class="n">exclude_row_id_attribute</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a><span class="sd">    Return indices of features of a given type, e.g. all nominal features.</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">    Optional parameters to exclude various features by index or ontology.</span>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">    data_type : str</span>
+<a id="__codelineno-0-885" name="__codelineno-0-885"></a><span class="sd">        The data type to return (e.g., nominal, numeric, date, string)</span>
+<a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">    exclude : list(int)</span>
+<a id="__codelineno-0-887" name="__codelineno-0-887"></a><span class="sd">        List of columns to exclude from the return value</span>
+<a id="__codelineno-0-888" name="__codelineno-0-888"></a><span class="sd">    exclude_ignore_attribute : bool</span>
+<a id="__codelineno-0-889" name="__codelineno-0-889"></a><span class="sd">        Whether to exclude the defined ignore attributes (and adapt the</span>
+<a id="__codelineno-0-890" name="__codelineno-0-890"></a><span class="sd">        return values as if these indices are not present)</span>
+<a id="__codelineno-0-891" name="__codelineno-0-891"></a><span class="sd">    exclude_row_id_attribute : bool</span>
+<a id="__codelineno-0-892" name="__codelineno-0-892"></a><span class="sd">        Whether to exclude the defined row id attributes (and adapt the</span>
+<a id="__codelineno-0-893" name="__codelineno-0-893"></a><span class="sd">        return values as if these indices are not present)</span>
+<a id="__codelineno-0-894" name="__codelineno-0-894"></a>
+<a id="__codelineno-0-895" name="__codelineno-0-895"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-896" name="__codelineno-0-896"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-897" name="__codelineno-0-897"></a><span class="sd">    result : list</span>
+<a id="__codelineno-0-898" name="__codelineno-0-898"></a><span class="sd">        a list of indices that have the specified data type</span>
+<a id="__codelineno-0-899" name="__codelineno-0-899"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-900" name="__codelineno-0-900"></a>    <span class="k">if</span> <span class="n">data_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">OpenMLDataFeature</span><span class="o">.</span><span class="n">LEGAL_DATA_TYPES</span><span class="p">:</span>
+<a id="__codelineno-0-901" name="__codelineno-0-901"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Illegal feature type requested&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-902" name="__codelineno-0-902"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+<a id="__codelineno-0-903" name="__codelineno-0-903"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;ignore_attribute should be a list&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-904" name="__codelineno-0-904"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-0-905" name="__codelineno-0-905"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;row id attribute should be a str&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-906" name="__codelineno-0-906"></a>    <span class="k">if</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exclude</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+<a id="__codelineno-0-907" name="__codelineno-0-907"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Exclude should be a list&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-908" name="__codelineno-0-908"></a>        <span class="c1"># assert all(isinstance(elem, str) for elem in exclude),</span>
+<a id="__codelineno-0-909" name="__codelineno-0-909"></a>        <span class="c1">#            &quot;Exclude should be a list of strings&quot;</span>
+<a id="__codelineno-0-910" name="__codelineno-0-910"></a>    <span class="n">to_exclude</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-911" name="__codelineno-0-911"></a>    <span class="k">if</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-912" name="__codelineno-0-912"></a>        <span class="n">to_exclude</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">exclude</span><span class="p">)</span>
+<a id="__codelineno-0-913" name="__codelineno-0-913"></a>    <span class="k">if</span> <span class="n">exclude_ignore_attribute</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-914" name="__codelineno-0-914"></a>        <span class="n">to_exclude</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_attribute</span><span class="p">)</span>
+<a id="__codelineno-0-915" name="__codelineno-0-915"></a>    <span class="k">if</span> <span class="n">exclude_row_id_attribute</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-916" name="__codelineno-0-916"></a>        <span class="n">to_exclude</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_id_attribute</span><span class="p">)</span>
+<a id="__codelineno-0-917" name="__codelineno-0-917"></a>
+<a id="__codelineno-0-918" name="__codelineno-0-918"></a>    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-919" name="__codelineno-0-919"></a>    <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-0-920" name="__codelineno-0-920"></a>    <span class="c1"># this function assumes that everything in to_exclude will</span>
+<a id="__codelineno-0-921" name="__codelineno-0-921"></a>    <span class="c1"># be &#39;excluded&#39; from the dataset (hence the offset)</span>
+<a id="__codelineno-0-922" name="__codelineno-0-922"></a>    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
+<a id="__codelineno-0-923" name="__codelineno-0-923"></a>        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+<a id="__codelineno-0-924" name="__codelineno-0-924"></a>        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">to_exclude</span><span class="p">:</span>
+<a id="__codelineno-0-925" name="__codelineno-0-925"></a>            <span class="n">offset</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-0-926" name="__codelineno-0-926"></a>        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">data_type</span><span class="p">:</span>
+<a id="__codelineno-0-927" name="__codelineno-0-927"></a>            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span>
+<a id="__codelineno-0-928" name="__codelineno-0-928"></a>    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4742,16 +4752,7 @@ classname when uploading the results of a run.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/datasets/dataset.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-830">830</a></span>
-<span class="normal"><a href="#__codelineno-0-831">831</a></span>
-<span class="normal"><a href="#__codelineno-0-832">832</a></span>
-<span class="normal"><a href="#__codelineno-0-833">833</a></span>
-<span class="normal"><a href="#__codelineno-0-834">834</a></span>
-<span class="normal"><a href="#__codelineno-0-835">835</a></span>
-<span class="normal"><a href="#__codelineno-0-836">836</a></span>
-<span class="normal"><a href="#__codelineno-0-837">837</a></span>
-<span class="normal"><a href="#__codelineno-0-838">838</a></span>
-<span class="normal"><a href="#__codelineno-0-839">839</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-839">839</a></span>
 <span class="normal"><a href="#__codelineno-0-840">840</a></span>
 <span class="normal"><a href="#__codelineno-0-841">841</a></span>
 <span class="normal"><a href="#__codelineno-0-842">842</a></span>
@@ -4772,37 +4773,46 @@ classname when uploading the results of a run.</p>
 <span class="normal"><a href="#__codelineno-0-857">857</a></span>
 <span class="normal"><a href="#__codelineno-0-858">858</a></span>
 <span class="normal"><a href="#__codelineno-0-859">859</a></span>
-<span class="normal"><a href="#__codelineno-0-860">860</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="k">def</span><span class="w"> </span><span class="nf">retrieve_class_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;class&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads the datasets arff to determine the class-labels.</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="sd">    If the task has no class labels (for example a regression problem)</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">    it returns None. Necessary because the data returned by get_data</span>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a><span class="sd">    only contains the indices of the classes, while OpenML needs the real</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a><span class="sd">    classname when uploading the results of a run.</span>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="sd">    target_name : str</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="sd">        Name of the target attribute</span>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">    list</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a>    <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a>        <span class="k">if</span> <span class="n">feature</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">target_name</span><span class="p">:</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a>            <span class="k">if</span> <span class="n">feature</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;nominal&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a>                <span class="k">return</span> <span class="n">feature</span><span class="o">.</span><span class="n">nominal_values</span>
+<span class="normal"><a href="#__codelineno-0-860">860</a></span>
+<span class="normal"><a href="#__codelineno-0-861">861</a></span>
+<span class="normal"><a href="#__codelineno-0-862">862</a></span>
+<span class="normal"><a href="#__codelineno-0-863">863</a></span>
+<span class="normal"><a href="#__codelineno-0-864">864</a></span>
+<span class="normal"><a href="#__codelineno-0-865">865</a></span>
+<span class="normal"><a href="#__codelineno-0-866">866</a></span>
+<span class="normal"><a href="#__codelineno-0-867">867</a></span>
+<span class="normal"><a href="#__codelineno-0-868">868</a></span>
+<span class="normal"><a href="#__codelineno-0-869">869</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="k">def</span><span class="w"> </span><span class="nf">retrieve_class_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;class&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads the datasets arff to determine the class-labels.</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">    If the task has no class labels (for example a regression problem)</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">    it returns None. Necessary because the data returned by get_data</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">    only contains the indices of the classes, while OpenML needs the real</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">    classname when uploading the results of a run.</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">    target_name : str</span>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">        Name of the target attribute</span>
 <a id="__codelineno-0-851" name="__codelineno-0-851"></a>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a>            <span class="k">if</span> <span class="n">feature</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a>                <span class="c1"># Rel.: #1311</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a>                <span class="c1"># The target is invalid for a classification task if the feature type is string</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a>                <span class="c1"># and not nominal. For such miss-configured tasks, we silently fix it here as</span>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a>                <span class="c1"># we can safely interpreter string as nominal.</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a>                <span class="n">df</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a>                <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">feature</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a>    <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">    list</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a>    <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a>        <span class="k">if</span> <span class="n">feature</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">target_name</span><span class="p">:</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a>            <span class="k">if</span> <span class="n">feature</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;nominal&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a>                <span class="k">return</span> <span class="n">feature</span><span class="o">.</span><span class="n">nominal_values</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a>            <span class="k">if</span> <span class="n">feature</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a>                <span class="c1"># Rel.: #1311</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a>                <span class="c1"># The target is invalid for a classification task if the feature type is string</span>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a>                <span class="c1"># and not nominal. For such miss-configured tasks, we silently fix it here as</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a>                <span class="c1"># we can safely interpreter string as nominal.</span>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a>                <span class="n">df</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a>                <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">feature</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a>    <span class="k">return</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
