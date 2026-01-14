@@ -152,7 +152,6 @@ class TestTask(TestBase):
             os.path.join(self.workdir, "org", "openml", "test", "datasets", "1", "dataset.arff")
         )
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_task_lazy(self):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)

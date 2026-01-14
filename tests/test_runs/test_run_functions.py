@@ -413,7 +413,6 @@ class TestRun(TestBase):
                 task=task,
             )
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     def test_check_erronous_sklearn_flow_fails(self):
         task_id = 115  # diabetes; crossvalidation
@@ -882,7 +881,6 @@ class TestRun(TestBase):
 
     ##########################################################################
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     def test_learning_curve_task_1(self):
         task_id = 801  # diabates dataset
@@ -907,7 +905,6 @@ class TestRun(TestBase):
         )
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     def test_learning_curve_task_2(self):
         task_id = 801  # diabates dataset
@@ -944,7 +941,6 @@ class TestRun(TestBase):
         )
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.21"),
@@ -1023,7 +1019,6 @@ class TestRun(TestBase):
                 assert alt_scores[idx] >= 0
                 assert alt_scores[idx] <= 1
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     def test_local_run_swapped_parameter_order_model(self):
         clf = DecisionTreeClassifier()
@@ -1039,7 +1034,6 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1068,7 +1062,6 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1106,7 +1099,6 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1168,7 +1160,6 @@ class TestRun(TestBase):
         assert flowS.components["Imputer"].parameters["strategy"] == '"most_frequent"'
         assert flowS.components["VarianceThreshold"].parameters["threshold"] == "0.05"
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1228,7 +1219,6 @@ class TestRun(TestBase):
             run_ids = run_exists(task.task_id, setup_exists)
             assert run_ids, (run_ids, clf)
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     def test_run_with_illegal_flow_id(self):
         # check the case where the user adds an illegal flow id to a
@@ -1248,7 +1238,6 @@ class TestRun(TestBase):
                 avoid_duplicate_runs=True,
             )
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     def test_run_with_illegal_flow_id_after_load(self):
         # Same as `test_run_with_illegal_flow_id`, but test this error is also
@@ -1305,7 +1294,6 @@ class TestRun(TestBase):
                 avoid_duplicate_runs=True,
             )
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     def test_run_with_illegal_flow_id_1_after_load(self):
         # Same as `test_run_with_illegal_flow_id_1`, but test this error is
@@ -1344,7 +1332,6 @@ class TestRun(TestBase):
             loaded_run.publish,
         )
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1572,7 +1559,6 @@ class TestRun(TestBase):
         runs = openml.runs.list_runs(tag="curves", size=2)
         assert len(runs) >= 1
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1609,7 +1595,6 @@ class TestRun(TestBase):
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             assert len(row) == 12
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1662,7 +1647,6 @@ class TestRun(TestBase):
         with pytest.raises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @pytest.mark.sklearn()
     def test_run_flow_on_task_downloaded_flow(self):
         model = sklearn.ensemble.RandomForestClassifier(n_estimators=33)
@@ -1703,7 +1687,6 @@ class TestRun(TestBase):
         with pytest.raises(ValueError, match="`proba` is required for classification task"):
             format_prediction(classification, *ignored_input, proba=None)
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_format_prediction_classification_incomplete_probabilities(self):
         classification = openml.tasks.get_task(
             self.TEST_SERVER_TASK_SIMPLE["task_id"],
@@ -1724,7 +1707,6 @@ class TestRun(TestBase):
         with pytest.raises(ValueError, match="The classification task must have class labels set"):
             format_prediction(classification, *ignored_input, proba={})
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_format_prediction_task_learning_curve_sample_not_set(self):
         learning_curve = openml.tasks.get_task(801, download_data=False)  # diabetes;crossvalidation
         probabilities = {c: 0.2 for c in learning_curve.class_labels}
@@ -1732,7 +1714,6 @@ class TestRun(TestBase):
         with pytest.raises(ValueError, match="`sample` can not be none for LearningCurveTask"):
             format_prediction(learning_curve, *ignored_input, sample=None, proba=probabilities)
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_format_prediction_task_regression(self):
         task_meta_data = self.TEST_SERVER_TASK_REGRESSION["task_meta_data"]
         _task_id = check_task_existence(**task_meta_data)
@@ -1762,7 +1743,6 @@ class TestRun(TestBase):
 
 
 
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1863,7 +1843,6 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
 
 
 @pytest.mark.sklearn()
-@pytest.mark.xfail(reason="failures_issue_1544", strict=False)
 @unittest.skipIf(
     Version(sklearn.__version__) < Version("0.21"),
     reason="couldn't perform local tests successfully w/o bloating RAM",
@@ -1940,7 +1919,6 @@ def test__run_task_get_arffcontent_2(parallel_mock):
     )
 
 
-@pytest.mark.xfail(reason="failures_issue_1544", strict=False)
 @pytest.mark.sklearn()
 @unittest.skipIf(
     Version(sklearn.__version__) < Version("0.21"),
