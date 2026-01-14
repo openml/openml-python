@@ -1,18 +1,30 @@
 from __future__ import annotations
 
+import json
+import logging
+import pickle
 from collections import OrderedDict
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from typing_extensions import Literal
+
+from openml._api.resources.base import DatasetsAPI
+from openml.datasets.data_feature import OpenMLDataFeature
+from openml.datasets.dataset import OpenMLDataset
+from openml.exceptions import OpenMLNotAuthorizedError, OpenMLServerError, OpenMLServerException
 
 if TYPE_CHECKING:
     from requests import Response
 
+    import openml
+
 import pandas as pd
 import xmltodict
 
-import openml.utils
-from openml._api.resources.base import DatasetsAPI
-from openml.datasets.dataset import OpenMLDataset
+logger = logging.getLogger(__name__)
+
+
+NO_ACCESS_GRANTED_ERRCODE = 112
 
 
 class DatasetsV1(DatasetsAPI):
@@ -26,7 +38,6 @@ class DatasetsV1(DatasetsAPI):
         response = self._http.get(path)
         xml_content = response.text
         dataset = self._create_dataset_from_xml(xml_content)
-
         if return_response:
             return dataset, response
 
@@ -78,42 +89,8 @@ class DatasetsV1(DatasetsAPI):
                     api_call += f"/{operator}/{value}"
         if data_id is not None:
             api_call += f"/data_id/{','.join([str(int(i)) for i in data_id])}"
-
         xml_string = self._http.get(api_call).text
-        datasets_dict = xmltodict.parse(xml_string, force_list=("oml:dataset",))
-
-        # Minimalistic check if the XML is useful
-        assert isinstance(datasets_dict["oml:data"]["oml:dataset"], list), type(
-            datasets_dict["oml:data"],
-        )
-        assert datasets_dict["oml:data"]["@xmlns:oml"] == "http://openml.org/openml", datasets_dict[
-            "oml:data"
-        ]["@xmlns:oml"]
-
-        datasets = {}
-        for dataset_ in datasets_dict["oml:data"]["oml:dataset"]:
-            ignore_attribute = ["oml:file_id", "oml:quality"]
-            dataset = {
-                k.replace("oml:", ""): v for (k, v) in dataset_.items() if k not in ignore_attribute
-            }
-            dataset["did"] = int(dataset["did"])
-            dataset["version"] = int(dataset["version"])
-
-            # The number of qualities can range from 0 to infinity
-            for quality in dataset_.get("oml:quality", []):
-                try:
-                    dataset[quality["@name"]] = int(quality["#text"])
-                except ValueError:
-                    dataset[quality["@name"]] = float(quality["#text"])
-            datasets[dataset["did"]] = dataset
-
-        return pd.DataFrame.from_dict(datasets, orient="index").astype(
-            {
-                "did": int,
-                "version": int,
-                "status": pd.CategoricalDtype(["active", "deactivated", "in_preparation"]),
-            }
-        )
+        return self._parse_list_xml(xml_string)
 
     def delete(self, dataset_id: int) -> bool:
         """Delete dataset with id `dataset_id` from the OpenML server.
@@ -131,11 +108,45 @@ class DatasetsV1(DatasetsAPI):
         bool
             True if the deletion was successful. False otherwise.
         """
-        return openml.utils._delete_entity("data", dataset_id)
+        url_suffix = f"data/{dataset_id}"
+        try:
+            result_xml = self._http.delete(url_suffix)
+            result = xmltodict.parse(result_xml)
+            return "oml:data_delete" in result
+        except OpenMLServerException as e:
+            # https://github.com/openml/OpenML/blob/21f6188d08ac24fcd2df06ab94cf421c946971b0/openml_OS/views/pages/api_new/v1/xml/pre.php
+            # Most exceptions are descriptive enough to be raised as their standard
+            # OpenMLServerException, however there are two cases where we add information:
+            #  - a generic "failed" message, we direct them to the right issue board
+            #  - when the user successfully authenticates with the server,
+            #    but user is not allowed to take the requested action,
+            #    in which case we specify a OpenMLNotAuthorizedError.
+            by_other_user = [323, 353, 393, 453, 594]
+            has_dependent_entities = [324, 326, 327, 328, 354, 454, 464, 595]
+            unknown_reason = [325, 355, 394, 455, 593]
+            if e.code in by_other_user:
+                raise OpenMLNotAuthorizedError(
+                    message=("The data can not be deleted because it was not uploaded by you."),
+                ) from e
+            if e.code in has_dependent_entities:
+                raise OpenMLNotAuthorizedError(
+                    message=(
+                        f"The data can not be deleted because "
+                        f"it still has associated entities: {e.message}"
+                    ),
+                ) from e
+            if e.code in unknown_reason:
+                raise OpenMLServerError(
+                    message=(
+                        "The data can not be deleted for unknown reason,"
+                        " please open an issue at: https://github.com/openml/openml/issues/new"
+                    ),
+                ) from e
+            raise e
 
     def edit(  # noqa: PLR0913
         self,
-        data_id: int,
+        dataset_id: int,
         description: str | None = None,
         creator: str | None = None,
         contributor: str | None = None,
@@ -150,7 +161,7 @@ class DatasetsV1(DatasetsAPI):
     ) -> int:
         """Edits an OpenMLDataset.
 
-        In addition to providing the dataset id of the dataset to edit (through data_id),
+        In addition to providing the dataset id of the dataset to edit (through dataset_id),
         you must specify a value for at least one of the optional function arguments,
         i.e. one value for a field to edit.
 
@@ -166,7 +177,7 @@ class DatasetsV1(DatasetsAPI):
 
         Parameters
         ----------
-        data_id : int
+        dataset_id : int
             ID of the dataset.
         description : str
             Description of the dataset.
@@ -205,11 +216,11 @@ class DatasetsV1(DatasetsAPI):
         -------
         Dataset id
         """
-        if not isinstance(data_id, int):
-            raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
+        if not isinstance(dataset_id, int):
+            raise TypeError(f"`dataset_id` must be of type `int`, not {type(dataset_id)}.")
 
         # compose data edit parameters as xml
-        form_data = {"data_id": data_id}  # type: openml._api_calls.DATA_TYPE
+        form_data = {"data_id": dataset_id}  # type: openml._api_calls.DATA_TYPE
         xml = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
         xml["oml:data_edit_parameters"] = OrderedDict()
         xml["oml:data_edit_parameters"]["@xmlns:oml"] = "http://openml.org/openml"
@@ -235,10 +246,10 @@ class DatasetsV1(DatasetsAPI):
         }  # type: openml._api_calls.FILE_ELEMENTS_TYPE
         result_xml = self._http.post("data/edit", data=form_data, files=file_elements).text
         result = xmltodict.parse(result_xml)
-        data_id = result["oml:data_edit"]["oml:id"]
-        return int(data_id)
+        dataset_id = result["oml:data_edit"]["oml:id"]
+        return int(dataset_id)
 
-    def fork(self, data_id: int) -> int:
+    def fork(self, dataset_id: int) -> int:
         """
         Creates a new dataset version, with the authenticated user as the new owner.
         The forked dataset can have distinct dataset meta-data,
@@ -259,7 +270,7 @@ class DatasetsV1(DatasetsAPI):
 
         Parameters
         ----------
-        data_id : int
+        dataset_id : int
             id of the dataset to be forked
 
         Returns
@@ -267,16 +278,16 @@ class DatasetsV1(DatasetsAPI):
         Dataset id of the forked dataset
 
         """
-        if not isinstance(data_id, int):
-            raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
+        if not isinstance(dataset_id, int):
+            raise TypeError(f"`dataset_id` must be of type `int`, not {type(dataset_id)}.")
         # compose data fork parameters
-        form_data = {"data_id": data_id}
+        form_data = {"data_id": dataset_id}
         result_xml = self._http.post("data/fork", data=form_data).text
         result = xmltodict.parse(result_xml)
-        data_id = result["oml:data_fork"]["oml:id"]
-        return int(data_id)
+        dataset_id = result["oml:data_fork"]["oml:id"]
+        return int(dataset_id)
 
-    def status_update(self, data_id: int, status: Literal["active", "deactivated"]) -> None:
+    def status_update(self, dataset_id: int, status: Literal["active", "deactivated"]) -> None:
         """
         Updates the status of a dataset to either 'active' or 'deactivated'.
         Please see the OpenML API documentation for a description of the status
@@ -285,7 +296,7 @@ class DatasetsV1(DatasetsAPI):
 
         Parameters
         ----------
-        data_id : int
+        dataset_id : int
             The data id of the dataset
         status : str,
             'active' or 'deactivated'
@@ -294,12 +305,12 @@ class DatasetsV1(DatasetsAPI):
         if status not in legal_status:
             raise ValueError(f"Illegal status value. Legal values: {legal_status}")
 
-        data: openml._api_calls.DATA_TYPE = {"data_id": data_id, "status": status}
+        data: openml._api_calls.DATA_TYPE = {"data_id": dataset_id, "status": status}
         result_xml = self._http.post("data/status/update", data=data).text
         result = xmltodict.parse(result_xml)
         server_data_id = result["oml:data_status_update"]["oml:id"]
         server_status = result["oml:data_status_update"]["oml:status"]
-        if status != server_status or int(data_id) != int(server_data_id):
+        if status != server_status or int(dataset_id) != int(server_data_id):
             # This should never happen
             raise ValueError("Data id/status does not collide")
 
@@ -376,7 +387,7 @@ class DatasetsV1(DatasetsAPI):
             parquet_file=str(parquet_file) if parquet_file is not None else None,
         )
 
-    def feature_add_ontology(self, data_id: int, index: int, ontology: str) -> bool:
+    def feature_add_ontology(self, dataset_id: int, index: int, ontology: str) -> bool:
         """
         An ontology describes the concept that are described in a feature. An
         ontology is defined by an URL where the information is provided. Adds
@@ -386,7 +397,7 @@ class DatasetsV1(DatasetsAPI):
 
         Parameters
         ----------
-        data_id : int
+        dataset_id : int
             id of the dataset to which the feature belongs
         index : int
             index of the feature in dataset (0-based)
@@ -398,7 +409,7 @@ class DatasetsV1(DatasetsAPI):
         True or throws an OpenML server exception
         """
         upload_data: dict[str, int | str] = {
-            "data_id": data_id,
+            "data_id": dataset_id,
             "index": index,
             "ontology": ontology,
         }
@@ -406,7 +417,7 @@ class DatasetsV1(DatasetsAPI):
         # an error will be thrown in case the request was unsuccessful
         return True
 
-    def feature_remove_ontology(self, data_id: int, index: int, ontology: str) -> bool:
+    def feature_remove_ontology(self, dataset_id: int, index: int, ontology: str) -> bool:
         """
         Removes an existing ontology (URL) from a given dataset feature (defined
         by a dataset id and index). The dataset has to exists on OpenML and needs
@@ -415,7 +426,7 @@ class DatasetsV1(DatasetsAPI):
 
         Parameters
         ----------
-        data_id : int
+        dataset_id : int
             id of the dataset to which the feature belongs
         index : int
             index of the feature in dataset (0-based)
@@ -427,13 +438,140 @@ class DatasetsV1(DatasetsAPI):
         True or throws an OpenML server exception
         """
         upload_data: dict[str, int | str] = {
-            "data_id": data_id,
+            "data_id": dataset_id,
             "index": index,
             "ontology": ontology,
         }
         self._http.post("data/feature/ontology/remove", data=upload_data)
         # an error will be thrown in case the request was unsuccessful
         return True
+
+    def get_features(self, dataset_id: int) -> dict[int, OpenMLDataFeature]:
+        path = f"data/features/{dataset_id}"
+        xml = self._http.get(path, use_cache=True).text
+
+        return self._parse_features_xml(xml)
+
+    def get_qualities(self, dataset_id: int) -> dict[str, float] | None:
+        path = f"data/qualities/{dataset_id!s}"
+        try:
+            self._http.get(path, use_cache=True).text
+        except OpenMLServerException as e:
+            if e.code == 362 and str(e) == "No qualities found - None":
+                # quality file stays as None
+                logger.warning(f"No qualities found for dataset {dataset_id}")
+                return None
+
+            raise e
+
+        return self._parse_qualities_xml()
+
+    def parse_features_file(
+        self, features_file: Path, features_pickle_file: Path
+    ) -> dict[int, OpenMLDataFeature]:
+        if features_file.suffix != ".xml":
+            # TODO (Shrivaths) can only parse xml warn/ raise exception
+            raise NotImplementedError()
+
+        with Path(features_file).open("r", encoding="utf8") as fh:
+            features_xml = fh.read()
+
+        features = self._parse_features_xml(features_xml)
+
+        with features_pickle_file.open("wb") as fh_binary:
+            pickle.dump(features, fh_binary)
+
+        return features
+
+    def parse_qualities_file(
+        self, qualities_file: Path, qualities_pickle_file: Path
+    ) -> dict[int, OpenMLDataFeature]:
+        if qualities_file.suffix != ".xml":
+            # TODO (Shrivaths) can only parse xml warn/ raise exception
+            raise NotImplementedError()
+
+        with Path(qualities_file).open("r", encoding="utf8") as fh:
+            qualities_xml = fh.read()
+
+        qualities = self._parse_qualities_xml(qualities_xml)
+
+        with qualities_pickle_file.open("wb") as fh_binary:
+            pickle.dump(qualities, fh_binary)
+
+        return qualities
+
+    def _parse_features_xml(self, features_xml_string: str) -> dict[int, OpenMLDataFeature]:
+        xml_dict = xmltodict.parse(
+            features_xml_string,
+            force_list=("oml:feature", "oml:nominal_value"),
+            strip_whitespace=False,
+        )
+        features_xml = xml_dict["oml:data_features"]
+
+        features: dict[int, OpenMLDataFeature] = {}
+        for idx, xmlfeature in enumerate(features_xml["oml:feature"]):
+            nr_missing = xmlfeature.get("oml:number_of_missing_values", 0)
+            feature = OpenMLDataFeature(
+                int(xmlfeature["oml:index"]),
+                xmlfeature["oml:name"],
+                xmlfeature["oml:data_type"],
+                xmlfeature.get("oml:nominal_value"),
+                int(nr_missing),
+                xmlfeature.get("oml:ontology"),
+            )
+            if idx != feature.index:
+                raise ValueError("Data features not provided in right order")
+            features[feature.index] = feature
+
+        return features
+
+    def _parse_qualities_xml(self, qualities_xml: str) -> dict[str, float] | None:
+        xml_as_dict = xmltodict.parse(qualities_xml, force_list=("oml:quality",))
+        qualities = xml_as_dict["oml:data_qualities"]["oml:quality"]
+        qualities_ = {}
+        for xmlquality in qualities:
+            name = xmlquality["oml:name"]
+            if xmlquality.get("oml:value", None) is None or xmlquality["oml:value"] == "null":
+                value = float("NaN")
+            else:
+                value = float(xmlquality["oml:value"])
+            qualities_[name] = value
+        return qualities_
+
+    def _parse_list_xml(self, xml_string: str) -> pd.DataFrame:
+        datasets_dict = xmltodict.parse(xml_string, force_list=("oml:dataset",))
+        # Minimalistic check if the XML is useful
+        assert isinstance(datasets_dict["oml:data"]["oml:dataset"], list), type(
+            datasets_dict["oml:data"],
+        )
+        assert datasets_dict["oml:data"]["@xmlns:oml"] == "http://openml.org/openml", datasets_dict[
+            "oml:data"
+        ]["@xmlns:oml"]
+
+        datasets = {}
+        for dataset_ in datasets_dict["oml:data"]["oml:dataset"]:
+            ignore_attribute = ["oml:file_id", "oml:quality"]
+            dataset = {
+                k.replace("oml:", ""): v for (k, v) in dataset_.items() if k not in ignore_attribute
+            }
+            dataset["did"] = int(dataset["did"])
+            dataset["version"] = int(dataset["version"])
+
+            # The number of qualities can range from 0 to infinity
+            for quality in dataset_.get("oml:quality", []):
+                try:
+                    dataset[quality["@name"]] = int(quality["#text"])
+                except ValueError:
+                    dataset[quality["@name"]] = float(quality["#text"])
+            datasets[dataset["did"]] = dataset
+
+        return pd.DataFrame.from_dict(datasets, orient="index").astype(
+            {
+                "did": int,
+                "version": int,
+                "status": pd.CategoricalDtype(["active", "deactivated", "in_preparation"]),
+            }
+        )
 
 
 class DatasetsV2(DatasetsAPI):
@@ -457,6 +595,8 @@ class DatasetsV2(DatasetsAPI):
         self,
         limit: int,
         offset: int,
+        *,
+        dataset_id: list[int] | None = None,  # type: ignore
         **kwargs: Any,
     ) -> pd.DataFrame:
         """
@@ -473,12 +613,12 @@ class DatasetsV2(DatasetsAPI):
             The maximum number of datasets to show.
         offset : int
             The number of datasets to skip, starting from the first.
-        data_id : list, optional
+        dataset_id: list[int], optional
 
         kwargs : dict, optional
             Legal filter operators (keys in the dict):
             tag, status, limit, offset, data_name, data_version, number_instances,
-            number_features, number_classes, number_missing_values, data_id.
+            number_features, number_classes, number_missing_values.
 
         Returns
         -------
@@ -490,7 +630,8 @@ class DatasetsV2(DatasetsAPI):
             json["pagination"]["limit"] = limit
         if offset is not None:
             json["pagination"]["offset"] = offset
-
+        if dataset_id is not None:
+            json["data_id"] = dataset_id
         if kwargs is not None:
             for operator, value in kwargs.items():
                 if value is not None:
@@ -501,35 +642,14 @@ class DatasetsV2(DatasetsAPI):
         # Minimalistic check if the JSON is useful
         assert isinstance(datasets_list, list), type(datasets_list)
 
-        datasets = {}
-        for dataset_ in datasets_list:
-            ignore_attribute = ["file_id", "quality"]
-            dataset = {k: v for (k, v) in dataset_.items() if k not in ignore_attribute}
-            dataset["did"] = int(dataset["did"])
-            dataset["version"] = int(dataset["version"])
-
-            # The number of qualities can range from 0 to infinity
-            for quality in dataset_.get("quality", []):
-                try:
-                    dataset[quality["name"]] = int(quality["value"])
-                except ValueError:
-                    dataset[quality["name"]] = float(quality["value"])
-            datasets[dataset["did"]] = dataset
-
-        return pd.DataFrame.from_dict(datasets, orient="index").astype(
-            {
-                "did": int,
-                "version": int,
-                "status": pd.CategoricalDtype(["active", "deactivated", "in_preparation"]),
-            }
-        )
+        return self._parse_list_json(datasets_list)
 
     def delete(self, dataset_id: int) -> bool:
         raise NotImplementedError()
 
     def edit(  # noqa: PLR0913
         self,
-        data_id: int,
+        dataset_id: int,
         description: str | None = None,
         creator: str | None = None,
         contributor: str | None = None,
@@ -544,10 +664,10 @@ class DatasetsV2(DatasetsAPI):
     ) -> int:
         raise NotImplementedError()
 
-    def fork(self, data_id: int) -> int:
+    def fork(self, dataset_id: int) -> int:
         raise NotImplementedError()
 
-    def status_update(self, data_id: int, status: Literal["active", "deactivated"]) -> None:
+    def status_update(self, dataset_id: int, status: Literal["active", "deactivated"]) -> None:
         """
         Updates the status of a dataset to either 'active' or 'deactivated'.
         Please see the OpenML API documentation for a description of the status
@@ -556,7 +676,7 @@ class DatasetsV2(DatasetsAPI):
 
         Parameters
         ----------
-        data_id : int
+        dataset_id : int
             The data id of the dataset
         status : str,
             'active' or 'deactivated'
@@ -565,11 +685,11 @@ class DatasetsV2(DatasetsAPI):
         if status not in legal_status:
             raise ValueError(f"Illegal status value. Legal values: {legal_status}")
 
-        data: openml._api_calls.DATA_TYPE = {"dataset_id": data_id, "status": status}
+        data: openml._api_calls.DATA_TYPE = {"dataset_id": dataset_id, "status": status}
         result = self._http.post("datasets/status/update", json=data).json()
         server_data_id = result["dataset_id"]
         server_status = result["status"]
-        if status != server_status or int(data_id) != int(server_data_id):
+        if status != server_status or int(dataset_id) != int(server_data_id):
             # This should never happen
             raise ValueError("Data id/status does not collide")
 
@@ -643,8 +763,129 @@ class DatasetsV2(DatasetsAPI):
             parquet_file=str(parquet_file) if parquet_file is not None else None,
         )
 
-    def feature_add_ontology(self, data_id: int, index: int, ontology: str) -> bool:
+    def feature_add_ontology(self, dataset_id: int, index: int, ontology: str) -> bool:
         raise NotImplementedError()
 
-    def feature_remove_ontology(self, data_id: int, index: int, ontology: str) -> bool:
+    def feature_remove_ontology(self, dataset_id: int, index: int, ontology: str) -> bool:
         raise NotImplementedError()
+
+    def get_features(self, dataset_id: int) -> dict[int, OpenMLDataFeature]:
+        path = f"dataset/features/{dataset_id}"
+        json = self._http.get(path, use_cache=True).json()
+        features: dict[int, OpenMLDataFeature] = {}
+        for idx, xmlfeature in enumerate(json["data_features"]["feature"]):
+            nr_missing = xmlfeature.get("number_of_missing_values", 0)
+            feature = OpenMLDataFeature(
+                int(xmlfeature["index"]),
+                xmlfeature["name"],
+                xmlfeature["data_type"],
+                xmlfeature.get("nominal_value"),
+                int(nr_missing),
+                xmlfeature.get("ontology"),
+            )
+            if idx != feature.index:
+                raise ValueError("Data features not provided in right order")
+            features[feature.index] = feature
+
+        return features
+
+    def get_qualities(self, dataset_id: int) -> dict[str, float] | None:
+        path = f"dataset/qualities/{dataset_id!s}"
+        try:
+            qualities_json = self._http.get(path, use_cache=True).json()
+        except OpenMLServerException as e:
+            if e.code == 362 and str(e) == "No qualities found - None":
+                logger.warning(f"No qualities found for dataset {dataset_id}")
+                return None
+
+            raise e
+
+        return self._parse_features_json(qualities_json)
+
+    def parse_features_file(
+        self, features_file: Path, features_pickle_file: Path
+    ) -> dict[int, OpenMLDataFeature]:
+        if features_file.suffix != ".json":
+            # can fallback to v1 if the file is .xml
+            raise NotImplementedError()
+
+        with Path(features_file).open("r", encoding="utf8") as fh:
+            features_json = json.load(fh)
+
+        features = self._parse_features_json(features_json)
+
+        with features_pickle_file.open("wb") as fh_binary:
+            pickle.dump(features, fh_binary)
+
+        return features
+
+    def parse_qualities_file(
+        self, qualities_file: Path, qualities_pickle_file: Path
+    ) -> dict[str, float] | None:
+        if qualities_file.suffix != ".json":
+            # can fallback to v1 if the file is .xml
+            raise NotImplementedError()
+
+        with Path(qualities_file).open("r", encoding="utf8") as fh:
+            qualities_json = json.load(fh)
+
+        qualities = self._parse_qualities_json(qualities_json)
+
+        with qualities_pickle_file.open("wb") as fh_binary:
+            pickle.dump(qualities, fh_binary)
+
+        return qualities
+
+    def _parse_features_json(self: dict) -> dict[int, OpenMLDataFeature]:
+        features: dict[int, OpenMLDataFeature] = {}
+        for idx, xmlfeature in enumerate(self["data_features"]["feature"]):
+            nr_missing = xmlfeature.get("number_of_missing_values", 0)
+            feature = OpenMLDataFeature(
+                int(xmlfeature["index"]),
+                xmlfeature["name"],
+                xmlfeature["data_type"],
+                xmlfeature.get("nominal_value"),
+                int(nr_missing),
+                xmlfeature.get("ontology"),
+            )
+            if idx != feature.index:
+                raise ValueError("Data features not provided in right order")
+            features[feature.index] = feature
+
+        return features
+
+    def _parse_qualities_json(self: dict) -> dict[str, float] | None:
+        qualities = self["data_qualities"]["quality"]
+        qualities_ = {}
+        for quality in qualities:
+            name = quality["name"]
+            if quality.get("value", None) is None or quality["value"] == "null":
+                value = float("NaN")
+            else:
+                value = float(quality["value"])
+            qualities_[name] = value
+        return qualities_
+
+    def _parse_list_json(self, datasets_list: list) -> pd.DataFrame:  # type: ignore
+        datasets = {}
+        for dataset_ in datasets_list:
+            ignore_attribute = ["file_id", "quality"]
+            dataset = {k: v for (k, v) in dataset_.items() if k not in ignore_attribute}
+            dataset["did"] = int(dataset["did"])
+            dataset["version"] = int(dataset["version"])
+
+            # The number of qualities can range from 0 to infinity
+            for quality in dataset_.get("quality", []):
+                try:
+                    dataset[quality["name"]] = int(quality["value"])
+                except ValueError:
+                    dataset[quality["name"]] = float(quality["value"])
+            datasets[dataset["did"]] = dataset
+
+        return pd.DataFrame.from_dict(datasets, orient="index").astype(
+            {
+                "did": int,
+                "version": int,
+                "status": pd.CategoricalDtype(["active", "deactivated", "in_preparation"]),
+            }
+        )

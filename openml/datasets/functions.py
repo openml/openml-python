@@ -88,7 +88,7 @@ def list_datasets(
 
     Parameters
     ----------
-    data_id : list, optional
+    dataset_id : list, optional
         A list of data ids, to specify which datasets should be
         listed
     offset : int, optional
@@ -717,7 +717,7 @@ def status_update(data_id: int, status: Literal["active", "deactivated"]) -> Non
     if status not in legal_status:
         raise ValueError(f"Illegal status value. Legal values: {legal_status}")
 
-    api_context.backend.datasets.status_update(data_id=data_id, status=status)
+    api_context.backend.datasets.status_update(dataset_id=data_id, status=status)
 
 
 def edit_dataset(
@@ -840,7 +840,7 @@ def fork_dataset(data_id: int) -> int:
     """
     from openml._api import api_context
 
-    return api_context.backend.datasets.fork(data_id=data_id)
+    return api_context.backend.datasets.fork(dataset_id=data_id)
 
 
 def data_feature_add_ontology(data_id: int, index: int, ontology: str) -> bool:
