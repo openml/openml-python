@@ -2898,7 +2898,7 @@ Hopefully soon allows using a test server, not the production server.</p>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a>    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_levels</span><span class="p">):</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a>        <span class="n">static_cache_dir</span> <span class="o">=</span> <span class="n">static_cache_dir</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="n">content</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">static_cache_dir</span><span class="p">)</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="n">content</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">static_cache_dir</span><span class="p">)</span>  <span class="c1"># noqa: PTH208</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="k">if</span> <span class="s2">&quot;files&quot;</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
 <a id="__codelineno-0-85" name="__codelineno-0-85"></a>        <span class="n">static_cache_dir</span> <span class="o">=</span> <span class="n">static_cache_dir</span> <span class="o">/</span> <span class="s2">&quot;files&quot;</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a>    <span class="k">else</span><span class="p">:</span>
@@ -3057,11 +3057,7 @@ target_name : str</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/testing.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-275">275</a></span>
-<span class="normal"><a href="#__codelineno-0-276">276</a></span>
-<span class="normal"><a href="#__codelineno-0-277">277</a></span>
-<span class="normal"><a href="#__codelineno-0-278">278</a></span>
-<span class="normal"><a href="#__codelineno-0-279">279</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-279">279</a></span>
 <span class="normal"><a href="#__codelineno-0-280">280</a></span>
 <span class="normal"><a href="#__codelineno-0-281">281</a></span>
 <span class="normal"><a href="#__codelineno-0-282">282</a></span>
@@ -3106,56 +3102,60 @@ target_name : str</p>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
 <span class="normal"><a href="#__codelineno-0-323">323</a></span>
-<span class="normal"><a href="#__codelineno-0-324">324</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_task_existence</span><span class="p">(</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="n">TaskType</span><span class="p">,</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>    <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">TaskType</span><span class="p">]],</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks if any task with exists on test server that matches the meta data.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    Parameter</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    ---------</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    task_type : openml.tasks.TaskType</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    dataset_id : int</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    target_name : str</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    Return</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    ------</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    int, None</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="n">return_val</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">)</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tasks</span><span class="p">[</span><span class="s2">&quot;did&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">dataset_id</span><span class="p">]</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tasks</span><span class="p">[</span><span class="s2">&quot;target_feature&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">target_name</span><span class="p">]</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="n">task_match</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="k">for</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">[</span><span class="s2">&quot;tid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">():</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="n">task_match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="k">except</span> <span class="n">OpenMLServerException</span><span class="p">:</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>            <span class="c1"># can fail if task_id deleted by another parallely run unit test</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>            <span class="n">task_match</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>            <span class="n">return_val</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>            <span class="k">continue</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">!=</span> <span class="n">v</span><span class="p">:</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>                <span class="c1"># even if one of the meta-data key mismatches, then task_id is not a match</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>                <span class="n">task_match</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>                <span class="k">break</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>        <span class="c1"># if task_id is retained in the task_match list, it passed all meta key-value matches</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">task_match</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="n">return_val</span> <span class="o">=</span> <span class="n">task_id</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="k">break</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">task_match</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="n">return_val</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="k">return</span> <span class="n">return_val</span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_task_existence</span><span class="p">(</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="n">task_type</span><span class="p">:</span> <span class="n">TaskType</span><span class="p">,</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>    <span class="n">target_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">TaskType</span><span class="p">]],</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks if any task with exists on test server that matches the meta data.</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    Parameter</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    ---------</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">    task_type : openml.tasks.TaskType</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">    dataset_id : int</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    target_name : str</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">    Return</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    ------</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">    int, None</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="n">return_val</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="n">tasks</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">list_tasks</span><span class="p">(</span><span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">)</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tasks</span><span class="p">[</span><span class="s2">&quot;did&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">dataset_id</span><span class="p">]</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tasks</span><span class="p">[</span><span class="s2">&quot;target_feature&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">target_name</span><span class="p">]</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="n">task_match</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="k">for</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">[</span><span class="s2">&quot;tid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">():</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="n">task_match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>            <span class="n">task</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="k">except</span> <span class="n">OpenMLServerException</span><span class="p">:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>            <span class="c1"># can fail if task_id deleted by another parallely run unit test</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>            <span class="n">task_match</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>            <span class="n">return_val</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>            <span class="k">continue</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">!=</span> <span class="n">v</span><span class="p">:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>                <span class="c1"># even if one of the meta-data key mismatches, then task_id is not a match</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>                <span class="n">task_match</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>                <span class="k">break</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="c1"># if task_id is retained in the task_match list, it passed all meta key-value matches</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">task_match</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="n">return_val</span> <span class="o">=</span> <span class="n">task_id</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="k">break</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">task_match</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="n">return_val</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="k">return</span> <span class="n">return_val</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

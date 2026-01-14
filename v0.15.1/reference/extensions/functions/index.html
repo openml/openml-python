@@ -2789,7 +2789,7 @@ Raises an exception if two extensions can handle a flow.</p>
 <span class="normal"><a href="#__codelineno-0-88">88</a></span>
 <span class="normal"><a href="#__codelineno-0-89">89</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_extension_by_flow</span><span class="p">(</span>
 <a id="__codelineno-0-44" name="__codelineno-0-44"></a>    <span class="n">flow</span><span class="p">:</span> <span class="n">OpenMLFlow</span><span class="p">,</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45"></a>    <span class="n">raise_if_no_extension</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT001, FBT002</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a>    <span class="n">raise_if_no_extension</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
 <a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Extension</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get an extension which can handle the given flow.</span>
 <a id="__codelineno-0-48" name="__codelineno-0-48"></a>
@@ -2979,7 +2979,7 @@ Raises an exception if two extensions can handle a model.</p>
 <span class="normal"><a href="#__codelineno-0-136">136</a></span>
 <span class="normal"><a href="#__codelineno-0-137">137</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_extension_by_model</span><span class="p">(</span>
 <a id="__codelineno-0-93" name="__codelineno-0-93"></a>    <span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a>    <span class="n">raise_if_no_extension</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT001, FBT002</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a>    <span class="n">raise_if_no_extension</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
 <a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Extension</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get an extension which can handle the given flow.</span>
 <a id="__codelineno-0-97" name="__codelineno-0-97"></a>
@@ -3066,7 +3066,7 @@ Raises an exception if two extensions can handle a model.</p>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="typing.Type">Type</span>[<a class="autorefs autorefs-internal" title="            Extension (openml.extensions.Extension)" href="../#openml.extensions.Extension">Extension</a>]</code>
+                      <code><span title="Type">Type</span>[<a class="autorefs autorefs-internal" title="            Extension (openml.extensions.Extension)" href="../#openml.extensions.Extension">Extension</a>]</code>
                   </span>
               </p>
             </td>
