@@ -2,9 +2,10 @@
 # ruff: noqa: PLR0913
 from __future__ import annotations
 
+import json
 from functools import partial
 from itertools import chain
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from typing_extensions import Literal, overload
 
 import numpy as np
@@ -15,9 +16,7 @@ import openml
 import openml._api_calls
 import openml.utils
 from openml._api import api_context
-
-if TYPE_CHECKING:
-    from openml.evaluations import OpenMLEvaluation
+from openml.evaluations import OpenMLEvaluation
 
 
 @overload
@@ -144,7 +143,7 @@ def list_evaluations(
     return {e.run_id: e for e in flattened}
 
 
-def _list_evaluations(  # noqa: C901
+def _list_evaluations(
     limit: int,
     offset: int,
     *,
@@ -196,36 +195,48 @@ def _list_evaluations(  # noqa: C901
     -------
     list of OpenMLEvaluation objects
     """
-    api_call = f"evaluation/list/function/{function}"
-    if limit is not None:
-        api_call += f"/limit/{limit}"
-    if offset is not None:
-        api_call += f"/offset/{offset}"
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            if value is not None:
-                api_call += f"/{operator}/{value}"
-    if tasks is not None:
-        api_call += f"/task/{','.join([str(int(i)) for i in tasks])}"
-    if setups is not None:
-        api_call += f"/setup/{','.join([str(int(i)) for i in setups])}"
-    if flows is not None:
-        api_call += f"/flow/{','.join([str(int(i)) for i in flows])}"
-    if runs is not None:
-        api_call += f"/run/{','.join([str(int(i)) for i in runs])}"
-    if uploaders is not None:
-        api_call += f"/uploader/{','.join([str(int(i)) for i in uploaders])}"
-    if study is not None:
-        api_call += f"/study/{study}"
-    if sort_order is not None:
-        api_call += f"/sort_order/{sort_order}"
+    evals_dict = api_context.backend.evaluations.list(
+        limit,
+        offset,
+        function=function,
+        tasks=tasks,
+        setups=setups,
+        flows=flows,
+        runs=runs,
+        uploaders=uploaders,
+        study=study,
+        sort_order=sort_order,
+        **kwargs,
+    )
 
-    return __list_evaluations(api_call)
+    user_dict = evals_dict["users"]
+    evals = []
+    for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]:
+        run_id = int(eval_["oml:run_id"])
+        value = float(eval_["oml:value"]) if "oml:value" in eval_ else None
+        values = json.loads(eval_["oml:values"]) if eval_.get("oml:values", None) else None
+        array_data = eval_.get("oml:array_data")
 
+        evals.append(
+            OpenMLEvaluation(
+                run_id=run_id,
+                task_id=int(eval_["oml:task_id"]),
+                setup_id=int(eval_["oml:setup_id"]),
+                flow_id=int(eval_["oml:flow_id"]),
+                flow_name=eval_["oml:flow_name"],
+                data_id=int(eval_["oml:data_id"]),
+                data_name=eval_["oml:data_name"],
+                function=eval_["oml:function"],
+                upload_time=eval_["oml:upload_time"],
+                uploader=int(eval_["oml:uploader"]),
+                uploader_name=user_dict[eval_["oml:uploader"]],
+                value=value,
+                values=values,
+                array_data=array_data,
+            )
+        )
 
-def __list_evaluations(api_call: str) -> list[OpenMLEvaluation]:
-    """Helper function to parse API calls which are lists of runs"""
-    return api_context.backend.evaluations.list(api_call)
+    return evals
 
 
 def list_evaluation_measures() -> list[str]:
