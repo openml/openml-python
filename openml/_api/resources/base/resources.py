@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from openml._api.resources.base import ResourceAPI, ResourceType
 
@@ -9,7 +9,6 @@ if TYPE_CHECKING:
     from requests import Response
 
     from openml.datasets.dataset import OpenMLDataset
-    from openml.evaluations.evaluation import OpenMLEvaluation
     from openml.tasks.task import OpenMLTask
 
 
@@ -34,4 +33,13 @@ class TasksAPI(ResourceAPI):
 
 class EvaluationsAPI(ResourceAPI, ABC):
     @abstractmethod
-    def list(self, api_call: str) -> list[OpenMLEvaluation]: ...
+    def list(
+        self,
+        limit: int,
+        offset: int,
+        function: str,
+        **kwargs: Any,
+    ) -> dict: ...
+
+    @abstractmethod
+    def get_users(self, uploader_ids: list[str]) -> dict: ...
