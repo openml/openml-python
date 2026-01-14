@@ -6,7 +6,7 @@ from collections import OrderedDict
 import inspect
 import numpy as np
 import pytest
-
+from unittest.mock import patch
 import openml.testing
 from openml.extensions import Extension, get_extension_by_flow, get_extension_by_model, register_extension
 
@@ -109,43 +109,48 @@ class DummyExtension(Extension):
         return DummyModel()
 
 
-def _unregister():
-    # "Un-register" the test extensions
-    openml.extensions.extensions.clear()
-
 
 class TestInit(openml.testing.TestBase):
-    def setUp(self):
-        super().setUp()
-        _unregister()
 
     def test_get_extension_by_flow(self):
-        assert get_extension_by_flow(DummyFlow()) is None
-        with pytest.raises(ValueError, match="No extension registered which can handle flow:"):
-            get_extension_by_flow(DummyFlow(), raise_if_no_extension=True)
-        register_extension(DummyExtension1)
-        assert isinstance(get_extension_by_flow(DummyFlow()), DummyExtension1)
-        register_extension(DummyExtension2)
-        assert isinstance(get_extension_by_flow(DummyFlow()), DummyExtension1)
-        register_extension(DummyExtension1)
-        with pytest.raises(
-            ValueError, match="Multiple extensions registered which can handle flow:"
-        ):
-            get_extension_by_flow(DummyFlow())
+            # We replace the global list with a new empty list [] ONLY for this block
+            with patch("openml.extensions.extensions", []):
+                assert get_extension_by_flow(DummyFlow()) is None
+                
+                with pytest.raises(ValueError, match="No extension registered which can handle flow:"):
+                    get_extension_by_flow(DummyFlow(), raise_if_no_extension=True)
+                
+                register_extension(DummyExtension1)
+                assert isinstance(get_extension_by_flow(DummyFlow()), DummyExtension1)
+                
+                register_extension(DummyExtension2)
+                assert isinstance(get_extension_by_flow(DummyFlow()), DummyExtension1)
+                
+                register_extension(DummyExtension1)
+                with pytest.raises(
+                    ValueError, match="Multiple extensions registered which can handle flow:"
+                ):
+                    get_extension_by_flow(DummyFlow())
 
     def test_get_extension_by_model(self):
-        assert get_extension_by_model(DummyModel()) is None
-        with pytest.raises(ValueError, match="No extension registered which can handle model:"):
-            get_extension_by_model(DummyModel(), raise_if_no_extension=True)
-        register_extension(DummyExtension1)
-        assert isinstance(get_extension_by_model(DummyModel()), DummyExtension1)
-        register_extension(DummyExtension2)
-        assert isinstance(get_extension_by_model(DummyModel()), DummyExtension1)
-        register_extension(DummyExtension1)
-        with pytest.raises(
-            ValueError, match="Multiple extensions registered which can handle model:"
-        ):
-            get_extension_by_model(DummyModel())
+        # Again, we start with a fresh empty list automatically
+        with patch("openml.extensions.extensions", []):
+            assert get_extension_by_model(DummyModel()) is None
+            
+            with pytest.raises(ValueError, match="No extension registered which can handle model:"):
+                get_extension_by_model(DummyModel(), raise_if_no_extension=True)
+            
+            register_extension(DummyExtension1)
+            assert isinstance(get_extension_by_model(DummyModel()), DummyExtension1)
+            
+            register_extension(DummyExtension2)
+            assert isinstance(get_extension_by_model(DummyModel()), DummyExtension1)
+            
+            register_extension(DummyExtension1)
+            with pytest.raises(
+                ValueError, match="Multiple extensions registered which can handle model:"
+            ):
+                get_extension_by_model(DummyModel())
 
 
 def test_flow_to_model_with_defaults():
@@ -194,12 +199,11 @@ def test_invalid_flow_raises_error():
         ext.flow_to_model(flow)
 
 
+@patch("openml.extensions.extensions", [])
 def test_extension_not_found_error_message():
     """Test error message contains helpful information."""
     class UnknownModel:
         pass
-
-    _unregister()
 
     with pytest.raises(ValueError, match="No extension registered"):
         get_extension_by_model(UnknownModel(), raise_if_no_extension=True)
@@ -207,21 +211,21 @@ def test_extension_not_found_error_message():
  
 def test_register_same_extension_twice():
     """Test behavior when registering same extension twice."""
-    register_extension(DummyExtension)
-    register_extension(DummyExtension)
+    # Using a context manager here to isolate the list
+    with patch("openml.extensions.extensions", []):
+        register_extension(DummyExtension)
+        register_extension(DummyExtension)
 
-    matches = [
-        ext for ext in openml.extensions.extensions
-        if ext is DummyExtension
-    ]
+        matches = [
+            ext for ext in openml.extensions.extensions
+            if ext is DummyExtension
+        ]
+        assert len(matches) == 2
 
-    assert len(matches) == 2
 
-
+@patch("openml.extensions.extensions", [])
 def test_extension_priority_order():
-    """Test that extensions are checked in registration order."""
-    _unregister()
-
+    """Test that extensions are checked in registration order."""    
     class DummyExtensionA(DummyExtension):
         pass
     class DummyExtensionB(DummyExtension):
