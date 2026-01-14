@@ -121,7 +121,7 @@ def get_tasks(
 @openml.utils.thread_safe_if_oslo_installed
 def get_task(
     task_id: int,
-    download_splits: bool = False,  # noqa: FBT001, FBT002
+    download_splits: bool = False,  # noqa: FBT002
     **get_dataset_kwargs: Any,
 ) -> OpenMLTask:
     """Download OpenML task for a given task ID.
