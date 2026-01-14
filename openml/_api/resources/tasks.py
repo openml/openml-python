@@ -8,6 +8,7 @@ import pandas as pd
 import xmltodict
 
 import openml.utils
+from openml._api import api_context
 from openml._api.resources.base import TasksAPI
 from openml.datasets import get_dataset
 from openml.exceptions import OpenMLCacheException
@@ -107,7 +108,7 @@ class TasksV1(TasksAPI):
         except OpenMLCacheException:
             _cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
             xml_file = _cache_dir / "task.xml"
-            result = self.api_context.backend.tasks.get(task_id, return_response=True)
+            result = self._http.get(f"task/{task_id}", return_response=True)
 
             if isinstance(result, tuple):
                 task, response = result
@@ -200,75 +201,8 @@ class TasksV1(TasksAPI):
             raise NotImplementedError(f"Task type {common_kwargs['task_type']} not supported.")
         return cls(**common_kwargs)  # type: ignore
 
-    def list_tasks(  # noqa: PLR0913
-        self,
-        task_type: TaskType | None = None,
-        offset: int | None = None,
-        size: int | None = None,
-        tag: str | None = None,
-        data_tag: str | None = None,
-        status: str | None = None,
-        data_name: str | None = None,
-        data_id: int | None = None,
-        number_instances: int | None = None,
-        number_features: int | None = None,
-        number_classes: int | None = None,
-        number_missing_values: int | None = None,
-    ) -> pd.DataFrame:
-        """
-        Return a number of tasks having the given tag and task_type
 
-        Parameters
-        ----------
-        Filter task_type is separated from the other filters because
-        it is used as task_type in the task description, but it is named
-        type when used as a filter in list tasks call.
-        offset : int, optional
-            the number of tasks to skip, starting from the first
-        task_type : TaskType, optional
-            Refers to the type of task.
-        size : int, optional
-            the maximum number of tasks to show
-        tag : str, optional
-            the tag to include
-        data_tag : str, optional
-            the tag of the dataset
-        data_id : int, optional
-        status : str, optional
-        data_name : str, optional
-        number_instances : int, optional
-        number_features : int, optional
-        number_classes : int, optional
-        number_missing_values : int, optional
-
-        Returns
-        -------
-        dataframe
-            All tasks having the given task_type and the give tag. Every task is
-            represented by a row in the data frame containing the following information
-            as columns: task id, dataset id, task_type and status. If qualities are
-            calculated for the associated dataset, some of these are also returned.
-        """
-        listing_call = partial(
-            self._list_tasks,
-            task_type=task_type,
-            tag=tag,
-            data_tag=data_tag,
-            status=status,
-            data_id=data_id,
-            data_name=data_name,
-            number_instances=number_instances,
-            number_features=number_features,
-            number_classes=number_classes,
-            number_missing_values=number_missing_values,
-        )
-        batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
-        if len(batches) == 0:
-            return pd.DataFrame()
-
-        return pd.concat(batches)
-
-    def _list_tasks(
+    def list_tasks(
         self,
         limit: int,
         offset: int,
@@ -333,7 +267,8 @@ class TasksV1(TasksAPI):
         KeyError
             If an invalid key is found in the XML for a task.
         """
-        xml_string = openml._api_calls._perform_api_call(api_call, "get")
+        xml_string = self._http.get(api_call).text
+
         tasks_dict = xmltodict.parse(xml_string, force_list=("oml:task", "oml:input"))
         # Minimalistic check if the XML is useful
         if "oml:tasks" not in tasks_dict:
