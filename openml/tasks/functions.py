@@ -12,7 +12,6 @@ import xmltodict
 
 import openml._api_calls
 import openml.utils
-from openml._api import api_context
 from openml.datasets import get_dataset
 from openml.exceptions import OpenMLCacheException
 
@@ -445,7 +444,7 @@ def _get_task_description(task_id: int) -> OpenMLTask:
     except OpenMLCacheException:
         _cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
         xml_file = _cache_dir / "task.xml"
-        task_xml = openml._api_calls._perform_api_call(f"task/{task_id}", "get")
+        openml._api_calls._perform_api_call(f"task/{task_id}", "get")
 
         if isinstance(result, tuple):
             task, response = result

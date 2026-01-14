@@ -5,8 +5,8 @@ from openml._api.resources.tasks import TasksV1, TasksV2
 __all__ = [
     "DatasetsV1",
     "DatasetsV2",
-    "TasksV1",
-    "TasksV2",
     "FlowsV1",
     "FlowsV2",
+    "TasksV1",
+    "TasksV2",
 ]
