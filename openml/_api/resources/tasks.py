@@ -27,7 +27,7 @@ class TasksV1(TasksAPI):
     def get(
         self,
         task_id: int,
-        download_splits: bool = False,  # noqa: FBT001, FBT002
+        download_splits: bool = False,  # noqa: FBT002
         **get_dataset_kwargs: Any,
     ) -> OpenMLTask:
         """Download OpenML task for a given task ID.
@@ -160,7 +160,6 @@ class TasksV1(TasksAPI):
         if cls is None:
             raise NotImplementedError(f"Task type {common_kwargs['task_type']} not supported.")
         return cls(**common_kwargs)  # type: ignore
-
 
     def list_tasks(
         self,
@@ -504,7 +503,7 @@ class TasksV2(TasksAPI):
     def get(
         self,
         task_id: int,
-        download_splits: bool = False,  # noqa: FBT001, FBT002
+        download_splits: bool = False,  # noqa: FBT002
         **get_dataset_kwargs: Any,
     ) -> OpenMLTask:
         if not isinstance(task_id, int):

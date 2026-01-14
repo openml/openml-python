@@ -89,6 +89,7 @@ def list_tasks(  # noqa: PLR0913
 
     return pd.concat(batches)
 
+
 def get_tasks(
     task_ids: list[int],
     download_data: bool | None = None,
