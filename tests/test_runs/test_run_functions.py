@@ -1567,6 +1567,7 @@ class TestRun(TestBase):
         assert len(runs) == 2
 
     @pytest.mark.production()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_runs_list_by_tag(self):
         # We don't have tagged runs on the test server
         self.use_production_server()

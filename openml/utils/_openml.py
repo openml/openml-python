@@ -4,10 +4,11 @@ from __future__ import annotations
 import contextlib
 import shutil
 import warnings
+from collections.abc import Callable, Mapping, Sized
 from functools import wraps
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Mapping, Sized, TypeVar, overload
-from typing_extensions import Literal, ParamSpec
+from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
+from typing_extensions import ParamSpec
 
 import numpy as np
 import xmltodict
@@ -102,7 +103,7 @@ def _get_rest_api_type_alias(oml_object: OpenMLBase) -> str:
     return api_type_alias
 
 
-def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool = False) -> None:  # noqa: FBT001, FBT002
+def _tag_openml_base(oml_object: OpenMLBase, tag: str, untag: bool = False) -> None:  # noqa: FBT002
     api_type_alias = _get_rest_api_type_alias(oml_object)
     if oml_object.id is None:
         raise openml.exceptions.ObjectNotPublishedError(
@@ -197,7 +198,7 @@ def _delete_entity(entity_type: str, entity_id: int) -> bool:
     if entity_type not in legal_entities:
         raise ValueError(f"Can't delete a {entity_type}")
 
-    url_suffix = "%s/%d" % (entity_type, entity_id)
+    url_suffix = f"{entity_type}/{entity_id}"
     try:
         result_xml = openml._api_calls._perform_api_call(url_suffix, "delete")
         result = xmltodict.parse(result_xml)
@@ -343,7 +344,7 @@ def _create_cache_directory(key: str) -> Path:
     return cache_dir
 
 
-def _get_cache_dir_for_id(key: str, id_: int, create: bool = False) -> Path:  # noqa: FBT001, FBT002
+def _get_cache_dir_for_id(key: str, id_: int, create: bool = False) -> Path:  # noqa: FBT002
     cache_dir = _create_cache_directory(key) if create else _get_cache_dir_for_key(key)
     return Path(cache_dir) / str(id_)
 

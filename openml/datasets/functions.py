@@ -9,8 +9,7 @@ from collections import OrderedDict
 from functools import partial
 from pathlib import Path
 from pyexpat import ExpatError
-from typing import TYPE_CHECKING, Any
-from typing_extensions import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import arff
 import minio.error
@@ -259,7 +258,7 @@ def _validated_data_attributes(
 
 def check_datasets_active(
     dataset_ids: list[int],
-    raise_error_if_not_exist: bool = True,  # noqa: FBT001, FBT002
+    raise_error_if_not_exist: bool = True,  # noqa: FBT002
 ) -> dict[int, bool]:
     """
     Check if the dataset ids provided are active.
@@ -293,7 +292,7 @@ def check_datasets_active(
 def _name_to_id(
     dataset_name: str,
     version: int | None = None,
-    error_if_multiple: bool = False,  # noqa: FBT001, FBT002
+    error_if_multiple: bool = False,  # noqa: FBT002
 ) -> int:
     """Attempt to find the dataset id of the dataset with the given name.
 
@@ -341,8 +340,8 @@ def _name_to_id(
 
 def get_datasets(
     dataset_ids: list[str | int],
-    download_data: bool = False,  # noqa: FBT001, FBT002
-    download_qualities: bool = False,  # noqa: FBT001, FBT002
+    download_data: bool = False,  # noqa: FBT002
+    download_qualities: bool = False,  # noqa: FBT002
 ) -> list[OpenMLDataset]:
     """Download datasets.
 
@@ -377,14 +376,14 @@ def get_datasets(
 @openml.utils.thread_safe_if_oslo_installed
 def get_dataset(  # noqa: C901, PLR0912
     dataset_id: int | str,
-    download_data: bool = False,  # noqa: FBT002, FBT001
+    download_data: bool = False,  # noqa: FBT002
     version: int | None = None,
-    error_if_multiple: bool = False,  # noqa: FBT002, FBT001
+    error_if_multiple: bool = False,  # noqa: FBT002
     cache_format: Literal["pickle", "feather"] = "pickle",
-    download_qualities: bool = False,  # noqa: FBT002, FBT001
-    download_features_meta_data: bool = False,  # noqa: FBT002, FBT001
-    download_all_files: bool = False,  # noqa: FBT002, FBT001
-    force_refresh_cache: bool = False,  # noqa: FBT001, FBT002
+    download_qualities: bool = False,  # noqa: FBT002
+    download_features_meta_data: bool = False,  # noqa: FBT002
+    download_all_files: bool = False,  # noqa: FBT002
+    force_refresh_cache: bool = False,  # noqa: FBT002
 ) -> OpenMLDataset:
     """Download the OpenML dataset representation, optionally also download actual data file.
 
@@ -1116,7 +1115,7 @@ def _get_dataset_description(did_cache_dir: Path, dataset_id: int) -> dict[str, 
 def _get_dataset_parquet(
     description: dict | OpenMLDataset,
     cache_directory: Path | None = None,
-    download_all_files: bool = False,  # noqa: FBT001, FBT002
+    download_all_files: bool = False,  # noqa: FBT002
 ) -> Path | None:
     """Return the path to the local parquet file of the dataset. If is not cached, it is downloaded.
 
@@ -1418,7 +1417,7 @@ def _get_online_dataset_arff(dataset_id: int) -> str | None:
     str or None
         A string representation of an ARFF file. Or None if file already exists.
     """
-    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id, "get")
+    dataset_xml = openml._api_calls._perform_api_call(f"data/{dataset_id}", "get")
     # build a dict from the xml.
     # use the url from the dataset description and return the ARFF string
     return openml._api_calls._download_text_file(
@@ -1439,7 +1438,7 @@ def _get_online_dataset_format(dataset_id: int) -> str:
     str
         Dataset format.
     """
-    dataset_xml = openml._api_calls._perform_api_call("data/%d" % dataset_id, "get")
+    dataset_xml = openml._api_calls._perform_api_call(f"data/{dataset_id}", "get")
     # build a dict from the xml and get the format from the dataset description
     return xmltodict.parse(dataset_xml)["oml:data_set_description"]["oml:format"].lower()  # type: ignore
 
