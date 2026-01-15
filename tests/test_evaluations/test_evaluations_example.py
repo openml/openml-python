@@ -17,7 +17,6 @@ class TestEvaluationsExample(unittest.TestCase):
         ):
             import matplotlib.pyplot as plt
             import numpy as np
-            import openml
 
             df = openml.evaluations.list_evaluations_setups(
                 "predictive_accuracy",
