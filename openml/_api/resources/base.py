@@ -27,7 +27,7 @@ class TasksAPI(ResourceAPI, ABC):
     def get(
         self,
         task_id: int,
-        download_splits: bool = False,  # noqa: FBT001, FBT002
+        download_splits: bool = False,  # noqa: FBT002
         **get_dataset_kwargs: Any,
     ) -> OpenMLTask:
         """
