@@ -98,7 +98,7 @@ print(f"knn_flow was published with the ID {knn_flow.flow_id}")
 # Format the predictions for OpenML
 predictions = []
 for test_index, y_true_i, y_pred_i, y_pred_proba_i in zip(
-    test_indices, y_test, y_pred, y_pred_proba
+    test_indices, y_test, y_pred, y_pred_proba, strict=False
 ):
     predictions.append(
         openml.runs.functions.format_prediction(
@@ -108,7 +108,7 @@ for test_index, y_true_i, y_pred_i, y_pred_proba_i in zip(
             index=test_index,
             prediction=y_pred_i,
             truth=y_true_i,
-            proba=dict(zip(task.class_labels, y_pred_proba_i)),
+            proba=dict(zip(task.class_labels, y_pred_proba_i, strict=False)),
         )
     )
 
