@@ -533,7 +533,12 @@ def _create_task_from_xml(xml: str) -> OpenMLTask:
         TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
     }.get(task_type)
     if cls is None:
-        raise NotImplementedError(f"Task type {common_kwargs['task_type']} not supported.")
+        raise NotImplementedError(
+            f"Task type '{common_kwargs['task_type']}' is not supported. "
+            f"Supported task types: SUPERVISED_CLASSIFICATION,"
+            f"SUPERVISED_REGRESSION, CLUSTERING, LEARNING_CURVE."
+            f"Please check the OpenML documentation for available task types."
+        )
     return cls(**common_kwargs)  # type: ignore
 
 
@@ -589,7 +594,13 @@ def create_task(
     elif task_type == TaskType.SUPERVISED_REGRESSION:
         task_cls = OpenMLRegressionTask  # type: ignore
     else:
-        raise NotImplementedError(f"Task type {task_type:d} not supported.")
+        raise NotImplementedError(
+            f"Task type ID {task_type:d} is not supported. "
+            f"Supported task type IDs: {TaskType.SUPERVISED_CLASSIFICATION.value},"
+            f"{TaskType.SUPERVISED_REGRESSION.value}, "
+            f"{TaskType.CLUSTERING.value}, {TaskType.LEARNING_CURVE.value}. "
+            f"Please refer to the TaskType enum for valid task type identifiers."
+        )
 
     return task_cls(
         task_type_id=task_type,
