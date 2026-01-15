@@ -44,7 +44,7 @@ from .trace import OpenMLRunTrace
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
-    from openml.config import _Config
+    from openml._config import _Config
     from openml.extensions.extension_interface import Extension
 
 # get_dict is in run.py to avoid circular imports
