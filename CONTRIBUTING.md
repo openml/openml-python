@@ -83,6 +83,28 @@ pytest tests
 ```
 For Windows systems, you may need to add `pytest` to PATH before executing the command.
 
+#### Local Test Server (Recommended)
+
+To avoid flaky tests and race conditions with the remote test server, we provide a local Docker-based test infrastructure:
+
+```bash
+# Start local test server
+./docker/test-server.sh start
+
+# Run tests with local server (no remote dependencies!)
+pytest --local-server
+
+# Run only server tests
+pytest --local-server -m uses_test_server
+
+# Stop local server when done
+./docker/test-server.sh stop
+```
+
+See [docs/local_test_server.md](docs/local_test_server.md) for detailed documentation on the local test infrastructure.
+
+#### Testing Specific Modules
+
 Executing a specific unit test can be done by specifying the module, test case, and test.
 You may then run a specific module, test case, or unit test respectively:
 ```bash
@@ -95,6 +117,7 @@ To test your new contribution, add [unit tests](https://github.com/openml/openml
 * If a unit test contains an upload to the test server, please ensure that it is followed by a file collection for deletion, to prevent the test server from bulking up. For example, `TestBase._mark_entity_for_removal('data', dataset.dataset_id)`, `TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))`.
 * Please ensure that the example is run on the test server by beginning with the call to `openml.config.start_using_configuration_for_example()`, which is done by default for tests derived from `TestBase`.
 * Add the `@pytest.mark.sklearn` marker to your unit tests if they have a dependency on scikit-learn.
+* For tests that interact with the server, add the `@pytest.mark.uses_test_server()` marker and preferably run with `--local-server` flag.
 
 ### Pull Request Checklist
 

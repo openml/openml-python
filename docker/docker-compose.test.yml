@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # MySQL database for local testing
+  test-database:
+    image: mysql:8.0
+    container_name: openml-test-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ok
+      MYSQL_DATABASE: openml_test
+      MYSQL_USER: openml
+      MYSQL_PASSWORD: openml
+    ports:
+      - "3307:3306"
+    volumes:
+      - test-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "openml", "-popenml"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - openml-test-network
+
+  # PHP API v1 (OpenML test server)
+  php-api-v1:
+    image: openml/php-api:latest
+    container_name: openml-php-api
+    depends_on:
+      test-database:
+        condition: service_healthy
+    environment:
+      DB_HOST: test-database
+      DB_NAME: openml_test
+      DB_USER: openml
+      DB_PASSWORD: openml
+      OPENML_BASE_URL: http://localhost:8080
+    ports:
+      - "8080:80"
+    networks:
+      - openml-test-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/v1/json/data/list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Python API v2 (future migration target)
+  python-api-v2:
+    image: openml/python-api:latest
+    container_name: openml-python-api
+    depends_on:
+      test-database:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: mysql://openml:openml@test-database:3306/openml_test
+      API_HOST: 0.0.0.0
+      API_PORT: 8000
+    ports:
+      - "8000:8000"
+    networks:
+      - openml-test-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+networks:
+  openml-test-network:
+    driver: bridge
+
+volumes:
+  test-db-data:

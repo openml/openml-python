@@ -40,6 +40,9 @@ from openml.testing import TestBase
 
 import inspect
 
+# Import pytest plugin for local test server configuration
+pytest_plugins = ["tests.pytest_openml_server"]
+
 # creating logger for unit test file deletion status
 logger = logging.getLogger("unit_tests")
 logger.setLevel(logging.DEBUG)
