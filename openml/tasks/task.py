@@ -6,7 +6,7 @@ from abc import ABC
 from collections.abc import Sequence
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Sequence
+from typing import TYPE_CHECKING, Any, ClassVar
 from typing_extensions import TypedDict
 
 import openml._api_calls
