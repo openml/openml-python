@@ -10,11 +10,12 @@ import os
 import platform
 import shutil
 import warnings
+from collections.abc import Iterator
 from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
-from typing import Any, Iterator, cast
-from typing_extensions import Literal, TypedDict
+from typing import Any, Literal, cast
+from typing_extensions import TypedDict
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
@@ -37,7 +38,7 @@ class _Config(TypedDict):
     show_progress: bool
 
 
-def _create_log_handlers(create_file_handler: bool = True) -> None:  # noqa: FBT001, FBT002
+def _create_log_handlers(create_file_handler: bool = True) -> None:  # noqa: FBT002
     """Creates but does not attach the log handlers."""
     global console_handler, file_handler  # noqa: PLW0603
     if console_handler is not None or file_handler is not None:
@@ -172,7 +173,7 @@ def get_server_base_url() -> str:
     -------
     str
     """
-    domain, path = server.split("/api", maxsplit=1)
+    domain, _path = server.split("/api", maxsplit=1)
     return domain.replace("api", "www")
 
 
@@ -257,8 +258,8 @@ class ConfigurationForExamples:
         global server  # noqa: PLW0603
         global apikey  # noqa: PLW0603
 
-        server = cast(str, cls._last_used_server)
-        apikey = cast(str, cls._last_used_key)
+        server = cast("str", cls._last_used_server)
+        apikey = cast("str", cls._last_used_key)
         cls._start_last_called = False
 
 
@@ -515,10 +516,10 @@ def overwrite_config_context(config: dict[str, Any]) -> Iterator[_Config]:
 
 __all__ = [
     "get_cache_directory",
+    "get_config_as_dict",
     "set_root_cache_directory",
     "start_using_configuration_for_example",
     "stop_using_configuration_for_example",
-    "get_config_as_dict",
 ]
 
 _setup()
