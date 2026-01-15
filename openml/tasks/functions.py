@@ -20,8 +20,6 @@ if TYPE_CHECKING:
     )
 
 
-# v2: /tasktype/{task_type_id}
-# v1: /estimationprocedure/list
 def list_tasks(  # noqa: PLR0913
     task_type: TaskType | None = None,
     offset: int | None = None,

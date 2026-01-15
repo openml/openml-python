@@ -150,7 +150,7 @@ class OpenMLTask(OpenMLBase):
 
         Accepts the same keyword arguments as the `openml.datasets.get_dataset`.
         """
-        return datasets.get_dataset(self.dataset_id, **kwargs)
+        return datasets.get_dataset(self.dataset_id, **kwargs) # Shrivaths
 
     def get_train_test_split_indices(
         self,
