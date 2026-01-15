@@ -62,9 +62,9 @@ def run_model_on_task(  # noqa: PLR0913
     avoid_duplicate_runs: bool | None = None,
     flow_tags: list[str] | None = None,
     seed: int | None = None,
-    add_local_measures: bool = True,  # noqa: FBT001, FBT002
-    upload_flow: bool = False,  # noqa: FBT001, FBT002
-    return_flow: bool = False,  # noqa: FBT001, FBT002
+    add_local_measures: bool = True,  # noqa: FBT002
+    upload_flow: bool = False,  # noqa: FBT002
+    return_flow: bool = False,  # noqa: FBT002
     n_jobs: int | None = None,
 ) -> OpenMLRun | tuple[OpenMLRun, OpenMLFlow]:
     """Run the model on the dataset defined by the task.
@@ -181,8 +181,8 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
     avoid_duplicate_runs: bool | None = None,
     flow_tags: list[str] | None = None,
     seed: int | None = None,
-    add_local_measures: bool = True,  # noqa: FBT001, FBT002
-    upload_flow: bool = False,  # noqa: FBT001, FBT002
+    add_local_measures: bool = True,  # noqa: FBT002
+    upload_flow: bool = False,  # noqa: FBT002
     n_jobs: int | None = None,
 ) -> OpenMLRun:
     """Run the model provided by the flow on the dataset defined by task.
@@ -353,7 +353,7 @@ def get_run_trace(run_id: int) -> OpenMLRunTrace:
     -------
     openml.runs.OpenMLTrace
     """
-    trace_xml = openml._api_calls._perform_api_call("run/trace/%d" % run_id, "get")
+    trace_xml = openml._api_calls._perform_api_call(f"run/trace/{run_id}", "get")
     return OpenMLRunTrace.trace_from_xml(trace_xml)
 
 
@@ -608,7 +608,7 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
                         index=tst_idx,
                         prediction=prediction,
                         truth=truth,
-                        proba=dict(zip(task.class_labels, pred_prob)),
+                        proba=dict(zip(task.class_labels, pred_prob, strict=False)),
                     )
                 else:
                     raise ValueError("The task has no class labels")
@@ -755,7 +755,12 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
         test_x = None
         test_y = None
     else:
-        raise NotImplementedError(task.task_type)
+        raise NotImplementedError(
+            f"Task type '{task.task_type}' is not supported. "
+            f"Only OpenMLSupervisedTask and OpenMLClusteringTask are currently implemented. "
+            f"Task details: task_id={getattr(task, 'task_id', 'unknown')}, "
+            f"task_class={task.__class__.__name__}"
+        )
 
     config.logger.info(
         f"Going to run model {model!s} on "
@@ -798,7 +803,7 @@ def get_runs(run_ids: list[int]) -> list[OpenMLRun]:
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT002, FBT001
+def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT002
     """Gets run corresponding to run_id.
 
     Parameters
@@ -828,14 +833,14 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
         raise OpenMLCacheException(message="dummy")
 
     except OpenMLCacheException:
-        run_xml = openml._api_calls._perform_api_call("run/%d" % run_id, "get")
+        run_xml = openml._api_calls._perform_api_call(f"run/{run_id}", "get")
         with run_file.open("w", encoding="utf8") as fh:
             fh.write(run_xml)
 
     return _create_run_from_xml(run_xml)
 
 
-def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT001, FBT002
+def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT002
     """Create a run object from xml returned from server.
 
     Parameters
@@ -977,18 +982,24 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
                     evaluations[key] = value
 
     if "description" not in files and from_server is True:
-        raise ValueError("No description file for run %d in run description XML" % run_id)
+        raise ValueError(f"No description file for run {run_id} in run description XML")
 
     if "predictions" not in files and from_server is True:
         task = openml.tasks.get_task(task_id)
         if task.task_type_id == TaskType.SUBGROUP_DISCOVERY:
-            raise NotImplementedError("Subgroup discovery tasks are not yet supported.")
+            raise NotImplementedError(
+                f"Subgroup discovery tasks are not yet supported. "
+                f"Task ID: {task_id}. Please check the OpenML documentation"
+                f"for supported task types. "
+                f"Currently supported task types: Classification, Regression,"
+                f"Clustering, and Learning Curve."
+            )
 
         # JvR: actually, I am not sure whether this error should be raised.
         # a run can consist without predictions. But for now let's keep it
         # Matthias: yes, it should stay as long as we do not really handle
         # this stuff
-        raise ValueError("No prediction files for run %d in run description XML" % run_id)
+        raise ValueError(f"No prediction files for run {run_id} in run description XML")
 
     tags = openml.utils.extract_xml_tags("oml:tag", run)
 
@@ -1037,7 +1048,7 @@ def list_runs(  # noqa: PLR0913
     uploader: list | None = None,
     tag: str | None = None,
     study: int | None = None,
-    display_errors: bool = False,  # noqa: FBT001, FBT002
+    display_errors: bool = False,  # noqa: FBT002
     task_type: TaskType | int | None = None,
 ) -> pd.DataFrame:
     """
@@ -1171,7 +1182,7 @@ def _list_runs(  # noqa: PLR0913, C901
     if uploader is not None:
         api_call += f"/uploader/{','.join([str(int(i)) for i in uploader])}"
     if study is not None:
-        api_call += "/study/%d" % study
+        api_call += f"/study/{study}"
     if display_errors:
         api_call += "/show_errors/true"
     if tag is not None:
@@ -1282,7 +1293,12 @@ def format_prediction(  # noqa: PLR0913
     if isinstance(task, OpenMLRegressionTask):
         return [repeat, fold, index, prediction, truth]
 
-    raise NotImplementedError(f"Formatting for {type(task)} is not supported.")
+    raise NotImplementedError(
+        f"Formatting for {type(task)} is not supported."
+        f"Supported task types: OpenMLClassificationTask, OpenMLRegressionTask,"
+        f"and OpenMLLearningCurveTask. "
+        f"Please ensure your task is one of these types."
+    )
 
 
 def delete_run(run_id: int) -> bool:

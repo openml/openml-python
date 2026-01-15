@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import warnings
 from abc import ABC
+from collections.abc import Sequence
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Sequence
@@ -307,7 +308,12 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
             TaskType.SUPERVISED_REGRESSION,
             TaskType.LEARNING_CURVE,
         ):
-            raise NotImplementedError(self.task_type)
+            raise NotImplementedError(
+                f"Task type '{self.task_type}' is not implemented for get_X_and_y(). "
+                f"Supported types: SUPERVISED_CLASSIFICATION, SUPERVISED_REGRESSION,"
+                f"LEARNING_CURVE."
+                f"Task ID: {getattr(self, 'task_id', 'unknown')}. "
+            )
 
         X, y, _, _ = dataset.get_data(target=self.target_name)
         return X, y
@@ -400,7 +406,7 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
         self.class_labels = class_labels
         self.cost_matrix = cost_matrix
         if cost_matrix is not None:
-            raise NotImplementedError("Costmatrix")
+            raise NotImplementedError("Costmatrix functionality is not yet implemented.")
 
 
 class OpenMLRegressionTask(OpenMLSupervisedTask):
