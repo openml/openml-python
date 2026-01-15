@@ -531,7 +531,7 @@ def list_studies(
     return pd.concat(batches)
 
 
-def _list_studies(
+def _list_studies(  # noqa: PLR0913
     limit: int,
     offset: int,
     *,
@@ -548,45 +548,6 @@ def _list_studies(
         The maximum number of studies to return.
     offset: int
         The number of studies to skip, starting from the first.
-    kwargs : dict, optional
-        Legal filter operators (keys in the dict):
-        status, main_entity_type, uploader, benchmark_suite
-
-    Returns
-    -------
-    studies : dataframe
-    """
-    return __list_studies(
-        limit=limit,
-        offset=offset,
-        status=status,
-        main_entity_type=main_entity_type,
-        uploader=uploader,
-        benchmark_suite=benchmark_suite,
-    )
-
-
-def __list_studies(
-    limit: int | None,
-    offset: int | None,
-    *,
-    status: str | None = None,
-    main_entity_type: str | None = None,
-    uploader: list[int] | None = None,
-    benchmark_suite: int | None = None,
-) -> pd.DataFrame:
-    """Retrieves the list of OpenML studies and
-    returns it in a dictionary or a Pandas DataFrame.
-
-    This function constructs the API call from parameters, making it
-    ready for both V1 (URL-based) and future V2 (JSON-based) APIs.
-
-    Parameters
-    ----------
-    limit : int, optional
-        The maximum number of studies to return.
-    offset : int, optional
-        The number of studies to skip, starting from the first.
     status : str, optional
         Filter by status (active, in_preparation, deactivated, all)
     main_entity_type : str, optional
@@ -598,10 +559,9 @@ def __list_studies(
 
     Returns
     -------
-    pd.DataFrame
-        A Pandas DataFrame of OpenML studies
+    studies : dataframe
     """
-    xml_string = api_context.backend.studies.list(
+    return api_context.backend.studies.list(
         limit=limit,
         offset=offset,
         status=status,
@@ -609,35 +569,3 @@ def __list_studies(
         uploader=uploader,
         benchmark_suite=benchmark_suite,
     )
-    study_dict = xmltodict.parse(xml_string, force_list=("oml:study",))
-
-    # Minimalistic check if the XML is useful
-    assert isinstance(study_dict["oml:study_list"]["oml:study"], list), type(
-        study_dict["oml:study_list"],
-    )
-    assert study_dict["oml:study_list"]["@xmlns:oml"] == "http://openml.org/openml", study_dict[
-        "oml:study_list"
-    ]["@xmlns:oml"]
-
-    studies = {}
-    for study_ in study_dict["oml:study_list"]["oml:study"]:
-        # maps from xml name to a tuple of (dict name, casting fn)
-        expected_fields = {
-            "oml:id": ("id", int),
-            "oml:alias": ("alias", str),
-            "oml:main_entity_type": ("main_entity_type", str),
-            "oml:benchmark_suite": ("benchmark_suite", int),
-            "oml:name": ("name", str),
-            "oml:status": ("status", str),
-            "oml:creation_date": ("creation_date", str),
-            "oml:creator": ("creator", int),
-        }
-        study_id = int(study_["oml:id"])
-        current_study = {}
-        for oml_field_name, (real_field_name, cast_fn) in expected_fields.items():
-            if oml_field_name in study_:
-                current_study[real_field_name] = cast_fn(study_[oml_field_name])
-        current_study["id"] = int(current_study["id"])
-        studies[study_id] = current_study
-
-    return pd.DataFrame.from_dict(studies, orient="index")

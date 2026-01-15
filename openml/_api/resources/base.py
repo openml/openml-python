@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    import pandas as pd
     from requests import Response
 
     from openml._api.http import HTTPClient
@@ -41,4 +42,4 @@ class StudiesAPI(ResourceAPI, ABC):
         main_entity_type: str | None = None,
         uploader: list[int] | None = None,
         benchmark_suite: int | None = None,
-    ) -> Any: ...
+    ) -> pd.DataFrame: ...
