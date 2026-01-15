@@ -1,5 +1,4 @@
 # License: BSD 3-Clause
-# ruff: noqa: PLR0913
 from __future__ import annotations
 
 import warnings
@@ -423,7 +422,7 @@ def detach_from_study(study_id: int, run_ids: list[int]) -> int:
         new size of the study (in terms of explicitly linked entities)
     """
     # Interestingly, there's no need to tell the server about the entity type, it knows by itself
-    uri = "study/%d/detach" % study_id
+    uri = f"study/{study_id}/detach"
     post_variables = {"ids": ",".join(str(x) for x in run_ids)}  # type: openml._api_calls.DATA_TYPE
     result_xml = openml._api_calls._perform_api_call(
         call=uri,
