@@ -116,7 +116,7 @@ __all__ = [
     "OpenMLTask",
     "__version__",
     "_api_calls",
-    "_config",
+    "config",
     "datasets",
     "evaluations",
     "exceptions",
