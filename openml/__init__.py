@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING
 
 from . import (
     _api_calls,
-    config as _config_module,
+    _config as _config_module,
     datasets,
     evaluations,
     exceptions,
@@ -52,7 +52,7 @@ from .tasks import (
 )
 
 if TYPE_CHECKING:
-    from .config import OpenMLConfigManager
+    from ._config import OpenMLConfigManager
 
 config: OpenMLConfigManager = _config_module._config
 
@@ -116,7 +116,7 @@ __all__ = [
     "OpenMLTask",
     "__version__",
     "_api_calls",
-    "config",
+    "_config",
     "datasets",
     "evaluations",
     "exceptions",

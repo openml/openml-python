@@ -334,8 +334,6 @@ class OpenMLConfigManager:
             connection_n_retries=int(config["connection_n_retries"]),
         )
 
-        self.set_retry_policy(config["retry_policy"], self._config.connection_n_retries)
-
         user_defined_cache_dir = os.environ.get(self.OPENML_CACHE_DIR_ENV_VAR)
         if user_defined_cache_dir is not None:
             short_cache_dir = Path(user_defined_cache_dir)

@@ -6,10 +6,9 @@ import argparse
 import string
 import sys
 from collections.abc import Callable
+from dataclasses import fields
 from pathlib import Path
 from urllib.parse import urlparse
-
-from attr import fields
 
 from openml import config
 
