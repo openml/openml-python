@@ -4,12 +4,11 @@ from __future__ import annotations
 import pickle
 import time
 from collections import OrderedDict
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Sequence,
 )
 
 import arff
@@ -280,7 +279,7 @@ class OpenMLRun(OpenMLBase):
         ]
 
     @classmethod
-    def from_filesystem(cls, directory: str | Path, expect_model: bool = True) -> OpenMLRun:  # noqa: FBT001, FBT002
+    def from_filesystem(cls, directory: str | Path, expect_model: bool = True) -> OpenMLRun:  # noqa: FBT002
         """
         The inverse of the to_filesystem method. Instantiates an OpenMLRun
         object based on files stored on the file system.
@@ -347,7 +346,7 @@ class OpenMLRun(OpenMLBase):
     def to_filesystem(
         self,
         directory: str | Path,
-        store_model: bool = True,  # noqa: FBT001, FBT002
+        store_model: bool = True,  # noqa: FBT002
     ) -> None:
         """
         The inverse of the from_filesystem method. Serializes a run
@@ -365,7 +364,7 @@ class OpenMLRun(OpenMLBase):
             model.
         """
         if self.data_content is None or self.model is None:
-            raise ValueError("Run should have been executed (and contain " "model / predictions)")
+            raise ValueError("Run should have been executed (and contain model / predictions)")
         directory = Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
@@ -498,7 +497,7 @@ class OpenMLRun(OpenMLBase):
             # TODO: make this a stream reader
         else:
             raise ValueError(
-                "Run should have been locally executed or " "contain outputfile reference.",
+                "Run should have been locally executed or contain outputfile reference.",
             )
 
         # Need to know more about the task to compute scores correctly
@@ -509,11 +508,11 @@ class OpenMLRun(OpenMLBase):
             task.task_type_id in [TaskType.SUPERVISED_CLASSIFICATION, TaskType.LEARNING_CURVE]
             and "correct" not in attribute_names
         ):
-            raise ValueError('Attribute "correct" should be set for ' "classification task runs")
+            raise ValueError('Attribute "correct" should be set for classification task runs')
         if task.task_type_id == TaskType.SUPERVISED_REGRESSION and "truth" not in attribute_names:
-            raise ValueError('Attribute "truth" should be set for ' "regression task runs")
+            raise ValueError('Attribute "truth" should be set for regression task runs')
         if task.task_type_id != TaskType.CLUSTERING and "prediction" not in attribute_names:
-            raise ValueError('Attribute "predict" should be set for ' "supervised task runs")
+            raise ValueError('Attribute "prediction" should be set for supervised task runs')
 
         def _attribute_list_to_dict(attribute_list):  # type: ignore
             # convenience function: Creates a mapping to map from the name of
@@ -547,7 +546,7 @@ class OpenMLRun(OpenMLBase):
             pred = predictions_arff["attributes"][predicted_idx][1]
             corr = predictions_arff["attributes"][correct_idx][1]
             raise ValueError(
-                "Predicted and Correct do not have equal values:" f" {pred!s} Vs. {corr!s}",
+                f"Predicted and Correct do not have equal values: {pred!s} Vs. {corr!s}",
             )
 
         # TODO: these could be cached
@@ -583,7 +582,7 @@ class OpenMLRun(OpenMLBase):
             values_correct[rep][fold][samp].append(correct)
 
         scores = []
-        for rep in values_predict:
+        for rep in values_predict:  # noqa: PLC0206
             for fold in values_predict[rep]:
                 last_sample = len(values_predict[rep][fold]) - 1
                 y_pred = values_predict[rep][fold][last_sample]
