@@ -3,15 +3,16 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-from typing import Any, Callable, Dict
+from collections.abc import Callable
+from typing import Any
 
 from .datasets import get_dataset, list_datasets
 from .flows import get_flow, list_flows
 from .runs import get_run, list_runs
 from .tasks import get_task, list_tasks
 
-ListDispatcher = Dict[str, Callable[..., Any]]
-GetDispatcher = Dict[str, Callable[..., Any]]
+ListDispatcher = dict[str, Callable[..., Any]]
+GetDispatcher = dict[str, Callable[..., Any]]
 
 _LIST_DISPATCH: ListDispatcher = {
     "dataset": list_datasets,
