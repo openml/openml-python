@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
+from collections.abc import Hashable, Sequence
 from pathlib import Path
-from typing import Any, Hashable, Sequence, cast
+from typing import Any, cast
 
 import xmltodict
 
@@ -169,7 +170,7 @@ class OpenMLFlow(OpenMLBase):
         """The extension of the flow (e.g., sklearn)."""
         if self._extension is None:
             self._extension = cast(
-                Extension, get_extension_by_flow(self, raise_if_no_extension=True)
+                "Extension", get_extension_by_flow(self, raise_if_no_extension=True)
             )
 
         return self._extension
@@ -408,7 +409,7 @@ class OpenMLFlow(OpenMLBase):
         """Parse the id from the xml_response and assign it to self."""
         self.flow_id = int(xml_response["oml:upload_flow"]["oml:id"])
 
-    def publish(self, raise_error_if_exists: bool = False) -> OpenMLFlow:  # noqa: FBT001, FBT002
+    def publish(self, raise_error_if_exists: bool = False) -> OpenMLFlow:  # noqa: FBT002
         """Publish this flow to OpenML server.
 
         Raises a PyOpenMLError if the flow exists on the server, but
@@ -435,7 +436,7 @@ class OpenMLFlow(OpenMLBase):
         if not flow_id:
             if self.flow_id:
                 raise openml.exceptions.PyOpenMLError(
-                    "Flow does not exist on the server, " "but 'flow.flow_id' is not None.",
+                    "Flow does not exist on the server, but 'flow.flow_id' is not None.",
                 )
             super().publish()
             assert self.flow_id is not None  # for mypy
@@ -445,7 +446,7 @@ class OpenMLFlow(OpenMLBase):
             raise openml.exceptions.PyOpenMLError(error_message)
         elif self.flow_id is not None and self.flow_id != flow_id:
             raise openml.exceptions.PyOpenMLError(
-                "Local flow_id does not match server flow_id: " f"'{self.flow_id}' vs '{flow_id}'",
+                f"Local flow_id does not match server flow_id: '{self.flow_id}' vs '{flow_id}'",
             )
 
         flow = openml.flows.functions.get_flow(flow_id)
@@ -517,7 +518,7 @@ class OpenMLFlow(OpenMLBase):
         sub_identifier = structure[0]
         if sub_identifier not in self.components:
             raise ValueError(
-                f"Flow {self.name} does not contain component with " f"identifier {sub_identifier}",
+                f"Flow {self.name} does not contain component with identifier {sub_identifier}",
             )
         if len(structure) == 1:
             return self.components[sub_identifier]  # type: ignore
