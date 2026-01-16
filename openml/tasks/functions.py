@@ -5,18 +5,22 @@ from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
+from yaml import warnings
 
 import openml.utils
 from openml._api import api_context
 
+from .task import (
+    OpenMLClassificationTask,
+    OpenMLClusteringTask,
+    OpenMLLearningCurveTask,
+    OpenMLRegressionTask,
+    TaskType,
+)
+
 if TYPE_CHECKING:
     from .task import (
-        OpenMLClassificationTask,
-        OpenMLClusteringTask,
-        OpenMLLearningCurveTask,
-        OpenMLRegressionTask,
         OpenMLTask,
-        TaskType,
     )
 
 
@@ -69,7 +73,7 @@ def list_tasks(  # noqa: PLR0913
         calculated for the associated dataset, some of these are also returned.
     """
     listing_call = partial(
-        api_context.backend.tasks.list_tasks,
+        api_context.backend.tasks.list,
         task_type=task_type,
         tag=tag,
         data_tag=data_tag,
@@ -95,7 +99,7 @@ def get_tasks(
 ) -> list[OpenMLTask]:
     """Download tasks.
 
-    This function iterates :meth:`openml.tasks.get_task`.
+    This function iterates :meth:`openml.tasks.get`.
 
     Parameters
     ----------
@@ -110,48 +114,32 @@ def get_tasks(
     -------
     list
     """
-    return api_context.backend.tasks.get_tasks(
-        task_ids, download_data=download_data, download_qualities=download_qualities
-    )
+    if download_data is None:
+        warnings.warn(
+            "`download_data` will default to False starting in 0.16. "
+            "Please set `download_data` explicitly to suppress this warning.",
+            stacklevel=1,
+        )
+        download_data = True
+
+    if download_qualities is None:
+        warnings.warn(
+            "`download_qualities` will default to False starting in 0.16. "
+            "Please set `download_qualities` explicitly to suppress this warning.",
+            stacklevel=1,
+        )
+        download_qualities = True
+
+    tasks = []
+    for task_id in task_ids:
+        tasks.append(
+            api_context.backend.tasks.get(
+                task_id, download_data=download_data, download_qualities=download_qualities
+            )
+        )
+    return tasks
 
 
-# v1: /task/{task_id}
-# v2: /tasks/{task_id}
-@openml.utils.thread_safe_if_oslo_installed
-def get_task(
-    task_id: int,
-    download_splits: bool = False,  # noqa: FBT002
-    **get_dataset_kwargs: Any,
-) -> OpenMLTask:
-    """Download OpenML task for a given task ID.
-
-    Downloads the task representation.
-
-    Use the `download_splits` parameter to control whether the splits are downloaded.
-    Moreover, you may pass additional parameter (args or kwargs) that are passed to
-    :meth:`openml.datasets.get_dataset`.
-
-    Parameters
-    ----------
-    task_id : int
-        The OpenML task id of the task to download.
-    download_splits: bool (default=False)
-        Whether to download the splits as well.
-    get_dataset_kwargs :
-        Args and kwargs can be used pass optional parameters to :meth:`openml.datasets.get_dataset`.
-
-    Returns
-    -------
-    task: OpenMLTask
-    """
-    return api_context.backend.tasks.get(
-        task_id,
-        download_splits=download_splits,
-        **get_dataset_kwargs,
-    )
-
-
-# TODO(eddiebergman): overload on `task_type`
 def create_task(
     task_type: TaskType,
     dataset_id: int,
@@ -194,17 +182,28 @@ def create_task(
     OpenMLClassificationTask, OpenMLRegressionTask,
     OpenMLLearningCurveTask, OpenMLClusteringTask
     """
-    return api_context.backend.tasks.create_task(
-        task_type,
-        dataset_id,
-        estimation_procedure_id,
-        target_name=target_name,
+    if task_type == TaskType.CLUSTERING:
+        task_cls = OpenMLClusteringTask
+    elif task_type == TaskType.LEARNING_CURVE:
+        task_cls = OpenMLLearningCurveTask  # type: ignore
+    elif task_type == TaskType.SUPERVISED_CLASSIFICATION:
+        task_cls = OpenMLClassificationTask  # type: ignore
+    elif task_type == TaskType.SUPERVISED_REGRESSION:
+        task_cls = OpenMLRegressionTask  # type: ignore
+    else:
+        raise NotImplementedError(f"Task type {task_type:d} not supported.")
+
+    return task_cls(
+        task_type_id=task_type,
+        task_type="None",  # TODO: refactor to get task type string from ID.
+        data_set_id=dataset_id,
+        target_name=target_name,  # type: ignore
+        estimation_procedure_id=estimation_procedure_id,
         evaluation_measure=evaluation_measure,
         **kwargs,
     )
 
 
-# NOTE: not in v2
 def delete_task(task_id: int) -> bool:
     """Delete task with id `task_id` from the OpenML server.
 
@@ -221,4 +220,4 @@ def delete_task(task_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
-    return api_context.backend.tasks.delete(task_id)
+    return openml.utils._delete_entity("task", task_id)

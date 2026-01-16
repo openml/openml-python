@@ -6,7 +6,6 @@ from typing import Any
 import pandas as pd
 import xmltodict
 
-import openml.utils
 from openml._api.resources.base import TasksAPI
 from openml.datasets import get_dataset
 from openml.tasks.task import (
@@ -23,7 +22,6 @@ TASKS_CACHE_DIR_NAME = "tasks"
 
 
 class TasksV1(TasksAPI):
-    @openml.utils.thread_safe_if_oslo_installed
     def get(
         self,
         task_id: int,
@@ -161,7 +159,7 @@ class TasksV1(TasksAPI):
             raise NotImplementedError(f"Task type {common_kwargs['task_type']} not supported.")
         return cls(**common_kwargs)  # type: ignore
 
-    def list_tasks(
+    def list(
         self,
         limit: int,
         offset: int,
@@ -204,9 +202,9 @@ class TasksV1(TasksAPI):
                         value = ",".join([str(int(i)) for i in value])  # noqa: PLW2901
                     api_call += f"/{operator}/{value}"
 
-        return self.__list_tasks(api_call=api_call)
+        return self._fetch_tasks_df(api_call=api_call)
 
-    def __list_tasks(self, api_call: str) -> pd.DataFrame:  # noqa: C901, PLR0912
+    def _fetch_tasks_df(self, api_call: str) -> pd.DataFrame:  # noqa: C901, PLR0912
         """Returns a Pandas DataFrame with information about OpenML tasks.
 
         Parameters
@@ -297,7 +295,7 @@ class TasksV1(TasksAPI):
             except KeyError as e:
                 if tid is not None:
                     warnings.warn(
-                        "Invalid xml for task %d: %s\nFrom %s" % (tid, e, task_),
+                        f"Invalid xml for task {tid}: {e}\nFrom {task_}",
                         RuntimeWarning,
                         stacklevel=2,
                     )
@@ -363,143 +361,8 @@ class TasksV1(TasksAPI):
 
         return procs
 
-    def get_tasks(
-        self,
-        task_ids: list[int],
-        download_data: bool | None = None,
-        download_qualities: bool | None = None,
-    ) -> list[OpenMLTask]:
-        """Download tasks.
-
-        This function iterates :meth:`openml.tasks.get`.
-
-        Parameters
-        ----------
-        task_ids : List[int]
-            A list of task ids to download.
-        download_data : bool (default = True)
-            Option to trigger download of data along with the meta data.
-        download_qualities : bool (default=True)
-            Option to download 'qualities' meta-data in addition to the minimal dataset description.
-
-        Returns
-        -------
-        list
-        """
-        if download_data is None:
-            warnings.warn(
-                "`download_data` will default to False starting in 0.16. "
-                "Please set `download_data` explicitly to suppress this warning.",
-                stacklevel=1,
-            )
-            download_data = True
-
-        if download_qualities is None:
-            warnings.warn(
-                "`download_qualities` will default to False starting in 0.16. "
-                "Please set `download_qualities` explicitly to suppress this warning.",
-                stacklevel=1,
-            )
-            download_qualities = True
-
-        tasks = []
-        for task_id in task_ids:
-            tasks.append(
-                self.get(
-                    task_id, download_data=download_data, download_qualities=download_qualities
-                )
-            )
-        return tasks
-
-    def create_task(
-        self,
-        task_type: TaskType,
-        dataset_id: int,
-        estimation_procedure_id: int,
-        target_name: str | None = None,
-        evaluation_measure: str | None = None,
-        **kwargs: Any,
-    ) -> (
-        OpenMLClassificationTask
-        | OpenMLRegressionTask
-        | OpenMLLearningCurveTask
-        | OpenMLClusteringTask
-    ):
-        """Create a task based on different given attributes.
-
-        Builds a task object with the function arguments as
-        attributes. The type of the task object built is
-        determined from the task type id.
-        More information on how the arguments (task attributes),
-        relate to the different possible tasks can be found in
-        the individual task objects at the openml.tasks.task
-        module.
-
-        Parameters
-        ----------
-        task_type : TaskType
-            Id of the task type.
-        dataset_id : int
-            The id of the dataset for the task.
-        target_name : str, optional
-            The name of the feature used as a target.
-            At the moment, only optional for the clustering tasks.
-        estimation_procedure_id : int
-            The id of the estimation procedure.
-        evaluation_measure : str, optional
-            The name of the evaluation measure.
-        kwargs : dict, optional
-            Other task attributes that are not mandatory
-            for task upload.
-
-        Returns
-        -------
-        OpenMLClassificationTask, OpenMLRegressionTask,
-        OpenMLLearningCurveTask, OpenMLClusteringTask
-        """
-        if task_type == TaskType.CLUSTERING:
-            task_cls = OpenMLClusteringTask
-        elif task_type == TaskType.LEARNING_CURVE:
-            task_cls = OpenMLLearningCurveTask  # type: ignore
-        elif task_type == TaskType.SUPERVISED_CLASSIFICATION:
-            task_cls = OpenMLClassificationTask  # type: ignore
-        elif task_type == TaskType.SUPERVISED_REGRESSION:
-            task_cls = OpenMLRegressionTask  # type: ignore
-        else:
-            raise NotImplementedError(f"Task type {task_type:d} not supported.")
-
-        return task_cls(
-            task_type_id=task_type,
-            task_type="None",  # TODO: refactor to get task type string from ID.
-            data_set_id=dataset_id,
-            target_name=target_name,  # type: ignore
-            estimation_procedure_id=estimation_procedure_id,
-            evaluation_measure=evaluation_measure,
-            **kwargs,
-        )
-
-    # NOTE: not in v2
-    def delete_task(self, task_id: int) -> bool:
-        """Delete task with id `task_id` from the OpenML server.
-
-        You can only delete tasks which you created and have
-        no runs associated with them.
-
-        Parameters
-        ----------
-        task_id : int
-            OpenML id of the task
-
-        Returns
-        -------
-        bool
-            True if the deletion was successful. False otherwise.
-        """
-        return openml.utils._delete_entity("task", task_id)
-
 
 class TasksV2(TasksAPI):
-    @openml.utils.thread_safe_if_oslo_installed
     def get(
         self,
         task_id: int,
