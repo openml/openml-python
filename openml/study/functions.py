@@ -467,7 +467,7 @@ def list_suites(
         - creation_date
     """
     listing_call = partial(
-        _list_studies,
+        api_context.backend.studies.list,
         main_entity_type="task",
         status=status,
         uploader=uploader,
@@ -518,7 +518,7 @@ def list_studies(
         these are also returned.
     """
     listing_call = partial(
-        _list_studies,
+        api_context.backend.studies.list,
         main_entity_type="run",
         status=status,
         uploader=uploader,
@@ -529,43 +529,3 @@ def list_studies(
         return pd.DataFrame()
 
     return pd.concat(batches)
-
-
-def _list_studies(  # noqa: PLR0913
-    limit: int,
-    offset: int,
-    *,
-    status: str | None = None,
-    main_entity_type: str | None = None,
-    uploader: list[int] | None = None,
-    benchmark_suite: int | None = None,
-) -> pd.DataFrame:
-    """Perform api call to return a list of studies.
-
-    Parameters
-    ----------
-    limit: int
-        The maximum number of studies to return.
-    offset: int
-        The number of studies to skip, starting from the first.
-    status : str, optional
-        Filter by status (active, in_preparation, deactivated, all)
-    main_entity_type : str, optional
-        Filter by main entity type (run, task)
-    uploader : list[int], optional
-        Filter by uploader IDs
-    benchmark_suite : int, optional
-        Filter by benchmark suite ID
-
-    Returns
-    -------
-    studies : dataframe
-    """
-    return api_context.backend.studies.list(
-        limit=limit,
-        offset=offset,
-        status=status,
-        main_entity_type=main_entity_type,
-        uploader=uploader,
-        benchmark_suite=benchmark_suite,
-    )
