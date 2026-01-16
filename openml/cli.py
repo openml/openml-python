@@ -10,7 +10,7 @@ from dataclasses import fields
 from pathlib import Path
 from urllib.parse import urlparse
 
-from openml import config
+import openml
 from openml.__version__ import __version__
 
 
@@ -60,17 +60,17 @@ def wait_until_valid_input(
 
 
 def print_configuration() -> None:
-    file = config.determine_config_file_path()
+    file = openml.config.determine_config_file_path()
     header = f"File '{file}' contains (or defaults to):"
     print(header)
 
-    max_key_length = max(map(len, config.get_config_as_dict()))
-    for field, value in config.get_config_as_dict().items():
+    max_key_length = max(map(len, openml.config.get_config_as_dict()))
+    for field, value in openml.config.get_config_as_dict().items():
         print(f"{field.ljust(max_key_length)}: {value}")
 
 
 def verbose_set(field: str, value: str) -> None:
-    config.set_field_in_config_file(field, value)
+    openml.config.set_field_in_config_file(field, value)
     print(f"{field} set to '{value}'.")
 
 
@@ -83,7 +83,7 @@ def configure_apikey(value: str) -> None:
         return ""
 
     instructions = (
-        f"Your current API key is set to: '{config.apikey}'. "
+        f"Your current API key is set to: '{openml.config.apikey}'. "
         "You can get an API key at https://new.openml.org. "
         "You must create an account if you don't have one yet:\n"
         "  1. Log in with the account.\n"
@@ -349,7 +349,7 @@ def main() -> None:
     )
 
     configurable_fields = [
-        f.name for f in fields(config.OpenMLConfig) if f.name not in ["max_retries"]
+        f.name for f in fields(openml._config.OpenMLConfig) if f.name not in ["max_retries"]
     ]
 
     parser_configure.add_argument(
