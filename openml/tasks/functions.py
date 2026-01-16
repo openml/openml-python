@@ -139,6 +139,36 @@ def get_tasks(
         )
     return tasks
 
+def get_task(
+    task_id: int,
+    download_splits: bool = False,  # noqa: FBT002
+    **get_dataset_kwargs: Any,
+) -> OpenMLTask:
+    """Download OpenML task for a given task ID.
+
+    Downloads the task representation.
+
+    Use the `download_splits` parameter to control whether the splits are downloaded.
+    Moreover, you may pass additional parameter (args or kwargs) that are passed to
+    :meth:`openml.datasets.get_dataset`.
+
+    Parameters
+    ----------
+    task_id : int
+        The OpenML task id of the task to download.
+    download_splits: bool (default=False)
+        Whether to download the splits as well.
+    get_dataset_kwargs :
+        Args and kwargs can be used pass optional parameters to :meth:`openml.datasets.get_dataset`.
+
+    Returns
+    -------
+    task: OpenMLTask
+    """
+    return api_context.backend.tasks.get(
+        task_id, download_splits=download_splits, **get_dataset_kwargs
+    )
+
 
 def create_task(
     task_type: TaskType,

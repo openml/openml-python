@@ -68,14 +68,9 @@ class TasksV1(TasksAPI):
         return task
 
     def _get_task_description(self, task_id: int) -> OpenMLTask:
-        result = self._http.get(f"task/{task_id}", return_response=True)
+        response = self._http.get(f"task/{task_id}", return_response=True)
 
-        if isinstance(result, tuple):
-            task, _response = result
-        else:
-            task = result
-
-        return task
+        return self._create_task_from_xml(response.text)
 
     def _create_task_from_xml(self, xml: str) -> OpenMLTask:
         """Create a task given a xml string.
