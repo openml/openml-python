@@ -12,7 +12,6 @@ import xmltodict
 
 import openml._api_calls
 import openml.utils
-from openml._api import api_context
 from openml.datasets import get_dataset
 from openml.exceptions import OpenMLCacheException
 
@@ -39,7 +38,7 @@ def _get_cached_tasks() -> dict[int, OpenMLTask]:
         OpenMLTask.
     """
     task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
-    directory_content = os.listdir(task_cache_dir)
+    directory_content = os.listdir(task_cache_dir)  # noqa: PTH208
     directory_content.sort()
 
     # Find all dataset ids for which we have downloaded the dataset
@@ -330,7 +329,7 @@ def __list_tasks(api_call: str) -> pd.DataFrame:  # noqa: C901, PLR0912
         except KeyError as e:
             if tid is not None:
                 warnings.warn(
-                    "Invalid xml for task %d: %s\nFrom %s" % (tid, e, task_),
+                    f"Invalid xml for task {tid}: {e}\nFrom {task_}",
                     RuntimeWarning,
                     stacklevel=2,
                 )
@@ -389,7 +388,7 @@ def get_tasks(
 @openml.utils.thread_safe_if_oslo_installed
 def get_task(
     task_id: int,
-    download_splits: bool = False,  # noqa: FBT001, FBT002
+    download_splits: bool = False,  # noqa: FBT002
     **get_dataset_kwargs: Any,
 ) -> OpenMLTask:
     """Download OpenML task for a given task ID.
@@ -445,16 +444,11 @@ def _get_task_description(task_id: int) -> OpenMLTask:
     except OpenMLCacheException:
         _cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
         xml_file = _cache_dir / "task.xml"
-        result = api_context.backend.tasks.get(task_id, return_response=True)
+        task_xml = openml._api_calls._perform_api_call(f"task/{task_id}", "get")
 
-        if isinstance(result, tuple):
-            task, response = result
-            with xml_file.open("w", encoding="utf8") as fh:
-                fh.write(response.text)
-        else:
-            task = result
-
-        return task
+        with xml_file.open("w", encoding="utf8") as fh:
+            fh.write(task_xml)
+        return _create_task_from_xml(task_xml)
 
 
 def _create_task_from_xml(xml: str) -> OpenMLTask:
@@ -534,7 +528,12 @@ def _create_task_from_xml(xml: str) -> OpenMLTask:
         TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
     }.get(task_type)
     if cls is None:
-        raise NotImplementedError(f"Task type {common_kwargs['task_type']} not supported.")
+        raise NotImplementedError(
+            f"Task type '{common_kwargs['task_type']}' is not supported. "
+            f"Supported task types: SUPERVISED_CLASSIFICATION,"
+            f"SUPERVISED_REGRESSION, CLUSTERING, LEARNING_CURVE."
+            f"Please check the OpenML documentation for available task types."
+        )
     return cls(**common_kwargs)  # type: ignore
 
 
@@ -590,7 +589,13 @@ def create_task(
     elif task_type == TaskType.SUPERVISED_REGRESSION:
         task_cls = OpenMLRegressionTask  # type: ignore
     else:
-        raise NotImplementedError(f"Task type {task_type:d} not supported.")
+        raise NotImplementedError(
+            f"Task type ID {task_type:d} is not supported. "
+            f"Supported task type IDs: {TaskType.SUPERVISED_CLASSIFICATION.value},"
+            f"{TaskType.SUPERVISED_REGRESSION.value}, "
+            f"{TaskType.CLUSTERING.value}, {TaskType.LEARNING_CURVE.value}. "
+            f"Please refer to the TaskType enum for valid task type identifiers."
+        )
 
     return task_cls(
         task_type_id=task_type,
