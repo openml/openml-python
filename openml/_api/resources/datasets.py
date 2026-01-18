@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import builtins
 import json
 import logging
 import pickle
 from collections import OrderedDict
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
-from typing_extensions import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from openml._api.resources.base import DatasetsAPI
 from openml.datasets.data_feature import OpenMLDataFeature
@@ -48,7 +48,7 @@ class DatasetsV1(DatasetsAPI):
         limit: int,
         offset: int,
         *,
-        data_id: list[int] | None = None,  # type: ignore
+        data_id: builtins.list[int] | None = None,
         **kwargs: Any,
     ) -> pd.DataFrame:
         """
@@ -153,7 +153,7 @@ class DatasetsV1(DatasetsAPI):
         collection_date: str | None = None,
         language: str | None = None,
         default_target_attribute: str | None = None,
-        ignore_attribute: str | list[str] | None = None,  # type: ignore
+        ignore_attribute: str | builtins.list[str] | None = None,
         citation: str | None = None,
         row_id_attribute: str | None = None,
         original_data_url: str | None = None,
@@ -314,7 +314,7 @@ class DatasetsV1(DatasetsAPI):
             # This should never happen
             raise ValueError("Data id/status does not collide")
 
-    def list_qualities(self) -> list[str]:  # type: ignore
+    def list_qualities(self) -> builtins.list[str]:
         """Return list of data qualities available.
 
         The function performs an API call to retrieve the entire list of
@@ -455,7 +455,7 @@ class DatasetsV1(DatasetsAPI):
     def get_qualities(self, dataset_id: int) -> dict[str, float] | None:
         path = f"data/qualities/{dataset_id!s}"
         try:
-            self._http.get(path, use_cache=True).text
+            xml = self._http.get(path, use_cache=True).text
         except OpenMLServerException as e:
             if e.code == 362 and str(e) == "No qualities found - None":
                 # quality file stays as None
@@ -464,7 +464,7 @@ class DatasetsV1(DatasetsAPI):
 
             raise e
 
-        return self._parse_qualities_xml()
+        return self._parse_qualities_xml(xml)
 
     def parse_features_file(
         self, features_file: Path, features_pickle_file: Path
@@ -485,7 +485,7 @@ class DatasetsV1(DatasetsAPI):
 
     def parse_qualities_file(
         self, qualities_file: Path, qualities_pickle_file: Path
-    ) -> dict[int, OpenMLDataFeature]:
+    ) -> dict[str, float]:
         if qualities_file.suffix != ".xml":
             # TODO (Shrivaths) can only parse xml warn/ raise exception
             raise NotImplementedError()
@@ -525,7 +525,7 @@ class DatasetsV1(DatasetsAPI):
 
         return features
 
-    def _parse_qualities_xml(self, qualities_xml: str) -> dict[str, float] | None:
+    def _parse_qualities_xml(self, qualities_xml: str) -> dict[str, float]:
         xml_as_dict = xmltodict.parse(qualities_xml, force_list=("oml:quality",))
         qualities = xml_as_dict["oml:data_qualities"]["oml:quality"]
         qualities_ = {}
@@ -573,6 +573,24 @@ class DatasetsV1(DatasetsAPI):
             }
         )
 
+    def download_file(self, url_ext: str, encoding: str = "utf-8") -> Path:
+        def __handler(response: Response, path: Path, encoding: str) -> Path:
+            file_path = path / "response.xml"
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            with file_path.open("w", encoding=encoding) as f:
+                f.write(response.text)
+            return file_path
+
+        return self._http.download(url_ext, __handler, encoding)
+
+    def download_features_file(self, dataset_id: int) -> Path:
+        path = f"data/features/{dataset_id}"
+        return self.download_file(path)
+
+    def download_qualities_file(self, dataset_id: int) -> Path:
+        path = f"data/qualities/{dataset_id}"
+        return self.download_file(path)
+
 
 class DatasetsV2(DatasetsAPI):
     def get(
@@ -596,7 +614,7 @@ class DatasetsV2(DatasetsAPI):
         limit: int,
         offset: int,
         *,
-        dataset_id: list[int] | None = None,  # type: ignore
+        dataset_id: builtins.list[int] | None = None,
         **kwargs: Any,
     ) -> pd.DataFrame:
         """
@@ -656,7 +674,7 @@ class DatasetsV2(DatasetsAPI):
         collection_date: str | None = None,
         language: str | None = None,
         default_target_attribute: str | None = None,
-        ignore_attribute: str | list[str] | None = None,  # type: ignore
+        ignore_attribute: str | builtins.list[str] | None = None,
         citation: str | None = None,
         row_id_attribute: str | None = None,
         original_data_url: str | None = None,
@@ -693,7 +711,7 @@ class DatasetsV2(DatasetsAPI):
             # This should never happen
             raise ValueError("Data id/status does not collide")
 
-    def list_qualities(self) -> list[str]:  # type: ignore
+    def list_qualities(self) -> builtins.list[str]:
         """Return list of data qualities available.
 
         The function performs an API call to retrieve the entire list of
@@ -770,27 +788,13 @@ class DatasetsV2(DatasetsAPI):
         raise NotImplementedError()
 
     def get_features(self, dataset_id: int) -> dict[int, OpenMLDataFeature]:
-        path = f"dataset/features/{dataset_id}"
+        path = f"datasets/features/{dataset_id}"
         json = self._http.get(path, use_cache=True).json()
-        features: dict[int, OpenMLDataFeature] = {}
-        for idx, xmlfeature in enumerate(json["data_features"]["feature"]):
-            nr_missing = xmlfeature.get("number_of_missing_values", 0)
-            feature = OpenMLDataFeature(
-                int(xmlfeature["index"]),
-                xmlfeature["name"],
-                xmlfeature["data_type"],
-                xmlfeature.get("nominal_value"),
-                int(nr_missing),
-                xmlfeature.get("ontology"),
-            )
-            if idx != feature.index:
-                raise ValueError("Data features not provided in right order")
-            features[feature.index] = feature
 
-        return features
+        return self._parse_features_json(json)
 
     def get_qualities(self, dataset_id: int) -> dict[str, float] | None:
-        path = f"dataset/qualities/{dataset_id!s}"
+        path = f"datasets/qualities/{dataset_id!s}"
         try:
             qualities_json = self._http.get(path, use_cache=True).json()
         except OpenMLServerException as e:
@@ -800,7 +804,7 @@ class DatasetsV2(DatasetsAPI):
 
             raise e
 
-        return self._parse_features_json(qualities_json)
+        return self._parse_qualities_json(qualities_json)
 
     def parse_features_file(
         self, features_file: Path, features_pickle_file: Path
@@ -821,7 +825,7 @@ class DatasetsV2(DatasetsAPI):
 
     def parse_qualities_file(
         self, qualities_file: Path, qualities_pickle_file: Path
-    ) -> dict[str, float] | None:
+    ) -> dict[str, float]:
         if qualities_file.suffix != ".json":
             # can fallback to v1 if the file is .xml
             raise NotImplementedError()
@@ -836,17 +840,17 @@ class DatasetsV2(DatasetsAPI):
 
         return qualities
 
-    def _parse_features_json(self: dict) -> dict[int, OpenMLDataFeature]:
+    def _parse_features_json(self, features_json: dict) -> dict[int, OpenMLDataFeature]:
         features: dict[int, OpenMLDataFeature] = {}
-        for idx, xmlfeature in enumerate(self["data_features"]["feature"]):
-            nr_missing = xmlfeature.get("number_of_missing_values", 0)
+        for idx, jsonfeatures in enumerate(features_json):
+            nr_missing = jsonfeatures.get("number_of_missing_values", 0)
             feature = OpenMLDataFeature(
-                int(xmlfeature["index"]),
-                xmlfeature["name"],
-                xmlfeature["data_type"],
-                xmlfeature.get("nominal_value"),
+                int(jsonfeatures["index"]),
+                jsonfeatures["name"],
+                jsonfeatures["data_type"],
+                jsonfeatures.get("nominal_values"),
                 int(nr_missing),
-                xmlfeature.get("ontology"),
+                jsonfeatures.get("ontology"),
             )
             if idx != feature.index:
                 raise ValueError("Data features not provided in right order")
@@ -854,10 +858,9 @@ class DatasetsV2(DatasetsAPI):
 
         return features
 
-    def _parse_qualities_json(self: dict) -> dict[str, float] | None:
-        qualities = self["data_qualities"]["quality"]
+    def _parse_qualities_json(self, qualities_json: dict) -> dict[str, float]:
         qualities_ = {}
-        for quality in qualities:
+        for quality in qualities_json:
             name = quality["name"]
             if quality.get("value", None) is None or quality["value"] == "null":
                 value = float("NaN")
@@ -866,7 +869,7 @@ class DatasetsV2(DatasetsAPI):
             qualities_[name] = value
         return qualities_
 
-    def _parse_list_json(self, datasets_list: list) -> pd.DataFrame:  # type: ignore
+    def _parse_list_json(self, datasets_list: builtins.list) -> pd.DataFrame:
         datasets = {}
         for dataset_ in datasets_list:
             ignore_attribute = ["file_id", "quality"]
@@ -889,3 +892,21 @@ class DatasetsV2(DatasetsAPI):
                 "status": pd.CategoricalDtype(["active", "deactivated", "in_preparation"]),
             }
         )
+
+    def download_file(self, url_ext: str, encoding: str = "utf-8") -> Path:
+        def __handler(response: Response, path: Path, encoding: str) -> Path:
+            file_path = path / "response.json"
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            with file_path.open("w", encoding=encoding) as f:
+                json.dump(response.json(), f, indent=4)
+            return file_path
+
+        return self._http.download(url_ext, __handler, encoding)
+
+    def download_features_file(self, dataset_id: int) -> Path:
+        path = f"datasets/features/{dataset_id}"
+        return self.download_file(path)
+
+    def download_qualities_file(self, dataset_id: int) -> Path:
+        path = f"datasets/qualities/{dataset_id}"
+        return self.download_file(path)

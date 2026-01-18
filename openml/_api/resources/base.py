@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
-from typing_extensions import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -87,7 +86,16 @@ class DatasetsAPI(ResourceAPI, ABC):
     @abstractmethod
     def parse_qualities_file(
         self, qualities_file: Path, qualities_pickle_file: Path
-    ) -> dict[str, float] | None: ...
+    ) -> dict[str, float]: ...
+
+    @abstractmethod
+    def download_file(self, url_ext: str, encoding: str = "utf-8") -> Path: ...
+
+    @abstractmethod
+    def download_features_file(self, dataset_id: int) -> Path: ...
+
+    @abstractmethod
+    def download_qualities_file(self, dataset_id: int) -> Path: ...
 
 
 class TasksAPI(ResourceAPI, ABC):
