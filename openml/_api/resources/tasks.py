@@ -50,8 +50,7 @@ class TasksV1(TasksAPI):
             raise TypeError(f"Task id should be integer, is {type(task_id)}")
 
         response = self._http.get(f"task/{task_id}")
-        return self._create_task_from_xml(response.text)        
-
+        return self._create_task_from_xml(response.text)
 
     def _create_task_from_xml(self, xml: str) -> OpenMLTask:
         """Create a task given a xml string.
@@ -349,7 +348,7 @@ class TasksV2(TasksAPI):
                 "`download_splits` is not yet supported in the v2 API and will be ignored.",
                 stacklevel=2,
             )
-        
+
         response = self._http.get(f"tasks/{task_id}")
         return self._create_task_from_json(response.json())
 
@@ -392,4 +391,3 @@ class TasksV2(TasksAPI):
         }[task_type_id]
 
         return cls(**common_kwargs)
-
