@@ -1,3 +1,3 @@
-from openml._api.http.client import HTTPClient
+from openml._api.http.client import HTTPClient, MinIOClient
 
-__all__ = ["HTTPClient"]
+__all__ = ["HTTPClient", "MinIOClient"]

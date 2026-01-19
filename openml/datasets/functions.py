@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import os
 import warnings
 from functools import partial
 from pathlib import Path
@@ -11,21 +10,15 @@ from pyexpat import ExpatError
 from typing import TYPE_CHECKING, Any, Literal
 
 import arff
-import minio.error
 import numpy as np
 import pandas as pd
-import urllib3
 import xmltodict
 from scipy.sparse import coo_matrix
 
 import openml._api_calls
 import openml.utils
-from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 from openml.exceptions import (
-    OpenMLHashException,
-    OpenMLPrivateDatasetError,
     OpenMLServerError,
-    OpenMLServerException,
 )
 from openml.utils import (
     _create_cache_directory_for_id,
@@ -281,7 +274,7 @@ def get_datasets(
 
 
 @openml.utils.thread_safe_if_oslo_installed
-def get_dataset(  # noqa: C901, PLR0912
+def get_dataset(
     dataset_id: int | str,
     download_data: bool = False,  # noqa: FBT002
     version: int | None = None,
@@ -382,59 +375,15 @@ def get_dataset(  # noqa: C901, PLR0912
         if did_cache_dir.exists():
             _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, did_cache_dir)
 
-    did_cache_dir = _create_cache_directory_for_id(
-        DATASETS_CACHE_DIR_NAME,
+    from openml._api import api_context
+
+    return api_context.backend.datasets.get(
         dataset_id,
-    )
-
-    remove_dataset_cache = True
-    try:
-        description = _get_dataset_description(did_cache_dir, dataset_id)
-        features_file = None
-        qualities_file = None
-
-        if download_features_meta_data:
-            features_file = _get_dataset_features_file(did_cache_dir, dataset_id)
-        if download_qualities:
-            qualities_file = _get_dataset_qualities_file(did_cache_dir, dataset_id)
-
-        parquet_file = None
-        skip_parquet = os.environ.get(OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
-        download_parquet = "oml:parquet_url" in description and not skip_parquet
-        if download_parquet and (download_data or download_all_files):
-            try:
-                parquet_file = _get_dataset_parquet(
-                    description,
-                    download_all_files=download_all_files,
-                )
-            except urllib3.exceptions.MaxRetryError:
-                parquet_file = None
-
-        arff_file = None
-        if parquet_file is None and download_data:
-            if download_parquet:
-                logger.warning("Failed to download parquet, fallback on ARFF.")
-            arff_file = _get_dataset_arff(description)
-
-        remove_dataset_cache = False
-    except OpenMLServerException as e:
-        # if there was an exception
-        # check if the user had access to the dataset
-        if e.code == NO_ACCESS_GRANTED_ERRCODE:
-            raise OpenMLPrivateDatasetError(e.message) from None
-
-        raise e
-    finally:
-        if remove_dataset_cache:
-            _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, did_cache_dir)
-
-    return _create_dataset_from_description(
-        description,
-        features_file,
-        qualities_file,
-        arff_file,
-        parquet_file,
+        download_data,
         cache_format,
+        download_qualities,
+        download_features_meta_data,
+        download_all_files,
     )
 
 
@@ -988,7 +937,7 @@ def _get_dataset_description(did_cache_dir: Path, dataset_id: int) -> dict[str, 
 
 def _get_dataset_parquet(
     description: dict | OpenMLDataset,
-    cache_directory: Path | None = None,
+    cache_directory: Path | None = None,  # noqa: ARG001
     download_all_files: bool = False,  # noqa: FBT002
 ) -> Path | None:
     """Return the path to the local parquet file of the dataset. If is not cached, it is downloaded.
@@ -1018,47 +967,14 @@ def _get_dataset_parquet(
     output_filename : Path, optional
         Location of the Parquet file if successfully downloaded, None otherwise.
     """
-    if isinstance(description, dict):
-        url = str(description.get("oml:parquet_url"))
-        did = int(description.get("oml:id"))  # type: ignore
-    elif isinstance(description, OpenMLDataset):
-        url = str(description._parquet_url)
-        assert description.dataset_id is not None
+    from openml._api import api_context
 
-        did = int(description.dataset_id)
-    else:
-        raise TypeError("`description` should be either OpenMLDataset or Dict.")
-
-    if cache_directory is None:
-        cache_directory = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, did)
-
-    output_file_path = cache_directory / f"dataset_{did}.pq"
-
-    old_file_path = cache_directory / "dataset.pq"
-    if old_file_path.is_file():
-        old_file_path.rename(output_file_path)
-
-    # The call below skips files already on disk, so avoids downloading the parquet file twice.
-    # To force the old behavior of always downloading everything, use `force_refresh_cache`
-    # of `get_dataset`
-    if download_all_files:
-        openml._api_calls._download_minio_bucket(source=url, destination=cache_directory)
-
-    if not output_file_path.is_file():
-        try:
-            openml._api_calls._download_minio_file(
-                source=url,
-                destination=output_file_path,
-            )
-        except (FileNotFoundError, urllib3.exceptions.MaxRetryError, minio.error.ServerError) as e:
-            logger.warning(f"Could not download file from {url}: {e}")
-            return None
-    return output_file_path
+    return api_context.backend.datasets.download_dataset_parquet(description, download_all_files)
 
 
 def _get_dataset_arff(
     description: dict | OpenMLDataset,
-    cache_directory: Path | None = None,
+    cache_directory: Path | None = None,  # noqa: ARG001
 ) -> Path:
     """Return the path to the local arff file of the dataset. If is not cached, it is downloaded.
 
@@ -1082,47 +998,15 @@ def _get_dataset_arff(
     output_filename : Path
         Location of ARFF file.
     """
-    if isinstance(description, dict):
-        md5_checksum_fixture = description.get("oml:md5_checksum")
-        url = str(description["oml:url"])
-        did = int(description.get("oml:id"))  # type: ignore
-    elif isinstance(description, OpenMLDataset):
-        md5_checksum_fixture = description.md5_checksum
-        assert description.url is not None
-        assert description.dataset_id is not None
+    from openml._api import api_context
 
-        url = description.url
-        did = int(description.dataset_id)
-    else:
-        raise TypeError("`description` should be either OpenMLDataset or Dict.")
-
-    save_cache_directory = (
-        _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, did)
-        if cache_directory is None
-        else Path(cache_directory)
-    )
-    output_file_path = save_cache_directory / "dataset.arff"
-
-    try:
-        openml._api_calls._download_text_file(
-            source=url,
-            output_path=output_file_path,
-            md5_checksum=md5_checksum_fixture,
-        )
-    except OpenMLHashException as e:
-        additional_info = f" Raised when downloading dataset {did}."
-        e.args = (e.args[0] + additional_info,)
-        raise e
-
-    return output_file_path
+    return api_context.backend.datasets.download_dataset_arff(description)
 
 
-def _get_features_xml(dataset_id: int) -> str:
-    url_extension = f"data/features/{dataset_id}"
-    return openml._api_calls._perform_api_call(url_extension, "get")
-
-
-def _get_dataset_features_file(did_cache_dir: str | Path | None, dataset_id: int) -> Path:
+def _get_dataset_features_file(
+    did_cache_dir: str | Path | None,  # noqa: ARG001
+    dataset_id: int,
+) -> Path:
     """API call to load dataset features. Loads from cache or downloads them.
 
     Features are feature descriptions for each column.
@@ -1143,28 +1027,14 @@ def _get_dataset_features_file(did_cache_dir: str | Path | None, dataset_id: int
     Path
         Path of the cached dataset feature file
     """
-    did_cache_dir = Path(did_cache_dir) if did_cache_dir is not None else None
-    if did_cache_dir is None:
-        did_cache_dir = _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset_id)
+    # cache directory not used here anymore
+    from openml._api import api_context
 
-    features_file = did_cache_dir / "features.xml"
-
-    # Dataset features aren't subject to change...
-    if not features_file.is_file():
-        features_xml = _get_features_xml(dataset_id)
-        with features_file.open("w", encoding="utf8") as fh:
-            fh.write(features_xml)
-
-    return features_file
-
-
-def _get_qualities_xml(dataset_id: int) -> str:
-    url_extension = f"data/qualities/{dataset_id!s}"
-    return openml._api_calls._perform_api_call(url_extension, "get")
+    return api_context.backend.datasets.download_features_file(dataset_id)
 
 
 def _get_dataset_qualities_file(
-    did_cache_dir: str | Path | None,
+    did_cache_dir: str | Path | None,  # noqa: ARG001
     dataset_id: int,
 ) -> Path | None:
     """Get the path for the dataset qualities file, or None if no qualities exist.
@@ -1187,94 +1057,10 @@ def _get_dataset_qualities_file(
     str
         Path of the cached qualities file
     """
-    save_did_cache_dir = (
-        _create_cache_directory_for_id(DATASETS_CACHE_DIR_NAME, dataset_id)
-        if did_cache_dir is None
-        else Path(did_cache_dir)
-    )
+    # cache directory not used here anymore
+    from openml._api import api_context
 
-    # Dataset qualities are subject to change and must be fetched every time
-    qualities_file = save_did_cache_dir / "qualities.xml"
-    try:
-        with qualities_file.open(encoding="utf8") as fh:
-            qualities_xml = fh.read()
-    except OSError:
-        try:
-            qualities_xml = _get_qualities_xml(dataset_id)
-            with qualities_file.open("w", encoding="utf8") as fh:
-                fh.write(qualities_xml)
-        except OpenMLServerException as e:
-            if e.code == 362 and str(e) == "No qualities found - None":
-                # quality file stays as None
-                logger.warning(f"No qualities found for dataset {dataset_id}")
-                return None
-
-            raise e
-
-    return qualities_file
-
-
-def _create_dataset_from_description(
-    description: dict[str, str],
-    features_file: Path | None = None,
-    qualities_file: Path | None = None,
-    arff_file: Path | None = None,
-    parquet_file: Path | None = None,
-    cache_format: Literal["pickle", "feather"] = "pickle",
-) -> OpenMLDataset:
-    """Create a dataset object from a description dict.
-
-    Parameters
-    ----------
-    description : dict
-        Description of a dataset in xml dict.
-    features_file : str
-        Path of the dataset features as xml file.
-    qualities_file : list
-        Path of the dataset qualities as xml file.
-    arff_file : string, optional
-        Path of dataset ARFF file.
-    parquet_file : string, optional
-        Path of dataset Parquet file.
-    cache_format: string, optional
-        Caching option for datasets (feather/pickle)
-
-    Returns
-    -------
-    dataset : dataset object
-        Dataset object from dict and ARFF.
-    """
-    return OpenMLDataset(
-        description["oml:name"],
-        description.get("oml:description"),
-        data_format=description["oml:format"],  # type: ignore
-        dataset_id=int(description["oml:id"]),
-        version=int(description["oml:version"]),
-        creator=description.get("oml:creator"),
-        contributor=description.get("oml:contributor"),
-        collection_date=description.get("oml:collection_date"),
-        upload_date=description.get("oml:upload_date"),
-        language=description.get("oml:language"),
-        licence=description.get("oml:licence"),
-        url=description["oml:url"],
-        default_target_attribute=description.get("oml:default_target_attribute"),
-        row_id_attribute=description.get("oml:row_id_attribute"),
-        ignore_attribute=description.get("oml:ignore_attribute"),
-        version_label=description.get("oml:version_label"),
-        citation=description.get("oml:citation"),
-        tag=description.get("oml:tag"),
-        visibility=description.get("oml:visibility"),
-        original_data_url=description.get("oml:original_data_url"),
-        paper_url=description.get("oml:paper_url"),
-        update_comment=description.get("oml:update_comment"),
-        md5_checksum=description.get("oml:md5_checksum"),
-        data_file=str(arff_file) if arff_file is not None else None,
-        cache_format=cache_format,
-        features_file=str(features_file) if features_file is not None else None,
-        qualities_file=str(qualities_file) if qualities_file is not None else None,
-        parquet_url=description.get("oml:parquet_url"),
-        parquet_file=str(parquet_file) if parquet_file is not None else None,
-    )
+    return api_context.backend.datasets.download_features_file(dataset_id)
 
 
 def _get_online_dataset_arff(dataset_id: int) -> str | None:

@@ -1,17 +1,29 @@
+# ruff: noqa: PLR0913
 from __future__ import annotations
 
 import builtins
 import json
 import logging
+import os
 import pickle
 from collections import OrderedDict
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
+import minio
+import urllib3
+
 from openml._api.resources.base import DatasetsAPI
+from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 from openml.datasets.data_feature import OpenMLDataFeature
 from openml.datasets.dataset import OpenMLDataset
-from openml.exceptions import OpenMLNotAuthorizedError, OpenMLServerError, OpenMLServerException
+from openml.exceptions import (
+    OpenMLHashException,
+    OpenMLNotAuthorizedError,
+    OpenMLPrivateDatasetError,
+    OpenMLServerError,
+    OpenMLServerException,
+)
 
 if TYPE_CHECKING:
     from requests import Response
@@ -30,18 +42,55 @@ NO_ACCESS_GRANTED_ERRCODE = 112
 class DatasetsV1(DatasetsAPI):
     def get(
         self,
-        dataset_id: int | str,
-        *,
-        return_response: bool = False,
-    ) -> OpenMLDataset | tuple[OpenMLDataset, Response]:
+        dataset_id: int,
+        download_data: bool = False,  # noqa: FBT002
+        cache_format: Literal["pickle", "feather"] = "pickle",
+        download_qualities: bool = False,  # noqa: FBT002
+        download_features_meta_data: bool = False,  # noqa: FBT002
+        download_all_files: bool = False,  # noqa: FBT002
+    ) -> OpenMLDataset:
         path = f"data/{dataset_id}"
         response = self._http.get(path)
         xml_content = response.text
-        dataset = self._create_dataset_from_xml(xml_content)
-        if return_response:
-            return dataset, response
+        description = xmltodict.parse(xml_content)["oml:data_set_description"]
 
-        return dataset
+        try:
+            features_file = None
+            qualities_file = None
+
+            if download_features_meta_data:
+                features_file = self.download_features_file(dataset_id)
+            if download_qualities:
+                qualities_file = self.download_qualities_file(dataset_id)
+
+            parquet_file = None
+            skip_parquet = os.environ.get(OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+            download_parquet = "oml:parquet_url" in description and not skip_parquet
+            if download_parquet and (download_data or download_all_files):
+                try:
+                    parquet_file = self.download_dataset_parquet(
+                        description,
+                        download_all_files=download_all_files,
+                    )
+                except urllib3.exceptions.MaxRetryError:
+                    parquet_file = None
+
+            arff_file = None
+            if parquet_file is None and download_data:
+                if download_parquet:
+                    logger.warning("Failed to download parquet, fallback on ARFF.")
+                arff_file = self.download_dataset_arff(description)
+        except OpenMLServerException as e:
+            # if there was an exception
+            # check if the user had access to the dataset
+            if e.code == NO_ACCESS_GRANTED_ERRCODE:
+                raise OpenMLPrivateDatasetError(e.message) from None
+
+            raise e
+
+        return self._create_dataset_from_xml(
+            description, features_file, qualities_file, arff_file, parquet_file, cache_format
+        )
 
     def list(
         self,
@@ -144,7 +193,7 @@ class DatasetsV1(DatasetsAPI):
                 ) from e
             raise e
 
-    def edit(  # noqa: PLR0913
+    def edit(
         self,
         dataset_id: int,
         description: str | None = None,
@@ -336,7 +385,15 @@ class DatasetsV1(DatasetsAPI):
 
         return qualities["oml:data_qualities_list"]["oml:quality"]
 
-    def _create_dataset_from_xml(self, xml: str) -> OpenMLDataset:
+    def _create_dataset_from_xml(
+        self,
+        description: dict,
+        features_file: Path | None = None,
+        qualities_file: Path | None = None,
+        arff_file: Path | None = None,
+        parquet_file: Path | None = None,
+        cache_format: Literal["pickle", "feather"] = "pickle",
+    ) -> OpenMLDataset:
         """Create a dataset given a xml string.
 
         Parameters
@@ -348,14 +405,6 @@ class DatasetsV1(DatasetsAPI):
         -------
         OpenMLDataset
         """
-        description = xmltodict.parse(xml)["oml:data_set_description"]
-
-        # TODO file path after download, cache_format default = 'pickle'
-        arff_file = None
-        features_file = None
-        parquet_file = None
-        qualities_file = None
-
         return OpenMLDataset(
             description["oml:name"],
             description.get("oml:description"),
@@ -375,6 +424,7 @@ class DatasetsV1(DatasetsAPI):
             version_label=description.get("oml:version_label"),
             citation=description.get("oml:citation"),
             tag=description.get("oml:tag"),
+            cache_format=cache_format,
             visibility=description.get("oml:visibility"),
             original_data_url=description.get("oml:original_data_url"),
             paper_url=description.get("oml:paper_url"),
@@ -591,23 +641,110 @@ class DatasetsV1(DatasetsAPI):
         path = f"data/qualities/{dataset_id}"
         return self.download_file(path)
 
+    def download_dataset_parquet(
+        self,
+        description: dict | OpenMLDataset,
+        download_all_files: bool = False,  # noqa: FBT002
+    ) -> Path | None:
+        if isinstance(description, dict):
+            url = str(description.get("oml:parquet_url"))
+        elif isinstance(description, OpenMLDataset):
+            url = str(description._parquet_url)
+            assert description.dataset_id is not None
+        else:
+            raise TypeError("`description` should be either OpenMLDataset or Dict.")
+
+        if download_all_files:
+            self._minio.download_minio_bucket(source=url)
+
+        try:
+            output_file_path = self._minio.download_minio_file(
+                source=url,
+            )
+        except (FileNotFoundError, urllib3.exceptions.MaxRetryError, minio.error.ServerError) as e:
+            logger.warning(f"Could not download file from {url}: {e}")
+            return None
+        return output_file_path
+
+    def download_dataset_arff(
+        self,
+        description: dict | OpenMLDataset,
+    ) -> Path:
+        if isinstance(description, dict):
+            # TODO md5_checksum_fixture = description.get("oml:md5_checksum")
+            url = str(description["oml:url"])
+            did = int(description.get("oml:id"))  # type: ignore
+        elif isinstance(description, OpenMLDataset):
+            # TODO md5_checksum_fixture = description.md5_checksum
+            assert description.url is not None
+            assert description.dataset_id is not None
+
+            url = description.url
+            did = int(description.dataset_id)
+        else:
+            raise TypeError("`description` should be either OpenMLDataset or Dict.")
+
+        try:
+            output_file_path = self._http.download(url)
+        except OpenMLHashException as e:
+            additional_info = f" Raised when downloading dataset {did}."
+            e.args = (e.args[0] + additional_info,)
+            raise e
+
+        return output_file_path
+
 
 class DatasetsV2(DatasetsAPI):
     def get(
         self,
-        dataset_id: int | str,
-        *,
-        return_response: bool = False,
-    ) -> OpenMLDataset | tuple[OpenMLDataset, Response]:
-        path = f"data/{dataset_id}"
+        dataset_id: int,
+        download_data: bool = False,  # noqa: FBT002
+        cache_format: Literal["pickle", "feather"] = "pickle",
+        download_qualities: bool = False,  # noqa: FBT002
+        download_features_meta_data: bool = False,  # noqa: FBT002
+        download_all_files: bool = False,  # noqa: FBT002
+    ) -> OpenMLDataset:
+        path = f"datasets/{dataset_id}"
         response = self._http.get(path)
         json_content = response.json()
-        dataset = self._create_dataset_from_json(json_content)
 
-        if return_response:
-            return dataset, response
+        try:
+            features_file = None
+            qualities_file = None
 
-        return dataset
+            if download_features_meta_data:
+                features_file = self.download_features_file(dataset_id)
+            if download_qualities:
+                qualities_file = self.download_qualities_file(dataset_id)
+
+            parquet_file = None
+            skip_parquet = os.environ.get(OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+            download_parquet = "parquet_url" in json_content and not skip_parquet
+            if download_parquet and (download_data or download_all_files):
+                try:
+                    parquet_file = self.download_dataset_parquet(
+                        json_content,
+                        download_all_files=download_all_files,
+                    )
+                except urllib3.exceptions.MaxRetryError:
+                    parquet_file = None
+
+            arff_file = None
+            if parquet_file is None and download_data:
+                if download_parquet:
+                    logger.warning("Failed to download parquet, fallback on ARFF.")
+                arff_file = self.download_dataset_arff(json_content)
+        except OpenMLServerException as e:
+            # if there was an exception
+            # check if the user had access to the dataset
+            if e.code == NO_ACCESS_GRANTED_ERRCODE:
+                raise OpenMLPrivateDatasetError(e.message) from None
+
+            raise e
+
+        return self._create_dataset_from_json(
+            json_content, features_file, qualities_file, arff_file, parquet_file, cache_format
+        )
 
     def list(
         self,
@@ -665,7 +802,7 @@ class DatasetsV2(DatasetsAPI):
     def delete(self, dataset_id: int) -> bool:
         raise NotImplementedError()
 
-    def edit(  # noqa: PLR0913
+    def edit(
         self,
         dataset_id: int,
         description: str | None = None,
@@ -732,7 +869,15 @@ class DatasetsV2(DatasetsAPI):
 
         return qualities["data_qualities_list"]["quality"]
 
-    def _create_dataset_from_json(self, json_content: dict) -> OpenMLDataset:
+    def _create_dataset_from_json(
+        self,
+        json_content: dict,
+        features_file: Path | None = None,
+        qualities_file: Path | None = None,
+        arff_file: Path | None = None,
+        parquet_file: Path | None = None,
+        cache_format: Literal["pickle", "feather"] = "pickle",
+    ) -> OpenMLDataset:
         """Create a dataset given a json.
 
         Parameters
@@ -744,12 +889,6 @@ class DatasetsV2(DatasetsAPI):
         -------
         OpenMLDataset
         """
-        # TODO file path after download, cache_format default = 'pickle'
-        arff_file = None
-        features_file = None
-        parquet_file = None
-        qualities_file = None
-
         return OpenMLDataset(
             json_content["name"],
             json_content.get("description"),
@@ -769,6 +908,7 @@ class DatasetsV2(DatasetsAPI):
             version_label=json_content.get("version_label"),
             citation=json_content.get("citation"),
             tag=json_content.get("tag"),
+            cache_format=cache_format,
             visibility=json_content.get("visibility"),
             original_data_url=json_content.get("original_data_url"),
             paper_url=json_content.get("paper_url"),
@@ -910,3 +1050,53 @@ class DatasetsV2(DatasetsAPI):
     def download_qualities_file(self, dataset_id: int) -> Path:
         path = f"datasets/qualities/{dataset_id}"
         return self.download_file(path)
+
+    def download_dataset_parquet(
+        self,
+        description: dict | OpenMLDataset,
+        download_all_files: bool = False,  # noqa: FBT002
+    ) -> Path | None:
+        if isinstance(description, dict):
+            url = str(description.get("parquet_url"))
+        elif isinstance(description, OpenMLDataset):
+            url = str(description._parquet_url)
+            assert description.dataset_id is not None
+        else:
+            raise TypeError("`description` should be either OpenMLDataset or Dict.")
+
+        if download_all_files:
+            self._minio.download_minio_bucket(source=url)
+
+        try:
+            output_file_path = self._minio.download_minio_file(source=url)
+        except (FileNotFoundError, urllib3.exceptions.MaxRetryError, minio.error.ServerError) as e:
+            logger.warning(f"Could not download file from {url}: {e}")
+            return None
+        return output_file_path
+
+    def download_dataset_arff(
+        self,
+        description: dict | OpenMLDataset,
+    ) -> Path:
+        if isinstance(description, dict):
+            url = str(description["url"])
+            did = int(description.get("oml:id"))  # type: ignore
+        elif isinstance(description, OpenMLDataset):
+            assert description.url is not None
+            assert description.dataset_id is not None
+
+            url = description.url
+            did = int(description.dataset_id)
+        else:
+            raise TypeError("`description` should be either OpenMLDataset or Dict.")
+
+        try:
+            output_file_path = self._http.download(
+                url,
+            )
+        except OpenMLHashException as e:
+            additional_info = f" Raised when downloading dataset {did}."
+            e.args = (e.args[0] + additional_info,)
+            raise e
+
+        return output_file_path

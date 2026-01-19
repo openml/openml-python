@@ -164,7 +164,7 @@ class HTTPClient(CacheMixin):
     def download(
         self,
         url: str,
-        handler: Callable[[Response, Path, str], Path],
+        handler: Callable[[Response, Path, str], Path] | None = None,
         encoding: str = "utf-8",
     ) -> Path:
         response = self.get(url)
@@ -173,7 +173,7 @@ class HTTPClient(CacheMixin):
         if handler is not None:
             return handler(response, dir_path, encoding)
 
-        return self._text_handler(response, dir_path, encoding, url)
+        return self._text_handler(response, dir_path, encoding)
 
     def _text_handler(self, response: Response, path: Path, encoding: str) -> Path:
         if path.is_dir():
@@ -194,7 +194,7 @@ class MinIOClient(CacheMixin):
         destination: str | Path | None = None,
         exists_ok: bool = True,  # noqa: FBT002
         proxy: str | None = "auto",
-    ) -> str:
+    ) -> Path:
         """Download file ``source`` from a MinIO Bucket and store it at ``destination``.
 
         Parameters
@@ -249,9 +249,9 @@ class MinIOClient(CacheMixin):
             # permission error on minio level).
             raise FileNotFoundError("Bucket does not exist or is private.") from e
 
-        return str(destination)
+        return destination
 
-    def download_minio_bucket(self, source: str, destination: str | Path) -> None:
+    def download_minio_bucket(self, source: str, destination: str | Path | None = None) -> None:
         """Download file ``source`` from a MinIO Bucket and store it at ``destination``.
 
         Does not redownload files which already exist.

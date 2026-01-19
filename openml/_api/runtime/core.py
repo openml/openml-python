@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from openml._api.config import settings
-from openml._api.http.client import HTTPClient
+from openml._api.http.client import HTTPClient, MinIOClient
 from openml._api.resources import (
     DatasetsV1,
     DatasetsV2,
@@ -24,9 +24,9 @@ class APIBackend:
 def build_backend(version: str, *, strict: bool) -> APIBackend:
     v1_http = HTTPClient(config=settings.api.v1)
     v2_http = HTTPClient(config=settings.api.v2)
-
+    minio = MinIOClient()
     v1 = APIBackend(
-        datasets=DatasetsV1(v1_http),
+        datasets=DatasetsV1(v1_http, minio),
         tasks=TasksV1(v1_http),
     )
 
@@ -34,7 +34,7 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
         return v1
 
     v2 = APIBackend(
-        datasets=DatasetsV2(v2_http),
+        datasets=DatasetsV2(v2_http, minio),
         tasks=TasksV2(v2_http),
     )
 

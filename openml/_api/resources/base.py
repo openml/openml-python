@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     import pandas as pd
     from requests import Response
 
-    from openml._api.http import HTTPClient
+    from openml._api.http import HTTPClient, MinIOClient
     from openml.datasets.dataset import OpenMLDataFeature, OpenMLDataset
     from openml.tasks.task import OpenMLTask
 
@@ -19,13 +19,20 @@ class ResourceAPI:
 
 
 class DatasetsAPI(ResourceAPI, ABC):
+    def __init__(self, http: HTTPClient, minio: MinIOClient):
+        self._minio = minio
+        super().__init__(http)
+
     @abstractmethod
-    def get(
+    def get(  # noqa: PLR0913
         self,
-        dataset_id: int | str,
-        *,
-        return_response: bool = False,
-    ) -> OpenMLDataset | tuple[OpenMLDataset, Response]: ...
+        dataset_id: int,
+        download_data: bool = False,  # noqa: FBT002
+        cache_format: Literal["pickle", "feather"] = "pickle",
+        download_qualities: bool = False,  # noqa: FBT002
+        download_features_meta_data: bool = False,  # noqa: FBT002
+        download_all_files: bool = False,  # noqa: FBT002
+    ) -> OpenMLDataset: ...
 
     @abstractmethod
     def list(
@@ -96,6 +103,19 @@ class DatasetsAPI(ResourceAPI, ABC):
 
     @abstractmethod
     def download_qualities_file(self, dataset_id: int) -> Path: ...
+
+    @abstractmethod
+    def download_dataset_parquet(
+        self,
+        description: dict | OpenMLDataset,
+        download_all_files: bool = False,  # noqa: FBT002
+    ) -> Path | None: ...
+
+    @abstractmethod
+    def download_dataset_arff(
+        self,
+        description: dict | OpenMLDataset,
+    ) -> Path: ...
 
 
 class TasksAPI(ResourceAPI, ABC):
