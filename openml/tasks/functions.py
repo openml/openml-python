@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 from yaml import warnings
 
+from openml._api.resources.tasks import TasksV1
+from openml.datasets import get_dataset
 import openml.utils
 from openml._api import api_context
 
@@ -15,6 +17,7 @@ from .task import (
     OpenMLClusteringTask,
     OpenMLLearningCurveTask,
     OpenMLRegressionTask,
+    OpenMLSupervisedTask,
     TaskType,
 )
 
@@ -166,10 +169,19 @@ def get_task(
     -------
     task: OpenMLTask
     """
-    return api_context.backend.tasks.get(
-        task_id, download_splits=download_splits, **get_dataset_kwargs
-    )
+    if not isinstance(task_id, int):
+            raise TypeError(f"Task id should be integer, is {type(task_id)}")
 
+    task =  api_context.backend.tasks.get(task_id, download_splits=download_splits)
+    dataset = get_dataset(task.dataset_id, **get_dataset_kwargs)
+    
+    if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
+        task.class_labels = dataset.retrieve_class_labels(task.target_name)
+
+    if download_splits and isinstance(task, OpenMLSupervisedTask) and isinstance(api_context.backend.tasks, TasksV1):
+        task.download_split()
+
+    return task
 
 def create_task(
     task_type: TaskType,

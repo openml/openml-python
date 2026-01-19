@@ -7,13 +7,11 @@ import pandas as pd
 import xmltodict
 
 from openml._api.resources.base import TasksAPI
-from openml.datasets import get_dataset
 from openml.tasks.task import (
     OpenMLClassificationTask,
     OpenMLClusteringTask,
     OpenMLLearningCurveTask,
     OpenMLRegressionTask,
-    OpenMLSupervisedTask,
     OpenMLTask,
     TaskType,
 )
@@ -25,8 +23,6 @@ class TasksV1(TasksAPI):
     def get(
         self,
         task_id: int,
-        download_splits: bool = False,  # noqa: FBT002
-        **get_dataset_kwargs: Any,
     ) -> OpenMLTask:
         """Download OpenML task for a given task ID.
 
@@ -53,24 +49,9 @@ class TasksV1(TasksAPI):
         if not isinstance(task_id, int):
             raise TypeError(f"Task id should be integer, is {type(task_id)}")
 
-        task = self._get_task_description(task_id)
-        dataset = get_dataset(task.dataset_id, **get_dataset_kwargs)
-        # List of class labels available in dataset description
-        # Including class labels as part of task meta data handles
-        #   the case where data download was initially disabled
-        if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
-            task.class_labels = dataset.retrieve_class_labels(task.target_name)
-        # Clustering tasks do not have class labels
-        # and do not offer download_split
-        if download_splits and isinstance(task, OpenMLSupervisedTask):
-            task.download_split()
+        response = self._http.get(f"task/{task_id}")
+        return self._create_task_from_xml(response.text)        
 
-        return task
-
-    def _get_task_description(self, task_id: int) -> OpenMLTask:
-        response = self._http.get(f"task/{task_id}", return_response=True)
-
-        return self._create_task_from_xml(response.text)
 
     def _create_task_from_xml(self, xml: str) -> OpenMLTask:
         """Create a task given a xml string.
@@ -362,27 +343,13 @@ class TasksV2(TasksAPI):
         self,
         task_id: int,
         download_splits: bool = False,  # noqa: FBT002
-        **get_dataset_kwargs: Any,
     ) -> OpenMLTask:
-        if not isinstance(task_id, int):
-            raise TypeError(f"Task id should be integer, is {type(task_id)}")
-
         if download_splits:
             warnings.warn(
                 "`download_splits` is not yet supported in the v2 API and will be ignored.",
                 stacklevel=2,
             )
-        task = self._get_task_description(task_id)
-        dataset = get_dataset(task.dataset_id, **get_dataset_kwargs)  # Shrivaths work
-        # List of class labels available in dataset description
-        # Including class labels as part of task meta data handles
-        #   the case where data download was initially disabled
-        if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
-            task.class_labels = dataset.retrieve_class_labels(task.target_name)
-
-        return task
-
-    def _get_task_description(self, task_id: int) -> OpenMLTask:
+        
         response = self._http.get(f"tasks/{task_id}")
         return self._create_task_from_json(response.json())
 
@@ -426,39 +393,3 @@ class TasksV2(TasksAPI):
 
         return cls(**common_kwargs)
 
-    def list_task_types(self) -> list[dict[str, str | int | None]]:
-        response = self._http.get("tasktype/list")
-        payload = response.json()
-
-        return [
-            {
-                "id": int(tt["id"]),
-                "name": tt["name"],
-                "description": tt["description"] or None,
-                "creator": tt.get("creator"),
-            }
-            for tt in payload["task_types"]["task_type"]
-        ]
-
-    def get_task_type(self, task_type_id: int) -> dict[str, Any]:
-        if not isinstance(task_type_id, int):
-            raise TypeError("task_type_id must be int")
-
-        response = self._http.get(f"tasktype/{task_type_id}")
-        tt = response.json()["task_type"]
-
-        return {
-            "id": int(tt["id"]),
-            "name": tt["name"],
-            "description": tt.get("description"),
-            "creator": tt.get("creator", []),
-            "creation_date": tt.get("creation_date"),
-            "inputs": [
-                {
-                    "name": i["name"],
-                    "required": i.get("requirement") == "required",
-                    "data_type": i.get("data_type"),
-                }
-                for i in tt.get("input", [])
-            ],
-        }
