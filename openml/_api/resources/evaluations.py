@@ -195,7 +195,7 @@ class EvaluationsV1(EvaluationsAPI):
         uploader_ids = list(
             {eval_["oml:uploader"] for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]},
         )
-        user_dict = self.get_users(uploader_ids)
+        user_dict = self._get_users(uploader_ids)
 
         evals = []
         for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]:
@@ -225,7 +225,7 @@ class EvaluationsV1(EvaluationsAPI):
 
         return evals
 
-    def get_users(self, uploader_ids: list[str]) -> dict:
+    def _get_users(self, uploader_ids: list[str]) -> dict:
         """
         Retrieve usernames for a list of OpenML user IDs.
 
@@ -269,16 +269,6 @@ class EvaluationsV2(EvaluationsAPI):
     ) -> list[OpenMLEvaluation]:
         """
         Retrieve evaluation results from the OpenML v2 JSON API.
-
-        Notes
-        -----
-        This method is not yet implemented.
-        """
-        raise NotImplementedError("V2 API implementation is not yet available")
-
-    def get_users(self, uploader_ids: list[str]) -> dict:
-        """
-        Retrieve usernames for a list of OpenML user IDs using the v2 API.
 
         Notes
         -----

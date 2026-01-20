@@ -49,6 +49,3 @@ class EvaluationsAPI(ResourceAPI, ABC):
         sort_order: str | None = None,
         **kwargs: Any,
     ) -> list[OpenMLEvaluation]: ...
-
-    @abstractmethod
-    def get_users(self, uploader_ids: list[str]) -> dict: ...
