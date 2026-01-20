@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 
 import xmltodict
 
 from openml._api.resources.base import EvaluationsAPI
+from openml.evaluations import OpenMLEvaluation
 
 
 class EvaluationsV1(EvaluationsAPI):
@@ -12,13 +14,21 @@ class EvaluationsV1(EvaluationsAPI):
     Fetches evaluations from the v1 XML API endpoint.
     """
 
-    def list(
+    def list(  # noqa: PLR0913
         self,
         limit: int,
         offset: int,
+        *,
         function: str,
+        tasks: list | None = None,
+        setups: list | None = None,
+        flows: list | None = None,
+        runs: list | None = None,
+        uploaders: list | None = None,
+        study: int | None = None,
+        sort_order: str | None = None,
         **kwargs: Any,
-    ) -> dict:
+    ) -> list[OpenMLEvaluation]:
         """Retrieve evaluations from the OpenML v1 XML API.
 
         This method builds an evaluation query URL based on the provided
@@ -28,36 +38,38 @@ class EvaluationsV1(EvaluationsAPI):
 
         Parameters
         ----------
+        The arguments that are lists are separated from the single value
+        ones which are put into the kwargs.
+
         limit : int
-            Maximum number of evaluations to return.
+            the number of evaluations to return
         offset : int
-            Offset for pagination.
+            the number of evaluations to skip, starting from the first
         function : str
             the evaluation function. e.g., predictive_accuracy
-        **kwargs
-            Optional filters supported by the OpenML evaluation API, such as:
-            - tasks
-            - setups
-            - flows
-            - runs
-            - uploaders
-            - tag
-            - study
-            - sort_order
+
+        tasks : list[int,str], optional
+            the list of task IDs
+        setups: list[int,str], optional
+            the list of setup IDs
+        flows : list[int,str], optional
+            the list of flow IDs
+        runs :list[int,str], optional
+            the list of run IDs
+        uploaders : list[int,str], optional
+            the list of uploader IDs
+
+        study : int, optional
+
+        kwargs: dict, optional
+            Legal filter operators: tag, per_fold
+
+        sort_order : str, optional
+            order of sorting evaluations, ascending ("asc") or descending ("desc")
 
         Returns
         -------
-        dict
-            A dictionary containing:
-            - Parsed evaluation data from the XML response
-            - A "users" key mapping uploader IDs to usernames
-
-        Raises
-        ------
-        ValueError
-            If the XML response does not contain the expected structure.
-        AssertionError
-            If the evaluation data is not in list format as expected.
+        list of OpenMLEvaluation objects
 
         Notes
         -----
@@ -67,15 +79,112 @@ class EvaluationsV1(EvaluationsAPI):
 
         The user information is used to map uploader IDs to usernames.
         """
-        api_call = self._build_url(limit, offset, function, **kwargs)
+        api_call = self._build_url(
+            limit,
+            offset,
+            function=function,
+            tasks=tasks,
+            setups=setups,
+            flows=flows,
+            runs=runs,
+            uploaders=uploaders,
+            study=study,
+            sort_order=sort_order,
+            **kwargs,
+        )
+
         eval_response = self._http.get(api_call)
         xml_content = eval_response.text
 
+        return self._parse_list_xml(xml_content)
+
+    def _build_url(  # noqa: PLR0913
+        self,
+        limit: int,
+        offset: int,
+        *,
+        function: str,
+        tasks: list | None = None,
+        setups: list | None = None,
+        flows: list | None = None,
+        runs: list | None = None,
+        uploaders: list | None = None,
+        study: int | None = None,
+        sort_order: str | None = None,
+        **kwargs: Any,
+    ) -> str:
+        """
+        Construct an OpenML evaluation API URL with filtering parameters.
+
+        Parameters
+        ----------
+        The arguments that are lists are separated from the single value
+        ones which are put into the kwargs.
+
+        limit : int
+            the number of evaluations to return
+        offset : int
+            the number of evaluations to skip, starting from the first
+        function : str
+            the evaluation function. e.g., predictive_accuracy
+
+        tasks : list[int,str], optional
+            the list of task IDs
+        setups: list[int,str], optional
+            the list of setup IDs
+        flows : list[int,str], optional
+            the list of flow IDs
+        runs :list[int,str], optional
+            the list of run IDs
+        uploaders : list[int,str], optional
+            the list of uploader IDs
+
+        study : int, optional
+
+        kwargs: dict, optional
+            Legal filter operators: tag, per_fold
+
+        sort_order : str, optional
+            order of sorting evaluations, ascending ("asc") or descending ("desc")
+
+        Returns
+        -------
+        str
+            A relative API path suitable for an OpenML HTTP request.
+        """
+        api_call = f"evaluation/list/function/{function}"
+        if limit is not None:
+            api_call += f"/limit/{limit}"
+        if offset is not None:
+            api_call += f"/offset/{offset}"
+        if kwargs is not None:
+            for operator, value in kwargs.items():
+                if value is not None:
+                    api_call += f"/{operator}/{value}"
+        if tasks is not None:
+            api_call += f"/task/{','.join([str(int(i)) for i in tasks])}"
+        if setups is not None:
+            api_call += f"/setup/{','.join([str(int(i)) for i in setups])}"
+        if flows is not None:
+            api_call += f"/flow/{','.join([str(int(i)) for i in flows])}"
+        if runs is not None:
+            api_call += f"/run/{','.join([str(int(i)) for i in runs])}"
+        if uploaders is not None:
+            api_call += f"/uploader/{','.join([str(int(i)) for i in uploaders])}"
+        if study is not None:
+            api_call += f"/study/{study}"
+        if sort_order is not None:
+            api_call += f"/sort_order/{sort_order}"
+
+        return api_call
+
+    def _parse_list_xml(self, xml_content: str) -> list[OpenMLEvaluation]:
+        """Helper function to parse API calls which are lists of runs"""
         evals_dict: dict[str, Any] = xmltodict.parse(xml_content, force_list=("oml:evaluation",))
         # Minimalistic check if the XML is useful
         if "oml:evaluations" not in evals_dict:
             raise ValueError(
-                "Error in return XML, does not contain " f'"oml:evaluations": {evals_dict!s}',
+                f'Error in return XML, does not contain "oml:evaluations": {evals_dict!s}',
             )
 
         assert isinstance(evals_dict["oml:evaluations"]["oml:evaluation"], list), (
@@ -87,9 +196,34 @@ class EvaluationsV1(EvaluationsAPI):
             {eval_["oml:uploader"] for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]},
         )
         user_dict = self.get_users(uploader_ids)
-        evals_dict["users"] = user_dict
 
-        return evals_dict
+        evals = []
+        for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]:
+            run_id = int(eval_["oml:run_id"])
+            value = float(eval_["oml:value"]) if "oml:value" in eval_ else None
+            values = json.loads(eval_["oml:values"]) if eval_.get("oml:values", None) else None
+            array_data = eval_.get("oml:array_data")
+
+            evals.append(
+                OpenMLEvaluation(
+                    run_id=run_id,
+                    task_id=int(eval_["oml:task_id"]),
+                    setup_id=int(eval_["oml:setup_id"]),
+                    flow_id=int(eval_["oml:flow_id"]),
+                    flow_name=eval_["oml:flow_name"],
+                    data_id=int(eval_["oml:data_id"]),
+                    data_name=eval_["oml:data_name"],
+                    function=eval_["oml:function"],
+                    upload_time=eval_["oml:upload_time"],
+                    uploader=int(eval_["oml:uploader"]),
+                    uploader_name=user_dict[eval_["oml:uploader"]],
+                    value=value,
+                    values=values,
+                    array_data=array_data,
+                )
+            )
+
+        return evals
 
     def get_users(self, uploader_ids: list[str]) -> dict:
         """
@@ -112,80 +246,27 @@ class EvaluationsV1(EvaluationsAPI):
         users = xmltodict.parse(xml_content_user, force_list=("oml:user",))
         return {user["oml:id"]: user["oml:username"] for user in users["oml:users"]["oml:user"]}
 
-    def _build_url(
-        self,
-        limit: int,
-        offset: int,
-        function: str,
-        **kwargs: Any,
-    ) -> str:
-        """
-        Construct an OpenML evaluation API URL with filtering parameters.
-
-        Parameters
-        ----------
-        limit : int
-            Maximum number of evaluations to return.
-        offset : int
-            Offset for pagination.
-        function : str
-            the evaluation function. e.g., predictive_accuracy
-        **kwargs
-            Evaluation filters such as task IDs, flow IDs,
-            uploader IDs, study name, and sorting options.
-
-        Returns
-        -------
-        str
-            A relative API path suitable for an OpenML HTTP request.
-        """
-        api_call = f"evaluation/list/function/{function}"
-        if limit is not None:
-            api_call += f"/limit/{limit}"
-        if offset is not None:
-            api_call += f"/offset/{offset}"
-
-        # List-based filters
-        list_filters = {
-            "task": kwargs.get("tasks"),
-            "setup": kwargs.get("setups"),
-            "flow": kwargs.get("flows"),
-            "run": kwargs.get("runs"),
-            "uploader": kwargs.get("uploaders"),
-        }
-
-        for name, values in list_filters.items():
-            if values is not None:
-                api_call += f"/{name}/" + ",".join(str(int(v)) for v in values)
-
-        # Single-value filters
-        if kwargs.get("study") is not None:
-            api_call += f"/study/{kwargs['study']}"
-
-        if kwargs.get("sort_order") is not None:
-            api_call += f"/sort_order/{kwargs['sort_order']}"
-
-        # Extra filters (tag, per_fold, future-proof)
-        for key in ("tag", "per_fold"):
-            value = kwargs.get(key)
-            if value is not None:
-                api_call += f"/{key}/{value}"
-
-        return api_call
-
 
 class EvaluationsV2(EvaluationsAPI):
     """V2 API implementation for evaluations.
     Fetches evaluations from the v2 json API endpoint.
     """
 
-    def list(
+    def list(  # noqa: PLR0913
         self,
         limit: int,
         offset: int,
+        *,
         function: str,
+        tasks: list | None = None,
+        setups: list | None = None,
+        flows: list | None = None,
+        runs: list | None = None,
+        uploaders: list | None = None,
+        study: int | None = None,
+        sort_order: str | None = None,
         **kwargs: Any,
-    ) -> dict:
+    ) -> list[OpenMLEvaluation]:
         """
         Retrieve evaluation results from the OpenML v2 JSON API.
 

@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from requests import Response
 
     from openml.datasets.dataset import OpenMLDataset
+    from openml.evaluations import OpenMLEvaluation
     from openml.tasks.task import OpenMLTask
 
 
@@ -33,13 +34,21 @@ class TasksAPI(ResourceAPI):
 
 class EvaluationsAPI(ResourceAPI, ABC):
     @abstractmethod
-    def list(
+    def list(  # noqa: PLR0913
         self,
         limit: int,
         offset: int,
+        *,
         function: str,
+        tasks: list | None = None,
+        setups: list | None = None,
+        flows: list | None = None,
+        runs: list | None = None,
+        uploaders: list | None = None,
+        study: int | None = None,
+        sort_order: str | None = None,
         **kwargs: Any,
-    ) -> dict: ...
+    ) -> list[OpenMLEvaluation]: ...
 
     @abstractmethod
     def get_users(self, uploader_ids: list[str]) -> dict: ...
