@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -8,6 +9,7 @@ if TYPE_CHECKING:
 
     from openml._api.http import HTTPClient
     from openml.datasets.dataset import OpenMLDataset
+    from openml.setups.setup import OpenMLSetup
     from openml.tasks.task import OpenMLTask
 
 
@@ -29,3 +31,25 @@ class TasksAPI(ResourceAPI, ABC):
         *,
         return_response: bool = False,
     ) -> OpenMLTask | tuple[OpenMLTask, Response]: ...
+
+
+class SetupsAPI(ResourceAPI, ABC):
+    @abstractmethod
+    def list(
+        self,
+        limit: int,
+        offset: int,
+        *,
+        setup: Iterable[int] | None = None,
+        flow: int | None = None,
+        tag: str | None = None,
+    ) -> list[OpenMLSetup]: ...
+
+    @abstractmethod
+    def _create_setup(self, result_dict: dict) -> OpenMLSetup: ...
+
+    @abstractmethod
+    def get(self, setup_id: int) -> OpenMLSetup: ...
+
+    @abstractmethod
+    def exists(self) -> int: ...
