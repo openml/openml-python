@@ -2,11 +2,10 @@
 # ruff: noqa: PLR0913
 from __future__ import annotations
 
-import json
 from functools import partial
 from itertools import chain
-from typing import Any
-from typing_extensions import Literal, overload
+from typing import TYPE_CHECKING, Literal
+from typing_extensions import overload
 
 import numpy as np
 import pandas as pd
@@ -16,7 +15,9 @@ import openml
 import openml._api_calls
 import openml.utils
 from openml._api import api_context
-from openml.evaluations import OpenMLEvaluation
+
+if TYPE_CHECKING:
+    from openml.evaluations import OpenMLEvaluation
 
 
 @overload
@@ -121,7 +122,7 @@ def list_evaluations(
         per_fold_str = str(per_fold).lower()
 
     listing_call = partial(
-        _list_evaluations,
+        api_context.backend.evaluations.list,
         function=function,
         tasks=tasks,
         setups=setups,
@@ -141,102 +142,6 @@ def list_evaluations(
         return pd.DataFrame.from_records(records)  # No index...
 
     return {e.run_id: e for e in flattened}
-
-
-def _list_evaluations(
-    limit: int,
-    offset: int,
-    *,
-    function: str,
-    tasks: list | None = None,
-    setups: list | None = None,
-    flows: list | None = None,
-    runs: list | None = None,
-    uploaders: list | None = None,
-    study: int | None = None,
-    sort_order: str | None = None,
-    **kwargs: Any,
-) -> list[OpenMLEvaluation]:
-    """
-    Perform API call ``/evaluation/function{function}/{filters}``
-
-    Parameters
-    ----------
-    The arguments that are lists are separated from the single value
-    ones which are put into the kwargs.
-
-    limit : int
-        the number of evaluations to return
-    offset : int
-        the number of evaluations to skip, starting from the first
-    function : str
-        the evaluation function. e.g., predictive_accuracy
-
-    tasks : list[int,str], optional
-        the list of task IDs
-    setups: list[int,str], optional
-        the list of setup IDs
-    flows : list[int,str], optional
-        the list of flow IDs
-    runs :list[int,str], optional
-        the list of run IDs
-    uploaders : list[int,str], optional
-        the list of uploader IDs
-
-    study : int, optional
-
-    kwargs: dict, optional
-        Legal filter operators: tag, per_fold
-
-    sort_order : str, optional
-        order of sorting evaluations, ascending ("asc") or descending ("desc")
-
-    Returns
-    -------
-    list of OpenMLEvaluation objects
-    """
-    evals_dict = api_context.backend.evaluations.list(
-        limit,
-        offset,
-        function=function,
-        tasks=tasks,
-        setups=setups,
-        flows=flows,
-        runs=runs,
-        uploaders=uploaders,
-        study=study,
-        sort_order=sort_order,
-        **kwargs,
-    )
-
-    user_dict = evals_dict["users"]
-    evals = []
-    for eval_ in evals_dict["oml:evaluations"]["oml:evaluation"]:
-        run_id = int(eval_["oml:run_id"])
-        value = float(eval_["oml:value"]) if "oml:value" in eval_ else None
-        values = json.loads(eval_["oml:values"]) if eval_.get("oml:values", None) else None
-        array_data = eval_.get("oml:array_data")
-
-        evals.append(
-            OpenMLEvaluation(
-                run_id=run_id,
-                task_id=int(eval_["oml:task_id"]),
-                setup_id=int(eval_["oml:setup_id"]),
-                flow_id=int(eval_["oml:flow_id"]),
-                flow_name=eval_["oml:flow_name"],
-                data_id=int(eval_["oml:data_id"]),
-                data_name=eval_["oml:data_name"],
-                function=eval_["oml:function"],
-                upload_time=eval_["oml:upload_time"],
-                uploader=int(eval_["oml:uploader"]),
-                uploader_name=user_dict[eval_["oml:uploader"]],
-                value=value,
-                values=values,
-                array_data=array_data,
-            )
-        )
-
-    return evals
 
 
 def list_evaluation_measures() -> list[str]:
