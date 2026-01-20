@@ -28,10 +28,11 @@ from openml.exceptions import (
 if TYPE_CHECKING:
     from requests import Response
 
-    import openml
 
 import pandas as pd
 import xmltodict
+
+import openml
 
 logger = logging.getLogger(__name__)
 
@@ -693,6 +694,20 @@ class DatasetsV1(DatasetsAPI):
 
         return output_file_path
 
+    def add_topic(self, data_id: int, topic: str) -> int:
+        form_data = {"data_id": data_id, "topic": topic}  # type: openml._api_calls.DATA_TYPE
+        result_xml = openml._api_calls._perform_api_call("data/topicadd", "post", data=form_data)
+        result = xmltodict.parse(result_xml)
+        data_id = result["oml:data_topic"]["oml:id"]
+        return int(data_id)
+
+    def delete_topic(self, data_id: int, topic: str) -> int:
+        form_data = {"data_id": data_id, "topic": topic}  # type: openml._api_calls.DATA_TYPE
+        result_xml = openml._api_calls._perform_api_call("data/topicdelete", "post", data=form_data)
+        result = xmltodict.parse(result_xml)
+        data_id = result["oml:data_topic"]["oml:id"]
+        return int(data_id)
+
 
 class DatasetsV2(DatasetsAPI):
     def get(
@@ -1100,3 +1115,9 @@ class DatasetsV2(DatasetsAPI):
             raise e
 
         return output_file_path
+
+    def add_topic(self, data_id: int, topic: str) -> int:
+        raise NotImplementedError()
+
+    def delete_topic(self, data_id: int, topic: str) -> int:
+        raise NotImplementedError()

@@ -267,7 +267,7 @@ class MinIOClient(CacheMixin):
         parsed_url = urllib.parse.urlparse(source)
 
         # expect path format: /BUCKET/path/to/file.ext
-        _, bucket, *prefixes, _file = parsed_url.path.split("/")
+        _, bucket, *prefixes, _ = parsed_url.path.split("/")
         prefix = "/".join(prefixes)
 
         client = minio.Minio(endpoint=parsed_url.netloc, secure=False)

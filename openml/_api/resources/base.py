@@ -117,6 +117,12 @@ class DatasetsAPI(ResourceAPI, ABC):
         description: dict | OpenMLDataset,
     ) -> Path: ...
 
+    @abstractmethod
+    def add_topic(self, data_id: int, topic: str) -> int: ...
+
+    @abstractmethod
+    def delete_topic(self, data_id: int, topic: str) -> int: ...
+
 
 class TasksAPI(ResourceAPI, ABC):
     @abstractmethod

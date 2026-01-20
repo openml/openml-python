@@ -80,7 +80,7 @@ def list_datasets(
 
     Parameters
     ----------
-    dataset_id : list, optional
+    data_id : list, optional
         A list of data ids, to specify which datasets should be
         listed
     offset : int, optional
@@ -842,6 +842,7 @@ def data_feature_remove_ontology(data_id: int, index: int, ontology: str) -> boo
     return api_context.backend.datasets.feature_remove_ontology(data_id, index, ontology)
 
 
+# TODO used only in tests
 def _topic_add_dataset(data_id: int, topic: str) -> int:
     """
     Adds a topic for a dataset.
@@ -858,15 +859,12 @@ def _topic_add_dataset(data_id: int, topic: str) -> int:
     -------
     Dataset id
     """
-    if not isinstance(data_id, int):
-        raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
-    form_data = {"data_id": data_id, "topic": topic}  # type: openml._api_calls.DATA_TYPE
-    result_xml = openml._api_calls._perform_api_call("data/topicadd", "post", data=form_data)
-    result = xmltodict.parse(result_xml)
-    data_id = result["oml:data_topic"]["oml:id"]
-    return int(data_id)
+    from openml._api import api_context
+
+    return api_context.backend.datasets.add_topic(data_id, topic)
 
 
+# TODO used only in tests
 def _topic_delete_dataset(data_id: int, topic: str) -> int:
     """
     Removes a topic from a dataset.
@@ -883,15 +881,12 @@ def _topic_delete_dataset(data_id: int, topic: str) -> int:
     -------
     Dataset id
     """
-    if not isinstance(data_id, int):
-        raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
-    form_data = {"data_id": data_id, "topic": topic}  # type: openml._api_calls.DATA_TYPE
-    result_xml = openml._api_calls._perform_api_call("data/topicdelete", "post", data=form_data)
-    result = xmltodict.parse(result_xml)
-    data_id = result["oml:data_topic"]["oml:id"]
-    return int(data_id)
+    from openml._api import api_context
+
+    return api_context.backend.datasets.delete_topic(data_id, topic)
 
 
+# TODO used by tests only
 def _get_dataset_description(did_cache_dir: Path, dataset_id: int) -> dict[str, Any]:
     """Get the dataset description as xml dictionary.
 
@@ -935,6 +930,7 @@ def _get_dataset_description(did_cache_dir: Path, dataset_id: int) -> dict[str, 
     return description  # type: ignore
 
 
+# TODO remove cache dir
 def _get_dataset_parquet(
     description: dict | OpenMLDataset,
     cache_directory: Path | None = None,  # noqa: ARG001
@@ -972,6 +968,7 @@ def _get_dataset_parquet(
     return api_context.backend.datasets.download_dataset_parquet(description, download_all_files)
 
 
+# TODO remove cache dir
 def _get_dataset_arff(
     description: dict | OpenMLDataset,
     cache_directory: Path | None = None,  # noqa: ARG001
@@ -1003,6 +1000,7 @@ def _get_dataset_arff(
     return api_context.backend.datasets.download_dataset_arff(description)
 
 
+# TODO remove cache dir
 def _get_dataset_features_file(
     did_cache_dir: str | Path | None,  # noqa: ARG001
     dataset_id: int,
@@ -1033,6 +1031,7 @@ def _get_dataset_features_file(
     return api_context.backend.datasets.download_features_file(dataset_id)
 
 
+# TODO remove cache dir
 def _get_dataset_qualities_file(
     did_cache_dir: str | Path | None,  # noqa: ARG001
     dataset_id: int,
@@ -1060,9 +1059,10 @@ def _get_dataset_qualities_file(
     # cache directory not used here anymore
     from openml._api import api_context
 
-    return api_context.backend.datasets.download_features_file(dataset_id)
+    return api_context.backend.datasets.download_qualities_file(dataset_id)
 
 
+# TODO used only in tests
 def _get_online_dataset_arff(dataset_id: int) -> str | None:
     """Download the ARFF file for a given dataset id
     from the OpenML website.
@@ -1085,6 +1085,7 @@ def _get_online_dataset_arff(dataset_id: int) -> str | None:
     )
 
 
+# TODO used only in tests
 def _get_online_dataset_format(dataset_id: int) -> str:
     """Get the dataset format for a given dataset id from the OpenML website.
 
