@@ -14,7 +14,8 @@ from openml._api.resources import (
 )
 
 if TYPE_CHECKING:
-    from openml._api.resources.base import DatasetsAPI, FlowsAPI, TasksAPI
+    from openml._api.resources.base import DatasetsAPI, FlowsAPI, ResourceAPI, TasksAPI
+    from openml.base import OpenMLBase
 
 
 class APIBackend:
@@ -22,6 +23,25 @@ class APIBackend:
         self.datasets = datasets
         self.tasks = tasks
         self.flows = flows
+
+    def get_resource_for_entity(self, entity: OpenMLBase) -> ResourceAPI:
+        from openml.datasets.dataset import OpenMLDataset
+        from openml.flows.flow import OpenMLFlow
+        from openml.runs.run import OpenMLRun
+        from openml.study.study import OpenMLStudy
+        from openml.tasks.task import OpenMLTask
+
+        if isinstance(entity, OpenMLFlow):
+            return self.flows  # type: ignore
+        if isinstance(entity, OpenMLRun):
+            return self.runs  # type: ignore
+        if isinstance(entity, OpenMLDataset):
+            return self.datasets  # type: ignore
+        if isinstance(entity, OpenMLTask):
+            return self.tasks  # type: ignore
+        if isinstance(entity, OpenMLStudy):
+            return self.studies  # type: ignore
+        raise ValueError(f"No resource manager available for entity type {type(entity)}")
 
 
 def build_backend(version: str, *, strict: bool) -> APIBackend:

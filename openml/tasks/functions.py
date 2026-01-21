@@ -444,16 +444,11 @@ def _get_task_description(task_id: int) -> OpenMLTask:
     except OpenMLCacheException:
         _cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
         xml_file = _cache_dir / "task.xml"
-        openml._api_calls._perform_api_call(f"task/{task_id}", "get")
+        task_xml = openml._api_calls._perform_api_call(f"task/{task_id}", "get")
 
-        if isinstance(result, tuple):
-            task, response = result
-            with xml_file.open("w", encoding="utf8") as fh:
-                fh.write(response.text)
-        else:
-            task = result
-
-        return task
+        with xml_file.open("w", encoding="utf8") as fh:
+            fh.write(task_xml)
+        return _create_task_from_xml(task_xml)
 
 
 def _create_task_from_xml(xml: str) -> OpenMLTask:

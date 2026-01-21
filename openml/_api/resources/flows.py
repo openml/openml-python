@@ -7,6 +7,7 @@ import requests
 import xmltodict
 
 from openml._api.resources.base import FlowsAPI
+from openml.exceptions import OpenMLServerException
 from openml.flows.flow import OpenMLFlow
 
 
@@ -53,16 +54,31 @@ class FlowsV1(FlowsAPI):
         if not (isinstance(external_version, str) and len(external_version) > 0):
             raise ValueError("Argument 'version' should be a non-empty string")
 
-        xml_response = self._http.post(
-            "flow/exists", data={"name": name, "external_version": external_version}
-        ).text
+        data = {"name": name, "external_version": external_version, "api_key": self._http.key}
+        # Avoid duplicating base_url when server already contains the API path
+        server = self._http.server
+        base = self._http.base_url
+        if base and base.strip("/") in server:
+            url = server.rstrip("/") + "/flow/exists"
+            response = requests.post(
+                url, data=data, headers=self._http.headers, timeout=self._http.timeout
+            )
+            xml_response = response.text
+        else:
+            xml_response = self._http.post("flow/exists", data=data).text
         result_dict = xmltodict.parse(xml_response)
+        # Detect error payloads and raise
+        if "oml:error" in result_dict:
+            err = result_dict["oml:error"]
+            code = int(err.get("oml:code", 0)) if "oml:code" in err else None
+            message = err.get("oml:message", "Server returned an error")
+            raise OpenMLServerException(message=message, code=code)
+
         flow_id = int(result_dict["oml:flow_exists"]["oml:id"])
         return flow_id if flow_id > 0 else False
 
     def list(
         self,
-        *,
         limit: int | None = None,
         offset: int | None = None,
         tag: str | None = None,
@@ -100,8 +116,27 @@ class FlowsV1(FlowsAPI):
         if uploader is not None:
             api_call += f"/uploader/{uploader}"
 
-        xml_string = self._http.get(api_call).text
+        server = self._http.server
+        base = self._http.base_url
+        if base and base.strip("/") in server:
+            url = server.rstrip("/") + "/" + api_call
+            response = requests.get(
+                url,
+                headers=self._http.headers,
+                params={"api_key": self._http.key},
+                timeout=self._http.timeout,
+            )
+            xml_string = response.text
+        else:
+            response = self._http.get(api_call, use_api_key=True)
+            xml_string = response.text
         flows_dict = xmltodict.parse(xml_string, force_list=("oml:flow",))
+
+        if "oml:error" in flows_dict:
+            err = flows_dict["oml:error"]
+            code = int(err.get("oml:code", 0)) if "oml:code" in err else None
+            message = err.get("oml:message", "Server returned an error")
+            raise OpenMLServerException(message=message, code=code)
 
         assert isinstance(flows_dict["oml:flows"]["oml:flow"], list), type(flows_dict["oml:flows"])
         assert flows_dict["oml:flows"]["@xmlns:oml"] == "http://openml.org/openml", flows_dict[
@@ -149,8 +184,26 @@ class FlowsV1(FlowsAPI):
         if "description" not in file_elements:
             file_elements["description"] = flow._to_xml()
 
-        # POST to server
-        response = self._http.post("flow", data=file_elements)
+        # POST to server (multipart/files). Ensure api_key is sent in the form data.
+        files = file_elements
+        data = {"api_key": self._http.key}
+        # If server already contains base path, post directly with requests to avoid double base_url
+        server = self._http.server
+        base = self._http.base_url
+        if base and base.strip("/") in server:
+            url = server.rstrip("/") + "/flow"
+            response = requests.post(
+                url, files=files, data=data, headers=self._http.headers, timeout=self._http.timeout
+            )
+        else:
+            response = self._http.post("flow", files=files, data=data)
+
+        parsed = xmltodict.parse(response.text)
+        if "oml:error" in parsed:
+            err = parsed["oml:error"]
+            code = int(err.get("oml:code", 0)) if "oml:code" in err else None
+            message = err.get("oml:message", "Server returned an error")
+            raise OpenMLServerException(message=message, code=code)
 
         # Parse response and update flow with server-assigned ID
         xml_response = xmltodict.parse(response.text)
@@ -258,7 +311,7 @@ class FlowsV2(FlowsAPI):
         flow_dict = {
             "oml:flow": {
                 "@xmlns:oml": "http://openml.org/openml",
-                "oml:id": str(v2_json.get("id", "")),
+                "oml:id": str(v2_json.get("id", "0")),
                 "oml:uploader": str(v2_json.get("uploader", "")),
                 "oml:name": v2_json.get("name", ""),
                 "oml:version": str(v2_json.get("version", "")),

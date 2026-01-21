@@ -167,33 +167,6 @@ def list_flows(
     return pd.concat(batches)
 
 
-def _list_flows(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
-    """
-    Perform the api call that return a list of all flows.
-
-    Parameters
-    ----------
-    limit : int
-        the maximum number of flows to return
-    offset : int
-        the number of flows to skip, starting from the first
-    kwargs: dict, optional
-        Legal filter operators: uploader, tag
-
-    Returns
-    -------
-    flows : dataframe
-    """
-    from openml._api import api_context
-
-    return api_context.backend.flows.list(
-        limit=limit,
-        offset=offset,
-        tag=kwargs.get("tag"),
-        uploader=kwargs.get("uploader"),
-    )
-
-
 def flow_exists(name: str, external_version: str) -> int | bool:
     """Retrieves the flow id.
 
@@ -289,31 +262,6 @@ def get_flow_id(
     flows = list_flows()
     flows = flows.query(f'name == "{flow_name}"')
     return flows["id"].to_list()  # type: ignore[no-any-return]
-
-
-def __list_flows(api_call: str) -> pd.DataFrame:
-    """Backwards-compatible indirection; now routes via new backend."""
-    from openml._api import api_context
-
-    parts = api_call.split("/")
-    limit = None
-    offset = None
-    tag = None
-    uploader = None
-    try:
-        if "limit" in parts:
-            limit = int(parts[parts.index("limit") + 1])
-        if "offset" in parts:
-            offset = int(parts[parts.index("offset") + 1])
-        if "tag" in parts:
-            tag = parts[parts.index("tag") + 1]
-        if "uploader" in parts:
-            uploader = parts[parts.index("uploader") + 1]
-    except (ValueError, IndexError):
-        # Silently continue if parsing fails; all params default to None
-        pass
-
-    return api_context.backend.flows.list(limit=limit, offset=offset, tag=tag, uploader=uploader)
 
 
 def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
