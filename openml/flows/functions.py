@@ -88,7 +88,7 @@ def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = T
         ``strict_version`` is True, an exception will be raised.
     strict_version : bool, optional (default=True)
         When ``reinstantiate`` is True, whether to enforce exact version
-        requirements for the extension/model. If False, a fallback flow may
+        requirements for the extension/model. If False, a new flow may
         be returned when versions differ.
 
     Returns
@@ -204,7 +204,7 @@ def list_flows(
 
     Side Effects
     ------------
-    - None: results are fetched and returned; no local state is modified.
+    - None: results are fetched and returned; Read-only operation.
 
     Preconditions
     -------------
