@@ -13,7 +13,7 @@ class DelayMethod(str, Enum):
 class APIConfig:
     server: str
     base_url: str
-    key: str
+    api_key: str
     timeout: int = 10  # seconds
 
 
@@ -48,12 +48,12 @@ settings = Settings(
         v1=APIConfig(
             server="https://www.openml.org/",
             base_url="api/v1/xml/",
-            key="...",
+            api_key="...",
         ),
         v2=APIConfig(
             server="http://127.0.0.1:8001/",
             base_url="",
-            key="...",
+            api_key="...",
         ),
     ),
     connection=ConnectionConfig(),
