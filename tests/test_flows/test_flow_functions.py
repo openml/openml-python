@@ -453,7 +453,6 @@ class TestFlowFunctions(TestBase):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_flow_not_owned(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_owned.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -466,14 +465,13 @@ def test_delete_flow_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(40_000)
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/40000"
+    flow_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/flow/40000"
     assert flow_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_flow_with_run(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_has_runs.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -486,14 +484,13 @@ def test_delete_flow_with_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(40_000)
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/40000"
+    flow_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/flow/40000"
     assert flow_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_subflow(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_is_subflow.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -506,14 +503,13 @@ def test_delete_subflow(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(40_000)
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/40000"
+    flow_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/flow/40000"
     assert flow_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_successful.xml"
     mock_delete.return_value = create_request_response(
         status_code=200,
@@ -523,7 +519,7 @@ def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
     success = openml.flows.delete_flow(33364)
     assert success
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/33364"
+    flow_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/flow/33364"
     assert flow_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -531,7 +527,6 @@ def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
 @mock.patch.object(requests.Session, "delete")
 @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
 def test_delete_unknown_flow(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_exist.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -544,6 +539,6 @@ def test_delete_unknown_flow(mock_delete, test_files_directory, test_api_key):
     ):
         openml.flows.delete_flow(9_999_999)
 
-    flow_url = "https://test.openml.org/api/v1/xml/flow/9999999"
+    flow_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/flow/9999999"
     assert flow_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")

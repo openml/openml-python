@@ -1730,7 +1730,6 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_owned.xml"
     )
@@ -1745,14 +1744,13 @@ def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_ke
     ):
         openml.datasets.delete_dataset(40_000)
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
+    dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/40000"
     assert dataset_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_has_tasks.xml"
     )
@@ -1767,14 +1765,13 @@ def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key
     ):
         openml.datasets.delete_dataset(40_000)
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
+    dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/40000"
     assert dataset_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_successful.xml"
     )
@@ -1786,14 +1783,13 @@ def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key)
     success = openml.datasets.delete_dataset(40000)
     assert success
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
+    dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/40000"
     assert dataset_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_exist.xml"
     )
@@ -1808,7 +1804,7 @@ def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key)
     ):
         openml.datasets.delete_dataset(9_999_999)
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/9999999"
+    dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/9999999"
     assert dataset_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -2010,7 +2006,7 @@ def test_get_dataset_parquet(requests_mock, test_files_directory):
             test_files_directory / "mock_responses" / "datasets" / "data_description_61.xml"
     )
     # While the mocked example is from production, unit tests by default connect to the test server.
-    requests_mock.get("https://test.openml.org/api/v1/xml/data/61", text=content_file.read_text())
+    requests_mock.get(f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/61", text=content_file.read_text())
     dataset = openml.datasets.get_dataset(61, download_data=True)
     assert dataset._parquet_url is not None
     assert dataset.parquet_file is not None

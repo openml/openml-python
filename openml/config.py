@@ -27,6 +27,8 @@ OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
 OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
 _TEST_SERVER_NORMAL_USER_KEY = "normaluser"
 
+TEST_SERVER_URL = "https://test.openml.org"
+
 
 class _Config(TypedDict):
     apikey: str
@@ -213,7 +215,7 @@ class ConfigurationForExamples:
     _last_used_server = None
     _last_used_key = None
     _start_last_called = False
-    _test_server = "https://test.openml.org/api/v1/xml"
+    _test_server = f"{TEST_SERVER_URL}/api/v1/xml"
     _test_apikey = _TEST_SERVER_NORMAL_USER_KEY
 
     @classmethod
