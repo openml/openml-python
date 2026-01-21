@@ -266,9 +266,6 @@ class DatasetsV1(DatasetsAPI):
         -------
         Dataset id
         """
-        if not isinstance(dataset_id, int):
-            raise TypeError(f"`dataset_id` must be of type `int`, not {type(dataset_id)}.")
-
         # compose data edit parameters as xml
         form_data = {"data_id": dataset_id}  # type: openml._api_calls.DATA_TYPE
         xml = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
@@ -1095,7 +1092,7 @@ class DatasetsV2(DatasetsAPI):
     ) -> Path:
         if isinstance(description, dict):
             url = str(description["url"])
-            did = int(description.get("oml:id"))  # type: ignore
+            did = int(description.get("id"))  # type: ignore
         elif isinstance(description, OpenMLDataset):
             assert description.url is not None
             assert description.dataset_id is not None

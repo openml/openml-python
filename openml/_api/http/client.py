@@ -265,7 +265,8 @@ class MinIOClient(CacheMixin):
         """
         destination = self._get_cache_dir(source, {}) if destination is None else Path(destination)
         parsed_url = urllib.parse.urlparse(source)
-
+        if destination.suffix:
+            destination = destination.parent
         # expect path format: /BUCKET/path/to/file.ext
         _, bucket, *prefixes, _ = parsed_url.path.split("/")
         prefix = "/".join(prefixes)

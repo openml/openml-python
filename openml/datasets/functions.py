@@ -741,6 +741,9 @@ def edit_dataset(
     """
     from openml._api import api_context
 
+    if not isinstance(data_id, int):
+        raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
+
     return api_context.backend.datasets.edit(
         data_id,
         description,
