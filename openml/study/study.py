@@ -176,11 +176,23 @@ class BaseStudy(OpenMLBase):
 
     def push_tag(self, tag: str) -> None:
         """Add a tag to the study."""
-        raise NotImplementedError("Tags for studies is not (yet) supported.")
+        raise NotImplementedError(
+            "Tag management for studies is not yet supported. "
+            "The OpenML Python SDK does not currently provide functionality"
+            "for adding tags to studies."
+            "For updates on this feature, please refer to the GitHub issues at: "
+            "https://github.com/openml/openml-python/issues"
+        )
 
     def remove_tag(self, tag: str) -> None:
         """Remove a tag from the study."""
-        raise NotImplementedError("Tags for studies is not (yet) supported.")
+        raise NotImplementedError(
+            "Tag management for studies is not yet supported. "
+            "The OpenML Python SDK does not currently provide functionality"
+            "for removing tags from studies. "
+            "For updates on this feature, please refer to the GitHub issues at: "
+            "https://github.com/openml/openml-python/issues"
+        )
 
 
 class OpenMLStudy(BaseStudy):
