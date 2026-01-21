@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import Any
 
 import xmltodict
 
@@ -156,7 +157,7 @@ class SetupsV1(SetupsAPI):
             value=result_dict["oml:value"],
         )
 
-    def get(self, setup_id: int) -> OpenMLSetup:
+    def get(self, setup_id: int) -> tuple[str, OpenMLSetup]:
         """
         Downloads the setup (configuration) description from OpenML
         and returns a structured object
@@ -168,11 +169,40 @@ class SetupsV1(SetupsAPI):
 
         Returns
         -------
-        OpenMLSetup (an initialized openml setup object)
+        tuple[str, OpenMLSetup]
+            A tuple containing:
+            - xml_content: The raw XML response from the server
+            - setup: An initialized OpenMLSetup object parsed from the XML
         """
+        url_suffix = f"/setup/{setup_id}"
+        setup_response = self._http.get(url_suffix)
+        xml_content = setup_response.text
+        result_dict = xmltodict.parse(xml_content)
 
-    def exists(self) -> int:
-        pass
+        setup = self._create_setup(result_dict)
+        return xml_content, setup
+
+    def exists(self, file_elements: dict[str, Any]) -> int:
+        """
+        Checks whether a hyperparameter configuration already exists on the server.
+
+        Parameters
+        ----------
+        file_elements : dict
+            Dictionary containing file data for the API request
+
+        Returns
+        -------
+        setup_id : int
+            setup id iff exists, False otherwise
+        """
+        api_call = "/setup/exists/"
+        setup_response = self._http.post(api_call, files=file_elements)
+        xml_content = setup_response.text
+        result_dict = xmltodict.parse(xml_content)
+
+        setup_id = int(result_dict["oml:setup_exists"]["oml:id"])
+        return setup_id if setup_id > 0 else False
 
 
 class SetupsV2(SetupsAPI):
@@ -192,8 +222,8 @@ class SetupsV2(SetupsAPI):
     def _create_setup(self, result_dict: dict) -> OpenMLSetup:
         raise NotImplementedError("V2 API implementation is not yet available")
 
-    def get(self, setup_id: int) -> OpenMLSetup:
+    def get(self, setup_id: int) -> tuple[str, OpenMLSetup]:
         raise NotImplementedError("V2 API implementation is not yet available")
 
-    def exists(self) -> int:
+    def exists(self, file_elements: dict[str, Any]) -> int:
         raise NotImplementedError("V2 API implementation is not yet available")
