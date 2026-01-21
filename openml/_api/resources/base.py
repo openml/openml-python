@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from requests import Response
@@ -49,7 +49,7 @@ class SetupsAPI(ResourceAPI, ABC):
     def _create_setup(self, result_dict: dict) -> OpenMLSetup: ...
 
     @abstractmethod
-    def get(self, setup_id: int) -> OpenMLSetup: ...
+    def get(self, setup_id: int) -> tuple[str, OpenMLSetup]: ...
 
     @abstractmethod
-    def exists(self) -> int: ...
+    def exists(self, file_elements: dict[str, Any]) -> int: ...

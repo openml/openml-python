@@ -58,14 +58,8 @@ def setup_exists(flow: OpenMLFlow) -> int:
     file_elements = {
         "description": ("description.arff", description),
     }  # type: openml._api_calls.FILE_ELEMENTS_TYPE
-    result = openml._api_calls._perform_api_call(
-        "/setup/exists/",
-        "post",
-        file_elements=file_elements,
-    )
-    result_dict = xmltodict.parse(result)
-    setup_id = int(result_dict["oml:setup_exists"]["oml:id"])
-    return setup_id if setup_id > 0 else False
+
+    return api_context.backend.setups.exists(file_elements=file_elements)
 
 
 def _get_cached_setup(setup_id: int) -> OpenMLSetup:
@@ -92,7 +86,7 @@ def _get_cached_setup(setup_id: int) -> OpenMLSetup:
         setup_file = setup_cache_dir / "description.xml"
         with setup_file.open(encoding="utf8") as fh:
             setup_xml = xmltodict.parse(fh.read())
-            return _create_setup_from_xml(setup_xml)
+            return _create_setup(setup_xml)
 
     except OSError as e:
         raise openml.exceptions.OpenMLCacheException(
@@ -122,13 +116,12 @@ def get_setup(setup_id: int) -> OpenMLSetup:
     try:
         return _get_cached_setup(setup_id)
     except openml.exceptions.OpenMLCacheException:
-        url_suffix = f"/setup/{setup_id}"
-        setup_xml = openml._api_calls._perform_api_call(url_suffix, "get")
+        result: tuple[str, OpenMLSetup] = api_context.backend.setups.get(setup_id=setup_id)
+        setup_xml, setup = result
         with setup_file.open("w", encoding="utf8") as fh:
             fh.write(setup_xml)
 
-    result_dict = xmltodict.parse(setup_xml)
-    return _create_setup_from_xml(result_dict)
+    return setup
 
 
 def list_setups(  # noqa: PLR0913
@@ -238,6 +231,6 @@ def _to_dict(flow_id: int, openml_parameter_settings: list[dict[str, Any]]) -> O
     return xml
 
 
-def _create_setup_from_xml(result_dict: dict) -> OpenMLSetup:
+def _create_setup(result_dict: dict) -> OpenMLSetup:
     """Turns an API xml result into a OpenMLSetup object (or dict)"""
     return api_context.backend.setups._create_setup(result_dict)
