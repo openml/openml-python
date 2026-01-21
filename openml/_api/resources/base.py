@@ -8,7 +8,8 @@ if TYPE_CHECKING:
     import pandas as pd
     from requests import Response
 
-    from openml._api.http import HTTPClient, MinIOClient
+    from openml._api.clients.http import HTTPClient
+    from openml._api.clients.minio import MinIOClient
     from openml.datasets.dataset import OpenMLDataFeature, OpenMLDataset
     from openml.tasks.task import OpenMLTask
 
@@ -96,7 +97,7 @@ class DatasetsAPI(ResourceAPI, ABC):
     ) -> dict[str, float]: ...
 
     @abstractmethod
-    def download_file(self, url_ext: str, encoding: str = "utf-8") -> Path: ...
+    def _download_file(self, url_ext: str, file_path: str, encoding: str = "utf-8") -> Path: ...
 
     @abstractmethod
     def download_features_file(self, dataset_id: int) -> Path: ...

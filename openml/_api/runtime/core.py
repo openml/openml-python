@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from openml._api.clients import HTTPCache, HTTPClient
+from openml._api.clients import HTTPCache, HTTPClient, MinIOClient
 from openml._api.config import settings
 from openml._api.resources import (
     DatasetsV1,
@@ -27,6 +27,7 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
         path=Path(settings.cache.dir),
         ttl=settings.cache.ttl,
     )
+    minio_client = MinIOClient(path=Path(settings.cache.dir))
     v1_http_client = HTTPClient(
         server=settings.api.v1.server,
         base_url=settings.api.v1.base_url,
@@ -49,7 +50,7 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
     )
 
     v1 = APIBackend(
-        datasets=DatasetsV1(v1_http_client),
+        datasets=DatasetsV1(v1_http_client, minio_client),
         tasks=TasksV1(v1_http_client),
     )
 
@@ -57,7 +58,7 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
         return v1
 
     v2 = APIBackend(
-        datasets=DatasetsV2(v2_http_client),
+        datasets=DatasetsV2(v2_http_client, minio_client),
         tasks=TasksV2(v2_http_client),
     )
 

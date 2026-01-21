@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import time
+from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlencode, urljoin, urlparse
@@ -209,3 +210,27 @@ class HTTPClient:
             use_api_key=True,
             **request_kwargs,
         )
+
+    def download(
+        self,
+        url: str,
+        handler: Callable[[Response, Path, str], Path] | None = None,
+        encoding: str = "utf-8",
+        file_name: str = "response.txt",
+    ) -> Path:
+        file_path = self.cache.path / "downloads" / urlparse(url).path.lstrip("/") / file_name
+        file_path = file_path.expanduser()
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        if file_path.exists():
+            return file_path
+
+        response = self.get(url)
+        if handler is not None:
+            return handler(response, file_path, encoding)
+
+        return self._text_handler(response, file_path, encoding)
+
+    def _text_handler(self, response: Response, path: Path, encoding: str) -> Path:
+        with path.open("w", encoding=encoding) as f:
+            f.write(response.text)
+        return path

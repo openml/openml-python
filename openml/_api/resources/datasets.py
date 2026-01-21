@@ -28,11 +28,11 @@ from openml.exceptions import (
 if TYPE_CHECKING:
     from requests import Response
 
+    import openml
+
 
 import pandas as pd
 import xmltodict
-
-import openml
 
 logger = logging.getLogger(__name__)
 
@@ -621,23 +621,21 @@ class DatasetsV1(DatasetsAPI):
             }
         )
 
-    def download_file(self, url_ext: str, encoding: str = "utf-8") -> Path:
+    def _download_file(self, url_ext: str, file_path: str, encoding: str = "utf-8") -> Path:
         def __handler(response: Response, path: Path, encoding: str) -> Path:
-            file_path = path / "response.xml"
-            file_path.parent.mkdir(parents=True, exist_ok=True)
-            with file_path.open("w", encoding=encoding) as f:
+            with path.open("w", encoding=encoding) as f:
                 f.write(response.text)
-            return file_path
+            return path
 
-        return self._http.download(url_ext, __handler, encoding)
+        return self._http.download(url_ext, __handler, encoding, file_path)
 
     def download_features_file(self, dataset_id: int) -> Path:
         path = f"data/features/{dataset_id}"
-        return self.download_file(path)
+        return self._download_file(path, "features.xml")
 
     def download_qualities_file(self, dataset_id: int) -> Path:
         path = f"data/qualities/{dataset_id}"
-        return self.download_file(path)
+        return self._download_file(path, "qualities.xml")
 
     def download_dataset_parquet(
         self,
@@ -683,7 +681,7 @@ class DatasetsV1(DatasetsAPI):
             raise TypeError("`description` should be either OpenMLDataset or Dict.")
 
         try:
-            output_file_path = self._http.download(url)
+            output_file_path = self._http.download(url, file_name="dataset.arff")
         except OpenMLHashException as e:
             additional_info = f" Raised when downloading dataset {did}."
             e.args = (e.args[0] + additional_info,)
@@ -693,14 +691,14 @@ class DatasetsV1(DatasetsAPI):
 
     def add_topic(self, data_id: int, topic: str) -> int:
         form_data = {"data_id": data_id, "topic": topic}  # type: openml._api_calls.DATA_TYPE
-        result_xml = openml._api_calls._perform_api_call("data/topicadd", "post", data=form_data)
+        result_xml = self._http.post("data/topicadd", data=form_data)
         result = xmltodict.parse(result_xml)
         data_id = result["oml:data_topic"]["oml:id"]
         return int(data_id)
 
     def delete_topic(self, data_id: int, topic: str) -> int:
         form_data = {"data_id": data_id, "topic": topic}  # type: openml._api_calls.DATA_TYPE
-        result_xml = openml._api_calls._perform_api_call("data/topicdelete", "post", data=form_data)
+        result_xml = self._http.post("data/topicdelete", data=form_data)
         result = xmltodict.parse(result_xml)
         data_id = result["oml:data_topic"]["oml:id"]
         return int(data_id)
@@ -1045,23 +1043,21 @@ class DatasetsV2(DatasetsAPI):
             }
         )
 
-    def download_file(self, url_ext: str, encoding: str = "utf-8") -> Path:
+    def _download_file(self, url_ext: str, file_name: str, encoding: str = "utf-8") -> Path:
         def __handler(response: Response, path: Path, encoding: str) -> Path:
-            file_path = path / "response.json"
-            file_path.parent.mkdir(parents=True, exist_ok=True)
-            with file_path.open("w", encoding=encoding) as f:
+            with path.open("w", encoding=encoding) as f:
                 json.dump(response.json(), f, indent=4)
-            return file_path
+            return path
 
-        return self._http.download(url_ext, __handler, encoding)
+        return self._http.download(url_ext, __handler, encoding, file_name)
 
     def download_features_file(self, dataset_id: int) -> Path:
         path = f"datasets/features/{dataset_id}"
-        return self.download_file(path)
+        return self._download_file(path, "features.json")
 
     def download_qualities_file(self, dataset_id: int) -> Path:
         path = f"datasets/qualities/{dataset_id}"
-        return self.download_file(path)
+        return self._download_file(path, "qualities.json")
 
     def download_dataset_parquet(
         self,
@@ -1103,9 +1099,7 @@ class DatasetsV2(DatasetsAPI):
             raise TypeError("`description` should be either OpenMLDataset or Dict.")
 
         try:
-            output_file_path = self._http.download(
-                url,
-            )
+            output_file_path = self._http.download(url, file_name="dataset.arff")
         except OpenMLHashException as e:
             additional_info = f" Raised when downloading dataset {did}."
             e.args = (e.args[0] + additional_info,)
