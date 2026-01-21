@@ -5,9 +5,9 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     import pandas as pd
+    from _api.http import HTTPClient
     from requests import Response
 
-    from _api.http import HTTPClient
     from openml.datasets.dataset import OpenMLDataset
     from openml.tasks.task import OpenMLTask, TaskType
 
