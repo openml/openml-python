@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal
+from enum import Enum
 
-DelayMethod = Literal["human", "robot"]
+
+class DelayMethod(str, Enum):
+    HUMAN = "human"
+    ROBOT = "robot"
 
 
 @dataclass
@@ -23,12 +26,8 @@ class APISettings:
 @dataclass
 class ConnectionConfig:
     retries: int = 3
-    delay_method: DelayMethod = "human"
+    delay_method: DelayMethod = DelayMethod.HUMAN
     delay_time: int = 1  # seconds
-
-    def __post_init__(self) -> None:
-        if self.delay_method not in ("human", "robot"):
-            raise ValueError(f"delay_method must be 'human' or 'robot', got {self.delay_method}")
 
 
 @dataclass
