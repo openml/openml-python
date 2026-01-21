@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlencode, urljoin, urlparse
@@ -34,11 +36,70 @@ class CacheMixin:
 
         return Path(self.dir).joinpath(*netloc_parts, *path_parts, *params_part)
 
-    def _get_cache_response(self, cache_dir: Path) -> Response:  # noqa: ARG002
-        return Response()
+    def _get_cache_response(self, cache_dir: Path) -> Response:
+        if not cache_dir.exists():
+            raise FileNotFoundError(f"Cache directory not found: {cache_dir}")
 
-    def _set_cache_response(self, cache_dir: Path, response: Response) -> None:  # noqa: ARG002
-        return None
+        meta_path = cache_dir / "meta.json"
+        headers_path = cache_dir / "headers.json"
+        body_path = cache_dir / "body.bin"
+
+        if not (meta_path.exists() and headers_path.exists() and body_path.exists()):
+            raise FileNotFoundError(f"Incomplete cache at {cache_dir}")
+
+        with meta_path.open("r", encoding="utf-8") as f:
+            meta = json.load(f)
+
+        created_at = meta.get("created_at")
+        if created_at is None:
+            raise ValueError("Cache metadata missing 'created_at'")
+
+        if time.time() - created_at > self.ttl:
+            raise TimeoutError(f"Cache expired for {cache_dir}")
+
+        with headers_path.open("r", encoding="utf-8") as f:
+            headers = json.load(f)
+
+        body = body_path.read_bytes()
+
+        response = Response()
+        response.status_code = meta["status_code"]
+        response.url = meta["url"]
+        response.reason = meta["reason"]
+        response.headers = headers
+        response._content = body
+        response.encoding = meta["encoding"]
+
+        return response
+
+    def _set_cache_response(self, cache_dir: Path, response: Response) -> None:
+        cache_dir.mkdir(parents=True, exist_ok=True)
+
+        # body
+        (cache_dir / "body.bin").write_bytes(response.content)
+
+        # headers
+        with (cache_dir / "headers.json").open("w", encoding="utf-8") as f:
+            json.dump(dict(response.headers), f)
+
+        # meta
+        meta = {
+            "status_code": response.status_code,
+            "url": response.url,
+            "reason": response.reason,
+            "encoding": response.encoding,
+            "elapsed": response.elapsed.total_seconds(),
+            "created_at": time.time(),
+            "request": {
+                "method": response.request.method if response.request else None,
+                "url": response.request.url if response.request else None,
+                "headers": dict(response.request.headers) if response.request else None,
+                "body": response.request.body if response.request else None,
+            },
+        }
+
+        with (cache_dir / "meta.json").open("w", encoding="utf-8") as f:
+            json.dump(meta, f)
 
 
 class HTTPClient(CacheMixin):
@@ -88,7 +149,10 @@ class HTTPClient(CacheMixin):
         if use_cache:
             try:
                 return self._get_cache_response(cache_dir)
-            # TODO: handle ttl expired error
+            except FileNotFoundError:
+                pass
+            except TimeoutError:
+                pass
             except Exception:
                 raise
 
@@ -114,8 +178,6 @@ class HTTPClient(CacheMixin):
         use_api_key: bool = False,
         **request_kwargs: Any,
     ) -> Response:
-        # TODO: remove override when cache is implemented
-        use_cache = False
         return self.request(
             method="GET",
             path=path,
