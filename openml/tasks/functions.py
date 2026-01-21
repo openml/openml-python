@@ -1,16 +1,16 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import warnings
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
-from yaml import warnings
 
-from openml._api.resources.tasks import TasksV1
-from openml.datasets import get_dataset
 import openml.utils
 from openml._api import api_context
+from openml._api.resources.tasks import TasksV1, TasksV2
+from openml.datasets import get_dataset
 
 from .task import (
     OpenMLClassificationTask,
@@ -136,9 +136,7 @@ def get_tasks(
     tasks = []
     for task_id in task_ids:
         tasks.append(
-            api_context.backend.tasks.get(
-                task_id, download_data=download_data, download_qualities=download_qualities
-            )
+            get_task(task_id, download_data=download_data, download_qualities=download_qualities)
         )
     return tasks
 
@@ -170,18 +168,28 @@ def get_task(
     task: OpenMLTask
     """
     if not isinstance(task_id, int):
-            raise TypeError(f"Task id should be integer, is {type(task_id)}")
+        raise TypeError(f"Task id should be integer, is {type(task_id)}")
 
-    task =  api_context.backend.tasks.get(task_id, download_splits=download_splits)
+    task = api_context.backend.tasks.get(task_id)
     dataset = get_dataset(task.dataset_id, **get_dataset_kwargs)
-    
+
     if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
         task.class_labels = dataset.retrieve_class_labels(task.target_name)
 
-    if download_splits and isinstance(task, OpenMLSupervisedTask) and isinstance(api_context.backend.tasks, TasksV1):
+    if (
+        download_splits
+        and isinstance(task, OpenMLSupervisedTask)
+        and isinstance(api_context.backend.tasks, TasksV1)
+    ):
         task.download_split()
+    elif download_splits and isinstance(api_context.backend.tasks, TasksV2):
+        warnings.warn(
+            "`download_splits` is not yet supported in the v2 API and will be ignored.",
+            stacklevel=2,
+        )
 
     return task
+
 
 def create_task(
     task_type: TaskType,

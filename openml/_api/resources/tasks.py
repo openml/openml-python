@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import builtins
 import warnings
 from typing import Any
 
@@ -20,24 +21,15 @@ TASKS_CACHE_DIR_NAME = "tasks"
 
 
 class TasksV1(TasksAPI):
-    def get(
-        self,
-        task_id: int,
-    ) -> OpenMLTask:
+    def get(self, task_id: int) -> OpenMLTask:
         """Download OpenML task for a given task ID.
 
         Downloads the task representation.
-
-        Use the `download_splits` parameter to control whether the splits are downloaded.
-        Moreover, you may pass additional parameter (args or kwargs) that are passed to
-        :meth:`openml.datasets.get_dataset`.
 
         Parameters
         ----------
         task_id : int
             The OpenML task id of the task to download.
-        download_splits: bool (default=False)
-            Whether to download the splits as well.
         get_dataset_kwargs :
             Args and kwargs can be used pass optional parameters to
             :meth:`openml.datasets.get_dataset`.
@@ -50,8 +42,7 @@ class TasksV1(TasksAPI):
             raise TypeError(f"Task id should be integer, is {type(task_id)}")
 
         response = self._http.get(f"task/{task_id}")
-        return self._create_task_from_xml(response.text)        
-
+        return self._create_task_from_xml(response.text)
 
     def _create_task_from_xml(self, xml: str) -> OpenMLTask:
         """Create a task given a xml string.
@@ -282,7 +273,7 @@ class TasksV1(TasksAPI):
 
         return pd.DataFrame.from_dict(tasks, orient="index")
 
-    def _get_estimation_procedure_list(self) -> list[dict[str, Any]]:
+    def _get_estimation_procedure_list(self) -> builtins.list[dict[str, Any]]:
         """Return a list of all estimation procedures which are on OpenML.
 
         Returns
@@ -339,17 +330,7 @@ class TasksV1(TasksAPI):
 
 
 class TasksV2(TasksAPI):
-    def get(
-        self,
-        task_id: int,
-        download_splits: bool = False,  # noqa: FBT002
-    ) -> OpenMLTask:
-        if download_splits:
-            warnings.warn(
-                "`download_splits` is not yet supported in the v2 API and will be ignored.",
-                stacklevel=2,
-            )
-        
+    def get(self, task_id: int) -> OpenMLTask:
         response = self._http.get(f"tasks/{task_id}")
         return self._create_task_from_json(response.json())
 
@@ -391,5 +372,13 @@ class TasksV2(TasksAPI):
             TaskType.LEARNING_CURVE: OpenMLLearningCurveTask,
         }[task_type_id]
 
-        return cls(**common_kwargs)
+        return cls(**common_kwargs)  # type: ignore
 
+    def list(
+        self,
+        limit: int,
+        offset: int,
+        task_type: TaskType | int | None = None,
+        **kwargs: Any,
+    ) -> pd.DataFrame:
+        raise NotImplementedError("Task listing is not available in API v2 yet.")
