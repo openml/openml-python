@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import os
 import re
 from collections import OrderedDict
 from functools import partial
@@ -30,7 +31,8 @@ def _get_cached_flows() -> OrderedDict:
     flows = OrderedDict()  # type: 'OrderedDict[int, OpenMLFlow]'
 
     flow_cache_dir = openml.utils._create_cache_directory(FLOWS_CACHE_DIR_NAME)
-    directory_content = sorted(p.name for p in flow_cache_dir.iterdir())
+    directory_content = os.listdir(flow_cache_dir)  # noqa : PTH208
+    directory_content.sort()
     # Find all flow ids for which we have downloaded
     # the flow description
 
