@@ -105,18 +105,18 @@ class OpenMLDatasetTest(TestBase):
         col_dtype = {
             "pclass": "uint8",
             "survived": "category",
-            "name": "object",
+            "name": "str",
             "sex": "category",
             "age": "float64",
             "sibsp": "uint8",
             "parch": "uint8",
-            "ticket": "object",
+            "ticket": "str",
             "fare": "float64",
-            "cabin": "object",
+            "cabin": "str",
             "embarked": "category",
-            "boat": "object",
+            "boat": "str",
             "body": "float64",
-            "home.dest": "object",
+            "home.dest": "str",
         }
         for col_name in data.columns:
             assert data[col_name].dtype.name == col_dtype[col_name]
