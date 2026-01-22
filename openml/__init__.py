@@ -36,6 +36,7 @@ from .__version__ import __version__
 from .datasets import OpenMLDataFeature, OpenMLDataset
 from .evaluations import OpenMLEvaluation
 from .flows import OpenMLFlow
+from .publish import publish
 from .runs import OpenMLRun
 from .setups import OpenMLParameter, OpenMLSetup
 from .study import OpenMLBenchmarkSuite, OpenMLStudy
@@ -108,6 +109,8 @@ __all__ = [
     "OpenMLSupervisedTask",
     "OpenMLTask",
     "__version__",
+    "__version__",
+    "_api_calls",
     "_api_calls",
     "config",
     "datasets",
@@ -115,6 +118,7 @@ __all__ = [
     "exceptions",
     "extensions",
     "flows",
+    "publish",
     "runs",
     "setups",
     "study",

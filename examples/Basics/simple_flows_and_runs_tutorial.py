@@ -2,9 +2,8 @@
 # A simple tutorial on how to upload results from a machine learning experiment to OpenML.
 
 # %%
-import sklearn
 from sklearn.neighbors import KNeighborsClassifier
-
+import sklearn
 import openml
 
 # %% [markdown]
@@ -54,7 +53,17 @@ y_pred_proba = clf.predict_proba(X_test)
 
 # %% [markdown]
 # ## Upload the machine learning experiments to OpenML
-# First, create a fow and fill it with metadata about the machine learning model.
+#
+# ### Option A: Automatic publishing (simplified)
+# The publish function automatically detects the model type and creates the flow:
+
+# %%
+knn_flow = openml.publish(clf, tags=["openml_tutorial_knn"])
+print(f"Flow was auto-published with ID {knn_flow.flow_id}")
+
+# %% [markdown]
+# ### Option B: Manual flow construction (full control)
+# For advanced use cases, you can manually construct the flow:
 
 # %%
 knn_flow = openml.flows.OpenMLFlow(
@@ -76,6 +85,9 @@ knn_flow = openml.flows.OpenMLFlow(
 )
 knn_flow.publish()
 print(f"knn_flow was published with the ID {knn_flow.flow_id}")
+
+# %% [markdown]
+# Now we'll use the auto-published flow to create and upload a run.
 
 # %% [markdown]
 # Second, we create a run to store the results associated with the flow.
