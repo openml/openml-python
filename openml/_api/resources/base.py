@@ -124,6 +124,12 @@ class DatasetsAPI(ResourceAPI, ABC):
     @abstractmethod
     def delete_topic(self, data_id: int, topic: str) -> int: ...
 
+    @abstractmethod
+    def get_online_dataset_format(self, dataset_id: int) -> str: ...
+
+    @abstractmethod
+    def get_online_dataset_arff(self, dataset_id: int) -> str | None: ...
+
 
 class TasksAPI(ResourceAPI, ABC):
     @abstractmethod

@@ -28,8 +28,6 @@ from openml.exceptions import (
 if TYPE_CHECKING:
     from requests import Response
 
-    import openml
-
 
 import pandas as pd
 import xmltodict
@@ -158,6 +156,7 @@ class DatasetsV1(DatasetsAPI):
         bool
             True if the deletion was successful. False otherwise.
         """
+        # TODO will be updated later from the utils
         url_suffix = f"data/{dataset_id}"
         try:
             result_xml = self._http.delete(url_suffix)
@@ -267,7 +266,7 @@ class DatasetsV1(DatasetsAPI):
         Dataset id
         """
         # compose data edit parameters as xml
-        form_data = {"data_id": dataset_id}  # type: openml._api_calls.DATA_TYPE
+        form_data = {"data_id": dataset_id}  # type: dict[str, str | int]
         xml = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
         xml["oml:data_edit_parameters"] = OrderedDict()
         xml["oml:data_edit_parameters"]["@xmlns:oml"] = "http://openml.org/openml"
@@ -290,7 +289,7 @@ class DatasetsV1(DatasetsAPI):
 
         file_elements = {
             "edit_parameters": ("description.xml", xmltodict.unparse(xml)),
-        }  # type: openml._api_calls.FILE_ELEMENTS_TYPE
+        }  # type: dict[str, str | tuple[str, str]]
         result_xml = self._http.post("data/edit", data=form_data, files=file_elements).text
         result = xmltodict.parse(result_xml)
         dataset_id = result["oml:data_edit"]["oml:id"]
@@ -352,7 +351,7 @@ class DatasetsV1(DatasetsAPI):
         if status not in legal_status:
             raise ValueError(f"Illegal status value. Legal values: {legal_status}")
 
-        data: openml._api_calls.DATA_TYPE = {"data_id": dataset_id, "status": status}
+        data: dict[str, str | int] = {"data_id": dataset_id, "status": status}
         result_xml = self._http.post("data/status/update", data=data).text
         result = xmltodict.parse(result_xml)
         server_data_id = result["oml:data_status_update"]["oml:id"]
@@ -692,18 +691,29 @@ class DatasetsV1(DatasetsAPI):
         return output_file_path
 
     def add_topic(self, data_id: int, topic: str) -> int:
-        form_data = {"data_id": data_id, "topic": topic}  # type: openml._api_calls.DATA_TYPE
+        form_data = {"data_id": data_id, "topic": topic}  # type: dict[str, str | int]
         result_xml = self._http.post("data/topicadd", data=form_data)
         result = xmltodict.parse(result_xml)
         data_id = result["oml:data_topic"]["oml:id"]
         return int(data_id)
 
     def delete_topic(self, data_id: int, topic: str) -> int:
-        form_data = {"data_id": data_id, "topic": topic}  # type: openml._api_calls.DATA_TYPE
+        form_data = {"data_id": data_id, "topic": topic}  # type: dict[str, str | int]
         result_xml = self._http.post("data/topicdelete", data=form_data)
         result = xmltodict.parse(result_xml)
         data_id = result["oml:data_topic"]["oml:id"]
         return int(data_id)
+
+    def get_online_dataset_format(self, dataset_id: int) -> str:
+        dataset_xml = self._http.get(f"data/{dataset_id}")
+        # build a dict from the xml and get the format from the dataset description
+        return xmltodict.parse(dataset_xml)["oml:data_set_description"]["oml:format"].lower()  # type: ignore
+
+    def get_online_dataset_arff(self, dataset_id: int) -> str | None:
+        dataset_xml = self._http.get(f"data/{dataset_id}")
+        # build a dict from the xml.
+        # use the url from the dataset description and return the ARFF string
+        return str(self.download_dataset_arff(xmltodict.parse(dataset_xml)))
 
 
 class DatasetsV2(DatasetsAPI):
@@ -717,7 +727,7 @@ class DatasetsV2(DatasetsAPI):
         download_all_files: bool = False,  # noqa: FBT002
     ) -> OpenMLDataset:
         path = f"datasets/{dataset_id}"
-        response = self._http.get(path)
+        response = self._http.get(path, use_cache=True)
         json_content = response.json()
 
         try:
@@ -852,7 +862,7 @@ class DatasetsV2(DatasetsAPI):
         if status not in legal_status:
             raise ValueError(f"Illegal status value. Legal values: {legal_status}")
 
-        data: openml._api_calls.DATA_TYPE = {"dataset_id": dataset_id, "status": status}
+        data: dict[str, str | int] = {"dataset_id": dataset_id, "status": status}
         result = self._http.post("datasets/status/update", json=data).json()
         server_data_id = result["dataset_id"]
         server_status = result["status"]
@@ -1114,3 +1124,14 @@ class DatasetsV2(DatasetsAPI):
 
     def delete_topic(self, data_id: int, topic: str) -> int:
         raise NotImplementedError()
+
+    def get_online_dataset_format(self, dataset_id: int) -> str:
+        dataset_json = self._http.get(f"datasets/{dataset_id}").text
+        # build a dict from the xml and get the format from the dataset description
+        return dataset_json["data_set_description"]["format"].lower()  # type: ignore
+
+    def get_online_dataset_arff(self, dataset_id: int) -> str | None:
+        dataset_json = self._http.get(f"datasets/{dataset_id}").json()
+        # build a dict from the xml.
+        # use the url from the dataset description and return the ARFF string
+        return str(self.download_dataset_arff(dataset_json))

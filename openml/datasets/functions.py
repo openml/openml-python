@@ -17,6 +17,7 @@ from scipy.sparse import coo_matrix
 
 import openml._api_calls
 import openml.utils
+from openml._api import api_context
 from openml.exceptions import (
     OpenMLServerError,
 )
@@ -56,8 +57,6 @@ def list_qualities() -> list[str]:
     -------
     list
     """
-    from openml._api import api_context
-
     return api_context.backend.datasets.list_qualities()
 
 
@@ -111,8 +110,6 @@ def list_datasets(
         If qualities are calculated for the dataset, some of
         these are also included as columns.
     """
-    from openml._api import api_context
-
     listing_call = partial(
         api_context.backend.datasets.list,
         data_id=data_id,
@@ -374,8 +371,6 @@ def get_dataset(
         did_cache_dir = _get_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, dataset_id)
         if did_cache_dir.exists():
             _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, did_cache_dir)
-
-    from openml._api import api_context
 
     return api_context.backend.datasets.get(
         dataset_id,
@@ -659,8 +654,6 @@ def status_update(data_id: int, status: Literal["active", "deactivated"]) -> Non
     status : str,
         'active' or 'deactivated'
     """
-    from openml._api import api_context
-
     legal_status = {"active", "deactivated"}
     if status not in legal_status:
         raise ValueError(f"Illegal status value. Legal values: {legal_status}")
@@ -739,8 +732,6 @@ def edit_dataset(
     -------
     Dataset id
     """
-    from openml._api import api_context
-
     if not isinstance(data_id, int):
         raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
 
@@ -789,8 +780,6 @@ def fork_dataset(data_id: int) -> int:
     Dataset id of the forked dataset
 
     """
-    from openml._api import api_context
-
     return api_context.backend.datasets.fork(dataset_id=data_id)
 
 
@@ -815,8 +804,6 @@ def data_feature_add_ontology(data_id: int, index: int, ontology: str) -> bool:
     -------
     True or throws an OpenML server exception
     """
-    from openml._api import api_context
-
     return api_context.backend.datasets.feature_add_ontology(data_id, index, ontology)
 
 
@@ -840,8 +827,6 @@ def data_feature_remove_ontology(data_id: int, index: int, ontology: str) -> boo
     -------
     True or throws an OpenML server exception
     """
-    from openml._api import api_context
-
     return api_context.backend.datasets.feature_remove_ontology(data_id, index, ontology)
 
 
@@ -862,8 +847,6 @@ def _topic_add_dataset(data_id: int, topic: str) -> int:
     -------
     Dataset id
     """
-    from openml._api import api_context
-
     return api_context.backend.datasets.add_topic(data_id, topic)
 
 
@@ -884,8 +867,6 @@ def _topic_delete_dataset(data_id: int, topic: str) -> int:
     -------
     Dataset id
     """
-    from openml._api import api_context
-
     return api_context.backend.datasets.delete_topic(data_id, topic)
 
 
@@ -966,8 +947,6 @@ def _get_dataset_parquet(
     output_filename : Path, optional
         Location of the Parquet file if successfully downloaded, None otherwise.
     """
-    from openml._api import api_context
-
     return api_context.backend.datasets.download_dataset_parquet(description, download_all_files)
 
 
@@ -998,8 +977,6 @@ def _get_dataset_arff(
     output_filename : Path
         Location of ARFF file.
     """
-    from openml._api import api_context
-
     return api_context.backend.datasets.download_dataset_arff(description)
 
 
@@ -1029,7 +1006,6 @@ def _get_dataset_features_file(
         Path of the cached dataset feature file
     """
     # cache directory not used here anymore
-    from openml._api import api_context
 
     return api_context.backend.datasets.download_features_file(dataset_id)
 
@@ -1060,7 +1036,6 @@ def _get_dataset_qualities_file(
         Path of the cached qualities file
     """
     # cache directory not used here anymore
-    from openml._api import api_context
 
     return api_context.backend.datasets.download_qualities_file(dataset_id)
 
@@ -1080,12 +1055,7 @@ def _get_online_dataset_arff(dataset_id: int) -> str | None:
     str or None
         A string representation of an ARFF file. Or None if file already exists.
     """
-    dataset_xml = openml._api_calls._perform_api_call(f"data/{dataset_id}", "get")
-    # build a dict from the xml.
-    # use the url from the dataset description and return the ARFF string
-    return openml._api_calls._download_text_file(
-        xmltodict.parse(dataset_xml)["oml:data_set_description"]["oml:url"],
-    )
+    return api_context.backend.datasets.get_online_dataset_arff(dataset_id)
 
 
 # TODO used only in tests
@@ -1102,9 +1072,7 @@ def _get_online_dataset_format(dataset_id: int) -> str:
     str
         Dataset format.
     """
-    dataset_xml = openml._api_calls._perform_api_call(f"data/{dataset_id}", "get")
-    # build a dict from the xml and get the format from the dataset description
-    return xmltodict.parse(dataset_xml)["oml:data_set_description"]["oml:format"].lower()  # type: ignore
+    return api_context.backend.datasets.get_online_dataset_format(dataset_id)
 
 
 def delete_dataset(dataset_id: int) -> bool:
@@ -1123,6 +1091,4 @@ def delete_dataset(dataset_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
-    from openml._api import api_context
-
     return api_context.backend.datasets.delete(dataset_id)
