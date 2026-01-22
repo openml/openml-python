@@ -667,11 +667,11 @@ class DatasetsV1(DatasetsAPI):
         description: dict | OpenMLDataset,
     ) -> Path:
         if isinstance(description, dict):
-            # TODO md5_checksum_fixture = description.get("oml:md5_checksum")
+            md5_checksum_fixture = description.get("oml:md5_checksum")
             url = str(description["oml:url"])
             did = int(description.get("oml:id"))  # type: ignore
         elif isinstance(description, OpenMLDataset):
-            # TODO md5_checksum_fixture = description.md5_checksum
+            md5_checksum_fixture = description.md5_checksum
             assert description.url is not None
             assert description.dataset_id is not None
 
@@ -681,7 +681,9 @@ class DatasetsV1(DatasetsAPI):
             raise TypeError("`description` should be either OpenMLDataset or Dict.")
 
         try:
-            output_file_path = self._http.download(url, file_name="dataset.arff")
+            output_file_path = self._http.download(
+                url, file_name="dataset.arff", md5_checksum=md5_checksum_fixture
+            )
         except OpenMLHashException as e:
             additional_info = f" Raised when downloading dataset {did}."
             e.args = (e.args[0] + additional_info,)

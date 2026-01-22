@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import time
 from collections.abc import Callable
@@ -131,6 +132,7 @@ class HTTPClient:
         *,
         use_cache: bool = False,
         use_api_key: bool = False,
+        md5_checksum: str | None,
         **request_kwargs: Any,
     ) -> Response:
         url = urljoin(self.server, urljoin(self.base_url, path))
@@ -164,10 +166,19 @@ class HTTPClient:
             **request_kwargs,
         )
 
+        if md5_checksum is not None:
+            self._verify_checksum(response, md5_checksum)
+
         if use_cache and self.cache is not None:
             self.cache.save(cache_key, response)
 
         return response
+
+    def _verify_checksum(self, response: Response, md5_checksum: str) -> None:
+        # ruff sees hashlib.md5 as insecure
+        actual = hashlib.md5(response.content).hexdigest()  # noqa: S324
+        if actual != md5_checksum:
+            raise ValueError(f"MD5 checksum mismatch: expected {md5_checksum}, got {actual}")
 
     def get(
         self,
@@ -175,6 +186,7 @@ class HTTPClient:
         *,
         use_cache: bool = False,
         use_api_key: bool = False,
+        md5_checksum: str | None = None,
         **request_kwargs: Any,
     ) -> Response:
         return self.request(
@@ -182,6 +194,7 @@ class HTTPClient:
             path=path,
             use_cache=use_cache,
             use_api_key=use_api_key,
+            md5_checksum=md5_checksum,
             **request_kwargs,
         )
 
@@ -217,14 +230,17 @@ class HTTPClient:
         handler: Callable[[Response, Path, str], Path] | None = None,
         encoding: str = "utf-8",
         file_name: str = "response.txt",
+        md5_checksum: str | None = None,
     ) -> Path:
-        file_path = self.cache.path / "downloads" / urlparse(url).path.lstrip("/") / file_name
+        # TODO(Shrivaths) find better way to get base path
+        base = self.cache.path if self.cache is not None else Path("~/.openml/cache")
+        file_path = base / "downloads" / urlparse(url).path.lstrip("/") / file_name
         file_path = file_path.expanduser()
         file_path.parent.mkdir(parents=True, exist_ok=True)
         if file_path.exists():
             return file_path
 
-        response = self.get(url)
+        response = self.get(url, md5_checksum=md5_checksum)
         if handler is not None:
             return handler(response, file_path, encoding)
 
