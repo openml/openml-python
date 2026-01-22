@@ -339,7 +339,6 @@ class TestFlowFunctions(TestBase):
         reason="Requires scikit-learn!=0.19.1, because target flow is from that version.",
     )
     @pytest.mark.production()
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_flow_with_reinstantiate_strict_with_wrong_version_raises_exception(self):
         self.use_production_server()
         flow = 8175
