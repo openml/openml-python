@@ -1,0 +1,58 @@
+name: Mark stale issues and pull requests
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # Allow manual triggering
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Days of inactivity before marking as stale
+          days-before-stale: 60
+          days-before-close: 14
+          
+          # Issue-specific settings
+          stale-issue-message: >
+            This issue has been automatically marked as stale because it has not had
+            recent activity. It will be closed if no further activity occurs. Thank you
+            for your contributions.
+          close-issue-message: >
+            This issue was closed because it has been inactive for 14 days since being
+            marked as stale. If this issue is still relevant, please feel free to reopen it.
+          stale-issue-label: 'stale'
+          exempt-issue-labels: 'pinned,security,roadmap,good first issue'
+          
+          # Pull request-specific settings
+          stale-pr-message: >
+            This pull request has been automatically marked as stale because it has not had
+            recent activity. It will be closed if no further activity occurs. Thank you
+            for your contributions.
+          close-pr-message: >
+            This pull request was closed because it has been inactive for 14 days since being
+            marked as stale. If you would like to continue working on this, please feel free
+            to reopen the PR or create a new one.
+          stale-pr-label: 'stale'
+          exempt-pr-labels: 'pinned,security,work-in-progress,in review'
+          
+          # Dry run for testing (set to false in production)
+          # debug-only: true
+          
+          # How many operations per run (higher = faster processing of backlog)
+          operations-per-run: 100
+          
+          # Remove stale label when issue/PR is updated
+          remove-stale-when-updated: true
+          
+          # Only apply to issues/PRs with certain labels
+          # any-of-labels: 'needs-info,awaiting-response'
