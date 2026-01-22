@@ -94,5 +94,17 @@ class OpenMLDataFeature(ReprMixin):
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, OpenMLDataFeature) and self.__dict__ == other.__dict__
 
+    def __hash__(self) -> int:
+        return hash(
+            (
+                self.index,
+                self.name,
+                self.data_type,
+                tuple(self.nominal_values) if self.nominal_values is not None else None,
+                self.number_missing_values,
+                tuple(self.ontologies) if self.ontologies is not None else None,
+            )
+        )
+
     def _repr_pretty_(self, pp: pretty.PrettyPrinter, cycle: bool) -> None:  # noqa: ARG002
         pp.text(str(self))

@@ -109,6 +109,29 @@ class OpenMLSplit(ReprMixin):
                 return False
         return True
 
+    def __hash__(self) -> int:
+        split_items = []
+        for repetition in sorted(self.split):
+            for fold in sorted(self.split[repetition]):
+                for sample in sorted(self.split[repetition][fold]):
+                    train, test = self.split[repetition][fold][sample]
+                    split_items.append(
+                        (
+                            repetition,
+                            fold,
+                            sample,
+                            hash(train.tobytes()),
+                            hash(test.tobytes()),
+                        )
+                    )
+        return hash(
+            (
+                self.name,
+                self.description,
+                tuple(split_items),
+            )
+        )
+
     @classmethod
     def _from_arff_file(cls, filename: Path) -> OpenMLSplit:  # noqa: C901, PLR0912
         repetitions = None
