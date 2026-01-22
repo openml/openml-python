@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import pickle
 from collections import OrderedDict
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 from typing_extensions import NamedTuple
 
 import arff  # type: ignore
