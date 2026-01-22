@@ -102,21 +102,24 @@ class OpenMLDatasetTest(TestBase):
         assert isinstance(data, pd.DataFrame)
         assert data.shape[1] == len(self.titanic.features)
         assert data.shape[0] == 1309
+        # Dynamically detect what this version of Pandas calls string columns.
+        str_dtype = data["name"].dtype.name
+
         col_dtype = {
             "pclass": "uint8",
             "survived": "category",
-            "name": "str",
+            "name": str_dtype,
             "sex": "category",
             "age": "float64",
             "sibsp": "uint8",
             "parch": "uint8",
-            "ticket": "str",
+            "ticket": str_dtype,
             "fare": "float64",
-            "cabin": "str",
+            "cabin": str_dtype,
             "embarked": "category",
-            "boat": "str",
+            "boat": str_dtype,
             "body": "float64",
-            "home.dest": "str",
+            "home.dest": str_dtype,
         }
         for col_name in data.columns:
             assert data[col_name].dtype.name == col_dtype[col_name]
