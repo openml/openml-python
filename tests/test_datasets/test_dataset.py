@@ -357,7 +357,7 @@ class OpenMLDatasetTestSparse(TestBase):
     def test_get_sparse_dataset_dataframe_with_target(self):
         X, y, _, attribute_names = self.sparse_dataset.get_data(target="class")
         assert isinstance(X, pd.DataFrame)
-        assert isinstance(X.dtypes[0], pd.SparseDtype)
+        assert isinstance(X.dtypes.iloc[0], pd.SparseDtype)
         assert X.shape == (600, 20000)
 
         assert isinstance(y, pd.Series)
