@@ -12,7 +12,6 @@ import urllib.parse
 import xml
 import zipfile
 from pathlib import Path
-from typing import Dict, Tuple, Union
 
 import minio
 import requests
@@ -33,8 +32,8 @@ from .utils import ProgressBar
 
 _HEADERS = {"user-agent": f"openml-python/{__version__}"}
 
-DATA_TYPE = Dict[str, Union[str, int]]
-FILE_ELEMENTS_TYPE = Dict[str, Union[str, Tuple[str, str]]]
+DATA_TYPE = dict[str, str | int]
+FILE_ELEMENTS_TYPE = dict[str, str | tuple[str, str]]
 DATABASE_CONNECTION_ERRCODE = 107
 
 API_TOKEN_HELP_LINK = "https://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/#authentication"  # noqa: S105
@@ -133,7 +132,7 @@ def _perform_api_call(
 def _download_minio_file(
     source: str,
     destination: str | Path,
-    exists_ok: bool = True,  # noqa: FBT001, FBT002
+    exists_ok: bool = True,  # noqa: FBT002
     proxy: str | None = "auto",
 ) -> None:
     """Download file ``source`` from a MinIO Bucket and store it at ``destination``.
@@ -239,7 +238,7 @@ def _download_text_file(
     source: str,
     output_path: str | Path | None = None,
     md5_checksum: str | None = None,
-    exists_ok: bool = True,  # noqa: FBT001, FBT002
+    exists_ok: bool = True,  # noqa: FBT002
     encoding: str = "utf8",
 ) -> str | None:
     """Download the text file at `source` and store it in `output_path`.

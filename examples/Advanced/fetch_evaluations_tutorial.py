@@ -75,7 +75,7 @@ from matplotlib import pyplot as plt
 
 def plot_cdf(values, metric="predictive_accuracy"):
     max_val = max(values)
-    n, bins, patches = plt.hist(values, density=True, histtype="step", cumulative=True, linewidth=3)
+    _, _, patches = plt.hist(values, density=True, histtype="step", cumulative=True, linewidth=3)
     patches[0].set_xy(patches[0].get_xy()[:-1])
     plt.xlim(max(0, min(values) - 0.1), 1)
     plt.title("CDF")
@@ -116,7 +116,7 @@ def plot_flow_compare(evaluations, top_n=10, metric="predictive_accuracy"):
     for i in range(len(flow_ids)):
         flow_values = evaluations[evaluations.flow_id == flow_ids[i]].value
         df = pd.concat([df, flow_values], ignore_index=True, axis=1)
-    fig, axs = plt.subplots()
+    _, axs = plt.subplots()
     df.boxplot()
     axs.set_title("Boxplot comparing " + metric + " for different flows")
     axs.set_ylabel(metric)
