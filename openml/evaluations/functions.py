@@ -231,9 +231,9 @@ def __list_evaluations(api_call: str) -> list[OpenMLEvaluation]:
             f'Error in return XML, does not contain "oml:evaluations": {evals_dict!s}',
         )
 
-    assert isinstance(
-        evals_dict["oml:evaluations"]["oml:evaluation"], list
-    ), "Expected 'oml:evaluation' to be a list, but got"
+    assert isinstance(evals_dict["oml:evaluations"]["oml:evaluation"], list), (
+        "Expected 'oml:evaluation' to be a list, but got"
+    )
     f"{type(evals_dict['oml:evaluations']['oml:evaluation']).__name__}. "
 
     uploader_ids = list(
