@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from requests import Response
 
-    from openml._api.http import HTTPClient
+    from openml._api.clients import HTTPClient
     from openml.datasets.dataset import OpenMLDataset
     from openml.tasks.task import OpenMLTask
 
