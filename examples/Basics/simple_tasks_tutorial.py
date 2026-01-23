@@ -10,7 +10,10 @@ import openml
 # [supervised classification on credit-g](https://www.openml.org/search?type=task&id=31&source_data.data_id=31):
 
 # %%
-task = openml.tasks.get_task(31)
+task = openml.get(31, object_type="task")
+
+# Legacy path still works:
+# task = openml.tasks.get_task(31)
 
 # %% [markdown]
 # Get the dataset and its data from the task.

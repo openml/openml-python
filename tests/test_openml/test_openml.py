@@ -41,3 +41,43 @@ class TestInit(TestBase):
         assert task_mock.call_count == 2
         for argument, fixture in zip(task_mock.call_args_list, [(1,), (2,)]):
             assert argument[0] == fixture
+
+    @mock.patch("openml.tasks.functions.list_tasks")
+    @mock.patch("openml.datasets.functions.list_datasets")
+    def test_list_dispatch(self, list_datasets_mock, list_tasks_mock):
+        # Need to patch after import, so update dispatch dict
+        with mock.patch.dict(
+            "openml.dispatchers._LIST_DISPATCH",
+            {
+                "dataset": list_datasets_mock,
+                "task": list_tasks_mock,
+            },
+        ):
+            openml.list_all("dataset")
+            list_datasets_mock.assert_called_once_with()
+
+            openml.list_all("task", size=5)
+            list_tasks_mock.assert_called_once_with(size=5)
+
+    @mock.patch("openml.tasks.functions.get_task")
+    @mock.patch("openml.datasets.functions.get_dataset")
+    def test_get_dispatch(self, get_dataset_mock, get_task_mock):
+        # Need to patch after import, so update dispatch dict
+        with mock.patch.dict(
+            "openml.dispatchers._GET_DISPATCH",
+            {
+                "dataset": get_dataset_mock,
+                "task": get_task_mock,
+            },
+        ):
+            openml.get(61)
+            get_dataset_mock.assert_called_with(61)
+
+            openml.get("Fashion-MNIST", version=2)
+            get_dataset_mock.assert_called_with("Fashion-MNIST", version=2)
+
+            openml.get("Fashion-MNIST")
+            get_dataset_mock.assert_called_with("Fashion-MNIST")
+
+            openml.get(31, object_type="task")
+            get_task_mock.assert_called_with(31)
