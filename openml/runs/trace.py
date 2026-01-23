@@ -94,7 +94,8 @@ class OpenMLTraceIteration:
                 for param, value in self.setup_string.items()
             }
 
-        assert self.parameters is not None
+        if self.parameters is None:
+            raise ValueError("Parameters must be set before calling get_parameters().")
         return {param[len(PREFIX) :]: value for param, value in self.parameters.items()}
 
 
@@ -490,13 +491,21 @@ class OpenMLRunTrace:
             for iteration in trace:
                 key = (iteration.repeat, iteration.fold, iteration.iteration)
 
-                assert iteration.parameters is not None
+                if iteration.parameters is None:
+                    raise ValueError(
+                        f"Iteration parameters cannot be None for repeat {iteration.repeat}, "
+                        f"fold {iteration.fold}, iteration {iteration.iteration}"
+                    )
                 param_keys = iteration.parameters.keys()
 
                 if previous_iteration is not None:
                     trace_itr = merged_trace[previous_iteration]
 
-                    assert trace_itr.parameters is not None
+                    if trace_itr.parameters is None:
+                        raise ValueError(
+                            f"Trace iteration parameters cannot be None "
+                            f"for iteration {previous_iteration}"
+                        )
                     trace_itr_keys = trace_itr.parameters.keys()
 
                     if list(param_keys) != list(trace_itr_keys):

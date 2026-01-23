@@ -389,6 +389,48 @@ class OpenMLRun(OpenMLBase):
         if self.trace is not None:
             self.trace._to_filesystem(directory)
 
+    def _get_arff_attributes_for_task(self, task: OpenMLTask) -> list[tuple[str, Any]]:
+        """Get ARFF attributes based on task type.
+
+        Parameters
+        ----------
+        task : OpenMLTask
+            The task for which to generate attributes.
+
+        Returns
+        -------
+        list[tuple[str, Any]]
+            List of attribute tuples (name, type).
+        """
+        instance_specifications = [
+            ("repeat", "NUMERIC"),
+            ("fold", "NUMERIC"),
+        ]
+
+        if isinstance(task, (OpenMLLearningCurveTask, OpenMLClassificationTask)):
+            instance_specifications.append(("sample", "NUMERIC"))
+
+        instance_specifications.append(("row_id", "NUMERIC"))
+
+        if isinstance(task, (OpenMLLearningCurveTask, OpenMLClassificationTask)):
+            class_labels = task.class_labels
+            if class_labels is None:
+                raise ValueError("The task has no class labels")
+
+            prediction_confidences = [
+                ("confidence." + class_labels[i], "NUMERIC") for i in range(len(class_labels))
+            ]
+            prediction_and_true = [("prediction", class_labels), ("correct", class_labels)]
+            return instance_specifications + prediction_and_true + prediction_confidences
+
+        if isinstance(task, OpenMLRegressionTask):
+            return [*instance_specifications, ("prediction", "NUMERIC"), ("truth", "NUMERIC")]
+
+        if isinstance(task, OpenMLClusteringTask):
+            return [*instance_specifications, ("cluster", "NUMERIC")]
+
+        raise NotImplementedError(f"Task type {task.task_type!s} is not yet supported.")
+
     def _generate_arff_dict(self) -> OrderedDict[str, Any]:
         """Generates the arff dictionary for uploading predictions to the
         server.
@@ -406,7 +448,8 @@ class OpenMLRun(OpenMLBase):
         if self.data_content is None:
             raise ValueError("Run has not been executed.")
         if self.flow is None:
-            assert self.flow_id is not None, "Run has no associated flow id!"
+            if self.flow_id is None:
+                raise ValueError("Run has no associated flow id!")
             self.flow = get_flow(self.flow_id)
 
         if self.description_text is None:
@@ -417,74 +460,7 @@ class OpenMLRun(OpenMLBase):
         arff_dict["data"] = self.data_content
         arff_dict["description"] = self.description_text
         arff_dict["relation"] = f"openml_task_{task.task_id}_predictions"
-
-        if isinstance(task, OpenMLLearningCurveTask):
-            class_labels = task.class_labels
-            instance_specifications = [
-                ("repeat", "NUMERIC"),
-                ("fold", "NUMERIC"),
-                ("sample", "NUMERIC"),
-                ("row_id", "NUMERIC"),
-            ]
-
-            arff_dict["attributes"] = instance_specifications
-            if class_labels is not None:
-                arff_dict["attributes"] = (
-                    arff_dict["attributes"]
-                    + [("prediction", class_labels), ("correct", class_labels)]
-                    + [
-                        ("confidence." + class_labels[i], "NUMERIC")
-                        for i in range(len(class_labels))
-                    ]
-                )
-            else:
-                raise ValueError("The task has no class labels")
-
-        elif isinstance(task, OpenMLClassificationTask):
-            class_labels = task.class_labels
-            instance_specifications = [
-                ("repeat", "NUMERIC"),
-                ("fold", "NUMERIC"),
-                ("sample", "NUMERIC"),  # Legacy
-                ("row_id", "NUMERIC"),
-            ]
-
-            arff_dict["attributes"] = instance_specifications
-            if class_labels is not None:
-                prediction_confidences = [
-                    ("confidence." + class_labels[i], "NUMERIC") for i in range(len(class_labels))
-                ]
-                prediction_and_true = [("prediction", class_labels), ("correct", class_labels)]
-                arff_dict["attributes"] = (
-                    arff_dict["attributes"] + prediction_and_true + prediction_confidences
-                )
-            else:
-                raise ValueError("The task has no class labels")
-
-        elif isinstance(task, OpenMLRegressionTask):
-            arff_dict["attributes"] = [
-                ("repeat", "NUMERIC"),
-                ("fold", "NUMERIC"),
-                ("row_id", "NUMERIC"),
-                ("prediction", "NUMERIC"),
-                ("truth", "NUMERIC"),
-            ]
-
-        elif isinstance(task, OpenMLClusteringTask):
-            arff_dict["attributes"] = [
-                ("repeat", "NUMERIC"),
-                ("fold", "NUMERIC"),
-                ("row_id", "NUMERIC"),
-                ("cluster", "NUMERIC"),
-            ]
-
-        else:
-            raise NotImplementedError(
-                f"Task type '{task.task_type}' is not yet supported. "
-                f"Supported task types: Classification, Regression, Clustering, Learning Curve. "
-                f"Task ID: {task.task_id}. "
-                f"Please check the OpenML documentation for supported task types."
-            )
+        arff_dict["attributes"] = self._get_arff_attributes_for_task(task)
 
         return arff_dict
 
@@ -641,7 +617,10 @@ class OpenMLRun(OpenMLBase):
 
         if self.parameter_settings is None:
             if self.flow is None:
-                assert self.flow_id is not None  # for mypy
+                if self.flow_id is None:
+                    raise ValueError(
+                        "Run has no associated flow_id and cannot obtain parameter values."
+                    )
                 self.flow = openml.flows.get_flow(self.flow_id)
             self.parameter_settings = self.flow.extension.obtain_parameter_values(
                 self.flow,
