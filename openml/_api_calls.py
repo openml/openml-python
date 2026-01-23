@@ -362,6 +362,11 @@ def _send_request(  # noqa: C901, PLR0912
     files: FILE_ELEMENTS_TYPE | None = None,
     md5_checksum: str | None = None,
 ) -> requests.Response:
+    MAX_URL_LENGTH = 2000  # Conservative limit for broad compatibility
+
+    if len(url) > MAX_URL_LENGTH:
+        raise OpenMLServerError("URI too long!")
+
     n_retries = max(1, config.connection_n_retries)
 
     response: requests.Response | None = None
