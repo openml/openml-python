@@ -5,8 +5,13 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Any
 
+import pandas as pd
+
 from openml.base import OpenMLBase
 from openml.config import get_server_base_url
+from openml.datasets.functions import list_datasets
+from openml.exceptions import OpenMLServerException
+from openml.tasks.functions import _list_tasks
 
 
 class BaseStudy(OpenMLBase):
@@ -343,3 +348,148 @@ class OpenMLBenchmarkSuite(BaseStudy):
             runs=None,
             setups=None,
         )
+        # Initialize metadata cache
+        self._metadata: pd.DataFrame | None = None
+
+    def _fetch_task_metadata(self) -> pd.DataFrame:
+        """Fetch task metadata for all tasks in the suite.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame with task metadata, with 'tid' as a column.
+
+        Raises
+        ------
+        RuntimeError
+            If task metadata cannot be retrieved.
+        """
+        try:
+            # self.tasks is guaranteed non-empty here (checked in metadata property)
+            tasks_list = self.tasks if self.tasks is not None else []
+            task_df = _list_tasks(
+                limit=max(len(tasks_list), 1000),
+                offset=0,
+                task_id=tasks_list,
+            )
+
+            # _list_tasks returns DataFrame with 'tid' as index (from orient="index")
+            # Reset index to make 'tid' a column for easier merging
+            if task_df.index.name == "tid":
+                task_df = task_df.reset_index()
+
+            # Verify we got the expected tasks
+            if len(task_df) == 0:
+                return pd.DataFrame()
+
+            # Ensure 'tid' column exists
+            if "tid" not in task_df.columns:
+                raise RuntimeError(
+                    f"Task metadata missing 'tid' column. Columns: {task_df.columns.tolist()}"
+                )
+
+            return task_df
+
+        except OpenMLServerException as e:
+            msg = f"Failed to retrieve task metadata for suite {self.id}: {e}"
+            raise RuntimeError(msg) from e
+        except Exception as e:
+            msg = f"Unexpected error retrieving task metadata for suite {self.id}: {e}"
+            raise RuntimeError(msg) from e
+
+    def _merge_dataset_metadata(self, task_df: pd.DataFrame) -> pd.DataFrame:
+        """Merge dataset metadata with task metadata.
+
+        Parameters
+        ----------
+        task_df : pd.DataFrame
+            DataFrame containing task metadata with 'did' column.
+
+        Returns
+        -------
+        pd.DataFrame
+            Merged DataFrame with both task and dataset metadata.
+
+        Raises
+        ------
+        RuntimeError
+            If dataset metadata cannot be retrieved.
+        """
+        if "did" not in task_df.columns or len(task_df) == 0:
+            return task_df
+
+        unique_dids = task_df["did"].unique().tolist()
+
+        try:
+            dataset_df = list_datasets(data_id=unique_dids)
+        except OpenMLServerException as e:
+            raise RuntimeError(f"Failed to retrieve dataset metadata: {e}") from e
+        except Exception as e:
+            raise RuntimeError(f"Unexpected error retrieving dataset metadata: {e}") from e
+
+        # Use DataFrame.merge() method instead of pd.merge() function
+        return task_df.merge(
+            dataset_df,
+            on="did",
+            how="left",
+            suffixes=("", "_dataset"),
+        )
+
+    @property
+    def metadata(self) -> pd.DataFrame:
+        """
+        Returns a pandas DataFrame containing metadata for all tasks in the suite.
+
+        The DataFrame includes:
+        - Task-level information: task ID (tid), task type, estimation procedure,
+          target feature, evaluation measure
+        - Dataset-level information: dataset ID (did), dataset name, version,
+          uploader, number of instances, number of features, number of classes,
+          and other dataset qualities
+
+        The result is cached after the first access. Subsequent calls return the
+        cached DataFrame without making additional API calls.
+
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame with one row per task in the suite. The DataFrame is indexed
+            by the default integer index. Columns include both task and dataset metadata.
+
+        Raises
+        ------
+        RuntimeError
+            If task metadata cannot be retrieved from the OpenML server.
+
+        Examples
+        --------
+        >>> import openml
+        >>> suite = openml.study.get_suite(99)  # OpenML-CC18
+        >>> meta = suite.metadata
+        >>> print(meta.columns.tolist()[:5])  # First 5 columns
+        ['tid', 'did', 'name', 'task_type', 'status']
+
+        >>> # Export to LaTeX
+        >>> columns = ['name', 'NumberOfInstances', 'NumberOfFeatures', 'NumberOfClasses']
+        >>> latex_table = meta[columns].style.to_latex(
+        ...     caption="Dataset Characteristics",
+        ...     label="tab:suite_metadata"
+        ... )
+        """
+        # Return cached result if available
+        if self._metadata is not None:
+            return self._metadata
+
+        # Handle empty suites gracefully
+        if not self.tasks:
+            self._metadata = pd.DataFrame()
+            return self._metadata
+
+        # Fetch task metadata and merge with dataset metadata
+        task_df = self._fetch_task_metadata()
+        if len(task_df) == 0:
+            self._metadata = pd.DataFrame()
+            return self._metadata
+
+        self._metadata = self._merge_dataset_metadata(task_df)
+        return self._metadata
