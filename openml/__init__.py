@@ -5,7 +5,7 @@ learning. OpenML can be used to
 
 * store, download and analyze datasets
 * make experiments and their results (e.g. models, predictions)
-  accesible and reproducible for everybody
+  accessible and reproducible for everybody
 * analyze experiments (uploaded by you and other collaborators) and conduct
   meta studies
 

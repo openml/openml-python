@@ -83,7 +83,7 @@ def configure_apikey(value: str) -> None:
 
     instructions = (
         f"Your current API key is set to: '{config.apikey}'. "
-        "You can get an API key at https://new.openml.org. "
+        "You can get an API key at https://www.openml.org. "
         "You must create an account if you don't have one yet:\n"
         "  1. Log in with the account.\n"
         "  2. Navigate to the profile page (top right circle > Your Profile). \n"
