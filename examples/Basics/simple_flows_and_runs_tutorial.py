@@ -29,7 +29,10 @@ openml.config.start_using_configuration_for_example()
 # NOTE: We are using task 119 from the test server: https://test.openml.org/d/20
 
 # %%
-task = openml.tasks.get_task(119)
+# New: top-level convenience alias
+task = openml.get_task(119)
+# Old path still works:
+# task = openml.tasks.get_task(119)
 
 # Get the data
 dataset = task.get_dataset()
@@ -54,7 +57,7 @@ y_pred_proba = clf.predict_proba(X_test)
 
 # %% [markdown]
 # ## Upload the machine learning experiments to OpenML
-# First, create a fow and fill it with metadata about the machine learning model.
+# First, create a flow and fill it with metadata about the machine learning model.
 
 # %%
 knn_flow = openml.flows.OpenMLFlow(
