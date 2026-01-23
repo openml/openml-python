@@ -803,6 +803,26 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         assert isinstance(y, pd.Series)
         return x, y, categorical_mask, attribute_names
 
+    def get_missing_summary(self) -> dict:
+        """Returns a missing-value summary for the dataset.
+
+        Returns
+        -------
+        dict
+            {
+                "n_missing_total": int,
+                "missing_per_column": dict
+            }
+        """
+        df, _, _, _ = self.get_data()
+        missing_per_column = df.isna().sum().to_dict()
+        n_missing_total = sum(missing_per_column.values())
+
+        return {
+            "n_missing_total": n_missing_total,
+            "missing_per_column": missing_per_column,
+        }
+
     def _load_features(self) -> None:
         """Load the features metadata from the server and store it in the dataset object."""
         # Delayed Import to avoid circular imports or having to import all of dataset.functions to
