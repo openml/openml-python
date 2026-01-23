@@ -100,4 +100,4 @@ appreciate a reference to our JMLR-MLOSS paper
 
     Feurer, Matthias, et al. 
     "OpenML-Python: an extensible Python API for OpenML."
-    _Journal of Machine Learning Research_ 22.100 (2021):1−5.
+    _Journal of Machine Learning Research_ 22.100 (2021): 1−5.
