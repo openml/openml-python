@@ -1,5 +1,17 @@
 cff-version: 1.2.0
-message: "If you use this software in a publication, please cite the metadata from preferred-citation."
+title: "OpenML Python"
+message: "If you use this software in a publication, please cite the metadata from 'preferred-citation'."
+type: software
+license: "BSD-3-Clause"
+repository-code: "https://github.com/openml/openml-python"
+url: "https://openml.github.io/openml-python/"
+authors:
+  - family-names: "Feurer"
+    given-names: "Matthias"
+  - family-names: "Gijsbers"
+    given-names: "Pieter"
+  - family-names: "Vanschoren"
+    given-names: "Joaquin"
 preferred-citation:
   type: article
   authors:
