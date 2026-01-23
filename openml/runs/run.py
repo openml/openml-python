@@ -711,3 +711,46 @@ class OpenMLRun(OpenMLBase):
                                 current,
                             )
         return description
+
+    def _check_file_size(self, file: Any, max_file_size_mb: int = 100) -> bool:
+        """Check file size for file-like objects"""
+        file_size = 0
+        if isinstance(file, (bytes, bytearray)):  # If file is a binary data
+            file_size = len(file)
+        elif hasattr(file, "read") and hasattr(file, "seek"):  # File-like object
+            current_pos = file.tell()  # Save the current position
+            file.seek(0, 2)  # Move to the end of the file
+            file_size = file.tell()
+            file.seek(current_pos)  # Restore the original position
+        else:
+            raise TypeError("Unsupported file type. Provide binary data or a file-like object.")
+
+        if file_size > max_file_size_mb * 1024 * 1024:  # MB in bytes
+            return False
+        return True
+
+    def add_file_to_run(self, file: Any, name: str, max_file_size_mb: int = 100) -> None:
+        """
+        Add a file to the run object. This file will be uploaded to the server
+        when the run is published with a name specified by the user.
+        Ensures that the file size is less than 100MB.
+        """
+        # Check if path was provided and return an error
+        if isinstance(file, (str, Path)):
+            raise TypeError("Provide the file content instead of the file path.")
+
+        # Check if the file size exceeds the limit
+        if not self._check_file_size(file, max_file_size_mb):
+            raise ValueError(f"File size exceeds {max_file_size_mb}MB. File: {name}")
+
+        # Save reference to the original method
+        self._old_get_file_elements = self._get_file_elements
+
+        # Add the new file to the file elements dictionary with the specified name
+        def modified_get_file_elements():
+            elements = self._old_get_file_elements()
+            elements[name] = (name, file)
+            return elements
+
+        # Override the original data
+        self._get_file_elements = modified_get_file_elements
