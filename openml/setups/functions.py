@@ -14,7 +14,6 @@ import xmltodict
 import openml
 import openml.exceptions
 import openml.utils
-from openml import config
 from openml.flows import OpenMLFlow, flow_exists
 
 from .setup import OpenMLParameter, OpenMLSetup
@@ -84,7 +83,7 @@ def _get_cached_setup(setup_id: int) -> OpenMLSetup:
     OpenMLCacheException
         If the setup file for the given setup ID is not cached.
     """
-    cache_dir = Path(config.get_cache_directory())
+    cache_dir = Path(openml.config.get_cache_directory())
     setup_cache_dir = cache_dir / "setups" / str(setup_id)
     try:
         setup_file = setup_cache_dir / "description.xml"
@@ -112,7 +111,7 @@ def get_setup(setup_id: int) -> OpenMLSetup:
     -------
     OpenMLSetup (an initialized openml setup object)
     """
-    setup_dir = Path(config.get_cache_directory()) / "setups" / str(setup_id)
+    setup_dir = Path(openml.config.get_cache_directory()) / "setups" / str(setup_id)
     setup_dir.mkdir(exist_ok=True, parents=True)
 
     setup_file = setup_dir / "description.xml"

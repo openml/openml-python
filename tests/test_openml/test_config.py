@@ -12,7 +12,7 @@ import platform
 
 import pytest
 
-import openml.config
+import openml
 import openml.testing
 from openml.testing import TestBase
 
@@ -37,7 +37,7 @@ def safe_environ_patcher(key: str, value: Any) -> Iterator[None]:
 
 class TestConfig(openml.testing.TestBase):
     @unittest.mock.patch("openml.config.openml_logger.warning")
-    @unittest.mock.patch("openml.config._create_log_handlers")
+    @unittest.mock.patch("openml._config.OpenMLConfigManager._create_log_handlers")
     @unittest.skipIf(os.name == "nt", "https://github.com/openml/openml-python/issues/1033")
     @unittest.skipIf(
         platform.uname().release.endswith(("-Microsoft", "microsoft-standard-WSL2")),
@@ -127,7 +127,6 @@ class TestConfigurationForExamples(openml.testing.TestBase):
 
         openml.config.start_using_configuration_for_example()
         openml.config.stop_using_configuration_for_example()
-
         assert openml.config.apikey == TestBase.user_key
         assert openml.config.server == self.production_server
 

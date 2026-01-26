@@ -19,8 +19,6 @@ import openml
 import openml._api_calls
 import openml.exceptions
 
-from . import config
-
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
     from openml.base import OpenMLBase
@@ -329,7 +327,7 @@ def _list_all(  # noqa: C901
 
 
 def _get_cache_dir_for_key(key: str) -> Path:
-    return Path(config.get_cache_directory()) / key
+    return Path(openml.config.get_cache_directory()) / key
 
 
 def _create_cache_directory(key: str) -> Path:
@@ -429,7 +427,7 @@ def thread_safe_if_oslo_installed(func: Callable[P, R]) -> Callable[P, R]:
 
 
 def _create_lockfiles_dir() -> Path:
-    path = Path(config.get_cache_directory()) / "locks"
+    path = Path(openml.config.get_cache_directory()) / "locks"
     # TODO(eddiebergman): Not sure why this is allowed to error and ignore???
     with contextlib.suppress(OSError):
         path.mkdir(exist_ok=True, parents=True)
