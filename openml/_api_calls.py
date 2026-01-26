@@ -22,8 +22,8 @@ from urllib3 import ProxyManager
 from . import config
 from .__version__ import __version__
 from .exceptions import (
+    OpenMLAuthenticationError,
     OpenMLHashException,
-    OpenMLNotAuthorizedError,
     OpenMLServerError,
     OpenMLServerException,
     OpenMLServerNoResult,
@@ -515,11 +515,7 @@ def __parse_server_exception(
         400,  # run/42 delete
         460,  # task/42 delete
     ]:
-        msg = (
-            f"The API call {url} requires authentication via an API key.\nPlease configure "
-            "OpenML-Python to use your API as described in this example:"
-            "\nhttps://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/#authentication"
-        )
-        return OpenMLNotAuthorizedError(message=msg)
+        msg = f"The API call {url} requires authentication via an API key."
+        return OpenMLAuthenticationError(message=msg)
 
     return OpenMLServerException(code=code, message=full_message, url=url)
