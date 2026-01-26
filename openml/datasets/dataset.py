@@ -490,7 +490,7 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
                 try:
                     # checks if the strings which should be the class labels
                     # can be encoded into integers
-                    pd.factorize(type_)[0]
+                    pd.factorize(np.array(type_))[0]
                 except ValueError as e:
                     raise ValueError(
                         "Categorical data needs to be numeric when using sparse ARFF."
