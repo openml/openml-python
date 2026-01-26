@@ -71,3 +71,32 @@ class ModelSerializer(ABC):
     @abstractmethod
     def get_version_information(self) -> list[str]:
         """Return dependency and version information."""
+
+    @abstractmethod
+    def obtain_parameter_values(
+        self,
+        flow: OpenMLFlow,
+        model: Any = None,
+    ) -> list[dict[str, Any]]:
+        """Extracts all parameter settings required for the flow from the model.
+
+        If no explicit model is provided, the parameters will be extracted from `flow.model`
+        instead.
+
+        Parameters
+        ----------
+        flow : OpenMLFlow
+            OpenMLFlow object (containing flow ids, i.e., it has to be downloaded from the server)
+
+        model: Any, optional (default=None)
+            The model from which to obtain the parameter values. Must match the flow signature.
+            If None, use the model specified in ``OpenMLFlow.model``.
+
+        Returns
+        -------
+        list
+            A list of dicts, where each dict has the following entries:
+            - ``oml:name`` : str: The OpenML parameter name
+            - ``oml:value`` : mixed: A representation of the parameter value
+            - ``oml:component`` : int: flow id to which the parameter belongs
+        """
