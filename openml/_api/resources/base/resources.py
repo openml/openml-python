@@ -1,27 +1,27 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import TYPE_CHECKING
+
+from openml._api.resources.base import ResourceAPI, ResourceType
 
 if TYPE_CHECKING:
     from requests import Response
 
-    from openml._api.clients import HTTPClient
     from openml.datasets.dataset import OpenMLDataset
     from openml.tasks.task import OpenMLTask
 
 
-class ResourceAPI:
-    def __init__(self, http: HTTPClient):
-        self._http = http
+class DatasetsAPI(ResourceAPI):
+    resource_type: ResourceType | None = ResourceType.DATASETS
 
-
-class DatasetsAPI(ResourceAPI, ABC):
     @abstractmethod
     def get(self, dataset_id: int) -> OpenMLDataset | tuple[OpenMLDataset, Response]: ...
 
 
-class TasksAPI(ResourceAPI, ABC):
+class TasksAPI(ResourceAPI):
+    resource_type: ResourceType | None = ResourceType.TASKS
+
     @abstractmethod
     def get(
         self,
