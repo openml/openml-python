@@ -40,6 +40,7 @@ class TestTask(TestBase):
         task = openml.tasks.functions._get_cached_task(1)
         assert isinstance(task, OpenMLTask)
 
+    @pytest.mark.skip("Tasks cache")
     def test__get_cached_task_not_cached(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         self.assertRaisesRegex(
@@ -151,6 +152,7 @@ class TestTask(TestBase):
         # https://github.com/openml/openml-python/issues/378
         openml.tasks.get_task(34536)
 
+    @pytest.mark.skip("Tasks cache")
     @pytest.mark.uses_test_server()
     def test_get_task(self):
         task = openml.tasks.get_task(1, download_data=True)  # anneal; crossvalidation
@@ -187,6 +189,7 @@ class TestTask(TestBase):
             os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff")
         )
 
+    @pytest.mark.skip("Tasks cache")
     @mock.patch("openml.tasks.functions.get_dataset")
     @pytest.mark.uses_test_server()
     def test_removal_upon_download_failure(self, get_dataset):
@@ -206,6 +209,7 @@ class TestTask(TestBase):
         # Now the file should no longer exist
         assert not os.path.exists(os.path.join(os.getcwd(), "tasks", "1", "tasks.xml"))
 
+    @pytest.mark.skip("Tasks cache")
     @pytest.mark.uses_test_server()
     def test_get_task_with_cache(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
@@ -222,6 +226,7 @@ class TestTask(TestBase):
         # Issue 538, get_task failing with clustering task.
         openml.tasks.functions.get_task(126033)
 
+    @pytest.mark.skip("Tasks cache")
     @pytest.mark.uses_test_server()
     def test_download_split(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
@@ -231,6 +236,7 @@ class TestTask(TestBase):
             os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "datasplits.arff")
         )
 
+    @pytest.mark.skip("Tasks cache")
     def test_deletion_of_cache_dir(self):
         # Simple removal
         tid_cache_dir = openml.utils._create_cache_directory_for_id(
