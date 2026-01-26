@@ -36,6 +36,7 @@ class _Config(TypedDict):
     retry_policy: Literal["human", "robot"]
     connection_n_retries: int
     show_progress: bool
+    check_digest: bool
 
 
 def _create_log_handlers(create_file_handler: bool = True) -> None:  # noqa: FBT002
@@ -156,6 +157,7 @@ _defaults: _Config = {
     "retry_policy": "human",
     "connection_n_retries": 5,
     "show_progress": False,
+    "check_digest": True,  # Whether to check the md5 checksum of downloaded files
 }
 
 # Default values are actually added here in the _setup() function which is
@@ -185,6 +187,7 @@ avoid_duplicate_runs = _defaults["avoid_duplicate_runs"]
 
 retry_policy: Literal["human", "robot"] = _defaults["retry_policy"]
 connection_n_retries: int = _defaults["connection_n_retries"]
+check_digest: bool = _defaults["check_digest"]
 
 
 def set_retry_policy(value: Literal["human", "robot"], n_retries: int | None = None) -> None:
@@ -342,6 +345,7 @@ def _setup(config: _Config | None = None) -> None:
     global _root_cache_directory  # noqa: PLW0603
     global avoid_duplicate_runs  # noqa: PLW0603
     global show_progress  # noqa: PLW0603
+    global check_digest  # noqa: PLW0603
 
     config_file = determine_config_file_path()
     config_dir = config_file.parent
@@ -363,6 +367,7 @@ def _setup(config: _Config | None = None) -> None:
     apikey = config["apikey"]
     server = config["server"]
     show_progress = config["show_progress"]
+    check_digest = config["check_digest"]
     n_retries = int(config["connection_n_retries"])
 
     set_retry_policy(config["retry_policy"], n_retries)
@@ -429,7 +434,7 @@ def _parse_config(config_file: str | Path) -> _Config:
     config_file_.seek(0)
     config.read_file(config_file_)
     configuration = dict(config.items("FAKE_SECTION"))
-    for boolean_field in ["avoid_duplicate_runs", "show_progress"]:
+    for boolean_field in ["avoid_duplicate_runs", "show_progress", "check_digest"]:
         if isinstance(config["FAKE_SECTION"][boolean_field], str):
             configuration[boolean_field] = config["FAKE_SECTION"].getboolean(boolean_field)  # type: ignore
     return configuration  # type: ignore
@@ -444,6 +449,7 @@ def get_config_as_dict() -> _Config:
         "connection_n_retries": connection_n_retries,
         "retry_policy": retry_policy,
         "show_progress": show_progress,
+        "check_digest": check_digest,
     }
 
 

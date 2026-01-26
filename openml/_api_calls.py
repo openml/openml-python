@@ -343,6 +343,7 @@ def __read_url(
         url=url,
         data=data,
         md5_checksum=md5_checksum,
+        check_digest=config.check_digest,
     )
 
 
@@ -355,12 +356,14 @@ def __is_checksum_equal(downloaded_file_binary: bytes, md5_checksum: str | None 
     return md5_checksum == md5_checksum_download
 
 
-def _send_request(  # noqa: C901, PLR0912
+def _send_request(  # noqa: C901, PLR0912, PLR0913
     request_method: str,
     url: str,
     data: DATA_TYPE,
+    *,
     files: FILE_ELEMENTS_TYPE | None = None,
     md5_checksum: str | None = None,
+    check_digest: bool = True,
 ) -> requests.Response:
     n_retries = max(1, config.connection_n_retries)
 
@@ -385,16 +388,18 @@ def _send_request(  # noqa: C901, PLR0912
 
                 __check_response(response=response, url=url, file_elements=files)
 
-                if request_method == "get" and not __is_checksum_equal(
-                    response.text.encode("utf-8"), md5_checksum
+                if (
+                    request_method == "get"
+                    and check_digest
+                    and not __is_checksum_equal(response.text.encode("utf-8"), md5_checksum)
                 ):
                     # -- Check if encoding is not UTF-8 perhaps
                     if __is_checksum_equal(response.content, md5_checksum):
                         raise OpenMLHashException(
-                            f"Checksum of downloaded file is unequal to the expected checksum"
+                            "Checksum of downloaded file is unequal to the expected checksum "
                             f"{md5_checksum} because the text encoding is not UTF-8 when "
-                            f"downloading {url}. There might be a sever-sided issue with the file, "
-                            "see: https://github.com/openml/openml-python/issues/1180.",
+                            f"downloading {url}. There might be a server-sided issue with the "
+                            "file, see issue #1180."
                         )
 
                     raise OpenMLHashException(
