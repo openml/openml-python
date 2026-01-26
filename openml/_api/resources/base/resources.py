@@ -13,14 +13,14 @@ if TYPE_CHECKING:
 
 
 class DatasetsAPI(ResourceAPI):
-    resource_type: ResourceType | None = ResourceType.DATASETS
+    resource_type: ResourceType = ResourceType.DATASET
 
     @abstractmethod
     def get(self, dataset_id: int) -> OpenMLDataset | tuple[OpenMLDataset, Response]: ...
 
 
 class TasksAPI(ResourceAPI):
-    resource_type: ResourceType | None = ResourceType.TASKS
+    resource_type: ResourceType = ResourceType.TASK
 
     @abstractmethod
     def get(
