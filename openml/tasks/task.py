@@ -172,7 +172,7 @@ class OpenMLTask(OpenMLBase, ResourceAPI):
                 pass
         except OSError:
             split_url = self.estimation_procedure["data_splits_url"]
-            self._http.download(source=str(split_url), file_name="datasplits.arff")
+            self._http.download(url=str(split_url), file_name="datasplits.arff")
 
     def download_split(self) -> OpenMLSplit:
         """Download the OpenML split for a given task."""
