@@ -35,6 +35,9 @@ class TestModelSerializer:
 
         def get_version_information(self):
             return ["dummy>=0.1"]
+        
+        def obtain_parameter_values(self, flow, model=None):
+            return []
 
     def test_concrete_implementation(self):
         serializer = self.DummySerializer()
@@ -54,6 +57,10 @@ class TestModelExecutor:
             ModelExecutor()  # noqa: B024
 
     class DummyExecutor(ModelExecutor):
+        @classmethod
+        def can_handle_model(cls, model):
+            return True
+    
         def seed_model(self, model, seed):
             return model
 
@@ -76,9 +83,6 @@ class TestModelExecutor:
 
         def check_if_model_fitted(self, model):
             return False
-
-        def obtain_parameter_values(self, flow, model=None):
-            return []
 
         def instantiate_model_from_hpo_class(self, model, trace_iteration):
             return model
