@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 
-class DelayMethod(str, Enum):
+class RetryPolicy(str, Enum):
     HUMAN = "human"
     ROBOT = "robot"
 
@@ -26,8 +26,7 @@ class APISettings:
 @dataclass
 class ConnectionConfig:
     retries: int = 3
-    delay_method: DelayMethod = DelayMethod.HUMAN
-    delay_time: int = 1  # seconds
+    retry_policy: RetryPolicy = RetryPolicy.HUMAN
 
 
 @dataclass
