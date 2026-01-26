@@ -47,8 +47,8 @@ class ModelSerializer(ABC):
     def flow_to_model(
         self,
         flow: OpenMLFlow,
-        initialize_with_defaults: bool = False,  # noqa: FBT001, FBT002
-        strict_version: bool = True,  # noqa: FBT002, FBT001
+        initialize_with_defaults: bool = False,  # noqa: FBT002
+        strict_version: bool = True,  # noqa: FBT002
     ) -> Any:
         """Instantiate a model from the flow representation.
 
