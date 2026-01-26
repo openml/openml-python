@@ -2,8 +2,9 @@
 # # Plotting hyperparameter surfaces
 
 # %%
-import openml
 import numpy as np
+
+import openml
 
 # %% [markdown]
 # # First step - obtaining the data
