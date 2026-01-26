@@ -6,20 +6,17 @@ import re
 import shutil
 import warnings
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Iterable, Mapping, Sequence, Sized
 from functools import wraps
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    Callable,
-    Iterable,
-    Mapping,
-    Sequence,
-    Sized,
+    Literal,
     TypeVar,
     overload,
 )
-from typing_extensions import Literal, ParamSpec
+from typing_extensions import ParamSpec
 
 import numpy as np
 import xmltodict
