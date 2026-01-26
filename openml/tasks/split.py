@@ -3,12 +3,15 @@ from __future__ import annotations
 
 import pickle
 from collections import OrderedDict
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 from typing_extensions import NamedTuple
 
 import arff  # type: ignore
 import numpy as np
+
+from openml.utils import ReprMixin
 
 
 class Split(NamedTuple):
@@ -18,7 +21,7 @@ class Split(NamedTuple):
     test: np.ndarray
 
 
-class OpenMLSplit:  # noqa: PLW1641
+class OpenMLSplit(ReprMixin):
     """OpenML Split object.
 
     This class manages train-test splits for a dataset across multiple
@@ -63,6 +66,22 @@ class OpenMLSplit:  # noqa: PLW1641
         self.folds = len(self.split[0])
         self.samples = len(self.split[0][0])
 
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
+        """Collect all information to display in the __repr__ body."""
+        fields = {
+            "Name": self.name,
+            "Description": (
+                self.description if len(self.description) <= 80 else self.description[:77] + "..."
+            ),
+            "Repeats": self.repeats,
+            "Folds": self.folds,
+            "Samples": self.samples,
+        }
+
+        order = ["Name", "Description", "Repeats", "Folds", "Samples"]
+
+        return [(key, fields[key]) for key in order if key in fields]
+
     def __eq__(self, other: Any) -> bool:
         if (
             (not isinstance(self, type(other)))
@@ -89,6 +108,29 @@ class OpenMLSplit:  # noqa: PLW1641
             if not (np.all(self_train == other_train) and np.all(self_test == other_test)):
                 return False
         return True
+
+    def __hash__(self) -> int:
+        split_items = []
+        for repetition in sorted(self.split):
+            for fold in sorted(self.split[repetition]):
+                for sample in sorted(self.split[repetition][fold]):
+                    train, test = self.split[repetition][fold][sample]
+                    split_items.append(
+                        (
+                            repetition,
+                            fold,
+                            sample,
+                            hash(train.tobytes()),
+                            hash(test.tobytes()),
+                        )
+                    )
+        return hash(
+            (
+                self.name,
+                self.description,
+                tuple(split_items),
+            )
+        )
 
     @classmethod
     def _from_arff_file(cls, filename: Path) -> OpenMLSplit:  # noqa: C901, PLR0912
