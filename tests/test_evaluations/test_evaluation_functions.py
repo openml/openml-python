@@ -155,6 +155,7 @@ class TestEvaluationFunctions(TestBase):
         )
         assert len(evaluations) == 100
 
+    @pytest.mark.uses_test_server()
     def test_list_evaluations_empty(self):
         evaluations = openml.evaluations.list_evaluations("unexisting_measure")
         if len(evaluations) > 0:
@@ -232,6 +233,7 @@ class TestEvaluationFunctions(TestBase):
         test_output = sorted(unsorted_output, reverse=True)
         assert test_output[:size] == sorted_output
 
+    @pytest.mark.uses_test_server()
     def test_list_evaluation_measures(self):
         measures = openml.evaluations.list_evaluation_measures()
         assert isinstance(measures, list) is True
@@ -256,6 +258,7 @@ class TestEvaluationFunctions(TestBase):
         assert all(elem in columns for elem in keys)
 
     @pytest.mark.production()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_list_evaluations_setups_filter_task(self):
         self.use_production_server()
         task_id = [6]

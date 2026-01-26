@@ -72,7 +72,7 @@ openml.config.start_using_configuration_for_example()
 
 # %%
 all_tasks = list(openml.tasks.list_tasks()["tid"])
-task_ids_for_suite = sorted(np.random.choice(all_tasks, replace=False, size=20))
+task_ids_for_suite = sorted(np.random.choice(all_tasks, replace=False, size=20))  # noqa: NPY002
 
 # The study needs a machine-readable and unique alias. To obtain this,
 # we simply generate a random uuid.
