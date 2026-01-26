@@ -13,7 +13,7 @@ from typing_extensions import TypedDict
 
 import openml.config
 from openml import datasets
-from openml._api import api_context
+from openml._api.resources.base import ResourceAPI
 from openml.base import OpenMLBase
 from openml.utils import _create_cache_directory_for_id
 
@@ -46,7 +46,7 @@ class _EstimationProcedure(TypedDict):
     data_splits_url: str | None
 
 
-class OpenMLTask(OpenMLBase):
+class OpenMLTask(OpenMLBase, ResourceAPI):
     """OpenML Task object.
 
     Parameters
@@ -172,7 +172,7 @@ class OpenMLTask(OpenMLBase):
                 pass
         except OSError:
             split_url = self.estimation_procedure["data_splits_url"]
-            api_context.download(source=str(split_url), file_name="datasplits.arff")
+            self._http.download(source=str(split_url), file_name="datasplits.arff")
 
     def download_split(self) -> OpenMLSplit:
         """Download the OpenML split for a given task."""
