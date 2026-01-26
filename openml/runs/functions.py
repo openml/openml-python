@@ -19,6 +19,7 @@ import openml
 import openml._api_calls
 import openml.utils
 from openml import config
+from openml._api import api_context
 from openml.exceptions import (
     OpenMLCacheException,
     OpenMLRunsExistError,
@@ -822,7 +823,7 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
         Run corresponding to ID, fetched from the server.
     """
     run_dir = Path(openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id))
-    run_file = run_dir / "description.xml"
+    run_dir / "description.xml"
 
     run_dir.mkdir(parents=True, exist_ok=True)
 
@@ -833,11 +834,7 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
         raise OpenMLCacheException(message="dummy")
 
     except OpenMLCacheException:
-        run_xml = openml._api_calls._perform_api_call(f"run/{run_id}", "get")
-        with run_file.open("w", encoding="utf8") as fh:
-            fh.write(run_xml)
-
-    return _create_run_from_xml(run_xml)
+        return api_context.backend.runs.get(run_id)
 
 
 def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT002
@@ -1098,8 +1095,8 @@ def list_runs(  # noqa: PLR0913
         raise TypeError("uploader must be of type list.")
 
     listing_call = partial(
-        _list_runs,
-        id=id,
+        api_context.backend.runs.list,
+        ids=id,
         task=task,
         setup=setup,
         flow=flow,
