@@ -338,8 +338,6 @@ class HTTPClient:
         timeout = request_kwargs.pop("timeout", self.timeout)
         files = request_kwargs.pop("files", None)
 
-        use_cache = False
-
         if use_cache and self.cache is not None:
             cache_key = self.cache.get_key(url, params)
             try:
