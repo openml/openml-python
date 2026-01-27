@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   test:
-    name: (${{ matrix.os }},Py${{ matrix.python-version }},sk${{ matrix.scikit-learn }},sk-only:${{ matrix.sklearn-only }})
+    name: (${{ matrix.os }},Py${{ matrix.python-version }},sk${{ matrix.scikit-learn }}${{ matrix.pandas-version != '' && format(',pd:{0}', matrix.pandas-version) || '' }},sk-only:${{ matrix.sklearn-only }})
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -64,6 +64,14 @@ jobs:
             sklearn-only: "false"
             code-cov: true
 
+          # Pandas 2 run
+          - os: ubuntu-latest
+            python-version: "3.12"
+            scikit-learn: "1.5.*"
+            sklearn-only: "false"
+            pandas-version: "2.*"
+            code-cov: false
+
     steps:
     - uses: actions/checkout@v6
       with:
@@ -74,10 +82,16 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install test dependencies and scikit-learn
+    - name: Install test dependencies, scikit-learn, and optional pandas
+      shell: bash
       run: |
         python -m pip install --upgrade pip
         pip install -e .[test] scikit-learn==${{ matrix.scikit-learn }}
+        
+        if [ "${{ matrix.pandas-version }}" != "" ]; then
+          echo "Installing specific pandas version: ${{ matrix.pandas-version }}"
+          pip install "pandas==${{ matrix.pandas-version }}"
+        fi
 
     - name: Store repository status
       id: status-before
