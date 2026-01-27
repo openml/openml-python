@@ -11,9 +11,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from typing_extensions import TypedDict
 
-import openml._api_calls
 import openml.config
 from openml import datasets
+from openml._api.resources.base import ResourceAPI
 from openml.base import OpenMLBase
 from openml.utils import _create_cache_directory_for_id
 
@@ -46,7 +46,7 @@ class _EstimationProcedure(TypedDict):
     data_splits_url: str | None
 
 
-class OpenMLTask(OpenMLBase):
+class OpenMLTask(OpenMLBase, ResourceAPI):
     """OpenML Task object.
 
     Parameters
@@ -172,10 +172,7 @@ class OpenMLTask(OpenMLBase):
                 pass
         except OSError:
             split_url = self.estimation_procedure["data_splits_url"]
-            openml._api_calls._download_text_file(
-                source=str(split_url),
-                output_path=str(cache_file),
-            )
+            self._http.download(url=str(split_url), file_name="datasplits.arff")
 
     def download_split(self) -> OpenMLSplit:
         """Download the OpenML split for a given task."""
