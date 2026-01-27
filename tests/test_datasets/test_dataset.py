@@ -294,7 +294,6 @@ def test_tagging():
     datasets = openml.datasets.list_datasets(tag=tag)
     assert datasets.empty
 
-@pytest.mark.xfail(reason="failures_issue_1544")
 def test_get_feature_with_ontology_data_id_11():
     # test on car dataset, which has built-in ontology references
     dataset = openml.datasets.get_dataset(11)
