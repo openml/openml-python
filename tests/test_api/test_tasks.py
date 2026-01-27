@@ -1,11 +1,11 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from openml._api.config import settings
 import pytest
 import pandas as pd
-import requests
+from openml._api.clients.http import HTTPClient
 from openml.testing import TestBase
-from openml._api import api_context
 from openml._api.resources.tasks import TasksV1, TasksV2
 from openml.tasks.task import (
     OpenMLClassificationTask, 
@@ -17,8 +17,26 @@ from openml.tasks.task import (
 class TestTasksEndpoints(TestBase):
     def setUp(self):
         super().setUp()
-        self.v1_api = TasksV1(api_context.backend.tasks._http)
-        self.v2_api = TasksV2(api_context.backend.tasks._http)
+        v1_http_client = HTTPClient(
+            server=settings.api.v1.server,
+            base_url=settings.api.v1.base_url,
+            api_key=settings.api.v1.api_key,
+            timeout=settings.api.v1.timeout,
+            retries=settings.connection.retries,
+            delay_method=settings.connection.delay_method,
+            delay_time=settings.connection.delay_time,
+        )
+        v2_http_client = HTTPClient(
+            server=settings.api.v2.server,
+            base_url=settings.api.v2.base_url,
+            api_key=settings.api.v2.api_key,
+            timeout=settings.api.v2.timeout,
+            retries=settings.connection.retries,
+            delay_method=settings.connection.delay_method,
+            delay_time=settings.connection.delay_time,
+        )
+        self.v1_api = TasksV1(v1_http_client)
+        self.v2_api = TasksV2(v2_http_client)
 
     def _get_first_tid(self, task_type: TaskType) -> int:
         """Helper to find an existing task ID for a given type on the server."""
@@ -60,11 +78,8 @@ class TestTasksEndpoints(TestBase):
     def test_v2_get_task(self):
         """Verify TasksV2 (JSON) skips gracefully if V2 is not supported."""
         tid = self._get_first_tid(TaskType.SUPERVISED_CLASSIFICATION)
-        try:
-            task_v2 = self.v2_api.get(tid)
-            assert int(task_v2.task_id) == tid
-        except (requests.exceptions.JSONDecodeError, Exception):
-            pytest.skip("V2 API JSON format not supported on this server.")
+        task_v2 = self.v2_api.get(tid)
+        assert int(task_v2.task_id) == tid
 
     @pytest.mark.uses_test_server()
     def test_v1_estimation_procedure_list(self):
