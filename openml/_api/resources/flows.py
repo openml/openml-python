@@ -54,7 +54,7 @@ class FlowsV1(FlowsAPI):
         if not (isinstance(external_version, str) and len(external_version) > 0):
             raise ValueError("Argument 'version' should be a non-empty string")
 
-        data = {"name": name, "external_version": external_version, "api_key": self._http.key}
+        data = {"name": name, "external_version": external_version, "api_key": self._http.api_key}
         # Avoid duplicating base_url when server already contains the API path
         server = self._http.server
         base = self._http.base_url
@@ -123,7 +123,7 @@ class FlowsV1(FlowsAPI):
             response = requests.get(
                 url,
                 headers=self._http.headers,
-                params={"api_key": self._http.key},
+                params={"api_key": self._http.api_key},
                 timeout=self._http.timeout,
             )
             xml_string = response.text
@@ -186,7 +186,7 @@ class FlowsV1(FlowsAPI):
 
         # POST to server (multipart/files). Ensure api_key is sent in the form data.
         files = file_elements
-        data = {"api_key": self._http.key}
+        data = {"api_key": self._http.api_key}
         # If server already contains base path, post directly with requests to avoid double base_url
         server = self._http.server
         base = self._http.base_url
@@ -211,7 +211,7 @@ class FlowsV1(FlowsAPI):
 
         return flow
 
-    def delete(self, flow_id: int) -> None:
+    def delete(self, flow_id: int) -> bool:
         """Delete a flow from the OpenML server.
 
         Parameters
@@ -220,6 +220,10 @@ class FlowsV1(FlowsAPI):
             The ID of the flow to delete.
         """
         self._http.delete(f"flow/{flow_id}")
+        return True
+
+    def publish(self) -> None:
+        pass
 
 
 class FlowsV2(FlowsAPI):
@@ -290,8 +294,11 @@ class FlowsV2(FlowsAPI):
     def create(self, flow: OpenMLFlow) -> OpenMLFlow:
         raise NotImplementedError("POST /flows (create) not yet implemented in v2 server")
 
-    def delete(self, flow_id: int) -> None:
+    def delete(self, flow_id: int) -> bool:
         raise NotImplementedError("DELETE /flows/{id} not yet implemented in v2 server")
+
+    def publish(self) -> None:
+        raise NotImplementedError("publish not implemented in v2 server")
 
     @staticmethod
     def _convert_v2_to_v1_format(v2_json: dict[str, Any]) -> dict[str, dict]:
