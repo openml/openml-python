@@ -197,6 +197,7 @@ class HTTPClient:
 
         if code in [
             102,  # flow/exists post
+            103,  # dataset delete
             137,  # dataset post
             350,  # dataset/42 delete
             310,  # flow/<something> post
@@ -388,7 +389,7 @@ class HTTPClient:
         actual = hashlib.md5(response.content).hexdigest()  # noqa: S324
         if actual != md5_checksum:
             raise OpenMLHashException(
-                "Checksum of downloaded file is unequal to the expected checksum {md5_checksum} "
+                f"Checksum of downloaded file is unequal to the expected checksum {md5_checksum} "
                 f"when downloading {response.url}.",
             )
 

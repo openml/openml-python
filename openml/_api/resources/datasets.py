@@ -19,9 +19,7 @@ from openml.datasets.data_feature import OpenMLDataFeature
 from openml.datasets.dataset import OpenMLDataset
 from openml.exceptions import (
     OpenMLHashException,
-    OpenMLNotAuthorizedError,
     OpenMLPrivateDatasetError,
-    OpenMLServerError,
     OpenMLServerException,
 )
 
@@ -156,42 +154,7 @@ class DatasetsV1(ResourceV1, DatasetsAPI):
         bool
             True if the deletion was successful. False otherwise.
         """
-        # TODO will be updated later from the utils
-        url_suffix = f"data/{dataset_id}"
-        try:
-            result_xml = self._http.delete(url_suffix)
-            result = xmltodict.parse(result_xml)
-            return "oml:data_delete" in result
-        except OpenMLServerException as e:
-            # https://github.com/openml/OpenML/blob/21f6188d08ac24fcd2df06ab94cf421c946971b0/openml_OS/views/pages/api_new/v1/xml/pre.php
-            # Most exceptions are descriptive enough to be raised as their standard
-            # OpenMLServerException, however there are two cases where we add information:
-            #  - a generic "failed" message, we direct them to the right issue board
-            #  - when the user successfully authenticates with the server,
-            #    but user is not allowed to take the requested action,
-            #    in which case we specify a OpenMLNotAuthorizedError.
-            by_other_user = [323, 353, 393, 453, 594]
-            has_dependent_entities = [324, 326, 327, 328, 354, 454, 464, 595]
-            unknown_reason = [325, 355, 394, 455, 593]
-            if e.code in by_other_user:
-                raise OpenMLNotAuthorizedError(
-                    message=("The data can not be deleted because it was not uploaded by you."),
-                ) from e
-            if e.code in has_dependent_entities:
-                raise OpenMLNotAuthorizedError(
-                    message=(
-                        f"The data can not be deleted because "
-                        f"it still has associated entities: {e.message}"
-                    ),
-                ) from e
-            if e.code in unknown_reason:
-                raise OpenMLServerError(
-                    message=(
-                        "The data can not be deleted for unknown reason,"
-                        " please open an issue at: https://github.com/openml/openml/issues/new"
-                    ),
-                ) from e
-            raise e
+        return super().delete(resource_id=dataset_id)
 
     def edit(
         self,
@@ -822,7 +785,7 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
         return self._parse_list_json(datasets_list)
 
     def delete(self, dataset_id: int) -> bool:
-        raise NotImplementedError()
+        raise NotImplementedError(self._get_not_implemented_message("delete"))
 
     def edit(
         self,
@@ -839,10 +802,10 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
         original_data_url: str | None = None,
         paper_url: str | None = None,
     ) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError(self._get_not_implemented_message("edit"))
 
     def fork(self, dataset_id: int) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError(self._get_not_implemented_message("fork"))
 
     def status_update(self, dataset_id: int, status: Literal["active", "deactivated"]) -> None:
         """
@@ -944,10 +907,10 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
         )
 
     def feature_add_ontology(self, dataset_id: int, index: int, ontology: str) -> bool:
-        raise NotImplementedError()
+        raise NotImplementedError(self._get_not_implemented_message())
 
     def feature_remove_ontology(self, dataset_id: int, index: int, ontology: str) -> bool:
-        raise NotImplementedError()
+        raise NotImplementedError(self._get_not_implemented_message())
 
     def get_features(self, dataset_id: int) -> dict[int, OpenMLDataFeature]:
         path = f"datasets/features/{dataset_id}"
@@ -971,7 +934,7 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
     def parse_features_file(
         self, features_file: Path, features_pickle_file: Path
     ) -> dict[int, OpenMLDataFeature]:
-        if features_file.suffix != ".json":
+        if features_file.suffix == ".xml":
             # can fallback to v1 if the file is .xml
             raise NotImplementedError()
 
@@ -988,7 +951,7 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
     def parse_qualities_file(
         self, qualities_file: Path, qualities_pickle_file: Path
     ) -> dict[str, float]:
-        if qualities_file.suffix != ".json":
+        if qualities_file.suffix == ".xml":
             # can fallback to v1 if the file is .xml
             raise NotImplementedError()
 
@@ -1120,10 +1083,10 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
         return output_file_path
 
     def add_topic(self, data_id: int, topic: str) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError(self._get_not_implemented_message("add_topic"))
 
     def delete_topic(self, data_id: int, topic: str) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError(self._get_not_implemented_message("delete_topic"))
 
     def get_online_dataset_format(self, dataset_id: int) -> str:
         dataset_json = self._http.get(f"datasets/{dataset_id}").text
