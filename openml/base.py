@@ -128,15 +128,15 @@ class OpenMLBase(ABC):
         """Publish the object on the OpenML server."""
         from openml._api import api_context
 
-        # 1. Resolve the correct resource manager (e.g., Flows, Runs)
         resource_manager = api_context.backend.get_resource_for_entity(self)
 
-        # 2. Delegate creation to the backend (Handles V1/V2 switching internally)
-        # The backend returns the updated entity (with ID) or the ID itself.
-        published_entity = resource_manager.create(self)  # type: ignore
+        published_entity = resource_manager.publish(self)  # type: ignore
 
-        # 3. Update self with ID if not already done (V2 response handling)
-        if self.id is None and published_entity.id is not None:
+        if (
+            published_entity is not None
+            and hasattr(published_entity, "id")
+            and published_entity.id is not None
+        ):
             self.id = published_entity.id  # type: ignore
 
         return self

@@ -3,11 +3,10 @@ from __future__ import annotations
 from typing import Any
 
 import pandas as pd
-import requests
 import xmltodict
 
 from openml._api.resources.base import FlowsAPI
-from openml.exceptions import OpenMLServerException
+from openml.exceptions import OpenMLServerError, OpenMLServerException
 from openml.flows.flow import OpenMLFlow
 
 
@@ -55,17 +54,7 @@ class FlowsV1(FlowsAPI):
             raise ValueError("Argument 'version' should be a non-empty string")
 
         data = {"name": name, "external_version": external_version, "api_key": self._http.api_key}
-        # Avoid duplicating base_url when server already contains the API path
-        server = self._http.server
-        base = self._http.base_url
-        if base and base.strip("/") in server:
-            url = server.rstrip("/") + "/flow/exists"
-            response = requests.post(
-                url, data=data, headers=self._http.headers, timeout=self._http.timeout
-            )
-            xml_response = response.text
-        else:
-            xml_response = self._http.post("flow/exists", data=data).text
+        xml_response = self._http.post("flow/exists", data=data).text
         result_dict = xmltodict.parse(xml_response)
         # Detect error payloads and raise
         if "oml:error" in result_dict:
@@ -116,20 +105,8 @@ class FlowsV1(FlowsAPI):
         if uploader is not None:
             api_call += f"/uploader/{uploader}"
 
-        server = self._http.server
-        base = self._http.base_url
-        if base and base.strip("/") in server:
-            url = server.rstrip("/") + "/" + api_call
-            response = requests.get(
-                url,
-                headers=self._http.headers,
-                params={"api_key": self._http.api_key},
-                timeout=self._http.timeout,
-            )
-            xml_string = response.text
-        else:
-            response = self._http.get(api_call, use_api_key=True)
-            xml_string = response.text
+        response = self._http.get(api_call, use_api_key=True)
+        xml_string = response.text
         flows_dict = xmltodict.parse(xml_string, force_list=("oml:flow",))
 
         if "oml:error" in flows_dict:
@@ -158,7 +135,7 @@ class FlowsV1(FlowsAPI):
 
         return pd.DataFrame.from_dict(flows, orient="index")
 
-    def create(self, flow: OpenMLFlow) -> OpenMLFlow:
+    def publish(self, flow: OpenMLFlow) -> OpenMLFlow:  # type: ignore[override]
         """Create a new flow on the OpenML server.
 
         under development , not fully functional yet
@@ -187,16 +164,7 @@ class FlowsV1(FlowsAPI):
         # POST to server (multipart/files). Ensure api_key is sent in the form data.
         files = file_elements
         data = {"api_key": self._http.api_key}
-        # If server already contains base path, post directly with requests to avoid double base_url
-        server = self._http.server
-        base = self._http.base_url
-        if base and base.strip("/") in server:
-            url = server.rstrip("/") + "/flow"
-            response = requests.post(
-                url, files=files, data=data, headers=self._http.headers, timeout=self._http.timeout
-            )
-        else:
-            response = self._http.post("flow", files=files, data=data)
+        response = self._http.post("flow", files=files, data=data)
 
         parsed = xmltodict.parse(response.text)
         if "oml:error" in parsed:
@@ -221,9 +189,6 @@ class FlowsV1(FlowsAPI):
         """
         self._http.delete(f"flow/{flow_id}")
         return True
-
-    def publish(self) -> None:
-        pass
 
 
 class FlowsV2(FlowsAPI):
@@ -277,8 +242,8 @@ class FlowsV2(FlowsAPI):
             result = response.json()
             flow_id: int | bool = result.get("flow_id", False)
             return flow_id
-        except (requests.exceptions.HTTPError, KeyError):
-            # v2 returns 404 when flow doesn't exist
+        except (OpenMLServerError, KeyError):
+            # v2 returns 404 when flow doesn't exist, which raises OpenMLServerError
             return False
 
     def list(
@@ -291,14 +256,11 @@ class FlowsV2(FlowsAPI):
     ) -> pd.DataFrame:
         raise NotImplementedError("flows (list) not yet implemented in v2 server")
 
-    def create(self, flow: OpenMLFlow) -> OpenMLFlow:
+    def publish(self, flow: OpenMLFlow) -> OpenMLFlow:  # type: ignore[override]
         raise NotImplementedError("POST /flows (create) not yet implemented in v2 server")
 
     def delete(self, flow_id: int) -> bool:
         raise NotImplementedError("DELETE /flows/{id} not yet implemented in v2 server")
-
-    def publish(self) -> None:
-        raise NotImplementedError("publish not implemented in v2 server")
 
     @staticmethod
     def _convert_v2_to_v1_format(v2_json: dict[str, Any]) -> dict[str, dict]:

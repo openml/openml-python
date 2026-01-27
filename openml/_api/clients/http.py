@@ -151,9 +151,14 @@ class HTTPClient:
         if "json" in content_type:
             server_exception = response.json()
             server_error = server_exception["detail"]
-            code = server_error.get("code")
-            message = server_error.get("message")
-            additional_information = server_error.get("additional_information")
+            if isinstance(server_error, dict):
+                code = server_error.get("code")
+                message = server_error.get("message")
+                additional_information = server_error.get("additional_information")
+            else:
+                code = None
+                message = str(server_error)
+                additional_information = None
         else:
             server_exception = xmltodict.parse(response.text)
             server_error = server_exception["oml:error"]

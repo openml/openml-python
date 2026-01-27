@@ -69,7 +69,7 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
         raise OpenMLCacheException(f"Flow file for fid {fid} not cached") from e
 
 
-@openml.utils.thread_safe_if_oslo_installed
+# @openml.utils.thread_safe_if_oslo_installed
 def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = True) -> OpenMLFlow:  # noqa: FBT002
     """Download the OpenML flow for a given flow ID.
 
@@ -192,7 +192,7 @@ def flow_exists(name: str, external_version: str) -> int | bool:
     """
     if not (isinstance(name, str) and len(name) > 0):
         raise ValueError("Argument 'name' should be a non-empty string")
-    if not (isinstance(name, str) and len(external_version) > 0):
+    if not (isinstance(external_version, str) and len(external_version) > 0):
         raise ValueError("Argument 'version' should be a non-empty string")
 
     from openml._api import api_context
