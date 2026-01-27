@@ -8,6 +8,7 @@ from openml._api.config import settings
 from openml._api.resources import (
     DatasetsV1,
     DatasetsV2,
+    FallbackProxy,
     TasksV1,
     TasksV2,
 )
@@ -17,7 +18,7 @@ if TYPE_CHECKING:
 
 
 class APIBackend:
-    def __init__(self, *, datasets: DatasetsAPI, tasks: TasksAPI):
+    def __init__(self, *, datasets: DatasetsAPI | FallbackProxy, tasks: TasksAPI | FallbackProxy):
         self.datasets = datasets
         self.tasks = tasks
 
@@ -62,7 +63,10 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
     if strict:
         return v2
 
-    return v1
+    return APIBackend(
+        datasets=FallbackProxy(DatasetsV2(v2_http_client), DatasetsV1(v1_http_client)),
+        tasks=FallbackProxy(TasksV2(v2_http_client), TasksV1(v1_http_client)),
+    )
 
 
 class APIContext:
