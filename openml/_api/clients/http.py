@@ -197,7 +197,6 @@ class HTTPClient:
 
         if code in [
             102,  # flow/exists post
-            103,  # dataset delete
             137,  # dataset post
             350,  # dataset/42 delete
             310,  # flow/<something> post
