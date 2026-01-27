@@ -43,6 +43,12 @@ class ResourceAPI(ABC):
     @abstractmethod
     def publish(self, path: str, files: Mapping[str, Any] | None) -> int: ...
 
+    @abstractmethod
+    def tag(self, resource_id: int, tag: str) -> list[str]: ...
+
+    @abstractmethod
+    def untag(self, resource_id: int, tag: str) -> list[str]: ...
+
     def _get_not_implemented_message(self, method_name: str | None = None) -> str:
         version = getattr(self.api_version, "name", "Unknown version")
         resource = getattr(self.resource_type, "name", "Unknown resource")
