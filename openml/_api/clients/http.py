@@ -12,6 +12,7 @@ import requests
 from requests import Response
 
 from openml.__version__ import __version__
+from openml.exceptions import OpenMLHashException
 
 if TYPE_CHECKING:
     from openml._api.config import DelayMethod
@@ -132,7 +133,7 @@ class HTTPClient:
         *,
         use_cache: bool = False,
         use_api_key: bool = False,
-        md5_checksum: str | None,
+        md5_checksum: str | None = None,
         **request_kwargs: Any,
     ) -> Response:
         url = urljoin(self.server, urljoin(self.base_url, path))
@@ -178,7 +179,10 @@ class HTTPClient:
         # ruff sees hashlib.md5 as insecure
         actual = hashlib.md5(response.content).hexdigest()  # noqa: S324
         if actual != md5_checksum:
-            raise ValueError(f"MD5 checksum mismatch: expected {md5_checksum}, got {actual}")
+            raise OpenMLHashException(
+                "Checksum of downloaded file is unequal to the expected checksum {md5_checksum} "
+                f"when downloading {response.url}.",
+            )
 
     def get(
         self,

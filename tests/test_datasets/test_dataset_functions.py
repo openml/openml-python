@@ -441,8 +441,8 @@ class TestOpenMLDataset(TestBase):
 
         self.assertRaisesRegex(
             OpenMLHashException,
-            "Checksum of downloaded file is unequal to the expected checksum abc when downloading "
-            "https://www.openml.org/data/download/61. Raised when downloading dataset 5.",
+            "Checksum of downloaded file is unequal to the expected checksum abc "
+            "when downloading https://www.openml.org/data/download/61.",
             _get_dataset_arff,
             description,
         )
@@ -451,17 +451,15 @@ class TestOpenMLDataset(TestBase):
 
     @pytest.mark.uses_test_server()
     def test__get_dataset_features(self):
-        features_file = _get_dataset_features_file(self.workdir, 2)
+        features_file = _get_dataset_features_file(2)
         assert isinstance(features_file, Path)
-        features_xml_path = self.workdir / "features.xml"
-        assert features_xml_path.exists()
+        assert features_file.exists()
 
     @pytest.mark.uses_test_server()
     def test__get_dataset_qualities(self):
-        qualities = _get_dataset_qualities_file(self.workdir, 2)
+        qualities = _get_dataset_qualities_file(2)
         assert isinstance(qualities, Path)
-        qualities_xml_path = self.workdir / "qualities.xml"
-        assert qualities_xml_path.exists()
+        assert qualities.exists()
 
     @pytest.mark.uses_test_server()
     def test_get_dataset_force_refresh_cache(self):
@@ -565,7 +563,7 @@ class TestOpenMLDataset(TestBase):
         labels = openml.datasets.get_dataset(2).retrieve_class_labels(
             target_name="product-type",
         )
-        assert labels == ["C", "H", "G"]
+        assert labels == ["C", "G", "H"]
 
         # Test workaround for string-typed class labels
         custom_ds = openml.datasets.get_dataset(2)

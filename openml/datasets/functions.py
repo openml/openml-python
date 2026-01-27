@@ -1005,7 +1005,6 @@ def _get_dataset_arff(
 
 # TODO remove cache dir
 def _get_dataset_features_file(
-    did_cache_dir: str | Path | None,  # noqa: ARG001
     dataset_id: int,
 ) -> Path:
     """API call to load dataset features. Loads from cache or downloads them.
@@ -1035,7 +1034,6 @@ def _get_dataset_features_file(
 
 # TODO remove cache dir
 def _get_dataset_qualities_file(
-    did_cache_dir: str | Path | None,  # noqa: ARG001
     dataset_id: int,
 ) -> Path | None:
     """Get the path for the dataset qualities file, or None if no qualities exist.

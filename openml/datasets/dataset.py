@@ -992,7 +992,8 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         }
 
 
-def _read_features(features_file: Path) -> dict[int, OpenMLDataFeature]:
+def _read_features(features_file: str | Path) -> dict[int, OpenMLDataFeature]:
+    features_file = Path(features_file)
     features_pickle_file = Path(_get_features_pickle_file(str(features_file)))
     try:
         with features_pickle_file.open("rb") as fh_binary:
@@ -1001,7 +1002,12 @@ def _read_features(features_file: Path) -> dict[int, OpenMLDataFeature]:
     except:  # noqa: E722
         from openml._api import api_context
 
-        return api_context.backend.datasets.parse_features_file(features_file, features_pickle_file)
+        features = api_context.backend.datasets.parse_features_file(
+            features_file, features_pickle_file
+        )
+        with features_pickle_file.open("wb") as fh_binary:
+            pickle.dump(features, fh_binary)
+        return features
 
 
 # TODO(eddiebergman): Should this really exist?
@@ -1025,6 +1031,9 @@ def _read_qualities(qualities_file: str | Path) -> dict[str, float]:
     except:  # noqa: E722
         from openml._api import api_context
 
-        return api_context.backend.datasets.parse_qualities_file(
+        qualities = api_context.backend.datasets.parse_qualities_file(
             qualities_file, qualities_pickle_file
         )
+        with qualities_pickle_file.open("wb") as fh_binary:
+            pickle.dump(qualities, fh_binary)
+        return qualities

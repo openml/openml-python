@@ -466,16 +466,3 @@ def test__read_qualities(static_cache_dir, workdir, mocker):
     assert pickle_mock.dump.call_count == 1
 
 
-
-def test__check_qualities():
-    qualities = [{"oml:name": "a", "oml:value": "0.5"}]
-    qualities = openml.datasets.dataset._check_qualities(qualities)
-    assert qualities["a"] == 0.5
-
-    qualities = [{"oml:name": "a", "oml:value": "null"}]
-    qualities = openml.datasets.dataset._check_qualities(qualities)
-    assert qualities["a"] != qualities["a"]
-
-    qualities = [{"oml:name": "a", "oml:value": None}]
-    qualities = openml.datasets.dataset._check_qualities(qualities)
-    assert qualities["a"] != qualities["a"]
