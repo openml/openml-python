@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any, Literal
 import minio
 import urllib3
 
-from openml._api.resources.base import DatasetsAPI
+from openml._api.resources.base import DatasetsAPI, ResourceV1
 from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 from openml.datasets.data_feature import OpenMLDataFeature
 from openml.datasets.dataset import OpenMLDataset
@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 NO_ACCESS_GRANTED_ERRCODE = 112
 
 
-class DatasetsV1(DatasetsAPI):
+class DatasetsV1(ResourceV1, DatasetsAPI):
     def get(
         self,
         dataset_id: int,
@@ -716,7 +716,7 @@ class DatasetsV1(DatasetsAPI):
         return str(self.download_dataset_arff(xmltodict.parse(dataset_xml)))
 
 
-class DatasetsV2(DatasetsAPI):
+class DatasetsV2(ResourceV1, DatasetsAPI):
     def get(
         self,
         dataset_id: int,

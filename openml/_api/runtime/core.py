@@ -34,8 +34,7 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
         api_key=settings.api.v1.api_key,
         timeout=settings.api.v1.timeout,
         retries=settings.connection.retries,
-        delay_method=settings.connection.delay_method,
-        delay_time=settings.connection.delay_time,
+        retry_policy=settings.connection.retry_policy,
         cache=http_cache,
     )
     v2_http_client = HTTPClient(
@@ -44,8 +43,7 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
         api_key=settings.api.v2.api_key,
         timeout=settings.api.v2.timeout,
         retries=settings.connection.retries,
-        delay_method=settings.connection.delay_method,
-        delay_time=settings.connection.delay_time,
+        retry_policy=settings.connection.retry_policy,
         cache=http_cache,
     )
 

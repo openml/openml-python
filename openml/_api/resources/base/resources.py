@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
+
+from openml._api.resources.base import ResourceAPI, ResourceType
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -14,12 +16,9 @@ if TYPE_CHECKING:
     from openml.tasks.task import OpenMLTask
 
 
-class ResourceAPI:
-    def __init__(self, http: HTTPClient):
-        self._http = http
+class DatasetsAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.DATASET
 
-
-class DatasetsAPI(ResourceAPI, ABC):
     def __init__(self, http: HTTPClient, minio: MinIOClient):
         self._minio = minio
         super().__init__(http)
@@ -131,7 +130,9 @@ class DatasetsAPI(ResourceAPI, ABC):
     def get_online_dataset_arff(self, dataset_id: int) -> str | None: ...
 
 
-class TasksAPI(ResourceAPI, ABC):
+class TasksAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.TASK
+
     @abstractmethod
     def get(
         self,

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import xmltodict
 
-from openml._api.resources.base import TasksAPI
+from openml._api.resources.base import ResourceV1, ResourceV2, TasksAPI
 from openml.tasks.task import (
     OpenMLClassificationTask,
     OpenMLClusteringTask,
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from requests import Response
 
 
-class TasksV1(TasksAPI):
+class TasksV1(ResourceV1, TasksAPI):
     def get(
         self,
         task_id: int,
@@ -118,7 +118,7 @@ class TasksV1(TasksAPI):
         return cls(**common_kwargs)  # type: ignore
 
 
-class TasksV2(TasksAPI):
+class TasksV2(ResourceV2, TasksAPI):
     def get(
         self,
         task_id: int,
