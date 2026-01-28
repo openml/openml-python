@@ -31,6 +31,8 @@ class TasksAPI(ResourceAPI):
     ) -> OpenMLTask | tuple[OpenMLTask, Response]: ...
 
 
-class EvaluationMeasuresAPI(ResourceAPI, ABC):
+class EvaluationMeasuresAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.EVALUATION_MEASURE
+
     @abstractmethod
     def list(self) -> list[str]: ...
