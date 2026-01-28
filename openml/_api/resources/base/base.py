@@ -5,6 +5,9 @@ from enum import Enum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+    from typing import Any
+
     from openml._api.clients import HTTPClient
 
 
@@ -34,6 +37,18 @@ class ResourceAPI(ABC):
     def __init__(self, http: HTTPClient):
         self._http = http
 
+    @abstractmethod
+    def delete(self, resource_id: int) -> bool: ...
+
+    @abstractmethod
+    def publish(self, path: str, files: Mapping[str, Any] | None) -> int: ...
+
+    @abstractmethod
+    def tag(self, resource_id: int, tag: str) -> list[str]: ...
+
+    @abstractmethod
+    def untag(self, resource_id: int, tag: str) -> list[str]: ...
+
     def _get_not_implemented_message(self, method_name: str | None = None) -> str:
         version = getattr(self.api_version, "name", "Unknown version")
         resource = getattr(self.resource_type, "name", "Unknown resource")
@@ -42,9 +57,3 @@ class ResourceAPI(ABC):
             f"{self.__class__.__name__}: {version} API does not support this "
             f"functionality for resource: {resource}.{method_info}"
         )
-
-    @abstractmethod
-    def delete(self, resource_id: int) -> bool: ...
-
-    @abstractmethod
-    def publish(self) -> None: ...

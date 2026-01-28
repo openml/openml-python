@@ -281,6 +281,7 @@ class HTTPClient:
         method: str,
         url: str,
         params: Mapping[str, Any],
+        data: Mapping[str, Any],
         headers: Mapping[str, str],
         timeout: float | int,
         files: Mapping[str, Any] | None,
@@ -294,6 +295,7 @@ class HTTPClient:
                 method=method,
                 url=url,
                 params=params,
+                data=data,
                 headers=headers,
                 timeout=timeout,
                 files=files,
@@ -329,10 +331,15 @@ class HTTPClient:
         url = urljoin(self.server, urljoin(self.base_url, path))
         retries = max(1, self.retries)
 
-        # prepare params
         params = request_kwargs.pop("params", {}).copy()
+        data = request_kwargs.pop("data", {}).copy()
+
         if use_api_key:
             params["api_key"] = self.api_key
+
+        if method.upper() in {"POST", "PUT", "PATCH"}:
+            data = {**params, **data}
+            params = {}
 
         # prepare headers
         headers = request_kwargs.pop("headers", {}).copy()
@@ -340,8 +347,6 @@ class HTTPClient:
 
         timeout = request_kwargs.pop("timeout", self.timeout)
         files = request_kwargs.pop("files", None)
-
-        use_cache = False
 
         if use_cache and self.cache is not None:
             cache_key = self.cache.get_key(url, params)
@@ -357,6 +362,7 @@ class HTTPClient:
                 method=method,
                 url=url,
                 params=params,
+                data=data,
                 headers=headers,
                 timeout=timeout,
                 files=files,
