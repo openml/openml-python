@@ -34,6 +34,8 @@ class TasksAPI(ResourceAPI):
 
 
 class FlowsAPI(ResourceAPI, ABC):
+    resource_type: ResourceType = ResourceType.FLOW
+
     @abstractmethod
     def get(
         self,

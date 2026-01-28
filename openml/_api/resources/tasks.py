@@ -26,7 +26,7 @@ class TasksV1(ResourceV1, TasksAPI):
         return_response: bool = False,
     ) -> OpenMLTask | tuple[OpenMLTask, Response]:
         path = f"task/{task_id}"
-        response = self._http.get(path)
+        response = self._http.get(path, use_cache=True)
         xml_content = response.text
         task = self._create_task_from_xml(xml_content)
 
@@ -125,4 +125,4 @@ class TasksV2(ResourceV2, TasksAPI):
         *,
         return_response: bool = False,
     ) -> OpenMLTask | tuple[OpenMLTask, Response]:
-        raise NotImplementedError
+        raise NotImplementedError(self._get_not_implemented_message("get"))

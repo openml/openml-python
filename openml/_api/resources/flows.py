@@ -5,12 +5,12 @@ from typing import Any
 import pandas as pd
 import xmltodict
 
-from openml._api.resources.base import FlowsAPI
+from openml._api.resources.base import FlowsAPI, ResourceV1, ResourceV2
 from openml.exceptions import OpenMLServerError, OpenMLServerException
 from openml.flows.flow import OpenMLFlow
 
 
-class FlowsV1(FlowsAPI):
+class FlowsV1(ResourceV1, FlowsAPI):
     def get(
         self,
         flow_id: int,
@@ -191,7 +191,7 @@ class FlowsV1(FlowsAPI):
         return True
 
 
-class FlowsV2(FlowsAPI):
+class FlowsV2(ResourceV2, FlowsAPI):
     def get(
         self,
         flow_id: int,
