@@ -532,14 +532,7 @@ class TestOpenMLDataset(TestBase):
 
     @pytest.mark.uses_test_server()
     def test_publish_dataset(self):
-        # lazy loading not possible as we need the arff-file.
-        openml.datasets.get_dataset(3, download_data=True)
-        file_path = os.path.join(
-            openml.config.get_cache_directory(),
-            "datasets",
-            "3",
-            "dataset.arff",
-        )
+        arff_file_path = Path(__file__).parent.parent / "files" / "org" / "openml" / "test" / "datasets" / "2" / "dataset.arff"
         dataset = OpenMLDataset(
             "anneal",
             "test",
@@ -547,7 +540,7 @@ class TestOpenMLDataset(TestBase):
             version=1,
             licence="public",
             default_target_attribute="class",
-            data_file=file_path,
+            data_file=arff_file_path,
         )
         dataset.publish()
         TestBase._mark_entity_for_removal("data", dataset.dataset_id)
