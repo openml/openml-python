@@ -32,7 +32,9 @@ class TasksAPI(ResourceAPI):
     ) -> OpenMLTask | tuple[OpenMLTask, Response]: ...
 
 
-class EvaluationsAPI(ResourceAPI, ABC):
+class EvaluationsAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.EVALUATION
+
     @abstractmethod
     def list(  # noqa: PLR0913
         self,

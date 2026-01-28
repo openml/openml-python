@@ -6,11 +6,11 @@ from typing import Any
 
 import xmltodict
 
-from openml._api.resources.base import EvaluationsAPI
+from openml._api.resources.base import EvaluationsAPI, ResourceV1, ResourceV2
 from openml.evaluations import OpenMLEvaluation
 
 
-class EvaluationsV1(EvaluationsAPI):
+class EvaluationsV1(ResourceV1, EvaluationsAPI):
     """V1 API implementation for evaluations.
     Fetches evaluations from the v1 XML API endpoint.
     """
@@ -248,7 +248,7 @@ class EvaluationsV1(EvaluationsAPI):
         return {user["oml:id"]: user["oml:username"] for user in users["oml:users"]["oml:user"]}
 
 
-class EvaluationsV2(EvaluationsAPI):
+class EvaluationsV2(ResourceV2, EvaluationsAPI):
     """V2 API implementation for evaluations.
     Fetches evaluations from the v2 json API endpoint.
     """

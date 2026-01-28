@@ -8,9 +8,9 @@ from openml._api.config import settings
 from openml._api.resources import (
     DatasetsV1,
     DatasetsV2,
-    FallbackProxy,
     EvaluationsV1,
     EvaluationsV2,
+    FallbackProxy,
     TasksV1,
     TasksV2,
 )
@@ -20,7 +20,13 @@ if TYPE_CHECKING:
 
 
 class APIBackend:
-    def __init__(self, *, datasets: DatasetsAPI | FallbackProxy, tasks: TasksAPI | FallbackProxy, evaluations: EvaluationsAPI):
+    def __init__(
+        self,
+        *,
+        datasets: DatasetsAPI | FallbackProxy,
+        tasks: TasksAPI | FallbackProxy,
+        evaluations: EvaluationsAPI | FallbackProxy,
+    ):
         self.datasets = datasets
         self.tasks = tasks
         self.evaluations = evaluations
@@ -51,14 +57,18 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
     )
 
     v1 = APIBackend(
-        datasets=DatasetsV1(v1_http_client), tasks=TasksV1(v1_http_client), evaluations=EvaluationsV1(v1_http_client)
+        datasets=DatasetsV1(v1_http_client),
+        tasks=TasksV1(v1_http_client),
+        evaluations=EvaluationsV1(v1_http_client),
     )
 
     if version == "v1":
         return v1
 
     v2 = APIBackend(
-        datasets=DatasetsV2(v2_http_client), tasks=TasksV2(v2_http_client), evaluations=EvaluationsV2(v2_http_client)
+        datasets=DatasetsV2(v2_http_client),
+        tasks=TasksV2(v2_http_client),
+        evaluations=EvaluationsV2(v2_http_client),
     )
 
     if strict:
@@ -67,6 +77,7 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
     return APIBackend(
         datasets=FallbackProxy(DatasetsV2(v2_http_client), DatasetsV1(v1_http_client)),
         tasks=FallbackProxy(TasksV2(v2_http_client), TasksV1(v1_http_client)),
+        evaluations=FallbackProxy(EvaluationsV2(v2_http_client), EvaluationsV1(v1_http_client)),
     )
 
 
