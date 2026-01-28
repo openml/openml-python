@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal
+from enum import Enum
 
-DelayMethod = Literal["human", "robot"]
+
+class RetryPolicy(str, Enum):
+    HUMAN = "human"
+    ROBOT = "robot"
 
 
 @dataclass
 class APIConfig:
     server: str
     base_url: str
-    key: str
+    api_key: str
     timeout: int = 10  # seconds
 
 
@@ -23,12 +26,7 @@ class APISettings:
 @dataclass
 class ConnectionConfig:
     retries: int = 3
-    delay_method: DelayMethod = "human"
-    delay_time: int = 1  # seconds
-
-    def __post_init__(self) -> None:
-        if self.delay_method not in ("human", "robot"):
-            raise ValueError(f"delay_method must be 'human' or 'robot', got {self.delay_method}")
+    retry_policy: RetryPolicy = RetryPolicy.HUMAN
 
 
 @dataclass
@@ -49,12 +47,12 @@ settings = Settings(
         v1=APIConfig(
             server="https://www.openml.org/",
             base_url="api/v1/xml/",
-            key="...",
+            api_key="...",
         ),
         v2=APIConfig(
             server="http://127.0.0.1:8001/",
             base_url="",
-            key="...",
+            api_key="...",
         ),
     ),
     connection=ConnectionConfig(),

@@ -1,29 +1,30 @@
 from __future__ import annotations
 
+import builtins
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
+
+from openml._api.resources.base import ResourceAPI, ResourceType
 
 if TYPE_CHECKING:
     import pandas as pd
     from requests import Response
 
-    from openml._api.http import HTTPClient
     from openml.datasets.dataset import OpenMLDataset
     from openml.runs.run import OpenMLRun
     from openml.tasks.task import OpenMLTask, TaskType
 
 
-class ResourceAPI:
-    def __init__(self, http: HTTPClient):
-        self._http = http
+class DatasetsAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.DATASET
 
-
-class DatasetsAPI(ResourceAPI, ABC):
     @abstractmethod
     def get(self, dataset_id: int) -> OpenMLDataset | tuple[OpenMLDataset, Response]: ...
 
 
-class TasksAPI(ResourceAPI, ABC):
+class TasksAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.TASK
+
     @abstractmethod
     def get(
         self,
@@ -38,16 +39,16 @@ class RunsAPI(ResourceAPI, ABC):
     def get(self, run_id: int) -> OpenMLRun: ...
 
     @abstractmethod
-    def list(  # noqa: PLR0913
+    def list(  # type: ignore[valid-type]  # noqa: PLR0913
         self,
         limit: int,
         offset: int,
         *,
-        ids: list | None = None,
-        task: list | None = None,
-        setup: list | None = None,
-        flow: list | None = None,
-        uploader: list | None = None,
+        ids: builtins.list[int] | None = None,
+        task: builtins.list[int] | None = None,
+        setup: builtins.list[int] | None = None,
+        flow: builtins.list[int] | None = None,
+        uploader: builtins.list[int] | None = None,
         study: int | None = None,
         tag: str | None = None,
         display_errors: bool = False,
@@ -58,4 +59,10 @@ class RunsAPI(ResourceAPI, ABC):
     def delete(self, run_id: int) -> bool: ...
 
     @abstractmethod
-    def create(self, run: OpenMLRun) -> OpenMLRun: ...
+    def publish(self, run: OpenMLRun) -> OpenMLRun: ...  # type: ignore
+
+    @abstractmethod
+    def tag(self, resource_id: int, tag: str) -> builtins.list[str]: ...
+
+    @abstractmethod
+    def untag(self, resource_id: int, tag: str) -> builtins.list[str]: ...

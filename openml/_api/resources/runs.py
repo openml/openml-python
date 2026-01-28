@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import builtins
 from typing import TYPE_CHECKING
 
 import pandas as pd
@@ -37,16 +38,16 @@ class RunsV1(RunsAPI):
         xml_content = response.text
         return openml.runs.functions._create_run_from_xml(xml_content)
 
-    def list(  # noqa: PLR0913, C901, PLR0912
+    def list(  # type: ignore[valid-type]  # noqa: PLR0913, C901, PLR0912
         self,
         limit: int,
         offset: int,
         *,
-        ids: list | None = None,
-        task: list | None = None,
-        setup: list | None = None,
-        flow: list | None = None,
-        uploader: list | None = None,
+        ids: builtins.list[int] | None = None,
+        task: builtins.list[int] | None = None,
+        setup: builtins.list[int] | None = None,
+        flow: builtins.list[int] | None = None,
+        uploader: builtins.list[int] | None = None,
         study: int | None = None,
         tag: str | None = None,
         display_errors: bool = False,
@@ -178,8 +179,8 @@ class RunsV1(RunsAPI):
         xml_response = xmltodict.parse(response.text)
         return "oml:run_delete" in xml_response
 
-    def create(self, run: OpenMLRun) -> OpenMLRun:
-        """Create (publish) a run on the OpenML server.
+    def publish(self, run: OpenMLRun) -> OpenMLRun:  # type: ignore
+        """Publish a run on the OpenML server.
 
         Parameters
         ----------
@@ -196,7 +197,13 @@ class RunsV1(RunsAPI):
         # 2. Get file elements (description.xml, predictions.arff, trace.arff)
         # 3. POST multipart to /run/
         # 4. Parse XML response and set run_id
-        raise NotImplementedError("RunsV1.create() is not implemented yet.")
+        raise NotImplementedError("RunsV1.publish() is not implemented yet.")
+
+    def untag(self, _resource_id: int, _tag: str) -> builtins.list[str]:
+        raise NotImplementedError("RunsV1.untag() is not implemented yet.")
+
+    def tag(self, _resource_id: int, _tag: str) -> builtins.list[str]:
+        raise NotImplementedError("RunsV1.tag() is not implemented yet.")
 
 
 class RunsV2(RunsAPI):
@@ -222,16 +229,16 @@ class RunsV2(RunsAPI):
         """
         raise NotImplementedError("RunsV2.get is not implemented yet.")
 
-    def list(  # noqa: PLR0913
+    def list(  # type: ignore[valid-type]  # noqa: PLR0913
         self,
         limit: int,
         offset: int,
         *,
-        ids: list | None = None,
-        task: list | None = None,
-        setup: list | None = None,
-        flow: list | None = None,
-        uploader: list | None = None,
+        ids: builtins.list[int] | None = None,
+        task: builtins.list[int] | None = None,
+        setup: builtins.list[int] | None = None,
+        flow: builtins.list[int] | None = None,
+        uploader: builtins.list[int] | None = None,
         study: int | None = None,
         tag: str | None = None,
         display_errors: bool = False,
@@ -266,8 +273,8 @@ class RunsV2(RunsAPI):
         """
         raise NotImplementedError("RunsV2.delete is not implemented yet.")
 
-    def create(self, run: OpenMLRun) -> OpenMLRun:
-        """Create (publish) a run on the V2 server.
+    def publish(self, run: OpenMLRun) -> OpenMLRun:  # type: ignore
+        """Publish a run on the V2 server.
 
         Parameters
         ----------
@@ -285,4 +292,10 @@ class RunsV2(RunsAPI):
             V2 server does not yet support POST /runs/ endpoint.
             Expected availability: Q2 2025
         """
-        raise NotImplementedError("RunsV2.create is not implemented yet.")
+        raise NotImplementedError("RunsV2.publish is not implemented yet.")
+
+    def untag(self, _resource_id: int, _tag: str) -> builtins.list[str]:
+        raise NotImplementedError("RunsV2.untag() is not implemented yet.")
+
+    def tag(self, _resource_id: int, _tag: str) -> builtins.list[str]:
+        raise NotImplementedError("RunsV2.tag() is not implemented yet.")
