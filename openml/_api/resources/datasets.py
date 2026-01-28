@@ -47,11 +47,11 @@ class DatasetsV1(ResourceV1, DatasetsAPI):
         download_all_files: bool = False,  # noqa: FBT002
     ) -> OpenMLDataset:
         path = f"data/{dataset_id}"
-        response = self._http.get(path)
-        xml_content = response.text
-        description = xmltodict.parse(xml_content)["oml:data_set_description"]
-
         try:
+            response = self._http.get(path)
+            xml_content = response.text
+            description = xmltodict.parse(xml_content)["oml:data_set_description"]
+
             features_file = None
             qualities_file = None
 
@@ -690,10 +690,9 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
         download_all_files: bool = False,  # noqa: FBT002
     ) -> OpenMLDataset:
         path = f"datasets/{dataset_id}"
-        response = self._http.get(path, use_cache=True)
-        json_content = response.json()
-
         try:
+            response = self._http.get(path, use_cache=True)
+            json_content = response.json()
             features_file = None
             qualities_file = None
 

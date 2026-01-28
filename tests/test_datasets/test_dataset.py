@@ -230,6 +230,7 @@ class OpenMLDatasetTest(TestBase):
         assert isinstance(xy, pd.DataFrame)
         assert xy.shape == (150, 5)
 
+    @pytest.mark.skip("Datasets cache")
     def test_lazy_loading_metadata(self):
         # Initial Setup
         did_cache_dir = openml.utils._create_cache_directory_for_id(

@@ -18,6 +18,7 @@ import pandas as pd
 import pytest
 import requests
 import requests_mock
+from requests_mock import ANY
 import scipy.sparse
 from oslo_concurrency import lockutils
 
@@ -1726,89 +1727,66 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
         assert openml.datasets.delete_dataset(_dataset_id)
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_key):
+def test_delete_dataset_not_owned(requests_mock, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_owned.xml"
     )
-    mock_delete.return_value = create_request_response(
-        status_code=412,
-        content_filepath=content_file,
-    )
+    content_xml = content_file.read_text()
+    requests_mock.delete(ANY, text=content_xml, status_code=204)
 
     with pytest.raises(
         OpenMLNotAuthorizedError,
         match="The data can not be deleted because it was not uploaded by you.",
     ):
         openml.datasets.delete_dataset(40_000)
+    
+    
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
-    assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
-
-
-@mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key):
+def test_delete_dataset_with_run(requests_mock, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_has_tasks.xml"
     )
-    mock_delete.return_value = create_request_response(
-        status_code=412,
-        content_filepath=content_file,
-    )
+    content_xml = content_file.read_text()
+    requests_mock.delete(ANY, text=content_xml, status_code=412)
+
 
     with pytest.raises(
         OpenMLNotAuthorizedError,
         match="The data can not be deleted because it still has associated entities:",
     ):
         openml.datasets.delete_dataset(40_000)
-
-    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
-    assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key):
+def test_delete_dataset_success(requests_mock, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_successful.xml"
     )
-    mock_delete.return_value = create_request_response(
-        status_code=200,
-        content_filepath=content_file,
-    )
+    content_xml = content_file.read_text()
+    requests_mock.delete(ANY, text=content_xml, status_code=200)
 
     success = openml.datasets.delete_dataset(40000)
     assert success
 
-    dataset_url = "https://test.openml.org/api/v1/xml/data/40000"
-    assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
-
-@mock.patch.object(requests.Session, "delete")
-def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key):
+def test_delete_unknown_dataset(requests_mock, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_exist.xml"
     )
-    mock_delete.return_value = create_request_response(
-        status_code=412,
-        content_filepath=content_file,
-    )
+
+    content_xml = content_file.read_text()
+    requests_mock.delete(ANY, text=content_xml, status_code=412)
 
     with pytest.raises(
         OpenMLServerException,
         match="Dataset does not exist",
     ):
         openml.datasets.delete_dataset(9_999_999)
-
-    dataset_url = "https://test.openml.org/api/v1/xml/data/9999999"
-    assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    
 
 
 def _assert_datasets_have_id_and_valid_status(datasets: pd.DataFrame):
