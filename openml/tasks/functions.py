@@ -12,6 +12,7 @@ import xmltodict
 
 import openml._api_calls
 import openml.utils
+from openml._api import api_context
 from openml.datasets import get_dataset
 from openml.exceptions import OpenMLCacheException
 
@@ -80,7 +81,8 @@ def _get_estimation_procedure_list() -> list[dict[str, Any]]:
         a dictionary containing the following information: id, task type id,
         name, type, repeats, folds, stratified.
     """
-    return api_context.backend.estimation_procedures._get_details()
+    result: list[dict[str, Any]] = api_context.backend.estimation_procedures._get_details()
+    return result
 
 
 def list_tasks(  # noqa: PLR0913

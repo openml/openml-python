@@ -6,11 +6,11 @@ from typing import Any
 
 import xmltodict
 
-from openml._api.resources.base import EstimationProceduresAPI
+from openml._api.resources.base import EstimationProceduresAPI, ResourceV1, ResourceV2
 from openml.tasks.task import TaskType
 
 
-class EstimationProceduresV1(EstimationProceduresAPI):
+class EstimationProceduresV1(ResourceV1, EstimationProceduresAPI):
     """V1 API implementation for estimation procedures.
 
     Fetches estimation procedures from the v1 XML API endpoint.
@@ -105,7 +105,7 @@ class EstimationProceduresV1(EstimationProceduresAPI):
         return procs
 
 
-class EstimationProceduresV2(EstimationProceduresAPI):
+class EstimationProceduresV2(ResourceV2, EstimationProceduresAPI):
     """V2 API implementation for estimation procedures.
 
     Fetches estimation procedures from the v2 JSON API endpoint.
