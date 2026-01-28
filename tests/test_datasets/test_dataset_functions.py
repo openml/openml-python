@@ -886,7 +886,7 @@ class TestOpenMLDataset(TestBase):
 
     @pytest.mark.uses_test_server()
     def test_get_online_dataset_arff(self):
-        dataset_id = 100  # Australian
+        dataset_id = 128  # iris -- one of the few datasets with parquet file
         # lazy loading not used as arff file is checked.
         dataset = openml.datasets.get_dataset(dataset_id, download_data=True)
         decoder = arff.ArffDecoder()
