@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from abc import abstractmethod
+import builtins
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
 from openml._api.resources.base import ResourceAPI, ResourceType
@@ -36,4 +37,4 @@ class EstimationProceduresAPI(ResourceAPI, ABC):
     def list(self) -> list[str]: ...
 
     @abstractmethod
-    def _get_details(self) -> list[dict[str, Any]]: ...
+    def _get_details(self) -> builtins.list[dict[str, Any]]: ...
