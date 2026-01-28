@@ -8,9 +8,9 @@ from openml._api.config import settings
 from openml._api.resources import (
     DatasetsV1,
     DatasetsV2,
-    FallbackProxy,
     EstimationProceduresV1,
     EstimationProceduresV2,
+    FallbackProxy,
     TasksV1,
     TasksV2,
 )
@@ -77,6 +77,9 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
     return APIBackend(
         datasets=FallbackProxy(DatasetsV2(v2_http_client), DatasetsV1(v1_http_client)),
         tasks=FallbackProxy(TasksV2(v2_http_client), TasksV1(v1_http_client)),
+        estimation_procedures=FallbackProxy(
+            EstimationProceduresV2(v2_http_client), EstimationProceduresV1(v1_http_client)
+        ),
     )
 
 

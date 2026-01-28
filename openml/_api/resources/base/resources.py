@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import builtins
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import TYPE_CHECKING, Any
 
 from openml._api.resources.base import ResourceAPI, ResourceType
@@ -32,7 +32,7 @@ class TasksAPI(ResourceAPI):
     ) -> OpenMLTask | tuple[OpenMLTask, Response]: ...
 
 
-class EstimationProceduresAPI(ResourceAPI, ABC):
+class EstimationProceduresAPI(ResourceAPI):
     @abstractmethod
     def list(self) -> list[str]: ...
 
