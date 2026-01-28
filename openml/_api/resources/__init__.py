@@ -8,9 +8,10 @@ from openml._api.resources.tasks import TasksV1, TasksV2
 
 __all__ = [
     "DatasetsV1",
-    "DatasetsV2", "FallbackProxy",
-    "TasksV1",
-    "TasksV2",
+    "DatasetsV2",
     "EvaluationMeasuresV1",
     "EvaluationMeasuresV2",
+    "FallbackProxy",
+    "TasksV1",
+    "TasksV2",
 ]
