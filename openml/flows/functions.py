@@ -31,7 +31,7 @@ def _get_cached_flows() -> OrderedDict:
     flows = OrderedDict()  # type: 'OrderedDict[int, OpenMLFlow]'
 
     flow_cache_dir = openml.utils._create_cache_directory(FLOWS_CACHE_DIR_NAME)
-    directory_content = os.listdir(flow_cache_dir)  # noqa: PTH208
+    directory_content = os.listdir(flow_cache_dir)  # noqa : PTH208
     directory_content.sort()
     # Find all flow ids for which we have downloaded
     # the flow description
@@ -69,7 +69,7 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
         raise OpenMLCacheException(f"Flow file for fid {fid} not cached") from e
 
 
-@openml.utils.thread_safe_if_oslo_installed
+# @openml.utils.thread_safe_if_oslo_installed
 def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = True) -> OpenMLFlow:  # noqa: FBT002
     """Download the OpenML flow for a given flow ID.
 
@@ -121,15 +121,9 @@ def _get_flow_description(flow_id: int) -> OpenMLFlow:
     try:
         return _get_cached_flow(flow_id)
     except OpenMLCacheException:
-        xml_file = (
-            openml.utils._create_cache_directory_for_id(FLOWS_CACHE_DIR_NAME, flow_id) / "flow.xml"
-        )
-        flow_xml = openml._api_calls._perform_api_call(f"flow/{flow_id}", request_method="get")
+        from openml._api import api_context
 
-        with xml_file.open("w", encoding="utf8") as fh:
-            fh.write(flow_xml)
-
-        return _create_flow_from_xml(flow_xml)
+        return api_context.backend.flows.get(flow_id)
 
 
 def list_flows(
@@ -165,44 +159,14 @@ def list_flows(
             - external version
             - uploader
     """
-    listing_call = partial(_list_flows, tag=tag, uploader=uploader)
+    from openml._api import api_context
+
+    listing_call = partial(api_context.backend.flows.list, tag=tag, uploader=uploader)
     batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
     if len(batches) == 0:
         return pd.DataFrame()
 
     return pd.concat(batches)
-
-
-def _list_flows(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
-    """
-    Perform the api call that return a list of all flows.
-
-    Parameters
-    ----------
-    limit : int
-        the maximum number of flows to return
-    offset : int
-        the number of flows to skip, starting from the first
-    kwargs: dict, optional
-        Legal filter operators: uploader, tag
-
-    Returns
-    -------
-    flows : dataframe
-    """
-    api_call = "flow/list"
-
-    if limit is not None:
-        api_call += f"/limit/{limit}"
-    if offset is not None:
-        api_call += f"/offset/{offset}"
-
-    if kwargs is not None:
-        for operator, value in kwargs.items():
-            if value is not None:
-                api_call += f"/{operator}/{value}"
-
-    return __list_flows(api_call=api_call)
 
 
 def flow_exists(name: str, external_version: str) -> int | bool:
@@ -228,18 +192,12 @@ def flow_exists(name: str, external_version: str) -> int | bool:
     """
     if not (isinstance(name, str) and len(name) > 0):
         raise ValueError("Argument 'name' should be a non-empty string")
-    if not (isinstance(name, str) and len(external_version) > 0):
+    if not (isinstance(external_version, str) and len(external_version) > 0):
         raise ValueError("Argument 'version' should be a non-empty string")
 
-    xml_response = openml._api_calls._perform_api_call(
-        "flow/exists",
-        "post",
-        data={"name": name, "external_version": external_version},
-    )
+    from openml._api import api_context
 
-    result_dict = xmltodict.parse(xml_response)
-    flow_id = int(result_dict["oml:flow_exists"]["oml:id"])
-    return flow_id if flow_id > 0 else False
+    return api_context.backend.flows.exists(name=name, external_version=external_version)
 
 
 def get_flow_id(
@@ -306,44 +264,6 @@ def get_flow_id(
     flows = list_flows()
     flows = flows.query(f'name == "{flow_name}"')
     return flows["id"].to_list()  # type: ignore[no-any-return]
-
-
-def __list_flows(api_call: str) -> pd.DataFrame:
-    """Retrieve information about flows from OpenML API
-    and parse it to a dictionary or a Pandas DataFrame.
-
-    Parameters
-    ----------
-    api_call: str
-        Retrieves the information about flows.
-
-    Returns
-    -------
-        The flows information in the specified output format.
-    """
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    flows_dict = xmltodict.parse(xml_string, force_list=("oml:flow",))
-
-    # Minimalistic check if the XML is useful
-    assert isinstance(flows_dict["oml:flows"]["oml:flow"], list), type(flows_dict["oml:flows"])
-    assert flows_dict["oml:flows"]["@xmlns:oml"] == "http://openml.org/openml", flows_dict[
-        "oml:flows"
-    ]["@xmlns:oml"]
-
-    flows = {}
-    for flow_ in flows_dict["oml:flows"]["oml:flow"]:
-        fid = int(flow_["oml:id"])
-        flow = {
-            "id": fid,
-            "full_name": flow_["oml:full_name"],
-            "name": flow_["oml:name"],
-            "version": flow_["oml:version"],
-            "external_version": flow_["oml:external_version"],
-            "uploader": flow_["oml:uploader"],
-        }
-        flows[fid] = flow
-
-    return pd.DataFrame.from_dict(flows, orient="index")
 
 
 def _check_flow_for_server_id(flow: OpenMLFlow) -> None:
@@ -551,4 +471,7 @@ def delete_flow(flow_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
-    return openml.utils._delete_entity("flow", flow_id)
+    from openml._api import api_context
+
+    api_context.backend.flows.delete(flow_id)
+    return True
