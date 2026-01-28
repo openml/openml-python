@@ -527,7 +527,7 @@ class TestOpenMLDataset(TestBase):
     def test_deletion_of_cache_dir_faulty_download(self, patch):
         patch.side_effect = Exception("Boom!")
         self.assertRaisesRegex(Exception, "Boom!", openml.datasets.get_dataset, dataset_id=1)
-        datasets_cache_dir = os.path.join(self.workdir, "org", "openml", "test", "datasets")
+        datasets_cache_dir = os.path.join(openml.config.get_cache_directory(), "datasets")
         assert len(os.listdir(datasets_cache_dir)) == 0
 
     @pytest.mark.uses_test_server()
