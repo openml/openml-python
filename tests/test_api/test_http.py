@@ -1,6 +1,7 @@
 from requests import Response, Request
 import time
 import xmltodict
+import pytest
 from openml.testing import TestAPIBase
 
 
@@ -43,12 +44,14 @@ class TestHTTPClient(TestAPIBase):
             cached_response.headers["Content-Type"], "text/xml"
         )
 
+    @pytest.mark.uses_test_server()
     def test_get(self):
         response = self.http_client.get("task/1")
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"<oml:task", response.content)
 
+    @pytest.mark.uses_test_server()
     def test_get_with_cache_creates_cache(self):
         response = self.http_client.get("task/1", use_cache=True)
 
@@ -66,6 +69,7 @@ class TestHTTPClient(TestAPIBase):
         self.assertTrue((cache_path / "headers.json").exists())
         self.assertTrue((cache_path / "body.bin").exists())
 
+    @pytest.mark.uses_test_server()
     def test_get_uses_cached_response(self):
         # first request populates cache
         response1 = self.http_client.get("task/1", use_cache=True)
@@ -76,6 +80,7 @@ class TestHTTPClient(TestAPIBase):
         self.assertEqual(response1.content, response2.content)
         self.assertEqual(response1.status_code, response2.status_code)
 
+    @pytest.mark.uses_test_server()
     def test_get_cache_expires(self):
         # force short TTL
         self.cache.ttl = 1
@@ -98,6 +103,7 @@ class TestHTTPClient(TestAPIBase):
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response1.content, response2.content)
 
+    @pytest.mark.uses_test_server()
     def test_post_and_delete(self):
         task_xml = """
         <oml:task_inputs xmlns:oml="http://openml.org/openml">
