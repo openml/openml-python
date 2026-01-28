@@ -12,6 +12,7 @@ import xmltodict
 
 import openml._api_calls
 import openml.utils
+from openml._api import api_context
 from openml.datasets import get_dataset
 from openml.exceptions import OpenMLCacheException
 
@@ -80,50 +81,8 @@ def _get_estimation_procedure_list() -> list[dict[str, Any]]:
         a dictionary containing the following information: id, task type id,
         name, type, repeats, folds, stratified.
     """
-    url_suffix = "estimationprocedure/list"
-    xml_string = openml._api_calls._perform_api_call(url_suffix, "get")
-
-    procs_dict = xmltodict.parse(xml_string)
-    # Minimalistic check if the XML is useful
-    if "oml:estimationprocedures" not in procs_dict:
-        raise ValueError("Error in return XML, does not contain tag oml:estimationprocedures.")
-
-    if "@xmlns:oml" not in procs_dict["oml:estimationprocedures"]:
-        raise ValueError(
-            "Error in return XML, does not contain tag "
-            "@xmlns:oml as a child of oml:estimationprocedures.",
-        )
-
-    if procs_dict["oml:estimationprocedures"]["@xmlns:oml"] != "http://openml.org/openml":
-        raise ValueError(
-            "Error in return XML, value of "
-            "oml:estimationprocedures/@xmlns:oml is not "
-            "http://openml.org/openml, but {}".format(
-                str(procs_dict["oml:estimationprocedures"]["@xmlns:oml"])
-            ),
-        )
-
-    procs: list[dict[str, Any]] = []
-    for proc_ in procs_dict["oml:estimationprocedures"]["oml:estimationprocedure"]:
-        task_type_int = int(proc_["oml:ttid"])
-        try:
-            task_type_id = TaskType(task_type_int)
-            procs.append(
-                {
-                    "id": int(proc_["oml:id"]),
-                    "task_type_id": task_type_id,
-                    "name": proc_["oml:name"],
-                    "type": proc_["oml:type"],
-                },
-            )
-        except ValueError as e:
-            warnings.warn(
-                f"Could not create task type id for {task_type_int} due to error {e}",
-                RuntimeWarning,
-                stacklevel=2,
-            )
-
-    return procs
+    result: list[dict[str, Any]] = api_context.backend.estimation_procedures._get_details()
+    return result
 
 
 def list_tasks(  # noqa: PLR0913
