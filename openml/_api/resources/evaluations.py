@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import builtins
 import json
 from typing import Any
 
@@ -20,15 +21,15 @@ class EvaluationsV1(EvaluationsAPI):
         offset: int,
         *,
         function: str,
-        tasks: list | None = None,
-        setups: list | None = None,
-        flows: list | None = None,
-        runs: list | None = None,
-        uploaders: list | None = None,
+        tasks: builtins.list | None = None,
+        setups: builtins.list | None = None,
+        flows: builtins.list | None = None,
+        runs: builtins.list | None = None,
+        uploaders: builtins.list | None = None,
         study: int | None = None,
         sort_order: str | None = None,
         **kwargs: Any,
-    ) -> list[OpenMLEvaluation]:
+    ) -> builtins.list[OpenMLEvaluation]:
         """Retrieve evaluations from the OpenML v1 XML API.
 
         This method builds an evaluation query URL based on the provided
@@ -98,17 +99,17 @@ class EvaluationsV1(EvaluationsAPI):
 
         return self._parse_list_xml(xml_content)
 
-    def _build_url(  # noqa: PLR0913
+    def _build_url(  # noqa: PLR0913, C901
         self,
         limit: int,
         offset: int,
         *,
         function: str,
-        tasks: list | None = None,
-        setups: list | None = None,
-        flows: list | None = None,
-        runs: list | None = None,
-        uploaders: list | None = None,
+        tasks: builtins.list | None = None,
+        setups: builtins.list | None = None,
+        flows: builtins.list | None = None,
+        runs: builtins.list | None = None,
+        uploaders: builtins.list | None = None,
         study: int | None = None,
         sort_order: str | None = None,
         **kwargs: Any,
@@ -178,7 +179,7 @@ class EvaluationsV1(EvaluationsAPI):
 
         return api_call
 
-    def _parse_list_xml(self, xml_content: str) -> list[OpenMLEvaluation]:
+    def _parse_list_xml(self, xml_content: str) -> builtins.list[OpenMLEvaluation]:
         """Helper function to parse API calls which are lists of runs"""
         evals_dict: dict[str, Any] = xmltodict.parse(xml_content, force_list=("oml:evaluation",))
         # Minimalistic check if the XML is useful
@@ -225,7 +226,7 @@ class EvaluationsV1(EvaluationsAPI):
 
         return evals
 
-    def _get_users(self, uploader_ids: list[str]) -> dict:
+    def _get_users(self, uploader_ids: builtins.list[str]) -> dict:
         """
         Retrieve usernames for a list of OpenML user IDs.
 
@@ -258,15 +259,15 @@ class EvaluationsV2(EvaluationsAPI):
         offset: int,
         *,
         function: str,
-        tasks: list | None = None,
-        setups: list | None = None,
-        flows: list | None = None,
-        runs: list | None = None,
-        uploaders: list | None = None,
+        tasks: builtins.list | None = None,
+        setups: builtins.list | None = None,
+        flows: builtins.list | None = None,
+        runs: builtins.list | None = None,
+        uploaders: builtins.list | None = None,
         study: int | None = None,
         sort_order: str | None = None,
         **kwargs: Any,
-    ) -> list[OpenMLEvaluation]:
+    ) -> builtins.list[OpenMLEvaluation]:
         """
         Retrieve evaluation results from the OpenML v2 JSON API.
 
