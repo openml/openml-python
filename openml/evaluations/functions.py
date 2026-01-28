@@ -15,6 +15,7 @@ import xmltodict
 import openml
 import openml._api_calls
 import openml.utils
+from openml._api import api_context
 from openml.evaluations import OpenMLEvaluation
 
 
@@ -284,17 +285,7 @@ def list_evaluation_measures() -> list[str]:
     list
 
     """
-    api_call = "evaluationmeasure/list"
-    xml_string = openml._api_calls._perform_api_call(api_call, "get")
-    qualities = xmltodict.parse(xml_string, force_list=("oml:measures"))
-    # Minimalistic check if the XML is useful
-    if "oml:evaluation_measures" not in qualities:
-        raise ValueError('Error in return XML, does not contain "oml:evaluation_measures"')
-
-    if not isinstance(qualities["oml:evaluation_measures"]["oml:measures"][0]["oml:measure"], list):
-        raise TypeError('Error in return XML, does not contain "oml:measure" as a list')
-
-    return qualities["oml:evaluation_measures"]["oml:measures"][0]["oml:measure"]
+    return api_context.backend.evaluation_measures.list()
 
 
 def list_estimation_procedures() -> list[str]:
