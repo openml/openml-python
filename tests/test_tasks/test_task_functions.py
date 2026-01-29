@@ -96,7 +96,9 @@ class TestTask(TestBase):
 
     @pytest.mark.uses_test_server()
     def test_list_tasks_by_tag(self):
-        num_basic_tasks = 100  # number is flexible, check server if fails
+        # Server starts with 99 active tasks with the tag, and one 'in_preparation',
+        # so depending on the processing of the last dataset, there may be 99 or 100 matches.
+        num_basic_tasks = 99
         tasks = openml.tasks.list_tasks(tag="OpenML100")
         assert len(tasks) >= num_basic_tasks
         for task in tasks.to_dict(orient="index").values():
