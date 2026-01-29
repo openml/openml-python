@@ -156,13 +156,13 @@ class TestTask(TestBase):
         task = openml.tasks.get_task(1, download_data=True)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "task.xml")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "1", "task.xml")
         )
         assert not os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "datasplits.arff")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "1", "datasplits.arff")
         )
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "datasets", "1", "dataset.arff")
+            os.path.join(openml.config.get_cache_directory(), "datasets", "1", "dataset_1.pq")
         )
 
     @pytest.mark.uses_test_server()
@@ -170,21 +170,21 @@ class TestTask(TestBase):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "task.xml")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "2", "task.xml")
         )
         assert task.class_labels == ["1", "2", "3", "4", "5", "U"]
 
         assert not os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff")
         )
         # Since the download_data=False is propagated to get_dataset
         assert not os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "datasets", "2", "dataset.arff")
+            os.path.join(openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")
         )
 
         task.download_split()
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff")
         )
 
     @mock.patch("openml.tasks.functions.get_dataset")
@@ -228,7 +228,7 @@ class TestTask(TestBase):
         split = task.download_split()
         assert type(split) == OpenMLSplit
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "datasplits.arff")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "1", "datasplits.arff")
         )
 
     def test_deletion_of_cache_dir(self):
