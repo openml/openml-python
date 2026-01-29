@@ -104,6 +104,24 @@ class TestHTTPClient(TestAPIBase):
         self.assertEqual(response1.content, response2.content)
 
     @pytest.mark.uses_test_server()
+    def test_get_reset_cache(self):
+        path = "task/1"
+
+        url = self._get_url(path=path)
+        key = self.cache.get_key(url, {})
+        cache_path = self.cache._key_to_path(key) / "meta.json"
+
+        response1 = self.http_client.get(path, use_cache=True)
+        response1_cache_time_stamp = cache_path.stat().st_ctime
+
+        response2 = self.http_client.get(path, use_cache=True, reset_cache=True)
+        response2_cache_time_stamp = cache_path.stat().st_ctime
+
+        self.assertNotEqual(response1_cache_time_stamp, response2_cache_time_stamp)
+        self.assertEqual(response2.status_code, 200)
+        self.assertEqual(response1.content, response2.content)
+
+    @pytest.mark.uses_test_server()
     def test_post_and_delete(self):
         task_xml = """
         <oml:task_inputs xmlns:oml="http://openml.org/openml">
