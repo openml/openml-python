@@ -1457,8 +1457,9 @@ class TestOpenMLDataset(TestBase):
                     raise e
                 time.sleep(10)
                 # Delete the cache dir to get the newer version of the dataset
+                
                 shutil.rmtree(
-                    os.path.join(self.workdir, "org", "openml", "test", "datasets", str(did)),
+                    os.path.join(openml.config.get_cache_directory(), "datasets", str(did)),
                 )
 
     @pytest.mark.uses_test_server()
@@ -1892,9 +1893,8 @@ def _dataset_features_is_downloaded(did: int):
 
 
 def _dataset_data_file_is_downloaded(did: int):
-    parquet_present = _dataset_file_is_downloaded(did, "dataset.pq")
-    arff_present = _dataset_file_is_downloaded(did, "dataset.arff")
-    return parquet_present or arff_present
+    cache_directory = Path(openml.config.get_cache_directory()) / "datasets" / str(did)
+    return any(f.suffix in (".pq", ".arff") for f in cache_directory.iterdir())
 
 
 def _assert_datasets_retrieved_successfully(
