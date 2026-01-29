@@ -33,7 +33,9 @@ class TasksAPI(ResourceAPI):
     ) -> OpenMLTask | tuple[OpenMLTask, Response]: ...
 
 
-class SetupsAPI(ResourceAPI, ABC):
+class SetupsAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.SETUP
+
     @abstractmethod
     def list(
         self,

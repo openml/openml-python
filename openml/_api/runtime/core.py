@@ -20,7 +20,13 @@ if TYPE_CHECKING:
 
 
 class APIBackend:
-    def __init__(self, *, datasets: DatasetsAPI | FallbackProxy, tasks: TasksAPI | FallbackProxy, setups: SetupsAPI | FallbackProxy):
+    def __init__(
+        self,
+        *,
+        datasets: DatasetsAPI | FallbackProxy,
+        tasks: TasksAPI | FallbackProxy,
+        setups: SetupsAPI | FallbackProxy,
+    ):
         self.datasets = datasets
         self.tasks = tasks
         self.setups = setups
@@ -59,7 +65,11 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
     if version == "v1":
         return v1
 
-    v2 = APIBackend(datasets=DatasetsV2(v2_http_client), tasks=TasksV2(v2_http_client), setups=SetupsV2(v2_http_client))
+    v2 = APIBackend(
+        datasets=DatasetsV2(v2_http_client),
+        tasks=TasksV2(v2_http_client),
+        setups=SetupsV2(v2_http_client),
+    )
 
     if strict:
         return v2
@@ -67,6 +77,7 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
     return APIBackend(
         datasets=FallbackProxy(DatasetsV2(v2_http_client), DatasetsV1(v1_http_client)),
         tasks=FallbackProxy(TasksV2(v2_http_client), TasksV1(v1_http_client)),
+        setups=FallbackProxy(SetupsV2(v2_http_client), SetupsV1(v1_http_client)),
     )
 
 

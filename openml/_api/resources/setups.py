@@ -1,15 +1,16 @@
 from __future__ import annotations
 
+import builtins
 from collections.abc import Iterable
 from typing import Any
 
 import xmltodict
 
-from openml._api.resources.base import SetupsAPI
+from openml._api.resources.base import ResourceV1, ResourceV2, SetupsAPI
 from openml.setups.setup import OpenMLParameter, OpenMLSetup
 
 
-class SetupsV1(SetupsAPI):
+class SetupsV1(ResourceV1, SetupsAPI):
     """V1 XML API implementation for setups."""
 
     def list(
@@ -20,7 +21,7 @@ class SetupsV1(SetupsAPI):
         setup: Iterable[int] | None = None,
         flow: int | None = None,
         tag: str | None = None,
-    ) -> list[OpenMLSetup]:
+    ) -> builtins.list[OpenMLSetup]:
         """Perform API call `/setup/list/{filters}`
 
         Parameters
@@ -86,7 +87,7 @@ class SetupsV1(SetupsAPI):
 
         return api_call
 
-    def _parse_list_xml(self, xml_content: str) -> list[OpenMLSetup]:
+    def _parse_list_xml(self, xml_content: str) -> builtins.list[OpenMLSetup]:
         """Helper function to parse API calls which are lists of setups"""
         setups_dict = xmltodict.parse(xml_content, force_list=("oml:setup",))
         openml_uri = "http://openml.org/openml"
@@ -132,7 +133,7 @@ class SetupsV1(SetupsAPI):
                     xml_parameters
                 ),
             }
-        elif isinstance(xml_parameters, list):
+        elif isinstance(xml_parameters, builtins.list):
             parameters = {
                 int(xml_parameter["oml:id"]): self._create_setup_parameter_from_xml(xml_parameter)
                 for xml_parameter in xml_parameters
@@ -205,7 +206,7 @@ class SetupsV1(SetupsAPI):
         return setup_id if setup_id > 0 else False
 
 
-class SetupsV2(SetupsAPI):
+class SetupsV2(ResourceV2, SetupsAPI):
     """V2 JSoN API implementation for setups."""
 
     def list(
@@ -216,7 +217,7 @@ class SetupsV2(SetupsAPI):
         setup: Iterable[int] | None = None,
         flow: int | None = None,
         tag: str | None = None,
-    ) -> list[OpenMLSetup]:
+    ) -> builtins.list[OpenMLSetup]:
         raise NotImplementedError("V2 API implementation is not yet available")
 
     def _create_setup(self, result_dict: dict) -> OpenMLSetup:
