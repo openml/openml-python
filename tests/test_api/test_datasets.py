@@ -1,95 +1,161 @@
 from __future__ import annotations
+from pathlib import Path
 
 import pytest
 import pandas as pd
-import requests
-from openml.datasets.data_feature import OpenMLDataFeature
-from openml.testing import TestBase
-from openml._api import api_context
+from openml._api.clients.minio import MinIOClient
+from openml._api.resources.base.fallback import FallbackProxy
+from openml.testing import TestAPIBase
 from openml._api.resources.datasets import DatasetsV1, DatasetsV2
-from openml.datasets.dataset import OpenMLDataset
-from openml._api.runtime.core import build_backend
 
-@pytest.mark.uses_test_server()
-class TestDatasetsEndpoints(TestBase):
+
+class TestDatasetsV1(TestAPIBase):
     def setUp(self):
         super().setUp()
-        _v1_backend = build_backend('v1',strict = True)
-        _v2_backend = build_backend('v2',strict = True)
-        self.v1_api = DatasetsV1(
-            _v1_backend.datasets._http,
-            _v1_backend.datasets._minio
+        self.minio_client = MinIOClient()
+        self.client = self._get_http_client(
+            server=self.server,
+            base_url=self.base_url,
+            api_key=self.api_key,
+            timeout=self.timeout,
+            retries=self.retries,
+            retry_policy=self.retry_policy,
         )
-        self.v2_api = DatasetsV2(
-            _v2_backend.datasets._http,
-            _v2_backend.datasets._minio
+        self.dataset = DatasetsV1(self.client,self.minio_client)
+    
+    @pytest.mark.uses_test_server()
+    def test_get(self):
+        output = self.dataset.get(2)
+        assert output.dataset_id == 2
+
+    @pytest.mark.uses_test_server()
+    def test_list(self):
+        output =self.dataset.list(limit=2, offset=0, status="active")
+        assert not output.empty
+        assert output.shape[0] == 2
+        assert (output["status"].nunique() == 1)
+        assert (output["status"].unique()[0] == "active")
+
+    @pytest.mark.uses_test_server()
+    def test_download_arff_from_get(self):
+        output = self.dataset.get(2,download_data=True)
+
+        assert output.data_file != None
+        assert Path(output.data_file).exists()
+
+    @pytest.mark.uses_test_server()
+    def test_download_qualities_from_get(self):
+        output = self.dataset.get(2,download_qualities=True)
+
+        assert output._qualities is not None
+    
+    @pytest.mark.uses_test_server()
+    def test_download_features_from_get(self):
+        output = self.dataset.get(2,download_features_meta_data=True)
+
+        assert output._features is not None
+
+
+
+class TestDatasetsV2(TestAPIBase):
+    def setUp(self):
+        super().setUp()
+        self.minio_client = MinIOClient()
+        self.client = self._get_http_client(
+            server="http://127.0.0.1:8001/",
+            base_url="",
+            api_key=self.api_key,
+            timeout=self.timeout,
+            retries=self.retries,
+            retry_policy=self.retry_policy,
         )
+        self.dataset = DatasetsV2(self.client,self.minio_client)
+    
+    @pytest.mark.uses_test_server()
+    def test_get(self):
+        output= self.dataset.get(2)
+        assert output.dataset_id == 2
+    
+    @pytest.mark.uses_test_server()
+    def test_list(self):
+        output =self.dataset.list(limit=2, offset=0, status="active")
+        assert not output.empty
+        assert output.shape[0] == 2
+        assert (output["status"].nunique() == 1)
+        assert (output["status"].unique()[0] == "active")
+    
+    @pytest.mark.uses_test_server()
+    def test_download_arff_from_get(self):
+        output = self.dataset.get(2,download_data=True)
+        
+        assert output.data_file != None
+        assert Path(output.data_file).exists()
 
     @pytest.mark.uses_test_server()
-    def test_v1_get_dataset(self):
-        did = 1
-        ds = self.v1_api.get(did)
-        assert isinstance(ds, OpenMLDataset)
-        assert int(ds.dataset_id) == did
+    def test_download_qualities_from_get(self):
+        output = self.dataset.get(2,download_qualities=True)
 
+        assert output._qualities is not None
+    
     @pytest.mark.uses_test_server()
-    def test_v2_get_dataset(self):
-        did = 1
-        try:
-            ds = self.v2_api.get(did)
-            assert isinstance(ds, OpenMLDataset)
-            assert int(ds.dataset_id) == did
-        except (requests.exceptions.JSONDecodeError, NotImplementedError, Exception):
-            pytest.skip("V2 API JSON format not supported on this server.")
+    def test_download_features_from_get(self):
+        output = self.dataset.get(2,download_features_meta_data=True)
 
+        assert output._features is not None
+
+
+class TestDatasetsCombined(TestAPIBase):
+    def setUp(self):
+        super().setUp()
+        self.minio_client = MinIOClient()
+        self.v1_client = self._get_http_client(
+			server=self.server,
+			base_url=self.base_url,
+			api_key=self.api_key,
+			timeout=self.timeout,
+			retries=self.retries,
+			retry_policy=self.retry_policy,
+		)
+        self.v2_client = self._get_http_client(
+            server="http://127.0.0.1:8001/",
+            base_url="",
+            api_key=self.api_key,
+            timeout=self.timeout,
+            retries=self.retries,
+            retry_policy=self.retry_policy,
+        )
+        self.dataset_v1 = DatasetsV1(self.v1_client,self.minio_client)
+        self.dataset_v2 = DatasetsV2(self.v2_client,self.minio_client)
+        self.dataset_fallback = FallbackProxy(self.dataset_v1,self.dataset_v2)
+    
     @pytest.mark.uses_test_server()
-    def test_v1_list_datasets(self):
-        df = self.v1_api.list(limit=5, offset=0)
-        assert isinstance(df, pd.DataFrame)
-        assert not df.empty
-        assert "did" in df.columns
+    def test_get_matches(self):
+        output_v1 = self.dataset_v1.get(2)
+        output_v2 = self.dataset_v2.get(2)
 
+        assert output_v1.dataset_id == output_v2.dataset_id
+        assert output_v1.name == output_v2.name
+        assert output_v1.data_file is None
+        assert output_v1.data_file == output_v2.data_file
+    
     @pytest.mark.uses_test_server()
-    def test_v2_list_datasets(self):
-        try:
-            df = self.v2_api.list(limit=5, offset=0)
-            assert isinstance(df, pd.DataFrame)
-            assert not df.empty
-            assert "did" in df.columns
-        except (requests.exceptions.JSONDecodeError, NotImplementedError, Exception):
-            pytest.skip("V2 API JSON format not supported on this server.")
+    def test_get_fallback(self):
+        output_fallback =  self.dataset_fallback.get(2)
+        assert output_fallback.dataset_id == 2
 
+    # list has different structure compared to v1
     @pytest.mark.uses_test_server()
-    def test_v1_get_features(self):
-        did = 1
-        features = self.v1_api.get_features(did)
-        assert isinstance(features, dict)
-        assert all(isinstance(f, int) for f in features)
-        assert all(isinstance(features[f], OpenMLDataFeature) for f in features)
+    def test_list_matches(self):
+        output_v1 = self.dataset_v1.list(limit=2, offset=1)
+        output_v2 = self.dataset_v2.list(limit=2, offset=1)
 
+        pd.testing.assert_series_equal(output_v1["did"],output_v2["did"])
+    
     @pytest.mark.uses_test_server()
-    def test_v2_get_features(self):
-        did = 1
-        try:
-            features = self.v2_api.get_features(did)
-            assert isinstance(features, dict)
-            assert all(isinstance(f, int) for f in features)
-            assert all(isinstance(features[f], OpenMLDataFeature) for f in features)
-        except (requests.exceptions.JSONDecodeError, NotImplementedError, Exception):
-            pytest.skip("V2 API JSON format not supported on this server.")
+    def test_list_fallback(self):
+        output =self.dataset_fallback.list(limit=2, offset=0,data_id=[2,3])
+        assert not output.empty
+        assert output.shape[0] == 2
+        assert set(output["did"]) == {2, 3}
 
-    @pytest.mark.uses_test_server()
-    def test_v1_get_qualities(self):
-        did = 1
-        qualities = self.v1_api.get_qualities(did)
-        assert isinstance(qualities, dict) or qualities is None
-
-    @pytest.mark.uses_test_server()
-    def test_v2_get_qualities(self):
-        did = 1
-        try:
-            qualities = self.v2_api.get_qualities(did)
-            assert isinstance(qualities, dict) or qualities is None
-        except (requests.exceptions.JSONDecodeError, NotImplementedError, Exception):
-            pytest.skip("V2 API JSON format not supported on this server.")
-
+    

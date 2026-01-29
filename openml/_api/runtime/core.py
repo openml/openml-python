@@ -65,7 +65,9 @@ def build_backend(version: str, *, strict: bool) -> APIBackend:
         return v2
 
     return APIBackend(
-        datasets=FallbackProxy(DatasetsV2(v2_http_client), DatasetsV1(v1_http_client)),
+        datasets=FallbackProxy(
+            DatasetsV2(v2_http_client, minio_client), DatasetsV1(v1_http_client, minio_client)
+        ),
         tasks=FallbackProxy(TasksV2(v2_http_client), TasksV1(v1_http_client)),
     )
 

@@ -477,8 +477,10 @@ class DatasetsV1(ResourceV1, DatasetsAPI):
         return self._parse_qualities_xml(xml)
 
     def parse_features_file(
-        self, features_file: Path, features_pickle_file: Path
+        self, features_file: Path, features_pickle_file: Path | None = None
     ) -> dict[int, OpenMLDataFeature]:
+        if features_pickle_file is None:
+            features_pickle_file = features_file.with_suffix(features_file.suffix + ".pkl")
         if features_file.suffix != ".xml":
             # TODO (Shrivaths) can only parse xml warn/ raise exception
             raise NotImplementedError()
@@ -494,8 +496,10 @@ class DatasetsV1(ResourceV1, DatasetsAPI):
         return features
 
     def parse_qualities_file(
-        self, qualities_file: Path, qualities_pickle_file: Path
+        self, qualities_file: Path, qualities_pickle_file: Path | None = None
     ) -> dict[str, float]:
+        if qualities_pickle_file is None:
+            qualities_pickle_file = qualities_file.with_suffix(qualities_file.suffix + ".pkl")
         if qualities_file.suffix != ".xml":
             # TODO (Shrivaths) can only parse xml warn/ raise exception
             raise NotImplementedError()
@@ -593,11 +597,15 @@ class DatasetsV1(ResourceV1, DatasetsAPI):
 
     def download_features_file(self, dataset_id: int) -> Path:
         path = f"data/features/{dataset_id}"
-        return self._download_file(path, "features.xml")
+        file = self._download_file(path, "features.xml")
+        _ = self.parse_features_file(file)
+        return file
 
     def download_qualities_file(self, dataset_id: int) -> Path:
         path = f"data/qualities/{dataset_id}"
-        return self._download_file(path, "qualities.xml")
+        file = self._download_file(path, "qualities.xml")
+        _ = self.parse_qualities_file(file)
+        return file
 
     def download_dataset_parquet(
         self,
@@ -735,7 +743,7 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
         limit: int,
         offset: int,
         *,
-        dataset_id: builtins.list[int] | None = None,
+        data_id: builtins.list[int] | None = None,
         **kwargs: Any,
     ) -> pd.DataFrame:
         """
@@ -769,15 +777,17 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
             json["pagination"]["limit"] = limit
         if offset is not None:
             json["pagination"]["offset"] = offset
-        if dataset_id is not None:
-            json["data_id"] = dataset_id
+        if data_id is not None:
+            json["data_id"] = data_id
         if kwargs is not None:
             for operator, value in kwargs.items():
                 if value is not None:
                     json[operator] = value
 
         api_call = "datasets/list"
-        datasets_list = self._http.post(api_call, json=json).json()
+        datasets_list = self._http.post(
+            path=api_call, json=json, headers={"accept": "application/json"}
+        ).json()
         # Minimalistic check if the JSON is useful
         assert isinstance(datasets_list, list), type(datasets_list)
 
@@ -931,8 +941,10 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
         return self._parse_qualities_json(qualities_json)
 
     def parse_features_file(
-        self, features_file: Path, features_pickle_file: Path
+        self, features_file: Path, features_pickle_file: Path | None = None
     ) -> dict[int, OpenMLDataFeature]:
+        if features_pickle_file is None:
+            features_pickle_file = features_file.with_suffix(features_file.suffix + ".pkl")
         if features_file.suffix == ".xml":
             # can fallback to v1 if the file is .xml
             raise NotImplementedError()
@@ -948,8 +960,10 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
         return features
 
     def parse_qualities_file(
-        self, qualities_file: Path, qualities_pickle_file: Path
+        self, qualities_file: Path, qualities_pickle_file: Path | None = None
     ) -> dict[str, float]:
+        if qualities_pickle_file is None:
+            qualities_pickle_file = qualities_file.with_suffix(qualities_file.suffix + ".pkl")
         if qualities_file.suffix == ".xml":
             # can fallback to v1 if the file is .xml
             raise NotImplementedError()
@@ -1027,11 +1041,15 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
 
     def download_features_file(self, dataset_id: int) -> Path:
         path = f"datasets/features/{dataset_id}"
-        return self._download_file(path, "features.json")
+        file = self._download_file(path, "features.json")
+        _ = self.parse_features_file(file)
+        return file
 
     def download_qualities_file(self, dataset_id: int) -> Path:
         path = f"datasets/qualities/{dataset_id}"
-        return self._download_file(path, "qualities.json")
+        file = self._download_file(path, "qualities.json")
+        _ = self.parse_qualities_file(file)
+        return file
 
     def download_dataset_parquet(
         self,

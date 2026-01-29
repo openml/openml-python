@@ -31,6 +31,8 @@ from .dataset import OpenMLDataset
 if TYPE_CHECKING:
     import scipy
 
+    from openml.datasets.data_feature import OpenMLDataFeature
+
 DATASETS_CACHE_DIR_NAME = "datasets"
 logger = logging.getLogger(__name__)
 
@@ -1119,3 +1121,11 @@ def delete_dataset(dataset_id: int) -> bool:
     from openml._api import api_context
 
     return api_context.backend.datasets.delete(dataset_id)
+
+
+def parse_features_file(
+    features_file: Path, features_pickle_file: Path
+) -> dict[int, OpenMLDataFeature]:
+    from openml._api import api_context
+
+    return api_context.backend.datasets.parse_features_file(features_file, features_pickle_file)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
+import builtins
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -71,7 +72,7 @@ class DatasetsAPI(ResourceAPI):
     def status_update(self, dataset_id: int, status: Literal["active", "deactivated"]) -> None: ...
 
     @abstractmethod
-    def list_qualities(self) -> list[str]: ...  # type: ignore
+    def list_qualities(self) -> builtins.list[str]: ...
 
     @abstractmethod
     def feature_add_ontology(self, dataset_id: int, index: int, ontology: str) -> bool: ...

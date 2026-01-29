@@ -12,13 +12,14 @@ from urllib3 import ProxyManager
 
 import openml
 from openml.__version__ import __version__
+from openml._api.config import settings
 from openml.utils import ProgressBar
 
 
 class MinIOClient:
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path | None = None) -> None:
         self.headers: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
-        self.path = path
+        self.path = path if path is not None else Path(settings.cache.dir)
 
     def _get_path(self, url: str) -> Path:
         parsed_url = urllib.parse.urlparse(url)

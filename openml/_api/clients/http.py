@@ -289,18 +289,28 @@ class HTTPClient:
     ) -> tuple[Response | None, Exception | None]:
         retry_raise_e: Exception | None = None
         response: Response | None = None
-
         try:
-            response = requests.request(
-                method=method,
-                url=url,
-                params=params,
-                data=data,
-                headers=headers,
-                timeout=timeout,
-                files=files,
-                **request_kwargs,
-            )
+            if "json" in request_kwargs:
+                response = requests.request(
+                    method=method,
+                    url=url,
+                    params=params,
+                    headers=headers,
+                    timeout=timeout,
+                    files=files,
+                    **request_kwargs,
+                )
+            else:
+                response = requests.request(
+                    method=method,
+                    url=url,
+                    params=params,
+                    data=data,
+                    headers=headers,
+                    timeout=timeout,
+                    files=files,
+                    **request_kwargs,
+                )
         except (
             requests.exceptions.ChunkedEncodingError,
             requests.exceptions.ConnectionError,

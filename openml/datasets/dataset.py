@@ -999,7 +999,7 @@ def _read_features(features_file: str | Path) -> dict[int, OpenMLDataFeature]:
         with features_pickle_file.open("rb") as fh_binary:
             return pickle.load(fh_binary)  # type: ignore  # noqa: S301
 
-    except:  # noqa: E722
+    except FileNotFoundError:
         from openml._api import api_context
 
         features = api_context.backend.datasets.parse_features_file(
