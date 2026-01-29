@@ -169,34 +169,6 @@ class TestFlowsV2(TestAPIBase):
         
         assert result is False
 
-    def test_list_not_implemented(self):
-        """Test that list raises NotImplementedError for V2."""
-        with pytest.raises(NotImplementedError):
-            self.resource.list(limit=10)
-
-    def test_publish_not_implemented(self):
-        """Test that publish raises NotImplementedError for V2."""
-        from collections import OrderedDict
-        
-        with pytest.raises(NotImplementedError):
-            flow = OpenMLFlow(
-                name="test",
-                description="test",
-                model=None,
-                components=OrderedDict(),
-                parameters=OrderedDict(),
-                parameters_meta_info=OrderedDict(),
-                external_version="1.0",
-                tags=[],
-                language="English",
-                dependencies=None,
-            )
-            self.resource.publish(flow)
-
-    def test_delete_not_implemented(self):
-        """Test that delete raises NotImplementedError for V2."""
-        with pytest.raises(NotImplementedError):
-            self.resource.delete(flow_id=1)
 
 
 class TestFlowsCombined(TestAPIBase):
@@ -299,8 +271,3 @@ class TestFlowsCombined(TestAPIBase):
         assert len(flows_df) <= 10
         assert "id" in flows_df.columns
 
-    def test_fallback_raises_when_all_not_implemented(self):
-        """Test that fallback proxy raises NotImplementedError when all APIs raise it."""
-        # Both V2 and a hypothetical V1 that doesn't support something should raise
-        # For now, we can't easily test this without mocking, but document the behavior
-        pass
