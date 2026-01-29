@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from abc import abstractmethod
 import builtins
+from abc import abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
