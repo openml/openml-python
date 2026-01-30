@@ -80,3 +80,14 @@ class TestEvaluationsCombined(TestAPIBase):
         self.resource_v1 = EvaluationsV1(self.v1_client)
         self.resource_v2 = EvaluationsV2(self.v2_client)
         self.resource_fallback = FallbackProxy(self.resource_v2, self.resource_v1)
+
+    @pytest.mark.uses_test_server()
+    def test_list_fallback(self):
+        output_fallback = self.resource_fallback.list(
+            function="predictive_accuracy",
+            limit=10,
+            offset=0,
+        )
+        assert isinstance(output_fallback, list)
+        assert len(output_fallback) == 10
+        assert all(isinstance(e, OpenMLEvaluation) for e in output_fallback)
