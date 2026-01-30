@@ -35,6 +35,8 @@ class TasksAPI(ResourceAPI):
 
 
 class RunsAPI(ResourceAPI, ABC):
+    resource_type: ResourceType = ResourceType.RUN
+
     @abstractmethod
     def get(self, run_id: int) -> OpenMLRun: ...
 
@@ -54,15 +56,3 @@ class RunsAPI(ResourceAPI, ABC):
         display_errors: bool = False,
         task_type: TaskType | int | None = None,
     ) -> pd.DataFrame: ...
-
-    @abstractmethod
-    def delete(self, run_id: int) -> bool: ...
-
-    @abstractmethod
-    def publish(self, run: OpenMLRun) -> OpenMLRun: ...  # type: ignore
-
-    @abstractmethod
-    def tag(self, resource_id: int, tag: str) -> builtins.list[str]: ...
-
-    @abstractmethod
-    def untag(self, resource_id: int, tag: str) -> builtins.list[str]: ...

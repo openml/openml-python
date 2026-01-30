@@ -1,21 +1,28 @@
 from __future__ import annotations
 
 import builtins
-from typing import TYPE_CHECKING
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 import xmltodict
 
 import openml
-from openml._api.resources.base import RunsAPI
+from openml._api.resources.base import ResourceV1, ResourceV2, RunsAPI
 from openml.tasks.task import TaskType
 
 if TYPE_CHECKING:
     from openml.runs.run import OpenMLRun
 
 
-class RunsV1(RunsAPI):
-    def get(self, run_id: int) -> OpenMLRun:
+class RunsV1(ResourceV1, RunsAPI):
+    def get(
+        self,
+        run_id: int,
+        *,
+        use_cache: bool = True,
+        reset_cache: bool = False,
+    ) -> OpenMLRun:  # type: ignore[override]
         """Fetch a single run from the OpenML server.
 
         Parameters
@@ -34,7 +41,12 @@ class RunsV1(RunsAPI):
             If the run does not exist or server error occurs.
         """
         path = f"run/{run_id}"
-        response = self._http.get(path)
+        response = self._http.get(
+            path,
+            use_cache=use_cache,
+            reset_cache=reset_cache,
+            use_api_key=True,
+        )
         xml_content = response.text
         return openml.runs.functions._create_run_from_xml(xml_content)
 
@@ -116,7 +128,7 @@ class RunsV1(RunsAPI):
             tvalue = task_type.value if isinstance(task_type, TaskType) else task_type
             path += f"/task_type/{tvalue}"
 
-        xml_string = self._http.get(path).text
+        xml_string = self._http.get(path, use_api_key=True).text
         runs_dict = xmltodict.parse(xml_string, force_list=("oml:run",))
         # Minimalistic check if the XML is useful
         if "oml:runs" not in runs_dict:
@@ -151,65 +163,34 @@ class RunsV1(RunsAPI):
         }
         return pd.DataFrame.from_dict(runs, orient="index")
 
-    def delete(self, run_id: int) -> bool:
-        """Delete a run from the OpenML server.
-
-        Parameters
-        ----------
-        run_id : int
-            The ID of the run to delete.
-
-        Returns
-        -------
-        bool
-            True if deletion was successful, False otherwise.
-
-        Raises
-        ------
-        openml.exceptions.OpenMLServerException
-            If the run does not exist or user lacks permissions.
-
-        Notes
-        -----
-        Only the uploader or server administrators can delete a run.
-        """
-        path = f"run/{run_id}"
-        response = self._http.delete(path)
-        # Parse XML response to check if deletion was successful
-        xml_response = xmltodict.parse(response.text)
-        return "oml:run_delete" in xml_response
-
-    def publish(self, run: OpenMLRun) -> OpenMLRun:  # type: ignore
+    def publish(self, path: str, files: Mapping[str, Any] | None = None) -> int:
         """Publish a run on the OpenML server.
 
         Parameters
         ----------
-        run : OpenMLRun
-            The run object to publish.
+        path : str
+            The endpoint path to publish to (e.g., "run").
+        files : Mapping[str, Any], optional
+            The files to publish.
 
         Returns
         -------
-        OpenMLRun
-            The published run with run_id assigned.
+        int
+            The ID of the published run.
         """
-        # TODO: Implement V1 multipart upload
-        # 1. Ensure flow is published
-        # 2. Get file elements (description.xml, predictions.arff, trace.arff)
-        # 3. POST multipart to /run/
-        # 4. Parse XML response and set run_id
-        raise NotImplementedError("RunsV1.publish() is not implemented yet.")
-
-    def untag(self, _resource_id: int, _tag: str) -> builtins.list[str]:
-        raise NotImplementedError("RunsV1.untag() is not implemented yet.")
-
-    def tag(self, _resource_id: int, _tag: str) -> builtins.list[str]:
-        raise NotImplementedError("RunsV1.tag() is not implemented yet.")
+        return super().publish(path=path, files=files)
 
 
-class RunsV2(RunsAPI):
+class RunsV2(ResourceV2, RunsAPI):
     """V2 API resource for runs. Currently read-only until V2 server supports POST."""
 
-    def get(self, run_id: int) -> OpenMLRun:
+    def get(
+        self,
+        run_id: int,
+        *,
+        use_cache: bool = True,
+        reset_cache: bool = False,
+    ) -> OpenMLRun:  # type: ignore[override]
         """Fetch a single run from the V2 server.
 
         Parameters
@@ -227,7 +208,7 @@ class RunsV2(RunsAPI):
         NotImplementedError
             V2 server API not yet available for this operation.
         """
-        raise NotImplementedError("RunsV2.get is not implemented yet.")
+        raise NotImplementedError("not implemented yet on V2 server")
 
     def list(  # type: ignore[valid-type]  # noqa: PLR0913
         self,
@@ -251,40 +232,22 @@ class RunsV2(RunsAPI):
         NotImplementedError
             V2 server API not yet available for this operation.
         """
-        raise NotImplementedError("RunsV2.list is not implemented yet.")
+        raise NotImplementedError("not implemented yet on V2 server")
 
-    def delete(self, run_id: int) -> bool:
-        """Delete a run from the V2 server.
-
-        Parameters
-        ----------
-        run_id : int
-            The ID of the run to delete.
-
-        Returns
-        -------
-        bool
-            True if deletion was successful, False otherwise.
-
-        Raises
-        ------
-        NotImplementedError
-            V2 server API not yet available for this operation.
-        """
-        raise NotImplementedError("RunsV2.delete is not implemented yet.")
-
-    def publish(self, run: OpenMLRun) -> OpenMLRun:  # type: ignore
+    def publish(self, path: str, files: Mapping[str, Any] | None = None) -> int:
         """Publish a run on the V2 server.
 
         Parameters
         ----------
-        run : OpenMLRun
-            The run object to publish.
+        path : str
+            The endpoint path to publish to.
+        files : Mapping[str, Any], optional
+            The files to publish.
 
         Returns
         -------
-        OpenMLRun
-            The published run with run_id assigned.
+        int
+            The ID of the published run.
 
         Raises
         ------
@@ -292,10 +255,4 @@ class RunsV2(RunsAPI):
             V2 server does not yet support POST /runs/ endpoint.
             Expected availability: Q2 2025
         """
-        raise NotImplementedError("RunsV2.publish is not implemented yet.")
-
-    def untag(self, _resource_id: int, _tag: str) -> builtins.list[str]:
-        raise NotImplementedError("RunsV2.untag() is not implemented yet.")
-
-    def tag(self, _resource_id: int, _tag: str) -> builtins.list[str]:
-        raise NotImplementedError("RunsV2.tag() is not implemented yet.")
+        raise NotImplementedError("not implemented yet on V2 server")

@@ -45,9 +45,9 @@ class Settings:
 settings = Settings(
     api=APISettings(
         v1=APIConfig(
-            server="https://www.openml.org/",
+            server="https://test.openml.org/",
             base_url="api/v1/xml/",
-            api_key="...",
+            api_key="normaluser",
         ),
         v2=APIConfig(
             server="http://127.0.0.1:8001/",

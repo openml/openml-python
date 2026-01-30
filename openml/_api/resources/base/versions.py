@@ -123,18 +123,23 @@ class ResourceV1(ResourceAPI):
         if not isinstance(root_value, Mapping):
             raise ValueError("Unexpected XML structure")
 
-        # Look for oml:id directly in the root value
-        if "oml:id" in root_value:
-            id_value = root_value["oml:id"]
-            if isinstance(id_value, (str, int)):
-                return int(id_value)
-
-        # Fallback: check all values for numeric/string IDs
-        for v in root_value.values():
-            if isinstance(v, (str, int)):
+        # 1. Specifically look for keys ending in _id or id (e.g., oml:id, oml:run_id)
+        for k, v in root_value.items():
+            if (
+                (k.endswith(("id", "_id")) or "id" in k.lower())
+                and isinstance(v, (str, int))
+                and str(v).isdigit()
+            ):
                 return int(v)
 
-        raise ValueError("No ID found in upload response")
+        # 2. Fallback: check all values for numeric/string IDs, excluding xmlns or URLs
+        for v in root_value.values():
+            if isinstance(v, (str, int)):
+                val_str = str(v)
+                if val_str.isdigit():
+                    return int(val_str)
+
+        raise ValueError(f"No ID found in upload response: {root_value}")
 
 
 class ResourceV2(ResourceAPI):
