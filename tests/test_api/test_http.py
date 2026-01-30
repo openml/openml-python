@@ -3,6 +3,7 @@ import time
 import xmltodict
 import pytest
 from openml.testing import TestAPIBase
+import os
 
 
 class TestHTTPClient(TestAPIBase):
@@ -11,12 +12,19 @@ class TestHTTPClient(TestAPIBase):
         params = {"param1": "value1", "param2": "value2"}
 
         key = self.cache.get_key(url, params)
+        expected_key = os.path.join(
+            "org",
+            "openml",
+            "test",
+            "api",
+            "v1",
+            "task",
+            "31",
+            "param1=value1&param2=value2",
+        )
 
         # validate key
-        self.assertEqual(
-            key,
-            "org/openml/test/api/v1/task/31/param1=value1&param2=value2",
-        )
+        self.assertEqual(key, expected_key)
 
         # create fake response
         req = Request("GET", url).prepare()
@@ -149,10 +157,5 @@ class TestHTTPClient(TestAPIBase):
         finally:
             # DELETE the task if it was created
             if task_id is not None:
-                try:
-                    del_response = self.http_client.delete(f"task/{task_id}")
-                    # optional: verify delete
-                    if del_response.status_code != 200:
-                        print(f"Warning: delete failed for task {task_id}")
-                except Exception as e:
-                    print(f"Warning: failed to delete task {task_id}: {e}")
+                del_response = self.http_client.delete(f"task/{task_id}")
+                self.assertEqual(del_response.status_code, 200)
