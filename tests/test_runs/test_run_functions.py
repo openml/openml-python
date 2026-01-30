@@ -7,6 +7,7 @@ import random
 import time
 import unittest
 import warnings
+from urllib.parse import urljoin
 
 from openml_sklearn import SklearnExtension, cat, cont
 from packaging.version import Version
@@ -40,6 +41,8 @@ from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerException,
 )
+from openml._api import api_context
+from openml._api.config import settings
 #from openml.extensions.sklearn import cat, cont
 from openml.runs.functions import (
     _run_task_get_arffcontent,
@@ -1658,13 +1661,56 @@ class TestRun(TestBase):
 
     @pytest.mark.uses_test_server()
     def test_get_cached_run(self):
-        openml.config.set_root_cache_directory(self.static_cache_dir)
-        openml.runs.functions._get_cached_run(1)
+        previous_cache_dir = settings.cache.dir
+        try:
+            settings.cache.dir = str(self.workdir / "http_cache_runs")
+            api_context.set_version("v1", strict=False)
+
+            run = openml.runs.get_run(1)
+            assert run.run_id == 1
+
+            http_client = api_context.backend.runs._http
+            assert http_client.cache is not None
+
+            url = urljoin(
+                http_client.server,
+                urljoin(http_client.base_url, "run/1"),
+            )
+            cache_key = http_client.cache.get_key(url, {})
+            cache_path = http_client.cache._key_to_path(cache_key)
+
+            assert (cache_path / "meta.json").exists()
+            assert (cache_path / "headers.json").exists()
+            assert (cache_path / "body.bin").exists()
+        finally:
+            settings.cache.dir = previous_cache_dir
+            api_context.set_version("v1", strict=False)
 
     def test_get_uncached_run(self):
-        openml.config.set_root_cache_directory(self.static_cache_dir)
-        with pytest.raises(openml.exceptions.OpenMLCacheException):
-            openml.runs.functions._get_cached_run(10)
+        previous_cache_dir = settings.cache.dir
+        try:
+            settings.cache.dir = str(self.workdir / "http_cache_runs_uncached")
+            api_context.set_version("v1", strict=False)
+
+            run = openml.runs.get_run(1)
+            assert run.run_id == 1
+
+            http_client = api_context.backend.runs._http
+            assert http_client.cache is not None
+
+            url = urljoin(
+                http_client.server,
+                urljoin(http_client.base_url, "run/1"),
+            )
+            cache_key = http_client.cache.get_key(url, {})
+            cache_path = http_client.cache._key_to_path(cache_key)
+
+            assert (cache_path / "meta.json").exists()
+            assert (cache_path / "headers.json").exists()
+            assert (cache_path / "body.bin").exists()
+        finally:
+            settings.cache.dir = previous_cache_dir
+            api_context.set_version("v1", strict=False)
 
     @pytest.mark.sklearn()
     @pytest.mark.uses_test_server()
