@@ -6,7 +6,6 @@ import time
 import warnings
 from collections import OrderedDict
 from functools import partial
-from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -21,7 +20,6 @@ import openml.utils
 from openml import config
 from openml._api import api_context
 from openml.exceptions import (
-    OpenMLCacheException,
     OpenMLRunsExistError,
     OpenMLServerException,
     PyOpenMLError,
@@ -51,7 +49,6 @@ if TYPE_CHECKING:
 
 # get_dict is in run.py to avoid circular imports
 
-RUNS_CACHE_DIR_NAME = "runs"
 ERROR_CODE = 512
 
 
@@ -822,19 +819,13 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    run_dir = Path(openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id))
-    run_dir / "description.xml"
-
-    run_dir.mkdir(parents=True, exist_ok=True)
-
-    try:
-        if not ignore_cache:
-            return _get_cached_run(run_id)
-
-        raise OpenMLCacheException(message="dummy")
-
-    except OpenMLCacheException:
-        return api_context.backend.runs.get(run_id)
+    use_cache = not ignore_cache
+    reset_cache = ignore_cache
+    return api_context.backend.runs.get(
+        run_id,
+        use_cache=use_cache,
+        reset_cache=reset_cache,
+    )
 
 
 def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT002
@@ -1022,17 +1013,6 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
         predictions_url=predictions_url,
         run_details=run_details,
     )
-
-
-def _get_cached_run(run_id: int) -> OpenMLRun:
-    """Load a run from the cache."""
-    run_cache_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id)
-    run_file = run_cache_dir / "description.xml"
-    try:
-        with run_file.open(encoding="utf8") as fh:
-            return _create_run_from_xml(xml=fh.read())
-    except OSError as e:
-        raise OpenMLCacheException(f"Run file for run id {run_id} not cached") from e
 
 
 def list_runs(  # noqa: PLR0913
@@ -1313,4 +1293,4 @@ def delete_run(run_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
-    return openml.utils._delete_entity("run", run_id)
+    return api_context.backend.runs.delete(run_id)

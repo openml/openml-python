@@ -9,6 +9,7 @@ import xmltodict
 
 import openml
 from openml._api.resources.base import ResourceV1, ResourceV2, RunsAPI
+from openml.exceptions import OpenMLNotSupportedError
 from openml.tasks.task import TaskType
 
 if TYPE_CHECKING:
@@ -186,10 +187,10 @@ class RunsV2(ResourceV2, RunsAPI):
 
     def get(
         self,
-        run_id: int,
+        run_id: int,  # noqa: ARG002
         *,
-        use_cache: bool = True,
-        reset_cache: bool = False,
+        use_cache: bool = True,  # noqa: ARG002
+        reset_cache: bool = False,  # noqa: ARG002
     ) -> OpenMLRun:  # type: ignore[override]
         """Fetch a single run from the V2 server.
 
@@ -208,22 +209,22 @@ class RunsV2(ResourceV2, RunsAPI):
         NotImplementedError
             V2 server API not yet available for this operation.
         """
-        raise NotImplementedError("not implemented yet on V2 server")
+        raise OpenMLNotSupportedError("not implemented yet on V2 server")
 
     def list(  # type: ignore[valid-type]  # noqa: PLR0913
         self,
-        limit: int,
-        offset: int,
+        limit: int,  # noqa: ARG002
+        offset: int,  # noqa: ARG002
         *,
-        ids: builtins.list[int] | None = None,
-        task: builtins.list[int] | None = None,
-        setup: builtins.list[int] | None = None,
-        flow: builtins.list[int] | None = None,
-        uploader: builtins.list[int] | None = None,
-        study: int | None = None,
-        tag: str | None = None,
-        display_errors: bool = False,
-        task_type: TaskType | int | None = None,
+        ids: builtins.list[int] | None = None,  # noqa: ARG002
+        task: builtins.list[int] | None = None,  # noqa: ARG002
+        setup: builtins.list[int] | None = None,  # noqa: ARG002
+        flow: builtins.list[int] | None = None,  # noqa: ARG002
+        uploader: builtins.list[int] | None = None,  # noqa: ARG002
+        study: int | None = None,  # noqa: ARG002
+        tag: str | None = None,  # noqa: ARG002
+        display_errors: bool = False,  # noqa: ARG002
+        task_type: TaskType | int | None = None,  # noqa: ARG002
     ) -> pd.DataFrame:
         """List runs from the V2 server.
 
@@ -232,9 +233,9 @@ class RunsV2(ResourceV2, RunsAPI):
         NotImplementedError
             V2 server API not yet available for this operation.
         """
-        raise NotImplementedError("not implemented yet on V2 server")
+        raise OpenMLNotSupportedError("not implemented yet on V2 server")
 
-    def publish(self, path: str, files: Mapping[str, Any] | None = None) -> int:
+    def publish(self, path: str, files: Mapping[str, Any] | None = None) -> int:  # noqa: ARG002
         """Publish a run on the V2 server.
 
         Parameters
@@ -255,4 +256,4 @@ class RunsV2(ResourceV2, RunsAPI):
             V2 server does not yet support POST /runs/ endpoint.
             Expected availability: Q2 2025
         """
-        raise NotImplementedError("not implemented yet on V2 server")
+        raise OpenMLNotSupportedError("not implemented yet on V2 server")
