@@ -1099,6 +1099,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.skip(reason="Run not found on test server")
     @pytest.mark.production()
     def test_online_run_metric_score(self):
         self.use_production_server()
@@ -1410,6 +1411,7 @@ class TestRun(TestBase):
             trace_arff = arff.load(arff_file)
         OpenMLRunTrace.trace_from_arff(trace_arff)
 
+    @pytest.mark.skip(reason="Run not found on test server")
     @pytest.mark.production()
     def test_get_run(self):
         # this run is not available on test
@@ -1459,6 +1461,7 @@ class TestRun(TestBase):
         runs = openml.runs.list_runs(task=[0])
         assert runs.empty
 
+    @pytest.mark.skip(reason="Run not found on test server")
     @pytest.mark.production()
     def test_get_runs_list_by_task(self):
         # TODO: comes from live, no such lists on test
@@ -1478,6 +1481,7 @@ class TestRun(TestBase):
             assert run["task_id"] in task_ids
             self._check_run(run)
 
+    @pytest.mark.skip(reason="Run not found on test server")
     @pytest.mark.production()
     def test_get_runs_list_by_uploader(self):
         # TODO: comes from live, no such lists on test
@@ -1500,6 +1504,7 @@ class TestRun(TestBase):
             assert run["uploader"] in uploader_ids
             self._check_run(run)
 
+    @pytest.mark.skip(reason="Run not found on test server")
     @pytest.mark.production()
     def test_get_runs_list_by_flow(self):
         # TODO: comes from live, no such lists on test
@@ -1532,6 +1537,7 @@ class TestRun(TestBase):
             for run in runs.to_dict(orient="index").values():
                 assert run["uploader"] in uploader_ids
 
+    @pytest.mark.skip(reason="Run not found on test server")
     @pytest.mark.production()
     def test_get_runs_list_by_filters(self):
         # TODO: comes from live, no such lists on test

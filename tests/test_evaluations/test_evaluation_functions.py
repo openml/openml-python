@@ -239,6 +239,7 @@ class TestEvaluationFunctions(TestBase):
         assert isinstance(measures, list) is True
         assert all(isinstance(s, str) for s in measures) is True
 
+    @pytest.mark.skip(reason="Run not found on test server")
     @pytest.mark.production()
     def test_list_evaluations_setups_filter_flow(self):
         self.use_production_server()
