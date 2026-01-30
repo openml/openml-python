@@ -532,7 +532,7 @@ class TestOpenMLDataset(TestBase):
 
     @pytest.mark.uses_test_server()
     def test_publish_dataset(self):
-        arff_file_path = Path(__file__).parent.parent / "files" / "org" / "openml" / "test" / "datasets" / "2" / "dataset.arff"
+        arff_file_path = self.static_cache_dir / "org" / "openml" / "test" / "datasets" / "2" / "dataset.arff"
         dataset = OpenMLDataset(
             "anneal",
             "test",
