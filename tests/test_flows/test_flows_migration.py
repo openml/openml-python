@@ -105,7 +105,7 @@ class TestFlowsV1(TestAPIBase):
             if "description" not in file_elements:
                 file_elements["description"] = dt_flow._to_xml()
             
-            flow_id = self.resource.publish(file_elements)
+            flow_id = self.resource.publish(files=file_elements)
         
         # Now delete it
         result = self.resource.delete(flow_id)
@@ -134,14 +134,15 @@ class TestFlowsV1(TestAPIBase):
             external_version=dt_flow.external_version,
         )
         
-        if not flow_id:
-            file_elements = dt_flow._get_file_elements()
-            if "description" not in file_elements:
-                print("Adding description to flow XML")
-                file_elements["description"] = dt_flow._to_xml()
-                
-            flow_id = self.resource.publish(file_elements)
-
+        if flow_id:
+            _ = self.resource.delete(flow_id)
+            
+        file_elements = dt_flow._get_file_elements()
+        if "description" not in file_elements:
+            print("Adding description to flow XML")
+            file_elements["description"] = dt_flow._to_xml()
+            
+        flow_id = self.resource.publish(files=file_elements)
         assert isinstance(flow_id, int)
         assert flow_id > 0
 
