@@ -65,3 +65,7 @@ class OpenMLNotAuthorizedError(OpenMLServerError):
 
 class ObjectNotPublishedError(PyOpenMLError):
     """Indicates an object has not been published yet."""
+
+
+class OpenMLNotSupportedError(PyOpenMLError):
+    """Raised when an API operation is not supported for a resource/version."""

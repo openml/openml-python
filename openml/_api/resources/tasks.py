@@ -121,8 +121,8 @@ class TasksV1(ResourceV1, TasksAPI):
 class TasksV2(ResourceV2, TasksAPI):
     def get(
         self,
-        task_id: int,
+        task_id: int,  # noqa: ARG002
         *,
-        return_response: bool = False,
+        return_response: bool = False,  # noqa: ARG002
     ) -> OpenMLTask | tuple[OpenMLTask, Response]:
-        raise NotImplementedError(self._get_not_implemented_message("get"))
+        self._not_supported(method="get")
