@@ -322,6 +322,7 @@ class HTTPClient:
         path: str,
         *,
         use_cache: bool = False,
+        reset_cache: bool = False,
         use_api_key: bool = False,
         **request_kwargs: Any,
     ) -> Response:
@@ -345,7 +346,7 @@ class HTTPClient:
         timeout = request_kwargs.pop("timeout", self.timeout)
         files = request_kwargs.pop("files", None)
 
-        if use_cache and self.cache is not None:
+        if use_cache and not reset_cache and self.cache is not None:
             cache_key = self.cache.get_key(url, params)
             try:
                 return self.cache.load(cache_key)
@@ -379,6 +380,7 @@ class HTTPClient:
         assert response is not None
 
         if use_cache and self.cache is not None:
+            cache_key = self.cache.get_key(url, params)
             self.cache.save(cache_key, response)
 
         return response
@@ -388,6 +390,7 @@ class HTTPClient:
         path: str,
         *,
         use_cache: bool = False,
+        reset_cache: bool = False,
         use_api_key: bool = False,
         **request_kwargs: Any,
     ) -> Response:
@@ -395,6 +398,7 @@ class HTTPClient:
             method="GET",
             path=path,
             use_cache=use_cache,
+            reset_cache=reset_cache,
             use_api_key=use_api_key,
             **request_kwargs,
         )
