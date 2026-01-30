@@ -1870,6 +1870,10 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     Version(sklearn.__version__) < Version("0.21"),
     reason="couldn't perform local tests successfully w/o bloating RAM",
     )
+@unittest.skipIf(
+    Version(sklearn.__version__) >= Version("1.8"),
+    reason="predictions differ significantly",
+    )
 @mock.patch("openml_sklearn.SklearnExtension._prevent_optimize_n_jobs")
 @pytest.mark.uses_test_server()
 def test__run_task_get_arffcontent_2(parallel_mock):
