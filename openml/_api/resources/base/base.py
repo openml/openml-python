@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NoReturn
+
+from openml.exceptions import OpenMLNotSupportedError
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -49,11 +51,12 @@ class ResourceAPI(ABC):
     @abstractmethod
     def untag(self, resource_id: int, tag: str) -> list[str]: ...
 
-    def _get_not_implemented_message(self, method_name: str | None = None) -> str:
-        version = getattr(self.api_version, "name", "Unknown version")
-        resource = getattr(self.resource_type, "name", "Unknown resource")
-        method_info = f" Method: {method_name}" if method_name else ""
-        return (
-            f"{self.__class__.__name__}: {version} API does not support this "
-            f"functionality for resource: {resource}.{method_info}"
+    def _not_supported(self, *, method: str) -> NoReturn:
+        version = getattr(self.api_version, "value", "unknown")
+        resource = getattr(self.resource_type, "value", "unknown")
+
+        raise OpenMLNotSupportedError(
+            f"{self.__class__.__name__}: "
+            f"{version} API does not support `{method}` "
+            f"for resource `{resource}`"
         )
