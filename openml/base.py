@@ -11,7 +11,7 @@ import xmltodict
 import openml._api_calls
 import openml.config
 
-from .utils import _tag_openml_base
+from .utils import _get_rest_api_type_alias, _tag_openml_base
 
 
 class OpenMLBase(ABC):
@@ -126,19 +126,20 @@ class OpenMLBase(ABC):
 
     def publish(self) -> OpenMLBase:
         """Publish the object on the OpenML server."""
-        from openml._api import api_context
+        file_elements = self._get_file_elements()
 
-        resource_manager = api_context.backend.get_resource_for_entity(self)
+        if "description" not in file_elements:
+            file_elements["description"] = self._to_xml()
 
-        published_entity = resource_manager.publish(self)  # type: ignore
+        call = f"{_get_rest_api_type_alias(self)}/"
+        response_text = openml._api_calls._perform_api_call(
+            call,
+            "post",
+            file_elements=file_elements,
+        )
+        xml_response = xmltodict.parse(response_text)
 
-        if (
-            published_entity is not None
-            and hasattr(published_entity, "id")
-            and published_entity.id is not None
-        ):
-            self.id = published_entity.id  # type: ignore
-
+        self._parse_publish_response(xml_response)
         return self
 
     def open_in_browser(self) -> None:

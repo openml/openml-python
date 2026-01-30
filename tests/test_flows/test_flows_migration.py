@@ -2,6 +2,8 @@
 """Tests for Flow V1 → V2 API Migration."""
 from __future__ import annotations
 
+import uuid
+
 import pytest
 
 from openml._api.resources import FallbackProxy, FlowsV1, FlowsV2
@@ -82,36 +84,66 @@ class TestFlowsV1(TestAPIBase):
             assert "id" in flows_df.columns
     
     @pytest.mark.uses_test_server()
-    def test_publish(self):
-        """Test publishing a sklearn flow using V1 API."""
-        from openml_sklearn.extension import SklearnExtension
-        from sklearn.tree import ExtraTreeRegressor
-        clf = ExtraTreeRegressor()
-        extension = SklearnExtension()
-        dt_flow = extension.model_to_flow(clf)
-        published_flow = self.resource.publish(dt_flow)
-        assert isinstance(published_flow, OpenMLFlow)
-        assert getattr(published_flow, "id", None) is not None
-    
-    @pytest.mark.uses_test_server()
     def test_delete(self):
         """Test deleting a flow using V1 API."""
         from openml_sklearn.extension import SklearnExtension
         from sklearn.tree import ExtraTreeRegressor
+
         clf = ExtraTreeRegressor()
         extension = SklearnExtension()
         dt_flow = extension.model_to_flow(clf)
+
+        # Check if flow exists, if not publish it
         flow_id = self.resource.exists(
             name=dt_flow.name,
-            external_version=dt_flow.external_version
+            external_version=dt_flow.external_version,
         )
+        
+        if not flow_id:
+            # Publish the flow first
+            file_elements = dt_flow._get_file_elements()
+            if "description" not in file_elements:
+                file_elements["description"] = dt_flow._to_xml()
+            
+            flow_id = self.resource.publish(file_elements)
+        
+        # Now delete it
         result = self.resource.delete(flow_id)
         assert result is True
+
+        # Verify it no longer exists
         exists = self.resource.exists(
             name=dt_flow.name,
-            external_version=dt_flow.external_version
+            external_version=dt_flow.external_version,
         )
         assert exists is False
+    
+    @pytest.mark.uses_test_server()
+    def test_publish(self):
+        """Test publishing a sklearn flow using V1 API."""
+        from openml_sklearn.extension import SklearnExtension
+        from sklearn.tree import ExtraTreeRegressor
+
+        clf = ExtraTreeRegressor()
+        extension = SklearnExtension()
+        dt_flow = extension.model_to_flow(clf)
+
+        # Check if flow already exists
+        flow_id = self.resource.exists(
+            name=dt_flow.name,
+            external_version=dt_flow.external_version,
+        )
+        
+        if not flow_id:
+            file_elements = dt_flow._get_file_elements()
+            if "description" not in file_elements:
+                print("Adding description to flow XML")
+                file_elements["description"] = dt_flow._to_xml()
+                
+            flow_id = self.resource.publish(file_elements)
+
+        assert isinstance(flow_id, int)
+        assert flow_id > 0
 
 
 

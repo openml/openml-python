@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
 import pandas as pd
@@ -135,49 +136,21 @@ class FlowsV1(ResourceV1, FlowsAPI):
 
         return pd.DataFrame.from_dict(flows, orient="index")
 
-    def publish(self, flow: OpenMLFlow) -> OpenMLFlow:  # type: ignore[override]
-        """Create a new flow on the OpenML server.
-
-        under development , not fully functional yet
+    def publish(self, path: str | None = None, files: Mapping[str, Any] | None = None) -> int:
+        """Publish a flow on the OpenML server.
 
         Parameters
         ----------
-        flow : OpenMLFlow
-            The flow object to upload to the server.
+        files : Mapping[str, Any] | None
+            Files to upload (including description).
 
         Returns
         -------
-        OpenMLFlow
-            The updated flow object with the server-assigned flow_id.
+        int
+            The server-assigned flow id.
         """
-        from openml.extensions import Extension
-
-        # Check if flow is an OpenMLFlow or a compatible extension object
-        if not isinstance(flow, OpenMLFlow) and not isinstance(flow, Extension):
-            raise TypeError(f"Flow must be an OpenMLFlow or Extension instance, got {type(flow)}")
-
-        # Get file elements for upload (includes XML description if not provided)
-        file_elements = flow._get_file_elements()
-        if "description" not in file_elements:
-            file_elements["description"] = flow._to_xml()
-
-        # POST to server (multipart/files). Ensure api_key is sent in the form data.
-        files = file_elements
-        data = {"api_key": self._http.api_key}
-        response = self._http.post("flow", files=files, data=data)
-
-        parsed = xmltodict.parse(response.text)
-        if "oml:error" in parsed:
-            err = parsed["oml:error"]
-            code = int(err.get("oml:code", 0)) if "oml:code" in err else None
-            message = err.get("oml:message", "Server returned an error")
-            raise OpenMLServerException(message=message, code=code)
-
-        # Parse response and update flow with server-assigned ID
-        xml_response = xmltodict.parse(response.text)
-        flow._parse_publish_response(xml_response)
-
-        return flow
+        path = "flow"
+        return super().publish(path, files)
 
     def delete(self, flow_id: int) -> bool:
         """Delete a flow from the OpenML server.
@@ -187,8 +160,7 @@ class FlowsV1(ResourceV1, FlowsAPI):
         flow_id : int
             The ID of the flow to delete.
         """
-        self._http.delete(f"flow/{flow_id}")
-        return True
+        return super().delete(flow_id)
 
 
 class FlowsV2(ResourceV2, FlowsAPI):

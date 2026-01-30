@@ -54,9 +54,3 @@ class FlowsAPI(ResourceAPI, ABC):
         tag: str | None = None,
         uploader: str | None = None,
     ) -> pd.DataFrame: ...
-
-    @abstractmethod
-    def publish(self, flow: OpenMLFlow) -> OpenMLFlow | tuple[OpenMLFlow, Response]: ...  # type: ignore[override]
-
-    @abstractmethod
-    def delete(self, flow_id: int) -> bool: ...

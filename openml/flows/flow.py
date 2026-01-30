@@ -431,6 +431,7 @@ class OpenMLFlow(OpenMLBase):
         # get_flow(), while functions.py tries to import flow.py in order to
         # instantiate an OpenMLFlow.
         import openml.flows.functions
+        from openml._api import api_context
 
         flow_id = openml.flows.functions.flow_exists(self.name, self.external_version)
         if not flow_id:
@@ -438,9 +439,13 @@ class OpenMLFlow(OpenMLBase):
                 raise openml.exceptions.PyOpenMLError(
                     "Flow does not exist on the server, but 'flow.flow_id' is not None.",
                 )
-            super().publish()
-            assert self.flow_id is not None  # for mypy
-            flow_id = self.flow_id
+
+            file_elements = self._get_file_elements()
+            if "description" not in file_elements:
+                file_elements["description"] = self._to_xml()
+
+            flow_id = api_context.backend.flows.publish(path="flow", files=file_elements)
+            self.flow_id = flow_id
         elif raise_error_if_exists:
             error_message = f"This OpenMLFlow already exists with id: {flow_id}."
             raise openml.exceptions.PyOpenMLError(error_message)
