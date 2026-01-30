@@ -140,14 +140,14 @@ class ResourceV1(ResourceAPI):
 class ResourceV2(ResourceAPI):
     api_version: APIVersion = APIVersion.V2
 
-    def publish(self, path: str, files: Mapping[str, Any] | None) -> int:
-        raise NotImplementedError(self._get_not_implemented_message("publish"))
+    def publish(self, path: str, files: Mapping[str, Any] | None) -> int:  # noqa: ARG002
+        self._not_supported(method="publish")
 
-    def delete(self, resource_id: int) -> bool:
-        raise NotImplementedError(self._get_not_implemented_message("delete"))
+    def delete(self, resource_id: int) -> bool:  # noqa: ARG002
+        self._not_supported(method="delete")
 
-    def tag(self, resource_id: int, tag: str) -> list[str]:
-        raise NotImplementedError(self._get_not_implemented_message("untag"))
+    def tag(self, resource_id: int, tag: str) -> list[str]:  # noqa: ARG002
+        self._not_supported(method="tag")
 
-    def untag(self, resource_id: int, tag: str) -> list[str]:
-        raise NotImplementedError(self._get_not_implemented_message("untag"))
+    def untag(self, resource_id: int, tag: str) -> list[str]:  # noqa: ARG002
+        self._not_supported(method="untag")
