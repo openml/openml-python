@@ -38,9 +38,7 @@ class RunsAPI(ResourceAPI, ABC):
     resource_type: ResourceType = ResourceType.RUN
 
     @abstractmethod
-    def get(
-        self, run_id: int, *, use_cache: bool = True, reset_cache: bool = False
-    ) -> OpenMLRun: ...
+    def get(self, run_id: int, *, reset_cache: bool = False) -> OpenMLRun: ...
 
     @abstractmethod
     def list(  # type: ignore[valid-type]  # noqa: PLR0913

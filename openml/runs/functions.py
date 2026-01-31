@@ -812,19 +812,18 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
         Whether to ignore the cache. If ``true`` this will download and overwrite the run xml
         even if the requested run is already cached.
 
-    ignore_cache
+    ignore_cache : bool
+        Whether to ignore the cache. If ``true`` this will download and overwrite the run xml
+        even if the requested run is already cached.
 
     Returns
     -------
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    use_cache = not ignore_cache
-    reset_cache = ignore_cache
     return api_context.backend.runs.get(
         run_id,
-        use_cache=use_cache,
-        reset_cache=reset_cache,
+        reset_cache=ignore_cache,
     )
 
 

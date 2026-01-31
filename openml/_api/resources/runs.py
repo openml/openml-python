@@ -21,7 +21,6 @@ class RunsV1(ResourceV1, RunsAPI):
         self,
         run_id: int,
         *,
-        use_cache: bool = True,
         reset_cache: bool = False,
     ) -> OpenMLRun:  # type: ignore[override]
         """Fetch a single run from the OpenML server.
@@ -44,7 +43,7 @@ class RunsV1(ResourceV1, RunsAPI):
         path = f"run/{run_id}"
         response = self._http.get(
             path,
-            use_cache=use_cache,
+            use_cache=True,
             reset_cache=reset_cache,
             use_api_key=True,
         )
@@ -189,7 +188,6 @@ class RunsV2(ResourceV2, RunsAPI):
         self,
         run_id: int,  # noqa: ARG002
         *,
-        use_cache: bool = True,  # noqa: ARG002
         reset_cache: bool = False,  # noqa: ARG002
     ) -> OpenMLRun:  # type: ignore[override]
         """Fetch a single run from the V2 server.
