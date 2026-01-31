@@ -444,6 +444,7 @@ class OpenMLFlow(OpenMLBase):
             if "description" not in file_elements:
                 file_elements["description"] = self._to_xml()
 
+            # Use api_context.backend.flows.publish which internally calls ResourceV1.publish
             flow_id = api_context.backend.flows.publish(path="flow", files=file_elements)
             self.flow_id = flow_id
         elif raise_error_if_exists:
@@ -472,6 +473,34 @@ class OpenMLFlow(OpenMLBase):
                 f"the flow if necessary! Error is:\n'{message}'",
             ) from e
         return self
+
+    def push_tag(self, tag: str) -> None:
+        """Annotates this flow with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the flow.
+        """
+        from openml._api import api_context
+
+        if self.flow_id is None:
+            raise ValueError("Flow does not have an ID. Please publish the flow before tagging.")
+        api_context.backend.flows.tag(self.flow_id, tag)
+
+    def remove_tag(self, tag: str) -> None:
+        """Removes a tag from this flow on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to remove from the flow.
+        """
+        from openml._api import api_context
+
+        if self.flow_id is None:
+            raise ValueError("Flow does not have an ID. Please publish the flow before untagging.")
+        api_context.backend.flows.untag(self.flow_id, tag)
 
     def get_structure(self, key_item: str) -> dict[str, list[str]]:
         """

@@ -152,16 +152,6 @@ class FlowsV1(ResourceV1, FlowsAPI):
         path = "flow"
         return super().publish(path, files)
 
-    def delete(self, flow_id: int) -> bool:
-        """Delete a flow from the OpenML server.
-
-        Parameters
-        ----------
-        flow_id : int
-            The ID of the flow to delete.
-        """
-        return super().delete(flow_id)
-
 
 class FlowsV2(ResourceV2, FlowsAPI):
     def get(
@@ -221,18 +211,15 @@ class FlowsV2(ResourceV2, FlowsAPI):
     def list(
         self,
         *,
-        limit: int | None = None,
-        offset: int | None = None,
-        tag: str | None = None,
-        uploader: str | None = None,
+        limit: int | None = None,  # noqa: ARG002
+        offset: int | None = None,  # noqa: ARG002
+        tag: str | None = None,  # noqa: ARG002
+        uploader: str | None = None,  # noqa: ARG002
     ) -> pd.DataFrame:
-        raise NotImplementedError("flows (list) not yet implemented in v2 server")
+        self._not_supported(method="list")
 
-    def publish(self, flow: OpenMLFlow) -> OpenMLFlow:  # type: ignore[override]
-        raise NotImplementedError("POST /flows (create) not yet implemented in v2 server")
-
-    def delete(self, flow_id: int) -> bool:
-        raise NotImplementedError("DELETE /flows/{id} not yet implemented in v2 server")
+    def publish(self, path: str | None = None, files: Mapping[str, Any] | None = None) -> int:  # type: ignore[override]  # noqa: ARG002
+        self._not_supported(method="publish")
 
     @staticmethod
     def _convert_v2_to_v1_format(v2_json: dict[str, Any]) -> dict[str, dict]:

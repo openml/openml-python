@@ -69,7 +69,7 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
         raise OpenMLCacheException(f"Flow file for fid {fid} not cached") from e
 
 
-# @openml.utils.thread_safe_if_oslo_installed
+@openml.utils.thread_safe_if_oslo_installed
 def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = True) -> OpenMLFlow:  # noqa: FBT002
     """Download the OpenML flow for a given flow ID.
 
