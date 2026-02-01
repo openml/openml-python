@@ -3,10 +3,10 @@ from __future__ import annotations
 import pandas as pd
 import xmltodict
 
-from openml._api.resources.base import StudiesAPI
+from openml._api.resources.base import ResourceV1API, ResourceV2API, StudyAPI
 
 
-class StudiesV1(StudiesAPI):
+class StudyV1API(ResourceV1API, StudyAPI):
     def list(  # noqa: PLR0913
         self,
         limit: int | None = None,
@@ -16,6 +16,29 @@ class StudiesV1(StudiesAPI):
         uploader: list[int] | None = None,
         benchmark_suite: int | None = None,
     ) -> pd.DataFrame:
+        """List studies using V1 API.
+
+        Parameters
+        ----------
+        limit : int, optional
+            Maximum number of studies to return.
+        offset : int, optional
+            Number of studies to skip.
+        status : str, optional
+            Filter by status (active, in_preparation, deactivated, all).
+        main_entity_type : str, optional
+            Filter by main entity type (run, task).
+        uploader : list[int], optional
+            Filter by uploader IDs.
+        benchmark_suite : int, optional
+            Filter by benchmark suite ID.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame containing study information.
+        """
+        # Build the V1 API call string
         api_call = "study/list"
 
         if limit is not None:
@@ -31,12 +54,14 @@ class StudiesV1(StudiesAPI):
         if benchmark_suite is not None:
             api_call += f"/benchmark_suite/{benchmark_suite}"
 
+        # Make the GET request
         response = self._http.get(api_call)
-        xml_string = response.text
+        xml_string = response.content.decode("utf-8")
 
         # Parse XML and convert to DataFrame
         study_dict = xmltodict.parse(xml_string, force_list=("oml:study",))
 
+        # Minimalistic check if the XML is useful
         assert isinstance(study_dict["oml:study_list"]["oml:study"], list), type(
             study_dict["oml:study_list"],
         )
@@ -46,6 +71,7 @@ class StudiesV1(StudiesAPI):
 
         studies = {}
         for study_ in study_dict["oml:study_list"]["oml:study"]:
+            # maps from xml name to a tuple of (dict name, casting fn)
             expected_fields = {
                 "oml:id": ("id", int),
                 "oml:alias": ("alias", str),
@@ -67,14 +93,15 @@ class StudiesV1(StudiesAPI):
         return pd.DataFrame.from_dict(studies, orient="index")
 
 
-class StudiesV2(StudiesAPI):
+class StudyV2API(ResourceV2API, StudyAPI):
     def list(  # noqa: PLR0913
         self,
-        limit: int | None = None,
-        offset: int | None = None,
-        status: str | None = None,
-        main_entity_type: str | None = None,
-        uploader: list[int] | None = None,
-        benchmark_suite: int | None = None,
+        limit: int | None = None,  # noqa: ARG002
+        offset: int | None = None,  # noqa: ARG002
+        status: str | None = None,  # noqa: ARG002
+        main_entity_type: str | None = None,  # noqa: ARG002
+        uploader: list[int] | None = None,  # noqa: ARG002
+        benchmark_suite: int | None = None,  # noqa: ARG002
     ) -> pd.DataFrame:
-        raise NotImplementedError("V2 API implementation is not yet available")
+        """V2 API for listing studies is not yet available."""
+        self._not_supported(method="list")

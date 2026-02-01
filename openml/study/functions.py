@@ -338,7 +338,8 @@ def delete_study(study_id: int) -> bool:
     bool
         True iff the deletion was successful. False otherwise
     """
-    return openml.utils._delete_entity("study", study_id)
+    result: bool = api_context.backend.study.delete(study_id)
+    return result
 
 
 def attach_to_suite(suite_id: int, task_ids: list[int]) -> int:
@@ -467,7 +468,7 @@ def list_suites(
         - creation_date
     """
     listing_call = partial(
-        api_context.backend.studies.list,
+        api_context.backend.study.list,
         main_entity_type="task",
         status=status,
         uploader=uploader,
@@ -518,7 +519,7 @@ def list_studies(
         these are also returned.
     """
     listing_call = partial(
-        api_context.backend.studies.list,
+        api_context.backend.study.list,
         main_entity_type="run",
         status=status,
         uploader=uploader,
