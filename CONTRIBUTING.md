@@ -98,10 +98,7 @@ To test your new contribution, add [unit tests](https://github.com/openml/openml
 
 #### Running Tests That Require Admin Privileges
 
-Some tests require admin privileges on the test server and will be automatically skipped unless you provide an admin API key. For regular contributors, the tests will skip gracefully. For core contributors who need to run these tests locally:
-
-**Set up the key** by exporting the variable:
-run this in the terminal before running the tests:
+Some tests require admin privileges on the test server and will be automatically skipped unless you provide an admin API key. For regular contributors, the tests will skip gracefully. For core contributors who need to run these tests locally, you can set up the key by exporting the variable as below before running the tests:
 
 ```bash
 # For windows
