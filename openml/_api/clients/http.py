@@ -19,6 +19,7 @@ from requests import Response
 from openml.__version__ import __version__
 from openml._api.config import RetryPolicy
 from openml.exceptions import (
+    OpenMLCacheRequiredError,
     OpenMLHashException,
     OpenMLNotAuthorizedError,
     OpenMLServerError,
@@ -328,7 +329,7 @@ class HTTPClient:
 
         return response, retry_raise_e
 
-    def request(
+    def request( # noqa: PLR0913
         self,
         method: str,
         path: str,
@@ -464,8 +465,11 @@ class HTTPClient:
         file_name: str = "response.txt",
         md5_checksum: str | None = None,
     ) -> Path:
-        # TODO(Shrivaths) find better way to get base path
-        base = self.cache.path if self.cache is not None else Path("~/.openml/cache")
+        if self.cache is None:
+            raise OpenMLCacheRequiredError(
+                "A cache object is required for download, but none was provided in the HTTPClient."
+            )
+        base = self.cache.path
         file_path = base / "downloads" / urlparse(url).path.lstrip("/") / file_name
         file_path = file_path.expanduser()
         file_path.parent.mkdir(parents=True, exist_ok=True)

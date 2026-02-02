@@ -69,3 +69,7 @@ class ObjectNotPublishedError(PyOpenMLError):
 
 class OpenMLNotSupportedError(PyOpenMLError):
     """Raised when an API operation is not supported for a resource/version."""
+
+
+class OpenMLCacheRequiredError(PyOpenMLError):
+    """Raised when a cache object is required but not provided."""

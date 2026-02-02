@@ -45,10 +45,11 @@ class DatasetsV1(ResourceV1, DatasetsAPI):
         download_qualities: bool = False,  # noqa: FBT002
         download_features_meta_data: bool = False,  # noqa: FBT002
         download_all_files: bool = False,  # noqa: FBT002
+        force_refresh_cache: bool = False,  # noqa: FBT002
     ) -> OpenMLDataset:
         path = f"data/{dataset_id}"
         try:
-            response = self._http.get(path)
+            response = self._http.get(path, use_cache=True, reset_cache=force_refresh_cache)
             xml_content = response.text
             description = xmltodict.parse(xml_content)["oml:data_set_description"]
 
@@ -137,24 +138,6 @@ class DatasetsV1(ResourceV1, DatasetsAPI):
             api_call += f"/data_id/{','.join([str(int(i)) for i in data_id])}"
         xml_string = self._http.get(api_call).text
         return self._parse_list_xml(xml_string)
-
-    def delete(self, dataset_id: int) -> bool:
-        """Delete dataset with id `dataset_id` from the OpenML server.
-
-        This can only be done if you are the owner of the dataset and
-        no tasks are attached to the dataset.
-
-        Parameters
-        ----------
-        dataset_id : int
-            OpenML id of the dataset
-
-        Returns
-        -------
-        bool
-            True if the deletion was successful. False otherwise.
-        """
-        return super().delete(resource_id=dataset_id)
 
     def edit(
         self,
@@ -696,10 +679,11 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
         download_qualities: bool = False,  # noqa: FBT002
         download_features_meta_data: bool = False,  # noqa: FBT002
         download_all_files: bool = False,  # noqa: FBT002
+        force_refresh_cache: bool = False,  # noqa: FBT002
     ) -> OpenMLDataset:
         path = f"datasets/{dataset_id}"
         try:
-            response = self._http.get(path, use_cache=True)
+            response = self._http.get(path, use_cache=True, reset_cache=force_refresh_cache)
             json_content = response.json()
             features_file = None
             qualities_file = None
@@ -793,9 +777,6 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
 
         return self._parse_list_json(datasets_list)
 
-    def delete(self, dataset_id: int) -> bool:
-        raise NotImplementedError(self._get_not_implemented_message("delete"))
-
     def edit(
         self,
         dataset_id: int,
@@ -811,10 +792,10 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
         original_data_url: str | None = None,
         paper_url: str | None = None,
     ) -> int:
-        raise NotImplementedError(self._get_not_implemented_message("edit"))
+        raise NotImplementedError(self._not_supported(method="edit"))
 
     def fork(self, dataset_id: int) -> int:
-        raise NotImplementedError(self._get_not_implemented_message("fork"))
+        raise NotImplementedError(self._not_supported(method="fork"))
 
     def status_update(self, dataset_id: int, status: Literal["active", "deactivated"]) -> None:
         """
@@ -916,10 +897,10 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
         )
 
     def feature_add_ontology(self, dataset_id: int, index: int, ontology: str) -> bool:
-        raise NotImplementedError(self._get_not_implemented_message())
+        raise NotImplementedError(self._not_supported(method="feature_add_ontology"))
 
     def feature_remove_ontology(self, dataset_id: int, index: int, ontology: str) -> bool:
-        raise NotImplementedError(self._get_not_implemented_message())
+        raise NotImplementedError(self._not_supported(method="feature_remove_ontology"))
 
     def get_features(self, dataset_id: int) -> dict[int, OpenMLDataFeature]:
         path = f"datasets/features/{dataset_id}"
@@ -1100,10 +1081,10 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
         return output_file_path
 
     def add_topic(self, data_id: int, topic: str) -> int:
-        raise NotImplementedError(self._get_not_implemented_message("add_topic"))
+        raise NotImplementedError(self._not_supported(method="add_topic"))
 
     def delete_topic(self, data_id: int, topic: str) -> int:
-        raise NotImplementedError(self._get_not_implemented_message("delete_topic"))
+        raise NotImplementedError(self._not_supported(method="delete_topic"))
 
     def get_online_dataset_format(self, dataset_id: int) -> str:
         dataset_json = self._http.get(f"datasets/{dataset_id}").text

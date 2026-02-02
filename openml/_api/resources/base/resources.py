@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from abc import abstractmethod
 import builtins
+from abc import abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -33,6 +33,7 @@ class DatasetsAPI(ResourceAPI):
         download_qualities: bool = False,  # noqa: FBT002
         download_features_meta_data: bool = False,  # noqa: FBT002
         download_all_files: bool = False,  # noqa: FBT002
+        force_refresh_cache: bool = False,  # noqa: FBT002
     ) -> OpenMLDataset: ...
 
     @abstractmethod
@@ -44,9 +45,6 @@ class DatasetsAPI(ResourceAPI):
         data_id: list[int] | None = None,  # type: ignore
         **kwargs: Any,
     ) -> pd.DataFrame: ...
-
-    @abstractmethod
-    def delete(self, dataset_id: int) -> bool: ...
 
     @abstractmethod
     def edit(  # noqa: PLR0913

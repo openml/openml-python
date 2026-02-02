@@ -22,8 +22,6 @@ from openml.exceptions import (
 )
 from openml.utils import (
     _create_cache_directory_for_id,
-    _get_cache_dir_for_id,
-    _remove_cache_dir_for_id,
 )
 
 from .dataset import OpenMLDataset
@@ -31,7 +29,6 @@ from .dataset import OpenMLDataset
 if TYPE_CHECKING:
     import scipy
 
-    from openml.datasets.data_feature import OpenMLDataFeature
 
 DATASETS_CACHE_DIR_NAME = "datasets"
 logger = logging.getLogger(__name__)
@@ -374,11 +371,6 @@ def get_dataset(
             f"`dataset_id` must be one of `str` or `int`, not {type(dataset_id)}.",
         )
 
-    if force_refresh_cache:
-        did_cache_dir = _get_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, dataset_id)
-        if did_cache_dir.exists():
-            _remove_cache_dir_for_id(DATASETS_CACHE_DIR_NAME, did_cache_dir)
-
     return api_context.backend.datasets.get(
         dataset_id,
         download_data,
@@ -386,6 +378,7 @@ def get_dataset(
         download_qualities,
         download_features_meta_data,
         download_all_files,
+        force_refresh_cache,
     )
 
 
@@ -1121,11 +1114,3 @@ def delete_dataset(dataset_id: int) -> bool:
     from openml._api import api_context
 
     return api_context.backend.datasets.delete(dataset_id)
-
-
-def parse_features_file(
-    features_file: Path, features_pickle_file: Path
-) -> dict[int, OpenMLDataFeature]:
-    from openml._api import api_context
-
-    return api_context.backend.datasets.parse_features_file(features_file, features_pickle_file)
