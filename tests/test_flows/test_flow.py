@@ -301,7 +301,6 @@ class TestFlow(TestBase):
     @pytest.mark.uses_test_server()
     @mock.patch("openml.flows.functions.get_flow")
     @mock.patch("openml.flows.functions.flow_exists")
-    @mock.patch("openml._api_calls._perform_api_call")
     def test_publish_error(self, api_call_mock, flow_exists_mock, get_flow_mock):
         model = sklearn.ensemble.RandomForestClassifier()
         flow = self.extension.model_to_flow(model)
