@@ -6,12 +6,13 @@ from typing import Any
 import pandas as pd
 import xmltodict
 
-from openml._api.resources.base import FlowsAPI, ResourceV1, ResourceV2
 from openml.exceptions import OpenMLServerError, OpenMLServerException
 from openml.flows.flow import OpenMLFlow
 
+from .base import FlowAPI, ResourceV1API, ResourceV2API
 
-class FlowsV1(ResourceV1, FlowsAPI):
+
+class FlowV1API(ResourceV1API, FlowAPI):
     def get(
         self,
         flow_id: int,
@@ -153,7 +154,7 @@ class FlowsV1(ResourceV1, FlowsAPI):
         return super().publish(path, files)
 
 
-class FlowsV2(ResourceV2, FlowsAPI):
+class FlowV2API(ResourceV2API, FlowAPI):
     def get(
         self,
         flow_id: int,
@@ -278,7 +279,7 @@ class FlowsV2(ResourceV2, FlowsAPI):
             flow_dict["oml:flow"]["oml:component"] = [
                 {
                     "oml:identifier": subflow.get("identifier", ""),
-                    "oml:flow": FlowsV2._convert_v2_to_v1_format(subflow["flow"])["oml:flow"],
+                    "oml:flow": FlowV2API._convert_v2_to_v1_format(subflow["flow"])["oml:flow"],
                 }
                 for subflow in v2_json["subflows"]
             ]

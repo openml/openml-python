@@ -5,12 +5,13 @@ import os
 import re
 from collections import OrderedDict
 from functools import partial
-from typing import Any
+from typing import Any, cast
 
 import dateutil.parser
 import pandas as pd
 import xmltodict
 
+import openml
 import openml._api_calls
 import openml.utils
 from openml.exceptions import OpenMLCacheException
@@ -121,9 +122,7 @@ def _get_flow_description(flow_id: int) -> OpenMLFlow:
     try:
         return _get_cached_flow(flow_id)
     except OpenMLCacheException:
-        from openml._api import api_context
-
-        return api_context.backend.flows.get(flow_id)
+        return cast("OpenMLFlow", openml._backend.flow.get(flow_id))
 
 
 def list_flows(
@@ -159,9 +158,7 @@ def list_flows(
             - external version
             - uploader
     """
-    from openml._api import api_context
-
-    listing_call = partial(api_context.backend.flows.list, tag=tag, uploader=uploader)
+    listing_call = partial(openml._backend.flow.list, tag=tag, uploader=uploader)
     batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
     if len(batches) == 0:
         return pd.DataFrame()
@@ -195,9 +192,9 @@ def flow_exists(name: str, external_version: str) -> int | bool:
     if not (isinstance(external_version, str) and len(external_version) > 0):
         raise ValueError("Argument 'version' should be a non-empty string")
 
-    from openml._api import api_context
-
-    return api_context.backend.flows.exists(name=name, external_version=external_version)
+    return cast(
+        "int | bool", openml._backend.flow.exists(name=name, external_version=external_version)
+    )
 
 
 def get_flow_id(
@@ -471,7 +468,5 @@ def delete_flow(flow_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
-    from openml._api import api_context
-
-    api_context.backend.flows.delete(flow_id)
+    openml._backend.flow.delete(flow_id)
     return True

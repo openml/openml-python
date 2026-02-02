@@ -9,6 +9,7 @@ from typing import Any, cast
 
 import xmltodict
 
+import openml
 from openml.base import OpenMLBase
 from openml.extensions import Extension, get_extension_by_flow
 from openml.utils import extract_xml_tags
@@ -431,7 +432,6 @@ class OpenMLFlow(OpenMLBase):
         # get_flow(), while functions.py tries to import flow.py in order to
         # instantiate an OpenMLFlow.
         import openml.flows.functions
-        from openml._api import api_context
 
         flow_id = openml.flows.functions.flow_exists(self.name, self.external_version)
         if not flow_id:
@@ -444,8 +444,8 @@ class OpenMLFlow(OpenMLBase):
             if "description" not in file_elements:
                 file_elements["description"] = self._to_xml()
 
-            # Use api_context.backend.flows.publish which internally calls ResourceV1.publish
-            flow_id = api_context.backend.flows.publish(path="flow", files=file_elements)
+            # Use openml._backend.flow.publish which internally calls ResourceV1.publish
+            flow_id = openml._backend.flow.publish(path="flow", files=file_elements)
             self.flow_id = flow_id
         elif raise_error_if_exists:
             error_message = f"This OpenMLFlow already exists with id: {flow_id}."
@@ -482,11 +482,9 @@ class OpenMLFlow(OpenMLBase):
         tag : str
             Tag to attach to the flow.
         """
-        from openml._api import api_context
-
         if self.flow_id is None:
             raise ValueError("Flow does not have an ID. Please publish the flow before tagging.")
-        api_context.backend.flows.tag(self.flow_id, tag)
+        openml._backend.flow.tag(self.flow_id, tag)
 
     def remove_tag(self, tag: str) -> None:
         """Removes a tag from this flow on the server.
@@ -496,11 +494,9 @@ class OpenMLFlow(OpenMLBase):
         tag : str
             Tag to remove from the flow.
         """
-        from openml._api import api_context
-
         if self.flow_id is None:
             raise ValueError("Flow does not have an ID. Please publish the flow before untagging.")
-        api_context.backend.flows.untag(self.flow_id, tag)
+        openml._backend.flow.untag(self.flow_id, tag)
 
     def get_structure(self, key_item: str) -> dict[str, list[str]]:
         """

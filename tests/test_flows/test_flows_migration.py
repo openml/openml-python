@@ -6,7 +6,7 @@ import uuid
 
 import pytest
 
-from openml._api.resources import FallbackProxy, FlowsV1, FlowsV2
+from openml._api.resources import FallbackProxy, FlowV1API, FlowV2API
 from openml.flows.flow import OpenMLFlow
 from openml.testing import TestAPIBase
 
@@ -16,7 +16,7 @@ class TestFlowsV1(TestAPIBase):
 
     def setUp(self):
         super().setUp()
-        self.resource = FlowsV1(self.http_client)
+        self.resource = FlowV1API(self.http_client)
 
     @pytest.mark.uses_test_server()
     def test_get(self):
@@ -162,7 +162,7 @@ class TestFlowsV2(TestAPIBase):
             retry_policy=self.retry_policy,
             cache=self.cache,
         )
-        self.resource = FlowsV2(self.v2_http_client)
+        self.resource = FlowV2API(self.v2_http_client)
 
     # @pytest.mark.skip(reason="V2 API not yet deployed on test server")
     @pytest.mark.uses_test_server()
@@ -230,8 +230,8 @@ class TestFlowsCombined(TestAPIBase):
             cache=self.cache,
         )
         
-        self.resource_v1 = FlowsV1(self.v1_http_client)
-        self.resource_v2 = FlowsV2(self.v2_http_client)
+        self.resource_v1 = FlowV1API(self.v1_http_client)
+        self.resource_v2 = FlowV2API(self.v2_http_client)
         self.resource_fallback = FallbackProxy(self.resource_v2, self.resource_v1)
 
     # @pytest.mark.skip(reason="V2 API not yet deployed on test server")

@@ -16,7 +16,7 @@ import xmltodict
 from requests import Response
 
 from openml.__version__ import __version__
-from openml._api.config import RetryPolicy
+from openml.enums import RetryPolicy
 from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerError,

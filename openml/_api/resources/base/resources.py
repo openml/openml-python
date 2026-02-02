@@ -1,56 +1,41 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from openml.enums import ResourceType
 
-from openml._api.resources.base import ResourceAPI, ResourceType
-
-if TYPE_CHECKING:
-    import pandas as pd
-    from requests import Response
-
-    from openml.datasets.dataset import OpenMLDataset
-    from openml.flows.flow import OpenMLFlow
-    from openml.tasks.task import OpenMLTask
+from .base import ResourceAPI
 
 
-class DatasetsAPI(ResourceAPI):
+class DatasetAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.DATASET
 
-    @abstractmethod
-    def get(self, dataset_id: int) -> OpenMLDataset | tuple[OpenMLDataset, Response]: ...
 
-
-class TasksAPI(ResourceAPI):
+class TaskAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.TASK
 
-    @abstractmethod
-    def get(
-        self,
-        task_id: int,
-        *,
-        return_response: bool = False,
-    ) -> OpenMLTask | tuple[OpenMLTask, Response]: ...
+
+class EvaluationMeasureAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.EVALUATION_MEASURE
 
 
-class FlowsAPI(ResourceAPI, ABC):
+class EstimationProcedureAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.ESTIMATION_PROCEDURE
+
+
+class EvaluationAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.EVALUATION
+
+
+class FlowAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.FLOW
 
-    @abstractmethod
-    def get(
-        self,
-        flow_id: int,
-    ) -> OpenMLFlow: ...
 
-    @abstractmethod
-    def exists(self, name: str, external_version: str) -> int | bool: ...
+class StudyAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.STUDY
 
-    @abstractmethod
-    def list(
-        self,
-        *,
-        limit: int | None = None,
-        offset: int | None = None,
-        tag: str | None = None,
-        uploader: str | None = None,
-    ) -> pd.DataFrame: ...
+
+class RunAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.RUN
+
+
+class SetupAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.SETUP

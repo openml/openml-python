@@ -1,13 +1,14 @@
+from time import time
 import pytest
 from openml.testing import TestAPIBase
-from openml._api.resources.base.versions import ResourceV1
-from openml._api.resources.base.resources import ResourceType
+from openml._api import ResourceV1API
+from openml.enums import ResourceType
 
 
-class TestResourceV1(TestAPIBase):
+class TestResourceV1API(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.resource = ResourceV1(self.http_client)
+        self.resource = ResourceV1API(self.http_client)
         self.resource.resource_type = ResourceType.TASK
 
     @pytest.mark.uses_test_server()
@@ -41,4 +42,12 @@ class TestResourceV1(TestAPIBase):
 
     @pytest.mark.uses_test_server()
     def test_tag_and_untag(self):
-        pass
+        resource_id = 1
+        unique_indicator = str(time()).replace(".", "")
+        tag = f"TestResourceV1API_test_tag_and_untag_{unique_indicator}"
+
+        tags = self.resource.tag(resource_id, tag)
+        self.assertIn(tag, tags)
+
+        tags = self.resource.untag(resource_id, tag)
+        self.assertNotIn(tag, tags)
