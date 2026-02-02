@@ -298,7 +298,7 @@ class TestFlow(TestBase):
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
         TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
 
-    @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
     @mock.patch("openml.flows.functions.get_flow")
     @mock.patch("openml.flows.functions.flow_exists")
     @mock.patch("openml._api_calls._perform_api_call")
