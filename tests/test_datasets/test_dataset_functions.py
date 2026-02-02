@@ -428,7 +428,7 @@ class TestOpenMLDataset(TestBase):
             "oml:parquet_url": "http://data.openml.org/dataset20/does_not_exist.pq",
             "oml:id": "20",
         }
-        path = _get_dataset_parquet(description, cache_directory=self.workdir)
+        path = _get_dataset_parquet(description)
         assert path is None, "_get_dataset_parquet returns None if no file is found"
 
     def test__getarff_md5_issue(self):
@@ -1963,7 +1963,7 @@ def test__get_dataset_parquet_not_cached():
         "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
         "oml:id": "20",
     }
-    path = _get_dataset_parquet(description, cache_directory=Path(openml.config.get_cache_directory()))
+    path = _get_dataset_parquet(description)
     assert isinstance(path, Path), "_get_dataset_parquet returns a path"
     assert path.is_file(), "_get_dataset_parquet returns path to real file"
 

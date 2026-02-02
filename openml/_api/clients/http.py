@@ -290,6 +290,7 @@ class HTTPClient:
     ) -> tuple[Response | None, Exception | None]:
         retry_raise_e: Exception | None = None
         response: Response | None = None
+
         try:
             response = requests.request(
                 method=method,
@@ -318,13 +319,15 @@ class HTTPClient:
 
         return response, retry_raise_e
 
-    def request(
+    def request(  # noqa: PLR0913, C901
         self,
         method: str,
         path: str,
         *,
         use_cache: bool = False,
+        reset_cache: bool = False,
         use_api_key: bool = False,
+        md5_checksum: str | None = None,
         **request_kwargs: Any,
     ) -> Response:
         url = urljoin(self.server, urljoin(self.base_url, path))
@@ -347,7 +350,7 @@ class HTTPClient:
         timeout = request_kwargs.pop("timeout", self.timeout)
         files = request_kwargs.pop("files", None)
 
-        if use_cache and self.cache is not None:
+        if use_cache and not reset_cache and self.cache is not None:
             cache_key = self.cache.get_key(url, params)
             try:
                 return self.cache.load(cache_key)
@@ -381,7 +384,11 @@ class HTTPClient:
         assert response is not None
 
         if use_cache and self.cache is not None:
+            cache_key = self.cache.get_key(url, params)
             self.cache.save(cache_key, response)
+
+        if md5_checksum is not None:
+            self._verify_checksum(response, md5_checksum)
 
         return response
 
