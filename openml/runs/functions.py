@@ -901,7 +901,15 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
     run_details = obtain_field(run, "oml:run_details", from_server=False)
 
     if "oml:input_data" in run:
-        dataset_id = int(run["oml:input_data"]["oml:dataset"]["oml:did"])
+        input_data = run["oml:input_data"]
+        if isinstance(input_data, list):
+            input_data = input_data[0]
+
+        dataset_data = input_data["oml:dataset"]
+        if isinstance(dataset_data, list):
+            dataset_data = dataset_data[0]
+
+        dataset_id = int(dataset_data["oml:did"])
     elif not from_server:
         dataset_id = None
     else:
