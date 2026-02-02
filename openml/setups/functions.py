@@ -5,7 +5,6 @@ from collections import OrderedDict
 from collections.abc import Iterable
 from functools import partial
 from itertools import chain
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
@@ -14,7 +13,6 @@ import xmltodict
 import openml
 import openml.exceptions
 import openml.utils
-from openml import config
 from openml._api import api_context
 from openml.flows import OpenMLFlow, flow_exists
 
@@ -62,38 +60,6 @@ def setup_exists(flow: OpenMLFlow) -> int:
     return api_context.backend.setups.exists(file_elements=file_elements)
 
 
-def _get_cached_setup(setup_id: int) -> OpenMLSetup:
-    """Load a run from the cache.
-
-    Parameters
-    ----------
-    setup_id : int
-        ID of the setup to be loaded.
-
-    Returns
-    -------
-    OpenMLSetup
-        The loaded setup object.
-
-    Raises
-    ------
-    OpenMLCacheException
-        If the setup file for the given setup ID is not cached.
-    """
-    cache_dir = Path(config.get_cache_directory())
-    setup_cache_dir = cache_dir / "setups" / str(setup_id)
-    try:
-        setup_file = setup_cache_dir / "description.xml"
-        with setup_file.open(encoding="utf8") as fh:
-            setup_xml = xmltodict.parse(fh.read())
-            return _create_setup(setup_xml)
-
-    except OSError as e:
-        raise openml.exceptions.OpenMLCacheException(
-            f"Setup file for setup id {setup_id} not cached",
-        ) from e
-
-
 def get_setup(setup_id: int) -> OpenMLSetup:
     """
      Downloads the setup (configuration) description from OpenML
@@ -108,19 +74,7 @@ def get_setup(setup_id: int) -> OpenMLSetup:
     -------
     OpenMLSetup (an initialized openml setup object)
     """
-    setup_dir = Path(config.get_cache_directory()) / "setups" / str(setup_id)
-    setup_dir.mkdir(exist_ok=True, parents=True)
-
-    setup_file = setup_dir / "description.xml"
-
-    try:
-        return _get_cached_setup(setup_id)
-    except openml.exceptions.OpenMLCacheException:
-        result: tuple[str, OpenMLSetup] = api_context.backend.setups.get(setup_id=setup_id)
-        setup_xml, setup = result
-        with setup_file.open("w", encoding="utf8") as fh:
-            fh.write(setup_xml)
-
+    setup: OpenMLSetup = api_context.backend.setups.get(setup_id=setup_id)
     return setup
 
 

@@ -158,7 +158,7 @@ class SetupsV1(ResourceV1, SetupsAPI):
             value=result_dict["oml:value"],
         )
 
-    def get(self, setup_id: int) -> tuple[str, OpenMLSetup]:
+    def get(self, setup_id: int) -> OpenMLSetup:
         """
         Downloads the setup (configuration) description from OpenML
         and returns a structured object
@@ -170,18 +170,15 @@ class SetupsV1(ResourceV1, SetupsAPI):
 
         Returns
         -------
-        tuple[str, OpenMLSetup]
-            A tuple containing:
-            - xml_content: The raw XML response from the server
-            - setup: An initialized OpenMLSetup object parsed from the XML
+        OpenMLSetup
+            An initialized OpenMLSetup object parsed from the XML
         """
-        url_suffix = f"/setup/{setup_id}"
-        setup_response = self._http.get(url_suffix)
+        url_suffix = f"setup/{setup_id}"
+        setup_response = self._http.get(url_suffix, use_cache=True)
         xml_content = setup_response.text
         result_dict = xmltodict.parse(xml_content)
 
-        setup = self._create_setup(result_dict)
-        return xml_content, setup
+        return self._create_setup(result_dict)
 
     def exists(self, file_elements: dict[str, Any]) -> int:
         """
@@ -197,7 +194,7 @@ class SetupsV1(ResourceV1, SetupsAPI):
         setup_id : int
             setup id iff exists, False otherwise
         """
-        api_call = "/setup/exists/"
+        api_call = "setup/exists/"
         setup_response = self._http.post(api_call, files=file_elements)
         xml_content = setup_response.text
         result_dict = xmltodict.parse(xml_content)
@@ -223,7 +220,7 @@ class SetupsV2(ResourceV2, SetupsAPI):
     def _create_setup(self, result_dict: dict) -> OpenMLSetup:
         raise NotImplementedError("V2 API implementation is not yet available")
 
-    def get(self, setup_id: int) -> tuple[str, OpenMLSetup]:
+    def get(self, setup_id: int) -> OpenMLSetup:
         raise NotImplementedError("V2 API implementation is not yet available")
 
     def exists(self, file_elements: dict[str, Any]) -> int:
