@@ -67,9 +67,9 @@ class TestFlowFunctions(TestBase):
         assert isinstance(flows, pd.DataFrame)
         assert len(flows) >= 1500
 
-    @pytest.mark.production()
+    @pytest.mark.use_test_server()
     def test_list_flows_empty(self):
-        self.use_production_server()
+        # self.use_production_server()
         flows = openml.flows.list_flows(tag="NoOneEverUsesThisTag123")
         assert flows.empty
 
