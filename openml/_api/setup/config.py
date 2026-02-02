@@ -51,7 +51,7 @@ class Config:
         default_factory=lambda: ConnectionConfig(
             retries=5,
             retry_policy=RetryPolicy.HUMAN,
-            timeout=10,
+            timeout=50,
         )
     )
 
