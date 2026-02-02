@@ -41,7 +41,6 @@ from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerException,
 )
-from openml._api import api_context
 from openml._api.config import settings
 #from openml.extensions.sklearn import cat, cont
 from openml.runs.functions import (
@@ -1670,12 +1669,13 @@ class TestRun(TestBase):
         previous_cache_dir = settings.cache.dir
         try:
             settings.cache.dir = str(self.workdir / "http_cache_runs")
-            api_context.set_version("v1", strict=False)
+            openml._backend.set_config_value("api_version", "v1")
+            openml._backend.set_config_value("fallback_api_version", "v1")
 
             run = openml.runs.get_run(1)
             assert run.run_id == 1
 
-            http_client = api_context.backend.runs._http
+            http_client = openml._backend.run._http
             assert http_client.cache is not None
 
             url = urljoin(
@@ -1690,18 +1690,20 @@ class TestRun(TestBase):
             assert (cache_path / "body.bin").exists()
         finally:
             settings.cache.dir = previous_cache_dir
-            api_context.set_version("v1", strict=False)
+            openml._backend.set_config_value("api_version", "v1")
+            openml._backend.set_config_value("fallback_api_version", "v1")
 
     def test_get_uncached_run(self):
         previous_cache_dir = settings.cache.dir
         try:
             settings.cache.dir = str(self.workdir / "http_cache_runs_uncached")
-            api_context.set_version("v1", strict=False)
+            openml._backend.set_config_value("api_version", "v1")
+            openml._backend.set_config_value("fallback_api_version", "v1")
 
             run = openml.runs.get_run(1)
             assert run.run_id == 1
 
-            http_client = api_context.backend.runs._http
+            http_client = openml._backend.run._http
             assert http_client.cache is not None
 
             url = urljoin(
@@ -1716,7 +1718,8 @@ class TestRun(TestBase):
             assert (cache_path / "body.bin").exists()
         finally:
             settings.cache.dir = previous_cache_dir
-            api_context.set_version("v1", strict=False)
+            openml._backend.set_config_value("api_version", "v1")
+            openml._backend.set_config_value("fallback_api_version", "v1")
 
     @pytest.mark.sklearn()
     @pytest.mark.uses_test_server()
