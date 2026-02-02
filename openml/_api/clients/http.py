@@ -32,7 +32,8 @@ class HTTPCache:
 
     def get_key(self, url: str, params: dict[str, Any]) -> str:
         parsed_url = urlparse(url)
-        netloc_parts = parsed_url.netloc.split(".")[::-1]
+        netloc = parsed_url.netloc.replace(":", "_")
+        netloc_parts = netloc.split(".")[::-1]
         path_parts = parsed_url.path.strip("/").split("/")
 
         filtered_params = {k: v for k, v in params.items() if k != "api_key"}

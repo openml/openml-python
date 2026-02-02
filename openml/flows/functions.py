@@ -1,9 +1,6 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import os
-import re
-from collections import OrderedDict
 from functools import partial
 from typing import Any, cast
 
@@ -14,64 +11,20 @@ import xmltodict
 import openml
 import openml._api_calls
 import openml.utils
-from openml.exceptions import OpenMLCacheException
 
 from . import OpenMLFlow
 
 FLOWS_CACHE_DIR_NAME = "flows"
 
 
-def _get_cached_flows() -> OrderedDict:
-    """Return all the cached flows.
-
-    Returns
-    -------
-    flows : OrderedDict
-        Dictionary with flows. Each flow is an instance of OpenMLFlow.
-    """
-    flows = OrderedDict()  # type: 'OrderedDict[int, OpenMLFlow]'
-
-    flow_cache_dir = openml.utils._create_cache_directory(FLOWS_CACHE_DIR_NAME)
-    directory_content = os.listdir(flow_cache_dir)  # noqa : PTH208
-    directory_content.sort()
-    # Find all flow ids for which we have downloaded
-    # the flow description
-
-    for filename in directory_content:
-        if not re.match(r"[0-9]*", filename):
-            continue
-
-        fid = int(filename)
-        flows[fid] = _get_cached_flow(fid)
-
-    return flows
-
-
-def _get_cached_flow(fid: int) -> OpenMLFlow:
-    """Get the cached flow with the given id.
-
-    Parameters
-    ----------
-    fid : int
-        Flow id.
-
-    Returns
-    -------
-    OpenMLFlow.
-    """
-    fid_cache_dir = openml.utils._create_cache_directory_for_id(FLOWS_CACHE_DIR_NAME, fid)
-    flow_file = fid_cache_dir / "flow.xml"
-
-    try:
-        with flow_file.open(encoding="utf8") as fh:
-            return _create_flow_from_xml(fh.read())
-    except OSError as e:
-        openml.utils._remove_cache_dir_for_id(FLOWS_CACHE_DIR_NAME, fid_cache_dir)
-        raise OpenMLCacheException(f"Flow file for fid {fid} not cached") from e
-
-
 @openml.utils.thread_safe_if_oslo_installed
-def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = True) -> OpenMLFlow:  # noqa: FBT002
+def get_flow(
+    flow_id: int,
+    *,
+    reinstantiate: bool = False,
+    strict_version: bool = True,
+    ignore_cache: bool = False,
+) -> OpenMLFlow:
     """Download the OpenML flow for a given flow ID.
 
     Parameters
@@ -85,13 +38,17 @@ def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = T
     strict_version : bool, default=True
         Whether to fail if version requirements are not fulfilled.
 
+    ignore_cache : bool, default=False
+        Whether to ignore the cache. If ``true`` this will download and overwrite the flow xml
+        even if the requested flow is already cached.
+
     Returns
     -------
     flow : OpenMLFlow
         the flow
     """
     flow_id = int(flow_id)
-    flow = _get_flow_description(flow_id)
+    flow = openml._backend.flow.get(flow_id, reset_cache=ignore_cache)
 
     if reinstantiate:
         flow.model = flow.extension.flow_to_model(flow, strict_version=strict_version)
@@ -99,30 +56,8 @@ def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = T
             # check if we need to return a new flow b/c of version mismatch
             new_flow = flow.extension.model_to_flow(flow.model)
             if new_flow.dependencies != flow.dependencies:
-                return new_flow
-    return flow
-
-
-def _get_flow_description(flow_id: int) -> OpenMLFlow:
-    """Get the Flow for a given  ID.
-
-    Does the real work for get_flow. It returns a cached flow
-    instance if the flow exists locally, otherwise it downloads the
-    flow and returns an instance created from the xml representation.
-
-    Parameters
-    ----------
-    flow_id : int
-        The OpenML flow id.
-
-    Returns
-    -------
-    OpenMLFlow
-    """
-    try:
-        return _get_cached_flow(flow_id)
-    except OpenMLCacheException:
-        return cast("OpenMLFlow", openml._backend.flow.get(flow_id))
+                return cast("OpenMLFlow", new_flow)
+    return cast("OpenMLFlow", flow)
 
 
 def list_flows(

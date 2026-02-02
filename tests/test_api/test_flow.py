@@ -27,6 +27,16 @@ class TestFlowsV1(TestAPIBase):
         assert flow.flow_id == 1
         assert isinstance(flow.name, str)
         assert len(flow.name) > 0
+    
+    @pytest.mark.uses_test_server()
+    def test_get_with_cache_reset(self):
+        """Test getting a flow from the V1 API with cache reset."""
+        flow = self.resource.get(flow_id=1, reset_cache=True)
+        
+        assert isinstance(flow, OpenMLFlow)
+        assert flow.flow_id == 1
+        assert isinstance(flow.name, str)
+        assert len(flow.name) > 0
 
     @pytest.mark.uses_test_server()
     def test_exists(self):

@@ -16,6 +16,8 @@ class FlowV1API(ResourceV1API, FlowAPI):
     def get(
         self,
         flow_id: int,
+        *,
+        reset_cache: bool = False,
     ) -> OpenMLFlow:
         """Get a flow from the OpenML server.
 
@@ -23,15 +25,19 @@ class FlowV1API(ResourceV1API, FlowAPI):
         ----------
         flow_id : int
             The ID of the flow to retrieve.
-        return_response : bool, optional (default=False)
-            Whether to return the raw response object along with the flow.
+        reset_cache : bool, optional (default=False)
+            Whether to reset the cache for this request.
 
         Returns
         -------
-        OpenMLFlow | tuple[OpenMLFlow, Response]
-            The retrieved flow object, and optionally the raw response.
+        OpenMLFlow
+            The retrieved flow object.
         """
-        response = self._http.get(f"flow/{flow_id}")
+        response = self._http.get(
+            f"flow/{flow_id}",
+            use_cache=True,
+            reset_cache=reset_cache,
+        )
         flow_xml = response.text
         return OpenMLFlow._from_dict(xmltodict.parse(flow_xml))
 
@@ -107,7 +113,7 @@ class FlowV1API(ResourceV1API, FlowAPI):
         if uploader is not None:
             api_call += f"/uploader/{uploader}"
 
-        response = self._http.get(api_call, use_api_key=True)
+        response = self._http.get(api_call, use_api_key=True, use_cache=True)
         xml_string = response.text
         flows_dict = xmltodict.parse(xml_string, force_list=("oml:flow",))
 
@@ -158,6 +164,8 @@ class FlowV2API(ResourceV2API, FlowAPI):
     def get(
         self,
         flow_id: int,
+        *,
+        reset_cache: bool = False,
     ) -> OpenMLFlow:
         """Get a flow from the OpenML v2 server.
 
@@ -165,15 +173,19 @@ class FlowV2API(ResourceV2API, FlowAPI):
         ----------
         flow_id : int
             The ID of the flow to retrieve.
-        return_response : bool, optional (default=False)
-            Whether to return the raw response object along with the flow.
+        reset_cache : bool, optional (default=False)
+            Whether to reset the cache for this request.
 
         Returns
         -------
-        OpenMLFlow | tuple[OpenMLFlow, Response]
-            The retrieved flow object, and optionally the raw response.
+        OpenMLFlow
+            The retrieved flow object.
         """
-        response = self._http.get(f"flows/{flow_id}/")
+        response = self._http.get(
+            f"flows/{flow_id}/",
+            use_cache=True,
+            reset_cache=reset_cache,
+        )
         flow_json = response.json()
 
         # Convert v2 JSON to v1-compatible dict for OpenMLFlow._from_dict()
