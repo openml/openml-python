@@ -5,15 +5,17 @@ from typing import Any, cast
 
 import xmltodict
 
-from openml._api.resources.base import APIVersion, ResourceAPI, ResourceType
+from openml.enums import APIVersion, ResourceType
 from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerError,
     OpenMLServerException,
 )
 
+from .base import ResourceAPI
 
-class ResourceV1(ResourceAPI):
+
+class ResourceV1API(ResourceAPI):
     api_version: APIVersion = APIVersion.V1
 
     def publish(self, path: str, files: Mapping[str, Any] | None) -> int:
@@ -142,7 +144,7 @@ class ResourceV1(ResourceAPI):
         raise ValueError(f"No ID found in upload response: {root_value}")
 
 
-class ResourceV2(ResourceAPI):
+class ResourceV2API(ResourceAPI):
     api_version: APIVersion = APIVersion.V2
 
     def publish(self, path: str, files: Mapping[str, Any] | None) -> int:  # noqa: ARG002

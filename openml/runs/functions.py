@@ -6,7 +6,7 @@ import time
 import warnings
 from collections import OrderedDict
 from functools import partial
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pandas as pd
@@ -18,7 +18,6 @@ import openml
 import openml._api_calls
 import openml.utils
 from openml import config
-from openml._api import api_context
 from openml.exceptions import (
     OpenMLRunsExistError,
     OpenMLServerException,
@@ -821,9 +820,12 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    return api_context.backend.runs.get(
-        run_id,
-        reset_cache=ignore_cache,
+    return cast(
+        "OpenMLRun",
+        openml._backend.run.get(
+            run_id,
+            reset_cache=ignore_cache,
+        ),
     )
 
 
@@ -1074,7 +1076,7 @@ def list_runs(  # noqa: PLR0913
         raise TypeError("uploader must be of type list.")
 
     listing_call = partial(
-        api_context.backend.runs.list,
+        openml._backend.run.list,
         ids=id,
         task=task,
         setup=setup,
@@ -1292,4 +1294,4 @@ def delete_run(run_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
-    return api_context.backend.runs.delete(run_id)
+    return cast("bool", openml._backend.run.delete(run_id))

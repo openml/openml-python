@@ -1,58 +1,41 @@
 from __future__ import annotations
 
-import builtins
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from openml.enums import ResourceType
 
-from openml._api.resources.base import ResourceAPI, ResourceType
-
-if TYPE_CHECKING:
-    import pandas as pd
-    from requests import Response
-
-    from openml.datasets.dataset import OpenMLDataset
-    from openml.runs.run import OpenMLRun
-    from openml.tasks.task import OpenMLTask, TaskType
+from .base import ResourceAPI
 
 
-class DatasetsAPI(ResourceAPI):
+class DatasetAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.DATASET
 
-    @abstractmethod
-    def get(self, dataset_id: int) -> OpenMLDataset | tuple[OpenMLDataset, Response]: ...
 
-
-class TasksAPI(ResourceAPI):
+class TaskAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.TASK
 
-    @abstractmethod
-    def get(
-        self,
-        task_id: int,
-        *,
-        return_response: bool = False,
-    ) -> OpenMLTask | tuple[OpenMLTask, Response]: ...
+
+class EvaluationMeasureAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.EVALUATION_MEASURE
 
 
-class RunsAPI(ResourceAPI, ABC):
+class EstimationProcedureAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.ESTIMATION_PROCEDURE
+
+
+class EvaluationAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.EVALUATION
+
+
+class FlowAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.FLOW
+
+
+class StudyAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.STUDY
+
+
+class RunAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.RUN
 
-    @abstractmethod
-    def get(self, run_id: int, *, reset_cache: bool = False) -> OpenMLRun: ...
 
-    @abstractmethod
-    def list(  # type: ignore[valid-type]  # noqa: PLR0913
-        self,
-        limit: int,
-        offset: int,
-        *,
-        ids: builtins.list[int] | None = None,
-        task: builtins.list[int] | None = None,
-        setup: builtins.list[int] | None = None,
-        flow: builtins.list[int] | None = None,
-        uploader: builtins.list[int] | None = None,
-        study: int | None = None,
-        tag: str | None = None,
-        display_errors: bool = False,
-        task_type: TaskType | int | None = None,
-    ) -> pd.DataFrame: ...
+class SetupAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.SETUP

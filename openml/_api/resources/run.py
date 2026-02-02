@@ -8,7 +8,7 @@ import pandas as pd
 import xmltodict
 
 import openml
-from openml._api.resources.base import ResourceV1, ResourceV2, RunsAPI
+from openml._api.resources.base import ResourceV1API, ResourceV2API, RunAPI
 from openml.exceptions import OpenMLNotSupportedError
 from openml.tasks.task import TaskType
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from openml.runs.run import OpenMLRun
 
 
-class RunsV1(ResourceV1, RunsAPI):
+class RunV1API(ResourceV1API, RunAPI):
     def get(
         self,
         run_id: int,
@@ -29,6 +29,8 @@ class RunsV1(ResourceV1, RunsAPI):
         ----------
         run_id : int
             The ID of the run to fetch.
+        reset_cache : bool, default=False
+            Whether to reset the cache.
 
         Returns
         -------
@@ -73,7 +75,7 @@ class RunsV1(ResourceV1, RunsAPI):
             Maximum number of runs to return.
         offset : int
             Starting position for pagination.
-        id : list of int, optional
+        ids : list of int, optional
             List of run IDs to filter by.
         task : list of int, optional
             List of task IDs to filter by.
@@ -181,7 +183,7 @@ class RunsV1(ResourceV1, RunsAPI):
         return super().publish(path=path, files=files)
 
 
-class RunsV2(ResourceV2, RunsAPI):
+class RunV2API(ResourceV2API, RunAPI):
     """V2 API resource for runs. Currently read-only until V2 server supports POST."""
 
     def get(
@@ -196,6 +198,8 @@ class RunsV2(ResourceV2, RunsAPI):
         ----------
         run_id : int
             The ID of the run to fetch.
+        reset_cache : bool, default=False
+            Whether to reset the cache.
 
         Returns
         -------
@@ -204,7 +208,7 @@ class RunsV2(ResourceV2, RunsAPI):
 
         Raises
         ------
-        NotImplementedError
+        OpenMLNotSupportedError
             V2 server API not yet available for this operation.
         """
         raise OpenMLNotSupportedError("not implemented yet on V2 server")
@@ -228,7 +232,7 @@ class RunsV2(ResourceV2, RunsAPI):
 
         Raises
         ------
-        NotImplementedError
+        OpenMLNotSupportedError
             V2 server API not yet available for this operation.
         """
         raise OpenMLNotSupportedError("not implemented yet on V2 server")
@@ -250,7 +254,7 @@ class RunsV2(ResourceV2, RunsAPI):
 
         Raises
         ------
-        NotImplementedError
+        OpenMLNotSupportedError
             V2 server does not yet support POST /runs/ endpoint.
             Expected availability: Q2 2025
         """
