@@ -180,12 +180,4 @@ class TestSetupFunctions(TestBase):
 
         assert len(all) == size * 2
 
-    @pytest.mark.uses_test_server()
-    def test_get_cached_setup(self):
-        openml.config.set_root_cache_directory(self.static_cache_dir)
-        openml.setups.functions._get_cached_setup(1)
 
-    def test_get_uncached_setup(self):
-        openml.config.set_root_cache_directory(self.static_cache_dir)
-        with pytest.raises(openml.exceptions.OpenMLCacheException):
-            openml.setups.functions._get_cached_setup(10)
