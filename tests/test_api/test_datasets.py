@@ -3,16 +3,19 @@ from pathlib import Path
 
 import pytest
 import pandas as pd
+from typing import TYPE_CHECKING
 from openml._api.clients.minio import MinIOClient
 from openml._api.resources.base.fallback import FallbackProxy
 from openml.testing import TestAPIBase
-from openml._api.resources.datasets import DatasetsV1, DatasetsV2
+from openml._api.resources.dataset import DatasetV1API, DatasetV2API
 
 
-class TestDatasetsV1(TestAPIBase):
+class TestDatasetV1API(TestAPIBase):
     def setUp(self):
+        #TODO move path to testApiBase
+        from openml._api.setup import Config
         super().setUp()
-        self.minio_client = MinIOClient()
+        self.minio_client = MinIOClient(path=Path(Config().cache.dir))
         self.client = self._get_http_client(
             server=self.server,
             base_url=self.base_url,
@@ -22,7 +25,7 @@ class TestDatasetsV1(TestAPIBase):
             retry_policy=self.retry_policy,
             cache=self.cache
         )
-        self.dataset = DatasetsV1(self.client,self.minio_client)
+        self.dataset = DatasetV1API(self.client,self.minio_client)
     
     @pytest.mark.uses_test_server()
     def test_get(self):
@@ -72,10 +75,12 @@ class TestDatasetsV1(TestAPIBase):
 
 
 
-class TestDatasetsV2(TestAPIBase):
+class TestDatasetV2API(TestAPIBase):
     def setUp(self):
+        #TODO move path to testApiBase
+        from openml._api.setup import Config
         super().setUp()
-        self.minio_client = MinIOClient()
+        self.minio_client = MinIOClient(path=Path(Config().cache.dir))
         self.client = self._get_http_client(
             server="http://127.0.0.1:8001/",
             base_url="",
@@ -85,7 +90,7 @@ class TestDatasetsV2(TestAPIBase):
             retry_policy=self.retry_policy,
             cache=self.cache
         )
-        self.dataset = DatasetsV2(self.client,self.minio_client)
+        self.dataset = DatasetV2API(self.client,self.minio_client)
     
     @pytest.mark.uses_test_server()
     def test_get(self):
@@ -136,8 +141,10 @@ class TestDatasetsV2(TestAPIBase):
 
 class TestDatasetsCombined(TestAPIBase):
     def setUp(self):
+        #TODO move path to testApiBase
+        from openml._api.setup import Config
         super().setUp()
-        self.minio_client = MinIOClient()
+        self.minio_client = MinIOClient(path=Path(Config().cache.dir))
         self.v1_client = self._get_http_client(
 			server=self.server,
 			base_url=self.base_url,
@@ -156,8 +163,8 @@ class TestDatasetsCombined(TestAPIBase):
             retry_policy=self.retry_policy,
             cache=self.cache
         )
-        self.dataset_v1 = DatasetsV1(self.v1_client,self.minio_client)
-        self.dataset_v2 = DatasetsV2(self.v2_client,self.minio_client)
+        self.dataset_v1 = DatasetV1API(self.v1_client,self.minio_client)
+        self.dataset_v2 = DatasetV2API(self.v2_client,self.minio_client)
         self.dataset_fallback = FallbackProxy(self.dataset_v1,self.dataset_v2)
     
     @pytest.mark.uses_test_server()

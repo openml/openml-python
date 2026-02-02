@@ -5,24 +5,17 @@ from abc import abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
-from openml._api.resources.base import ResourceAPI, ResourceType
-
 if TYPE_CHECKING:
     import pandas as pd
-    from requests import Response
 
-    from openml._api.clients.http import HTTPClient
-    from openml._api.clients.minio import MinIOClient
     from openml.datasets.dataset import OpenMLDataFeature, OpenMLDataset
-    from openml.tasks.task import OpenMLTask
+from openml.enums import ResourceType
+
+from .base import ResourceAPI
 
 
-class DatasetsAPI(ResourceAPI):
+class DatasetAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.DATASET
-
-    def __init__(self, http: HTTPClient, minio: MinIOClient):
-        self._minio = minio
-        super().__init__(http)
 
     @abstractmethod
     def get(  # noqa: PLR0913
@@ -125,17 +118,34 @@ class DatasetsAPI(ResourceAPI):
     @abstractmethod
     def get_online_dataset_format(self, dataset_id: int) -> str: ...
 
-    @abstractmethod
-    def get_online_dataset_arff(self, dataset_id: int) -> str | None: ...
 
-
-class TasksAPI(ResourceAPI):
+class TaskAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.TASK
 
-    @abstractmethod
-    def get(
-        self,
-        task_id: int,
-        *,
-        return_response: bool = False,
-    ) -> OpenMLTask | tuple[OpenMLTask, Response]: ...
+
+class EvaluationMeasureAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.EVALUATION_MEASURE
+
+
+class EstimationProcedureAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.ESTIMATION_PROCEDURE
+
+
+class EvaluationAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.EVALUATION
+
+
+class FlowAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.FLOW
+
+
+class StudyAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.STUDY
+
+
+class RunAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.RUN
+
+
+class SetupAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.SETUP

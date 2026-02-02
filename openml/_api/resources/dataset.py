@@ -13,15 +13,17 @@ from typing import TYPE_CHECKING, Any, Literal
 import minio
 import urllib3
 
-from openml._api.resources.base import DatasetsAPI, ResourceV1
 from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 from openml.datasets.data_feature import OpenMLDataFeature
 from openml.datasets.dataset import OpenMLDataset
 from openml.exceptions import (
     OpenMLHashException,
+    OpenMLMinioRequiredError,
     OpenMLPrivateDatasetError,
     OpenMLServerException,
 )
+
+from .base import DatasetAPI, ResourceV1API, ResourceV2API
 
 if TYPE_CHECKING:
     from requests import Response
@@ -36,7 +38,7 @@ logger = logging.getLogger(__name__)
 NO_ACCESS_GRANTED_ERRCODE = 112
 
 
-class DatasetsV1(ResourceV1, DatasetsAPI):
+class DatasetV1API(ResourceV1API, DatasetAPI):
     def get(
         self,
         dataset_id: int,
@@ -595,6 +597,10 @@ class DatasetsV1(ResourceV1, DatasetsAPI):
         description: dict | OpenMLDataset,
         download_all_files: bool = False,  # noqa: FBT002
     ) -> Path | None:
+        if self._minio is None:
+            raise OpenMLMinioRequiredError(
+                "A minio object is required for Dataset, but none was provided"
+            )
         if isinstance(description, dict):
             url = str(description.get("oml:parquet_url"))
         elif isinstance(description, OpenMLDataset):
@@ -670,7 +676,7 @@ class DatasetsV1(ResourceV1, DatasetsAPI):
         return str(self.download_dataset_arff(xmltodict.parse(dataset_xml)))
 
 
-class DatasetsV2(ResourceV1, DatasetsAPI):
+class DatasetV2API(ResourceV2API, DatasetAPI):
     def get(
         self,
         dataset_id: int,
@@ -769,9 +775,7 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
                     json[operator] = value
 
         api_call = "datasets/list"
-        datasets_list = self._http.post(
-            path=api_call, json=json, headers={"accept": "application/json"}
-        ).json()
+        datasets_list = self._http.post(path=api_call, json=json, use_api_key=False).json()
         # Minimalistic check if the JSON is useful
         assert isinstance(datasets_list, list), type(datasets_list)
 
@@ -1037,6 +1041,10 @@ class DatasetsV2(ResourceV1, DatasetsAPI):
         description: dict | OpenMLDataset,
         download_all_files: bool = False,  # noqa: FBT002
     ) -> Path | None:
+        if self._minio is None:
+            raise OpenMLMinioRequiredError(
+                "A minio object is required for Dataset, but none was provided"
+            )
         if isinstance(description, dict):
             url = str(description.get("parquet_url"))
         elif isinstance(description, OpenMLDataset):

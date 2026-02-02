@@ -16,8 +16,8 @@ from urllib.parse import urljoin
 import requests
 
 import openml
-from openml._api.clients import HTTPCache, HTTPClient
-from openml._api.config import RetryPolicy
+from openml._api import HTTPCache, HTTPClient
+from openml.enums import RetryPolicy
 from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType
 
@@ -298,7 +298,7 @@ class TestAPIBase(unittest.TestCase):
         self.timeout = 10
         self.retries = 3
         self.retry_policy = RetryPolicy.HUMAN
-        self.dir = "test_cache"
+        self.dir = "~/.openml/test_cache"
         self.ttl = 60 * 60 * 24 * 7
 
         self.cache = self._get_http_cache(

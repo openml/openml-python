@@ -17,7 +17,7 @@ import xmltodict
 from requests import Response
 
 from openml.__version__ import __version__
-from openml._api.config import RetryPolicy
+from openml.enums import RetryPolicy
 from openml.exceptions import (
     OpenMLCacheRequiredError,
     OpenMLHashException,
@@ -291,27 +291,16 @@ class HTTPClient:
         retry_raise_e: Exception | None = None
         response: Response | None = None
         try:
-            if "json" in request_kwargs:
-                response = requests.request(
-                    method=method,
-                    url=url,
-                    params=params,
-                    headers=headers,
-                    timeout=timeout,
-                    files=files,
-                    **request_kwargs,
-                )
-            else:
-                response = requests.request(
-                    method=method,
-                    url=url,
-                    params=params,
-                    data=data,
-                    headers=headers,
-                    timeout=timeout,
-                    files=files,
-                    **request_kwargs,
-                )
+            response = requests.request(
+                method=method,
+                url=url,
+                params=params,
+                data=data,
+                headers=headers,
+                timeout=timeout,
+                files=files,
+                **request_kwargs,
+            )
         except (
             requests.exceptions.ChunkedEncodingError,
             requests.exceptions.ConnectionError,
@@ -329,15 +318,13 @@ class HTTPClient:
 
         return response, retry_raise_e
 
-    def request( # noqa: PLR0913
+    def request(
         self,
         method: str,
         path: str,
         *,
         use_cache: bool = False,
-        reset_cache: bool = False,
         use_api_key: bool = False,
-        md5_checksum: str | None = None,
         **request_kwargs: Any,
     ) -> Response:
         url = urljoin(self.server, urljoin(self.base_url, path))
@@ -360,7 +347,7 @@ class HTTPClient:
         timeout = request_kwargs.pop("timeout", self.timeout)
         files = request_kwargs.pop("files", None)
 
-        if use_cache and not reset_cache and self.cache is not None:
+        if use_cache and self.cache is not None:
             cache_key = self.cache.get_key(url, params)
             try:
                 return self.cache.load(cache_key)
@@ -393,11 +380,7 @@ class HTTPClient:
 
         assert response is not None
 
-        if md5_checksum is not None:
-            self._verify_checksum(response, md5_checksum)
-
         if use_cache and self.cache is not None:
-            cache_key = self.cache.get_key(url, params)
             self.cache.save(cache_key, response)
 
         return response
@@ -434,13 +417,15 @@ class HTTPClient:
     def post(
         self,
         path: str,
+        *,
+        use_api_key: bool = True,
         **request_kwargs: Any,
     ) -> Response:
         return self.request(
             method="POST",
             path=path,
             use_cache=False,
-            use_api_key=True,
+            use_api_key=use_api_key,
             **request_kwargs,
         )
 

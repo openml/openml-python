@@ -1,13 +1,13 @@
 import pytest
 from openml.testing import TestAPIBase
-from openml._api.resources.base.versions import ResourceV1
-from openml._api.resources.base.resources import ResourceType
+from openml._api import ResourceV1API
+from openml.enums import ResourceType
 
 
-class TestResourceV1(TestAPIBase):
+class TestResourceV1API(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.resource = ResourceV1(self.http_client)
+        self.resource = ResourceV1API(self.http_client)
         self.resource.resource_type = ResourceType.TASK
 
     @pytest.mark.uses_test_server()

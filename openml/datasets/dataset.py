@@ -9,13 +9,14 @@ import re
 import warnings
 from collections.abc import Iterable, Sequence
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import arff
 import numpy as np
 import pandas as pd
 import scipy.sparse
 
+import openml
 from openml.base import OpenMLBase
 from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 
@@ -487,7 +488,7 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
                 try:
                     # checks if the strings which should be the class labels
                     # can be encoded into integers
-                    pd.factorize(type_)[0]
+                    pd.factorize(np.array(type_))[0]
                 except ValueError as e:
                     raise ValueError(
                         "Categorical data needs to be numeric when using sparse ARFF."
@@ -806,7 +807,6 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         """Load the features metadata from the server and store it in the dataset object."""
         # Delayed Import to avoid circular imports or having to import all of dataset.functions to
         # import OpenMLDataset.
-        from openml._api import api_context
 
         if self.dataset_id is None:
             raise ValueError(
@@ -814,12 +814,11 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
                 "metadata.",
             )
 
-        self._features = api_context.backend.datasets.get_features(self.dataset_id)
+        self._features = openml._backend.dataset.get_features(self.dataset_id)
 
     def _load_qualities(self) -> None:
         """Load qualities information from the server and store it in the dataset object."""
         # same reason as above for _load_features
-        from openml._api import api_context
 
         if self.dataset_id is None:
             raise ValueError(
@@ -827,7 +826,7 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
                 "metadata.",
             )
 
-        qualities = api_context.backend.datasets.get_qualities(self.dataset_id)
+        qualities = openml._backend.dataset.get_qualities(self.dataset_id)
 
         if qualities is None:
             self._no_qualities_found = True
@@ -1000,10 +999,9 @@ def _read_features(features_file: str | Path) -> dict[int, OpenMLDataFeature]:
             return pickle.load(fh_binary)  # type: ignore  # noqa: S301
 
     except FileNotFoundError:
-        from openml._api import api_context
-
-        features = api_context.backend.datasets.parse_features_file(
-            features_file, features_pickle_file
+        features = cast(
+            "dict[int, OpenMLDataFeature]",
+            openml._backend.dataset.parse_features_file(features_file, features_pickle_file),
         )
         with features_pickle_file.open("wb") as fh_binary:
             pickle.dump(features, fh_binary)
@@ -1029,10 +1027,9 @@ def _read_qualities(qualities_file: str | Path) -> dict[str, float]:
         with qualities_pickle_file.open("rb") as fh_binary:
             return pickle.load(fh_binary)  # type: ignore  # noqa: S301
     except:  # noqa: E722
-        from openml._api import api_context
-
-        qualities = api_context.backend.datasets.parse_qualities_file(
-            qualities_file, qualities_pickle_file
+        qualities = cast(
+            "dict[str, float]",
+            openml._backend.dataset.parse_qualities_file(qualities_file, qualities_pickle_file),
         )
         with qualities_pickle_file.open("wb") as fh_binary:
             pickle.dump(qualities, fh_binary)

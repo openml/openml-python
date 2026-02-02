@@ -73,3 +73,7 @@ class OpenMLNotSupportedError(PyOpenMLError):
 
 class OpenMLCacheRequiredError(PyOpenMLError):
     """Raised when a cache object is required but not provided."""
+
+
+class OpenMLMinioRequiredError(PyOpenMLError):
+    """Raised when a minio object is required but not provided"""
