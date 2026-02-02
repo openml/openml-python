@@ -469,4 +469,4 @@ def delete_flow(flow_id: int) -> bool:
         True if the deletion was successful. False otherwise.
     """
     openml._backend.flow.delete(flow_id)
-    return True
+    return api_context.backend.flows.delete(flow_id)
