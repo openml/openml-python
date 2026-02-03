@@ -14,8 +14,7 @@ class TestEstimationProceduresV1(TestAPIBase):
   
     def setUp(self) -> None:    
         super().setUp() 
-        self.client = self.http_client
-        self.resource = EstimationProcedureV1API(self.client)
+        self.resource = EstimationProcedureV1API(self.http_client)
   
     @pytest.mark.uses_test_server()
     def test_list(self):
