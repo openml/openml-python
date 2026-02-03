@@ -8,10 +8,10 @@ from typing import TYPE_CHECKING
 import pandas as pd
 import xmltodict
 
+import openml
 import openml._api_calls
 import openml.config
 import openml.utils
-from openml._api import api_context
 from openml.study.study import OpenMLBenchmarkSuite, OpenMLStudy
 
 if TYPE_CHECKING:
@@ -338,7 +338,7 @@ def delete_study(study_id: int) -> bool:
     bool
         True iff the deletion was successful. False otherwise
     """
-    result: bool = api_context.backend.study.delete(study_id)
+    result: bool = openml._backend.study.delete(study_id)
     return result
 
 
@@ -468,7 +468,7 @@ def list_suites(
         - creation_date
     """
     listing_call = partial(
-        api_context.backend.study.list,
+        openml._backend.study.list,
         main_entity_type="task",
         status=status,
         uploader=uploader,
@@ -519,7 +519,7 @@ def list_studies(
         these are also returned.
     """
     listing_call = partial(
-        api_context.backend.study.list,
+        openml._backend.study.list,
         main_entity_type="run",
         status=status,
         uploader=uploader,
