@@ -959,7 +959,6 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         file_elements = self._get_file_elements()
         if "description" not in file_elements:
             file_elements["description"] = self._to_xml()
-
         dataset_id = openml._backend.dataset.publish(path="data", files=file_elements)
         self.dataset_id = dataset_id
         return self

@@ -295,6 +295,7 @@ class TestAPIBase(unittest.TestCase):
         self.server = "https://test.openml.org/"
         self.base_url = "api/v1/xml"
         self.api_key = "normaluser"
+        self.admin_key = "abc"
         self.timeout = 10
         self.retries = 3
         self.retry_policy = RetryPolicy.HUMAN
