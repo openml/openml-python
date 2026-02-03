@@ -6,11 +6,12 @@ from typing import Any
 
 import xmltodict
 
-from openml._api.resources.base import EvaluationsAPI, ResourceV1, ResourceV2
 from openml.evaluations import OpenMLEvaluation
 
+from .base import EvaluationAPI, ResourceV1API, ResourceV2API
 
-class EvaluationsV1(ResourceV1, EvaluationsAPI):
+
+class EvaluationV1API(ResourceV1API, EvaluationAPI):
     """V1 API implementation for evaluations.
     Fetches evaluations from the v1 XML API endpoint.
     """
@@ -248,25 +249,25 @@ class EvaluationsV1(ResourceV1, EvaluationsAPI):
         return {user["oml:id"]: user["oml:username"] for user in users["oml:users"]["oml:user"]}
 
 
-class EvaluationsV2(ResourceV2, EvaluationsAPI):
+class EvaluationV2API(ResourceV2API, EvaluationAPI):
     """V2 API implementation for evaluations.
     Fetches evaluations from the v2 json API endpoint.
     """
 
     def list(  # noqa: PLR0913
         self,
-        limit: int,
-        offset: int,
+        limit: int,  # noqa: ARG002
+        offset: int,  # noqa: ARG002
         *,
-        function: str,
-        tasks: builtins.list | None = None,
-        setups: builtins.list | None = None,
-        flows: builtins.list | None = None,
-        runs: builtins.list | None = None,
-        uploaders: builtins.list | None = None,
-        study: int | None = None,
-        sort_order: str | None = None,
-        **kwargs: Any,
+        function: str,  # noqa: ARG002
+        tasks: builtins.list | None = None,  # noqa: ARG002
+        setups: builtins.list | None = None,  # noqa: ARG002
+        flows: builtins.list | None = None,  # noqa: ARG002
+        runs: builtins.list | None = None,  # noqa: ARG002
+        uploaders: builtins.list | None = None,  # noqa: ARG002
+        study: int | None = None,  # noqa: ARG002
+        sort_order: str | None = None,  # noqa: ARG002
+        **kwargs: Any,  # noqa: ARG002
     ) -> builtins.list[OpenMLEvaluation]:
         """
         Retrieve evaluation results from the OpenML v2 JSON API.
@@ -275,4 +276,4 @@ class EvaluationsV2(ResourceV2, EvaluationsAPI):
         -----
         This method is not yet implemented.
         """
-        raise NotImplementedError("V2 API implementation is not yet available")
+        self._not_supported(method="list")

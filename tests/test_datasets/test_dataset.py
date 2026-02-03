@@ -102,21 +102,24 @@ class OpenMLDatasetTest(TestBase):
         assert isinstance(data, pd.DataFrame)
         assert data.shape[1] == len(self.titanic.features)
         assert data.shape[0] == 1309
+        # Dynamically detect what this version of Pandas calls string columns.
+        str_dtype = data["name"].dtype.name
+
         col_dtype = {
             "pclass": "uint8",
             "survived": "category",
-            "name": "object",
+            "name": str_dtype,
             "sex": "category",
             "age": "float64",
             "sibsp": "uint8",
             "parch": "uint8",
-            "ticket": "object",
+            "ticket": str_dtype,
             "fare": "float64",
-            "cabin": "object",
+            "cabin": str_dtype,
             "embarked": "category",
-            "boat": "object",
+            "boat": str_dtype,
             "body": "float64",
-            "home.dest": "object",
+            "home.dest": str_dtype,
         }
         for col_name in data.columns:
             assert data[col_name].dtype.name == col_dtype[col_name]
@@ -357,7 +360,7 @@ class OpenMLDatasetTestSparse(TestBase):
     def test_get_sparse_dataset_dataframe_with_target(self):
         X, y, _, attribute_names = self.sparse_dataset.get_data(target="class")
         assert isinstance(X, pd.DataFrame)
-        assert isinstance(X.dtypes[0], pd.SparseDtype)
+        assert isinstance(X.dtypes.iloc[0], pd.SparseDtype)
         assert X.shape == (600, 20000)
 
         assert isinstance(y, pd.Series)

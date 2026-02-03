@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
+from openml.exceptions import OpenMLNotSupportedError
+
 
 class FallbackProxy:
     def __init__(self, *api_versions: Any):
@@ -32,7 +34,7 @@ class FallbackProxy:
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             try:
                 return primary_attr(*args, **kwargs)
-            except NotImplementedError:
+            except OpenMLNotSupportedError:
                 return self._call_fallbacks(name, primary_api, *args, **kwargs)
 
         return wrapper
@@ -51,6 +53,6 @@ class FallbackProxy:
             if callable(attr):
                 try:
                     return attr(*args, **kwargs)
-                except NotImplementedError:
+                except OpenMLNotSupportedError:
                     continue
-        raise NotImplementedError(f"Could not fallback to any API for method: {name}")
+        raise OpenMLNotSupportedError(f"Could not fallback to any API for method: {name}")

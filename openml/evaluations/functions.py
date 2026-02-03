@@ -14,7 +14,6 @@ import xmltodict
 import openml
 import openml._api_calls
 import openml.utils
-from openml._api import api_context
 
 if TYPE_CHECKING:
     from openml.evaluations import OpenMLEvaluation
@@ -122,7 +121,7 @@ def list_evaluations(
         per_fold_str = str(per_fold).lower()
 
     listing_call = partial(
-        api_context.backend.evaluations.list,
+        openml._backend.evaluation.list,
         function=function,
         tasks=tasks,
         setups=setups,
