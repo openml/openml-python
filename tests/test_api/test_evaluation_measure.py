@@ -1,30 +1,20 @@
 # License: BSD 3-Clause  
 from __future__ import annotations  
   
-import pytest  
-from openml._api.config import settings
-  
-from openml._api.resources.evaluation_measures import EvaluationMeasuresV1, EvaluationMeasuresV2
+import pytest    
+from openml._api.resources.evaluation_measure import EvaluationMeasureV1API, EvaluationMeasureV2API
 from openml.testing import TestAPIBase
 from openml._api.resources.base.fallback import FallbackProxy
   
   
-class TestEvaluationMeasuresV1(TestAPIBase):  
+class TestEvaluationMeasureV1(TestAPIBase):  
     """Tests for V1 XML API implementation of evaluation measures."""  
   
     _multiprocess_can_split_ = True  
   
     def setUp(self) -> None:    
         super().setUp() 
-        self.client = self._get_http_client(
-            server=settings.api.v1.server,
-            base_url=settings.api.v1.base_url,
-            api_key=settings.api.v1.api_key,
-            timeout=settings.api.v1.timeout,
-            retries=settings.connection.retries,
-            retry_policy=settings.connection.retry_policy,
-        )
-        self.resource = EvaluationMeasuresV1(self.client)
+        self.resource = EvaluationMeasureV1API(self.http_client)
   
     @pytest.mark.uses_test_server()
     def test_list(self):
@@ -33,7 +23,7 @@ class TestEvaluationMeasuresV1(TestAPIBase):
         assert all(isinstance(s, str) for s in measures) is True  
 
 
-class TestEvaluationMeasuresV2(TestAPIBase): 
+class TestEvaluationMeasureV2(TestAPIBase): 
     """Tests for V2 JSON API implementation of evaluation measures."""  
   
     _multiprocess_can_split_ = True  
@@ -41,14 +31,15 @@ class TestEvaluationMeasuresV2(TestAPIBase):
     def setUp(self) -> None:    
         super().setUp() 
         self.client = self._get_http_client(
-            server=settings.api.v2.server,
-            base_url=settings.api.v2.base_url,
-            api_key=settings.api.v2.api_key,
-            timeout=settings.api.v2.timeout,
-            retries=settings.connection.retries,
-            retry_policy=settings.connection.retry_policy,
+            server="http://localhost:8001/",
+            base_url="",
+            api_key="",
+            timeout_seconds=self.timeout_seconds,
+            retries=self.retries,
+            retry_policy=self.retry_policy,
+            cache=self.cache,
         )
-        self.resource = EvaluationMeasuresV2(self.client)
+        self.resource = EvaluationMeasureV2API(self.client)
   
     @pytest.mark.uses_test_server()
     def test_list(self):
@@ -60,24 +51,18 @@ class TestEvaluationMeasuresV2(TestAPIBase):
 class TestEvaluationMeasuresCombined(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.v1_client = self._get_http_client(
-            server=settings.api.v1.server,
-            base_url=settings.api.v1.base_url,
-            api_key=settings.api.v1.api_key,
-            timeout=settings.api.v1.timeout,
-            retries=settings.connection.retries,
-            retry_policy=settings.connection.retry_policy,
-        )
+        self.v1_client = self.http_client
         self.v2_client = self._get_http_client(
-            server=settings.api.v2.server,
-            base_url=settings.api.v2.base_url,
-            api_key=settings.api.v2.api_key,
-            timeout=settings.api.v2.timeout,
-            retries=settings.connection.retries,
-            retry_policy=settings.connection.retry_policy,
+            server="http://localhost:8001/",
+            base_url="",
+            api_key="",
+            timeout_seconds=self.timeout_seconds,
+            retries=self.retries,
+            retry_policy=self.retry_policy,
+            cache=self.cache,
         )
-        self.resource_v1 = EvaluationMeasuresV1(self.v1_client)
-        self.resource_v2 = EvaluationMeasuresV2(self.v2_client)
+        self.resource_v1 = EvaluationMeasureV1API(self.v1_client)
+        self.resource_v2 = EvaluationMeasureV2API(self.v2_client)
         self.resource_fallback = FallbackProxy(self.resource_v2, self.resource_v1)
 
     @pytest.mark.uses_test_server()
