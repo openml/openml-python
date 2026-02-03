@@ -6,10 +6,9 @@ from typing import TYPE_CHECKING
 
 from openml._api.clients import HTTPCache, HTTPClient, MinIOClient
 from openml._api.resources import API_REGISTRY, FallbackProxy, ResourceAPI
+from openml.enums import ResourceType
 
 if TYPE_CHECKING:
-    from openml.enums import ResourceType
-
     from .config import Config
 
 
@@ -18,8 +17,15 @@ class APIBackendBuilder:
         self,
         resource_apis: Mapping[ResourceType, ResourceAPI | FallbackProxy],
     ):
-        for resource_type, resource_api in resource_apis.items():
-            setattr(self, resource_type.value, resource_api)
+        self.dataset = resource_apis[ResourceType.DATASET]
+        self.task = resource_apis[ResourceType.TASK]
+        self.evaluation_measure = resource_apis[ResourceType.EVALUATION_MEASURE]
+        self.estimation_procedure = resource_apis[ResourceType.ESTIMATION_PROCEDURE]
+        self.evaluation = resource_apis[ResourceType.EVALUATION]
+        self.flow = resource_apis[ResourceType.FLOW]
+        self.study = resource_apis[ResourceType.STUDY]
+        self.run = resource_apis[ResourceType.RUN]
+        self.setup = resource_apis[ResourceType.SETUP]
 
     @classmethod
     def build(cls, config: Config) -> APIBackendBuilder:

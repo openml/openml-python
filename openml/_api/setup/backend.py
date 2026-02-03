@@ -1,10 +1,23 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
 
 from .builder import APIBackendBuilder
 from .config import Config
+
+if TYPE_CHECKING:
+    from openml._api.resources import (
+        DatasetAPI,
+        EstimationProcedureAPI,
+        EvaluationAPI,
+        EvaluationMeasureAPI,
+        FlowAPI,
+        RunAPI,
+        SetupAPI,
+        StudyAPI,
+        TaskAPI,
+    )
 
 
 class APIBackend:
@@ -14,12 +27,41 @@ class APIBackend:
         self._config: Config = config or Config()
         self._backend = APIBackendBuilder.build(self._config)
 
-    def __getattr__(self, name: str) -> Any:
-        """
-        Delegate attribute access to the underlying backend.
-        Called only if attribute is not found on RuntimeBackend.
-        """
-        return getattr(self._backend, name)
+    @property
+    def dataset(self) -> DatasetAPI:
+        return cast("DatasetAPI", self._backend.dataset)
+
+    @property
+    def task(self) -> TaskAPI:
+        return cast("TaskAPI", self._backend.task)
+
+    @property
+    def evaluation_measure(self) -> EvaluationMeasureAPI:
+        return cast("EvaluationMeasureAPI", self._backend.evaluation_measure)
+
+    @property
+    def estimation_procedure(self) -> EstimationProcedureAPI:
+        return cast("EstimationProcedureAPI", self._backend.estimation_procedure)
+
+    @property
+    def evaluation(self) -> EvaluationAPI:
+        return cast("EvaluationAPI", self._backend.evaluation)
+
+    @property
+    def flow(self) -> FlowAPI:
+        return cast("FlowAPI", self._backend.flow)
+
+    @property
+    def study(self) -> StudyAPI:
+        return cast("StudyAPI", self._backend.study)
+
+    @property
+    def run(self) -> RunAPI:
+        return cast("RunAPI", self._backend.run)
+
+    @property
+    def setup(self) -> SetupAPI:
+        return cast("SetupAPI", self._backend.setup)
 
     @classmethod
     def get_instance(cls) -> APIBackend:
