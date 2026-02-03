@@ -949,6 +949,49 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         """Parse the id from the xml_response and assign it to self."""
         self.dataset_id = int(xml_response["oml:upload_data_set"]["oml:id"])
 
+    def publish(self) -> OpenMLDataset:
+        """Publish this flow to OpenML server.
+
+        Returns
+        -------
+        self : OpenMLFlow
+        """
+        file_elements = self._get_file_elements()
+        if "description" not in file_elements:
+            file_elements["description"] = self._to_xml()
+
+        dataset_id = openml._backend.dataset.publish(path="data", files=file_elements)
+        self.dataset_id = dataset_id
+        return self
+
+    def push_tag(self, tag: str) -> None:
+        """Annotates this dataset with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the dataset.
+        """
+        if self.dataset_id is None:
+            raise ValueError(
+                "Dataset does not have an ID. Please publish the dataset before tagging."
+            )
+        openml._backend.dataset.tag(self.dataset_id, tag)
+
+    def remove_tag(self, tag: str) -> None:
+        """Removes a tag from this dataset on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to remove from the dataset.
+        """
+        if self.dataset_id is None:
+            raise ValueError(
+                "Dataset does not have an ID. Please publish the dataset before untagging."
+            )
+        openml._backend.dataset.untag(self.dataset_id, tag)
+
     def _to_dict(self) -> dict[str, dict]:
         """Creates a dictionary representation of self."""
         props = [

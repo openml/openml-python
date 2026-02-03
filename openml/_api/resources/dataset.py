@@ -18,7 +18,6 @@ from openml.datasets.data_feature import OpenMLDataFeature
 from openml.datasets.dataset import OpenMLDataset
 from openml.exceptions import (
     OpenMLHashException,
-    OpenMLMinioRequiredError,
     OpenMLPrivateDatasetError,
     OpenMLServerException,
 )
@@ -466,9 +465,7 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
     ) -> dict[int, OpenMLDataFeature]:
         if features_pickle_file is None:
             features_pickle_file = features_file.with_suffix(features_file.suffix + ".pkl")
-        if features_file.suffix != ".xml":
-            # TODO (Shrivaths) can only parse xml warn/ raise exception
-            raise NotImplementedError()
+        assert features_file.suffix == ".xml"
 
         with Path(features_file).open("r", encoding="utf8") as fh:
             features_xml = fh.read()
@@ -485,9 +482,7 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
     ) -> dict[str, float]:
         if qualities_pickle_file is None:
             qualities_pickle_file = qualities_file.with_suffix(qualities_file.suffix + ".pkl")
-        if qualities_file.suffix != ".xml":
-            # TODO (Shrivaths) can only parse xml warn/ raise exception
-            raise NotImplementedError()
+        assert qualities_file.suffix == ".xml"
 
         with Path(qualities_file).open("r", encoding="utf8") as fh:
             qualities_xml = fh.read()
@@ -582,25 +577,19 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
 
     def download_features_file(self, dataset_id: int) -> Path:
         path = f"data/features/{dataset_id}"
-        file = self._download_file(path, "features.xml")
-        _ = self.parse_features_file(file)
-        return file
+        return self._download_file(path, "features.xml")
 
     def download_qualities_file(self, dataset_id: int) -> Path:
         path = f"data/qualities/{dataset_id}"
-        file = self._download_file(path, "qualities.xml")
-        _ = self.parse_qualities_file(file)
-        return file
+        return self._download_file(path, "qualities.xml")
 
     def download_dataset_parquet(
         self,
         description: dict | OpenMLDataset,
         download_all_files: bool = False,  # noqa: FBT002
     ) -> Path | None:
-        if self._minio is None:
-            raise OpenMLMinioRequiredError(
-                "A minio object is required for Dataset, but none was provided"
-            )
+        assert self._minio is not None  # for mypy
+
         if isinstance(description, dict):
             url = str(description.get("oml:parquet_url"))
         elif isinstance(description, OpenMLDataset):
@@ -1026,25 +1015,19 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
 
     def download_features_file(self, dataset_id: int) -> Path:
         path = f"datasets/features/{dataset_id}"
-        file = self._download_file(path, "features.json")
-        _ = self.parse_features_file(file)
-        return file
+        return self._download_file(path, "features.json")
 
     def download_qualities_file(self, dataset_id: int) -> Path:
         path = f"datasets/qualities/{dataset_id}"
-        file = self._download_file(path, "qualities.json")
-        _ = self.parse_qualities_file(file)
-        return file
+        return self._download_file(path, "qualities.json")
 
     def download_dataset_parquet(
         self,
         description: dict | OpenMLDataset,
         download_all_files: bool = False,  # noqa: FBT002
     ) -> Path | None:
-        if self._minio is None:
-            raise OpenMLMinioRequiredError(
-                "A minio object is required for Dataset, but none was provided"
-            )
+        assert self._minio is not None  # for mypy
+
         if isinstance(description, dict):
             url = str(description.get("parquet_url"))
         elif isinstance(description, OpenMLDataset):
@@ -1095,7 +1078,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         raise NotImplementedError(self._not_supported(method="delete_topic"))
 
     def get_online_dataset_format(self, dataset_id: int) -> str:
-        dataset_json = self._http.get(f"datasets/{dataset_id}").text
+        dataset_json = self._http.get(f"datasets/{dataset_id}").json()
         # build a dict from the xml and get the format from the dataset description
         return dataset_json["data_set_description"]["format"].lower()  # type: ignore
 
