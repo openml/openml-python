@@ -32,15 +32,7 @@ class TestSetupV1(TestAPIBase):
   
     def setUp(self) -> None:    
         super().setUp() 
-        self.client = self._get_http_client(
-            server=self.server,
-            base_url=self.base_url,
-            api_key=self.api_key,
-            timeout_seconds=self.timeout_seconds,
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-        )
-        self.resource = SetupV1API(self.client)
+        self.resource = SetupV1API(self.http_client)
         self.extension = SklearnExtension()
   
     @pytest.mark.uses_test_server()
@@ -118,12 +110,13 @@ class TestSetupV2(TestAPIBase):
     def setUp(self) -> None:    
         super().setUp() 
         self.client = self._get_http_client(
-            server=self.server,
-            base_url=self.base_url,
-            api_key=self.api_key,
+            server="http://localhost:8001/",
+            base_url="",
+            api_key="",
             timeout_seconds=self.timeout_seconds,
             retries=self.retries,
             retry_policy=self.retry_policy,
+            cache=self.cache,
         )
         self.resource = SetupV2API(self.client)
 
@@ -131,21 +124,15 @@ class TestSetupV2(TestAPIBase):
 class TestSetupsCombined(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.v1_client = self._get_http_client(
-            server=self.server,
-            base_url=self.base_url,
-            api_key=self.api_key,
-            timeout_seconds=self.timeout_seconds,
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-        )
+        self.v1_client = self.http_client
         self.v2_client = self._get_http_client(
-            server=self.server,
-            base_url=self.base_url,
-            api_key=self.api_key,
+            server="http://localhost:8001/",
+            base_url="",
+            api_key="",
             timeout_seconds=self.timeout_seconds,
             retries=self.retries,
             retry_policy=self.retry_policy,
+            cache=self.cache,
         )
         self.resource_v1 = SetupV1API(self.v1_client)
         self.resource_v2 = SetupV2API(self.v2_client)
