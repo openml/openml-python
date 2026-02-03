@@ -56,7 +56,7 @@ def setup_exists(flow: OpenMLFlow) -> int:
         "description": ("description.arff", description),
     }  # type: openml._api_calls.FILE_ELEMENTS_TYPE
 
-    return openml._backend.setup.exists(file_elements=file_elements)  # type: ignore[no-any-return]
+    return openml._backend.setup.exists(file_elements=file_elements)
 
 
 def get_setup(setup_id: int) -> OpenMLSetup:
@@ -186,4 +186,4 @@ def _to_dict(flow_id: int, openml_parameter_settings: list[dict[str, Any]]) -> O
 
 def _create_setup(result_dict: dict) -> OpenMLSetup:
     """Turns an API xml result into a OpenMLSetup object (or dict)"""
-    return openml._backend.setup._create_setup(result_dict)  # type: ignore[no-any-return]
+    return openml._backend.setup._create_setup(result_dict)
