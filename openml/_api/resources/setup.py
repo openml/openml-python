@@ -208,20 +208,20 @@ class SetupV2API(ResourceV2API, SetupAPI):
 
     def list(
         self,
-        limit: int,
-        offset: int,
+        limit: int,  # noqa: ARG002
+        offset: int,  # noqa: ARG002
         *,
-        setup: Iterable[int] | None = None,
-        flow: int | None = None,
-        tag: str | None = None,
+        setup: Iterable[int] | None = None,  # noqa: ARG002
+        flow: int | None = None,  # noqa: ARG002
+        tag: str | None = None,  # noqa: ARG002
     ) -> builtins.list[OpenMLSetup]:
-        raise NotImplementedError("V2 API implementation is not yet available")
+        self._not_supported(method="list")
 
-    def _create_setup(self, result_dict: dict) -> OpenMLSetup:
-        raise NotImplementedError("V2 API implementation is not yet available")
+    def _create_setup(self, result_dict: dict) -> OpenMLSetup:  # noqa: ARG002
+        self._not_supported(method="create_setup")
 
-    def get(self, setup_id: int) -> OpenMLSetup:
-        raise NotImplementedError("V2 API implementation is not yet available")
+    def get(self, setup_id: int) -> OpenMLSetup:  # noqa: ARG002
+        self._not_supported(method="get")
 
-    def exists(self, file_elements: dict[str, Any]) -> int | bool:
-        raise NotImplementedError("V2 API implementation is not yet available")
+    def exists(self, file_elements: dict[str, Any]) -> int | bool:  # noqa: ARG002
+        self._not_supported(method="exists")

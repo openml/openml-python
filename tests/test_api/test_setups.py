@@ -4,7 +4,6 @@ from __future__ import annotations
 import pytest  
 import hashlib
 import time
-from openml._api.config import settings
 import sklearn.tree
 import sklearn.naive_bayes
 import openml
@@ -12,7 +11,7 @@ from openml_sklearn import SklearnExtension
 from openml.testing import TestBase
 
   
-from openml._api.resources.setups import SetupsV1, SetupsV2
+from openml._api.resources.setup import SetupV1API, SetupV2API
 from openml.setups.setup import OpenMLSetup
 from openml.testing import TestAPIBase
 from openml._api.resources.base.fallback import FallbackProxy
@@ -26,7 +25,7 @@ def get_sentinel():
     sentinel = md5.hexdigest()[:10]
     return f"TEST{sentinel}"  
   
-class TestSetupsV1(TestAPIBase):  
+class TestSetupV1(TestAPIBase):  
     """Tests for V1 XML API implementation of setups."""  
   
     _multiprocess_can_split_ = True  
@@ -34,14 +33,14 @@ class TestSetupsV1(TestAPIBase):
     def setUp(self) -> None:    
         super().setUp() 
         self.client = self._get_http_client(
-            server=settings.api.v1.server,
-            base_url=settings.api.v1.base_url,
-            api_key=settings.api.v1.api_key,
-            timeout=settings.api.v1.timeout,
-            retries=settings.connection.retries,
-            retry_policy=settings.connection.retry_policy,
+            server=self.server,
+            base_url=self.base_url,
+            api_key=self.api_key,
+            timeout_seconds=self.timeout_seconds,
+            retries=self.retries,
+            retry_policy=self.retry_policy,
         )
-        self.resource = SetupsV1(self.client)
+        self.resource = SetupV1API(self.client)
         self.extension = SklearnExtension()
   
     @pytest.mark.uses_test_server()
@@ -111,7 +110,7 @@ class TestSetupsV1(TestAPIBase):
         assert setup_id == run.setup_id
 
 
-class TestSetupsV2(TestAPIBase): 
+class TestSetupV2(TestAPIBase): 
     """Tests for V2 JSON API implementation of setups."""  
   
     _multiprocess_can_split_ = True  
@@ -119,37 +118,37 @@ class TestSetupsV2(TestAPIBase):
     def setUp(self) -> None:    
         super().setUp() 
         self.client = self._get_http_client(
-            server=settings.api.v2.server,
-            base_url=settings.api.v2.base_url,
-            api_key=settings.api.v2.api_key,
-            timeout=settings.api.v2.timeout,
-            retries=settings.connection.retries,
-            retry_policy=settings.connection.retry_policy,
+            server=self.server,
+            base_url=self.base_url,
+            api_key=self.api_key,
+            timeout_seconds=self.timeout_seconds,
+            retries=self.retries,
+            retry_policy=self.retry_policy,
         )
-        self.resource = SetupsV2(self.client)
+        self.resource = SetupV2API(self.client)
 
 
 class TestSetupsCombined(TestAPIBase):
     def setUp(self):
         super().setUp()
         self.v1_client = self._get_http_client(
-            server=settings.api.v1.server,
-            base_url=settings.api.v1.base_url,
-            api_key=settings.api.v1.api_key,
-            timeout=settings.api.v1.timeout,
-            retries=settings.connection.retries,
-            retry_policy=settings.connection.retry_policy,
+            server=self.server,
+            base_url=self.base_url,
+            api_key=self.api_key,
+            timeout_seconds=self.timeout_seconds,
+            retries=self.retries,
+            retry_policy=self.retry_policy,
         )
         self.v2_client = self._get_http_client(
-            server=settings.api.v2.server,
-            base_url=settings.api.v2.base_url,
-            api_key=settings.api.v2.api_key,
-            timeout=settings.api.v2.timeout,
-            retries=settings.connection.retries,
-            retry_policy=settings.connection.retry_policy,
+            server=self.server,
+            base_url=self.base_url,
+            api_key=self.api_key,
+            timeout_seconds=self.timeout_seconds,
+            retries=self.retries,
+            retry_policy=self.retry_policy,
         )
-        self.resource_v1 = SetupsV1(self.v1_client)
-        self.resource_v2 = SetupsV2(self.v2_client)
+        self.resource_v1 = SetupV1API(self.v1_client)
+        self.resource_v2 = SetupV2API(self.v2_client)
         self.resource_fallback = FallbackProxy(self.resource_v2, self.resource_v1)
         self.extension = SklearnExtension()
 
