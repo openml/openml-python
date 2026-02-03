@@ -76,6 +76,7 @@ class FlowV1API(ResourceV1API, FlowAPI):
 
     def list(
         self,
+        *,
         limit: int | None = None,
         offset: int | None = None,
         tag: str | None = None,
@@ -223,7 +224,6 @@ class FlowV2API(ResourceV2API, FlowAPI):
 
     def list(
         self,
-        *,
         limit: int | None = None,  # noqa: ARG002
         offset: int | None = None,  # noqa: ARG002
         tag: str | None = None,  # noqa: ARG002
