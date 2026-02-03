@@ -6,11 +6,12 @@ from typing import Any
 
 import xmltodict
 
-from openml._api.resources.base import ResourceV1, ResourceV2, SetupsAPI
 from openml.setups.setup import OpenMLParameter, OpenMLSetup
 
+from .base import ResourceV1API, ResourceV2API, SetupAPI
 
-class SetupsV1(ResourceV1, SetupsAPI):
+
+class SetupV1API(ResourceV1API, SetupAPI):
     """V1 XML API implementation for setups."""
 
     def list(
@@ -142,7 +143,6 @@ class SetupsV1(ResourceV1, SetupsAPI):
             raise ValueError(
                 f"Expected None, list or dict, received something else: {type(xml_parameters)!s}",
             )
-
         return OpenMLSetup(setup_id, flow_id, parameters)
 
     def _create_setup_parameter_from_xml(self, result_dict: dict[str, str]) -> OpenMLParameter:
@@ -180,7 +180,7 @@ class SetupsV1(ResourceV1, SetupsAPI):
 
         return self._create_setup(result_dict)
 
-    def exists(self, file_elements: dict[str, Any]) -> int:
+    def exists(self, file_elements: dict[str, Any]) -> int | bool:
         """
         Checks whether a hyperparameter configuration already exists on the server.
 
@@ -203,7 +203,7 @@ class SetupsV1(ResourceV1, SetupsAPI):
         return setup_id if setup_id > 0 else False
 
 
-class SetupsV2(ResourceV2, SetupsAPI):
+class SetupV2API(ResourceV2API, SetupAPI):
     """V2 JSoN API implementation for setups."""
 
     def list(
@@ -223,5 +223,5 @@ class SetupsV2(ResourceV2, SetupsAPI):
     def get(self, setup_id: int) -> OpenMLSetup:
         raise NotImplementedError("V2 API implementation is not yet available")
 
-    def exists(self, file_elements: dict[str, Any]) -> int:
+    def exists(self, file_elements: dict[str, Any]) -> int | bool:
         raise NotImplementedError("V2 API implementation is not yet available")

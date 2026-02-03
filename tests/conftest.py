@@ -99,6 +99,7 @@ def delete_remote_files(tracker, flow_names) -> None:
     """
     openml.config.server = TestBase.test_server
     openml.config.apikey = TestBase.user_key
+    openml.config._sync_api_config()
 
     # reordering to delete sub flows at the end of flows
     # sub-flows have shorter names, hence, sorting by descending order of flow name length
@@ -275,10 +276,12 @@ def with_server(request):
     if "production" in request.keywords:
         openml.config.server = "https://www.openml.org/api/v1/xml"
         openml.config.apikey = None
+        openml.config._sync_api_config()
         yield
         return
     openml.config.server = "https://test.openml.org/api/v1/xml"
     openml.config.apikey = TestBase.user_key
+    openml.config._sync_api_config()
     yield
 
 

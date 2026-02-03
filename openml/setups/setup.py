@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
+import openml
 import openml.config
 import openml.flows
 
@@ -74,8 +75,6 @@ class OpenMLSetup:
         tag : str
             Tag to attach to the setup.
         """
-        from openml._api import api_context
-
         if self.setup_id is None:
             raise openml.exceptions.PyOpenMLError(
                 "Cannot tag a setup that has not been published yet. "
@@ -83,7 +82,7 @@ class OpenMLSetup:
                 f"\n{self}"
             )
 
-        api_context.backend.setups.tag(resource_id=self.setup_id, tag=tag)
+        openml._backend.setup.tag(resource_id=self.setup_id, tag=tag)
 
     def remove_tag(self, tag: str) -> None:
         """
@@ -94,14 +93,12 @@ class OpenMLSetup:
         tag : str
             Tag to remove from the setup.
         """
-        from openml._api import api_context
-
         if self.setup_id is None:
             raise openml.exceptions.PyOpenMLError(
                 f"Cannot untag a setup that has not been published yet. \n{self}"
             )
 
-        api_context.backend.setups.untag(resource_id=self.setup_id, tag=tag)
+        openml._backend.setup.untag(resource_id=self.setup_id, tag=tag)
 
 
 class OpenMLParameter:

@@ -13,7 +13,6 @@ import xmltodict
 import openml
 import openml.exceptions
 import openml.utils
-from openml._api import api_context
 from openml.flows import OpenMLFlow, flow_exists
 
 if TYPE_CHECKING:
@@ -57,7 +56,7 @@ def setup_exists(flow: OpenMLFlow) -> int:
         "description": ("description.arff", description),
     }  # type: openml._api_calls.FILE_ELEMENTS_TYPE
 
-    return api_context.backend.setups.exists(file_elements=file_elements)
+    return openml._backend.setup.exists(file_elements=file_elements)  # type: ignore[no-any-return]
 
 
 def get_setup(setup_id: int) -> OpenMLSetup:
@@ -74,7 +73,7 @@ def get_setup(setup_id: int) -> OpenMLSetup:
     -------
     OpenMLSetup (an initialized openml setup object)
     """
-    setup: OpenMLSetup = api_context.backend.setups.get(setup_id=setup_id)
+    setup: OpenMLSetup = openml._backend.setup.get(setup_id=setup_id)
     return setup
 
 
@@ -110,7 +109,7 @@ def list_setups(  # noqa: PLR0913
             "Invalid output format selected. Only 'object', or 'dataframe' applicable.",
         )
 
-    listing_call = partial(api_context.backend.setups.list, flow=flow, tag=tag, setup=setup)
+    listing_call = partial(openml._backend.setup.list, flow=flow, tag=tag, setup=setup)
     batches = openml.utils._list_all(
         listing_call,
         batch_size=1_000,  # batch size for setups is lower
@@ -187,4 +186,4 @@ def _to_dict(flow_id: int, openml_parameter_settings: list[dict[str, Any]]) -> O
 
 def _create_setup(result_dict: dict) -> OpenMLSetup:
     """Turns an API xml result into a OpenMLSetup object (or dict)"""
-    return api_context.backend.setups._create_setup(result_dict)
+    return openml._backend.setup._create_setup(result_dict)  # type: ignore[no-any-return]
