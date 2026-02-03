@@ -41,8 +41,9 @@ class TestFlowFunctions(TestBase):
         assert isinstance(flow["full_name"], str)
         assert isinstance(flow["version"], str)
         # There are some runs on openml.org that can have an empty external version
+        ext_version = flow["external_version"]
         ext_version_str_or_none = (
-            isinstance(flow["external_version"], str) or flow["external_version"] is None
+            isinstance(ext_version, str) or ext_version is None or pd.isna(ext_version)
         )
         assert ext_version_str_or_none
 
@@ -338,7 +339,6 @@ class TestFlowFunctions(TestBase):
         reason="Requires scikit-learn!=0.19.1, because target flow is from that version.",
     )
     @pytest.mark.production()
-    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_flow_with_reinstantiate_strict_with_wrong_version_raises_exception(self):
         self.use_production_server()
         flow = 8175

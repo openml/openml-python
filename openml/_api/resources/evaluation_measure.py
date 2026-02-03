@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import xmltodict
 
-from openml._api.resources.base import EvaluationMeasuresAPI, ResourceV1, ResourceV2
+from .base import EvaluationMeasureAPI, ResourceV1API, ResourceV2API
 
 
-class EvaluationMeasuresV1(ResourceV1, EvaluationMeasuresAPI):
+class EvaluationMeasureV1API(ResourceV1API, EvaluationMeasureAPI):
     """V1 API implementation for evaluation measures.
 
     Fetches evaluation measures from the v1 XML API endpoint.
@@ -36,7 +36,7 @@ class EvaluationMeasuresV1(ResourceV1, EvaluationMeasuresAPI):
         return qualities["oml:evaluation_measures"]["oml:measures"][0]["oml:measure"]
 
 
-class EvaluationMeasuresV2(ResourceV2, EvaluationMeasuresAPI):
+class EvaluationMeasureV2API(ResourceV2API, EvaluationMeasureAPI):
     """V2 API implementation for evaluation measures.
 
     Fetches evaluation measures from the v2 JSON API endpoint.

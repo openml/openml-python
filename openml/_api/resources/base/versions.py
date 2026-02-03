@@ -1,19 +1,21 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, cast
 
 import xmltodict
 
-from openml._api.resources.base import APIVersion, ResourceAPI, ResourceType
+from openml.enums import APIVersion, ResourceType
 from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerError,
     OpenMLServerException,
 )
 
+from .base import ResourceAPI
 
-class ResourceV1(ResourceAPI):
+
+class ResourceV1API(ResourceAPI):
     api_version: APIVersion = APIVersion.V1
 
     def publish(self, path: str, files: Mapping[str, Any] | None) -> int:
@@ -76,7 +78,7 @@ class ResourceV1(ResourceAPI):
     def _get_endpoint_name(self) -> str:
         if self.resource_type == ResourceType.DATASET:
             return "data"
-        return self.resource_type.name
+        return cast("str", self.resource_type.value)
 
     def _handle_delete_exception(
         self, resource_type: str, exception: OpenMLServerException
@@ -114,8 +116,8 @@ class ResourceV1(ResourceAPI):
         raise exception
 
     def _extract_id_from_upload(self, parsed: Mapping[str, Any]) -> int:
-        # reads id from
-        # sample parsed dict: {"oml:openml": {"oml:upload_flow": {"oml:id": "42"}}}
+        # reads id from upload response
+        # actual parsed dict: {"oml:upload_flow": {"@xmlns:oml": "...", "oml:id": "42"}}
 
         # xmltodict always gives exactly one root key
         ((_, root_value),) = parsed.items()
@@ -123,31 +125,31 @@ class ResourceV1(ResourceAPI):
         if not isinstance(root_value, Mapping):
             raise ValueError("Unexpected XML structure")
 
-        # upload node (e.g. oml:upload_task, oml:study_upload, ...)
-        ((_, upload_value),) = root_value.items()
+        # Look for oml:id directly in the root value
+        if "oml:id" in root_value:
+            id_value = root_value["oml:id"]
+            if isinstance(id_value, (str, int)):
+                return int(id_value)
 
-        if not isinstance(upload_value, Mapping):
-            raise ValueError("Unexpected upload node structure")
-
-        # ID is the only leaf value
-        for v in upload_value.values():
+        # Fallback: check all values for numeric/string IDs
+        for v in root_value.values():
             if isinstance(v, (str, int)):
                 return int(v)
 
         raise ValueError("No ID found in upload response")
 
 
-class ResourceV2(ResourceAPI):
+class ResourceV2API(ResourceAPI):
     api_version: APIVersion = APIVersion.V2
 
-    def publish(self, path: str, files: Mapping[str, Any] | None) -> int:
-        raise NotImplementedError(self._get_not_implemented_message("publish"))
+    def publish(self, path: str, files: Mapping[str, Any] | None) -> int:  # noqa: ARG002
+        self._not_supported(method="publish")
 
-    def delete(self, resource_id: int) -> bool:
-        raise NotImplementedError(self._get_not_implemented_message("delete"))
+    def delete(self, resource_id: int) -> bool:  # noqa: ARG002
+        self._not_supported(method="delete")
 
-    def tag(self, resource_id: int, tag: str) -> list[str]:
-        raise NotImplementedError(self._get_not_implemented_message("untag"))
+    def tag(self, resource_id: int, tag: str) -> list[str]:  # noqa: ARG002
+        self._not_supported(method="tag")
 
-    def untag(self, resource_id: int, tag: str) -> list[str]:
-        raise NotImplementedError(self._get_not_implemented_message("untag"))
+    def untag(self, resource_id: int, tag: str) -> list[str]:  # noqa: ARG002
+        self._not_supported(method="untag")
