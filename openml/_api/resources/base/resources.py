@@ -118,6 +118,9 @@ class DatasetAPI(ResourceAPI):
     @abstractmethod
     def get_online_dataset_format(self, dataset_id: int) -> str: ...
 
+    @abstractmethod
+    def get_online_dataset_arff(self, dataset_id: int) -> str | None: ...
+
 
 class TaskAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.TASK
