@@ -1,8 +1,9 @@
 from time import time
 import pytest
 from openml.testing import TestAPIBase
-from openml._api import ResourceV1API
+from openml._api import ResourceV1API, ResourceV2API, FallbackProxy
 from openml.enums import ResourceType
+from openml.exceptions import OpenMLNotSupportedError
 
 
 class TestResourceV1API(TestAPIBase):
@@ -51,3 +52,56 @@ class TestResourceV1API(TestAPIBase):
 
         tags = self.resource.untag(resource_id, tag)
         self.assertNotIn(tag, tags)
+
+
+class TestResourceV2API(TestResourceV1API):
+    def setUp(self):
+        super().setUp()
+
+        self.server = ""
+        self.base_url = ""
+        self.api_key = ""
+        self.http_client = self._get_http_client(
+            server=self.server,
+            base_url=self.base_url,
+            api_key=self.api_key,
+            timeout_seconds=self.timeout_seconds,
+            retries=self.retries,
+            retry_policy=self.retry_policy,
+            cache=self.cache,
+        )
+
+        self.resource = ResourceV2API(self.http_client)
+        self.resource.resource_type = ResourceType.TASK
+
+    @pytest.mark.xfail(raises=OpenMLNotSupportedError)
+    def test_publish_and_delete(self):
+        super().test_tag_and_untag()
+
+
+    @pytest.mark.xfail(raises=OpenMLNotSupportedError)
+    def test_tag_and_untag(self):
+        super().test_tag_and_untag()
+
+
+class TestResourceFallbackAPI(TestResourceV1API):
+    def setUp(self):
+        super().setUp()
+
+        self.http_client_v2 = self._get_http_client(
+            server="",
+            base_url="",
+            api_key="",
+            timeout_seconds=self.timeout_seconds,
+            retries=self.retries,
+            retry_policy=self.retry_policy,
+            cache=self.cache,
+        )
+
+        resource_v1 = ResourceV1API(self.http_client)
+        resource_v1.resource_type = ResourceType.TASK
+
+        resource_v2 = ResourceV2API(self.http_client_v2)
+        resource_v2.resource_type = ResourceType.TASK
+
+        self.resource = FallbackProxy(resource_v2, resource_v1)

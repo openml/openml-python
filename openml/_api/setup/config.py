@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import timedelta
 
 from openml.enums import APIVersion, RetryPolicy
 
@@ -18,7 +19,7 @@ class APIConfig:
 class ConnectionConfig:
     retries: int
     retry_policy: RetryPolicy
-    timeout: int
+    timeout_seconds: int
 
 
 @dataclass
@@ -51,13 +52,13 @@ class Config:
         default_factory=lambda: ConnectionConfig(
             retries=5,
             retry_policy=RetryPolicy.HUMAN,
-            timeout=10,
+            timeout_seconds=10,
         )
     )
 
     cache: CacheConfig = field(
         default_factory=lambda: CacheConfig(
             dir=str(_resolve_default_cache_dir()),
-            ttl=60 * 60 * 24 * 7,
+            ttl=int(timedelta(weeks=1).total_seconds()),
         )
     )
