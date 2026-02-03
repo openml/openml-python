@@ -18,6 +18,8 @@ from typing import Any, Literal, cast
 from typing_extensions import TypedDict
 from urllib.parse import urlparse
 
+from openml.enums import RetryPolicy
+
 logger = logging.getLogger(__name__)
 openml_logger = logging.getLogger("openml")
 console_handler: logging.StreamHandler | None = None
@@ -206,6 +208,8 @@ def set_retry_policy(value: Literal["human", "robot"], n_retries: int | None = N
     retry_policy = value
     connection_n_retries = default_retries_by_policy[value] if n_retries is None else n_retries
 
+    _sync_api_config()
+
 
 class ConfigurationForExamples:
     """Allows easy switching to and from a test configuration, used for examples."""
@@ -244,6 +248,8 @@ class ConfigurationForExamples:
             stacklevel=2,
         )
 
+        _sync_api_config()
+
     @classmethod
     def stop_using_configuration_for_example(cls) -> None:
         """Return to configuration as it was before `start_use_example_configuration`."""
@@ -261,6 +267,8 @@ class ConfigurationForExamples:
         server = cast("str", cls._last_used_server)
         apikey = cast("str", cls._last_used_key)
         cls._start_last_called = False
+
+        _sync_api_config()
 
 
 def _handle_xdg_config_home_backwards_compatibility(
@@ -374,6 +382,8 @@ def _setup(config: _Config | None = None) -> None:
         short_cache_dir = Path(config["cachedir"])
     _root_cache_directory = short_cache_dir.expanduser().resolve()
 
+    _sync_api_config()
+
     try:
         cache_exists = _root_cache_directory.exists()
         # create the cache subdirectory
@@ -407,6 +417,8 @@ def set_field_in_config_file(field: str, value: Any) -> None:
             value = globals()[f] if f == field else config.get(f)  # type: ignore
             if value is not None:
                 fh.write(f"{f} = {value}\n")
+
+    _sync_api_config()
 
 
 def _parse_config(config_file: str | Path) -> _Config:
@@ -495,6 +507,8 @@ def set_root_cache_directory(root_cache_directory: str | Path) -> None:
     global _root_cache_directory  # noqa: PLW0603
     _root_cache_directory = Path(root_cache_directory)
 
+    _sync_api_config()
+
 
 start_using_configuration_for_example = (
     ConfigurationForExamples.start_using_configuration_for_example
@@ -512,6 +526,28 @@ def overwrite_config_context(config: dict[str, Any]) -> Iterator[_Config]:
     yield merged_config  # type: ignore
 
     _setup(existing_config)
+
+
+def _sync_api_config() -> None:
+    """Sync the new API config with the legacy config in this file."""
+    from ._api import APIBackend
+
+    p = urlparse(server)
+    v1_server = f"{p.scheme}://{p.netloc}/"
+    v1_base_url = p.path.lstrip("/")
+    connection_retry_policy = RetryPolicy.HUMAN if retry_policy == "human" else RetryPolicy.ROBOT
+    cache_dir = str(_root_cache_directory)
+
+    APIBackend.set_config_values(
+        {
+            "api_configs.v1.server": v1_server,
+            "api_configs.v1.base_url": v1_base_url,
+            "api_configs.v1.api_key": apikey,
+            "cache.dir": cache_dir,
+            "connection.retry_policy": connection_retry_policy,
+            "connection.retries": connection_n_retries,
+        }
+    )
 
 
 __all__ = [

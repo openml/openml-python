@@ -15,7 +15,6 @@ import xmltodict
 import openml
 import openml._api_calls
 import openml.utils
-from openml._api import api_context
 from openml.evaluations import OpenMLEvaluation
 
 
@@ -308,7 +307,7 @@ def list_estimation_procedures() -> list[str]:
     -------
     list
     """
-    return api_context.backend.estimation_procedures.list()
+    return openml._backend.estimation_procedure.list()
 
 
 def list_evaluations_setups(

@@ -16,7 +16,7 @@ import xmltodict
 from requests import Response
 
 from openml.__version__ import __version__
-from openml._api.config import RetryPolicy
+from openml.enums import RetryPolicy
 from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerError,
@@ -116,7 +116,7 @@ class HTTPClient:
         server: str,
         base_url: str,
         api_key: str,
-        timeout: int,
+        timeout_seconds: int,
         retries: int,
         retry_policy: RetryPolicy,
         cache: HTTPCache | None = None,
@@ -124,7 +124,7 @@ class HTTPClient:
         self.server = server
         self.base_url = base_url
         self.api_key = api_key
-        self.timeout = timeout
+        self.timeout_seconds = timeout_seconds
         self.retries = retries
         self.retry_policy = retry_policy
         self.cache = cache
@@ -322,6 +322,7 @@ class HTTPClient:
         path: str,
         *,
         use_cache: bool = False,
+        reset_cache: bool = False,
         use_api_key: bool = False,
         **request_kwargs: Any,
     ) -> Response:
@@ -342,10 +343,10 @@ class HTTPClient:
         headers = request_kwargs.pop("headers", {}).copy()
         headers.update(self.headers)
 
-        timeout = request_kwargs.pop("timeout", self.timeout)
+        timeout = request_kwargs.pop("timeout", self.timeout_seconds)
         files = request_kwargs.pop("files", None)
 
-        if use_cache and self.cache is not None:
+        if use_cache and not reset_cache and self.cache is not None:
             cache_key = self.cache.get_key(url, params)
             try:
                 return self.cache.load(cache_key)
@@ -379,6 +380,7 @@ class HTTPClient:
         assert response is not None
 
         if use_cache and self.cache is not None:
+            cache_key = self.cache.get_key(url, params)
             self.cache.save(cache_key, response)
 
         return response
@@ -388,6 +390,7 @@ class HTTPClient:
         path: str,
         *,
         use_cache: bool = False,
+        reset_cache: bool = False,
         use_api_key: bool = False,
         **request_kwargs: Any,
     ) -> Response:
@@ -395,6 +398,7 @@ class HTTPClient:
             method="GET",
             path=path,
             use_cache=use_cache,
+            reset_cache=reset_cache,
             use_api_key=use_api_key,
             **request_kwargs,
         )

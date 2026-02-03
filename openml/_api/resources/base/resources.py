@@ -2,39 +2,50 @@ from __future__ import annotations
 
 import builtins
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-from openml._api.resources.base import ResourceAPI, ResourceType
+from openml.enums import ResourceType
 
-if TYPE_CHECKING:
-    from requests import Response
-
-    from openml.datasets.dataset import OpenMLDataset
-    from openml.tasks.task import OpenMLTask
+from .base import ResourceAPI
 
 
-class DatasetsAPI(ResourceAPI):
+class DatasetAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.DATASET
 
-    @abstractmethod
-    def get(self, dataset_id: int) -> OpenMLDataset | tuple[OpenMLDataset, Response]: ...
 
-
-class TasksAPI(ResourceAPI):
+class TaskAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.TASK
 
-    @abstractmethod
-    def get(
-        self,
-        task_id: int,
-        *,
-        return_response: bool = False,
-    ) -> OpenMLTask | tuple[OpenMLTask, Response]: ...
+
+class EvaluationMeasureAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.EVALUATION_MEASURE
 
 
-class EstimationProceduresAPI(ResourceAPI):
+class EstimationProcedureAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.ESTIMATION_PROCEDURE
+
     @abstractmethod
     def list(self) -> list[str]: ...
 
     @abstractmethod
     def _get_details(self) -> builtins.list[dict[str, Any]]: ...
+
+
+class EvaluationAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.EVALUATION
+
+
+class FlowAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.FLOW
+
+
+class StudyAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.STUDY
+
+
+class RunAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.RUN
+
+
+class SetupAPI(ResourceAPI):
+    resource_type: ResourceType = ResourceType.SETUP
