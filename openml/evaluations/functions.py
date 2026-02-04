@@ -5,8 +5,8 @@ from __future__ import annotations
 import json
 from functools import partial
 from itertools import chain
-from typing import Any
-from typing_extensions import Literal, overload
+from typing import Any, Literal
+from typing_extensions import overload
 
 import numpy as np
 import pandas as pd
@@ -228,7 +228,7 @@ def __list_evaluations(api_call: str) -> list[OpenMLEvaluation]:
     # Minimalistic check if the XML is useful
     if "oml:evaluations" not in evals_dict:
         raise ValueError(
-            "Error in return XML, does not contain " f'"oml:evaluations": {evals_dict!s}',
+            f'Error in return XML, does not contain "oml:evaluations": {evals_dict!s}',
         )
 
     assert isinstance(evals_dict["oml:evaluations"]["oml:evaluation"], list), type(
@@ -339,7 +339,7 @@ def list_evaluations_setups(
     tag: str | None = None,
     per_fold: bool | None = None,
     sort_order: str | None = None,
-    parameters_in_separate_columns: bool = False,  # noqa: FBT001, FBT002
+    parameters_in_separate_columns: bool = False,  # noqa: FBT002
 ) -> pd.DataFrame:
     """List all run-evaluation pairs matching all of the given filters
     and their hyperparameter settings.

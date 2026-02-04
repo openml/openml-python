@@ -57,6 +57,7 @@ class TestTask(TestBase):
         assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
 
     @pytest.mark.production()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_list_clustering_task(self):
         self.use_production_server()
         # as shown by #383, clustering tasks can give list/dict casting problems

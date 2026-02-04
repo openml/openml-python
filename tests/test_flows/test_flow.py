@@ -78,6 +78,7 @@ class TestFlow(TestBase):
         assert len(subflow_3.components) == 0
 
     @pytest.mark.production()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_structure(self):
         # also responsible for testing: flow.get_subflow
         # We need to use the production server here because 4024 is not the

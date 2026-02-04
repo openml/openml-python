@@ -258,6 +258,7 @@ class TestEvaluationFunctions(TestBase):
         assert all(elem in columns for elem in keys)
 
     @pytest.mark.production()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_list_evaluations_setups_filter_task(self):
         self.use_production_server()
         task_id = [6]

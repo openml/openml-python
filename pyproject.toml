@@ -141,7 +141,7 @@ markers = [
 
 # https://github.com/charliermarsh/ruff
 [tool.ruff]
-target-version = "py38"
+target-version = "py310"
 line-length = 100
 output-format = "grouped"
 src = ["openml", "tests", "examples"]
@@ -274,9 +274,11 @@ ignore = [
   "S101",    # Use of assert detected.
   "W292",    # No newline at end of file
   "PLC1901", # "" can be simplified to be falsey
-  "TCH003",  # Move stdlib import into TYPE_CHECKING
+  "TC003",  # Move stdlib import into TYPE_CHECKING
   "COM812",  # Trailing comma missing (handled by linter, ruff recommend disabling if using formatter)
   "N803",    # Argument should be lowercase (but we accept things like `X`)
+  "PLC0415", # Allow imports inside functions / non-top-level scope
+  "FBT001",  # Allow Boolean-typed positional argument in function definition
 
   # TODO(@eddibergman): These should be enabled
   "D100",    # Missing docstring in public module
@@ -307,7 +309,7 @@ force-wrap-aliases = true
 convention = "numpy"
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.10"
 packages = ["openml", "tests"]
 
 show_error_codes = true

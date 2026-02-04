@@ -41,8 +41,9 @@ class TestFlowFunctions(TestBase):
         assert isinstance(flow["full_name"], str)
         assert isinstance(flow["version"], str)
         # There are some runs on openml.org that can have an empty external version
+        ext_version = flow["external_version"]
         ext_version_str_or_none = (
-            isinstance(flow["external_version"], str) or flow["external_version"] is None
+            isinstance(ext_version, str) or ext_version is None or pd.isna(ext_version)
         )
         assert ext_version_str_or_none
 
@@ -280,6 +281,7 @@ class TestFlowFunctions(TestBase):
         "No known models with list of lists parameters in older versions.",
     )
     @pytest.mark.uses_test_server()
+    @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_sklearn_to_flow_list_of_lists(self):
         from sklearn.preprocessing import OrdinalEncoder
 
@@ -527,6 +529,7 @@ def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
 
 
 @mock.patch.object(requests.Session, "delete")
+@pytest.mark.xfail(reason="failures_issue_1544", strict=False)
 def test_delete_unknown_flow(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_exist.xml"

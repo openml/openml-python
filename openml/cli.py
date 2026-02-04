@@ -5,11 +5,12 @@ from __future__ import annotations
 import argparse
 import string
 import sys
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable
 from urllib.parse import urlparse
 
 from openml import config
+from openml.__version__ import __version__
 
 
 def is_hex(string_: str) -> bool:
@@ -331,6 +332,13 @@ def main() -> None:
     subroutines = {"configure": configure}
 
     parser = argparse.ArgumentParser()
+    # Add a global --version flag to display installed version and exit
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
+        help="Show the OpenML version and exit",
+    )
     subparsers = parser.add_subparsers(dest="subroutine")
 
     parser_configure = subparsers.add_parser(

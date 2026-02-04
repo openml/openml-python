@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 import webbrowser
 from abc import ABC, abstractmethod
-from typing import Iterable, Sequence
+from collections.abc import Iterable, Sequence
 
 import xmltodict
 
