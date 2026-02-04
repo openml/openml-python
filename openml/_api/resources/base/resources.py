@@ -42,7 +42,6 @@ class FlowAPI(ResourceAPI):
     @abstractmethod
     def list(
         self,
-        *,
         limit: int | None = None,
         offset: int | None = None,
         tag: str | None = None,

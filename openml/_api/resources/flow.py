@@ -76,7 +76,6 @@ class FlowV1API(ResourceV1API, FlowAPI):
 
     def list(
         self,
-        *,
         limit: int | None = None,
         offset: int | None = None,
         tag: str | None = None,
