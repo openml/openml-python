@@ -41,8 +41,9 @@ class TestFlowFunctions(TestBase):
         assert isinstance(flow["full_name"], str)
         assert isinstance(flow["version"], str)
         # There are some runs on openml.org that can have an empty external version
+        ext_version = flow["external_version"]
         ext_version_str_or_none = (
-            isinstance(flow["external_version"], str) or flow["external_version"] is None
+            isinstance(ext_version, str) or ext_version is None or pd.isna(ext_version)
         )
         assert ext_version_str_or_none
 
