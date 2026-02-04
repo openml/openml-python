@@ -38,10 +38,9 @@ class TestEvaluationV2(TestAPIBase):
     def setUp(self) -> None:    
         super().setUp() 
         self.client = self._get_http_client(
-            server="",
+            server="http://localhost:8001/",
             base_url="",
             api_key="",
-            timeout_seconds=self.timeout_seconds,
             retries=self.retries,
             retry_policy=self.retry_policy,
             cache=self.cache,
@@ -54,10 +53,9 @@ class TestEvaluationsCombined(TestAPIBase):
         super().setUp()
         self.v1_client = self.http_client
         self.v2_client = self._get_http_client(
-            server="",
+            server="http://localhost:8001/",
             base_url="",
             api_key="",
-            timeout_seconds=self.timeout_seconds,
             retries=self.retries,
             retry_policy=self.retry_policy,
             cache=self.cache,
