@@ -95,7 +95,9 @@ def populate_cache(
 
 
 __all__ = [
+    "OpenMLBenchmarkSuite",
     "OpenMLClassificationTask",
+    "OpenMLClusteringTask",
     "OpenMLDataFeature",
     "OpenMLDataset",
     "OpenMLEvaluation",
@@ -105,6 +107,7 @@ __all__ = [
     "OpenMLParameter",
     "OpenMLRegressionTask",
     "OpenMLRun",
+    "OpenMLSetup",
     "OpenMLSplit",
     "OpenMLStudy",
     "OpenMLSupervisedTask",
