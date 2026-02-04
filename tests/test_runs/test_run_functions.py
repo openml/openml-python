@@ -1096,6 +1096,59 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
+    def test_run_flow_on_task_basic(self):
+        """Test that run_flow_on_task executes successfully with basic flow and task."""
+        # construct sci-kit learn classifier
+        clf = Pipeline(
+            steps=[
+                ("imputer", SimpleImputer(strategy="most_frequent")),
+                ("encoder", OneHotEncoder(handle_unknown="ignore")),
+                ("estimator", RandomForestClassifier(n_estimators=5, random_state=42)),
+            ],
+        )
+
+        # convert model to flow
+        flow = self.extension.model_to_flow(clf)
+
+        task = openml.tasks.get_task(119) 
+
+        run = openml.runs.run_flow_on_task(
+            flow=flow,
+            task=task,
+            upload_flow=False,
+        )
+
+        # verify run was created successfully
+        assert run.task_id == task.task_id
+        assert run.flow_name == flow.name
+        assert run.dataset_id == task.dataset_id
+        assert run.data_content is not None
+        assert len(run.data_content) > 0
+
+    @pytest.mark.sklearn()
+    @pytest.mark.uses_test_server()
+    def test_run_flow_on_task_with_flow_tags(self):
+        """Test run_flow_on_task with custom flow tags (for the flow, not the run)."""
+        clf = RandomForestClassifier(n_estimators=5, random_state=42)
+        flow = self.extension.model_to_flow(clf)
+        task = openml.tasks.get_task(119)
+
+        # invoke run_flow_on_task with custom flow tags
+        # Note: flow_tags are tags for the flow object, not the run
+        run = openml.runs.run_flow_on_task(
+            flow=flow,
+            task=task,
+            flow_tags=["test_flow_tag_1", "test_flow_tag_2"],
+            upload_flow=False,
+        )
+
+        # verify run was created successfully
+        assert run.task_id == task.task_id
+        assert run.flow_name == flow.name
+        assert run.data_content is not None
+
     @pytest.mark.production()
     def test_online_run_metric_score(self):
         self.use_production_server()
