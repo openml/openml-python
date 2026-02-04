@@ -286,7 +286,6 @@ class TestAPIBase(unittest.TestCase):
     server: str
     base_url: str
     api_key: str
-    timeout_seconds: int
     retries: int
     retry_policy: RetryPolicy
     dir: str
@@ -298,7 +297,6 @@ class TestAPIBase(unittest.TestCase):
         self.server = "https://test.openml.org/"
         self.base_url = "api/v1/xml"
         self.api_key = "normaluser"
-        self.timeout_seconds = 10
         self.retries = 3
         self.retry_policy = RetryPolicy.HUMAN
         self.dir = "test_cache"
@@ -312,7 +310,6 @@ class TestAPIBase(unittest.TestCase):
             server=self.server,
             base_url=self.base_url,
             api_key=self.api_key,
-            timeout_seconds=self.timeout_seconds,
             retries=self.retries,
             retry_policy=self.retry_policy,
             cache=self.cache,
@@ -341,7 +338,6 @@ class TestAPIBase(unittest.TestCase):
         server: str,
         base_url: str,
         api_key: str,
-        timeout_seconds: int,
         retries: int,
         retry_policy: RetryPolicy,
         cache: HTTPCache | None = None,
@@ -350,7 +346,6 @@ class TestAPIBase(unittest.TestCase):
             server=server,
             base_url=base_url,
             api_key=api_key,
-            timeout_seconds=timeout_seconds,
             retries=retries,
             retry_policy=retry_policy,
             cache=cache,
