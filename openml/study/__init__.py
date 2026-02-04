@@ -19,8 +19,8 @@ from .functions import (
 from .study import OpenMLBenchmarkSuite, OpenMLStudy
 
 __all__ = [
-    "OpenMLStudy",
     "OpenMLBenchmarkSuite",
+    "OpenMLStudy",
     "attach_to_study",
     "attach_to_suite",
     "create_benchmark_suite",
@@ -33,6 +33,6 @@ __all__ = [
     "get_suite",
     "list_studies",
     "list_suites",
-    "update_suite_status",
     "update_study_status",
+    "update_suite_status",
 ]
