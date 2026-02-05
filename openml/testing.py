@@ -281,52 +281,42 @@ class TestBase(unittest.TestCase):
                         assert evaluation <= max_val
 
 
-class TestAPIBase(unittest.TestCase):
-    retries: int
-    retry_policy: RetryPolicy
-    ttl: int
-    cache_dir: Path
+class TestAPIBase(TestBase):
     cache: HTTPCache
     http_clients: dict[APIVersion, HTTPClient]
     minio_client: MinIOClient
 
-    def setUp(self) -> None:
-        config = openml._backend.get_config()
+    def setUp(self, n_levels: int = 1, tmpdir_suffix: str = "") -> None:
+        super().setUp(n_levels=n_levels, tmpdir_suffix=tmpdir_suffix)
 
-        self.retries = config.connection.retries
-        self.retry_policy = config.connection.retry_policy
-        self.ttl = config.cache.ttl
-
-        abspath_this_file = Path(inspect.getfile(self.__class__)).absolute()
-        self.cache_dir = abspath_this_file.parent.parent / "files"
-        if not self.cache_dir.is_dir():
-            raise ValueError(
-                f"Cannot find test cache dir, expected it to be {self.cache_dir}!",
-            )
+        retries = self.connection_n_retries
+        retry_policy = RetryPolicy.HUMAN if self.retry_policy == "human" else RetryPolicy.ROBOT
+        ttl = openml._backend.get_config_value("cache.ttl")
+        cache_dir = self.static_cache_dir
 
         self.cache = HTTPCache(
-            path=self.cache_dir,
-            ttl=self.ttl,
+            path=cache_dir,
+            ttl=ttl,
         )
         self.http_clients = {
             APIVersion.V1: HTTPClient(
                 server="https://test.openml.org/",
                 base_url="api/v1/xml/",
                 api_key="normaluser",
-                retries=self.retries,
-                retry_policy=self.retry_policy,
+                retries=retries,
+                retry_policy=retry_policy,
                 cache=self.cache,
             ),
             APIVersion.V2: HTTPClient(
                 server="http://localhost:8002/",
                 base_url="",
                 api_key="",
-                retries=self.retries,
-                retry_policy=self.retry_policy,
+                retries=retries,
+                retry_policy=retry_policy,
                 cache=self.cache,
             ),
         }
-        self.minio_client = MinIOClient(path=self.cache_dir)
+        self.minio_client = MinIOClient(path=cache_dir)
 
 
 def check_task_existence(
