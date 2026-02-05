@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import builtins
+
 import pandas as pd
 import xmltodict
 
@@ -13,7 +15,7 @@ class StudyV1API(ResourceV1API, StudyAPI):
         offset: int | None = None,
         status: str | None = None,
         main_entity_type: str | None = None,
-        uploader: list[int] | None = None,
+        uploader: builtins.list[int] | None = None,
         benchmark_suite: int | None = None,
     ) -> pd.DataFrame:
         """List studies using V1 API.
@@ -38,7 +40,49 @@ class StudyV1API(ResourceV1API, StudyAPI):
         pd.DataFrame
             DataFrame containing study information.
         """
-        # Build the V1 API call string
+        api_call = self._build_url(
+            limit=limit,
+            offset=offset,
+            status=status,
+            main_entity_type=main_entity_type,
+            uploader=uploader,
+            benchmark_suite=benchmark_suite,
+        )
+        response = self._http.get(api_call)
+        xml_string = response.content.decode("utf-8")
+        return self._parse_list_xml(xml_string)
+
+    def _build_url(  # noqa: PLR0913
+        self,
+        limit: int | None = None,
+        offset: int | None = None,
+        status: str | None = None,
+        main_entity_type: str | None = None,
+        uploader: builtins.list[int] | None = None,
+        benchmark_suite: int | None = None,
+    ) -> str:
+        """Build the V1 API URL for listing studies.
+
+        Parameters
+        ----------
+        limit : int, optional
+            Maximum number of studies to return.
+        offset : int, optional
+            Number of studies to skip.
+        status : str, optional
+            Filter by status (active, in_preparation, deactivated, all).
+        main_entity_type : str, optional
+            Filter by main entity type (run, task).
+        uploader : list[int], optional
+            Filter by uploader IDs.
+        benchmark_suite : int, optional
+            Filter by benchmark suite ID.
+
+        Returns
+        -------
+        str
+            The API call string with all filters applied.
+        """
         api_call = "study/list"
 
         if limit is not None:
@@ -54,11 +98,21 @@ class StudyV1API(ResourceV1API, StudyAPI):
         if benchmark_suite is not None:
             api_call += f"/benchmark_suite/{benchmark_suite}"
 
-        # Make the GET request
-        response = self._http.get(api_call)
-        xml_string = response.content.decode("utf-8")
+        return api_call
 
-        # Parse XML and convert to DataFrame
+    def _parse_list_xml(self, xml_string: str) -> pd.DataFrame:
+        """Parse the XML response from study list API.
+
+        Parameters
+        ----------
+        xml_string : str
+            The XML response from the API.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame containing study information.
+        """
         study_dict = xmltodict.parse(xml_string, force_list=("oml:study",))
 
         # Minimalistic check if the XML is useful
@@ -100,7 +154,7 @@ class StudyV2API(ResourceV2API, StudyAPI):
         offset: int | None = None,  # noqa: ARG002
         status: str | None = None,  # noqa: ARG002
         main_entity_type: str | None = None,  # noqa: ARG002
-        uploader: list[int] | None = None,  # noqa: ARG002
+        uploader: builtins.list[int] | None = None,  # noqa: ARG002
         benchmark_suite: int | None = None,  # noqa: ARG002
     ) -> pd.DataFrame:
         """V2 API for listing studies is not yet available."""
