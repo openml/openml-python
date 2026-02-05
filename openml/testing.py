@@ -289,7 +289,6 @@ class TestAPIBase(unittest.TestCase):
     cache: HTTPCache
     http_clients: dict[APIVersion, HTTPClient]
     minio_client: MinIOClient
-    current_api_version: APIVersion | None
 
     def setUp(self) -> None:
         config = openml._backend.get_config()
@@ -297,7 +296,6 @@ class TestAPIBase(unittest.TestCase):
         self.retries = config.connection.retries
         self.retry_policy = config.connection.retry_policy
         self.ttl = config.cache.ttl
-        self.current_api_version = None
 
         abspath_this_file = Path(inspect.getfile(self.__class__)).absolute()
         self.cache_dir = abspath_this_file.parent.parent / "files"
