@@ -9,9 +9,8 @@ from openml.exceptions import PyOpenMLError
 from openml.extensions.base import (
     ModelSerializer,
     ModelExecutor,
-    OpenMLAPIConnector,
 )
-from openml.extensions.registry import resolve_api_connector
+from openml.extensions.registry import resolve_serializer, resolve_executor
 
 
 class TestModelSerializer:
@@ -92,56 +91,3 @@ class TestModelExecutor:
 
         assert executor.seed_model("model", 42) == "model"
         assert executor.check_if_model_fitted("model") is False
-        assert executor.obtain_parameter_values("flow") == []
-
-
-class TestOpenMLAPIConnector:
-    """Test OpenMLAPIConnector abstract base class."""
-
-    def test_is_abstract(self):
-        """OpenMLAPIConnector should not be instantiable."""
-        with pytest.raises(TypeError):
-            OpenMLAPIConnector()  # noqa: B024
-
-    class DummySerializer:
-        pass
-
-    class DummyExecutor:
-        pass
-
-    class DummyConnector(OpenMLAPIConnector):
-        def serializer(self):
-            return TestOpenMLAPIConnector.DummySerializer()
-
-        def executor(self):
-            return TestOpenMLAPIConnector.DummyExecutor()
-
-        @classmethod
-        def supports(cls, estimator):
-            return estimator == "supported"
-
-    def test_concrete_implementation(self):
-        connector = self.DummyConnector()
-
-        assert isinstance(connector.serializer(), self.DummySerializer)
-        assert isinstance(connector.executor(), self.DummyExecutor)
-        assert self.DummyConnector.supports("supported") is True
-        assert self.DummyConnector.supports("unsupported") is False
-
-    def test_resolve_api_connector_success(self, monkeypatch):
-        monkeypatch.setattr(
-            "openml.extensions.registry.API_CONNECTOR_REGISTRY",
-            [self.DummyConnector],
-        )
-
-        connector = resolve_api_connector("supported")
-        assert isinstance(connector, self.DummyConnector)
-
-    def test_resolve_api_connector_no_match(self, monkeypatch):
-        monkeypatch.setattr(
-            "openml.extensions.registry.API_CONNECTOR_REGISTRY",
-            [],
-        )
-
-        with pytest.raises(PyOpenMLError, match="No OpenML API connector supports"):
-            resolve_api_connector("anything")

@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from openml.extensions.registry import resolve_api_connector
+from openml.extensions.registry import resolve_serializer
 
 if TYPE_CHECKING:
     from openml.flows import OpenMLFlow
@@ -35,8 +35,8 @@ def flow_to_estimator(
     estimator_instance : Any
         The corresponding estimator instance.
     """
-    connector = resolve_api_connector(flow)
-    return connector.serializer().flow_to_model(
+    serializer = resolve_serializer(flow)
+    return serializer.flow_to_model(
         flow,
         initialize_with_defaults=initialize_with_defaults,
         strict_version=strict_version,
@@ -56,5 +56,5 @@ def estimator_to_flow(estimator_instance: Any) -> OpenMLFlow:
     flow : openml.flows.OpenMLFlow
         The corresponding OpenML flow.
     """
-    connector = resolve_api_connector(estimator_instance)
-    return connector.serializer().model_to_flow(estimator_instance)
+    serializer = resolve_serializer(estimator_instance)
+    return serializer.model_to_flow(estimator_instance)

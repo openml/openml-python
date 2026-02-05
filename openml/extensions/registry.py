@@ -1,6 +1,6 @@
 # License: BSD 3-Clause
 
-"""Extension registry."""
+"""Extension registries for serializers and executors."""
 
 from __future__ import annotations
 
@@ -9,41 +9,88 @@ from typing import TYPE_CHECKING, Any
 from openml.exceptions import PyOpenMLError
 
 if TYPE_CHECKING:
-    from openml.extensions.base import OpenMLAPIConnector
-
-API_CONNECTOR_REGISTRY: list[type[OpenMLAPIConnector]] = [
-    # Add OpenMLAPIConnector subclasses here to register them
-]
+    from openml.extensions.base import ModelExecutor, ModelSerializer
 
 
-def resolve_api_connector(estimator: Any) -> OpenMLAPIConnector:
+SERIALIZER_REGISTRY: list[type[ModelSerializer]] = []
+EXECUTOR_REGISTRY: list[type[ModelExecutor]] = []
+
+
+def register_serializer(cls: type[ModelSerializer]) -> type[ModelSerializer]:
+    """Register a serializer class."""
+    SERIALIZER_REGISTRY.append(cls)
+    return cls
+
+
+def register_executor(cls: type[ModelExecutor]) -> type[ModelExecutor]:
+    """Register an executor class."""
+    EXECUTOR_REGISTRY.append(cls)
+    return cls
+
+
+def resolve_serializer(estimator: Any) -> ModelSerializer:
     """
-    Identify and return the appropriate OpenML API connector for a given estimator.
-
-    This function iterates through the global ``API_CONNECTOR_REGISTRY`` to find
-    a connector class that supports the provided estimator instance or OpenML flow.
-    If a matching connector is found, it is instantiated and returned.
+    Identify and return the appropriate serializer for a given estimator.
 
     Parameters
     ----------
     estimator : Any
-        The estimator instance (e.g., a scikit-learn estimator) or OpenML flow for
-        which an API connector is required.
+        The estimator instance (e.g., sklearn estimator, sktime estimator).
 
     Returns
     -------
-    OpenMLAPIConnector
-        An instance of the matching API connector.
+    ModelSerializer
+        An instance of the matching serializer.
 
     Raises
     ------
-    OpenMLException
-        If no connector is found in the registry that supports the provided
-        model, or if multiple connectors in the registry claim support for
-        the provided model.
+    PyOpenMLError
+        If no serializer supports the estimator or if multiple serializers match.
     """
-    for connector_cls in API_CONNECTOR_REGISTRY:
-        if connector_cls.supports(estimator):
-            return connector_cls()
+    matches = [
+        serializer_cls
+        for serializer_cls in SERIALIZER_REGISTRY
+        if serializer_cls.can_handle_model(estimator)
+    ]
 
-    raise PyOpenMLError("No OpenML API connector supports this estimator.")
+    if len(matches) == 1:
+        return matches[0]()
+
+    if len(matches) > 1:
+        raise PyOpenMLError("Multiple serializers support this estimator.")
+
+    raise PyOpenMLError("No serializer supports this estimator.")
+
+
+def resolve_executor(estimator: Any) -> ModelExecutor:
+    """
+    Identify and return the appropriate executor for a given estimator.
+
+    Parameters
+    ----------
+    estimator : Any
+        The estimator instance.
+
+    Returns
+    -------
+    ModelExecutor
+        An instance of the matching executor.
+
+    Raises
+    ------
+    PyOpenMLError
+        If no executor supports the estimator or if multiple executors match.
+    """
+    matches = [
+        executor_cls
+        for executor_cls in EXECUTOR_REGISTRY
+        if executor_cls.can_handle_model(estimator)
+    ]
+
+    if len(matches) == 1:
+        return matches[0]()
+
+    if len(matches) > 1:
+        raise PyOpenMLError("Multiple executors support this estimator.")
+
+    raise PyOpenMLError("No executor supports this estimator.")
