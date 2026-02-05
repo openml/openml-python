@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
-from time import time
+import time
 
 from openml import OpenMLDataset
 import pytest
@@ -10,26 +10,19 @@ from openml.testing import TestAPIBase
 from openml._api.resources.dataset import DatasetV1API, DatasetV2API
 
 
+@pytest.mark.uses_test_server()
 class TestDatasetV1API(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.client = self._get_http_client(
-            server=self.server,
-            base_url=self.base_url,
-            api_key=self.api_key,
-            timeout=self.timeout,
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-            cache=self.cache
-        )
-        self.dataset = DatasetV1API(self.client,self.minio_client)
+
+        self.dataset = DatasetV1API(self.http_client,self.minio_client)
     
-    @pytest.mark.uses_test_server()
+
     def test_get(self):
         output = self.dataset.get(2)
         assert output.dataset_id == 2
 
-    @pytest.mark.uses_test_server()
+
     def test_list(self):
         output =self.dataset.list(limit=2, offset=0, status="active")
         assert not output.empty
@@ -37,43 +30,43 @@ class TestDatasetV1API(TestAPIBase):
         assert (output["status"].nunique() == 1)
         assert (output["status"].unique()[0] == "active")
 
-    @pytest.mark.uses_test_server()
+
     def test_download_arff_from_get(self):
         output = self.dataset.get(2,download_data=True)
 
         assert output.data_file != None
         assert Path(output.data_file).exists()
 
-    @pytest.mark.uses_test_server()
+
     def test_download_qualities_from_get(self):
         output = self.dataset.get(2,download_qualities=True)
 
         assert output._qualities is not None
     
-    @pytest.mark.uses_test_server()
+
     def test_download_features_from_get(self):
         output = self.dataset.get(2,download_features_meta_data=True)
 
         assert output._features is not None
 
-    @pytest.mark.uses_test_server()
+
     def test_get_features(self):
         output = self.dataset.get_features(2)
 
         assert isinstance(output,dict)
         assert len(output.keys()) == 37
 
-    @pytest.mark.uses_test_server()
+
     def test_get_qualities(self):
         output = self.dataset.get_qualities(2)
 
         assert isinstance(output,dict)
         assert len(output.keys()) == 19
 
-    @pytest.mark.uses_test_server()
+
     def test_status_update(self):
         dataset = OpenMLDataset(
-            f"TEST-{str(time())}-UploadTestWithURL",
+            f"TEST-{str(time.time())}-UploadTestWithURL",
             "test",
             "ARFF",
             version=1,
@@ -101,53 +94,96 @@ class TestDatasetV1API(TestAPIBase):
 
         assert self.dataset.delete(dataset_id)
 
-    @pytest.mark.uses_test_server()
-    def test_edit(self):pass
 
-    @pytest.mark.uses_test_server()
-    def test_fork(self):pass
+    def test_edit(self):
+        did = 2
+        result = self.dataset.fork(did)
+        self._wait_for_dataset_being_processed([did,result])
 
-    @pytest.mark.uses_test_server()
+        edited_did = self.dataset.edit(result,description="Forked dataset", default_target_attribute="shape")
+        assert result == edited_did
+        n_tries = 10
+        # we need to wait for the edit to be reflected on the server
+        for i in range(n_tries):
+            edited_dataset = self.dataset.get(result,force_refresh_cache=True)
+            try:
+                assert edited_dataset.default_target_attribute == "shape", edited_dataset
+                assert edited_dataset.description == "Forked dataset", edited_dataset
+                break
+            except AssertionError as e:
+                if i == n_tries - 1:
+                    raise e
+                time.sleep(10)
+
+
+    def test_fork(self):
+        did = 2
+        result = self.dataset.fork(did)
+        assert did != result
+        # wait for processing
+        self._wait_for_dataset_being_processed([did,result])
+
+        listing = self.dataset.list(limit=2,offset=0,data_id=[did,result])
+        assert listing.iloc[0]["name"] == listing.iloc[1]["name"]
+
+        self.dataset.delete(result)
+
+    def _wait_for_dataset_being_processed(self,dids,n_tries=10,wait_time=10):
+        for i in range(n_tries):
+            time.sleep(wait_time)
+            listing = self.dataset.list(limit=2,offset=0,data_id=dids)
+            if listing.shape[0] == 2:
+                return
+        raise TimeoutError("Dataset did not become active within given time")
+
+
     def test_list_qualities(self):
         output = self.dataset.list_qualities()
         assert len(output) == 19
         assert isinstance(output[0],str)
 
-    @pytest.mark.uses_test_server()
+
     def test_feature_add_remove_ontology(self):
         did = 11
         fid = 0
-        ontology = "https://www.openml.org/unittest/" + str(time())
+        ontology = "https://www.openml.org/unittest/" + str(time.time())
         output = self.dataset.feature_add_ontology(did,fid,ontology)
         assert output
 
         output = self.dataset.feature_remove_ontology(did,fid,ontology)
         assert output
 
-    @pytest.mark.uses_test_server()
-    def test_add_remove_topic(self):pass
+
+    def test_add_delete_topic(self):
+        topic = f"test_topic_{str(time.time())}"
+        # only admin can add or delete topics
+        self.api_key = self.dataset._http.api_key = self.admin_key
+
+        self.dataset.add_topic(31, topic)
+        self.dataset.delete_topic(31, topic)
 
 
+@pytest.mark.uses_test_server()
 class TestDatasetV2API(TestAPIBase):
     def setUp(self):
         super().setUp()
         self.client = self._get_http_client(
             server="http://127.0.0.1:8001/",
             base_url="",
-            api_key="",
-            timeout=self.timeout,
+            api_key="AD000000000000000000000000000000",
+            timeout_seconds=self.timeout_seconds,
             retries=self.retries,
             retry_policy=self.retry_policy,
             cache=self.cache
         )
         self.dataset = DatasetV2API(self.client,self.minio_client)
     
-    @pytest.mark.uses_test_server()
+
     def test_get(self):
         output= self.dataset.get(2)
         assert output.dataset_id == 2
     
-    @pytest.mark.uses_test_server()
+
     def test_list(self):
         output =self.dataset.list(limit=2, offset=0, status="active")
         assert not output.empty
@@ -155,72 +191,64 @@ class TestDatasetV2API(TestAPIBase):
         assert (output["status"].nunique() == 1)
         assert (output["status"].unique()[0] == "active")
     
-    @pytest.mark.uses_test_server()
+
     def test_download_arff_from_get(self):
         output = self.dataset.get(2,download_data=True)
         
         assert output.data_file != None
         assert Path(output.data_file).exists()
 
-    @pytest.mark.uses_test_server()
+
     def test_download_qualities_from_get(self):
         output = self.dataset.get(2,download_qualities=True)
 
         assert output._qualities is not None
     
-    @pytest.mark.uses_test_server()
+
     def test_download_features_from_get(self):
         output = self.dataset.get(2,download_features_meta_data=True)
 
         assert output._features is not None
 
-    @pytest.mark.uses_test_server()
+
     def test_get_features(self):
         output = self.dataset.get_features(2)
 
         assert isinstance(output,dict)
         assert len(output.keys()) == 37
 
-    @pytest.mark.uses_test_server()
+
     def test_get_qualities(self):
         output = self.dataset.get_qualities(2)
 
         assert isinstance(output,dict)
         assert len(output.keys()) == 107
 
-    @pytest.mark.uses_test_server()
+
     def test_list_qualities(self):
         output = self.dataset.list_qualities()
         assert len(output) == 107
         assert isinstance(output[0],str)
 
 
+@pytest.mark.uses_test_server()
 class TestDatasetsCombined(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.v1_client = self._get_http_client(
-			server=self.server,
-			base_url=self.base_url,
-			api_key=self.api_key,
-			timeout=self.timeout,
-			retries=self.retries,
-			retry_policy=self.retry_policy,
-            cache=self.cache
-		)
         self.v2_client = self._get_http_client(
             server="http://127.0.0.1:8001/",
-            base_url="",
-            api_key="",
-            timeout=self.timeout,
+            base_url="AD000000000000000000000000000000",
+            api_key="abc",
+            timeout_seconds=self.timeout_seconds,
             retries=self.retries,
             retry_policy=self.retry_policy,
             cache=self.cache
         )
-        self.dataset_v1 = DatasetV1API(self.v1_client,self.minio_client)
+        self.dataset_v1 = DatasetV1API(self.http_client,self.minio_client)
         self.dataset_v2 = DatasetV2API(self.v2_client,self.minio_client)
         self.dataset_fallback = FallbackProxy(self.dataset_v1,self.dataset_v2)
     
-    @pytest.mark.uses_test_server()
+
     def test_get_matches(self):
         output_v1 = self.dataset_v1.get(2)
         output_v2 = self.dataset_v2.get(2)
@@ -230,20 +258,20 @@ class TestDatasetsCombined(TestAPIBase):
         assert output_v1.data_file is None
         assert output_v1.data_file == output_v2.data_file
     
-    @pytest.mark.uses_test_server()
+
     def test_get_fallback(self):
         output_fallback =  self.dataset_fallback.get(2)
         assert output_fallback.dataset_id == 2
 
+
     #TODO list has different structure compared to v1
-    @pytest.mark.uses_test_server()
     def test_list_matches(self):
         output_v1 = self.dataset_v1.list(limit=2, offset=1)
         output_v2 = self.dataset_v2.list(limit=2, offset=1)
 
         pd.testing.assert_series_equal(output_v1["did"],output_v2["did"])
     
-    @pytest.mark.uses_test_server()
+
     def test_list_fallback(self):
         output_fallback =self.dataset_fallback.list(limit=2, offset=0,data_id=[2,3])
 
@@ -251,7 +279,7 @@ class TestDatasetsCombined(TestAPIBase):
         assert output_fallback.shape[0] == 2
         assert set(output_fallback["did"]) == {2, 3}
 
-    @pytest.mark.uses_test_server()
+
     def test_get_features_matches(self):
         output_v1 = self.dataset_v1.get_features(3)
         output_v2 = self.dataset_v2.get_features(3)
@@ -260,14 +288,14 @@ class TestDatasetsCombined(TestAPIBase):
         # would not be same if v1 has ontology
         assert output_v1 == output_v2
 
-    @pytest.mark.uses_test_server()
+
     def test_get_features_fallback(self):
         output_fallback = self.dataset_fallback.get_features(2)
 
         assert isinstance(output_fallback,dict)
         assert len(output_fallback.keys()) == 37
 
-    @pytest.mark.uses_test_server()
+
     def test_get_qualities_matches(self):
         #TODO Qualities in local python server and test server differ
         output_v1 = self.dataset_v1.get_qualities(2)
@@ -275,14 +303,13 @@ class TestDatasetsCombined(TestAPIBase):
         assert output_v1['AutoCorrelation'] == output_v2['AutoCorrelation']
 
 
-    @pytest.mark.uses_test_server()
     def test_get_qualities_fallback(self):
         #TODO Qualities in local python server and test server differ
         output_fallback = self.dataset_fallback.get_qualities(2)
 
         assert isinstance(output_fallback,dict)
 
-    @pytest.mark.uses_test_server()
+
     def test_list_qualities_matches(self):
         #TODO Qualities in local python server and test server differ
         output_v1 = self.dataset_v1.list_qualities()
@@ -292,17 +319,16 @@ class TestDatasetsCombined(TestAPIBase):
         assert "AutoCorrelation" in output_v2
 
 
-    @pytest.mark.uses_test_server()
     def test_list_qualities_fallback(self):
         #TODO Qualities in local python server and test server differ
         output_fallback = self.dataset_fallback.list_qualities()
 
         assert isinstance(output_fallback,list)
 
-    @pytest.mark.uses_test_server()
+
     def test_status_update_fallback(self):
         dataset = OpenMLDataset(
-            f"TEST-{str(time())}-UploadTestWithURL",
+            f"TEST-{str(time.time())}-UploadTestWithURL",
             "test",
             "ARFF",
             version=1,
@@ -319,15 +345,39 @@ class TestDatasetsCombined(TestAPIBase):
 
         assert self.dataset_fallback.delete(dataset_id)
 
-    @pytest.mark.uses_test_server()
-    def test_edit_fallback(self):pass
 
-    @pytest.mark.uses_test_server()
-    def test_fork_fallback(self):pass
+    def test_edit_fallback(self):
+        did = 2
+        result = self.dataset_fallback.fork(did)
+        self._wait_for_dataset_being_processed([did,result])
 
-    @pytest.mark.uses_test_server()
+        edited_did = self.dataset_fallback.edit(result,description="Forked dataset", default_target_attribute="shape")
+        assert result == edited_did
+        n_tries = 10
+        # we need to wait for the edit to be reflected on the server
+        for i in range(n_tries):
+            edited_dataset = self.dataset_fallback.get(result,force_refresh_cache=True)
+            try:
+                assert edited_dataset.default_target_attribute == "shape", edited_dataset
+                assert edited_dataset.description == "Forked dataset", edited_dataset
+                break
+            except AssertionError as e:
+                if i == n_tries - 1:
+                    raise e
+                time.sleep(10)
+
+
+    def test_fork_fallback(self):
+        did = 2
+        result = self.dataset_fallback.fork(did)
+        assert did != result
+        self._wait_for_dataset_being_processed([did,result])
+        
+        self.dataset_fallback.delete(result)
+
+
     def test_feature_add_remove_ontology_fallback(self):
-        ontology = "https://www.openml.org/unittest/" + str(time())
+        ontology = "https://www.openml.org/unittest/" + str(time.time())
         output_fallback_add = self.dataset_fallback.feature_add_ontology(
             11, 0,ontology)
         assert output_fallback_add
@@ -335,6 +385,18 @@ class TestDatasetsCombined(TestAPIBase):
             11, 0,ontology)
         assert output_fallback_remove
     
-    @pytest.mark.uses_test_server()
-    def test_add_remove_topic_fallback(self):pass
 
+    def test_add_delete_topic_fallback(self):
+        topic = f"test_topic_{str(time.time())}"
+        # only admin can add or delete topics
+        self.api_key = self.dataset_fallback._http.api_key = self.admin_key
+        self.dataset_fallback.add_topic(31, topic)
+        self.dataset_fallback.delete_topic(31, topic)
+
+    def _wait_for_dataset_being_processed(self,dids,n_tries=10,wait_time=10):
+        for i in range(n_tries):
+            time.sleep(wait_time)
+            listing = self.dataset_fallback.list(limit=2,offset=0,data_id=dids)
+            if listing.shape[0] == 2:
+                return
+        raise TimeoutError("Dataset did not become active within given time")

@@ -271,8 +271,6 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         Dataset id of the forked dataset
 
         """
-        if not isinstance(dataset_id, int):
-            raise TypeError(f"`dataset_id` must be of type `int`, not {type(dataset_id)}.")
         # compose data fork parameters
         form_data = {"data_id": dataset_id}
         result_xml = self._http.post("data/fork", data=form_data).text
@@ -577,11 +575,15 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
 
     def download_features_file(self, dataset_id: int) -> Path:
         path = f"data/features/{dataset_id}"
-        return self._download_file(path, "features.xml")
+        file = self._download_file(path, "features.xml")
+        self.parse_features_file(file)
+        return file
 
     def download_qualities_file(self, dataset_id: int) -> Path:
         path = f"data/qualities/{dataset_id}"
-        return self._download_file(path, "qualities.xml")
+        file = self._download_file(path, "qualities.xml")
+        self.parse_qualities_file(file)
+        return file
 
     def download_dataset_parquet(
         self,
@@ -641,25 +643,25 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
 
     def add_topic(self, data_id: int, topic: str) -> int:
         form_data = {"data_id": data_id, "topic": topic}  # type: dict[str, str | int]
-        result_xml = self._http.post("data/topicadd", data=form_data)
+        result_xml = self._http.post("data/topicadd", data=form_data).text
         result = xmltodict.parse(result_xml)
         data_id = result["oml:data_topic"]["oml:id"]
         return int(data_id)
 
     def delete_topic(self, data_id: int, topic: str) -> int:
         form_data = {"data_id": data_id, "topic": topic}  # type: dict[str, str | int]
-        result_xml = self._http.post("data/topicdelete", data=form_data)
+        result_xml = self._http.post("data/topicdelete", data=form_data).text
         result = xmltodict.parse(result_xml)
         data_id = result["oml:data_topic"]["oml:id"]
         return int(data_id)
 
     def get_online_dataset_format(self, dataset_id: int) -> str:
-        dataset_xml = self._http.get(f"data/{dataset_id}")
+        dataset_xml = self._http.get(f"data/{dataset_id}").text
         # build a dict from the xml and get the format from the dataset description
         return xmltodict.parse(dataset_xml)["oml:data_set_description"]["oml:format"].lower()  # type: ignore
 
     def get_online_dataset_arff(self, dataset_id: int) -> str | None:
-        dataset_xml = self._http.get(f"data/{dataset_id}")
+        dataset_xml = self._http.get(f"data/{dataset_id}").text
         # build a dict from the xml.
         # use the url from the dataset description and return the ARFF string
         return str(self.download_dataset_arff(xmltodict.parse(dataset_xml)))
@@ -785,10 +787,25 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         original_data_url: str | None = None,
         paper_url: str | None = None,
     ) -> int:
-        raise NotImplementedError(self._not_supported(method="edit"))
+        _ = (
+            dataset_id,
+            description,
+            creator,
+            contributor,
+            collection_date,
+            language,
+            default_target_attribute,
+            ignore_attribute,
+            citation,
+            row_id_attribute,
+            original_data_url,
+            paper_url,
+        )  # unsed method arg mypy error
+        raise self._not_supported(method="edit")
 
     def fork(self, dataset_id: int) -> int:
-        raise NotImplementedError(self._not_supported(method="fork"))
+        _ = dataset_id  # unsed method arg mypy error
+        raise self._not_supported(method="fork")
 
     def status_update(self, dataset_id: int, status: Literal["active", "deactivated"]) -> None:
         """
@@ -890,10 +907,12 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         )
 
     def feature_add_ontology(self, dataset_id: int, index: int, ontology: str) -> bool:
-        raise NotImplementedError(self._not_supported(method="feature_add_ontology"))
+        _ = (dataset_id, index, ontology)  # unused method arg mypy error
+        raise self._not_supported(method="feature_add_ontology")
 
     def feature_remove_ontology(self, dataset_id: int, index: int, ontology: str) -> bool:
-        raise NotImplementedError(self._not_supported(method="feature_remove_ontology"))
+        _ = (dataset_id, index, ontology)  # unused method arg mypy error
+        raise self._not_supported(method="feature_remove_ontology")
 
     def get_features(self, dataset_id: int) -> dict[int, OpenMLDataFeature]:
         path = f"datasets/features/{dataset_id}"
@@ -921,7 +940,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
             features_pickle_file = features_file.with_suffix(features_file.suffix + ".pkl")
         if features_file.suffix == ".xml":
             # can fallback to v1 if the file is .xml
-            raise NotImplementedError()
+            raise NotImplementedError("Unable to Parse .xml from v1")
 
         with Path(features_file).open("r", encoding="utf8") as fh:
             features_json = json.load(fh)
@@ -940,7 +959,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
             qualities_pickle_file = qualities_file.with_suffix(qualities_file.suffix + ".pkl")
         if qualities_file.suffix == ".xml":
             # can fallback to v1 if the file is .xml
-            raise NotImplementedError()
+            raise NotImplementedError("Unable to Parse .xml from v1")
 
         with Path(qualities_file).open("r", encoding="utf8") as fh:
             qualities_json = json.load(fh)
@@ -1015,11 +1034,15 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
 
     def download_features_file(self, dataset_id: int) -> Path:
         path = f"datasets/features/{dataset_id}"
-        return self._download_file(path, "features.json")
+        file = self._download_file(path, "features.json")
+        self.parse_features_file(file)
+        return file
 
     def download_qualities_file(self, dataset_id: int) -> Path:
         path = f"datasets/qualities/{dataset_id}"
-        return self._download_file(path, "qualities.json")
+        file = self._download_file(path, "qualities.json")
+        self.parse_qualities_file(file)
+        return file
 
     def download_dataset_parquet(
         self,
@@ -1071,11 +1094,13 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
 
         return output_file_path
 
-    def add_topic(self, data_id: int, topic: str) -> int:
-        raise NotImplementedError(self._not_supported(method="add_topic"))
+    def add_topic(self, dataset_id: int, topic: str) -> int:
+        _ = (dataset_id, topic)  # unused method arg mypy error
+        raise self._not_supported(method="add_topic")
 
-    def delete_topic(self, data_id: int, topic: str) -> int:
-        raise NotImplementedError(self._not_supported(method="delete_topic"))
+    def delete_topic(self, dataset_id: int, topic: str) -> int:
+        _ = (dataset_id, topic)  # unused method arg mypy error
+        raise self._not_supported(method="delete_topic")
 
     def get_online_dataset_format(self, dataset_id: int) -> str:
         dataset_json = self._http.get(f"datasets/{dataset_id}").json()

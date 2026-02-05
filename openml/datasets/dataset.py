@@ -9,7 +9,7 @@ import re
 import warnings
 from collections.abc import Iterable, Sequence
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, Literal
 
 import arff
 import numpy as np
@@ -1041,10 +1041,7 @@ def _read_features(features_file: str | Path) -> dict[int, OpenMLDataFeature]:
             return pickle.load(fh_binary)  # type: ignore  # noqa: S301
 
     except FileNotFoundError:
-        features = cast(
-            "dict[int, OpenMLDataFeature]",
-            openml._backend.dataset.parse_features_file(features_file, features_pickle_file),
-        )
+        features = openml._backend.dataset.parse_features_file(features_file, features_pickle_file)
         with features_pickle_file.open("wb") as fh_binary:
             pickle.dump(features, fh_binary)
         return features
@@ -1069,9 +1066,8 @@ def _read_qualities(qualities_file: str | Path) -> dict[str, float]:
         with qualities_pickle_file.open("rb") as fh_binary:
             return pickle.load(fh_binary)  # type: ignore  # noqa: S301
     except:  # noqa: E722
-        qualities = cast(
-            "dict[str, float]",
-            openml._backend.dataset.parse_qualities_file(qualities_file, qualities_pickle_file),
+        qualities = openml._backend.dataset.parse_qualities_file(
+            qualities_file, qualities_pickle_file
         )
         with qualities_pickle_file.open("wb") as fh_binary:
             pickle.dump(qualities, fh_binary)

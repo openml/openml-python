@@ -42,7 +42,7 @@ class DatasetAPI(ResourceAPI):
     @abstractmethod
     def edit(  # noqa: PLR0913
         self,
-        data_id: int,
+        dataset_id: int,
         description: str | None = None,
         creator: str | None = None,
         contributor: str | None = None,
@@ -110,10 +110,10 @@ class DatasetAPI(ResourceAPI):
     ) -> Path: ...
 
     @abstractmethod
-    def add_topic(self, data_id: int, topic: str) -> int: ...
+    def add_topic(self, dataset_id: int, topic: str) -> int: ...
 
     @abstractmethod
-    def delete_topic(self, data_id: int, topic: str) -> int: ...
+    def delete_topic(self, dataset_id: int, topic: str) -> int: ...
 
     @abstractmethod
     def get_online_dataset_format(self, dataset_id: int) -> str: ...

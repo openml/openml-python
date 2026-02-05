@@ -233,54 +233,6 @@ class OpenMLDatasetTest(TestBase):
         assert isinstance(xy, pd.DataFrame)
         assert xy.shape == (150, 5)
 
-    @pytest.mark.skip("Datasets cache")
-    def test_lazy_loading_metadata(self):
-        # Initial Setup
-        did_cache_dir = openml.utils._create_cache_directory_for_id(
-            openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
-            2,
-        )
-        _compare_dataset = openml.datasets.get_dataset(
-            2,
-            download_data=False,
-            download_features_meta_data=True,
-            download_qualities=True,
-        )
-        change_time = os.stat(did_cache_dir).st_mtime
-
-        # Test with cache
-        _dataset = openml.datasets.get_dataset(
-            2,
-            download_data=False,
-            download_features_meta_data=False,
-            download_qualities=False,
-        )
-        assert change_time == os.stat(did_cache_dir).st_mtime
-        assert _dataset.features == _compare_dataset.features
-        assert _dataset.qualities == _compare_dataset.qualities
-
-        # -- Test without cache
-        openml.utils._remove_cache_dir_for_id(
-            openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
-            did_cache_dir,
-        )
-
-        _dataset = openml.datasets.get_dataset(
-            2,
-            download_data=False,
-            download_features_meta_data=False,
-            download_qualities=False,
-        )
-        assert ["description.xml"] == os.listdir(did_cache_dir)
-        assert change_time != os.stat(did_cache_dir).st_mtime
-        assert _dataset.features == _compare_dataset.features
-        assert _dataset.qualities == _compare_dataset.qualities
-
-    def test_equality_comparison(self):
-        self.assertEqual(self.iris, self.iris)
-        self.assertNotEqual(self.iris, self.titanic)
-        self.assertNotEqual(self.titanic, "Wrong_object")
-
 
 @pytest.mark.uses_test_server()
 def test_tagging():

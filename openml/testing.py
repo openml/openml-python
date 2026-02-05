@@ -320,12 +320,16 @@ class TestAPIBase(unittest.TestCase):
         )
         self.minio_client = self._get_minio_client(path=Path(self.dir))
 
-        if self.cache.path.exists():
-            shutil.rmtree(self.cache.path)
+        self.tearDown()
 
     def tearDown(self) -> None:
         if self.cache.path.exists():
             shutil.rmtree(self.cache.path)
+        downloads_dir = Path(self.dir).expanduser() / "downloads"
+        minio_dir = Path(self.dir).expanduser() / "minio"
+        for extra_dir in [downloads_dir, minio_dir]:
+            if extra_dir.exists():
+                shutil.rmtree(extra_dir)
 
     def _get_http_cache(
         self,
