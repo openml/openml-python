@@ -48,6 +48,32 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         download_all_files: bool = False,  # noqa: FBT002
         force_refresh_cache: bool = False,  # noqa: FBT002
     ) -> OpenMLDataset:
+        """Download the OpenML dataset representation, optionally also download actual data file.
+
+        Parameters
+        ----------
+        dataset_id : int or str
+            Dataset ID (integer) or dataset name (string) of the dataset to download.
+        download_data : bool (default=False)
+            If True, download the data file.
+        cache_format : str (default='pickle') in {'pickle', 'feather'}
+            Format for caching the dataset - may be feather or pickle
+            Note that the default 'pickle' option may load slower than feather when
+            no.of.rows is very high.
+        download_qualities : bool (default=False)
+            Option to download 'qualities' meta-data with the minimal dataset description.
+        download_features_meta_data : bool (default=False)
+            Option to download 'features' meta-data with the minimal dataset description.
+        download_all_files: bool (default=False)
+            EXPERIMENTAL. Download all files related to the dataset that reside on the server.
+        force_refresh_cache : bool (default=False)
+            Force the cache to delete the cache directory and re-download the data.
+
+        Returns
+        -------
+        dataset : :class:`openml.OpenMLDataset`
+            The downloaded dataset.
+        """
         path = f"data/{dataset_id}"
         try:
             response = self._http.get(path, use_cache=True, reset_cache=force_refresh_cache)
@@ -157,42 +183,28 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
     ) -> int:
         """Edits an OpenMLDataset.
 
-        In addition to providing the dataset id of the dataset to edit (through dataset_id),
-        you must specify a value for at least one of the optional function arguments,
-        i.e. one value for a field to edit.
-
-        This function allows editing of both non-critical and critical fields.
-        Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.
-
-        - Editing non-critical data fields is allowed for all authenticated users.
-        - Editing critical fields is allowed only for the owner, provided there are no tasks
-        associated with this dataset.
-
-        If dataset has tasks or if the user is not the owner, the only way
-        to edit critical fields is to use fork_dataset followed by edit_dataset.
-
         Parameters
         ----------
         dataset_id : int
             ID of the dataset.
-        description : str
+        description : str, optional
             Description of the dataset.
-        creator : str
+        creator : str, optional
             The person who created the dataset.
-        contributor : str
+        contributor : str, optional
             People who contributed to the current version of the dataset.
-        collection_date : str
+        collection_date : str, optional
             The date the data was originally collected, given by the uploader.
-        language : str
+        language : str, optional
             Language in which the data is represented.
             Starts with 1 upper case letter, rest lower case, e.g. 'English'.
-        default_target_attribute : str
+        default_target_attribute : str, optional
             The default target attribute, if it exists.
             Can have multiple values, comma separated.
-        ignore_attribute : str | list
+        ignore_attribute : str | list, optional
             Attributes that should be excluded in modelling,
             such as identifiers and indexes.
-        citation : str
+        citation : str, optional
             Reference(s) that should be cited when building on this data.
         row_id_attribute : str, optional
             The attribute that represents the row-id column, if present in the
@@ -247,19 +259,6 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         Creates a new dataset version, with the authenticated user as the new owner.
         The forked dataset can have distinct dataset meta-data,
         but the actual data itself is shared with the original version.
-
-        This API is intended for use when a user is unable to edit the critical fields of a dataset
-        through the edit_dataset API.
-        (Critical fields are default_target_attribute, ignore_attribute, row_id_attribute.)
-
-        Specifically, this happens when the user is:
-                1. Not the owner of the dataset.
-                2. User is the owner of the dataset, but the dataset has tasks.
-
-        In these two cases the only way to edit critical fields is:
-                1. STEP 1: Fork the dataset using fork_dataset API
-                2. STEP 2: Call edit_dataset API on the forked version.
-
 
         Parameters
         ----------
@@ -336,12 +335,22 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         parquet_file: Path | None = None,
         cache_format: Literal["pickle", "feather"] = "pickle",
     ) -> OpenMLDataset:
-        """Create a dataset given a xml string.
+        """Create a dataset given a parsed xml dict.
 
         Parameters
         ----------
-        xml : string
-            Dataset xml representation.
+        description : dict
+            Parsed xml dict representing the dataset description.
+        features_file : Path, optional
+            Path to features file.
+        qualities_file : Path, optional
+            Path to qualities file.
+        arff_file : Path, optional
+            Path to arff file.
+        parquet_file : Path, optional
+            Path to parquet file.
+        cache_format : str (default='pickle') in {'pickle', 'feather'}
+            Format for caching the dataset - may be feather or pickle
 
         Returns
         -------
@@ -439,12 +448,34 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         return True
 
     def get_features(self, dataset_id: int) -> dict[int, OpenMLDataFeature]:
+        """Get features of a dataset from server.
+
+        Parameters
+        ----------
+        dataset_id : int
+            ID of the dataset.
+
+        Returns
+        -------
+        dict[int, OpenMLDataFeature]
+        """
         path = f"data/features/{dataset_id}"
         xml = self._http.get(path, use_cache=True).text
 
         return self._parse_features_xml(xml)
 
     def get_qualities(self, dataset_id: int) -> dict[str, float] | None:
+        """Get qualities of a dataset from server.
+
+        Parameters
+        ----------
+        dataset_id : int
+            ID of the dataset.
+
+        Returns
+        -------
+        dict[str, float] | None
+        """
         path = f"data/qualities/{dataset_id!s}"
         try:
             xml = self._http.get(path, use_cache=True).text
@@ -461,6 +492,20 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
     def parse_features_file(
         self, features_file: Path, features_pickle_file: Path | None = None
     ) -> dict[int, OpenMLDataFeature]:
+        """
+        Parse features file (xml) and store it as a pickle file.
+
+        Parameters
+        ----------
+        features_file : Path
+            Path to features file.
+        features_pickle_file : Path, optional
+            Path to pickle file for features.
+
+        Returns
+        -------
+        features : dict[int, OpenMLDataFeature]
+        """
         if features_pickle_file is None:
             features_pickle_file = features_file.with_suffix(features_file.suffix + ".pkl")
         assert features_file.suffix == ".xml"
@@ -478,6 +523,19 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
     def parse_qualities_file(
         self, qualities_file: Path, qualities_pickle_file: Path | None = None
     ) -> dict[str, float]:
+        """Parse qualities file (xml) and store it as a pickle file.
+
+        Parameters
+        ----------
+        qualities_file : Path
+            Path to qualities file.
+        qualities_pickle_file : Path, optional
+            Path to pickle file for qualities.
+
+        Returns
+        -------
+        qualities : dict[str, float]
+        """
         if qualities_pickle_file is None:
             qualities_pickle_file = qualities_file.with_suffix(qualities_file.suffix + ".pkl")
         assert qualities_file.suffix == ".xml"
@@ -493,6 +551,17 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         return qualities
 
     def _parse_features_xml(self, features_xml_string: str) -> dict[int, OpenMLDataFeature]:
+        """Parse features xml string.
+
+        Parameters
+        ----------
+        features_xml_string : str
+            Features xml string.
+
+        Returns
+        -------
+        features : dict[int, OpenMLDataFeature]
+        """
         xml_dict = xmltodict.parse(
             features_xml_string,
             force_list=("oml:feature", "oml:nominal_value"),
@@ -518,6 +587,17 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         return features
 
     def _parse_qualities_xml(self, qualities_xml: str) -> dict[str, float]:
+        """Parse qualities xml string.
+
+        Parameters
+        ----------
+        qualities_xml : str
+            Qualities xml string.
+
+        Returns
+        -------
+        qualities : dict[str, float]
+        """
         xml_as_dict = xmltodict.parse(qualities_xml, force_list=("oml:quality",))
         qualities = xml_as_dict["oml:data_qualities"]["oml:quality"]
         qualities_ = {}
@@ -531,6 +611,17 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         return qualities_
 
     def _parse_list_xml(self, xml_string: str) -> pd.DataFrame:
+        """Parse list response xml string.
+
+        Parameters
+        ----------
+        xml_string : str
+            List response xml string.
+
+        Returns
+        -------
+        pd.DataFrame
+        """
         datasets_dict = xmltodict.parse(xml_string, force_list=("oml:dataset",))
         # Minimalistic check if the XML is useful
         assert isinstance(datasets_dict["oml:data"]["oml:dataset"], list), type(
@@ -566,6 +657,22 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         )
 
     def _download_file(self, url_ext: str, file_path: str, encoding: str = "utf-8") -> Path:
+        """Helper method to pass respective handler to downloader.
+
+        Parameters
+        ----------
+        url_ext : str
+            URL extension to download from.
+        file_name : str
+            Name of the file to save as.
+        encoding : str, optional (default='utf-8')
+            Encoding of the file.
+
+        Returns
+        -------
+        Path
+        """
+
         def __handler(response: Response, path: Path, encoding: str) -> Path:
             with path.open("w", encoding=encoding) as f:
                 f.write(response.text)
@@ -574,12 +681,34 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         return self._http.download(url_ext, __handler, encoding, file_path)
 
     def download_features_file(self, dataset_id: int) -> Path:
+        """Download features file.
+
+        Parameters
+        ----------
+        dataset_id : int
+            ID of the dataset.
+
+        Returns
+        -------
+        Path
+        """
         path = f"data/features/{dataset_id}"
         file = self._download_file(path, "features.xml")
         self.parse_features_file(file)
         return file
 
     def download_qualities_file(self, dataset_id: int) -> Path:
+        """Download qualities file.
+
+        Parameters
+        ----------
+        dataset_id : int
+            ID of the dataset.
+
+        Returns
+        -------
+        Path
+        """
         path = f"data/qualities/{dataset_id}"
         file = self._download_file(path, "qualities.xml")
         self.parse_qualities_file(file)
@@ -590,6 +719,20 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         description: dict | OpenMLDataset,
         download_all_files: bool = False,  # noqa: FBT002
     ) -> Path | None:
+        """Download dataset parquet file.
+
+        Parameters
+        ----------
+        description : dictionary or OpenMLDataset
+            Either a dataset description as dict or OpenMLDataset.
+        download_all_files: bool, optional (default=False)
+            If `True`, download all data found in the bucket to which the description's
+            ``parquet_url`` points, only download the parquet file otherwise.
+
+        Returns
+        -------
+        Path | None
+        """
         assert self._minio is not None  # for mypy
 
         if isinstance(description, dict):
@@ -616,6 +759,18 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         self,
         description: dict | OpenMLDataset,
     ) -> Path:
+        """Download dataset arff file.
+
+        Parameters
+        ----------
+        description : dictionary or OpenMLDataset
+            Either a dataset description as dict or OpenMLDataset.
+
+        Returns
+        -------
+        output_filename : Path
+            Location of ARFF file.
+        """
         if isinstance(description, dict):
             md5_checksum_fixture = description.get("oml:md5_checksum")
             url = str(description["oml:url"])
@@ -641,26 +796,81 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
 
         return output_file_path
 
-    def add_topic(self, data_id: int, topic: str) -> int:
-        form_data = {"data_id": data_id, "topic": topic}  # type: dict[str, str | int]
+    def add_topic(self, dataset_id: int, topic: str) -> int:
+        """
+        Adds a topic to a dataset.
+        This API is not available for all OpenML users and is accessible only by admins.
+
+        Parameters
+        ----------
+        dataset_id : int
+            id of the dataset to be forked
+        topic : str
+            Topic to be added
+
+        Returns
+        -------
+        Dataset id
+        """
+        form_data = {"data_id": dataset_id, "topic": topic}  # type: dict[str, str | int]
         result_xml = self._http.post("data/topicadd", data=form_data).text
         result = xmltodict.parse(result_xml)
-        data_id = result["oml:data_topic"]["oml:id"]
-        return int(data_id)
+        dataset_id = result["oml:data_topic"]["oml:id"]
+        return int(dataset_id)
 
-    def delete_topic(self, data_id: int, topic: str) -> int:
-        form_data = {"data_id": data_id, "topic": topic}  # type: dict[str, str | int]
+    def delete_topic(self, dataset_id: int, topic: str) -> int:
+        """
+        Removes a topic from a dataset.
+        This API is not available for all OpenML users and is accessible only by admins.
+
+        Parameters
+        ----------
+        dataset_id : int
+            id of the dataset to be forked
+        topic : str
+            Topic to be deleted
+
+        Returns
+        -------
+        Dataset id
+        """
+        form_data = {"data_id": dataset_id, "topic": topic}  # type: dict[str, str | int]
         result_xml = self._http.post("data/topicdelete", data=form_data).text
         result = xmltodict.parse(result_xml)
-        data_id = result["oml:data_topic"]["oml:id"]
-        return int(data_id)
+        dataset_id = result["oml:data_topic"]["oml:id"]
+        return int(dataset_id)
 
     def get_online_dataset_format(self, dataset_id: int) -> str:
+        """Get the dataset format for a given dataset id from the OpenML website.
+
+        Parameters
+        ----------
+        dataset_id : int
+            A dataset id.
+
+        Returns
+        -------
+        str
+            Dataset format.
+        """
         dataset_xml = self._http.get(f"data/{dataset_id}").text
         # build a dict from the xml and get the format from the dataset description
         return xmltodict.parse(dataset_xml)["oml:data_set_description"]["oml:format"].lower()  # type: ignore
 
     def get_online_dataset_arff(self, dataset_id: int) -> str | None:
+        """Download the ARFF file for a given dataset id
+        from the OpenML website.
+
+        Parameters
+        ----------
+        dataset_id : int
+            A dataset id.
+
+        Returns
+        -------
+        str or None
+            A string representation of an ARFF file. Or None if file already exists.
+        """
         dataset_xml = self._http.get(f"data/{dataset_id}").text
         # build a dict from the xml.
         # use the url from the dataset description and return the ARFF string
@@ -678,6 +888,32 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         download_all_files: bool = False,  # noqa: FBT002
         force_refresh_cache: bool = False,  # noqa: FBT002
     ) -> OpenMLDataset:
+        """Download the OpenML dataset representation, optionally also download actual data file.
+
+        Parameters
+        ----------
+        dataset_id : int or str
+            Dataset ID (integer) or dataset name (string) of the dataset to download.
+        download_data : bool (default=False)
+            If True, download the data file.
+        cache_format : str (default='pickle') in {'pickle', 'feather'}
+            Format for caching the dataset - may be feather or pickle
+            Note that the default 'pickle' option may load slower than feather when
+            no.of.rows is very high.
+        download_qualities : bool (default=False)
+            Option to download 'qualities' meta-data with the minimal dataset description.
+        download_features_meta_data : bool (default=False)
+            Option to download 'features' meta-data with the minimal dataset description.
+        download_all_files: bool (default=False)
+            EXPERIMENTAL. Download all files related to the dataset that reside on the server.
+        force_refresh_cache : bool (default=False)
+            Force the cache to delete the cache directory and re-download the data.
+
+        Returns
+        -------
+        dataset : :class:`openml.OpenMLDataset`
+            The downloaded dataset.
+        """
         path = f"datasets/{dataset_id}"
         try:
             response = self._http.get(path, use_cache=True, reset_cache=force_refresh_cache)
@@ -741,7 +977,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
             The maximum number of datasets to show.
         offset : int
             The number of datasets to skip, starting from the first.
-        dataset_id: list[int], optional
+        data_id: list[int], optional
 
         kwargs : dict, optional
             Legal filter operators (keys in the dict):
@@ -869,6 +1105,16 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         ----------
         json_content : dict
             Dataset dict/json representation.
+        features_file : Path, optional
+            Path to features file.
+        qualities_file : Path, optional
+            Path to qualities file.
+        arff_file : Path, optional
+            Path to arff file.
+        parquet_file : Path, optional
+            Path to parquet file.
+        cache_format : str (default='pickle') in {'pickle', 'feather'}
+            Format for caching the dataset - may be feather or pickle
 
         Returns
         -------
@@ -915,12 +1161,36 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         raise self._not_supported(method="feature_remove_ontology")
 
     def get_features(self, dataset_id: int) -> dict[int, OpenMLDataFeature]:
+        """Get features of a dataset from server.
+
+        Parameters
+        ----------
+        dataset_id : int
+            ID of the dataset.
+
+        Returns
+        -------
+        dict[int, OpenMLDataFeature]
+        Dictionary mapping feature index to OpenMLDataFeature.
+        """
         path = f"datasets/features/{dataset_id}"
         json = self._http.get(path, use_cache=True).json()
 
         return self._parse_features_json(json)
 
     def get_qualities(self, dataset_id: int) -> dict[str, float] | None:
+        """Get qualities of a dataset from server.
+
+        Parameters
+        ----------
+        dataset_id : int
+            ID of the dataset.
+
+        Returns
+        -------
+        dict[str, float] | None
+        Dictionary mapping quality name to quality value.
+        """
         path = f"datasets/qualities/{dataset_id!s}"
         try:
             qualities_json = self._http.get(path, use_cache=True).json()
@@ -936,6 +1206,20 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
     def parse_features_file(
         self, features_file: Path, features_pickle_file: Path | None = None
     ) -> dict[int, OpenMLDataFeature]:
+        """
+        Parse features file (json) and store it as a pickle file.
+
+        Parameters
+        ----------
+        features_file : Path
+            Path to features file.
+        features_pickle_file : Path, optional
+            Path to pickle file for features.
+
+        Returns
+        -------
+        dict[int, OpenMLDataFeature]
+        """
         if features_pickle_file is None:
             features_pickle_file = features_file.with_suffix(features_file.suffix + ".pkl")
         if features_file.suffix == ".xml":
@@ -955,6 +1239,19 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
     def parse_qualities_file(
         self, qualities_file: Path, qualities_pickle_file: Path | None = None
     ) -> dict[str, float]:
+        """Parse qualities file (json) and store it as a pickle file.
+
+        Parameters
+        ----------
+        qualities_file : Path
+            Path to qualities file.
+        qualities_pickle_file : Path, optional
+            Path to pickle file for qualities.
+
+        Returns
+        -------
+        qualities : dict[str, float]
+        """
         if qualities_pickle_file is None:
             qualities_pickle_file = qualities_file.with_suffix(qualities_file.suffix + ".pkl")
         if qualities_file.suffix == ".xml":
@@ -972,6 +1269,17 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         return qualities
 
     def _parse_features_json(self, features_json: dict) -> dict[int, OpenMLDataFeature]:
+        """Parse features json.
+
+        Parameters
+        ----------
+        features_json : dict
+            Features json.
+
+        Returns
+        -------
+        dict[int, OpenMLDataFeature]
+        """
         features: dict[int, OpenMLDataFeature] = {}
         for idx, jsonfeatures in enumerate(features_json):
             nr_missing = jsonfeatures.get("number_of_missing_values", 0)
@@ -990,6 +1298,17 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         return features
 
     def _parse_qualities_json(self, qualities_json: dict) -> dict[str, float]:
+        """Parse qualities json.
+
+        Parameters
+        ----------
+        qualities_json : dict
+            Qualities json.
+
+        Returns
+        -------
+        dict[str, float]
+        """
         qualities_ = {}
         for quality in qualities_json:
             name = quality["name"]
@@ -1001,9 +1320,20 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         return qualities_
 
     def _parse_list_json(self, datasets_list: builtins.list) -> pd.DataFrame:
+        """Parse list response json.
+
+        Parameters
+        ----------
+        datasets_list : list
+            List of datasets in json format.
+
+        Returns
+        -------
+        pd.DataFrame
+        """
         datasets = {}
         for dataset_ in datasets_list:
-            ignore_attribute = ["file_id", "quality"]
+            ignore_attribute = ["file_id", "quality", "md5_checksum"]
             dataset = {k: v for (k, v) in dataset_.items() if k not in ignore_attribute}
             dataset["did"] = int(dataset["did"])
             dataset["version"] = int(dataset["version"])
@@ -1025,6 +1355,22 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         )
 
     def _download_file(self, url_ext: str, file_name: str, encoding: str = "utf-8") -> Path:
+        """Helper method to pass respective handler to downloader.
+
+        Parameters
+        ----------
+        url_ext : str
+            URL extension to download from.
+        file_name : str
+            Name of the file to save as.
+        encoding : str, optional (default='utf-8')
+            Encoding of the file.
+
+        Returns
+        -------
+        Path
+        """
+
         def __handler(response: Response, path: Path, encoding: str) -> Path:
             with path.open("w", encoding=encoding) as f:
                 json.dump(response.json(), f, indent=4)
@@ -1033,12 +1379,34 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         return self._http.download(url_ext, __handler, encoding, file_name)
 
     def download_features_file(self, dataset_id: int) -> Path:
+        """Download features file.
+
+        Parameters
+        ----------
+        dataset_id : int
+            ID of the dataset.
+
+        Returns
+        -------
+        Path
+        """
         path = f"datasets/features/{dataset_id}"
         file = self._download_file(path, "features.json")
         self.parse_features_file(file)
         return file
 
     def download_qualities_file(self, dataset_id: int) -> Path:
+        """Download qualities file.
+
+        Parameters
+        ----------
+        dataset_id : int
+            ID of the dataset.
+
+        Returns
+        -------
+        Path
+        """
         path = f"datasets/qualities/{dataset_id}"
         file = self._download_file(path, "qualities.json")
         self.parse_qualities_file(file)
@@ -1049,6 +1417,20 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         description: dict | OpenMLDataset,
         download_all_files: bool = False,  # noqa: FBT002
     ) -> Path | None:
+        """Download dataset parquet file.
+
+        Parameters
+        ----------
+        description : dictionary or OpenMLDataset
+            Either a dataset description as dict or OpenMLDataset.
+        download_all_files: bool, optional (default=False)
+            If `True`, download all data found in the bucket to which the description's
+            ``parquet_url`` points, only download the parquet file otherwise.
+
+        Returns
+        -------
+        Path | None
+        """
         assert self._minio is not None  # for mypy
 
         if isinstance(description, dict):
@@ -1073,6 +1455,18 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         self,
         description: dict | OpenMLDataset,
     ) -> Path:
+        """Download dataset arff file.
+
+        Parameters
+        ----------
+        description : dictionary or OpenMLDataset
+            Either a dataset description as dict or OpenMLDataset.
+
+        Returns
+        -------
+        output_filename : Path
+            Location of ARFF file.
+        """
         if isinstance(description, dict):
             url = str(description["url"])
             did = int(description.get("id"))  # type: ignore
@@ -1103,11 +1497,36 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         raise self._not_supported(method="delete_topic")
 
     def get_online_dataset_format(self, dataset_id: int) -> str:
+        """Get the dataset format for a given dataset id from the OpenML website.
+
+        Parameters
+        ----------
+        dataset_id : int
+            A dataset id.
+
+        Returns
+        -------
+        str
+            Dataset format.
+        """
         dataset_json = self._http.get(f"datasets/{dataset_id}").json()
         # build a dict from the xml and get the format from the dataset description
         return dataset_json["data_set_description"]["format"].lower()  # type: ignore
 
     def get_online_dataset_arff(self, dataset_id: int) -> str | None:
+        """Download the ARFF file for a given dataset id
+        from the OpenML website.
+
+        Parameters
+        ----------
+        dataset_id : int
+            A dataset id.
+
+        Returns
+        -------
+        str or None
+            A string representation of an ARFF file. Or None if file already exists.
+        """
         dataset_json = self._http.get(f"datasets/{dataset_id}").json()
         # build a dict from the xml.
         # use the url from the dataset description and return the ARFF string

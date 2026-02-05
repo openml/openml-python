@@ -6,6 +6,7 @@ from openml import OpenMLDataset
 import pytest
 import pandas as pd
 from openml._api.resources.base.fallback import FallbackProxy
+from openml.enums import APIVersion
 from openml.testing import TestAPIBase
 from openml._api.resources.dataset import DatasetV1API, DatasetV2API
 
@@ -14,9 +15,9 @@ from openml._api.resources.dataset import DatasetV1API, DatasetV2API
 class TestDatasetV1API(TestAPIBase):
     def setUp(self):
         super().setUp()
+        http_client_v1 = self.http_clients[APIVersion.V1]
+        self.dataset = DatasetV1API(http_client_v1,self.minio_client)
 
-        self.dataset = DatasetV1API(self.http_client,self.minio_client)
-    
 
     def test_get(self):
         output = self.dataset.get(2)
@@ -128,14 +129,6 @@ class TestDatasetV1API(TestAPIBase):
 
         self.dataset.delete(result)
 
-    def _wait_for_dataset_being_processed(self,dids,n_tries=10,wait_time=10):
-        for i in range(n_tries):
-            time.sleep(wait_time)
-            listing = self.dataset.list(limit=2,offset=0,data_id=dids)
-            if listing.shape[0] == 2:
-                return
-        raise TimeoutError("Dataset did not become active within given time")
-
 
     def test_list_qualities(self):
         output = self.dataset.list_qualities()
@@ -162,22 +155,23 @@ class TestDatasetV1API(TestAPIBase):
         self.dataset.add_topic(31, topic)
         self.dataset.delete_topic(31, topic)
 
+    
+    def _wait_for_dataset_being_processed(self,dids,n_tries=10,wait_time=10):
+        for i in range(n_tries):
+            time.sleep(wait_time)
+            listing = self.dataset.list(limit=2,offset=0,data_id=dids)
+            if listing.shape[0] == 2:
+                return
+        raise TimeoutError("Dataset did not become active within given time")
+
 
 @pytest.mark.uses_test_server()
 class TestDatasetV2API(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.client = self._get_http_client(
-            server="http://127.0.0.1:8001/",
-            base_url="",
-            api_key="AD000000000000000000000000000000",
-            timeout_seconds=self.timeout_seconds,
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-            cache=self.cache
-        )
-        self.dataset = DatasetV2API(self.client,self.minio_client)
-    
+        http_client_v2 = self.http_clients[APIVersion.V2]
+        self.dataset = DatasetV2API(http_client_v2,self.minio_client)
+
 
     def test_get(self):
         output= self.dataset.get(2)
@@ -235,17 +229,10 @@ class TestDatasetV2API(TestAPIBase):
 class TestDatasetsCombined(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.v2_client = self._get_http_client(
-            server="http://127.0.0.1:8001/",
-            base_url="AD000000000000000000000000000000",
-            api_key="abc",
-            timeout_seconds=self.timeout_seconds,
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-            cache=self.cache
-        )
-        self.dataset_v1 = DatasetV1API(self.http_client,self.minio_client)
-        self.dataset_v2 = DatasetV2API(self.v2_client,self.minio_client)
+        http_client_v1 = self.http_clients[APIVersion.V1]
+        http_client_v2 = self.http_clients[APIVersion.V2]
+        self.dataset_v1 = DatasetV1API(http_client_v1,self.minio_client)
+        self.dataset_v2 = DatasetV2API(http_client_v2,self.minio_client)
         self.dataset_fallback = FallbackProxy(self.dataset_v1,self.dataset_v2)
     
 
@@ -263,14 +250,16 @@ class TestDatasetsCombined(TestAPIBase):
         output_fallback =  self.dataset_fallback.get(2)
         assert output_fallback.dataset_id == 2
 
-
-    #TODO list has different structure compared to v1
+    
     def test_list_matches(self):
         output_v1 = self.dataset_v1.list(limit=2, offset=1)
         output_v2 = self.dataset_v2.list(limit=2, offset=1)
 
-        pd.testing.assert_series_equal(output_v1["did"],output_v2["did"])
-    
+        pd.testing.assert_frame_equal(
+            output_v1[["did","name","version"]],
+            output_v2[["did","name","version"]],
+            check_like=True
+            )
 
     def test_list_fallback(self):
         output_fallback =self.dataset_fallback.list(limit=2, offset=0,data_id=[2,3])
@@ -392,6 +381,7 @@ class TestDatasetsCombined(TestAPIBase):
         self.api_key = self.dataset_fallback._http.api_key = self.admin_key
         self.dataset_fallback.add_topic(31, topic)
         self.dataset_fallback.delete_topic(31, topic)
+
 
     def _wait_for_dataset_being_processed(self,dids,n_tries=10,wait_time=10):
         for i in range(n_tries):
