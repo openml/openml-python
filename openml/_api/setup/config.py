@@ -19,7 +19,6 @@ class APIConfig:
 class ConnectionConfig:
     retries: int
     retry_policy: RetryPolicy
-    timeout_seconds: int
 
 
 @dataclass
@@ -52,7 +51,6 @@ class Config:
         default_factory=lambda: ConnectionConfig(
             retries=5,
             retry_policy=RetryPolicy.HUMAN,
-            timeout_seconds=10,
         )
     )
 

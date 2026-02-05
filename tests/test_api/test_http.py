@@ -4,11 +4,25 @@ import xmltodict
 import pytest
 from openml.testing import TestAPIBase
 import os
+from urllib.parse import urljoin
+from openml.enums import APIVersion
+from openml._api import HTTPClient
 
 
 class TestHTTPClient(TestAPIBase):
+    http_client: HTTPClient
+
+    def setUp(self):
+        super().setUp()
+        self.http_client = self.http_clients[APIVersion.V1]
+
+    def _prepare_url(self, path: str | None = None) -> str:
+        server = self.http_client.server
+        base_url = self.http_client.base_url
+        return urljoin(server, urljoin(base_url, path))
+
     def test_cache(self):
-        url = self._get_url(path="task/31")
+        url = self._prepare_url(path="task/31")
         params = {"param1": "value1", "param2": "value2"}
 
         key = self.cache.get_key(url, params)
@@ -18,6 +32,7 @@ class TestHTTPClient(TestAPIBase):
             "test",
             "api",
             "v1",
+            "xml",
             "task",
             "31",
             "param1=value1&param2=value2",
@@ -68,7 +83,7 @@ class TestHTTPClient(TestAPIBase):
 
         # verify cache directory structure exists
         cache_key = self.cache.get_key(
-            self._get_url(path="task/1"),
+            self._prepare_url(path="task/1"),
             {},
         )
         cache_path = self.cache._key_to_path(cache_key)
@@ -94,7 +109,7 @@ class TestHTTPClient(TestAPIBase):
         self.cache.ttl = 1
         path = "task/1"
 
-        url = self._get_url(path=path)
+        url = self._prepare_url(path=path)
         key = self.cache.get_key(url, {})
         cache_path = self.cache._key_to_path(key) / "meta.json"
 
@@ -115,7 +130,7 @@ class TestHTTPClient(TestAPIBase):
     def test_get_reset_cache(self):
         path = "task/1"
 
-        url = self._get_url(path=path)
+        url = self._prepare_url(path=path)
         key = self.cache.get_key(url, {})
         cache_path = self.cache._key_to_path(key) / "meta.json"
 
