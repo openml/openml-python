@@ -9,7 +9,6 @@ import xmltodict
 
 import openml
 from openml._api.resources.base import ResourceV1API, ResourceV2API, RunAPI
-from openml.exceptions import OpenMLNotSupportedError
 from openml.tasks.task import TaskType
 
 if TYPE_CHECKING:
@@ -52,7 +51,7 @@ class RunV1API(ResourceV1API, RunAPI):
         xml_content = response.text
         return openml.runs.functions._create_run_from_xml(xml_content)
 
-    def list(  # type: ignore[valid-type]  # noqa: PLR0913, C901, PLR0912
+    def list(  # type: ignore[valid-type]  # noqa: PLR0913
         self,
         limit: int,
         offset: int,
@@ -105,6 +104,37 @@ class RunV1API(ResourceV1API, RunAPI):
         ValueError
             If the server response is invalid or malformed.
         """
+        path = self._build_url(
+            limit=limit,
+            offset=offset,
+            ids=ids,
+            task=task,
+            setup=setup,
+            flow=flow,
+            uploader=uploader,
+            study=study,
+            tag=tag,
+            display_errors=display_errors,
+            task_type=task_type,
+        )
+        xml_string = self._http.get(path, use_api_key=True).text
+        return self._parse_list_xml(xml_string)
+
+    def _build_url(  # noqa: PLR0913, C901
+        self,
+        limit: int,
+        offset: int,
+        *,
+        ids: builtins.list[int] | None = None,
+        task: builtins.list[int] | None = None,
+        setup: builtins.list[int] | None = None,
+        flow: builtins.list[int] | None = None,
+        uploader: builtins.list[int] | None = None,
+        study: int | None = None,
+        tag: str | None = None,
+        display_errors: bool = False,
+        task_type: TaskType | int | None = None,
+    ) -> str:
         path = "run/list"
         if limit is not None:
             path += f"/limit/{limit}"
@@ -129,8 +159,9 @@ class RunV1API(ResourceV1API, RunAPI):
         if task_type is not None:
             tvalue = task_type.value if isinstance(task_type, TaskType) else task_type
             path += f"/task_type/{tvalue}"
+        return path
 
-        xml_string = self._http.get(path, use_api_key=True).text
+    def _parse_list_xml(self, xml_string: str) -> pd.DataFrame:
         runs_dict = xmltodict.parse(xml_string, force_list=("oml:run",))
         # Minimalistic check if the XML is useful
         if "oml:runs" not in runs_dict:
@@ -211,7 +242,7 @@ class RunV2API(ResourceV2API, RunAPI):
         OpenMLNotSupportedError
             V2 server API not yet available for this operation.
         """
-        raise OpenMLNotSupportedError("not implemented yet on V2 server")
+        self._not_supported(method="get")
 
     def list(  # type: ignore[valid-type]  # noqa: PLR0913
         self,
@@ -235,7 +266,7 @@ class RunV2API(ResourceV2API, RunAPI):
         OpenMLNotSupportedError
             V2 server API not yet available for this operation.
         """
-        raise OpenMLNotSupportedError("not implemented yet on V2 server")
+        self._not_supported(method="list")
 
     def publish(self, path: str, files: Mapping[str, Any] | None = None) -> int:  # noqa: ARG002
         """Publish a run on the V2 server.
@@ -258,4 +289,4 @@ class RunV2API(ResourceV2API, RunAPI):
             V2 server does not yet support POST /runs/ endpoint.
             Expected availability: Q2 2025
         """
-        raise OpenMLNotSupportedError("not implemented yet on V2 server")
+        self._not_supported(method="publish")
