@@ -119,7 +119,6 @@ class HTTPClient:
         server: str,
         base_url: str,
         api_key: str,
-        timeout_seconds: int,
         retries: int,
         retry_policy: RetryPolicy,
         cache: HTTPCache | None = None,
@@ -127,7 +126,6 @@ class HTTPClient:
         self.server = server
         self.base_url = base_url
         self.api_key = api_key
-        self.timeout_seconds = timeout_seconds
         self.retries = retries
         self.retry_policy = retry_policy
         self.cache = cache
@@ -241,6 +239,8 @@ class HTTPClient:
             raise OpenMLServerError(f"URI too long! ({url})")
 
         retry_raise_e: Exception | None = None
+        code: int | None = None
+        message: str = ""
 
         try:
             code, message = self._parse_exception_response(response)
@@ -279,12 +279,12 @@ class HTTPClient:
 
     def _request(  # noqa: PLR0913
         self,
+        session: requests.Session,
         method: str,
         url: str,
         params: Mapping[str, Any],
         data: Mapping[str, Any],
         headers: Mapping[str, str],
-        timeout: float | int,
         files: Mapping[str, Any] | None,
         **request_kwargs: Any,
     ) -> tuple[Response | None, Exception | None]:
@@ -292,13 +292,12 @@ class HTTPClient:
         response: Response | None = None
 
         try:
-            response = requests.request(
+            response = session.request(
                 method=method,
                 url=url,
                 params=params,
                 data=data,
                 headers=headers,
-                timeout=timeout,
                 files=files,
                 **request_kwargs,
             )
@@ -347,7 +346,6 @@ class HTTPClient:
         headers = request_kwargs.pop("headers", {}).copy()
         headers.update(self.headers)
 
-        timeout = request_kwargs.pop("timeout", self.timeout_seconds)
         files = request_kwargs.pop("files", None)
 
         if use_cache and not reset_cache and self.cache is not None:
@@ -359,14 +357,15 @@ class HTTPClient:
             except Exception:
                 raise  # propagate unexpected cache errors
 
+        session = requests.Session()
         for retry_counter in range(1, retries + 1):
             response, retry_raise_e = self._request(
+                session=session,
                 method=method,
                 url=url,
                 params=params,
                 data=data,
                 headers=headers,
-                timeout=timeout,
                 files=files,
                 **request_kwargs,
             )
@@ -380,6 +379,8 @@ class HTTPClient:
 
             delay = self.retry_func(retry_counter)
             time.sleep(delay)
+
+        session.close()
 
         assert response is not None
 
