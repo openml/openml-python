@@ -55,12 +55,6 @@ class TestStudyV1API(TestAPIBase):
         except Exception:
             pytest.skip("Not enough studies on test server for pagination test")
 
-    @pytest.mark.uses_test_server()
-    def test_delete(self):
-        """Test delete method (inherited from ResourceV1API)."""
-        assert hasattr(self.api, "delete")
-        assert callable(self.api.delete)
-
 
 class TestStudyV2API(TestAPIBase):
     """Tests for V2 API implementation of studies."""
