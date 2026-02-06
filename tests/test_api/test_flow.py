@@ -54,10 +54,10 @@ class TestFlowsV1(TestAPIBase):
 
     def test_list(self):
         """Test listing flows from the V1 API."""
-        flows_df = self.resource.list(limit=10)
+        limit = 10
+        flows_df = self.resource.list(limit=limit)
         
-        self.assertGreater(len(flows_df), 0)
-        self.assertLessEqual(len(flows_df), 10)
+        self.assertEqual(len(flows_df), limit)
         self.assertIn("id", flows_df.columns)
         self.assertIn("name", flows_df.columns)
         self.assertIn("version", flows_df.columns)
@@ -67,16 +67,18 @@ class TestFlowsV1(TestAPIBase):
 
     def test_list_with_offset(self):
         """Test listing flows with offset from the V1 API."""
-        flows_df = self.resource.list(limit=5, offset=10)
+        limit = 5
+        flows_df = self.resource.list(limit=limit, offset=10)
         
-        self.assertGreater(len(flows_df), 0)
-        self.assertLessEqual(len(flows_df), 5)
+        self.assertEqual(len(flows_df), limit)
 
     def test_list_with_tag_limit_offset(self):
         """Test listing flows with filters from the V1 API."""
-        flows_df = self.resource.list(tag="weka", limit=5, offset=0, uploader=16)
+        limit = 5
+        flows_df = self.resource.list(tag="weka", limit=limit, offset=0, uploader=16)
         
         self.assertTrue(hasattr(flows_df, "columns"))
+        self.assertLessEqual(len(flows_df), limit)
         if len(flows_df) > 0:
             self.assertIn("id", flows_df.columns)
 
