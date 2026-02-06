@@ -41,7 +41,6 @@ from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerException,
 )
-from openml._api.config import settings
 #from openml.extensions.sklearn import cat, cont
 from openml.runs.functions import (
     _run_task_get_arffcontent,
@@ -1664,63 +1663,6 @@ class TestRun(TestBase):
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             assert len(row) == 12
 
-    @pytest.mark.uses_test_server()
-    def test_get_cached_run(self):
-        previous_cache_dir = settings.cache.dir
-        try:
-            settings.cache.dir = str(self.workdir / "http_cache_runs")
-            openml._backend.set_config_value("api_version", "v1")
-            openml._backend.set_config_value("fallback_api_version", "v1")
-
-            run = openml.runs.get_run(1)
-            assert run.run_id == 1
-
-            http_client = openml._backend.run._http
-            assert http_client.cache is not None
-
-            url = urljoin(
-                http_client.server,
-                urljoin(http_client.base_url, "run/1"),
-            )
-            cache_key = http_client.cache.get_key(url, {})
-            cache_path = http_client.cache._key_to_path(cache_key)
-
-            assert (cache_path / "meta.json").exists()
-            assert (cache_path / "headers.json").exists()
-            assert (cache_path / "body.bin").exists()
-        finally:
-            settings.cache.dir = previous_cache_dir
-            openml._backend.set_config_value("api_version", "v1")
-            openml._backend.set_config_value("fallback_api_version", "v1")
-
-    def test_get_uncached_run(self):
-        previous_cache_dir = settings.cache.dir
-        try:
-            settings.cache.dir = str(self.workdir / "http_cache_runs_uncached")
-            openml._backend.set_config_value("api_version", "v1")
-            openml._backend.set_config_value("fallback_api_version", "v1")
-
-            run = openml.runs.get_run(1)
-            assert run.run_id == 1
-
-            http_client = openml._backend.run._http
-            assert http_client.cache is not None
-
-            url = urljoin(
-                http_client.server,
-                urljoin(http_client.base_url, "run/1"),
-            )
-            cache_key = http_client.cache.get_key(url, {})
-            cache_path = http_client.cache._key_to_path(cache_key)
-
-            assert (cache_path / "meta.json").exists()
-            assert (cache_path / "headers.json").exists()
-            assert (cache_path / "body.bin").exists()
-        finally:
-            settings.cache.dir = previous_cache_dir
-            openml._backend.set_config_value("api_version", "v1")
-            openml._backend.set_config_value("fallback_api_version", "v1")
-
     @pytest.mark.sklearn()
     @pytest.mark.uses_test_server()
     def test_run_flow_on_task_downloaded_flow(self):
@@ -1865,7 +1807,6 @@ class TestRun(TestBase):
         # This tests all lines of code for OpenML but not the initialization, which we do not want to guarantee anyhow.
         _ = openml.runs.initialize_model_from_run(run_id=1, strict_version=False)
 
-@pytest.mark.skip(reason="old delete style test, to be removed")
 @mock.patch.object(requests.Session, "delete")
 def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
@@ -1885,7 +1826,6 @@ def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
     assert run_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
-@pytest.mark.skip(reason="old delete style test, to be removed")
 @mock.patch.object(requests.Session, "delete")
 def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
@@ -1902,7 +1842,6 @@ def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
     assert run_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
-@pytest.mark.skip(reason="old delete style test, to be removed")
 @mock.patch.object(requests.Session, "delete")
 def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
