@@ -429,7 +429,6 @@ class TestFlowFunctions(TestBase):
             assert flow_ids_exact_version_True == flow_ids_exact_version_False
 
     @pytest.mark.uses_test_server()
-    @pytest.mark.skip(reason="Delete flow tests temporarily skipped")
     def test_delete_flow(self):
         flow = openml.OpenMLFlow(
             name="sklearn.dummy.DummyClassifier",
