@@ -12,7 +12,7 @@ from openml.exceptions import OpenMLNotSupportedError
 from openml.flows.flow import OpenMLFlow
 from openml.testing import TestAPIBase
 
-
+@pytest.mark.uses_test_server()
 class TestFlowsV1(TestAPIBase):
     """Test FlowsV1 resource implementation."""
 
@@ -21,7 +21,6 @@ class TestFlowsV1(TestAPIBase):
         http_client = self.http_clients[APIVersion.V1]
         self.resource = FlowV1API(http_client)
 
-    @pytest.mark.uses_test_server()
     def test_get(self):
         """Test getting a flow from the V1 API."""
         flow = self.resource.get(flow_id=1)
@@ -31,7 +30,6 @@ class TestFlowsV1(TestAPIBase):
         self.assertIsInstance(flow.name, str)
         self.assertGreater(len(flow.name), 0)
 
-    @pytest.mark.uses_test_server()
     def test_exists(self):
         """Test checking if a flow exists using V1 API."""
         flow = self.resource.get(flow_id=1)
@@ -45,7 +43,6 @@ class TestFlowsV1(TestAPIBase):
         self.assertGreater(result, 0)
         self.assertEqual(result, flow.flow_id)
 
-    @pytest.mark.uses_test_server()
     def test_exists_nonexistent(self):
         """Test checking if a non-existent flow exists using V1 API."""
         result = self.resource.exists(
@@ -55,7 +52,6 @@ class TestFlowsV1(TestAPIBase):
         
         self.assertFalse(result)
 
-    @pytest.mark.uses_test_server()
     def test_list(self):
         """Test listing flows from the V1 API."""
         flows_df = self.resource.list(limit=10)
@@ -69,7 +65,6 @@ class TestFlowsV1(TestAPIBase):
         self.assertIn("full_name", flows_df.columns)
         self.assertIn("uploader", flows_df.columns)
 
-    @pytest.mark.uses_test_server()
     def test_list_with_offset(self):
         """Test listing flows with offset from the V1 API."""
         flows_df = self.resource.list(limit=5, offset=10)
@@ -77,7 +72,6 @@ class TestFlowsV1(TestAPIBase):
         self.assertGreater(len(flows_df), 0)
         self.assertLessEqual(len(flows_df), 5)
 
-    @pytest.mark.uses_test_server()
     def test_list_with_tag_limit_offset(self):
         """Test listing flows with filters from the V1 API."""
         flows_df = self.resource.list(tag="weka", limit=5, offset=0, uploader=16)
@@ -85,8 +79,7 @@ class TestFlowsV1(TestAPIBase):
         self.assertTrue(hasattr(flows_df, "columns"))
         if len(flows_df) > 0:
             self.assertIn("id", flows_df.columns)
-    
-    @pytest.mark.uses_test_server()
+
     def test_delete_and_publish(self):
         """Test deleting a flow using V1 API."""
         from openml_sklearn.extension import SklearnExtension
@@ -121,7 +114,7 @@ class TestFlowsV1(TestAPIBase):
         )
         self.assertFalse(exists)
 
-
+@pytest.mark.uses_test_server()
 class TestFlowsV2(TestFlowsV1):
     """Test FlowsV2 resource implementation."""
 
@@ -130,27 +123,23 @@ class TestFlowsV2(TestFlowsV1):
         http_client = self.http_clients[APIVersion.V2]
         self.resource = FlowV2API(http_client)
 
-    @pytest.mark.uses_test_server()
     def test_list(self):
         with pytest.raises(OpenMLNotSupportedError):
             super().test_list()
 
-    @pytest.mark.uses_test_server()
     def test_list_with_offset(self):
         with pytest.raises(OpenMLNotSupportedError):
             super().test_list_with_offset()
 
-    @pytest.mark.uses_test_server()
     def test_list_with_tag_limit_offset(self):
         with pytest.raises(OpenMLNotSupportedError):
             super().test_list_with_tag_limit_offset()
 
-    @pytest.mark.uses_test_server()
     def test_delete_and_publish(self):
         with pytest.raises(OpenMLNotSupportedError):
             super().test_delete_and_publish()
 
-
+@pytest.mark.uses_test_server()
 class TestFlowsFallback(TestFlowsV1):
     """Test combined functionality and fallback between V1 and V2."""
 
