@@ -298,8 +298,10 @@ class TestFlow(TestBase):
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
         TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
 
-    @pytest.mark.uses_test_server()
+    
+    @pytest.mark.sklearn()
     @mock.patch("openml.flows.functions.get_flow")
+    @mock.patch("openml._api_calls._perform_api_call")
     @mock.patch("openml.flows.functions.flow_exists")
     def test_publish_error(self, api_call_mock, flow_exists_mock, get_flow_mock):
         model = sklearn.ensemble.RandomForestClassifier()

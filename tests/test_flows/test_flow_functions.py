@@ -453,7 +453,6 @@ class TestFlowFunctions(TestBase):
 
 
 @mock.patch.object(requests.Session, "delete")
-@pytest.mark.skip(reason="Delete flow tests temporarily skipped")
 def test_delete_flow_not_owned(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_owned.xml"
@@ -474,7 +473,6 @@ def test_delete_flow_not_owned(mock_delete, test_files_directory, test_api_key):
 
 
 @mock.patch.object(requests.Session, "delete")
-@pytest.mark.skip(reason="Delete flow tests temporarily skipped")
 def test_delete_flow_with_run(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_has_runs.xml"
@@ -495,7 +493,6 @@ def test_delete_flow_with_run(mock_delete, test_files_directory, test_api_key):
 
 
 @mock.patch.object(requests.Session, "delete")
-@pytest.mark.skip(reason="Delete flow tests temporarily skipped")
 def test_delete_subflow(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_is_subflow.xml"
@@ -516,7 +513,6 @@ def test_delete_subflow(mock_delete, test_files_directory, test_api_key):
 
 
 @mock.patch.object(requests.Session, "delete")
-@pytest.mark.skip(reason="Delete flow tests temporarily skipped")
 def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_successful.xml"
