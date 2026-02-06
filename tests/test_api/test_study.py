@@ -97,16 +97,11 @@ class TestStudyCombined(TestAPIBase):
         self.resource_v2 = StudyV2API(self.v2_client)
         self.resource_fallback = FallbackProxy(self.resource_v2, self.resource_v1)
 
-    @pytest.mark.skip(reason="V2 list not yet implemented")
     @pytest.mark.uses_test_server()
     def test_list_matches(self):
-        """Test that V1 and V2 list return matching results."""
-        output_v1 = self.resource_v1.list(limit=5, offset=0)
-        output_v2 = self.resource_v2.list(limit=5, offset=0)
-
-        assert isinstance(output_v1, pd.DataFrame)
-        assert isinstance(output_v2, pd.DataFrame)
-        assert output_v1.equals(output_v2)
+        """Test that V2 raises not supported."""
+        with pytest.raises(OpenMLNotSupportedError):
+            self.resource_v2.list(limit=5, offset=0)
 
     @pytest.mark.uses_test_server()
     def test_list_fallback(self):
