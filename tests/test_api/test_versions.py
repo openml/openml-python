@@ -1,19 +1,16 @@
 from time import time
 import pytest
 from openml.testing import TestAPIBase
-from openml._api import ResourceV1API, ResourceV2API, FallbackProxy
-from openml.enums import ResourceType
+from openml._api import ResourceV1API, ResourceV2API, FallbackProxy, ResourceAPI
+from openml.enums import ResourceType, APIVersion
 from openml.exceptions import OpenMLNotSupportedError
 
 
-class TestResourceV1API(TestAPIBase):
-    def setUp(self):
-        super().setUp()
-        self.resource = ResourceV1API(self.http_client)
-        self.resource.resource_type = ResourceType.TASK
+@pytest.mark.uses_test_server()
+class TestResourceAPIBase(TestAPIBase):
+    resource: ResourceAPI | FallbackProxy
 
-    @pytest.mark.uses_test_server()
-    def test_publish_and_delete(self):
+    def _publish_and_delete(self):
         task_xml = """
         <oml:task_inputs xmlns:oml="http://openml.org/openml">
             <oml:task_type_id>5</oml:task_type_id>
@@ -22,30 +19,19 @@ class TestResourceV1API(TestAPIBase):
         </oml:task_inputs>
         """
 
-        task_id = None
-        try:
-            # Publish the task
-            task_id = self.resource.publish(
-                "task",
-                files={"description": task_xml},
-            )
+        task_id = self.resource.publish(
+            "task",
+            files={"description": task_xml},
+        )
+        self.assertIsNotNone(task_id)
 
-            # Get the task to verify it exists
-            get_response = self.http_client.get(f"task/{task_id}")
-            self.assertEqual(get_response.status_code, 200)
+        success = self.resource.delete(task_id)
+        self.assertTrue(success)
 
-        finally:
-            # delete the task if it was created
-            if task_id is not None:
-                success = self.resource.delete(task_id)
-                self.assertTrue(success)
-
-
-    @pytest.mark.uses_test_server()
-    def test_tag_and_untag(self):
+    def _tag_and_untag(self):
         resource_id = 1
         unique_indicator = str(time()).replace(".", "")
-        tag = f"TestResourceV1API_test_tag_and_untag_{unique_indicator}"
+        tag = f"{self.__class__.__name__}_test_tag_and_untag_{unique_indicator}"
 
         tags = self.resource.tag(resource_id, tag)
         self.assertIn(tag, tags)
@@ -54,52 +40,51 @@ class TestResourceV1API(TestAPIBase):
         self.assertNotIn(tag, tags)
 
 
-class TestResourceV2API(TestResourceV1API):
+class TestResourceV1API(TestResourceAPIBase):
     def setUp(self):
         super().setUp()
-
-        self.server = ""
-        self.base_url = ""
-        self.api_key = ""
-        self.http_client = self._get_http_client(
-            server=self.server,
-            base_url=self.base_url,
-            api_key=self.api_key,
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-            cache=self.cache,
-        )
-
-        self.resource = ResourceV2API(self.http_client)
+        http_client = self.http_clients[APIVersion.V1]
+        self.resource = ResourceV1API(http_client)
         self.resource.resource_type = ResourceType.TASK
 
-    @pytest.mark.xfail(raises=OpenMLNotSupportedError)
     def test_publish_and_delete(self):
-        super().test_tag_and_untag()
+        self._publish_and_delete()
 
-
-    @pytest.mark.xfail(raises=OpenMLNotSupportedError)
     def test_tag_and_untag(self):
-        super().test_tag_and_untag()
+        self._tag_and_untag()
 
 
-class TestResourceFallbackAPI(TestResourceV1API):
+class TestResourceV2API(TestResourceAPIBase):
     def setUp(self):
         super().setUp()
+        http_client = self.http_clients[APIVersion.V2]
+        self.resource = ResourceV2API(http_client)
+        self.resource.resource_type = ResourceType.TASK
 
-        self.http_client_v2 = self._get_http_client(
-            server="",
-            base_url="",
-            api_key="",
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-            cache=self.cache,
-        )
+    def test_publish_and_delete(self):
+        with pytest.raises(OpenMLNotSupportedError):
+            self._tag_and_untag()
 
-        resource_v1 = ResourceV1API(self.http_client)
+    def test_tag_and_untag(self):
+        with pytest.raises(OpenMLNotSupportedError):
+            self._tag_and_untag()
+
+
+class TestResourceFallbackAPI(TestResourceAPIBase):
+    def setUp(self):
+        super().setUp()
+        http_client_v1 = self.http_clients[APIVersion.V1]
+        resource_v1 = ResourceV1API(http_client_v1)
         resource_v1.resource_type = ResourceType.TASK
 
-        resource_v2 = ResourceV2API(self.http_client_v2)
+        http_client_v2 = self.http_clients[APIVersion.V2]
+        resource_v2 = ResourceV2API(http_client_v2)
         resource_v2.resource_type = ResourceType.TASK
 
         self.resource = FallbackProxy(resource_v2, resource_v1)
+
+    def test_publish_and_delete(self):
+        self._publish_and_delete()
+
+    def test_tag_and_untag(self):
+        self._tag_and_untag()
