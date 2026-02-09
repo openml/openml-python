@@ -1,14 +1,12 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-from collections import OrderedDict
 from collections.abc import Iterable
 from functools import partial
 from itertools import chain
 from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
-import xmltodict
 
 import openml
 import openml.exceptions
@@ -51,12 +49,8 @@ def setup_exists(flow: OpenMLFlow) -> int:
         )
 
     openml_param_settings = flow.extension.obtain_parameter_values(flow)
-    description = xmltodict.unparse(_to_dict(flow.flow_id, openml_param_settings), pretty=True)
-    file_elements = {
-        "description": ("description.arff", description),
-    }  # type: openml._api_calls.FILE_ELEMENTS_TYPE
 
-    return openml._backend.setup.exists(file_elements=file_elements)
+    return openml._backend.setup.exists(flow, openml_param_settings)
 
 
 def get_setup(setup_id: int) -> OpenMLSetup:
@@ -156,32 +150,6 @@ def initialize_model(setup_id: int, *, strict_version: bool = True) -> Any:
             subflow.parameters[hyperparameter.parameter_name] = hyperparameter.value
 
     return flow.extension.flow_to_model(flow, strict_version=strict_version)
-
-
-def _to_dict(flow_id: int, openml_parameter_settings: list[dict[str, Any]]) -> OrderedDict:
-    """Convert a flow ID and a list of OpenML parameter settings to
-    a dictionary representation that can be serialized to XML.
-
-    Parameters
-    ----------
-    flow_id : int
-        ID of the flow.
-    openml_parameter_settings : list[dict[str, Any]]
-        A list of OpenML parameter settings.
-
-    Returns
-    -------
-    OrderedDict
-        A dictionary representation of the flow ID and parameter settings.
-    """
-    # for convenience, this function (ab)uses the run object.
-    xml: OrderedDict = OrderedDict()
-    xml["oml:run"] = OrderedDict()
-    xml["oml:run"]["@xmlns:oml"] = "http://openml.org/openml"
-    xml["oml:run"]["oml:flow_id"] = flow_id
-    xml["oml:run"]["oml:parameter_setting"] = openml_parameter_settings
-
-    return xml
 
 
 def _create_setup(result_dict: dict) -> OpenMLSetup:

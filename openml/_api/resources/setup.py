@@ -1,14 +1,18 @@
 from __future__ import annotations
 
 import builtins
+from collections import OrderedDict
 from collections.abc import Iterable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import xmltodict
 
 from openml.setups.setup import OpenMLParameter, OpenMLSetup
 
 from .base import ResourceV1API, ResourceV2API, SetupAPI
+
+if TYPE_CHECKING:
+    from openml.flows.flow import OpenMLFlow
 
 
 class SetupV1API(ResourceV1API, SetupAPI):
@@ -180,20 +184,39 @@ class SetupV1API(ResourceV1API, SetupAPI):
 
         return self._create_setup(result_dict)
 
-    def exists(self, file_elements: dict[str, Any]) -> int | bool:
+    def exists(
+        self,
+        flow: OpenMLFlow,
+        param_settings: builtins.list[dict[str, Any]],
+    ) -> int | bool:
         """
         Checks whether a hyperparameter configuration already exists on the server.
 
         Parameters
         ----------
-        file_elements : dict
-            Dictionary containing file data for the API request
+        flow : OpenMLFlow
+            The openml flow object. Should have flow id present for the main flow
+            and all subflows (i.e., it should be downloaded from the server by
+            means of flow.get, and not instantiated locally)
+
+        list :
+            A list of dicts, where each dict has the following entries:
+                oml:name : str: The OpenML parameter name
+                oml:value : mixed: A representation of the parameter value
+                oml:component : int: flow id to which the parameter belongs
 
         Returns
         -------
         setup_id : int
             setup id iff exists, False otherwise
         """
+        if flow.flow_id is None:
+            raise ValueError("Flow must have a flow_id")
+        description = xmltodict.unparse(self._to_dict(flow.flow_id, param_settings), pretty=True)
+        file_elements = {
+            "description": ("description.arff", description),
+        }
+
         api_call = "setup/exists/"
         setup_response = self._http.post(api_call, files=file_elements)
         xml_content = setup_response.text
@@ -201,6 +224,33 @@ class SetupV1API(ResourceV1API, SetupAPI):
 
         setup_id = int(result_dict["oml:setup_exists"]["oml:id"])
         return setup_id if setup_id > 0 else False
+
+    def _to_dict(
+        self, flow_id: int, openml_parameter_settings: builtins.list[dict[str, Any]]
+    ) -> OrderedDict:
+        """Convert a flow ID and a list of OpenML parameter settings to
+        a dictionary representation that can be serialized to XML.
+
+        Parameters
+        ----------
+        flow_id : int
+            ID of the flow.
+        openml_parameter_settings : list[dict[str, Any]]
+            A list of OpenML parameter settings.
+
+        Returns
+        -------
+        OrderedDict
+            A dictionary representation of the flow ID and parameter settings.
+        """
+        # for convenience, this function (ab)uses the run object.
+        xml: OrderedDict = OrderedDict()
+        xml["oml:run"] = OrderedDict()
+        xml["oml:run"]["@xmlns:oml"] = "http://openml.org/openml"
+        xml["oml:run"]["oml:flow_id"] = flow_id
+        xml["oml:run"]["oml:parameter_setting"] = openml_parameter_settings
+
+        return xml
 
 
 class SetupV2API(ResourceV2API, SetupAPI):
@@ -223,5 +273,9 @@ class SetupV2API(ResourceV2API, SetupAPI):
     def get(self, setup_id: int) -> OpenMLSetup:  # noqa: ARG002
         self._not_supported(method="get")
 
-    def exists(self, file_elements: dict[str, Any]) -> int | bool:  # noqa: ARG002
+    def exists(
+        self,
+        flow: OpenMLFlow,  # noqa: ARG002
+        param_settings: builtins.list[dict[str, Any]],  # noqa: ARG002
+    ) -> int | bool:
         self._not_supported(method="exists")

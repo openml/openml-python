@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import builtins
 from abc import abstractmethod
 from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
@@ -9,6 +10,7 @@ from openml.enums import ResourceType
 from .base import ResourceAPI
 
 if TYPE_CHECKING:
+    from openml.flows.flow import OpenMLFlow
     from openml.setups.setup import OpenMLSetup
 
 
@@ -65,4 +67,8 @@ class SetupAPI(ResourceAPI):
     def get(self, setup_id: int) -> OpenMLSetup: ...
 
     @abstractmethod
-    def exists(self, file_elements: dict[str, Any]) -> int | bool: ...
+    def exists(
+        self,
+        flow: OpenMLFlow,
+        param_settings: builtins.list[dict[str, Any]],
+    ) -> int | bool: ...
