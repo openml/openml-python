@@ -129,4 +129,4 @@ class EstimationProcedureV2API(ResourceV2API, EstimationProcedureAPI):
         return [prod["name"] for prod in list_of_prod_dicts]
 
     def _get_details(self) -> builtins.list[dict[str, Any]]:
-        raise NotImplementedError("V2 API implementation is not yet available")
+        self._not_supported(method="get_details")
