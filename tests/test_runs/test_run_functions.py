@@ -1822,7 +1822,7 @@ def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.runs.delete_run(40_000)
 
-    run_url = "https://test.openml.org/api/v1/run/40000"
+    run_url = "https://test.openml.org/api/v1/xml/run/40000"
     print(mock_delete.call_args.kwargs)
     assert run_url == mock_delete.call_args.kwargs.get("url")
     assert "DELETE" == mock_delete.call_args.kwargs.get("method")
@@ -1841,7 +1841,7 @@ def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
     success = openml.runs.delete_run(10591880)
     assert success
 
-    run_url = "https://test.openml.org/api/v1/run/10591880"
+    run_url = "https://test.openml.org/api/v1/xml/run/10591880"
     print(mock_delete.call_args.kwargs)
     assert run_url == mock_delete.call_args.kwargs.get("url")
     assert "DELETE" == mock_delete.call_args.kwargs.get("method")
@@ -1863,7 +1863,7 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.runs.delete_run(9_999_999)
 
-    run_url = "https://test.openml.org/api/v1/run/9999999"
+    run_url = "https://test.openml.org/api/v1/xml/run/9999999"
     print(mock_delete.call_args.kwargs)
     assert run_url == mock_delete.call_args.kwargs.get("url")
     assert "DELETE" == mock_delete.call_args.kwargs.get("method")
