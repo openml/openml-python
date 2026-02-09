@@ -306,12 +306,14 @@ class TestFlow(TestBase):
     def test_publish_error(self, mock_request, flow_exists_mock, get_flow_mock):
         model = sklearn.ensemble.RandomForestClassifier()
         flow = self.extension.model_to_flow(model)
-        mock_request.return_value = create_request_response(
-            status_code=200,
-            content=(
-                "<oml:upload_flow>\n" "    <oml:id>1</oml:id>\n" "</oml:upload_flow>"
-            ),
-        )
+        
+        # Create mock response directly
+        response = requests.Response()
+        response.status_code = 200
+        response._content = (
+            "<oml:upload_flow>\n" "    <oml:id>1</oml:id>\n" "</oml:upload_flow>"
+        ).encode()
+        mock_request.return_value = response
         get_flow_mock.return_value = flow
 
         flow.publish()
