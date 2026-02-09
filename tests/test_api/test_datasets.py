@@ -7,7 +7,7 @@ import pytest
 import pandas as pd
 from openml._api.resources.base.fallback import FallbackProxy
 from openml.enums import APIVersion
-from openml.testing import TestAPIBase
+from openml.testing import TestAPIBase, TestBase
 from openml._api.resources.dataset import DatasetV1API, DatasetV2API
 
 
@@ -77,6 +77,7 @@ class TestDatasetV1API(TestAPIBase):
         file_elements["description"] = dataset._to_xml()
         dataset_id = self.dataset.publish(path="data", files=file_elements)
         self.dataset_id = dataset_id
+        TestBase._mark_entity_for_removal("data", dataset_id)
         # admin key for test server (only admins can activate datasets.
         # all users can deactivate their own datasets)
         self.api_key = self.dataset._http.api_key = self.admin_key
@@ -93,7 +94,6 @@ class TestDatasetV1API(TestAPIBase):
         result = result.to_dict(orient="index")
         assert result[dataset_id]["status"] == status
 
-        assert self.dataset.delete(dataset_id)
 
 
     def test_edit(self):
@@ -327,6 +327,7 @@ class TestDatasetsCombined(TestAPIBase):
         file_elements["description"] = dataset._to_xml()
         dataset_id = self.dataset_fallback.publish(path="data", files=file_elements)
         self.dataset_id = dataset_id
+        TestBase._mark_entity_for_removal("data", dataset_id)
         self.api_key = self.dataset_fallback._http.api_key = self.admin_key
 
         self.dataset_fallback.status_update(dataset_id,"deactivated")

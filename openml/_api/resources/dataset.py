@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any, Literal
 import minio
 import urllib3
 
+import openml
 from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 from openml.datasets.data_feature import OpenMLDataFeature
 from openml.datasets.dataset import OpenMLDataset
@@ -38,6 +39,7 @@ NO_ACCESS_GRANTED_ERRCODE = 112
 
 
 class DatasetV1API(ResourceV1API, DatasetAPI):
+    @openml.utils.thread_safe_if_oslo_installed
     def get(
         self,
         dataset_id: int,
@@ -878,6 +880,7 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
 
 
 class DatasetV2API(ResourceV2API, DatasetAPI):
+    @openml.utils.thread_safe_if_oslo_installed
     def get(
         self,
         dataset_id: int,
