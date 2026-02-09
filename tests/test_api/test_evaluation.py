@@ -5,8 +5,8 @@ import pytest
 from openml._api.resources.evaluation import EvaluationV1API, EvaluationV2API
 from openml.evaluations import OpenMLEvaluation
 from openml.testing import TestAPIBase
-from openml._api.resources.base.fallback import FallbackProxy
-  
+from openml.enums import APIVersion  
+from openml.exceptions import OpenMLNotSupportedError  
   
 class TestEvaluationV1(TestAPIBase):  
     """Tests for V1 XML API implementation of evaluations."""  
@@ -15,7 +15,8 @@ class TestEvaluationV1(TestAPIBase):
   
     def setUp(self) -> None:    
         super().setUp() 
-        self.resource = EvaluationV1API(self.http_client)
+        http_client = self.http_clients[APIVersion.V1]
+        self.resource = EvaluationV1API(http_client)
   
     @pytest.mark.uses_test_server()
     def test_list(self):
@@ -37,40 +38,24 @@ class TestEvaluationV2(TestAPIBase):
   
     def setUp(self) -> None:    
         super().setUp() 
-        self.client = self._get_http_client(
-            server="http://localhost:8001/",
-            base_url="",
-            api_key="",
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-            cache=self.cache,
-        )
-        self.resource = EvaluationV2API(self.client)
+        http_client = self.http_clients[APIVersion.V2]
+        self.resource = EvaluationV2API(http_client)
+
+    @pytest.mark.uses_test_server()
+    def test_list(self):
+        with pytest.raises(OpenMLNotSupportedError):
+            self.resource.list(
+                function="predictive_accuracy",
+                limit=10,
+                offset=0,
+            )
+            
 
 
 class TestEvaluationsCombined(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.v1_client = self.http_client
-        self.v2_client = self._get_http_client(
-            server="http://localhost:8001/",
-            base_url="",
-            api_key="",
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-            cache=self.cache,
-        )
+        self.v1_client = self.http_clients[APIVersion.V1]
+        self.v2_client = self.http_clients[APIVersion.V2]
         self.resource_v1 = EvaluationV1API(self.v1_client)
         self.resource_v2 = EvaluationV2API(self.v2_client)
-        self.resource_fallback = FallbackProxy(self.resource_v2, self.resource_v1)
-
-    @pytest.mark.uses_test_server()
-    def test_list_fallback(self):
-        output_fallback = self.resource_fallback.list(
-            function="predictive_accuracy",
-            limit=10,
-            offset=0,
-        )
-        assert isinstance(output_fallback, list)
-        assert len(output_fallback) == 10
-        assert all(isinstance(e, OpenMLEvaluation) for e in output_fallback)
