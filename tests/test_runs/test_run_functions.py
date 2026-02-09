@@ -1810,7 +1810,7 @@ class TestRun(TestBase):
 @mock.patch.object(requests.Session, "request")
 def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
-    content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_owned.xml"
+    content_file = test_files_directory / "mock_responses" / "xml" / "runs" / "run_delete_not_owned.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
@@ -1832,7 +1832,7 @@ def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
 @mock.patch.object(requests.Session, "request")
 def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
-    content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_successful.xml"
+    content_file = test_files_directory / "mock_responses" / "xml" / "runs" / "run_delete_successful.xml"
     mock_delete.return_value = create_request_response(
         status_code=200,
         content_filepath=content_file,
@@ -1851,7 +1851,7 @@ def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
 @mock.patch.object(requests.Session, "request")
 def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     openml.config.start_using_configuration_for_example()
-    content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_exist.xml"
+    content_file = test_files_directory / "mock_responses" / "xml" / "runs" / "run_delete_not_exist.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
