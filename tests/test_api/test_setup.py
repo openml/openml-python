@@ -27,6 +27,7 @@ def get_sentinel():
     sentinel = md5.hexdigest()[:10]
     return f"TEST{sentinel}"  
   
+@pytest.mark.uses_test_server()
 class TestSetupV1(TestAPIBase):  
     """Tests for V1 XML API implementation of setups."""  
   
@@ -38,7 +39,6 @@ class TestSetupV1(TestAPIBase):
         self.resource = SetupV1API(http_client)
         self.extension = SklearnExtension()
   
-    @pytest.mark.uses_test_server()
     def test_list(self):
         setups = self.resource.list(limit=10, offset=0)
         
@@ -46,7 +46,6 @@ class TestSetupV1(TestAPIBase):
         assert len(setups) > 0
         assert all(isinstance(s, OpenMLSetup) for s in setups)
     
-    @pytest.mark.uses_test_server()
     def test_get(self):
         setup_id = 1
         setup = self.resource.get(setup_id)
@@ -55,7 +54,6 @@ class TestSetupV1(TestAPIBase):
         assert setup.setup_id == setup_id
 
     @pytest.mark.sklearn()
-    @pytest.mark.uses_test_server()
     def test_exists_nonexisting_setup(self):
         """Test exists() returns False when setup doesn't exist"""
         # first publish a non-existing flow
@@ -76,7 +74,6 @@ class TestSetupV1(TestAPIBase):
         assert not setup_id
     
     @pytest.mark.sklearn()
-    @pytest.mark.uses_test_server()
     def test_exists_existing_setup(self):
         """Test exists() returns setup_id when setup exists"""
         flow = self.extension.model_to_flow(sklearn.naive_bayes.GaussianNB())
@@ -105,7 +102,7 @@ class TestSetupV1(TestAPIBase):
         setup_id = self.resource.exists(flow, openml_param_settings)
         assert setup_id == run.setup_id
 
-
+@pytest.mark.uses_test_server()
 class TestSetupV2(TestAPIBase): 
     """Tests for V2 JSON API implementation of setups."""  
   
@@ -117,19 +114,16 @@ class TestSetupV2(TestAPIBase):
         self.resource = SetupV2API(http_client)
         self.extension = SklearnExtension()
 
-    @pytest.mark.uses_test_server()
     def test_list(self):
         with pytest.raises(OpenMLNotSupportedError):
             self.resource.list(limit=10, offset=0)
     
-    @pytest.mark.uses_test_server()
     def test_get(self):
         with pytest.raises(OpenMLNotSupportedError):
             setup_id = 1
             self.resource.get(setup_id)
 
     @pytest.mark.sklearn()
-    @pytest.mark.uses_test_server()
     def test_exists_nonexisting_setup(self):
         # first publish a non-existing flow
         sentinel = get_sentinel()
@@ -149,7 +143,6 @@ class TestSetupV2(TestAPIBase):
             self.resource.exists(flow, openml_param_settings)
     
     @pytest.mark.sklearn()
-    @pytest.mark.uses_test_server()
     def test_exists_existing_setup(self):
         flow = self.extension.model_to_flow(sklearn.naive_bayes.GaussianNB())
         flow.name = f"{get_sentinel()}{flow.name}"
