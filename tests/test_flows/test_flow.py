@@ -29,8 +29,8 @@ from openml_sklearn import SklearnExtension
 import openml
 import openml.exceptions
 import openml.utils
-from openml._api_calls import _perform_api_call
-from openml.testing import SimpleImputer, TestBase
+import requests
+from openml.testing import SimpleImputer, TestBase, create_request_response
 
 
 
@@ -133,7 +133,7 @@ class TestFlow(TestBase):
             7,
             9,
         ]:
-            flow_xml = _perform_api_call("flow/%d" % flow_id, request_method="get")
+            flow_xml = openml.config.get_backend().http_client.get(f"flow/{flow_id}").text
             flow_dict = xmltodict.parse(flow_xml)
 
             flow = openml.OpenMLFlow._from_dict(flow_dict)
@@ -302,19 +302,22 @@ class TestFlow(TestBase):
     @pytest.mark.sklearn()
     @mock.patch("openml.flows.functions.get_flow")
     @mock.patch("openml.flows.functions.flow_exists")
-    def test_publish_error(self, api_call_mock, flow_exists_mock, get_flow_mock):
+    @mock.patch("requests.Session.request")
+    def test_publish_error(self, mock_request, flow_exists_mock, get_flow_mock):
         model = sklearn.ensemble.RandomForestClassifier()
         flow = self.extension.model_to_flow(model)
-        api_call_mock.return_value = (
-            "<oml:upload_flow>\n" "    <oml:id>1</oml:id>\n" "</oml:upload_flow>"
+        mock_request.return_value = create_request_response(
+            status_code=200,
+            content=(
+                "<oml:upload_flow>\n" "    <oml:id>1</oml:id>\n" "</oml:upload_flow>"
+            ),
         )
-        flow_exists_mock.return_value = False
         get_flow_mock.return_value = flow
 
         flow.publish()
         # Not collecting flow_id for deletion since this is a test for failed upload
 
-        assert api_call_mock.call_count == 1
+        assert mock_request.call_count == 1
         assert get_flow_mock.call_count == 1
         assert flow_exists_mock.call_count == 1
 
