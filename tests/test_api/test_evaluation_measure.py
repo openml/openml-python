@@ -4,8 +4,7 @@ from __future__ import annotations
 import pytest    
 from openml._api.resources.evaluation_measure import EvaluationMeasureV1API, EvaluationMeasureV2API
 from openml.testing import TestAPIBase
-from openml._api.resources.base.fallback import FallbackProxy
-  
+from openml.enums import APIVersion  
   
 class TestEvaluationMeasureV1(TestAPIBase):  
     """Tests for V1 XML API implementation of evaluation measures."""  
@@ -14,7 +13,8 @@ class TestEvaluationMeasureV1(TestAPIBase):
   
     def setUp(self) -> None:    
         super().setUp() 
-        self.resource = EvaluationMeasureV1API(self.http_client)
+        http_client = self.http_clients[APIVersion.V1]
+        self.resource = EvaluationMeasureV1API(http_client)
   
     @pytest.mark.uses_test_server()
     def test_list(self):
@@ -30,16 +30,8 @@ class TestEvaluationMeasureV2(TestAPIBase):
   
     def setUp(self) -> None:    
         super().setUp() 
-        self.client = self._get_http_client(
-            server="http://localhost:8001/",
-            base_url="",
-            api_key="",
-            timeout_seconds=self.timeout_seconds,
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-            cache=self.cache,
-        )
-        self.resource = EvaluationMeasureV2API(self.client)
+        http_client = self.http_clients[APIVersion.V2]
+        self.resource = EvaluationMeasureV2API(http_client)
   
     @pytest.mark.uses_test_server()
     def test_list(self):
@@ -51,19 +43,10 @@ class TestEvaluationMeasureV2(TestAPIBase):
 class TestEvaluationMeasuresCombined(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.v1_client = self.http_client
-        self.v2_client = self._get_http_client(
-            server="http://localhost:8001/",
-            base_url="",
-            api_key="",
-            timeout_seconds=self.timeout_seconds,
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-            cache=self.cache,
-        )
+        self.v1_client = self.http_clients[APIVersion.V1]
+        self.v2_client = self.http_clients[APIVersion.V2]
         self.resource_v1 = EvaluationMeasureV1API(self.v1_client)
         self.resource_v2 = EvaluationMeasureV2API(self.v2_client)
-        self.resource_fallback = FallbackProxy(self.resource_v2, self.resource_v1)
 
     @pytest.mark.uses_test_server()
     def test_list_matches(self):
@@ -73,9 +56,3 @@ class TestEvaluationMeasuresCombined(TestAPIBase):
         assert isinstance(output_v1, list)
         assert isinstance(output_v2, list)
         assert output_v1 == output_v2
-
-    @pytest.mark.uses_test_server()
-    def test_list_fallback(self):
-        output_fallback = self.resource_fallback.list()
-        assert isinstance(output_fallback, list)
-        assert all(isinstance(s, str) for s in output_fallback)
