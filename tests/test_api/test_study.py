@@ -4,8 +4,8 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from openml._api.resources.base.fallback import FallbackProxy
-from openml._api.resources.study import StudyV1API, StudyV2API
+from openml._api.config import APIVersion
+from openml._api.resources import FallbackProxy, StudyV1API, StudyV2API
 from openml.exceptions import OpenMLNotSupportedError
 from openml.testing import TestAPIBase
 
@@ -15,7 +15,7 @@ class TestStudyV1API(TestAPIBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.api = StudyV1API(self.http_client)
+        self.api = StudyV1API(self.http_clients[APIVersion.V1])
 
     @pytest.mark.uses_test_server()
     def test_list_basic(self):
@@ -61,16 +61,7 @@ class TestStudyV2API(TestAPIBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.v2_client = self._get_http_client(
-            server="http://localhost:8001/",
-            base_url="",
-            api_key="",
-            timeout=self.timeout,
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-            cache=self.cache,
-        )
-        self.api = StudyV2API(self.v2_client)
+        self.api = StudyV2API(self.http_clients[APIVersion.V2])
 
     def test_list_not_supported(self):
         """Test that list raises OpenMLNotSupportedError for V2."""
@@ -83,18 +74,8 @@ class TestStudyCombined(TestAPIBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.v1_client = self.http_client
-        self.v2_client = self._get_http_client(
-            server="http://localhost:8001/",
-            base_url="",
-            api_key="",
-            timeout=self.timeout,
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-            cache=self.cache,
-        )
-        self.resource_v1 = StudyV1API(self.v1_client)
-        self.resource_v2 = StudyV2API(self.v2_client)
+        self.resource_v1 = StudyV1API(self.http_clients[APIVersion.V1])
+        self.resource_v2 = StudyV2API(self.http_clients[APIVersion.V2])
         self.resource_fallback = FallbackProxy(self.resource_v2, self.resource_v1)
 
     @pytest.mark.uses_test_server()

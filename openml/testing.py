@@ -11,13 +11,12 @@ import time
 import unittest
 from pathlib import Path
 from typing import ClassVar
-from urllib.parse import urljoin
 
 import requests
 
 import openml
-from openml._api.clients import HTTPCache, HTTPClient
-from openml._api.config import RetryPolicy
+from openml._api.clients import HTTPCache, HTTPClient, MinIOClient
+from openml._api.config import APIVersion, RetryPolicy
 from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType
 
@@ -279,89 +278,45 @@ class TestBase(unittest.TestCase):
                         assert evaluation <= max_val
 
 
-class TestAPIBase(unittest.TestCase):
-    server: str
-    base_url: str
-    api_key: str
-    timeout: int
-    retries: int
-    retry_policy: RetryPolicy
-    dir: str
-    ttl: int
+class TestAPIBase(TestBase):
     cache: HTTPCache
-    http_client: HTTPClient
+    http_clients: dict[APIVersion, HTTPClient]
+    minio_client: MinIOClient
 
-    def setUp(self) -> None:
-        self.server = "https://test.openml.org/"
-        self.base_url = "api/v1/xml"
-        self.api_key = "normaluser"
-        self.timeout = 10
-        self.retries = 3
-        self.retry_policy = RetryPolicy.HUMAN
-        self.dir = "test_cache"
-        self.ttl = 60 * 60 * 24 * 7
+    def setUp(self, n_levels: int = 1, tmpdir_suffix: str = "") -> None:
+        super().setUp(n_levels=n_levels, tmpdir_suffix=tmpdir_suffix)
 
-        self.cache = self._get_http_cache(
-            path=Path(self.dir),
-            ttl=self.ttl,
-        )
-        self.http_client = self._get_http_client(
-            server=self.server,
-            base_url=self.base_url,
-            api_key=self.api_key,
-            timeout=self.timeout,
-            retries=self.retries,
-            retry_policy=self.retry_policy,
-            cache=self.cache,
-        )
+        timeout = 10
+        retries = self.connection_n_retries
+        retry_policy = RetryPolicy.HUMAN if self.retry_policy == "human" else RetryPolicy.ROBOT
+        ttl = 60 * 60 * 24 * 7  # one week
+        cache_dir = self.static_cache_dir
 
-        if self.cache.path.exists():
-            shutil.rmtree(self.cache.path)
-
-    def tearDown(self) -> None:
-        if self.cache.path.exists():
-            shutil.rmtree(self.cache.path)
-
-    def _get_http_cache(
-        self,
-        path: Path,
-        ttl: int,
-    ) -> HTTPCache:
-        return HTTPCache(
-            path=path,
+        self.cache = HTTPCache(
+            path=cache_dir,
             ttl=ttl,
         )
-
-    def _get_http_client(  # noqa: PLR0913
-        self,
-        server: str,
-        base_url: str,
-        api_key: str,
-        timeout: int,
-        retries: int,
-        retry_policy: RetryPolicy,
-        cache: HTTPCache | None = None,
-    ) -> HTTPClient:
-        return HTTPClient(
-            server=server,
-            base_url=base_url,
-            api_key=api_key,
-            timeout=timeout,
-            retries=retries,
-            retry_policy=retry_policy,
-            cache=cache,
-        )
-
-    def _get_url(
-        self,
-        server: str | None = None,
-        base_url: str | None = None,
-        path: str | None = None,
-    ) -> str:
-        server = server if server else self.server
-        base_url = base_url if base_url else self.base_url
-        path = path if path else ""
-        return urljoin(self.server, urljoin(self.base_url, path))
+        self.http_clients = {
+            APIVersion.V1: HTTPClient(
+                server="https://test.openml.org/",
+                base_url="api/v1/xml/",
+                api_key="normaluser",
+                timeout=timeout,
+                retries=retries,
+                retry_policy=retry_policy,
+                cache=self.cache,
+            ),
+            APIVersion.V2: HTTPClient(
+                server="http://localhost:8002/",
+                base_url="",
+                api_key="",
+                timeout=timeout,
+                retries=retries,
+                retry_policy=retry_policy,
+                cache=self.cache,
+            ),
+        }
+        self.minio_client = MinIOClient(path=cache_dir)
 
 
 def check_task_existence(

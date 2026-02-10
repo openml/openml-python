@@ -276,12 +276,12 @@ class HTTPClient:
 
     def _request(  # noqa: PLR0913
         self,
+        session: requests.Session,
         method: str,
         url: str,
         params: Mapping[str, Any],
         data: Mapping[str, Any],
         headers: Mapping[str, str],
-        timeout: float | int,
         files: Mapping[str, Any] | None,
         **request_kwargs: Any,
     ) -> tuple[Response | None, Exception | None]:
@@ -289,13 +289,12 @@ class HTTPClient:
         response: Response | None = None
 
         try:
-            response = requests.request(
+            response = session.request(
                 method=method,
                 url=url,
                 params=params,
                 data=data,
                 headers=headers,
-                timeout=timeout,
                 files=files,
                 **request_kwargs,
             )
@@ -343,7 +342,7 @@ class HTTPClient:
         headers = request_kwargs.pop("headers", {}).copy()
         headers.update(self.headers)
 
-        timeout = request_kwargs.pop("timeout", self.timeout)
+        request_kwargs.pop("timeout", self.timeout)
         files = request_kwargs.pop("files", None)
 
         if use_cache and not reset_cache and self.cache is not None:
@@ -355,14 +354,15 @@ class HTTPClient:
             except Exception:
                 raise  # propagate unexpected cache errors
 
+        session = requests.Session()
         for retry_counter in range(1, retries + 1):
             response, retry_raise_e = self._request(
+                session=session,
                 method=method,
                 url=url,
                 params=params,
                 data=data,
                 headers=headers,
-                timeout=timeout,
                 files=files,
                 **request_kwargs,
             )
@@ -376,6 +376,8 @@ class HTTPClient:
 
             delay = self.retry_func(retry_counter)
             time.sleep(delay)
+
+        session.close()
 
         assert response is not None
 
