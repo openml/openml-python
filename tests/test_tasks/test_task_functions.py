@@ -6,6 +6,7 @@ import unittest
 from unittest import mock
 
 import pytest
+import requests
 
 import openml
 from openml import OpenMLTask
@@ -140,7 +141,7 @@ class TestTask(TestBase):
             os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff")
         )
 
-@mock.patch("openml._api.clients.http.HTTPClient.delete")
+@mock.patch.object(requests.Session, "request")
 def test_delete_task_not_owned(mock_delete):
     openml.config.start_using_configuration_for_example()
     mock_delete.side_effect = OpenMLNotAuthorizedError(
@@ -152,10 +153,13 @@ def test_delete_task_not_owned(mock_delete):
     ):
         openml.tasks.delete_task(1)
 
-    task_url = "task/1"
-    assert task_url == mock_delete.call_args.args[0]
+    print(mock_delete.call_args.kwargs)
+    
+    task_url = "https://test.openml.org/api/v1/xml/task/1"
+    assert task_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
 
-@mock.patch("openml._api.clients.http.HTTPClient.delete")
+@mock.patch.object(requests.Session, "request")
 def test_delete_task_with_run(mock_delete):
     openml.config.start_using_configuration_for_example()
     mock_delete.side_effect = OpenMLServerException("Task does not exist")
@@ -166,11 +170,13 @@ def test_delete_task_with_run(mock_delete):
     ):
         openml.tasks.delete_task(3496)
 
-    task_url = "task/3496"
-    assert task_url == mock_delete.call_args.args[0]
+    task_url = "https://test.openml.org/api/v1/xml/task/3496"
+    assert task_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
 
-@mock.patch("openml._api.clients.http.HTTPClient.delete")
+@mock.patch.object(requests.Session, "request")
 def test_delete_success(mock_delete, test_files_directory):
+    openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_successful.xml"
     mock_delete.return_value = create_request_response(
         status_code=200,
@@ -180,14 +186,17 @@ def test_delete_success(mock_delete, test_files_directory):
     success = openml.tasks.delete_task(361323)
     assert success
 
-    task_url = "task/361323"
-    assert task_url == mock_delete.call_args.args[0]
+    task_url = "https://test.openml.org/api/v1/xml/task/361323"
+    assert task_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
 
-@mock.patch("openml._api.clients.http.HTTPClient.delete")
+@mock.patch.object(requests.Session, "request")
 def test_delete_unknown_task(mock_delete):
+    openml.config.start_using_configuration_for_example()
     mock_delete.side_effect = OpenMLServerException("Task does not exist")
     with pytest.raises(OpenMLServerException, match="Task does not exist"):
         openml.tasks.delete_task(9_999_999)
 
-    task_url = "task/9999999"
-    assert task_url == mock_delete.call_args.args[0]
+    task_url = "https://test.openml.org/api/v1/xml/task/9999999"
+    assert task_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
