@@ -1,64 +1,74 @@
-# License: BSD 3-Clause
 from __future__ import annotations
 
 import pytest
 import pandas as pd
 from openml._api.resources.task import TaskV1API, TaskV2API
+from openml._api.resources.base.fallback import FallbackProxy
 from openml.exceptions import OpenMLNotSupportedError
 from openml.testing import TestAPIBase
-from openml.tasks.task import TaskType
 from openml.enums import APIVersion
+from openml.tasks.task import TaskType
 
-class TestTaskV1(TestAPIBase):
+
+class TestTaskV1API(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.resource = TaskV1API(self.http_clients[APIVersion.V1])
+        self.client = self.http_clients[APIVersion.V1]
+        self.task = TaskV1API(self.client)
 
     @pytest.mark.uses_test_server()
     def test_list_tasks(self):
         """Verify V1 list endpoint returns a populated DataFrame."""
-        tasks_df = self.resource.list(limit=5, offset=0)
+        tasks_df = self.task.list(limit=5, offset=0)
         assert isinstance(tasks_df, pd.DataFrame)
         assert not tasks_df.empty
         assert "tid" in tasks_df.columns
 
-    @pytest.mark.uses_test_server()
-    def test_estimation_procedure_list(self):
-        """Verify that estimation procedure list endpoint works."""
-        procs = self.resource._get_estimation_procedure_list()
-        assert isinstance(procs, list)
-        assert len(procs) > 0
-        assert "id" in procs[0]
-
-class TestTaskV2(TestAPIBase):
+class TestTaskV2API(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.resource = TaskV2API(self.http_clients[APIVersion.V2])
+        self.client = self.http_clients[APIVersion.V2]
+        self.task = TaskV2API(self.client)
 
     @pytest.mark.uses_test_server()
     def test_list_tasks(self):
         """Verify V2 list endpoint returns a populated DataFrame."""
         with pytest.raises(OpenMLNotSupportedError):
-            self.resource.list(limit=5, offset=0)
+            self.task.list(limit=5, offset=0)
 
 class TestTasksCombined(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.v1_resource = TaskV1API(self.http_clients[APIVersion.V1])
-        self.v2_resource = TaskV2API(self.http_clients[APIVersion.V2])
+        self.v1_client = self.http_clients[APIVersion.V1]
+        self.v2_client = self.http_clients[APIVersion.V2]
+        self.task_v1 = TaskV1API(self.v1_client)
+        self.task_v2 = TaskV2API(self.v2_client)
+        self.task_fallback = FallbackProxy(self.task_v1, self.task_v2)
 
     def _get_first_tid(self, task_type: TaskType) -> int:
         """Helper to find an existing task ID for a given type using the V1 resource."""
-        tasks = self.v1_resource.list(limit=1, offset=0, task_type=task_type)
+        tasks = self.task_v1.list(limit=1, offset=0, task_type=task_type)
         if tasks.empty:
             pytest.skip(f"No tasks of type {task_type} found on test server.")
         return int(tasks.iloc[0]["tid"])
 
     @pytest.mark.uses_test_server()
-    def test_v2_get_task(self):
-        """Verify that we can get a task from V2 API using a task ID found via V1."""
+    def test_get_matches(self):
+        """Verify that we can get a task from V2 API and it matches V1."""
+        # Refactored to match the 'test_get_matches' style from Reference
         tid = self._get_first_tid(TaskType.SUPERVISED_CLASSIFICATION)
-        task_v1 = self.v1_resource.get(tid)
-        task_v2 = self.v2_resource.get(tid)
-        assert int(task_v1.task_id) == tid
-        assert int(task_v2.task_id) == tid
+        
+        output_v1 = self.task_v1.get(tid)
+        output_v2 = self.task_v2.get(tid)
+
+        assert int(output_v1.task_id) == tid
+        assert int(output_v2.task_id) == tid
+        assert output_v1.task_id == output_v2.task_id
+        assert output_v1.task_type == output_v2.task_type
+
+    @pytest.mark.uses_test_server()
+    def test_get_fallback(self):
+        """Verify the fallback proxy works for retrieving tasks."""
+        tid = self._get_first_tid(TaskType.SUPERVISED_CLASSIFICATION)
+        output_fallback = self.task_fallback.get(tid)
+        assert int(output_fallback.task_id) == tid

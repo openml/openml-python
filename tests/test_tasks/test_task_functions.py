@@ -114,6 +114,11 @@ class TestTask(TestBase):
         openml.tasks.get_task(34536)
 
     @pytest.mark.uses_test_server()
+    def test_get_task(self):
+        task = openml.tasks.get_task(1, download_data=True)  # anneal; crossvalidation
+        assert isinstance(task, OpenMLTask)
+
+    @pytest.mark.uses_test_server()
     def test_get_task_lazy(self):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
