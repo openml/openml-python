@@ -1,13 +1,15 @@
 from time import time
 import pytest
 from openml.testing import TestAPIBase
-from openml._api import ResourceV1API, ResourceV2API, FallbackProxy
+from openml._api import ResourceV1API, ResourceV2API, FallbackProxy, ResourceAPI
 from openml.enums import ResourceType, APIVersion
 from openml.exceptions import OpenMLNotSupportedError
 
 
 @pytest.mark.uses_test_server()
 class TestResourceAPIBase(TestAPIBase):
+    resource: ResourceAPI | FallbackProxy
+
     def _publish_and_delete(self):
         task_xml = """
         <oml:task_inputs xmlns:oml="http://openml.org/openml">

@@ -534,7 +534,7 @@ def _sync_api_config() -> None:
 
     p = urlparse(server)
     v1_server = f"{p.scheme}://{p.netloc}/"
-    v1_base_url = p.path.lstrip("/")
+    v1_base_url = p.path.rstrip("/") + "/"  # requirement for urllib.parse.urljoin
     connection_retry_policy = RetryPolicy.HUMAN if retry_policy == "human" else RetryPolicy.ROBOT
     cache_dir = str(_root_cache_directory)
 
