@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import math
 import random
 import time
 import xml
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode, urljoin, urlparse
@@ -18,6 +19,8 @@ from requests import Response
 from openml.__version__ import __version__
 from openml.enums import RetryPolicy
 from openml.exceptions import (
+    OpenMLCacheRequiredError,
+    OpenMLHashException,
     OpenMLNotAuthorizedError,
     OpenMLServerError,
     OpenMLServerException,
@@ -315,7 +318,7 @@ class HTTPClient:
 
         return response, retry_raise_e
 
-    def request(
+    def request(  # noqa: PLR0913, C901
         self,
         method: str,
         path: str,
@@ -323,6 +326,7 @@ class HTTPClient:
         use_cache: bool = False,
         reset_cache: bool = False,
         use_api_key: bool = False,
+        md5_checksum: str | None = None,
         **request_kwargs: Any,
     ) -> Response:
         url = urljoin(self.server, urljoin(self.base_url, path))
@@ -384,7 +388,19 @@ class HTTPClient:
             cache_key = self.cache.get_key(url, params)
             self.cache.save(cache_key, response)
 
+        if md5_checksum is not None:
+            self._verify_checksum(response, md5_checksum)
+
         return response
+
+    def _verify_checksum(self, response: Response, md5_checksum: str) -> None:
+        # ruff sees hashlib.md5 as insecure
+        actual = hashlib.md5(response.content).hexdigest()  # noqa: S324
+        if actual != md5_checksum:
+            raise OpenMLHashException(
+                f"Checksum of downloaded file is unequal to the expected checksum {md5_checksum} "
+                f"when downloading {response.url}.",
+            )
 
     def get(
         self,
@@ -393,6 +409,7 @@ class HTTPClient:
         use_cache: bool = False,
         reset_cache: bool = False,
         use_api_key: bool = False,
+        md5_checksum: str | None = None,
         **request_kwargs: Any,
     ) -> Response:
         return self.request(
@@ -401,19 +418,22 @@ class HTTPClient:
             use_cache=use_cache,
             reset_cache=reset_cache,
             use_api_key=use_api_key,
+            md5_checksum=md5_checksum,
             **request_kwargs,
         )
 
     def post(
         self,
         path: str,
+        *,
+        use_api_key: bool = True,
         **request_kwargs: Any,
     ) -> Response:
         return self.request(
             method="POST",
             path=path,
             use_cache=False,
-            use_api_key=True,
+            use_api_key=use_api_key,
             **request_kwargs,
         )
 
@@ -429,3 +449,33 @@ class HTTPClient:
             use_api_key=True,
             **request_kwargs,
         )
+
+    def download(
+        self,
+        url: str,
+        handler: Callable[[Response, Path, str], Path] | None = None,
+        encoding: str = "utf-8",
+        file_name: str = "response.txt",
+        md5_checksum: str | None = None,
+    ) -> Path:
+        if self.cache is None:
+            raise OpenMLCacheRequiredError(
+                "A cache object is required for download, but none was provided in the HTTPClient."
+            )
+        base = self.cache.path
+        file_path = base / "downloads" / urlparse(url).path.lstrip("/") / file_name
+        file_path = file_path.expanduser()
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        if file_path.exists():
+            return file_path
+
+        response = self.get(url, md5_checksum=md5_checksum)
+        if handler is not None:
+            return handler(response, file_path, encoding)
+
+        return self._text_handler(response, file_path, encoding)
+
+    def _text_handler(self, response: Response, path: Path, encoding: str) -> Path:
+        with path.open("w", encoding=encoding) as f:
+            f.write(response.text)
+        return path
