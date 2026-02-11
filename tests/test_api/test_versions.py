@@ -2,7 +2,7 @@ from time import time
 import pytest
 from openml.testing import TestAPIBase
 from openml._api.resources.base import ResourceV1API, ResourceV2API, FallbackProxy, ResourceAPI
-from openml._api.config import ResourceType, APIVersion
+from openml.enums import APIVersion, ResourceType
 from openml.exceptions import OpenMLNotSupportedError
 
 

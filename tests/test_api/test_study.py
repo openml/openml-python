@@ -4,7 +4,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from openml._api.config import APIVersion
+from openml.enums import APIVersion
 from openml._api.resources import FallbackProxy, StudyV1API, StudyV2API
 from openml.exceptions import OpenMLNotSupportedError
 from openml.testing import TestAPIBase

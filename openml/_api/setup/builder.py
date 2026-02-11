@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from openml._api.clients import HTTPCache, HTTPClient, MinIOClient
-from openml._api.config import APIVersion, ResourceType
 from openml._api.resources import (
     DatasetV1API,
     DatasetV2API,
@@ -27,6 +26,7 @@ from openml._api.resources import (
     TaskV1API,
     TaskV2API,
 )
+from openml.enums import APIVersion, ResourceType
 
 if TYPE_CHECKING:
     from openml._api.resources.base import ResourceAPI

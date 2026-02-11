@@ -16,7 +16,7 @@ import requests
 
 import openml
 from openml._api.clients import HTTPCache, HTTPClient, MinIOClient
-from openml._api.config import APIVersion, RetryPolicy
+from openml.enums import APIVersion, RetryPolicy
 from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType
 

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from openml._api.config import ResourceType
 from openml._api.resources.base import ResourceAPI
+from openml.enums import ResourceType
 
 if TYPE_CHECKING:
     import pandas as pd
