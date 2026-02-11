@@ -6,7 +6,7 @@ from openml.testing import TestAPIBase
 import os
 from urllib.parse import urljoin
 from openml.enums import APIVersion
-from openml._api import HTTPClient
+from openml._api.clients import HTTPClient
 
 
 class TestHTTPClient(TestAPIBase):
