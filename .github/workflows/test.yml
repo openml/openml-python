@@ -102,7 +102,6 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         git clone --depth 1 https://github.com/openml/services.git
-        git clone --depth 1 https://github.com/openml/services.git
         cd services
         
         git config user.email "ci@openml.org"
