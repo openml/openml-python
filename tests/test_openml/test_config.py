@@ -78,7 +78,7 @@ class TestConfig(openml.testing.TestBase):
         config = openml.config.get_config_as_dict()
         _config = {}
         _config["apikey"] = TestBase.user_key
-        _config["server"] = "https://test.openml.org/api/v1/xml"
+        _config["server"] = f"{openml.config.TEST_SERVER_URL}/api/v1/xml"
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = False
         _config["connection_n_retries"] = 20
