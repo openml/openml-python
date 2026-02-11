@@ -1,16 +1,13 @@
----
 name: Tests
 
 on:
   workflow_dispatch:
-
   push:
     branches:
       - main
       - develop
     tags:
       - "v*.*.*"
-
   pull_request:
     branches:
       - main
@@ -102,20 +99,24 @@ jobs:
         echo "Repository status before tests: $git_status"
 
     - name: Clone Services
+      if: matrix.os == 'ubuntu-latest'
       run: git clone --depth 1 https://github.com/openml/services.git
 
     - name: Start Docker Services
+      if: matrix.os == 'ubuntu-latest'
       working-directory: ./services
       run: |
         sudo systemctl stop mysql.service
         docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
-        docker wait openml-test-setup-ci
+        docker wait openml-test-database-setup
 
     - name: Show installed dependencies
       run: python -m pip list
 
     - name: Run tests on Ubuntu Test
       if: matrix.os == 'ubuntu-latest'
+      env:
+        TEST_SERVER_URL: "http://localhost:8000"
       run: |
         if [ "${{ matrix.code-cov }}" = "true" ]; then
           codecov="--cov=openml --long --cov-report=xml"
@@ -131,6 +132,8 @@ jobs:
 
     - name: Run tests on Ubuntu Production
       if: matrix.os == 'ubuntu-latest'
+      env:
+        TEST_SERVER_URL: "http://localhost:8000"
       run: |
         if [ "${{ matrix.code-cov }}" = "true" ]; then
           codecov="--cov=openml --long --cov-report=xml"
@@ -162,8 +165,7 @@ jobs:
       if: always()
       shell: bash
       run: |
-        rm -rf services
-        git checkout docker-compose.yml
+        sudo rm -rf services
 
     - name: Check for files left behind by test
       if: matrix.os != 'windows-latest' && always()

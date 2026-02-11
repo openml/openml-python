@@ -296,7 +296,7 @@ def with_test_cache(test_files_directory, request):
     if tmp_cache.exists():
         shutil.rmtree(tmp_cache)
 
-  
+ 
 @pytest.fixture
 def static_cache_dir():
     return Path(__file__).parent / "files" 
