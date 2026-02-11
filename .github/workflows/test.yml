@@ -101,20 +101,15 @@ jobs:
         echo "BEFORE=$git_status" >> $GITHUB_ENV
         echo "Repository status before tests: $git_status"
 
-    - name: Checkout server-api and patch Docker path
-      shell: bash
-      run: |
-        git clone --depth 1 https://github.com/openml/server-api.git server-api
-        sed -i 's|\.\./server-api|./server-api|g' docker-compose.yml
+    - name: Clone Services
+      run: git clone --depth 1 https://github.com/openml/services.git
 
-    - name: Start Docker Test Environment
-      if: matrix.os == 'ubuntu-latest'
-      shell: bash
+    - name: Start Docker Services
+      working-directory: ./services
       run: |
-        sed -i 's/\r$//' docker/update.sh
-        docker compose up -d
+        sudo systemctl stop mysql.service
+        docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
         docker wait openml-test-setup-ci
-        echo "OPENML_TEST_SERVER=local" >> $GITHUB_ENV
 
     - name: Show installed dependencies
       run: python -m pip list

@@ -296,19 +296,6 @@ def with_test_cache(test_files_directory, request):
     if tmp_cache.exists():
         shutil.rmtree(tmp_cache)
         
-@pytest.fixture(scope="session")
-def openml_test_config():
-    """
-    Returns the URL for the test server.
-    """
-    if os.environ.get("OPENML_TEST_SERVER") == "local":
-        return {
-            "v1": "http://localhost:9002/api/v1/",
-            "v2": "http://localhost:9001/"
-        }
-    
-    raise ValueError("Use the environment variable OPENML_TEST_SERVER=local before running docker to run tests against a local OpenML server.")
-
 @pytest.fixture
 def static_cache_dir():
     return Path(__file__).parent / "files" 
