@@ -100,7 +100,13 @@ jobs:
 
     - name: Clone Services
       if: matrix.os == 'ubuntu-latest'
-      run: git clone --depth 1 https://github.com/openml/services.git
+      run: |
+        git clone --depth 1 https://github.com/openml/services.git
+        git fetch origin setup-test-locally:setup-test-locally
+        git fetch origin add/python-rest-api:add/python-rest-api
+        
+        git merge setup-test-locally
+        git merge add/python-rest-api
 
     - name: Start Docker Services
       if: matrix.os == 'ubuntu-latest'
