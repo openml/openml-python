@@ -1,13 +1,16 @@
+---
 name: Tests
 
 on:
   workflow_dispatch:
+
   push:
     branches:
       - main
       - develop
     tags:
       - "v*.*.*"
+
   pull_request:
     branches:
       - main
@@ -125,7 +128,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         timeout 20s bash -c 'until curl -sSf http://localhost:8000/api/v1/xml/data/1 > /dev/null; do sleep 3; done'
-        curl -I http://localhost:8000/api/v1/xml/data/1
+        curl -I http://localhost:8000/api/v1/task/1
 
     - name: Show installed dependencies
       run: python -m pip list
@@ -140,9 +143,9 @@ jobs:
         fi
 
         if [ "${{ matrix.sklearn-only }}" = "true" ]; then
-          marks="sklearn and not production and not uses_test_server"
+          marks="sklearn and not production"
         else
-          marks="not production and not uses_test_server"
+          marks="not production"
         fi
 
         pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
@@ -157,9 +160,9 @@ jobs:
         fi
 
         if [ "${{ matrix.sklearn-only }}" = "true" ]; then
-          marks="sklearn and production and not uses_test_server"
+          marks="sklearn and production"
         else
-          marks="production and not uses_test_server"
+          marks="production"
         fi
 
         pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
@@ -167,7 +170,7 @@ jobs:
     - name: Run tests on Windows
       if: matrix.os == 'windows-latest'
       run: |  # we need a separate step because of the bash-specific if-statement in the previous one.
-        pytest -n 4 --durations=20 --dist load -sv --reruns 5 --reruns-delay 1 -m "not uses_test_server"
+        pytest -n 4 --durations=20 --dist load -sv --reruns 5 --reruns-delay 1
 
     - name: Upload coverage
       if: matrix.code-cov && always()
