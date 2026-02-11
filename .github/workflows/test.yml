@@ -162,7 +162,7 @@ jobs:
       if: always()
       shell: bash
       run: |
-        rm -rf server-api
+        rm -rf services
         git checkout docker-compose.yml
 
     - name: Check for files left behind by test
