@@ -162,8 +162,7 @@ jobs:
         verbose: true
 
     - name: Cleanup Docker setup
-      if: always()
-      shell: bash
+      if: matrix.os == 'ubuntu-latest'
       run: |
         sudo rm -rf services
 
