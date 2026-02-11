@@ -4,8 +4,8 @@ from .base import EvaluationMeasureAPI, ResourceV1API, ResourceV2API
 
 
 class EvaluationMeasureV1API(ResourceV1API, EvaluationMeasureAPI):
-    pass
+    """Version 1 API implementation for evaluation measure resources."""
 
 
 class EvaluationMeasureV2API(ResourceV2API, EvaluationMeasureAPI):
-    pass
+    """Version 2 API implementation for evaluation measure resources."""

@@ -29,11 +29,52 @@ from openml.exceptions import (
 
 
 class HTTPCache:
+    """
+    Filesystem-based cache for HTTP responses.
+
+    This class stores HTTP responses on disk using a structured directory layout
+    derived from the request URL and parameters. Each cached response consists of
+    three files: metadata (``meta.json``), headers (``headers.json``), and the raw
+    body (``body.bin``). Entries are considered valid until their time-to-live
+    (TTL) expires.
+
+    Parameters
+    ----------
+    path : pathlib.Path
+        Base directory where cache entries are stored.
+    ttl : int
+        Time-to-live in seconds. Cached entries older than this value are treated
+        as expired.
+
+    Notes
+    -----
+    The cache key is derived from the URL (domain and path components) and query
+    parameters, excluding the ``api_key`` parameter.
+    """
+
     def __init__(self, *, path: Path, ttl: int) -> None:
         self.path = path
         self.ttl = ttl
 
     def get_key(self, url: str, params: dict[str, Any]) -> str:
+        """
+        Generate a filesystem-safe cache key for a request.
+
+        The key is constructed from the reversed domain components, URL path
+        segments, and URL-encoded query parameters (excluding ``api_key``).
+
+        Parameters
+        ----------
+        url : str
+            The full request URL.
+        params : dict of str to Any
+            Query parameters associated with the request.
+
+        Returns
+        -------
+        str
+            A relative path string representing the cache key.
+        """
         parsed_url = urlparse(url)
         netloc_parts = parsed_url.netloc.split(".")[::-1]
         path_parts = parsed_url.path.strip("/").split("/")
@@ -44,9 +85,44 @@ class HTTPCache:
         return str(Path(*netloc_parts, *path_parts, *params_part))
 
     def _key_to_path(self, key: str) -> Path:
+        """
+        Convert a cache key into an absolute filesystem path.
+
+        Parameters
+        ----------
+        key : str
+            Cache key as returned by :meth:`get_key`.
+
+        Returns
+        -------
+        pathlib.Path
+            Absolute path corresponding to the cache entry.
+        """
         return self.path.joinpath(key)
 
     def load(self, key: str) -> Response:
+        """
+        Load a cached HTTP response from disk.
+
+        Parameters
+        ----------
+        key : str
+            Cache key identifying the stored response.
+
+        Returns
+        -------
+        requests.Response
+            Reconstructed response object with status code, headers, body, and metadata.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the cache entry or required files are missing.
+        TimeoutError
+            If the cached entry has expired based on the configured TTL.
+        ValueError
+            If required metadata is missing or malformed.
+        """
         path = self._key_to_path(key)
 
         if not path.exists():
@@ -85,6 +161,22 @@ class HTTPCache:
         return response
 
     def save(self, key: str, response: Response) -> None:
+        """
+        Persist an HTTP response to disk.
+
+        Parameters
+        ----------
+        key : str
+            Cache key identifying where to store the response.
+        response : requests.Response
+            Response object to cache.
+
+        Notes
+        -----
+        The response body is stored as binary data. Headers and metadata
+        (status code, URL, reason, encoding, elapsed time, request info, and
+        creation timestamp) are stored as JSON.
+        """
         path = self._key_to_path(key)
         path.mkdir(parents=True, exist_ok=True)
 
@@ -113,6 +205,29 @@ class HTTPCache:
 
 
 class HTTPClient:
+    """
+    HTTP client for interacting with the OpenML API.
+
+    This client supports configurable retry policies, optional filesystem
+    caching, API key authentication, and response validation including
+    checksum verification.
+
+    Parameters
+    ----------
+    server : str
+        Base server URL (e.g., ``https://www.openml.org``).
+    base_url : str
+        Base API path appended to the server URL.
+    api_key : str
+        API key used for authenticated endpoints.
+    retries : int
+        Maximum number of retry attempts for failed requests.
+    retry_policy : RetryPolicy
+        Strategy controlling delay between retries.
+    cache : HTTPCache or None, optional
+        Cache instance for storing and retrieving responses.
+    """
+
     def __init__(  # noqa: PLR0913
         self,
         *,
@@ -136,17 +251,62 @@ class HTTPClient:
         self.headers: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
 
     def _robot_delay(self, n: int) -> float:
+        """
+        Compute delay for automated retry policy.
+
+        Parameters
+        ----------
+        n : int
+            Current retry attempt number (1-based).
+
+        Returns
+        -------
+        float
+            Number of seconds to wait before the next retry.
+
+        Notes
+        -----
+        Uses a sigmoid-based growth curve with Gaussian noise to gradually
+        increase waiting time.
+        """
         wait = (1 / (1 + math.exp(-(n * 0.5 - 4)))) * 60
         variation = random.gauss(0, wait / 10)
         return max(1.0, wait + variation)
 
     def _human_delay(self, n: int) -> float:
+        """
+        Compute delay for human-like retry policy.
+
+        Parameters
+        ----------
+        n : int
+            Current retry attempt number (1-based).
+
+        Returns
+        -------
+        float
+            Number of seconds to wait before the next retry.
+        """
         return max(1.0, n)
 
     def _parse_exception_response(
         self,
         response: Response,
     ) -> tuple[int | None, str]:
+        """
+        Parse an error response returned by the server.
+
+        Parameters
+        ----------
+        response : requests.Response
+            HTTP response containing error details in JSON or XML format.
+
+        Returns
+        -------
+        tuple of (int or None, str)
+            Parsed error code and combined error message. The code may be
+            ``None`` if unavailable.
+        """
         content_type = response.headers.get("Content-Type", "").lower()
 
         if "json" in content_type:
@@ -183,6 +343,29 @@ class HTTPClient:
         url: str,
         files: Mapping[str, Any] | None,
     ) -> None:
+        """
+        Raise specialized exceptions based on OpenML error codes.
+
+        Parameters
+        ----------
+        code : int
+            Server-provided error code.
+        message : str
+            Parsed error message.
+        url : str
+            Request URL associated with the error.
+        files : Mapping of str to Any or None
+            Files sent with the request, if any.
+
+        Raises
+        ------
+        OpenMLServerNoResult
+            If the error indicates a missing resource.
+        OpenMLNotAuthorizedError
+            If authentication is required or invalid.
+        OpenMLServerException
+            For other server-side errors (except retryable database errors).
+        """
         if code in [111, 372, 512, 500, 482, 542, 674]:
             # 512 for runs, 372 for datasets, 500 for flows
             # 482 for tasks, 542 for evaluations, 674 for setups
@@ -226,6 +409,31 @@ class HTTPClient:
         files: Mapping[str, Any] | None,
         response: Response,
     ) -> Exception | None:
+        """
+        Validate an HTTP response and determine whether to retry.
+
+        Parameters
+        ----------
+        method : str
+            HTTP method used for the request.
+        url : str
+            Full request URL.
+        files : Mapping of str to Any or None
+            Files sent with the request, if any.
+        response : requests.Response
+            Received HTTP response.
+
+        Returns
+        -------
+        Exception or None
+            ``None`` if the response is valid. Otherwise, an exception
+            indicating the error to raise or retry.
+
+        Raises
+        ------
+        OpenMLServerError
+            For unexpected server errors or malformed responses.
+        """
         if (
             "Content-Encoding" not in response.headers
             or response.headers["Content-Encoding"] != "gzip"
@@ -288,6 +496,33 @@ class HTTPClient:
         files: Mapping[str, Any] | None,
         **request_kwargs: Any,
     ) -> tuple[Response | None, Exception | None]:
+        """
+        Execute a single HTTP request attempt.
+
+        Parameters
+        ----------
+        session : requests.Session
+            Active session used to send the request.
+        method : str
+            HTTP method (e.g., ``GET``, ``POST``).
+        url : str
+            Full request URL.
+        params : Mapping of str to Any
+            Query parameters.
+        data : Mapping of str to Any
+            Request body data.
+        headers : Mapping of str to str
+            HTTP headers.
+        files : Mapping of str to Any or None
+            Files to upload.
+        **request_kwargs : Any
+            Additional arguments forwarded to ``requests.Session.request``.
+
+        Returns
+        -------
+        tuple of (requests.Response or None, Exception or None)
+            Response and potential retry exception.
+        """
         retry_raise_e: Exception | None = None
         response: Response | None = None
 
@@ -329,6 +564,38 @@ class HTTPClient:
         md5_checksum: str | None = None,
         **request_kwargs: Any,
     ) -> Response:
+        """
+        Send an HTTP request with retry, caching, and validation support.
+
+        Parameters
+        ----------
+        method : str
+            HTTP method to use.
+        path : str
+            API path relative to the base URL.
+        use_cache : bool, optional
+            Whether to load/store responses from cache.
+        reset_cache : bool, optional
+            If True, bypass existing cache entries.
+        use_api_key : bool, optional
+            Whether to include the API key in query parameters.
+        md5_checksum : str or None, optional
+            Expected MD5 checksum of the response body.
+        **request_kwargs : Any
+            Additional arguments passed to the underlying request.
+
+        Returns
+        -------
+        requests.Response
+            Final validated response.
+
+        Raises
+        ------
+        Exception
+            Propagates network, validation, or server exceptions after retries.
+        OpenMLHashException
+            If checksum verification fails.
+        """
         url = urljoin(self.server, urljoin(self.base_url, path))
         retries = max(1, self.retries)
 
@@ -394,6 +661,21 @@ class HTTPClient:
         return response
 
     def _verify_checksum(self, response: Response, md5_checksum: str) -> None:
+        """
+        Verify MD5 checksum of a response body.
+
+        Parameters
+        ----------
+        response : requests.Response
+            HTTP response whose content should be verified.
+        md5_checksum : str
+            Expected hexadecimal MD5 checksum.
+
+        Raises
+        ------
+        OpenMLHashException
+            If the computed checksum does not match the expected value.
+        """
         # ruff sees hashlib.md5 as insecure
         actual = hashlib.md5(response.content).hexdigest()  # noqa: S324
         if actual != md5_checksum:
@@ -412,6 +694,29 @@ class HTTPClient:
         md5_checksum: str | None = None,
         **request_kwargs: Any,
     ) -> Response:
+        """
+        Send a GET request.
+
+        Parameters
+        ----------
+        path : str
+            API path relative to the base URL.
+        use_cache : bool, optional
+            Whether to use the response cache.
+        reset_cache : bool, optional
+            Whether to ignore existing cached entries.
+        use_api_key : bool, optional
+            Whether to include the API key.
+        md5_checksum : str or None, optional
+            Expected MD5 checksum for response validation.
+        **request_kwargs : Any
+            Additional request arguments.
+
+        Returns
+        -------
+        requests.Response
+            HTTP response.
+        """
         return self.request(
             method="GET",
             path=path,
@@ -429,6 +734,23 @@ class HTTPClient:
         use_api_key: bool = True,
         **request_kwargs: Any,
     ) -> Response:
+        """
+        Send a POST request.
+
+        Parameters
+        ----------
+        path : str
+            API path relative to the base URL.
+        use_api_key : bool, optional
+            Whether to include the API key.
+        **request_kwargs : Any
+            Additional request arguments.
+
+        Returns
+        -------
+        requests.Response
+            HTTP response.
+        """
         return self.request(
             method="POST",
             path=path,
@@ -442,6 +764,21 @@ class HTTPClient:
         path: str,
         **request_kwargs: Any,
     ) -> Response:
+        """
+        Send a DELETE request.
+
+        Parameters
+        ----------
+        path : str
+            API path relative to the base URL.
+        **request_kwargs : Any
+            Additional request arguments.
+
+        Returns
+        -------
+        requests.Response
+            HTTP response.
+        """
         return self.request(
             method="DELETE",
             path=path,
@@ -458,6 +795,35 @@ class HTTPClient:
         file_name: str = "response.txt",
         md5_checksum: str | None = None,
     ) -> Path:
+        """
+        Download a resource and store it in the cache directory.
+
+        Parameters
+        ----------
+        url : str
+            Absolute URL of the resource to download.
+        handler : callable or None, optional
+            Custom handler function accepting ``(response, path, encoding)``
+            and returning a ``pathlib.Path``.
+        encoding : str, optional
+            Text encoding used when writing the response body.
+        file_name : str, optional
+            Name of the saved file.
+        md5_checksum : str or None, optional
+            Expected MD5 checksum for integrity verification.
+
+        Returns
+        -------
+        pathlib.Path
+            Path to the downloaded file.
+
+        Raises
+        ------
+        OpenMLCacheRequiredError
+            If no cache instance is configured.
+        OpenMLHashException
+            If checksum verification fails.
+        """
         if self.cache is None:
             raise OpenMLCacheRequiredError(
                 "A cache object is required for download, but none was provided in the HTTPClient."
@@ -476,6 +842,23 @@ class HTTPClient:
         return self._text_handler(response, file_path, encoding)
 
     def _text_handler(self, response: Response, path: Path, encoding: str) -> Path:
+        """
+        Write response text content to a file.
+
+        Parameters
+        ----------
+        response : requests.Response
+            HTTP response containing text data.
+        path : pathlib.Path
+            Destination file path.
+        encoding : str
+            Text encoding for writing the file.
+
+        Returns
+        -------
+        pathlib.Path
+            Path to the written file.
+        """
         with path.open("w", encoding=encoding) as f:
             f.write(response.text)
         return path
