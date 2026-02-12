@@ -39,6 +39,8 @@ NO_ACCESS_GRANTED_ERRCODE = 112
 
 
 class DatasetV1API(ResourceV1API, DatasetAPI):
+    """Version 1 API implementation for dataset resources."""
+
     @openml.utils.thread_safe_if_oslo_installed
     def get(
         self,
@@ -880,6 +882,8 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
 
 
 class DatasetV2API(ResourceV2API, DatasetAPI):
+    """Version 2 API implementation for dataset resources."""
+
     @openml.utils.thread_safe_if_oslo_installed
     def get(
         self,

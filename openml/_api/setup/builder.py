@@ -13,6 +13,41 @@ if TYPE_CHECKING:
 
 
 class APIBackendBuilder:
+    """
+    Builder class for constructing API backend instances.
+
+    This class organizes resource-specific API objects (datasets, tasks,
+    flows, evaluations, runs, setups, studies, etc.) and provides a
+    centralized access point for both primary and optional fallback APIs.
+
+    Parameters
+    ----------
+    resource_apis : Mapping[ResourceType, ResourceAPI | FallbackProxy]
+        Mapping of resource types to their corresponding API instances
+        or fallback proxies.
+
+    Attributes
+    ----------
+    dataset : ResourceAPI | FallbackProxy
+        API interface for dataset resources.
+    task : ResourceAPI | FallbackProxy
+        API interface for task resources.
+    evaluation_measure : ResourceAPI | FallbackProxy
+        API interface for evaluation measure resources.
+    estimation_procedure : ResourceAPI | FallbackProxy
+        API interface for estimation procedure resources.
+    evaluation : ResourceAPI | FallbackProxy
+        API interface for evaluation resources.
+    flow : ResourceAPI | FallbackProxy
+        API interface for flow resources.
+    study : ResourceAPI | FallbackProxy
+        API interface for study resources.
+    run : ResourceAPI | FallbackProxy
+        API interface for run resources.
+    setup : ResourceAPI | FallbackProxy
+        API interface for setup resources.
+    """
+
     def __init__(
         self,
         resource_apis: Mapping[ResourceType, ResourceAPI | FallbackProxy],
@@ -29,6 +64,24 @@ class APIBackendBuilder:
 
     @classmethod
     def build(cls, config: Config) -> APIBackendBuilder:
+        """
+        Construct an APIBackendBuilder instance from a configuration.
+
+        This method initializes HTTP and MinIO clients, creates resource-specific
+        API instances for the primary API version, and optionally wraps them
+        with fallback proxies if a fallback API version is configured.
+
+        Parameters
+        ----------
+        config : Config
+            Configuration object containing API versions, endpoints, cache
+            settings, and connection parameters.
+
+        Returns
+        -------
+        APIBackendBuilder
+            Builder instance with all resource API interfaces initialized.
+        """
         cache_dir = Path(config.cache.dir).expanduser()
 
         http_cache = HTTPCache(path=cache_dir, ttl=config.cache.ttl)
