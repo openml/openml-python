@@ -148,14 +148,14 @@ jobs:
     - name: Finalize Setup & Verify Splits
       if: matrix.os == 'ubuntu-latest'
       run: |
-        echo "1. Forcing Elasticsearch Indexing Sync..."
-        # This helps clear the 412 errors the Engine is hitting
-        curl -s http://nginx:8000/api/v1/xml/admin/index/sync || echo "Sync endpoint not found, skipping..."
+        echo "1. Forcing Elasticsearch Indexing Sync (With Auth)..."
+        # We append the default test API Key (AD0...0) to authorized the admin action
+        curl -s "http://nginx:8000/api/v1/xml/admin/index/sync?api_key=AD000000000000000000000000000000" || echo "Sync request failed"
 
         echo "2. Waiting for Evaluation Engine to process Task 119..."
         echo "Targeting Task 119 (The primary failure point)."
         
-        # Give it 5 minutes (300s). Java + indexing + splits generation is heavy.
+        # We give it 5 minutes (300s) to handle the queue.
         count=0
         while [ $count -lt 30 ]; do
            code=$(curl -s -o /dev/null -w "%{http_code}" http://nginx:8000/api_splits/get/119/Task_119_splits.arff)
@@ -169,8 +169,17 @@ jobs:
         done
         
         echo "❌ ERROR: Evaluation Engine timed out."
-        # Dump logs only if this step fails
-        docker exec openml-evaluation-engine cat /logs/evaluation.log || echo "Could not read log file"
+        
+        echo "=== DEBUG: LISTING LOG DIR ==="
+        docker exec openml-evaluation-engine ls -R /logs/ || echo "Dir empty"
+        
+        echo "=== DEBUG: DUMPING ALL LOGS ==="
+        # Use wildcard to catch whatever the filename actually is
+        docker exec openml-evaluation-engine sh -c "cat /logs/*.log" || echo "Could not read logs"
+        
+        # Also check the cron log again, just in case
+        docker exec openml-evaluation-engine cat /cron.log || echo "Cron log empty"
+        
         exit 1
 
     - name: Error
