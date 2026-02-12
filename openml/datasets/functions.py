@@ -29,7 +29,6 @@ from .dataset import OpenMLDataset
 if TYPE_CHECKING:
     import scipy
 
-
 DATASETS_CACHE_DIR_NAME = "datasets"
 logger = logging.getLogger(__name__)
 
@@ -843,6 +842,9 @@ def _topic_add_dataset(data_id: int, topic: str) -> int:
     -------
     Dataset id
     """
+    if not isinstance(data_id, int):
+        raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
+
     return openml._backend.dataset.add_topic(data_id, topic)
 
 
@@ -862,6 +864,9 @@ def _topic_delete_dataset(data_id: int, topic: str) -> int:
     -------
     Dataset id
     """
+    if not isinstance(data_id, int):
+        raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
+
     return openml._backend.dataset.delete_topic(data_id, topic)
 
 
@@ -927,10 +932,6 @@ def _get_dataset_parquet(
     description : dictionary or OpenMLDataset
         Either a dataset description as dict or OpenMLDataset.
 
-    cache_directory: Path, optional (default=None)
-        Folder to store the parquet file in.
-        If None, use the default cache directory for the dataset.
-
     download_all_files: bool, optional (default=False)
         If `True`, download all data found in the bucket to which the description's
         ``parquet_url`` points, only download the parquet file otherwise.
@@ -958,10 +959,6 @@ def _get_dataset_arff(
     ----------
     description : dictionary or OpenMLDataset
         Either a dataset description as dict or OpenMLDataset.
-
-    cache_directory: Path, optional (default=None)
-        Folder to store the arff file in.
-        If None, use the default cache directory for the dataset.
 
     Returns
     -------
@@ -997,7 +994,6 @@ def _get_dataset_features_file(
     return openml._backend.dataset.download_features_file(dataset_id)
 
 
-# TODO remove cache dir
 def _get_dataset_qualities_file(
     dataset_id: int,
 ) -> Path | None:
@@ -1024,7 +1020,6 @@ def _get_dataset_qualities_file(
     return openml._backend.dataset.download_qualities_file(dataset_id)
 
 
-# TODO used only in tests
 def _get_online_dataset_arff(dataset_id: int) -> str | None:
     """Download the ARFF file for a given dataset id
     from the OpenML website.
@@ -1042,7 +1037,6 @@ def _get_online_dataset_arff(dataset_id: int) -> str | None:
     return openml._backend.dataset.get_online_dataset_arff(dataset_id)
 
 
-# TODO used only in tests
 def _get_online_dataset_format(dataset_id: int) -> str:
     """Get the dataset format for a given dataset id from the OpenML website.
 

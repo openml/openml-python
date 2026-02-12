@@ -233,6 +233,10 @@ class OpenMLDatasetTest(TestBase):
         assert isinstance(xy, pd.DataFrame)
         assert xy.shape == (150, 5)
 
+    def test_equality_comparison(self):
+        self.assertEqual(self.iris, self.iris)
+        self.assertNotEqual(self.iris, self.titanic)
+        self.assertNotEqual(self.titanic, "Wrong_object")
 
 @pytest.mark.uses_test_server()
 def test_tagging():

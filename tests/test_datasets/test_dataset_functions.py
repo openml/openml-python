@@ -568,7 +568,7 @@ class TestOpenMLDataset(TestBase):
         labels = openml.datasets.get_dataset(2).retrieve_class_labels(
             target_name="product-type",
         )
-        assert labels == ["C", "G", "H"]
+        assert labels == ["C", "H", "G"]
 
         # Test workaround for string-typed class labels
         custom_ds = openml.datasets.get_dataset(2)

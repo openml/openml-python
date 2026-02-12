@@ -5,7 +5,6 @@ import time
 from openml import OpenMLDataset
 import pytest
 import pandas as pd
-from openml._api.resources.base.fallback import FallbackProxy
 from openml._api.resources.base.resources import DatasetAPI
 from openml.enums import APIVersion
 from openml.testing import TestAPIBase, TestBase
