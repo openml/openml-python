@@ -101,7 +101,8 @@ jobs:
         echo "BEFORE=$git_status" >> $GITHUB_ENV
         echo "Repository status before tests: $git_status"
 
-    - name: Configure Host Network (The "Magic" Step)
+    - name: Configure Host Network
+      if: matrix.os == 'ubuntu-latest'
       run: |
         # Map 'nginx' to localhost so the Host machine can resolve the URLs in the database
         echo "127.0.0.1 nginx" | sudo tee -a /etc/hosts
