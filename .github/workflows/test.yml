@@ -168,7 +168,7 @@ jobs:
           marks="not production"
         fi
 
-        pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
+        pytest --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
 
     - name: Run tests on Ubuntu Production
       if: matrix.os == 'ubuntu-latest'
@@ -183,7 +183,7 @@ jobs:
           marks="production"
         fi
 
-        pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
+        pytest --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
 
     - name: Run tests on Windows
       if: matrix.os == 'windows-latest'
