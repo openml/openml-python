@@ -16,14 +16,74 @@ from .base import ResourceAPI
 
 
 class ResourceV1API(ResourceAPI):
+    """
+    Version 1 implementation of the OpenML resource API.
+
+    This class provides XML-based implementations for publishing,
+    deleting, tagging, and untagging resources using the V1 API
+    endpoints. Responses are parsed using ``xmltodict``.
+
+    Notes
+    -----
+    V1 endpoints expect and return XML. Error handling follows the
+    legacy OpenML server behavior and maps specific error codes to
+    more descriptive exceptions where appropriate.
+    """
+
     api_version: APIVersion = APIVersion.V1
 
     def publish(self, path: str, files: Mapping[str, Any] | None) -> int:
+        """
+        Publish a new resource using the V1 API.
+
+        Parameters
+        ----------
+        path : str
+            API endpoint path for the upload.
+        files : Mapping of str to Any or None
+            Files to upload as part of the request payload.
+
+        Returns
+        -------
+        int
+            Identifier of the newly created resource.
+
+        Raises
+        ------
+        ValueError
+            If the server response does not contain a valid resource ID.
+        OpenMLServerException
+            If the server returns an error during upload.
+        """
         response = self._http.post(path, files=files)
         parsed_response = xmltodict.parse(response.content)
         return self._extract_id_from_upload(parsed_response)
 
     def delete(self, resource_id: int) -> bool:
+        """
+        Delete a resource using the V1 API.
+
+        Parameters
+        ----------
+        resource_id : int
+            Identifier of the resource to delete.
+
+        Returns
+        -------
+        bool
+            ``True`` if the server confirms successful deletion.
+
+        Raises
+        ------
+        ValueError
+            If the resource type is not supported for deletion.
+        OpenMLNotAuthorizedError
+            If the user is not permitted to delete the resource.
+        OpenMLServerError
+            If deletion fails for an unknown reason.
+        OpenMLServerException
+            For other server-side errors.
+        """
         resource_type = self._get_endpoint_name()
 
         legal_resources = {"data", "flow", "task", "run", "study", "user"}
@@ -40,6 +100,28 @@ class ResourceV1API(ResourceAPI):
             raise
 
     def tag(self, resource_id: int, tag: str) -> list[str]:
+        """
+        Add a tag to a resource using the V1 API.
+
+        Parameters
+        ----------
+        resource_id : int
+            Identifier of the resource to tag.
+        tag : str
+            Tag to associate with the resource.
+
+        Returns
+        -------
+        list of str
+            Updated list of tags assigned to the resource.
+
+        Raises
+        ------
+        ValueError
+            If the resource type does not support tagging.
+        OpenMLServerException
+            If the server returns an error.
+        """
         resource_type = self._get_endpoint_name()
 
         legal_resources = {"data", "task", "flow", "setup", "run"}
@@ -58,6 +140,28 @@ class ResourceV1API(ResourceAPI):
         return tags
 
     def untag(self, resource_id: int, tag: str) -> list[str]:
+        """
+        Remove a tag from a resource using the V1 API.
+
+        Parameters
+        ----------
+        resource_id : int
+            Identifier of the resource to untag.
+        tag : str
+            Tag to remove from the resource.
+
+        Returns
+        -------
+        list of str
+            Updated list of tags assigned to the resource.
+
+        Raises
+        ------
+        ValueError
+            If the resource type does not support tagging.
+        OpenMLServerException
+            If the server returns an error.
+        """
         resource_type = self._get_endpoint_name()
 
         legal_resources = {"data", "task", "flow", "setup", "run"}
@@ -76,6 +180,19 @@ class ResourceV1API(ResourceAPI):
         return tags
 
     def _get_endpoint_name(self) -> str:
+        """
+        Return the V1 endpoint name for the current resource type.
+
+        Returns
+        -------
+        str
+            Endpoint segment used in V1 API paths.
+
+        Notes
+        -----
+        Datasets use the special endpoint name ``"data"`` instead of
+        their enum value.
+        """
         if self.resource_type == ResourceType.DATASET:
             return "data"
         return cast("str", self.resource_type.value)
@@ -83,6 +200,26 @@ class ResourceV1API(ResourceAPI):
     def _handle_delete_exception(
         self, resource_type: str, exception: OpenMLServerException
     ) -> None:
+        """
+        Map V1 deletion error codes to more specific exceptions.
+
+        Parameters
+        ----------
+        resource_type : str
+            Endpoint name of the resource type.
+        exception : OpenMLServerException
+            Original exception raised during deletion.
+
+        Raises
+        ------
+        OpenMLNotAuthorizedError
+            If the resource cannot be deleted due to ownership or
+            dependent entities.
+        OpenMLServerError
+            If deletion fails for an unknown reason.
+        OpenMLServerException
+            If the error code is not specially handled.
+        """
         # https://github.com/openml/OpenML/blob/21f6188d08ac24fcd2df06ab94cf421c946971b0/openml_OS/views/pages/api_new/v1/xml/pre.php
         # Most exceptions are descriptive enough to be raised as their standard
         # OpenMLServerException, however there are two cases where we add information:
@@ -116,6 +253,25 @@ class ResourceV1API(ResourceAPI):
         raise exception
 
     def _extract_id_from_upload(self, parsed: Mapping[str, Any]) -> int:
+        """
+        Extract the resource identifier from an XML upload response.
+
+        Parameters
+        ----------
+        parsed : Mapping of str to Any
+            Parsed XML response as returned by ``xmltodict.parse``.
+
+        Returns
+        -------
+        int
+            Extracted resource identifier.
+
+        Raises
+        ------
+        ValueError
+            If the response structure is unexpected or no identifier
+            can be found.
+        """
         # reads id from upload response
         # actual parsed dict: {"oml:upload_flow": {"@xmlns:oml": "...", "oml:id": "42"}}
 
@@ -145,6 +301,14 @@ class ResourceV1API(ResourceAPI):
 
 
 class ResourceV2API(ResourceAPI):
+    """
+    Version 2 implementation of the OpenML resource API.
+
+    This class represents the V2 API for resources. Operations such as
+    publishing, deleting, tagging, and untagging are currently not
+    supported and will raise ``OpenMLNotSupportedError``.
+    """
+
     api_version: APIVersion = APIVersion.V2
 
     def publish(self, path: str, files: Mapping[str, Any] | None) -> int:  # noqa: ARG002
