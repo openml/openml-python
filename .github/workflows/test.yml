@@ -117,8 +117,13 @@ jobs:
         git merge pr-15 --no-edit
         sed -i 's/localhost:8000/172.28.0.2:8000/g' config/database/update.sh
         
-        # Verify the change
-        grep "172.28.0.2" config/database/update.sh || echo "Patch failed!"
+        # === PATCH 2: Fix MinIO Path Mismatch ===
+        # The PR uses '/minio/' but Nginx usually expects '/data/' for MinIO
+        # We replace '/minio/' with '/data/' in the URL rewrite script
+        sed -i 's|/minio/|/data/|g' config/database/update.sh
+        
+        echo "=== Patched Update Script ==="
+        cat config/database/update.sh | grep "172.28.0.2"
 
     - name: Start Docker Services
       if: matrix.os == 'ubuntu-latest'
