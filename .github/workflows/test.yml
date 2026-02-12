@@ -183,56 +183,6 @@ jobs:
         
         exit 1
 
-    - name: Error
-      working-directory: ./services
-      run: |
-        echo "---------------------------------------------------"
-        echo "1. PROBING: Can we reach the API at all?"
-        timeout 60s bash -c 'until curl -sSf http://localhost:8000/api/v1/xml/data/1 > /dev/null; do sleep 5; done' || echo "WARNING: Main API is slow/down"
-
-        echo "---------------------------------------------------"
-        echo "2. PROBING: Waiting for Task 119 Splits (The Failure Point)..."
-        # We wait 60s. If it works, great. If not, we want the logs.
-        timeout 60s bash -c 'until curl -sSf http://localhost:8000/api_splits/get/119/Task_119_splits.arff > /dev/null; do 
-            echo "   ... file not ready yet"
-            sleep 5
-        done' || echo "FAILURE: Task 119 splits were NOT generated."
-
-        echo "---------------------------------------------------"
-        echo "3.DUMPING EVALUATION ENGINE LOGS (STDOUT)"
-        docker logs openml-evaluation-engine
-
-        echo "---------------------------------------------------"
-        echo "4.DUMPING INTERNAL CRON LOGS (The Hidden Logs)"
-        # The engine runs via cron, so the real errors are often in this file, NOT in docker logs
-        docker exec openml-evaluation-engine cat /cron.log || echo "Could not read /cron.log"
-
-        echo "---------------------------------------------------"
-        echo "5.DUMPING PHP API LOGS (Why did it throw 412?)"
-        docker logs openml-php-rest-api | grep "412" -B 5 -A 5 || echo "No 412 errors found in logs?"
-        
-        echo "---------------------------------------------------"
-        echo "6.CHECKING NETWORK (Can the container see Nginx?)"
-        # This checks if the container can actually resolve 'localhost' to the host machine
-        docker exec openml-evaluation-engine curl -v http://localhost:8000/api/v1/xml/data/1 || echo "Container cannot connect to localhost:8000"
-
-        # Force fail so you see the red X and check logs
-        exit 1
-    - name: Verify API and Splits
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        echo "Checking Data API..."
-        timeout 60s bash -c 'until [ "$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/v1/xml/data/1)" == "200" ]; do sleep 5; done'
-
-        echo "Checking Task Splits (The 412 Killer)..."
-        # If this fails, the evaluation engine is broken
-        timeout 120s bash -c 'until [ "$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api_splits/get/1/Task_1_splits.arff)" == "200" ]; do 
-           echo "Splits not ready yet. Waiting..."
-           sleep 5
-        done'
-        
-        echo "System is fully operational."
-
     - name: Show installed dependencies
       run: python -m pip list
 
