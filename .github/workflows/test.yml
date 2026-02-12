@@ -121,7 +121,7 @@ jobs:
       working-directory: ./services
       run: |
         sudo systemctl stop mysql.service
-        docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
+        docker compose --profile rest-api --profile minio up -d --build
         
         echo "1. Waiting for Database population..."
         docker wait openml-test-database-setup
@@ -145,7 +145,7 @@ jobs:
 
         echo "Checking Task Splits (The 412 Killer)..."
         # If this fails, the evaluation engine is broken
-        timeout 180s bash -c 'until [ "$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api_splits/get/1/Task_1_splits.arff)" == "200" ]; do 
+        timeout 120s bash -c 'until [ "$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api_splits/get/1/Task_1_splits.arff)" == "200" ]; do 
            echo "Splits not ready yet. Waiting..."
            sleep 5
         done'
