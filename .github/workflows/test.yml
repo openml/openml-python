@@ -121,8 +121,21 @@ jobs:
       working-directory: ./services
       run: |
         sudo systemctl stop mysql.service
-        docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
+        docker compose --profile rest-api --profile minio up -d
+        
+        echo "1. Waiting for Database population..."
         docker wait openml-test-database-setup
+        
+        echo "2. Waiting for Elasticsearch (this is the slow part)..."
+        # Wait up to 5 minutes for ES to go green
+        timeout 300s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} openml-elasticsearch)" == "healthy" ]; do sleep 5; done'
+        
+        echo "3. Waiting for PHP API..."
+        # Wait up to 5 minutes for PHP to accept connections
+        timeout 300s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} openml-php-rest-api)" == "healthy" ]; do sleep 5; done'
+        
+        echo "4. Docker Stack is Healthy!"
+        docker ps
 
     - name: Verify API is Reachable
       if: matrix.os == 'ubuntu-latest'
