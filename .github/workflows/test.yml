@@ -135,8 +135,6 @@ jobs:
 
     - name: Run tests on Ubuntu Test
       if: matrix.os == 'ubuntu-latest'
-      env:
-        TEST_SERVER_URL: "http://localhost:8000/"
       run: |
         if [ "${{ matrix.code-cov }}" = "true" ]; then
           codecov="--cov=openml --long --cov-report=xml"
@@ -152,8 +150,6 @@ jobs:
 
     - name: Run tests on Ubuntu Production
       if: matrix.os == 'ubuntu-latest'
-      env:
-        TEST_SERVER_URL: "http://localhost:8000/"
       run: |
         if [ "${{ matrix.code-cov }}" = "true" ]; then
           codecov="--cov=openml --long --cov-report=xml"

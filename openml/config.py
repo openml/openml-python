@@ -27,7 +27,7 @@ OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
 OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
 _TEST_SERVER_NORMAL_USER_KEY = "normaluser"
 
-TEST_SERVER_URL = "https://test.openml.org"
+TEST_SERVER_URL = "http://localhost:8000"
 
 
 class _Config(TypedDict):
