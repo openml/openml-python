@@ -1100,7 +1100,6 @@ class TestRun(TestBase):
     @pytest.mark.uses_test_server()
     def test_run_flow_on_task_basic(self):
         """Test that run_flow_on_task executes successfully with basic flow and task."""
-        # construct sci-kit learn classifier
         clf = Pipeline(
             steps=[
                 ("imputer", SimpleImputer(strategy="most_frequent")),
@@ -1108,21 +1107,15 @@ class TestRun(TestBase):
                 ("estimator", RandomForestClassifier(n_estimators=5, random_state=42)),
             ],
         )
-
-        # convert model to flow
         flow = self.extension.model_to_flow(clf)
-
-        # download task
         task = openml.tasks.get_task(119)  # diabetes; holdout
 
-        # invoke run_flow_on_task (refactored function under test)
         run = openml.runs.run_flow_on_task(
             flow=flow,
             task=task,
             upload_flow=False,
         )
 
-        # verify run was created successfully
         assert run.task_id == task.task_id
         assert run.flow_name == flow.name
         assert run.dataset_id == task.dataset_id
@@ -1140,8 +1133,6 @@ class TestRun(TestBase):
         flow = self.extension.model_to_flow(clf)
         task = openml.tasks.get_task(119)
 
-        # invoke run_flow_on_task with custom flow tags
-        # Note: flow_tags are tags for the flow object, not the run
         run = openml.runs.run_flow_on_task(
             flow=flow,
             task=task,
@@ -1149,7 +1140,6 @@ class TestRun(TestBase):
             upload_flow=False,
         )
 
-        # verify run was created successfully
         assert run.task_id == task.task_id
         assert run.flow_name == flow.name
         assert run.data_content is not None
