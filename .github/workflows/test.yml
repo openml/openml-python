@@ -115,6 +115,10 @@ jobs:
 
         git fetch origin pull/15/head:pr-15
         git merge pr-15 --no-edit
+        sed -i 's/localhost:8000/172.28.0.2:8000/g' config/database/update.sh
+        
+        # Verify the change
+        grep "172.28.0.2" config/database/update.sh || echo "Patch failed!"
 
     - name: Start Docker Services
       if: matrix.os == 'ubuntu-latest'
@@ -136,6 +140,7 @@ jobs:
         
         echo "4. Docker Stack is Healthy!"
         docker ps
+
     - name: Error
       working-directory: ./services
       run: |
