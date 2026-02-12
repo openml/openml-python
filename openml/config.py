@@ -9,6 +9,7 @@ import logging.handlers
 import os
 import platform
 import shutil
+import sys
 import warnings
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -27,7 +28,10 @@ OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
 OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
 _TEST_SERVER_NORMAL_USER_KEY = "normaluser"
 
-TEST_SERVER_URL = "http://localhost:8000"
+if sys.platform.startswith("win"):
+    TEST_SERVER_URL = "http://localhost"
+else:
+    TEST_SERVER_URL = "http://localhost:8000"
 
 
 class _Config(TypedDict):
