@@ -140,8 +140,38 @@ jobs:
     - name: Verify API is Reachable
       if: matrix.os == 'ubuntu-latest'
       run: |
-        timeout 20s bash -c 'until curl -sSf http://localhost:8000/api/v1/xml/data/1 > /dev/null; do sleep 3; done'
-        curl -I http://localhost:8000/api/v1/task/1
+        echo "Waiting for API to be ready (Handling 412 Sync Errors)..."
+        
+        # Helper function to check status
+        check_api() {
+          # Fetch HTTP code
+          code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/v1/xml/data/1)
+          if [ "$code" == "200" ]; then
+            return 0
+          else
+            return 1
+          fi
+        }
+
+        # Loop for up to 60 seconds
+        count=0
+        while [ $count -lt 12 ]; do
+          if check_api; then
+            echo "API is Ready (200 OK)!"
+            exit 0
+          fi
+          echo "API responded with status $(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/v1/xml/data/1). Retrying in 5s..."
+          sleep 5
+          count=$((count+1))
+        done
+
+        echo "API failed to initialize. Printing last response body for debugging:"
+        curl -v http://localhost:8000/api/v1/xml/data/1
+        
+        # Also print PHP logs to see the specific OpenML Exception
+        echo "=== PHP API LOGS ==="
+        docker logs openml-php-rest-api
+        exit 1
 
     - name: Show installed dependencies
       run: python -m pip list
