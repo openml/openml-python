@@ -105,7 +105,6 @@ jobs:
       run: |
         # Map 'nginx' to localhost so the Host machine can resolve the URLs in the database
         echo "127.0.0.1 nginx" | sudo tee -a /etc/hosts
-        ping -c 1 nginx
 
     - name: Clone Services & Apply Universal Patch
       if: matrix.os == 'ubuntu-latest'
@@ -145,9 +144,34 @@ jobs:
         echo "3. Waiting for PHP API..."
         # Wait up to 5 minutes for PHP to accept connections
         timeout 300s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} openml-php-rest-api)" == "healthy" ]; do sleep 5; done'
+
+    - name: Finalize Setup & Verify Splits
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        echo "1. Forcing Elasticsearch Indexing Sync..."
+        # This helps clear the 412 errors the Engine is hitting
+        curl -s http://nginx:8000/api/v1/xml/admin/index/sync || echo "Sync endpoint not found, skipping..."
+
+        echo "2. Waiting for Evaluation Engine to process Task 119..."
+        echo "Targeting Task 119 (The primary failure point)."
         
-        echo "4. Docker Stack is Healthy!"
-        docker ps
+        # Give it 5 minutes (300s). Java + indexing + splits generation is heavy.
+        count=0
+        while [ $count -lt 30 ]; do
+           code=$(curl -s -o /dev/null -w "%{http_code}" http://nginx:8000/api_splits/get/119/Task_119_splits.arff)
+           if [ "$code" == "200" ]; then
+             echo "✅ SUCCESS: Task 119 splits are ready!"
+             exit 0
+           fi
+           echo "   ... waiting for split generation (Current Status: $code)"
+           sleep 10
+           count=$((count+1))
+        done
+        
+        echo "❌ ERROR: Evaluation Engine timed out."
+        # Dump logs only if this step fails
+        docker exec openml-evaluation-engine cat /logs/evaluation.log || echo "Could not read log file"
+        exit 1
 
     - name: Error
       working-directory: ./services
