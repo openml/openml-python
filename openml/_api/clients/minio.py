@@ -29,6 +29,6 @@ class MinIOClient:
         OpenML Python client version.
     """
 
-    def __init__(self, path: Path | None = None) -> None:
+    def __init__(self, path: Path) -> None:
         self.path = path
         self.headers: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
