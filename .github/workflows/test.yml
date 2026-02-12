@@ -121,7 +121,7 @@ jobs:
       working-directory: ./services
       run: |
         sudo systemctl stop mysql.service
-        docker compose --profile rest-api --profile minio up -d --build
+        docker compose --profile rest-api --profile minio --profile evaluation-engine up -d --build
         
         echo "1. Waiting for Database population..."
         docker wait openml-test-database-setup
