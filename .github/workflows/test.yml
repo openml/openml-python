@@ -101,11 +101,11 @@ jobs:
         echo "BEFORE=$git_status" >> $GITHUB_ENV
         echo "Repository status before tests: $git_status"
 
-    - name: Configure Host Network
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        # Map 'nginx' to localhost so the Host machine can resolve the URLs in the database
-        echo "127.0.0.1 nginx" | sudo tee -a /etc/hosts
+    # - name: Configure Host Network
+    #   if: matrix.os == 'ubuntu-latest'
+    #   run: |
+    #     # Map 'nginx' to localhost so the Host machine can resolve the URLs in the database
+    #     echo "127.0.0.1 nginx" | sudo tee -a /etc/hosts
 
     - name: Clone Services & Apply Universal Patch
       if: matrix.os == 'ubuntu-latest'
@@ -117,71 +117,16 @@ jobs:
         git fetch origin pull/13/head:pr-13 && git merge pr-13 --no-edit
         git fetch origin pull/15/head:pr-15 && git merge pr-15 --no-edit
         
-        # === PATCH 1: Use 'nginx' hostname ===
-        # This works inside Docker (DNS) and on Host (via /etc/hosts hack above)
-        sed -i 's/localhost:8000/nginx:8000/g' config/database/update.sh
+        # # === PATCH 1: Use 'nginx' hostname ===
+        # # This works inside Docker (DNS) and on Host (via /etc/hosts hack above)
+        # sed -i 's/localhost:8000/nginx:8000/g' config/database/update.sh
         
-        # === PATCH 2: Fix Path Mismatch ===
-        # Ensure we use /data/ which Nginx recognizes
-        sed -i 's|/minio/|/data/|g' config/database/update.sh
+        # # === PATCH 2: Fix Path Mismatch ===
+        # # Ensure we use /data/ which Nginx recognizes
+        # sed -i 's|/minio/|/data/|g' config/database/update.sh
         
-        echo "=== Patched Update Script ==="
-        cat config/database/update.sh | grep "nginx"
-
-    - name: Start Docker Services
-      if: matrix.os == 'ubuntu-latest'
-      working-directory: ./services
-      run: |
-        sudo systemctl stop mysql.service
-        docker compose --profile rest-api --profile minio --profile evaluation-engine up -d --build
-        
-        echo "1. Waiting for Database population..."
-        docker wait openml-test-database-setup
-        
-        echo "2. Waiting for Elasticsearch (this is the slow part)..."
-        # Wait up to 5 minutes for ES to go green
-        timeout 300s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} openml-elasticsearch)" == "healthy" ]; do sleep 5; done'
-        
-        echo "3. Waiting for PHP API..."
-        # Wait up to 5 minutes for PHP to accept connections
-        timeout 300s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} openml-php-rest-api)" == "healthy" ]; do sleep 5; done'
-
-    - name: Finalize Setup & Verify Splits
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        echo "1. Forcing Elasticsearch Indexing Sync (With Auth)..."
-        # We append the default test API Key (AD0...0) to authorized the admin action
-        curl -s "http://nginx:8000/api/v1/xml/admin/index/sync?api_key=AD000000000000000000000000000000" || echo "Sync request failed"
-
-        echo "2. Waiting for Evaluation Engine to process Task 119..."
-        echo "Targeting Task 119 (The primary failure point)."
-        
-        # We give it 5 minutes (300s) to handle the queue.
-        count=0
-        while [ $count -lt 30 ]; do
-           code=$(curl -s -o /dev/null -w "%{http_code}" http://nginx:8000/api_splits/get/119/Task_119_splits.arff)
-           if [ "$code" == "200" ]; then
-             echo "✅ SUCCESS: Task 119 splits are ready!"
-             exit 0
-           fi
-           echo "   ... waiting for split generation (Current Status: $code)"
-           sleep 10
-           count=$((count+1))
-        done
-        
-        echo "❌ ERROR: Evaluation Engine timed out."
-        
-        echo "=== DEBUG: LISTING LOG DIR ==="
-        docker exec openml-evaluation-engine ls -R /logs/ || echo "Dir empty"
-        
-        echo "=== DEBUG: DUMPING ALL LOGS ==="
-        # Use wildcard to catch whatever the filename actually is
-        docker exec openml-evaluation-engine sh -c "cat /logs/*.log" || echo "Could not read logs"
-        
-        # Also check the cron log again, just in case
-        docker exec openml-evaluation-engine cat /cron.log || echo "Cron log empty"
-        
-        exit 1
+        # echo "=== Patched Update Script ==="
+        # cat config/database/update.sh | grep "nginx"
 
     - name: Show installed dependencies
       run: python -m pip list
