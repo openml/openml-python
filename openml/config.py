@@ -28,6 +28,7 @@ OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
 _TEST_SERVER_NORMAL_USER_KEY = "normaluser"
 
 TEST_SERVER_URL = "https://test.openml.org"
+TEST_SERVER_URL = "http://localhost:8000"
 
 
 class _Config(TypedDict):
@@ -471,7 +472,9 @@ def get_cache_directory() -> str:
 
     """
     url_suffix = urlparse(server).netloc
-    reversed_url_suffix = os.sep.join(url_suffix.split(".")[::-1])  # noqa: PTH118
+    url_parts = url_suffix.split(".")[::-1]
+    url_parts_no_port = [part.split(":")[0] for part in url_parts]
+    reversed_url_suffix = os.sep.join(url_parts_no_port)  # noqa: PTH118
     return os.path.join(_root_cache_directory, reversed_url_suffix)  # noqa: PTH118
 
 
