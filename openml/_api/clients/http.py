@@ -624,30 +624,28 @@ class HTTPClient:
             except Exception:
                 raise  # propagate unexpected cache errors
 
-        session = requests.Session()
-        for retry_counter in range(1, retries + 1):
-            response, exception = self._request(
-                session=session,
-                method=method,
-                url=url,
-                params=params,
-                data=data,
-                headers=headers,
-                files=files,
-                **request_kwargs,
-            )
+        with requests.Session() as session:
+            for retry_counter in range(1, retries + 1):
+                response, exception = self._request(
+                    session=session,
+                    method=method,
+                    url=url,
+                    params=params,
+                    data=data,
+                    headers=headers,
+                    files=files,
+                    **request_kwargs,
+                )
 
-            # executed successfully
-            if exception is None:
-                break
-            # tries completed
-            if retry_counter >= retries:
-                raise exception
+                # executed successfully
+                if exception is None:
+                    break
+                # tries completed
+                if retry_counter >= retries:
+                    raise exception
 
-            delay = self.retry_func(retry_counter)
-            time.sleep(delay)
-
-        session.close()
+                delay = self.retry_func(retry_counter)
+                time.sleep(delay)
 
         assert response is not None
 
