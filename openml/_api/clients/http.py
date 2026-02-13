@@ -9,7 +9,7 @@ import time
 import xml
 from collections.abc import Callable, Mapping
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from urllib.parse import urlencode, urljoin, urlparse
 
 import requests
@@ -647,7 +647,9 @@ class HTTPClient:
                 delay = self.retry_func(retry_counter)
                 time.sleep(delay)
 
-        assert response is not None
+        # response is guaranteed to be not `None`
+        # otherwise an exception would have been raised before
+        response = cast("Response", response)
 
         if use_cache and self.cache is not None:
             cache_key = self.cache.get_key(url, params)
