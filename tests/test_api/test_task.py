@@ -10,7 +10,15 @@ from openml.enums import APIVersion
 from openml.tasks.task import TaskType
 
 
-class TestTaskV1API(TestAPIBase):
+class TestTaskAPIBase(TestAPIBase):
+    """Common utilities for Task API tests."""
+    def _get_first_tid(self, api_resource, task_type: TaskType) -> int:
+        tasks = api_resource.list(limit=1, offset=0, task_type=task_type)
+        if tasks.empty:
+            pytest.skip(f"No tasks of type {task_type} found.")
+        return int(tasks.iloc[0]["tid"])
+
+class TestTaskV1API(TestTaskAPIBase):
     def setUp(self):
         super().setUp()
         self.client = self.http_clients[APIVersion.V1]
@@ -24,7 +32,7 @@ class TestTaskV1API(TestAPIBase):
         assert not tasks_df.empty
         assert "tid" in tasks_df.columns
 
-class TestTaskV2API(TestAPIBase):
+class TestTaskV2API(TestTaskAPIBase):
     def setUp(self):
         super().setUp()
         self.client = self.http_clients[APIVersion.V2]
@@ -36,7 +44,7 @@ class TestTaskV2API(TestAPIBase):
         with pytest.raises(OpenMLNotSupportedError):
             self.task.list(limit=5, offset=0)
 
-class TestTasksCombined(TestAPIBase):
+class TestTasksCombined(TestTaskAPIBase):
     def setUp(self):
         super().setUp()
         self.v1_client = self.http_clients[APIVersion.V1]
@@ -55,7 +63,6 @@ class TestTasksCombined(TestAPIBase):
     @pytest.mark.uses_test_server()
     def test_get_matches(self):
         """Verify that we can get a task from V2 API and it matches V1."""
-        # Refactored to match the 'test_get_matches' style from Reference
         tid = self._get_first_tid(TaskType.SUPERVISED_CLASSIFICATION)
         
         output_v1 = self.task_v1.get(tid)
