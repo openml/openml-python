@@ -446,7 +446,7 @@ class HTTPClient:
         if response.status_code == requests.codes.URI_TOO_LONG:
             raise OpenMLServerError(f"URI too long! ({url})")
 
-        retry_raise_e: Exception | None = None
+        exception: Exception | None = None
         code: int | None = None
         message: str = ""
 
@@ -461,7 +461,7 @@ class HTTPClient:
                     f"developers!\n{extra}"
                 ) from e
 
-            retry_raise_e = e
+            exception = e
 
         except Exception as e:
             # If we failed to parse it out,
@@ -480,10 +480,10 @@ class HTTPClient:
                 files=files,
             )
 
-        if retry_raise_e is None:
-            retry_raise_e = OpenMLServerException(code=code, message=message, url=url)
+        if exception is None:
+            exception = OpenMLServerException(code=code, message=message, url=url)
 
-        return retry_raise_e
+        return exception
 
     def _request(  # noqa: PLR0913
         self,
@@ -523,7 +523,7 @@ class HTTPClient:
         tuple of (requests.Response or None, Exception or None)
             Response and potential retry exception.
         """
-        retry_raise_e: Exception | None = None
+        exception: Exception | None = None
         response: Response | None = None
 
         try:
@@ -541,17 +541,17 @@ class HTTPClient:
             requests.exceptions.ConnectionError,
             requests.exceptions.SSLError,
         ) as e:
-            retry_raise_e = e
+            exception = e
 
         if response is not None:
-            retry_raise_e = self._validate_response(
+            exception = self._validate_response(
                 method=method,
                 url=url,
                 files=files,
                 response=response,
             )
 
-        return response, retry_raise_e
+        return response, exception
 
     def request(  # noqa: PLR0913, C901
         self,
@@ -626,7 +626,7 @@ class HTTPClient:
 
         session = requests.Session()
         for retry_counter in range(1, retries + 1):
-            response, retry_raise_e = self._request(
+            response, exception = self._request(
                 session=session,
                 method=method,
                 url=url,
@@ -638,11 +638,11 @@ class HTTPClient:
             )
 
             # executed successfully
-            if retry_raise_e is None:
+            if exception is None:
                 break
             # tries completed
             if retry_counter >= retries:
-                raise retry_raise_e
+                raise exception
 
             delay = self.retry_func(retry_counter)
             time.sleep(delay)
