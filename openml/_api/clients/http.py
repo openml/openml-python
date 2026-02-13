@@ -651,12 +651,12 @@ class HTTPClient:
         # otherwise an exception would have been raised before
         response = cast("Response", response)
 
+        if md5_checksum is not None:
+            self._verify_checksum(response, md5_checksum)
+
         if use_cache and self.cache is not None:
             cache_key = self.cache.get_key(url, params)
             self.cache.save(cache_key, response)
-
-        if md5_checksum is not None:
-            self._verify_checksum(response, md5_checksum)
 
         return response
 
