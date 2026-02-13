@@ -27,6 +27,8 @@ from openml.exceptions import (
     OpenMLServerNoResult,
 )
 
+from .utils import human_delay, robot_delay
+
 
 class HTTPCache:
     """
@@ -245,9 +247,7 @@ class HTTPClient:
         self.retry_policy = retry_policy
         self.cache = cache
 
-        self.retry_func = (
-            self._human_delay if retry_policy == RetryPolicy.HUMAN else self._robot_delay
-        )
+        self.retry_func = human_delay if retry_policy == RetryPolicy.HUMAN else robot_delay
         self.headers: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
 
     def _robot_delay(self, n: int) -> float:
