@@ -1,6 +1,6 @@
 from time import time
 import pytest
-from openml.testing import TestAPIBase
+from openml.testing import TestBase, TestAPIBase
 from openml._api import ResourceV1API, ResourceV2API, FallbackProxy, ResourceAPI
 from openml.enums import ResourceType, APIVersion
 from openml.exceptions import OpenMLNotSupportedError
@@ -18,13 +18,18 @@ class TestResourceAPIBase(TestAPIBase):
             <oml:input name="estimation_procedure">17</oml:input>
         </oml:task_inputs>
         """
-
+        # publish
         task_id = self.resource.publish(
             "task",
             files={"description": task_xml},
         )
         self.assertIsNotNone(task_id)
 
+        # cleanup incase of failure
+        TestBase._mark_entity_for_removal("task", task_id)
+        TestBase.logger.info(f"collected from {__file__}: {task_id}")
+
+        # delete
         success = self.resource.delete(task_id)
         self.assertTrue(success)
 

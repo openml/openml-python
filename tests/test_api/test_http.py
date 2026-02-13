@@ -2,7 +2,7 @@ from requests import Response, Request
 import time
 import xmltodict
 import pytest
-from openml.testing import TestAPIBase
+from openml.testing import TestBase, TestAPIBase
 import os
 from pathlib import Path
 from urllib.parse import urljoin
@@ -155,27 +155,22 @@ class TestHTTPClient(TestAPIBase):
             <oml:input name="estimation_procedure">17</oml:input>
         </oml:task_inputs>
         """
+        # post
+        response = self.http_client.post(
+            "task",
+            files={"description": task_xml},
+        )
+        self.assertEqual(response.status_code, 200)
+        xml_resp = xmltodict.parse(response.content)
+        task_id = int(xml_resp["oml:upload_task"]["oml:id"])
 
-        task_id = None
-        try:
-            # POST the task
-            post_response = self.http_client.post(
-                "task",
-                files={"description": task_xml},
-            )
-            self.assertEqual(post_response.status_code, 200)
-            xml_resp = xmltodict.parse(post_response.content)
-            task_id = int(xml_resp["oml:upload_task"]["oml:id"])
+        # cleanup incase of failure
+        TestBase._mark_entity_for_removal("task", task_id)
+        TestBase.logger.info(f"collected from {__file__}: {task_id}")
 
-            # GET the task to verify it exists
-            get_response = self.http_client.get(f"task/{task_id}")
-            self.assertEqual(get_response.status_code, 200)
-
-        finally:
-            # DELETE the task if it was created
-            if task_id is not None:
-                del_response = self.http_client.delete(f"task/{task_id}")
-                self.assertEqual(del_response.status_code, 200)
+        # delete
+        response = self.http_client.delete(f"task/{task_id}")
+        self.assertEqual(response.status_code, 200)
 
     def test_download_requires_cache(self):
         client = HTTPClient(
