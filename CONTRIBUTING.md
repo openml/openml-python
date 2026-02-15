@@ -96,6 +96,17 @@ To test your new contribution, add [unit tests](https://github.com/openml/openml
 * Please ensure that the example is run on the test server by beginning with the call to `openml.config.start_using_configuration_for_example()`, which is done by default for tests derived from `TestBase`.
 * Add the `@pytest.mark.sklearn` marker to your unit tests if they have a dependency on scikit-learn.
 
+#### Running Tests That Require Admin Privileges
+
+Some tests require admin privileges on the test server and will be automatically skipped unless you provide an admin API key. For regular contributors, the tests will skip gracefully. For core contributors who need to run these tests locally, you can set up the key by exporting the variable as below before running the tests:
+
+```bash
+# For windows
+$env:OPENML_TEST_SERVER_ADMIN_KEY = "admin-key"
+# For linux/mac
+export OPENML_TEST_SERVER_ADMIN_KEY="admin-key"
+```
+
 ### Pull Request Checklist
 
 You can go to the `openml-python` GitHub repository to create the pull request by [comparing the branch](https://github.com/openml/openml-python/compare) from your fork with the `develop` branch of the `openml-python` repository. When creating a pull request, make sure to follow the comments and structured provided by the template on GitHub.
