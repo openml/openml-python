@@ -20,7 +20,7 @@
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 <!-- Add green badges for CI and precommit -->
 
-[Installation](https://openml.github.io/openml-python/main/#how-to-get-openml-for-python) | [Documentation](https://openml.github.io/openml-python) | [Contribution guidelines](https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md)
+[Installation](https://openml.github.io/openml-python/main/#how-to-get-openml-for-python) | [Documentation](https://openml.github.io/openml-python) | [Contribution guidelines](https://github.com/openml/openml-python/blob/main/CONTRIBUTING.md)
 </div>
 
 OpenML-Python provides an easy-to-use and straightforward Python interface for [OpenML](http://openml.org), an online platform for open science collaboration in machine learning.
@@ -94,7 +94,7 @@ Bibtex entry:
 We welcome contributions from both new and experienced developers!
 
 If you would like to contribute to OpenML-Python, please read our  
-[Contribution Guidelines](https://github.com/openml/openml-python/blob/develop/CONTRIBUTING.md).
+[Contribution Guidelines](https://github.com/openml/openml-python/blob/main/CONTRIBUTING.md).
 
 If you are new to open-source development, a great way to get started is by
 looking at issues labeled **"good first issue"** in our GitHub issue tracker.
