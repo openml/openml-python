@@ -2,6 +2,7 @@
 
 from openml.utils._openml import (
     ProgressBar,
+    ReprMixin,
     _create_cache_directory,
     _create_cache_directory_for_id,
     _create_lockfiles_dir,
@@ -19,6 +20,7 @@ from openml.utils._openml import (
 
 __all__ = [
     "ProgressBar",
+    "ReprMixin",
     "_create_cache_directory",
     "_create_cache_directory_for_id",
     "_create_lockfiles_dir",
