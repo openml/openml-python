@@ -2893,8 +2893,7 @@ evaluation measures that are available.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/evaluations/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-276">276</a></span>
-<span class="normal"><a href="#__codelineno-0-277">277</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-277">277</a></span>
 <span class="normal"><a href="#__codelineno-0-278">278</a></span>
 <span class="normal"><a href="#__codelineno-0-279">279</a></span>
 <span class="normal"><a href="#__codelineno-0-280">280</a></span>
@@ -2914,28 +2913,29 @@ evaluation measures that are available.</p>
 <span class="normal"><a href="#__codelineno-0-294">294</a></span>
 <span class="normal"><a href="#__codelineno-0-295">295</a></span>
 <span class="normal"><a href="#__codelineno-0-296">296</a></span>
-<span class="normal"><a href="#__codelineno-0-297">297</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_evaluation_measures</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return list of evaluation measures available.</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    The function performs an API call to retrieve the entire list of</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">    evaluation measures that are available.</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    list</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="n">api_call</span> <span class="o">=</span> <span class="s2">&quot;evaluationmeasure/list&quot;</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="n">xml_string</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span><span class="n">api_call</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>    <span class="n">qualities</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_string</span><span class="p">,</span> <span class="n">force_list</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;oml:measures&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="c1"># Minimalistic check if the XML is useful</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="k">if</span> <span class="s2">&quot;oml:evaluation_measures&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qualities</span><span class="p">:</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Error in return XML, does not contain &quot;oml:evaluation_measures&quot;&#39;</span><span class="p">)</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">qualities</span><span class="p">[</span><span class="s2">&quot;oml:evaluation_measures&quot;</span><span class="p">][</span><span class="s2">&quot;oml:measures&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;oml:measure&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Error in return XML, does not contain &quot;oml:measure&quot; as a list&#39;</span><span class="p">)</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="k">return</span> <span class="n">qualities</span><span class="p">[</span><span class="s2">&quot;oml:evaluation_measures&quot;</span><span class="p">][</span><span class="s2">&quot;oml:measures&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;oml:measure&quot;</span><span class="p">]</span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_evaluation_measures</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return list of evaluation measures available.</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">    The function performs an API call to retrieve the entire list of</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">    evaluation measures that are available.</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">    list</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="n">api_call</span> <span class="o">=</span> <span class="s2">&quot;evaluationmeasure/list&quot;</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>    <span class="n">xml_string</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span><span class="n">api_call</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="n">qualities</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_string</span><span class="p">,</span> <span class="n">force_list</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;oml:measures&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="c1"># Minimalistic check if the XML is useful</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="k">if</span> <span class="s2">&quot;oml:evaluation_measures&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qualities</span><span class="p">:</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Error in return XML, does not contain &quot;oml:evaluation_measures&quot;&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">qualities</span><span class="p">[</span><span class="s2">&quot;oml:evaluation_measures&quot;</span><span class="p">][</span><span class="s2">&quot;oml:measures&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;oml:measure&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Error in return XML, does not contain &quot;oml:measure&quot; as a list&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="k">return</span> <span class="n">qualities</span><span class="p">[</span><span class="s2">&quot;oml:evaluation_measures&quot;</span><span class="p">][</span><span class="s2">&quot;oml:measures&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;oml:measure&quot;</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3739,8 +3739,7 @@ Valid only for a single flow</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/evaluations/functions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
@@ -3846,114 +3845,115 @@ Valid only for a single flow</p>
 <span class="normal"><a href="#__codelineno-0-434">434</a></span>
 <span class="normal"><a href="#__codelineno-0-435">435</a></span>
 <span class="normal"><a href="#__codelineno-0-436">436</a></span>
-<span class="normal"><a href="#__codelineno-0-437">437</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_evaluations_setups</span><span class="p">(</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="n">tasks</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="n">setups</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="n">flows</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="n">runs</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="n">uploaders</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="n">per_fold</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="n">sort_order</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>    <span class="n">parameters_in_separate_columns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;List all run-evaluation pairs matching all of the given filters</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">    and their hyperparameter settings.</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">    function : str</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        the evaluation function. e.g., predictive_accuracy</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    offset : int, optional</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        the number of runs to skip, starting from the first</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    size : int, optional</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        the maximum number of runs to show</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">    tasks : list[int], optional</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        the list of task IDs</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">    setups: list[int], optional</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        the list of setup IDs</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    flows : list[int], optional</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        the list of flow IDs</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    runs : list[int], optional</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        the list of run IDs</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    uploaders : list[int], optional</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        the list of uploader IDs</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">    tag : str, optional</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        filter evaluation based on given tag</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">    per_fold : bool, optional</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">    sort_order : str, optional</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">       order of sorting evaluations, ascending (&quot;asc&quot;) or descending (&quot;desc&quot;)</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">    parameters_in_separate_columns: bool, optional (default= False)</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        Returns hyperparameters in separate columns if set to True.</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        Valid only for a single flow</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">    dataframe with hyperparameter settings as a list of tuples.</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>    <span class="k">if</span> <span class="n">parameters_in_separate_columns</span> <span class="ow">and</span> <span class="p">(</span><span class="n">flows</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">flows</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">):</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can set parameters_in_separate_columns to true only for single flow_id&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>    <span class="c1"># List evaluations</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>    <span class="n">evals</span> <span class="o">=</span> <span class="n">list_evaluations</span><span class="p">(</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="n">runs</span><span class="o">=</span><span class="n">runs</span><span class="p">,</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="n">tasks</span><span class="o">=</span><span class="n">tasks</span><span class="p">,</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="n">setups</span><span class="o">=</span><span class="n">setups</span><span class="p">,</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="n">flows</span><span class="o">=</span><span class="n">flows</span><span class="p">,</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="n">uploaders</span><span class="o">=</span><span class="n">uploaders</span><span class="p">,</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="n">per_fold</span><span class="o">=</span><span class="n">per_fold</span><span class="p">,</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>        <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="p">)</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="c1"># List setups</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="c1"># list_setups by setup id does not support large sizes (exceeds URL length limit)</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>    <span class="c1"># Hence we split the list of unique setup ids returned by list_evaluations into chunks of size N</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">evals</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>        <span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># size of section</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a>        <span class="n">uniq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">evals</span><span class="p">[</span><span class="s2">&quot;setup_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">uniq</span><span class="p">)</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a>        <span class="c1"># array_split - allows indices_or_sections to not equally divide the array</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>        <span class="c1"># array_split -length % N sub-arrays of size length//N + 1 and the rest of size length//N.</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>        <span class="n">split_size</span> <span class="o">=</span> <span class="p">((</span><span class="n">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">N</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>        <span class="n">setup_chunks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">uniq</span><span class="p">,</span> <span class="n">split_size</span><span class="p">)</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="n">setup_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="k">for</span> <span class="n">_setups</span> <span class="ow">in</span> <span class="n">setup_chunks</span><span class="p">:</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">setups</span><span class="o">.</span><span class="n">list_setups</span><span class="p">(</span><span class="n">setup</span><span class="o">=</span><span class="n">_setups</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;flow_id&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>            <span class="c1"># concat resulting setup chunks into single datframe</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>            <span class="n">setup_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">setup_data</span><span class="p">,</span> <span class="n">result</span><span class="p">])</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="n">parameters</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="c1"># Convert parameters of setup into dict of (hyperparameter, value)</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="k">for</span> <span class="n">parameter_dict</span> <span class="ow">in</span> <span class="n">setup_data</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]:</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>            <span class="k">if</span> <span class="n">parameter_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>                <span class="n">parameters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>                    <span class="p">{</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;full_name&quot;</span><span class="p">]:</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameter_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()},</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>                <span class="p">)</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>                <span class="n">parameters</span><span class="o">.</span><span class="n">append</span><span class="p">({})</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="n">setup_data</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameters</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="c1"># Merge setups with evaluations</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>        <span class="n">_df</span> <span class="o">=</span> <span class="n">evals</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">setup_data</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;setup_id&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>    <span class="k">if</span> <span class="n">parameters_in_separate_columns</span><span class="p">:</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>            <span class="p">[</span><span class="n">_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;parameters&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">_df</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)],</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="p">)</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="k">return</span> <span class="n">_df</span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span>
+<span class="normal"><a href="#__codelineno-0-438">438</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="k">def</span><span class="w"> </span><span class="nf">list_evaluations_setups</span><span class="p">(</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="n">tasks</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="n">setups</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="n">flows</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="n">runs</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="n">uploaders</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="n">per_fold</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>    <span class="n">sort_order</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="n">parameters_in_separate_columns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># noqa: FBT002</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;List all run-evaluation pairs matching all of the given filters</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    and their hyperparameter settings.</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    function : str</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        the evaluation function. e.g., predictive_accuracy</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    offset : int, optional</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        the number of runs to skip, starting from the first</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    size : int, optional</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        the maximum number of runs to show</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    tasks : list[int], optional</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        the list of task IDs</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    setups: list[int], optional</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        the list of setup IDs</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">    flows : list[int], optional</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        the list of flow IDs</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">    runs : list[int], optional</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        the list of run IDs</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">    uploaders : list[int], optional</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        the list of uploader IDs</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">    tag : str, optional</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        filter evaluation based on given tag</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">    per_fold : bool, optional</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    sort_order : str, optional</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">       order of sorting evaluations, ascending (&quot;asc&quot;) or descending (&quot;desc&quot;)</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">    parameters_in_separate_columns: bool, optional (default= False)</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        Returns hyperparameters in separate columns if set to True.</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        Valid only for a single flow</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    dataframe with hyperparameter settings as a list of tuples.</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>    <span class="k">if</span> <span class="n">parameters_in_separate_columns</span> <span class="ow">and</span> <span class="p">(</span><span class="n">flows</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">flows</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">):</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can set parameters_in_separate_columns to true only for single flow_id&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>    <span class="c1"># List evaluations</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="n">evals</span> <span class="o">=</span> <span class="n">list_evaluations</span><span class="p">(</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="n">runs</span><span class="o">=</span><span class="n">runs</span><span class="p">,</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="n">tasks</span><span class="o">=</span><span class="n">tasks</span><span class="p">,</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="n">setups</span><span class="o">=</span><span class="n">setups</span><span class="p">,</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="n">flows</span><span class="o">=</span><span class="n">flows</span><span class="p">,</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="n">uploaders</span><span class="o">=</span><span class="n">uploaders</span><span class="p">,</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>        <span class="n">per_fold</span><span class="o">=</span><span class="n">per_fold</span><span class="p">,</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="p">)</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="c1"># List setups</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>    <span class="c1"># list_setups by setup id does not support large sizes (exceeds URL length limit)</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="c1"># Hence we split the list of unique setup ids returned by list_evaluations into chunks of size N</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>    <span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">evals</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>        <span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># size of section</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>        <span class="n">uniq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">evals</span><span class="p">[</span><span class="s2">&quot;setup_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">uniq</span><span class="p">)</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>        <span class="c1"># array_split - allows indices_or_sections to not equally divide the array</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>        <span class="c1"># array_split -length % N sub-arrays of size length//N + 1 and the rest of size length//N.</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>        <span class="n">split_size</span> <span class="o">=</span> <span class="p">((</span><span class="n">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">N</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="n">setup_chunks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">uniq</span><span class="p">,</span> <span class="n">split_size</span><span class="p">)</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="n">setup_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>        <span class="k">for</span> <span class="n">_setups</span> <span class="ow">in</span> <span class="n">setup_chunks</span><span class="p">:</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">setups</span><span class="o">.</span><span class="n">list_setups</span><span class="p">(</span><span class="n">setup</span><span class="o">=</span><span class="n">_setups</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;dataframe&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;flow_id&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>            <span class="c1"># concat resulting setup chunks into single datframe</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>            <span class="n">setup_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">setup_data</span><span class="p">,</span> <span class="n">result</span><span class="p">])</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="n">parameters</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="c1"># Convert parameters of setup into dict of (hyperparameter, value)</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="k">for</span> <span class="n">parameter_dict</span> <span class="ow">in</span> <span class="n">setup_data</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]:</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>            <span class="k">if</span> <span class="n">parameter_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>                <span class="n">parameters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>                    <span class="p">{</span><span class="n">param</span><span class="p">[</span><span class="s2">&quot;full_name&quot;</span><span class="p">]:</span> <span class="n">param</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameter_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()},</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>                <span class="p">)</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>                <span class="n">parameters</span><span class="o">.</span><span class="n">append</span><span class="p">({})</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="n">setup_data</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameters</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>        <span class="c1"># Merge setups with evaluations</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="n">_df</span> <span class="o">=</span> <span class="n">evals</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">setup_data</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;setup_id&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>    <span class="k">if</span> <span class="n">parameters_in_separate_columns</span><span class="p">:</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="n">_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>            <span class="p">[</span><span class="n">_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;parameters&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">_df</span><span class="p">[</span><span class="s2">&quot;parameters&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)],</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="p">)</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>    <span class="k">return</span> <span class="n">_df</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
