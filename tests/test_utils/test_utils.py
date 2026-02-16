@@ -161,7 +161,7 @@ def test_get_cache_size(config_mock,tmp_path):
 
     This test uses a temporary directory (tmp_path) as the cache location by
     patching the configuration via config_mock. It verifies two conditions:
-    empty cache and after dataset fetch. 
+    empty cache and after dataset fetch.
 
     Parameters
     ----------
@@ -170,12 +170,12 @@ def test_get_cache_size(config_mock,tmp_path):
     tmp_path : pathlib.Path
          A pytest-provided temporary directory used as an isolated cache location.
     """
-    
+
     config_mock.return_value = tmp_path
     cache_size = openml.utils.get_cache_size()
     assert cache_size == 0
     sub_dir = tmp_path / "subdir"
     sub_dir.mkdir()
     (sub_dir / "nested_file.txt").write_bytes(b"b" * 100)
-    
+
     assert openml.utils.get_cache_size() == 100
