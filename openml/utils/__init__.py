@@ -15,6 +15,7 @@ from openml.utils._openml import (
     _tag_entity,
     _tag_openml_base,
     extract_xml_tags,
+    get_cache_size,
     thread_safe_if_oslo_installed,
 )
 
@@ -33,5 +34,6 @@ __all__ = [
     "_tag_entity",
     "_tag_openml_base",
     "extract_xml_tags",
+    "get_cache_size",
     "thread_safe_if_oslo_installed",
 ]
