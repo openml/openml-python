@@ -436,6 +436,18 @@ def thread_safe_if_oslo_installed(func: Callable[P, R]) -> Callable[P, R]:
         return func
 
 
+def get_cache_size() -> int:
+    """Calculate the size of OpenML cache directory
+
+    Returns
+    -------
+    cache_size: int
+        Total size of cache in bytes
+    """
+    path = Path(config.get_cache_directory())
+    return sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
+
+
 def _create_lockfiles_dir() -> Path:
     path = Path(config.get_cache_directory()) / "locks"
     # TODO(eddiebergman): Not sure why this is allowed to error and ignore???
