@@ -71,23 +71,59 @@ def _get_cached_flow(fid: int) -> OpenMLFlow:
 
 @openml.utils.thread_safe_if_oslo_installed
 def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = True) -> OpenMLFlow:  # noqa: FBT002
-    """Download the OpenML flow for a given flow ID.
+    """Fetch an OpenMLFlow by its server-assigned ID.
+
+    Queries the OpenML REST API for the flow metadata and returns an
+    :class:`OpenMLFlow` instance. If the flow is already cached locally,
+    the cached copy is returned. Optionally the flow can be re-instantiated
+    into a concrete model instance using the registered extension.
 
     Parameters
     ----------
     flow_id : int
         The OpenML flow id.
-
-    reinstantiate: bool
-        Whether to reinstantiate the flow to a model instance.
-
-    strict_version : bool, default=True
-        Whether to fail if version requirements are not fulfilled.
+    reinstantiate : bool, optional (default=False)
+        If True, convert the flow description into a concrete model instance
+        using the flow's extension (e.g., sklearn). If conversion fails and
+        ``strict_version`` is True, an exception will be raised.
+    strict_version : bool, optional (default=True)
+        When ``reinstantiate`` is True, whether to enforce exact version
+        requirements for the extension/model. If False, a new flow may
+        be returned when versions differ.
 
     Returns
     -------
-    flow : OpenMLFlow
-        the flow
+    OpenMLFlow
+        The flow object with metadata; ``model`` may be populated when
+        ``reinstantiate=True``.
+
+    Raises
+    ------
+    OpenMLCacheException
+        When cached flow files are corrupted or cannot be read.
+    OpenMLServerException
+        When the REST API call fails.
+
+    Side Effects
+    ------------
+    - Writes to ``openml.config.cache_directory/flows/{flow_id}/flow.xml``
+      when the flow is downloaded from the server.
+
+    Preconditions
+    -------------
+    - Network access to the OpenML server is required unless the flow is cached.
+    - For private flows, ``openml.config.apikey`` must be set.
+
+    Notes
+    -----
+    Results are cached to speed up subsequent calls. When ``reinstantiate`` is
+    True and version mismatches occur, a new flow may be returned to reflect
+    the converted model (only when ``strict_version`` is False).
+
+    Examples
+    --------
+    >>> import openml
+    >>> flow = openml.flows.get_flow(5)  # doctest: +SKIP
     """
     flow_id = int(flow_id)
     flow = _get_flow_description(flow_id)
@@ -138,32 +174,47 @@ def list_flows(
     tag: str | None = None,
     uploader: str | None = None,
 ) -> pd.DataFrame:
-    """
-    Return a list of all flows which are on OpenML.
-    (Supports large amount of results)
+    """List flows available on the OpenML server.
+
+    This function supports paging and filtering and returns a pandas
+    DataFrame with one row per flow and columns for id, name, version,
+    external_version, full_name and uploader.
 
     Parameters
     ----------
     offset : int, optional
-        the number of flows to skip, starting from the first
+        Number of flows to skip, starting from the first (for paging).
     size : int, optional
-        the maximum number of flows to return
+        Maximum number of flows to return.
     tag : str, optional
-        the tag to include
-    kwargs: dict, optional
-        Legal filter operators: uploader.
+        Only return flows having this tag.
+    uploader : str, optional
+        Only return flows uploaded by this user.
 
     Returns
     -------
-    flows : dataframe
-            Each row maps to a dataset
-            Each column contains the following information:
-            - flow id
-            - full name
-            - name
-            - version
-            - external version
-            - uploader
+    pandas.DataFrame
+        Rows correspond to flows. Columns include ``id``, ``full_name``,
+        ``name``, ``version``, ``external_version``, and ``uploader``.
+
+    Raises
+    ------
+    OpenMLServerException
+        When the API call fails.
+
+    Side Effects
+    ------------
+    - None: results are fetched and returned; Read-only operation.
+
+    Preconditions
+    -------------
+    - Network access is required to list flows unless cached mechanisms are
+      used by the underlying API helper.
+
+    Examples
+    --------
+    >>> import openml
+    >>> flows = openml.flows.list_flows(size=100)  # doctest: +SKIP
     """
     listing_call = partial(_list_flows, tag=tag, uploader=uploader)
     batches = openml.utils._list_all(listing_call, offset=offset, limit=size)
@@ -206,25 +257,35 @@ def _list_flows(limit: int, offset: int, **kwargs: Any) -> pd.DataFrame:
 
 
 def flow_exists(name: str, external_version: str) -> int | bool:
-    """Retrieves the flow id.
+    """Check whether a flow (name + external_version) exists on the server.
 
-    A flow is uniquely identified by name + external_version.
+    The OpenML server defines uniqueness of flows by the pair
+    ``(name, external_version)``. This helper queries the server and
+    returns the corresponding flow id when present.
 
     Parameters
     ----------
-    name : string
-        Name of the flow
-    external_version : string
+    name : str
+        Flow name (e.g., ``sklearn.tree._classes.DecisionTreeClassifier(1)``).
+    external_version : str
         Version information associated with flow.
 
     Returns
     -------
-    flow_exist : int or bool
-        flow id iff exists, False otherwise
+    int or bool
+        The flow id if the flow exists on the server, otherwise ``False``.
 
-    Notes
-    -----
-    see https://www.openml.org/api_docs/#!/flow/get_flow_exists_name_version
+    Raises
+    ------
+    ValueError
+        If ``name`` or ``external_version`` are empty or not strings.
+    OpenMLServerException
+        When the API request fails.
+
+    Examples
+    --------
+    >>> import openml
+    >>> openml.flows.flow_exists("weka.JRip", "Weka_3.9.0_10153")  # doctest: +SKIP
     """
     if not (isinstance(name, str) and len(name) > 0):
         raise ValueError("Argument 'name' should be a non-empty string")
@@ -247,35 +308,58 @@ def get_flow_id(
     name: str | None = None,
     exact_version: bool = True,  # noqa: FBT002
 ) -> int | bool | list[int]:
-    """Retrieves the flow id for a model or a flow name.
+    """Retrieve flow id(s) for a model instance or a flow name.
 
-    Provide either a model or a name to this function. Depending on the input, it does
+    Provide either a concrete ``model`` (which will be converted to a flow by
+    the appropriate extension) or a flow ``name``. Behavior depends on
+    ``exact_version``:
 
-    * ``model`` and ``exact_version == True``: This helper function first queries for the necessary
-      extension. Second, it uses that extension to convert the model into a flow. Third, it
-      executes ``flow_exists`` to potentially obtain the flow id the flow is published to the
-      server.
-    * ``model`` and ``exact_version == False``: This helper function first queries for the
-      necessary extension. Second, it uses that extension to convert the model into a flow. Third
-      it calls ``list_flows`` and filters the returned values based on the flow name.
-    * ``name``: Ignores ``exact_version`` and calls ``list_flows``, then filters the returned
-      values based on the flow name.
+    - ``model`` + ``exact_version=True``: convert ``model`` to a flow and call
+        :func:`flow_exists` to get a single flow id (or False).
+    - ``model`` + ``exact_version=False``: convert ``model`` to a flow and
+        return all server flow ids with the same flow name.
+    - ``name``: ignore ``exact_version`` and return all server flow ids that
+        match ``name``.
 
     Parameters
     ----------
-    model : object
-        Any model. Must provide either ``model`` or ``name``.
-    name : str
-        Name of the flow. Must provide either ``model`` or ``name``.
-    exact_version : bool
-        Whether to return the flow id of the exact version or all flow ids where the name
-        of the flow matches. This is only taken into account for a model where a version number
-        is available (requires ``model`` to be set).
+    model : object, optional
+            A model instance that can be handled by a registered extension. Either
+            ``model`` or ``name`` must be provided.
+    name : str, optional
+            Flow name to query for. Either ``model`` or ``name`` must be provided.
+    exact_version : bool, optional (default=True)
+            When True and ``model`` is provided, only return the id for the exact
+            external version. When False, return a list of matching ids.
 
     Returns
     -------
-    int or bool, List
-        flow id iff exists, ``False`` otherwise, List if ``exact_version is False``
+    int or bool or list[int]
+            If ``exact_version`` is True: the flow id if found, otherwise ``False``.
+            If ``exact_version`` is False: a list of matching flow ids (may be empty).
+
+    Raises
+    ------
+    ValueError
+            If neither ``model`` nor ``name`` is provided, or if both are provided.
+    OpenMLServerException
+            If underlying API calls fail.
+
+    Side Effects
+    ------------
+    - May call server APIs (``flow/exists``, ``flow/list``) and therefore
+        depends on network access and API keys for private flows.
+
+    Examples
+    --------
+    >>> import openml
+    >>> # Lookup by flow name
+    >>> openml.flows.get_flow_id(name="weka.JRip")  # doctest: +SKIP
+    >>> # Lookup by model instance (requires a registered extension)
+    >>> import sklearn
+    >>> import openml_sklearn
+    >>> clf = sklearn.tree.DecisionTreeClassifier()
+    >>> openml.flows.get_flow_id(model=clf)  # doctest: +SKIP
     """
     if model is not None and name is not None:
         raise ValueError("Must provide either argument `model` or argument `name`, but not both.")
@@ -391,6 +475,21 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
 
     check_description : bool
         Whether to ignore matching of flow descriptions.
+
+    Raises
+    ------
+    TypeError
+        When either argument is not an :class:`OpenMLFlow`.
+    ValueError
+        When a relevant mismatch is found between the two flows.
+
+    Examples
+    --------
+    >>> import openml
+    >>> f1 = openml.flows.get_flow(5)  # doctest: +SKIP
+    >>> f2 = openml.flows.get_flow(5)  # doctest: +SKIP
+    >>> openml.flows.assert_flows_equal(f1, f2)  # doctest: +SKIP
+    >>> # If flows differ, a ValueError is raised
     """
     if not isinstance(flow1, OpenMLFlow):
         raise TypeError(f"Argument 1 must be of type OpenMLFlow, but is {type(flow1)}")
@@ -550,5 +649,20 @@ def delete_flow(flow_id: int) -> bool:
     -------
     bool
         True if the deletion was successful. False otherwise.
+
+    Raises
+    ------
+    OpenMLServerException
+        If the server-side deletion fails due to permissions or other errors.
+
+    Side Effects
+    ------------
+    - Removes the flow from the OpenML server (if permitted).
+
+    Examples
+    --------
+    >>> import openml
+    >>> # Deletes flow 23 if you are the uploader and it's not linked to runs
+    >>> openml.flows.delete_flow(23)  # doctest: +SKIP
     """
     return openml.utils._delete_entity("flow", flow_id)
