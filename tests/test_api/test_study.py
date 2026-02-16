@@ -6,21 +6,20 @@ import pytest
 
 from openml.enums import APIVersion
 from openml._api.resources import FallbackProxy, StudyV1API, StudyV2API
+from openml._api.resources.base import ResourceAPI
 from openml.exceptions import OpenMLNotSupportedError
 from openml.testing import TestAPIBase
 
 
-class TestStudyV1API(TestAPIBase):
-    """Tests for V1 XML API implementation of studies."""
+@pytest.mark.uses_test_server()
+class TestStudyAPIBase(TestAPIBase):
+    """Base class for study API tests with common test utilities."""
 
-    def setUp(self) -> None:
-        super().setUp()
-        self.api = StudyV1API(self.http_clients[APIVersion.V1])
+    resource: ResourceAPI | FallbackProxy
 
-    @pytest.mark.uses_test_server()
-    def test_list_basic(self):
+    def _list_basic(self):
         """Test basic list functionality with limit and offset."""
-        studies_df = self.api.list(limit=5, offset=0)
+        studies_df = self.resource.list(limit=5, offset=0)
 
         assert studies_df is not None
         assert len(studies_df) <= 5
@@ -28,10 +27,9 @@ class TestStudyV1API(TestAPIBase):
         expected_columns = {"id", "alias", "main_entity_type", "name", "status"}
         assert expected_columns.issubset(set(studies_df.columns))
 
-    @pytest.mark.uses_test_server()
-    def test_list_with_filters(self):
+    def _list_with_filters(self):
         """Test list with various filters."""
-        studies_df = self.api.list(
+        studies_df = self.resource.list(
             limit=10,
             offset=0,
             status="active",
@@ -39,14 +37,13 @@ class TestStudyV1API(TestAPIBase):
         if len(studies_df) > 0:
             assert all(studies_df["status"] == "active")
 
-    @pytest.mark.uses_test_server()
-    def test_list_pagination(self):
+    def _list_pagination(self):
         """Test pagination with offset and limit."""
         try:
-            page1 = self.api.list(limit=3, offset=0)
+            page1 = self.resource.list(limit=3, offset=0)
             
             if len(page1) >= 3:
-                page2 = self.api.list(limit=3, offset=3)
+                page2 = self.resource.list(limit=3, offset=3)
 
                 if len(page2) > 0:
                     page1_ids = set(page1["id"])
@@ -56,38 +53,70 @@ class TestStudyV1API(TestAPIBase):
             pytest.skip("Not enough studies on test server for pagination test")
 
 
-class TestStudyV2API(TestAPIBase):
+class TestStudyV1API(TestStudyAPIBase):
+    """Tests for V1 XML API implementation of studies."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.resource = StudyV1API(self.http_clients[APIVersion.V1])
+
+    def test_list_basic(self):
+        """Test basic list functionality."""
+        self._list_basic()
+
+    def test_list_with_filters(self):
+        """Test list with filters."""
+        self._list_with_filters()
+
+    def test_list_pagination(self):
+        """Test pagination."""
+        self._list_pagination()
+
+
+class TestStudyV2API(TestStudyAPIBase):
     """Tests for V2 API implementation of studies."""
 
     def setUp(self) -> None:
         super().setUp()
-        self.api = StudyV2API(self.http_clients[APIVersion.V2])
+        self.resource = StudyV2API(self.http_clients[APIVersion.V2])
 
-    def test_list_not_supported(self):
+    def test_list_basic(self):
         """Test that list raises OpenMLNotSupportedError for V2."""
         with pytest.raises(OpenMLNotSupportedError):
-            self.api.list(limit=10, offset=0)
+            self._list_basic()
+
+    def test_list_with_filters(self):
+        """Test that list with filters raises OpenMLNotSupportedError for V2."""
+        with pytest.raises(OpenMLNotSupportedError):
+            self._list_with_filters()
+
+    def test_list_pagination(self):
+        """Test that list pagination raises OpenMLNotSupportedError for V2."""
+        with pytest.raises(OpenMLNotSupportedError):
+            self._list_pagination()
 
 
-class TestStudyCombined(TestAPIBase):
-    """Combined tests for study API V1 and V2."""
+class TestStudyCombinedAPI(TestStudyAPIBase):
+    """Combined tests for study API with FallbackProxy."""
 
     def setUp(self) -> None:
         super().setUp()
-        self.resource_v1 = StudyV1API(self.http_clients[APIVersion.V1])
-        self.resource_v2 = StudyV2API(self.http_clients[APIVersion.V2])
-        self.resource_fallback = FallbackProxy(self.resource_v2, self.resource_v1)
+        http_client_v1 = self.http_clients[APIVersion.V1]
+        resource_v1 = StudyV1API(http_client_v1)
 
-    @pytest.mark.uses_test_server()
-    def test_list_matches(self):
-        """Test that V2 raises not supported."""
-        with pytest.raises(OpenMLNotSupportedError):
-            self.resource_v2.list(limit=5, offset=0)
+        http_client_v2 = self.http_clients[APIVersion.V2]
+        resource_v2 = StudyV2API(http_client_v2)
 
-    @pytest.mark.uses_test_server()
-    def test_list_fallback(self):
+        self.resource = FallbackProxy(resource_v2, resource_v1)
+
+    def test_list_basic(self):
         """Test that FallbackProxy falls back from V2 to V1 for list operation."""
-        output_fallback = self.resource_fallback.list(limit=5, offset=0)
-        
-        assert output_fallback is not None
-        assert len(output_fallback) <= 5
+        self._list_basic()
+
+    def test_list_with_filters(self):
+        """Test that FallbackProxy falls back for list with filters."""
+        self._list_with_filters()
+
+    def test_list_pagination(self):
+        """Test that FallbackProxy falls back for list pagination."""
+        self._list_pagination()
