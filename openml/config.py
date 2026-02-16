@@ -540,10 +540,10 @@ def _sync_api_config() -> None:
 
     APIBackend.set_config_values(
         {
+            "cache_dir": cache_dir,
             "api_configs.v1.server": v1_server,
             "api_configs.v1.base_url": v1_base_url,
             "api_configs.v1.api_key": apikey,
-            "cache.dir": cache_dir,
             "connection.retry_policy": connection_retry_policy,
             "connection.retries": connection_n_retries,
         }

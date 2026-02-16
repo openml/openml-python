@@ -82,7 +82,7 @@ class APIBackendBuilder:
         APIBackendBuilder
             Builder instance with all resource API interfaces initialized.
         """
-        cache_dir = Path(config.cache.dir).expanduser()
+        cache_dir = Path(config.cache_dir).expanduser()
 
         http_cache = HTTPCache(path=cache_dir)
         minio_client = MinIOClient(path=cache_dir)
