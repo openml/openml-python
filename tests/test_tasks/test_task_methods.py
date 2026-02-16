@@ -16,7 +16,7 @@ class OpenMLTaskMethodsTest(TestBase):
     def tearDown(self):
         super().tearDown()
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_tagging(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         # tags can be at most 64 alphanumeric (+ underscore) chars
@@ -32,7 +32,7 @@ class OpenMLTaskMethodsTest(TestBase):
         tasks = openml.tasks.list_tasks(tag=tag)
         assert len(tasks) == 0
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_get_train_and_test_split_indices(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         task = openml.tasks.get_task(1882)
