@@ -7,19 +7,12 @@ from openml.evaluations import OpenMLEvaluation
 from openml.testing import TestAPIBase
 from openml.enums import APIVersion  
 from openml.exceptions import OpenMLNotSupportedError  
-  
-class TestEvaluationV1(TestAPIBase):  
-    """Tests for V1 XML API implementation of evaluations."""  
-  
-    _multiprocess_can_split_ = True  
-  
-    def setUp(self) -> None:    
-        super().setUp() 
-        http_client = self.http_clients[APIVersion.V1]
-        self.resource = EvaluationV1API(http_client)
-  
-    @pytest.mark.uses_test_server()
-    def test_list(self):
+
+
+class TestEvaluationAPIBase(TestAPIBase):
+    resource: EvaluationV1API | EvaluationV2API
+    
+    def _list(self):
         evaluations = self.resource.list(
             function="predictive_accuracy",
             limit=10,
@@ -29,9 +22,25 @@ class TestEvaluationV1(TestAPIBase):
         assert isinstance(evaluations, list)
         assert len(evaluations) == 10
         assert all(isinstance(e, OpenMLEvaluation) for e in evaluations)
+    
+class TestEvaluationV1API(TestEvaluationAPIBase):  
+    """Tests for V1 XML API implementation of evaluations."""  
+  
+    _multiprocess_can_split_ = True  
+  
+    def setUp(self) -> None:    
+        super().setUp() 
+        http_client = self.http_clients[APIVersion.V1]
+        self.resource = EvaluationV1API(http_client)
+
+    @pytest.mark.uses_test_server()
+    def test_list(self):
+        self._list()
+  
+    
 
 
-class TestEvaluationV2(TestAPIBase): 
+class TestEvaluationV2API(TestEvaluationAPIBase): 
     """Tests for V2 JSON API implementation of evaluations."""  
   
     _multiprocess_can_split_ = True  
@@ -44,15 +53,11 @@ class TestEvaluationV2(TestAPIBase):
     @pytest.mark.uses_test_server()
     def test_list(self):
         with pytest.raises(OpenMLNotSupportedError):
-            self.resource.list(
-                function="predictive_accuracy",
-                limit=10,
-                offset=0,
-            )
+            self._list()
             
 
 
-class TestEvaluationsCombined(TestAPIBase):
+class TestEvaluationsCombinedAPI(TestEvaluationAPIBase):
     def setUp(self):
         super().setUp()
         self.v1_client = self.http_clients[APIVersion.V1]
