@@ -278,15 +278,12 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         data_splits_url: str | None = None,
         task_id: int | None = None,
     ):
-        resolved_estimation_procedure_id = self._resolve_estimation_procedure_id(
-            estimation_procedure_id,
-        )
         super().__init__(
             task_id=task_id,
             task_type_id=task_type_id,
             task_type=task_type,
             data_set_id=data_set_id,
-            estimation_procedure_id=resolved_estimation_procedure_id,
+            estimation_procedure_id=estimation_procedure_id,
             estimation_procedure_type=estimation_procedure_type,
             estimation_parameters=estimation_parameters,
             evaluation_measure=evaluation_measure,
