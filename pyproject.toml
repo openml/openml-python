@@ -137,6 +137,7 @@ markers = [
   "upload: anything that uploads to a server",
   "production: any interaction with the production server",
   "cache: anything that interacts with the (test) cache",
+  "uses_test_server: tests that require the OpenML test server",
 ]
 
 # https://github.com/charliermarsh/ruff
