@@ -22,19 +22,19 @@ class OpenMLSetup(ReprMixin):
         The setting of the parameters
     """
 
-    def __init__(self, setup_id: int, flow_id: int, parameters: dict[int, Any] | None):
-        if not isinstance(setup_id, int):
+    setup_id: int
+    flow_id: int
+    parameters: dict[int, Any] | None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.setup_id, int):
             raise ValueError("setup id should be int")
 
-        if not isinstance(flow_id, int):
+        if not isinstance(self.flow_id, int):
             raise ValueError("flow id should be int")
 
-        if parameters is not None and not isinstance(parameters, dict):
+        if self.parameters is not None and not isinstance(self.parameters, dict):
             raise ValueError("parameters should be dict")
-
-        self.setup_id = setup_id
-        self.flow_id = flow_id
-        self.parameters = parameters
 
     def _to_dict(self) -> dict[str, Any]:
         return {
@@ -84,37 +84,24 @@ class OpenMLParameter(ReprMixin):
         If the parameter was set, the value that it was set to.
     """
 
-    def __init__(  # noqa: PLR0913
-        self,
-        input_id: int,
-        flow_id: int,
-        flow_name: str,
-        full_name: str,
-        parameter_name: str,
-        data_type: str,
-        default_value: str,
-        value: str,
-    ):
-        self.id = input_id
-        self.flow_id = flow_id
-        self.flow_name = flow_name
-        self.full_name = full_name
-        self.parameter_name = parameter_name
-        self.data_type = data_type
-        self.default_value = default_value
-        self.value = value
+    input_id: int
+    flow_id: int
+    flow_name: str
+    full_name: str
+    parameter_name: str
+    data_type: str
+    default_value: str
+    value: str
+
+    def __post_init__(self) -> None:
+        # Map input_id to id for backward compatibility
+        self.id = self.input_id
 
     def _to_dict(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "flow_id": self.flow_id,
-            "flow_name": self.flow_name,
-            "full_name": self.full_name,
-            "parameter_name": self.parameter_name,
-            "data_type": self.data_type,
-            "default_value": self.default_value,
-            "value": self.value,
-        }
+        result = asdict(self)
+        # Replaces input_id with id for backward compatibility
+        result["id"] = result.pop("input_id")
+        return result
 
     def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
         """Collect all information to display in the __repr__ body."""
