@@ -291,12 +291,10 @@ class TestAPIBase(TestBase):
 
         retries = self.connection_n_retries
         retry_policy = RetryPolicy.HUMAN if self.retry_policy == "human" else RetryPolicy.ROBOT
-        ttl = openml._backend.get_config_value("cache.ttl")
         cache_dir = self.static_cache_dir
 
         self.cache = HTTPCache(
             path=cache_dir,
-            ttl=ttl,
         )
         self.http_clients = {
             APIVersion.V1: HTTPClient(

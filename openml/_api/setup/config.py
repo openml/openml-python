@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import timedelta
 
 from openml.enums import APIVersion, RetryPolicy
 
@@ -54,12 +53,9 @@ class CacheConfig:
     ----------
     dir : str
         Path to the directory where cached files will be stored.
-    ttl : int
-        Time-to-live for cached entries, in seconds.
     """
 
     dir: str
-    ttl: int
 
 
 @dataclass
@@ -111,6 +107,5 @@ class Config:
     cache: CacheConfig = field(
         default_factory=lambda: CacheConfig(
             dir=str(_resolve_default_cache_dir()),
-            ttl=int(timedelta(weeks=1).total_seconds()),
         )
     )

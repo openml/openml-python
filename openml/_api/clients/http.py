@@ -44,9 +44,6 @@ class HTTPCache:
     ----------
     path : pathlib.Path
         Base directory where cache entries are stored.
-    ttl : int
-        Time-to-live in seconds. Cached entries older than this value are treated
-        as expired.
 
     Notes
     -----
@@ -54,9 +51,8 @@ class HTTPCache:
     parameters, excluding the ``api_key`` parameter.
     """
 
-    def __init__(self, *, path: Path, ttl: int) -> None:
+    def __init__(self, *, path: Path) -> None:
         self.path = path
-        self.ttl = ttl
 
     def get_key(self, url: str, params: dict[str, Any]) -> str:
         """
@@ -143,9 +139,6 @@ class HTTPCache:
         created_at = meta.get("created_at")
         if created_at is None:
             raise ValueError("Cache metadata missing 'created_at'")
-
-        if time.time() - created_at > self.ttl:
-            raise TimeoutError(f"Cache expired for {path}")
 
         with headers_path.open("r", encoding="utf-8") as f:
             headers = json.load(f)

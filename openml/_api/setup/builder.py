@@ -84,7 +84,7 @@ class APIBackendBuilder:
         """
         cache_dir = Path(config.cache.dir).expanduser()
 
-        http_cache = HTTPCache(path=cache_dir, ttl=config.cache.ttl)
+        http_cache = HTTPCache(path=cache_dir)
         minio_client = MinIOClient(path=cache_dir)
 
         primary_api_config = config.api_configs[config.api_version]
