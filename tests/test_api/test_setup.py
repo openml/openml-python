@@ -26,9 +26,60 @@ def get_sentinel():
     md5.update(str(time.time()).encode("utf-8"))
     sentinel = md5.hexdigest()[:10]
     return f"TEST{sentinel}"  
-  
+
+class TestSetupAPIBase(TestAPIBase):
+    resource: SetupV1API | SetupV2API
+
+    def _list(self):
+        setups = self.resource.list(limit=10, offset=0)
+        
+        assert isinstance(setups, list)
+        assert len(setups) > 0
+        assert all(isinstance(s, OpenMLSetup) for s in setups)
+
+    def _get(self):
+        setup_id = 1
+        setup = self.resource.get(setup_id)
+        
+        assert isinstance(setup, OpenMLSetup)
+        assert setup.setup_id == setup_id
+
+    def _exists_nonexisting_setup(self):
+        # first publish a non-existing flow
+        sentinel = get_sentinel()
+        # because of the sentinel, we can not use flows that contain subflows
+        dectree = sklearn.tree.DecisionTreeClassifier()
+        flow = self.extension.model_to_flow(dectree)
+        flow.name = f"{sentinel}{flow.name}"
+        flow.publish()
+        TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
+        openml_param_settings = flow.extension.obtain_parameter_values(flow)
+        return flow, openml_param_settings
+
+    def _exists_existing_setup(self):
+        flow = self.extension.model_to_flow(
+            sklearn.naive_bayes.GaussianNB()
+        )
+        flow.name = f"{get_sentinel()}{flow.name}"
+        flow.publish()
+        TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
+        openml_param_settings = flow.extension.obtain_parameter_values(flow)
+        # now run the flow on an easy task:
+        task = openml.tasks.get_task(115)
+        run = openml.runs.run_flow_on_task(flow, task)
+        # spoof flow id, otherwise the sentinel is ignored
+        run.flow_id = flow.flow_id
+        run.publish()
+        TestBase._mark_entity_for_removal("run", run.run_id)
+        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {run.run_id}")
+        # download the run, as it contains the right setup id
+        run = openml.runs.get_run(run.run_id)
+        return flow, openml_param_settings, run
+
 @pytest.mark.uses_test_server()
-class TestSetupV1(TestAPIBase):  
+class TestSetupV1API(TestSetupAPIBase):  
     """Tests for V1 XML API implementation of setups."""  
   
     _multiprocess_can_split_ = True  
@@ -40,70 +91,32 @@ class TestSetupV1(TestAPIBase):
         self.extension = SklearnExtension()
   
     def test_list(self):
-        setups = self.resource.list(limit=10, offset=0)
-        
-        assert isinstance(setups, list)
-        assert len(setups) > 0
-        assert all(isinstance(s, OpenMLSetup) for s in setups)
+        self._list()
     
     def test_get(self):
-        setup_id = 1
-        setup = self.resource.get(setup_id)
-        
-        assert isinstance(setup, OpenMLSetup)
-        assert setup.setup_id == setup_id
+        self._get()
 
     @pytest.mark.sklearn()
     def test_exists_nonexisting_setup(self):
         """Test exists() returns False when setup doesn't exist"""
-        # first publish a non-existing flow
-        sentinel = get_sentinel()
-        # because of the sentinel, we can not use flows that contain subflows
-        dectree = sklearn.tree.DecisionTreeClassifier()
-        flow = self.extension.model_to_flow(dectree)
-        flow.name = f"{sentinel}{flow.name}"
-        flow.publish()
-        TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
-
-        openml_param_settings = flow.extension.obtain_parameter_values(flow)
+        flow, params = self._exists_nonexisting_setup()
         # although the flow exists (created as of previous statement),
         # we can be sure there are no setups (yet) as it was just created
         # and hasn't been ran
-        setup_id = self.resource.exists(flow, openml_param_settings)
+        setup_id = self.resource.exists(flow, params)
         assert not setup_id
+
     
     @pytest.mark.sklearn()
     def test_exists_existing_setup(self):
         """Test exists() returns setup_id when setup exists"""
-        flow = self.extension.model_to_flow(sklearn.naive_bayes.GaussianNB())
-        flow.name = f"{get_sentinel()}{flow.name}"
-        flow.publish()
-        TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
-
-        openml_param_settings = flow.extension.obtain_parameter_values(flow)
-        # although the flow exists, we can be sure there are no
-        # setups (yet) as it hasn't been ran
-        setup_id = self.resource.exists(flow, openml_param_settings)
-        assert not setup_id
-
-        # now run the flow on an easy task:
-        task = openml.tasks.get_task(115)  # diabetes; crossvalidation
-        run = openml.runs.run_flow_on_task(flow, task)
-        # spoof flow id, otherwise the sentinel is ignored
-        run.flow_id = flow.flow_id
-        run.publish()
-        TestBase._mark_entity_for_removal("run", run.run_id)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {run.run_id}")
-        # download the run, as it contains the right setup id
-        run = openml.runs.get_run(run.run_id)
+        flow, params, run = self._exists_existing_setup()
         # execute the function we are interested in
-        setup_id = self.resource.exists(flow, openml_param_settings)
+        setup_id = self.resource.exists(flow, params)
         assert setup_id == run.setup_id
 
 @pytest.mark.uses_test_server()
-class TestSetupV2(TestAPIBase): 
+class TestSetupV2API(TestSetupAPIBase): 
     """Tests for V2 JSON API implementation of setups."""  
   
     _multiprocess_can_split_ = True  
@@ -116,58 +129,30 @@ class TestSetupV2(TestAPIBase):
 
     def test_list(self):
         with pytest.raises(OpenMLNotSupportedError):
-            self.resource.list(limit=10, offset=0)
+            self._list()
     
     def test_get(self):
         with pytest.raises(OpenMLNotSupportedError):
-            setup_id = 1
-            self.resource.get(setup_id)
+            self._get()
 
     @pytest.mark.sklearn()
     def test_exists_nonexisting_setup(self):
-        # first publish a non-existing flow
-        sentinel = get_sentinel()
-        # because of the sentinel, we can not use flows that contain subflows
-        dectree = sklearn.tree.DecisionTreeClassifier()
-        flow = self.extension.model_to_flow(dectree)
-        flow.name = f"{sentinel}{flow.name}"
-        flow.publish()
-        TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
-
-        openml_param_settings = flow.extension.obtain_parameter_values(flow)
+        flow, params = self._exists_nonexisting_setup()
         # although the flow exists (created as of previous statement),
         # we can be sure there are no setups (yet) as it was just created
         # and hasn't been ran
         with pytest.raises(OpenMLNotSupportedError):
-            self.resource.exists(flow, openml_param_settings)
+            self.resource.exists(flow, params)
+
     
     @pytest.mark.sklearn()
     def test_exists_existing_setup(self):
-        flow = self.extension.model_to_flow(sklearn.naive_bayes.GaussianNB())
-        flow.name = f"{get_sentinel()}{flow.name}"
-        flow.publish()
-        TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
-
-        openml_param_settings = flow.extension.obtain_parameter_values(flow)
-        # now run the flow on an easy task:
-        task = openml.tasks.get_task(115)  # diabetes; crossvalidation
-        run = openml.runs.run_flow_on_task(flow, task)
-        # spoof flow id, otherwise the sentinel is ignored
-        run.flow_id = flow.flow_id
-        run.publish()
-        TestBase._mark_entity_for_removal("run", run.run_id)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {run.run_id}")
-        # download the run, as it contains the right setup id
-        run = openml.runs.get_run(run.run_id)
-        # execute the function we are interested in
-
+        flow, params, _ = self._exists_existing_setup()
         with pytest.raises(OpenMLNotSupportedError):
-            self.resource.exists(flow, openml_param_settings)
+            self.resource.exists(flow, params)
 
 
-class TestSetupsCombined(TestAPIBase):
+class TestSetupsCombinedAPI(TestSetupAPIBase):
     def setUp(self):
         super().setUp()
         self.v1_client = self.http_clients[APIVersion.V1]
