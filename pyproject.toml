@@ -21,7 +21,7 @@ dependencies = [
   "pyarrow",
   "tqdm",  # For MinIO download progress bars
 ]
-requires-python = ">=3.10,<3.15"    
+requires-python = ">=3.10,<3.15"
 maintainers = [
   { name = "Pieter Gijsbers", email="p.gijsbers@tue.nl"},
   { name = "Lennart Purucker"},
@@ -144,13 +144,9 @@ markers = [
 target-version = "py310"
 line-length = 100
 output-format = "grouped"
-src = ["openml", "tests", "examples"]
 unsafe-fixes = true
 
 exclude = [
-  # TODO(eddiebergman): Tests should be re-enabled after the refactor
-  "tests",
-  #
   ".bzr",
   ".direnv",
   ".eggs",
