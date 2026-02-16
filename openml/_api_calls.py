@@ -9,7 +9,7 @@ import random
 import shutil
 import time
 import urllib.parse
-import xml
+import xml.parsers.expat
 import zipfile
 from pathlib import Path
 
