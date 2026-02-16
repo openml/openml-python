@@ -6,8 +6,29 @@ from openml._api.resources.estimation_procedure import EstimationProcedureV1API,
 from openml.testing import TestAPIBase
 from openml.enums import APIVersion  
 from openml.exceptions import OpenMLNotSupportedError
-  
-class TestEstimationProceduresV1(TestAPIBase):  
+
+class TestEstimationProcedureAPIBase(TestAPIBase):
+    resource: EstimationProcedureV1API | EstimationProcedureV2API
+
+    def _list(self):
+        procedures = self.resource.list()
+        
+        assert isinstance(procedures, list)
+        assert len(procedures) > 0
+        assert all(isinstance(p, str) for p in procedures)
+    
+    def _get_details(self):
+        details = self.resource._get_details()
+        
+        assert isinstance(details, list)
+        assert len(details) > 0
+        assert all(isinstance(d, dict) for d in details)
+
+        assert all("id" in d for d in details)
+        assert all("name" in d for d in details)
+        assert all("task_type_id" in d for d in details)
+
+class TestEstimationProcedureV1API(TestEstimationProcedureAPIBase):  
     """Tests for V1 XML API implementation of estimation procedures."""  
   
     _multiprocess_can_split_ = True  
@@ -19,27 +40,15 @@ class TestEstimationProceduresV1(TestAPIBase):
   
     @pytest.mark.uses_test_server()
     def test_list(self):
-        procedures = self.resource.list()
-        
-        assert isinstance(procedures, list)
-        assert len(procedures) > 0
-        assert all(isinstance(p, str) for p in procedures)
+        self._list()
 
     
     @pytest.mark.uses_test_server()
     def test_get_details(self):
-        details = self.resource._get_details()
-        
-        assert isinstance(details, list)
-        assert len(details) > 0
-        assert all(isinstance(d, dict) for d in details)
-
-        assert all("id" in d for d in details)
-        assert all("name" in d for d in details)
-        assert all("task_type_id" in d for d in details)
+        self._get_details()
 
 
-class TestEstimationProceduresV2(TestAPIBase):
+class TestEstimationProcedureV2API(TestEstimationProcedureAPIBase):
     """Tests for V2 JSON API implementation of estimation procedures."""   
   
     _multiprocess_can_split_ = True  
@@ -51,19 +60,15 @@ class TestEstimationProceduresV2(TestAPIBase):
   
     @pytest.mark.uses_test_server()
     def test_list(self):
-        procedures = self.resource.list()
-        
-        assert isinstance(procedures, list)
-        assert len(procedures) > 0
-        assert all(isinstance(p, str) for p in procedures)
+        self._list()
     
     @pytest.mark.uses_test_server()
     def test_get_details(self):
         with pytest.raises(OpenMLNotSupportedError):
-            self.resource._get_details()
+            self._get_details()
         
 
-class TestEstimationProceduresCombined(TestAPIBase):
+class TestEstimationProcedureCombinedAPI(TestEstimationProcedureAPIBase):
     def setUp(self):
         super().setUp()
         self.v1_client = self.http_clients[APIVersion.V1]
