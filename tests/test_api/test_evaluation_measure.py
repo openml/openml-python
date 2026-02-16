@@ -5,8 +5,16 @@ import pytest
 from openml._api.resources.evaluation_measure import EvaluationMeasureV1API, EvaluationMeasureV2API
 from openml.testing import TestAPIBase
 from openml.enums import APIVersion  
-  
-class TestEvaluationMeasureV1(TestAPIBase):  
+
+class TestEvaluationMeasureAPIBase(TestAPIBase):
+    resource: EvaluationMeasureV1API | EvaluationMeasureV2API
+    
+    def _list(self):
+        measures = self.resource.list()   
+        assert isinstance(measures, list) is True
+        assert all(isinstance(s, str) for s in measures) is True
+
+class TestEvaluationMeasureV1API(TestEvaluationMeasureAPIBase):  
     """Tests for V1 XML API implementation of evaluation measures."""  
   
     _multiprocess_can_split_ = True  
@@ -18,12 +26,10 @@ class TestEvaluationMeasureV1(TestAPIBase):
   
     @pytest.mark.uses_test_server()
     def test_list(self):
-        measures = self.resource.list()   
-        assert isinstance(measures, list) is True
-        assert all(isinstance(s, str) for s in measures) is True  
+        self._list()
 
 
-class TestEvaluationMeasureV2(TestAPIBase): 
+class TestEvaluationMeasureV2API(TestEvaluationMeasureAPIBase): 
     """Tests for V2 JSON API implementation of evaluation measures."""  
   
     _multiprocess_can_split_ = True  
@@ -35,12 +41,10 @@ class TestEvaluationMeasureV2(TestAPIBase):
   
     @pytest.mark.uses_test_server()
     def test_list(self):
-        measures = self.resource.list()   
-        assert isinstance(measures, list) is True
-        assert all(isinstance(s, str) for s in measures) is True 
+        self._list()
 
 
-class TestEvaluationMeasuresCombined(TestAPIBase):
+class TestEvaluationMeasuresCombinedAPI(TestEvaluationMeasureAPIBase):
     def setUp(self):
         super().setUp()
         self.v1_client = self.http_clients[APIVersion.V1]
