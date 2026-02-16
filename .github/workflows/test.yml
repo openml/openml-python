@@ -87,7 +87,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -e .[test] scikit-learn==${{ matrix.scikit-learn }}
-        
+
         if [ "${{ matrix.pandas-version }}" != "" ]; then
           echo "Installing specific pandas version: ${{ matrix.pandas-version }}"
           pip install "pandas==${{ matrix.pandas-version }}"

@@ -4,7 +4,6 @@ from __future__ import annotations
 import contextlib
 import shutil
 import warnings
-from collections.abc import Callable, Mapping, Sized
 from functools import wraps
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
@@ -23,6 +22,8 @@ from . import config
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
+    from collections.abc import Callable, Mapping, Sized
+
     from openml.base import OpenMLBase
 
     P = ParamSpec("P")

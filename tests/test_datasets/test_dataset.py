@@ -305,7 +305,7 @@ def test_get_feature_with_ontology_data_id_11():
     assert len(dataset.features) == 7
     assert len(dataset.features[1].ontologies) >= 2
     assert len(dataset.features[2].ontologies) >= 1
-    assert len(dataset.features[3].ontologies) >= 1   
+    assert len(dataset.features[3].ontologies) >= 1
 
 @pytest.mark.uses_test_server()
 def test_add_remove_ontology_to_dataset():
@@ -313,7 +313,7 @@ def test_add_remove_ontology_to_dataset():
     feature_index = 1
     ontology = "https://www.openml.org/unittest/" + str(time())
     openml.datasets.functions.data_feature_add_ontology(did, feature_index, ontology)
-    openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)    
+    openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)
 
 @pytest.mark.uses_test_server()
 def test_add_same_ontology_multiple_features():
@@ -321,7 +321,7 @@ def test_add_same_ontology_multiple_features():
     ontology = "https://www.openml.org/unittest/" + str(time())
 
     for i in range(3):
-        openml.datasets.functions.data_feature_add_ontology(did, i, ontology)    
+        openml.datasets.functions.data_feature_add_ontology(did, i, ontology)
 
 
 @pytest.mark.uses_test_server()
@@ -333,7 +333,7 @@ def test_add_illegal_long_ontology():
         assert False
     except openml.exceptions.OpenMLServerException as e:
         assert e.code == 1105
-    
+
 
 
 @pytest.mark.uses_test_server()

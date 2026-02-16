@@ -1,10 +1,11 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from IPython.lib import pretty
 
 

@@ -4,13 +4,13 @@
 
 Welcome to the documentation of the OpenML Python API, a connector to
 the collaborative machine learning platform
-[OpenML.org](https://www.openml.org). 
+[OpenML.org](https://www.openml.org).
 OpenML-Python can download or upload data from OpenML, such as datasets
 and machine learning experiment results.
 
 If you are new to OpenML, we recommend checking out the [OpenML documentation](https://docs.openml.org/)
-to get familiar with the concepts and features of OpenML. In particular, we recommend 
-reading more about the [OpenML concepts](https://docs.openml.org/concepts/). 
+to get familiar with the concepts and features of OpenML. In particular, we recommend
+reading more about the [OpenML concepts](https://docs.openml.org/concepts/).
 
 ## :joystick: Minimal Examples
 
@@ -78,7 +78,7 @@ Contributing to the OpenML package is highly appreciated. Please see the
 ## Citing OpenML-Python
 
 If you use OpenML-Python in a scientific publication, we would
-appreciate a reference to our JMLR-MLOSS paper 
+appreciate a reference to our JMLR-MLOSS paper
 ["OpenML-Python: an extensible Python API for OpenML"](https://www.jmlr.org/papers/v22/19-920.html):
 
 === "Bibtex"
@@ -98,6 +98,6 @@ appreciate a reference to our JMLR-MLOSS paper
 
 === "MLA"
 
-    Feurer, Matthias, et al. 
+    Feurer, Matthias, et al.
     "OpenML-Python: an extensible Python API for OpenML."
     _Journal of Machine Learning Research_ 22.100 (2021):1−5.

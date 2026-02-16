@@ -3,12 +3,14 @@ from __future__ import annotations
 
 import pickle
 from collections import OrderedDict
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from typing_extensions import NamedTuple
 
 import arff  # type: ignore
 import numpy as np
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class Split(NamedTuple):

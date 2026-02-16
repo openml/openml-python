@@ -1,21 +1,21 @@
 % 1. Title of Database: Annealing Data
-% 
+%
 % 2. Source Information: donated by David Sterling and Wray Buntine.
-% 
+%
 % 3. Past Usage: unknown
-% 
+%
 % 4. Relevant Information:
 %    -- Explanation: I suspect this was left by Ross Quinlan in 1987 at the
 %       4th Machine Learning Workshop.  I'd have to check with Jeff Schlimmer
 %       to double check this.
-% 
+%
 % 5. Number of Instances: 798
-% 
+%
 % 6. Number of Attributes: 38
 %    -- 6 continuously-valued
 %    -- 3 integer-valued
 %    -- 29 nominal-valued
-% 
+%
 % 7. Attribute Information:
 %     1. family:          --,GB,GK,GS,TN,ZA,ZF,ZH,ZM,ZS
 %     2. product-type:    C, H, G
@@ -56,11 +56,11 @@
 %    37. bore:            0000,0500,0600,0760
 %    38. packing: -,1,2,3
 %    classes:        1,2,3,4,5,U
-%  
+%
 %    -- The '-' values are actually 'not_applicable' values rather than
 %       'missing_values' (and so can be treated as legal discrete
 %       values rather than as showing the absence of a discrete value).
-% 
+%
 % 8. Missing Attribute Values: Signified with "?"
 %    Attribute:  Number of instances missing its value:
 %    1           0
@@ -102,7 +102,7 @@
 %   37           0
 %   38           789
 %   39           0
-% 
+%
 % 9. Distribution of Classes
 %      Class Name:   Number of Instances:
 %      1               8
@@ -113,7 +113,7 @@
 %      U              34
 %                    ---
 %                    798
-% 
+%
 @relation anneal.ORIG
 @attribute 'family' {  GB , GK , GS , TN , ZA , ZF , ZH , ZM , ZS }
 @attribute 'product-type' {  C , H , G }

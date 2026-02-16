@@ -1,6 +1,6 @@
 BSD 3-Clause License
 
-Copyright (c) 2014-2019, Matthias Feurer, Jan van Rijn, Andreas Müller, 
+Copyright (c) 2014-2019, Matthias Feurer, Jan van Rijn, Andreas Müller,
 Joaquin Vanschoren and others.
 All rights reserved.
 
@@ -29,7 +29,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License of the files CONTRIBUTING.md, ISSUE_TEMPLATE.md and 
+License of the files CONTRIBUTING.md, ISSUE_TEMPLATE.md and
 PULL_REQUEST_TEMPLATE.md:
 
 Those files are modifications of the respecting templates in scikit-learn and
@@ -52,7 +52,7 @@ modification, are permitted provided that the following conditions are met:
   c. Neither the name of the Scikit-learn Developers  nor the names of
      its contributors may be used to endorse or promote products
      derived from this software without specific prior written
-     permission. 
+     permission.
 
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"

@@ -4,7 +4,6 @@ from __future__ import annotations
 import pickle
 import time
 from collections import OrderedDict
-from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -31,6 +30,8 @@ from openml.tasks import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
     from openml.runs.trace import OpenMLRunTrace
 
 
