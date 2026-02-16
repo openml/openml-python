@@ -4,8 +4,8 @@ from .base import FlowAPI, ResourceV1API, ResourceV2API
 
 
 class FlowV1API(ResourceV1API, FlowAPI):
-    pass
+    """Version 1 API implementation for flow resources."""
 
 
 class FlowV2API(ResourceV2API, FlowAPI):
-    pass
+    """Version 2 API implementation for flow resources."""

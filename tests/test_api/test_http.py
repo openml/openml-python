@@ -2,11 +2,13 @@ from requests import Response, Request
 import time
 import xmltodict
 import pytest
-from openml.testing import TestAPIBase
+from openml.testing import TestBase, TestAPIBase
 import os
+from pathlib import Path
 from urllib.parse import urljoin
 from openml.enums import APIVersion
 from openml._api import HTTPClient
+from openml.exceptions import OpenMLCacheRequiredError
 
 
 class TestHTTPClient(TestAPIBase):
@@ -153,24 +155,83 @@ class TestHTTPClient(TestAPIBase):
             <oml:input name="estimation_procedure">17</oml:input>
         </oml:task_inputs>
         """
+        # post
+        response = self.http_client.post(
+            "task",
+            files={"description": task_xml},
+        )
+        self.assertEqual(response.status_code, 200)
+        xml_resp = xmltodict.parse(response.content)
+        task_id = int(xml_resp["oml:upload_task"]["oml:id"])
 
-        task_id = None
-        try:
-            # POST the task
-            post_response = self.http_client.post(
-                "task",
-                files={"description": task_xml},
-            )
-            self.assertEqual(post_response.status_code, 200)
-            xml_resp = xmltodict.parse(post_response.content)
-            task_id = int(xml_resp["oml:upload_task"]["oml:id"])
+        # cleanup incase of failure
+        TestBase._mark_entity_for_removal("task", task_id)
+        TestBase.logger.info(f"collected from {__file__}: {task_id}")
 
-            # GET the task to verify it exists
-            get_response = self.http_client.get(f"task/{task_id}")
-            self.assertEqual(get_response.status_code, 200)
+        # delete
+        response = self.http_client.delete(f"task/{task_id}")
+        self.assertEqual(response.status_code, 200)
 
-        finally:
-            # DELETE the task if it was created
-            if task_id is not None:
-                del_response = self.http_client.delete(f"task/{task_id}")
-                self.assertEqual(del_response.status_code, 200)
+    def test_download_requires_cache(self):
+        client = HTTPClient(
+            server=self.http_client.server,
+            base_url=self.http_client.base_url,
+            api_key=self.http_client.api_key,
+            retries=1,
+            retry_policy=self.http_client.retry_policy,
+            cache=None,
+        )
+
+        with pytest.raises(OpenMLCacheRequiredError):
+            client.download("https://www.openml.org")
+
+    @pytest.mark.uses_test_server()
+    def test_download_creates_file(self):
+        # small stable resource
+        url = self.http_client.server
+
+        path = self.http_client.download(
+            url,
+            file_name="index.html",
+        )
+
+        assert path.exists()
+        assert path.is_file()
+        assert path.read_text(encoding="utf-8")
+
+    @pytest.mark.uses_test_server()
+    def test_download_is_cached_on_disk(self):
+        url = self.http_client.server
+
+        path1 = self.http_client.download(
+            url,
+            file_name="cached.html",
+        )
+        mtime1 = path1.stat().st_mtime
+
+        # second call should NOT re-download
+        path2 = self.http_client.download(
+            url,
+            file_name="cached.html",
+        )
+        mtime2 = path2.stat().st_mtime
+
+        assert path1 == path2
+        assert mtime1 == mtime2
+
+    @pytest.mark.uses_test_server()
+    def test_download_respects_custom_handler(self):
+        url = self.http_client.server
+
+        def handler(response, path: Path, encoding: str):
+            path.write_text("HANDLED", encoding=encoding)
+            return path
+
+        path = self.http_client.download(
+            url,
+            handler=handler,
+            file_name="handled.txt",
+        )
+
+        assert path.exists()
+        assert path.read_text() == "HANDLED"
