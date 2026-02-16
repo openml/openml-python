@@ -12,6 +12,30 @@ _user_path = Path("~").expanduser().absolute()
 
 
 def _resolve_default_cache_dir() -> Path:
+    """
+    Determine the default cache directory for OpenML data.
+
+    This function checks for user-defined environment variables and
+    platform-specific defaults to resolve where cached files should
+    be stored. It also provides backward-compatibility warnings if
+    legacy directories are detected.
+
+    Returns
+    -------
+    Path
+        Path to the cache directory that should be used.
+
+    Notes
+    -----
+    - If the environment variable ``OPENML_CACHE_DIR`` is set, its value
+    is used as the cache directory.
+    - On non-Linux systems, the default is ``~/.openml``.
+    - On Linux, the function follows the XDG Base Directory Specification:
+    - Uses ``$XDG_CACHE_HOME/openml`` if ``XDG_CACHE_HOME`` is set.
+    - Falls back to ``~/.cache/openml`` if ``XDG_CACHE_HOME`` is not set.
+    - If an old cache directory exists at ``$XDG_CACHE_HOME/org/openml``,
+    a warning is logged for backward compatibility.
+    """
     user_defined_cache_dir = os.environ.get("OPENML_CACHE_DIR")
     if user_defined_cache_dir is not None:
         return Path(user_defined_cache_dir)
