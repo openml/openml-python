@@ -110,7 +110,7 @@ class TestConfigurationForExamples(openml.testing.TestBase):
     def test_switch_to_example_configuration(self):
         """Verifies the test configuration is loaded properly."""
         # Below is the default test key which would be used anyway, but just for clarity:
-        openml.config.apikey = TestBase.admin_key
+        openml.config.apikey = "any-api-key"
         openml.config.server = self.production_server
 
         openml.config.start_using_configuration_for_example()
