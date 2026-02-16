@@ -323,14 +323,3 @@ no_implicit_optional = true
 check_untyped_defs = true
 
 warn_return_any = true
-
-
-[[tool.mypy.overrides]]
-module = ["tests.*", "openml.extensions.sklearn.*"]
-
-# TODO(eddiebergman): This should be re-enabled after tests get refactored
-ignore_errors = true
-#disallow_untyped_defs = false          # Sometimes we just want to ignore verbose types
-#disallow_untyped_decorators = false    # Test decorators are not properly typed
-#disallow_incomplete_defs = false       # Sometimes we just want to ignore verbose types
-#disable_error_code = ["var-annotated"]
