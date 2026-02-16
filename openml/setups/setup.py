@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import asdict, dataclass
 from typing import Any
 
 import openml.config
@@ -9,6 +10,7 @@ import openml.flows
 from openml.utils import ReprMixin
 
 
+@dataclass
 class OpenMLSetup(ReprMixin):
     """Setup object (a.k.a. Configuration).
 
@@ -59,6 +61,7 @@ class OpenMLSetup(ReprMixin):
         return [(key, fields[key]) for key in order if key in fields]
 
 
+@dataclass
 class OpenMLParameter(ReprMixin):
     """Parameter object (used in setup).
 
