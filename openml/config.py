@@ -472,9 +472,8 @@ def get_cache_directory() -> str:
 
     """
     url_suffix = urlparse(server).netloc
-    url_parts = url_suffix.split(".")[::-1]
-    url_parts_no_port = [part.split(":")[0] for part in url_parts]
-    reversed_url_suffix = os.sep.join(url_parts_no_port)  # noqa: PTH118
+    url_parts = url_suffix.replace(":", "_").split(".")[::-1]
+    reversed_url_suffix = os.sep.join(url_parts)  # noqa: PTH118
     return os.path.join(_root_cache_directory, reversed_url_suffix)  # noqa: PTH118
 
 
