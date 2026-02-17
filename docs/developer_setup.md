@@ -1,100 +1,87 @@
-# OpenML Development Environment Setup Guide
+# OpenML Local Development Environment Setup
 
-This document describes the working and reproducible approach to setting up a local development environment for OpenML. While multiple configurations are possible, the steps below reflect a setup that has been tested and verified in practice.
+This guide outlines the standard procedures for setting up a local development environment for the OpenML ecosystem. It covers the configuration of the backend servers (API v1 and API v2) and the Python Client SDK.
 
-OpenML currently provides two backend implementations:
+OpenML currently has two backend architecture:
 
-* **API v1**: The legacy PHP-based server (currently in production)
-* **API v2**: The newer Python-based server built with FastAPI
+* **API v1**: The PHP-based server currently serving production traffic.
+* **API v2**: The Python-based server (FastAPI) currently under active development.
 
-According to the OpenML maintainers, API v1 will remain operational until at least the end of 2026, while development and migration efforts continue on API v2.
+> Note on Migration: API v1 is projected to remain operational through at least 2026. API v2 is the target architecture for future development.
 
-This guide covers:
-* Local setup of API v1 (PHP backend)
-* Local setup of API v2 (Python backend)
-* Development setup for the Python SDK (openml-python)
-___
+## 1. API v1 Setup (PHP Backend)
 
-## API v1 (PHP Backend) Setup
+This section details the deployment of the legacy PHP backend.
 
 ### Prerequisites
 
-* Docker Desktop
-* Git
+* **Docker**: Docker Desktop (Ensure the daemon is running).
+* **Version Control**: Git.
 
-### Step 1: Clone the Services Repository
+### Installation Steps
 
-Fork and clone the OpenML services repository:
+#### 1. Clone the Repository
+
+Retrieve the OpenML services source code:
 
 ```bash
 git clone https://github.com/openml/services
 cd services
 ```
 
-### Step 2: Install Docker Desktop
+#### 2. Configure File Permissions
 
-Download and install Docker Desktop from: https://www.docker.com/products/docker-desktop/
+To ensure the containerized PHP service can write to the local filesystem, initialize the data directory permissions.
 
-Ensure Docker is running before proceeding.
-
-### Step 3: Initialize File Permissions
-
-On first use, you must ensure that the PHP data directory has the correct permissions. From the repository root, run:
+From the repository root:
 
 ```bash
 chown -R www-data:www-data data/php
 ```
 
-If this fails (for example, if www-data does not exist on your system), use:
+If the `www-data` user does not exist on the host system, grant full permissions as a fallback:
 
 ```bash
 chmod -R 777 data/php
 ```
 
-### Step 4: Start the API v1 Services
+#### 3. Launch Services
 
-With Docker running in the background, start all services using:
+Initialize the container stack:
 
 ```bash
 docker compose --profile all up -d
 ```
 
-**Handling Container Name Conflicts**
+#### Warning: Container Conflicts
 
-If you have previously set up the API v2 (Python backend), you may encounter container name conflicts, as some service names overlap.
-
-To resolve this:
-
-Remove or rename the conflicting containers (easiest via Docker Desktop), then restart:
+If API v2 (Python backend) containers are present on the system, name conflicts may occur. To resolve this, stop and remove existing containers before launching API v1:
 
 ```bash
 docker compose --profile all down
 docker compose --profile all up -d
 ```
 
-### Step 5: Verify the API v1 Server
+#### 4. Verification
 
-Confirm that the server is running correctly by opening: http://localhost:8080/api/v1/json/flow/181
+Validate the deployment by accessing the flow endpoint. A successful response will return structured JSON data.
 
-A successful setup will return structured JSON data describing an OpenML flow.
+* **Endpoint**: http://localhost:8080/api/v1/json/flow/181
 
-### Step 6: Configure `openml-python` to Use the Local API v1 Server
+### Client Configuration
 
-To interact with your local API v1 instance, configure the OpenML client to point to the local server and use the API key defined in:
-
-`services/config/php/.env`
-
-**Example usage:**
+To direct the `openml-python` client to the local API v1 instance, modify the configuration as shown below. The API key corresponds to the default key located in `services/config/php/.env`.
 
 ```python
 import openml
-
-openml.config.server = "http://localhost:8080/api/v1/xml"
-openml.config.apikey = "AD000000000000000000000000000000"
-
 from openml_sklearn.extension import SklearnExtension
 from sklearn.neighbors import KNeighborsClassifier
 
+# Configure client to use local Docker instance
+openml.config.server = "http://localhost:8080/api/v1/xml"
+openml.config.apikey = "AD000000000000000000000000000000"
+
+# Test flow publication
 clf = KNeighborsClassifier(n_neighbors=3)
 extension = SklearnExtension()
 knn_flow = extension.model_to_flow(clf)
@@ -102,176 +89,122 @@ knn_flow = extension.model_to_flow(clf)
 knn_flow.publish()
 ```
 
-If successful, the flow will be uploaded to your local OpenML server and you should see output similar to:
+## 2. API v2 Setup (Python Backend)
 
-```bash
-OpenML Flow
-===========
-Flow ID.........: 182 (version 1)
-Flow URL........: http://localhost:8080/f/182
-Flow Name.......: sklearn.neighbors._classification.KNeighborsClassifier
-Flow Description: Classifier implementing the k-nearest neighbors vote.
-Upload Date.....: 2025-12-30 09:11:17
-Dependencies....:
-  - sklearn==1.8.0
-  - numpy>=1.24.1
-  - scipy>=1.10.0
-  - joblib>=1.3.0
-  - threadpoolctl>=3.2.0
-```
----
-
-## API v2 (Python Backend) Setup
+This section details the deployment of the FastAPI backend.
 
 ### Prerequisites
 
-* Docker Desktop
-* Git
+* **Docker**: Docker Desktop (Ensure the daemon is running).
+* **Version Control**: Git.
 
-### Step 1: Clone the Server API Repository
+### Installation Steps
 
-Fork and clone the API v2 repository:
+#### 1. Clone the Repository
+
+Retrieve the API v2 source code:
 
 ```bash
 git clone https://github.com/openml/server-api
 cd server-api
 ```
 
-### Step 2: Install Docker Desktop
+#### 2. Launch Services
 
-If not already installed, download Docker Desktop from:
-
-https://www.docker.com/products/docker-desktop/
-
-Ensure Docker is running.
-
-### Step 3: Build and Start the Services
-
-From the repository root, run:
+Build and start the container stack:
 
 ```bash
 docker compose --profile all up
 ```
 
-This will build and start all containers and expose the services on your local machine.
+#### 3. Verification
 
-### Step 4: Verify the API v2 Server
+Validate the deployment using the following endpoints:
 
-Once the containers are running, verify the setup using the following endpoints:
+* **Task Endpoint**: http://localhost:8001/tasks/31
+* **Swagger UI (Documentation)**: http://localhost:8001/docs
 
-* FastAPI backend (v2): http://localhost:8001/tasks/31
-* Swagger UI documentation: http://localhost:8001/docs
+## 3. Python SDK (`openml-python`) Setup
 
+This section outlines the environment setup for contributing to the OpenML Python client.
 
-Both endpoints should return meaningful responses if the setup is successful.
+### Installation Steps
 
----
-
-## Python SDK (openml-python) Development Setup
-
-### Prerequisites
-
-* Python
-* Git
-* A virtual environment manager (conda, venv, uv, etc.)
-
-### Step 1: Clone the Python SDK Repository
-
-Fork and clone the OpenML Python client repository:
+#### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/openml/openml-python
 cd openml-python
 ```
 
-### Step 2: Create and Activate a Virtual Environment
+#### 2. Environment Initialization
 
-You may use any environment manager. Below is an example using conda:
+Create an isolated virtual environment (example using Conda):
 
 ```bash
 conda create -n openml-python-dev python=3.12
 conda activate openml-python-dev
 ```
 
-### Step 3: Install Development Dependencies
+#### 3. Install Dependencies
 
-Install the package in editable mode along with development and documentation dependencies:
+Install the package in editable mode, including development and documentation dependencies:
 
 ```bash
 python -m pip install -e ".[dev,docs]"
 ```
 
-### Step 4: Enable Pre-commit Hooks
+#### 4. Configure Quality Gates
 
-Install and run the pre-commit hooks to ensure code quality and formatting:
+Install pre-commit hooks to enforce coding standards:
 
 ```bash
 pre-commit install
 pre-commit run --all-files
 ```
----
 
-### Running Tests with Pytest Markers
+## 4. Testing Guidelines
 
-We are using pytest markers in OpenML Python SDK to categorize tests based on their dependencies and execution requirements. This allows developers to selectively include or skip certain groups of tests depending on their local setup.
+The OpenML Python SDK utilizes `pytest` markers to categorize tests based on dependencies and execution context.
 
-#### Available Markers
+| Marker            | Description                                                                 |
+|-------------------|-----------------------------------------------------------------------------|
+| `sklearn`          | Tests requiring `scikit-learn`. Skipped if the library is missing.          |
+| `production`      | Tests that interact with the live OpenML server (real API calls).         |
+| `uses_test_server`  | Tests requiring the OpenML test server environment.                       |
 
-* `sklearn`: Marks tests that require scikit-learn. These tests are skipped if scikit-learn is not installed.
+### Execution Examples
 
-* `production`: Marks tests that interact with the production OpenML server. These typically involve real API calls.
+Run the full test suite:
 
-* `uses_test_server`: Marks tests that require OpenML test server.
-
-#### Run full test suite:
-
-```python
+```bash
 pytest
 ```
 
-#### Run only tests with a specific marker (for example, `sklearn`):
+Run a specific subset (e.g., `scikit-learn` tests):
 
-```python
+```bash
 pytest -m sklearn
 ```
 
-#### Run multiple markers using logical expressions:
+Exclude production tests (local only):
 
-```python
-pytest -m "sklearn and not production"
-```
-
-### Skip tests that require the production server:
-
-```python
+```bash
 pytest -m "not production"
 ```
 
-### To list all registered pytest markers in the repository, run:
+### Admin Privilege Tests
 
-```python
-pytest --markers
+Certain tests require administrative privileges on the test server. These are skipped automatically unless an admin API key is provided via environment variables.
+
+#### Windows (PowerShell):
+
+```shell
+$env:OPENML_TEST_SERVER_ADMIN_KEY = "admin-key"
 ```
 
-### Running Tests That Require Admin Privileges
-
-Some tests require admin privileges on the test server and will be automatically skipped unless you provide an admin API key. For regular contributors, the tests will skip gracefully. For core contributors who need to run these tests locally:
-
-Set up the key by exporting the variable:
-run this in the terminal before running the tests:
+#### Linux/macOS:
 
 ```bash
-# For windows
-$env:OPENML_TEST_SERVER_ADMIN_KEY = "admin-key"
-# For linux/mac
 export OPENML_TEST_SERVER_ADMIN_KEY="admin-key"
 ```
-
-
-## Notes and Recommendations
-
-API v1 and API v2 can be run side-by-side, but container name conflicts must be resolved manually.
-
-API v1 is required for many existing workflows (e.g. flow publishing).
-
-API v2 is under active development and is the future direction of the OpenML platform.

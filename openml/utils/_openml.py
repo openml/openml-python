@@ -26,8 +26,7 @@ from tqdm import tqdm
 import openml
 import openml._api_calls
 import openml.exceptions
-
-from . import config
+from openml import config
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
@@ -434,6 +433,18 @@ def thread_safe_if_oslo_installed(func: Callable[P, R]) -> Callable[P, R]:
         return safe_func
     except ImportError:
         return func
+
+
+def get_cache_size() -> int:
+    """Calculate the size of OpenML cache directory
+
+    Returns
+    -------
+    cache_size: int
+        Total size of cache in bytes
+    """
+    path = Path(config.get_cache_directory())
+    return sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
 
 
 def _create_lockfiles_dir() -> Path:

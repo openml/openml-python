@@ -44,7 +44,7 @@ To contribute to the openml-python package, follow these steps:
 
 0. Determine how you want to contribute (see above).
 1. Set up your local development environment.
-   1. Fork and clone the `openml-python` repository. Then, create a new branch from the ``develop`` branch. If you are new to `git`, see our [detailed documentation](#basic-git-workflow), or rely on your favorite IDE.   
+   1. Fork and clone the `openml-python` repository. Then, create a new branch from the ``main`` branch. If you are new to `git`, see our [detailed documentation](#basic-git-workflow), or rely on your favorite IDE.   
    2. [Install the local dependencies](#install-local-dependencies) to run the tests for your contribution.
    3. [Test your installation](#testing-your-installation) to ensure everything is set up correctly.
 4. Implement your contribution. If contributing to the documentation, see [here](#contributing-to-the-documentation).
@@ -91,7 +91,7 @@ pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest
 pytest tests/test_datasets/test_dataset.py::OpenMLDatasetTest::test_get_data
 ```
 
-To test your new contribution, add [unit tests](https://github.com/openml/openml-python/tree/develop/tests), and, if needed, [examples](https://github.com/openml/openml-python/tree/develop/examples) for any new functionality being introduced. Some notes on unit tests and examples:
+To test your new contribution, add [unit tests](https://github.com/openml/openml-python/tree/main/tests), and, if needed, [examples](https://github.com/openml/openml-python/tree/main/examples) for any new functionality being introduced. Some notes on unit tests and examples:
 * If a unit test contains an upload to the test server, please ensure that it is followed by a file collection for deletion, to prevent the test server from bulking up. For example, `TestBase._mark_entity_for_removal('data', dataset.dataset_id)`, `TestBase._mark_entity_for_removal('flow', (flow.flow_id, flow.name))`.
 * Please ensure that the example is run on the test server by beginning with the call to `openml.config.start_using_configuration_for_example()`, which is done by default for tests derived from `TestBase`.
 * Add the `@pytest.mark.sklearn` marker to your unit tests if they have a dependency on scikit-learn.
@@ -109,7 +109,7 @@ export OPENML_TEST_SERVER_ADMIN_KEY="admin-key"
 
 ### Pull Request Checklist
 
-You can go to the `openml-python` GitHub repository to create the pull request by [comparing the branch](https://github.com/openml/openml-python/compare) from your fork with the `develop` branch of the `openml-python` repository. When creating a pull request, make sure to follow the comments and structured provided by the template on GitHub.
+You can go to the `openml-python` GitHub repository to create the pull request by [comparing the branch](https://github.com/openml/openml-python/compare) from your fork with the `main` branch of the `openml-python` repository. When creating a pull request, make sure to follow the comments and structured provided by the template on GitHub.
 
 **An incomplete contribution** -- where you expect to do more work before
 receiving a full review -- should be submitted as a `draft`. These may be useful
@@ -127,7 +127,7 @@ in the PR description.
 
 The preferred workflow for contributing to openml-python is to
 fork the [main repository](https://github.com/openml/openml-python) on
-GitHub, clone, check out the branch `develop`, and develop on a new branch
+GitHub, clone, check out the branch `main`, and develop on a new branch
 branch. Steps:
 
 0. Make sure you have git installed, and a GitHub account.
@@ -148,7 +148,7 @@ local disk:
 3. Switch to the ``develop`` branch:
 
    ```bash
-   git checkout develop
+   git checkout main
    ```
 
 3. Create a ``feature`` branch to hold your development changes:
@@ -157,7 +157,7 @@ local disk:
    git checkout -b feature/my-feature
    ```
 
-   Always use a ``feature`` branch. It's good practice to never work on the ``main`` or ``develop`` branch! 
+   Always use a ``feature`` branch. It's good practice to never work on the ``main`` branch! 
    To make the nature of your pull request easily visible, please prepend the name of the branch with the type of changes you want to merge, such as ``feature`` if it contains a new feature, ``fix`` for a bugfix, ``doc`` for documentation and ``maint`` for other maintenance on the package.
 
 4. Develop the feature on your feature branch. Add changed files using ``git add`` and then ``git commit`` files:
