@@ -737,8 +737,6 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         -------
         Path | None
         """
-        assert self._minio is not None  # for mypy
-
         if isinstance(description, dict):
             url = str(description.get("oml:parquet_url"))
         elif isinstance(description, OpenMLDataset):
@@ -1043,11 +1041,11 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
             row_id_attribute,
             original_data_url,
             paper_url,
-        )  # unsed method arg mypy error
+        )  # unused method arg mypy error
         raise self._not_supported(method="edit")
 
     def fork(self, dataset_id: int) -> int:
-        _ = dataset_id  # unsed method arg mypy error
+        _ = dataset_id  # unused method arg mypy error
         raise self._not_supported(method="fork")
 
     def status_update(self, dataset_id: int, status: Literal["active", "deactivated"]) -> None:
@@ -1440,8 +1438,6 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         -------
         Path | None
         """
-        assert self._minio is not None  # for mypy
-
         if isinstance(description, dict):
             url = str(description.get("parquet_url"))
         elif isinstance(description, OpenMLDataset):
