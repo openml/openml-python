@@ -550,8 +550,8 @@ class HTTPClient:
         method: str,
         path: str,
         *,
-        use_cache: bool = False,
-        reset_cache: bool = False,
+        enable_cache: bool = False,
+        refresh_cache: bool = False,
         use_api_key: bool = False,
         md5_checksum: str | None = None,
         **request_kwargs: Any,
@@ -565,10 +565,11 @@ class HTTPClient:
             HTTP method to use.
         path : str
             API path relative to the base URL.
-        use_cache : bool, optional
-            Whether to load/store responses from cache.
-        reset_cache : bool, optional
-            If True, bypass existing cache entries.
+        enable_cache : bool, optional
+            Whether to load/store response from cache.
+        refresh_cache : bool, optional
+            Only used when `enable_cache=True`. If True, ignore any existing
+            cached response and overwrite it with a fresh one.
         use_api_key : bool, optional
             Whether to include the API key in query parameters.
         md5_checksum : str or None, optional
@@ -607,7 +608,7 @@ class HTTPClient:
 
         files = request_kwargs.pop("files", None)
 
-        if use_cache and not reset_cache:
+        if enable_cache and not refresh_cache:
             cache_key = self.cache.get_key(url, params)
             try:
                 return self.cache.load(cache_key)
@@ -646,7 +647,7 @@ class HTTPClient:
         if md5_checksum is not None:
             self._verify_checksum(response, md5_checksum)
 
-        if use_cache:
+        if enable_cache:
             cache_key = self.cache.get_key(url, params)
             self.cache.save(cache_key, response)
 
@@ -680,8 +681,8 @@ class HTTPClient:
         self,
         path: str,
         *,
-        use_cache: bool = False,
-        reset_cache: bool = False,
+        enable_cache: bool = False,
+        refresh_cache: bool = False,
         use_api_key: bool = False,
         md5_checksum: str | None = None,
         **request_kwargs: Any,
@@ -693,9 +694,9 @@ class HTTPClient:
         ----------
         path : str
             API path relative to the base URL.
-        use_cache : bool, optional
+        enable_cache : bool, optional
             Whether to use the response cache.
-        reset_cache : bool, optional
+        refresh_cache : bool, optional
             Whether to ignore existing cached entries.
         use_api_key : bool, optional
             Whether to include the API key.
@@ -712,8 +713,8 @@ class HTTPClient:
         return self.request(
             method="GET",
             path=path,
-            use_cache=use_cache,
-            reset_cache=reset_cache,
+            enable_cache=enable_cache,
+            refresh_cache=refresh_cache,
             use_api_key=use_api_key,
             md5_checksum=md5_checksum,
             **request_kwargs,
@@ -746,7 +747,7 @@ class HTTPClient:
         return self.request(
             method="POST",
             path=path,
-            use_cache=False,
+            enable_cache=False,
             use_api_key=use_api_key,
             **request_kwargs,
         )
@@ -774,7 +775,7 @@ class HTTPClient:
         return self.request(
             method="DELETE",
             path=path,
-            use_cache=False,
+            enable_cache=False,
             use_api_key=True,
             **request_kwargs,
         )
