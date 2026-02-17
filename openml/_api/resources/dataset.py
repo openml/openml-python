@@ -80,7 +80,7 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         """
         path = f"data/{dataset_id}"
         try:
-            response = self._http.get(path, use_cache=True, reset_cache=force_refresh_cache)
+            response = self._http.get(path, enable_cache=True, refresh_cache=force_refresh_cache)
             xml_content = response.text
             description = xmltodict.parse(xml_content)["oml:data_set_description"]
 
@@ -464,7 +464,7 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         dict[int, OpenMLDataFeature]
         """
         path = f"data/features/{dataset_id}"
-        xml = self._http.get(path, use_cache=True).text
+        xml = self._http.get(path, enable_cache=True).text
 
         return self._parse_features_xml(xml)
 
@@ -482,7 +482,7 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         """
         path = f"data/qualities/{dataset_id!s}"
         try:
-            xml = self._http.get(path, use_cache=True).text
+            xml = self._http.get(path, enable_cache=True).text
         except OpenMLServerException as e:
             if e.code == 362 and str(e) == "No qualities found - None":
                 # quality file stays as None
@@ -923,7 +923,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         """
         path = f"datasets/{dataset_id}"
         try:
-            response = self._http.get(path, use_cache=True, reset_cache=force_refresh_cache)
+            response = self._http.get(path, enable_cache=True, refresh_cache=force_refresh_cache)
             json_content = response.json()
             features_file = None
             qualities_file = None
@@ -1183,7 +1183,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         Dictionary mapping feature index to OpenMLDataFeature.
         """
         path = f"datasets/features/{dataset_id}"
-        json = self._http.get(path, use_cache=True).json()
+        json = self._http.get(path, enable_cache=True).json()
 
         return self._parse_features_json(json)
 
@@ -1202,7 +1202,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         """
         path = f"datasets/qualities/{dataset_id!s}"
         try:
-            qualities_json = self._http.get(path, use_cache=True).json()
+            qualities_json = self._http.get(path, enable_cache=True).json()
         except OpenMLServerException as e:
             if e.code == 362 and str(e) == "No qualities found - None":
                 logger.warning(f"No qualities found for dataset {dataset_id}")
