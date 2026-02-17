@@ -152,3 +152,30 @@ def test_correct_test_server_download_state():
     task = openml.tasks.get_task(119)
     dataset = task.get_dataset()
     assert len(dataset.features) == dataset.get_data()[0].shape[1]
+
+@unittest.mock.patch("openml.config.get_cache_directory")
+def test_get_cache_size(config_mock,tmp_path):
+    """
+    Test that the OpenML cache size utility correctly reports the cache directory
+    size before and after fetching a dataset.
+
+    This test uses a temporary directory (tmp_path) as the cache location by
+    patching the configuration via config_mock. It verifies two conditions:
+    empty cache and after dataset fetch. 
+
+    Parameters
+    ----------
+    config_mock : unittest.mock.Mock
+         A mock that overrides the configured cache directory to point to tmp_path.
+    tmp_path : pathlib.Path
+         A pytest-provided temporary directory used as an isolated cache location.
+    """
+    
+    config_mock.return_value = tmp_path
+    cache_size = openml.utils.get_cache_size()
+    assert cache_size == 0
+    sub_dir = tmp_path / "subdir"
+    sub_dir.mkdir()
+    (sub_dir / "nested_file.txt").write_bytes(b"b" * 100)
+    
+    assert openml.utils.get_cache_size() == 100
