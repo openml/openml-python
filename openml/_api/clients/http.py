@@ -9,7 +9,7 @@ import time
 import xml
 from collections.abc import Callable, Mapping
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from urllib.parse import urlencode, urljoin, urlparse
 
 import requests
@@ -19,13 +19,14 @@ from requests import Response
 from openml.__version__ import __version__
 from openml.enums import RetryPolicy
 from openml.exceptions import (
-    OpenMLCacheRequiredError,
     OpenMLHashException,
     OpenMLNotAuthorizedError,
     OpenMLServerError,
     OpenMLServerException,
     OpenMLServerNoResult,
 )
+
+from .utils import human_delay, robot_delay
 
 
 class HTTPCache:
@@ -42,9 +43,6 @@ class HTTPCache:
     ----------
     path : pathlib.Path
         Base directory where cache entries are stored.
-    ttl : int
-        Time-to-live in seconds. Cached entries older than this value are treated
-        as expired.
 
     Notes
     -----
@@ -52,9 +50,8 @@ class HTTPCache:
     parameters, excluding the ``api_key`` parameter.
     """
 
-    def __init__(self, *, path: Path, ttl: int) -> None:
+    def __init__(self, *, path: Path) -> None:
         self.path = path
-        self.ttl = ttl
 
     def get_key(self, url: str, params: dict[str, Any]) -> str:
         """
@@ -142,9 +139,6 @@ class HTTPCache:
         created_at = meta.get("created_at")
         if created_at is None:
             raise ValueError("Cache metadata missing 'created_at'")
-
-        if time.time() - created_at > self.ttl:
-            raise TimeoutError(f"Cache expired for {path}")
 
         with headers_path.open("r", encoding="utf-8") as f:
             headers = json.load(f)
@@ -237,7 +231,7 @@ class HTTPClient:
         api_key: str,
         retries: int,
         retry_policy: RetryPolicy,
-        cache: HTTPCache | None = None,
+        cache: HTTPCache,
     ) -> None:
         self.server = server
         self.base_url = base_url
@@ -246,9 +240,7 @@ class HTTPClient:
         self.retry_policy = retry_policy
         self.cache = cache
 
-        self.retry_func = (
-            self._human_delay if retry_policy == RetryPolicy.HUMAN else self._robot_delay
-        )
+        self.retry_func = human_delay if retry_policy == RetryPolicy.HUMAN else robot_delay
         self.headers: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
 
     def _robot_delay(self, n: int) -> float:
@@ -452,7 +444,7 @@ class HTTPClient:
         if response.status_code == requests.codes.URI_TOO_LONG:
             raise OpenMLServerError(f"URI too long! ({url})")
 
-        retry_raise_e: Exception | None = None
+        exception: Exception | None = None
         code: int | None = None
         message: str = ""
 
@@ -467,7 +459,7 @@ class HTTPClient:
                     f"developers!\n{extra}"
                 ) from e
 
-            retry_raise_e = e
+            exception = e
 
         except Exception as e:
             # If we failed to parse it out,
@@ -486,10 +478,10 @@ class HTTPClient:
                 files=files,
             )
 
-        if retry_raise_e is None:
-            retry_raise_e = OpenMLServerException(code=code, message=message, url=url)
+        if exception is None:
+            exception = OpenMLServerException(code=code, message=message, url=url)
 
-        return retry_raise_e
+        return exception
 
     def _request(  # noqa: PLR0913
         self,
@@ -529,7 +521,7 @@ class HTTPClient:
         tuple of (requests.Response or None, Exception or None)
             Response and potential retry exception.
         """
-        retry_raise_e: Exception | None = None
+        exception: Exception | None = None
         response: Response | None = None
 
         try:
@@ -547,25 +539,25 @@ class HTTPClient:
             requests.exceptions.ConnectionError,
             requests.exceptions.SSLError,
         ) as e:
-            retry_raise_e = e
+            exception = e
 
         if response is not None:
-            retry_raise_e = self._validate_response(
+            exception = self._validate_response(
                 method=method,
                 url=url,
                 files=files,
                 response=response,
             )
 
-        return response, retry_raise_e
+        return response, exception
 
     def request(  # noqa: PLR0913, C901
         self,
         method: str,
         path: str,
         *,
-        use_cache: bool = False,
-        reset_cache: bool = False,
+        enable_cache: bool = False,
+        refresh_cache: bool = False,
         use_api_key: bool = False,
         md5_checksum: str | None = None,
         **request_kwargs: Any,
@@ -579,10 +571,11 @@ class HTTPClient:
             HTTP method to use.
         path : str
             API path relative to the base URL.
-        use_cache : bool, optional
-            Whether to load/store responses from cache.
-        reset_cache : bool, optional
-            If True, bypass existing cache entries.
+        enable_cache : bool, optional
+            Whether to load/store response from cache.
+        refresh_cache : bool, optional
+            Only used when `enable_cache=True`. If True, ignore any existing
+            cached response and overwrite it with a fresh one.
         use_api_key : bool, optional
             Whether to include the API key in query parameters.
         md5_checksum : str or None, optional
@@ -621,7 +614,7 @@ class HTTPClient:
 
         files = request_kwargs.pop("files", None)
 
-        if use_cache and not reset_cache and self.cache is not None:
+        if enable_cache and not refresh_cache:
             cache_key = self.cache.get_key(url, params)
             try:
                 return self.cache.load(cache_key)
@@ -630,39 +623,39 @@ class HTTPClient:
             except Exception:
                 raise  # propagate unexpected cache errors
 
-        session = requests.Session()
-        for retry_counter in range(1, retries + 1):
-            response, retry_raise_e = self._request(
-                session=session,
-                method=method,
-                url=url,
-                params=params,
-                data=data,
-                headers=headers,
-                files=files,
-                **request_kwargs,
-            )
+        with requests.Session() as session:
+            for retry_counter in range(1, retries + 1):
+                response, exception = self._request(
+                    session=session,
+                    method=method,
+                    url=url,
+                    params=params,
+                    data=data,
+                    headers=headers,
+                    files=files,
+                    **request_kwargs,
+                )
 
-            # executed successfully
-            if retry_raise_e is None:
-                break
-            # tries completed
-            if retry_counter >= retries:
-                raise retry_raise_e
+                # executed successfully
+                if exception is None:
+                    break
+                # tries completed
+                if retry_counter >= retries:
+                    raise exception
 
-            delay = self.retry_func(retry_counter)
-            time.sleep(delay)
+                delay = self.retry_func(retry_counter)
+                time.sleep(delay)
 
-        session.close()
-
-        assert response is not None
-
-        if use_cache and self.cache is not None:
-            cache_key = self.cache.get_key(url, params)
-            self.cache.save(cache_key, response)
+        # response is guaranteed to be not `None`
+        # otherwise an exception would have been raised before
+        response = cast("Response", response)
 
         if md5_checksum is not None:
             self._verify_checksum(response, md5_checksum)
+
+        if enable_cache:
+            cache_key = self.cache.get_key(url, params)
+            self.cache.save(cache_key, response)
 
         return response
 
@@ -694,8 +687,8 @@ class HTTPClient:
         self,
         path: str,
         *,
-        use_cache: bool = False,
-        reset_cache: bool = False,
+        enable_cache: bool = False,
+        refresh_cache: bool = False,
         use_api_key: bool = False,
         md5_checksum: str | None = None,
         **request_kwargs: Any,
@@ -707,9 +700,9 @@ class HTTPClient:
         ----------
         path : str
             API path relative to the base URL.
-        use_cache : bool, optional
+        enable_cache : bool, optional
             Whether to use the response cache.
-        reset_cache : bool, optional
+        refresh_cache : bool, optional
             Whether to ignore existing cached entries.
         use_api_key : bool, optional
             Whether to include the API key.
@@ -726,8 +719,8 @@ class HTTPClient:
         return self.request(
             method="GET",
             path=path,
-            use_cache=use_cache,
-            reset_cache=reset_cache,
+            enable_cache=enable_cache,
+            refresh_cache=refresh_cache,
             use_api_key=use_api_key,
             md5_checksum=md5_checksum,
             **request_kwargs,
@@ -760,7 +753,7 @@ class HTTPClient:
         return self.request(
             method="POST",
             path=path,
-            use_cache=False,
+            enable_cache=False,
             use_api_key=use_api_key,
             **request_kwargs,
         )
@@ -788,7 +781,7 @@ class HTTPClient:
         return self.request(
             method="DELETE",
             path=path,
-            use_cache=False,
+            enable_cache=False,
             use_api_key=True,
             **request_kwargs,
         )
@@ -825,15 +818,9 @@ class HTTPClient:
 
         Raises
         ------
-        OpenMLCacheRequiredError
-            If no cache instance is configured.
         OpenMLHashException
             If checksum verification fails.
         """
-        if self.cache is None:
-            raise OpenMLCacheRequiredError(
-                "A cache object is required for download, but none was provided in the HTTPClient."
-            )
         base = self.cache.path
         file_path = base / "downloads" / urlparse(url).path.lstrip("/") / file_name
         file_path = file_path.expanduser()

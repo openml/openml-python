@@ -166,7 +166,7 @@ class ResourceV1API(ResourceAPI):
 
         legal_resources = {"data", "task", "flow", "setup", "run"}
         if resource_type not in legal_resources:
-            raise ValueError(f"Can't tag a {resource_type}")
+            raise ValueError(f"Can't untag a {resource_type}")
 
         path = f"{resource_type}/untag"
         data = {f"{resource_type}_id": resource_id, "tag": tag}

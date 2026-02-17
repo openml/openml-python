@@ -35,8 +35,8 @@ class FlowV1API(ResourceV1API, FlowAPI):
         """
         response = self._http.get(
             f"flow/{flow_id}",
-            use_cache=True,
-            reset_cache=reset_cache,
+            enable_cache=True,
+            refresh_cache=reset_cache,
         )
         flow_xml = response.text
         return OpenMLFlow._from_dict(xmltodict.parse(flow_xml))
@@ -113,7 +113,7 @@ class FlowV1API(ResourceV1API, FlowAPI):
         if uploader is not None:
             api_call += f"/uploader/{uploader}"
 
-        response = self._http.get(api_call, use_api_key=True, use_cache=True)
+        response = self._http.get(api_call, use_api_key=True, enable_cache=True)
         xml_string = response.text
         flows_dict = xmltodict.parse(xml_string, force_list=("oml:flow",))
 
@@ -183,8 +183,8 @@ class FlowV2API(ResourceV2API, FlowAPI):
         """
         response = self._http.get(
             f"flows/{flow_id}/",
-            use_cache=True,
-            reset_cache=reset_cache,
+            enable_cache=True,
+            refresh_cache=reset_cache,
         )
         flow_json = response.json()
 

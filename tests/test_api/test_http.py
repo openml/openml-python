@@ -1,6 +1,5 @@
-from requests import Response, Request
-import time
-import xmltodict
+from requests import Response, Request, Session
+from unittest.mock import patch
 import pytest
 from openml.testing import TestAPIBase
 import os
@@ -8,7 +7,6 @@ from pathlib import Path
 from urllib.parse import urljoin
 from openml.enums import APIVersion
 from openml._api import HTTPClient
-from openml.exceptions import OpenMLCacheRequiredError
 
 
 class TestHTTPClient(TestAPIBase):
@@ -78,7 +76,7 @@ class TestHTTPClient(TestAPIBase):
 
     @pytest.mark.uses_test_server()
     def test_get_with_cache_creates_cache(self):
-        response = self.http_client.get("task/1", use_cache=True)
+        response = self.http_client.get("task/1", enable_cache=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.cache.path.exists())
@@ -97,98 +95,31 @@ class TestHTTPClient(TestAPIBase):
     @pytest.mark.uses_test_server()
     def test_get_uses_cached_response(self):
         # first request populates cache
-        response1 = self.http_client.get("task/1", use_cache=True)
+        response1 = self.http_client.get("task/1", enable_cache=True)
 
         # second request should load from cache
-        response2 = self.http_client.get("task/1", use_cache=True)
+        response2 = self.http_client.get("task/1", enable_cache=True)
 
         self.assertEqual(response1.content, response2.content)
         self.assertEqual(response1.status_code, response2.status_code)
 
     @pytest.mark.uses_test_server()
-    def test_get_cache_expires(self):
-        # force short TTL
-        self.cache.ttl = 1
+    def test_get_refresh_cache(self):
         path = "task/1"
 
         url = self._prepare_url(path=path)
         key = self.cache.get_key(url, {})
         cache_path = self.cache._key_to_path(key) / "meta.json"
 
-        response1 = self.http_client.get(path, use_cache=True)
+        response1 = self.http_client.get(path, enable_cache=True)
         response1_cache_time_stamp = cache_path.stat().st_ctime
 
-        time.sleep(2)
-
-        response2 = self.http_client.get(path, use_cache=True)
-        response2_cache_time_stamp = cache_path.stat().st_ctime
-
-        # cache expired -> new request
-        self.assertNotEqual(response1_cache_time_stamp, response2_cache_time_stamp)
-        self.assertEqual(response2.status_code, 200)
-        self.assertEqual(response1.content, response2.content)
-
-    @pytest.mark.uses_test_server()
-    def test_get_reset_cache(self):
-        path = "task/1"
-
-        url = self._prepare_url(path=path)
-        key = self.cache.get_key(url, {})
-        cache_path = self.cache._key_to_path(key) / "meta.json"
-
-        response1 = self.http_client.get(path, use_cache=True)
-        response1_cache_time_stamp = cache_path.stat().st_ctime
-
-        response2 = self.http_client.get(path, use_cache=True, reset_cache=True)
+        response2 = self.http_client.get(path, enable_cache=True, refresh_cache=True)
         response2_cache_time_stamp = cache_path.stat().st_ctime
 
         self.assertNotEqual(response1_cache_time_stamp, response2_cache_time_stamp)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response1.content, response2.content)
-
-    @pytest.mark.uses_test_server()
-    def test_post_and_delete(self):
-        task_xml = """
-        <oml:task_inputs xmlns:oml="http://openml.org/openml">
-            <oml:task_type_id>5</oml:task_type_id>
-            <oml:input name="source_data">193</oml:input>
-            <oml:input name="estimation_procedure">17</oml:input>
-        </oml:task_inputs>
-        """
-
-        task_id = None
-        try:
-            # POST the task
-            post_response = self.http_client.post(
-                "task",
-                files={"description": task_xml},
-            )
-            self.assertEqual(post_response.status_code, 200)
-            xml_resp = xmltodict.parse(post_response.content)
-            task_id = int(xml_resp["oml:upload_task"]["oml:id"])
-
-            # GET the task to verify it exists
-            get_response = self.http_client.get(f"task/{task_id}")
-            self.assertEqual(get_response.status_code, 200)
-
-        finally:
-            # DELETE the task if it was created
-            if task_id is not None:
-                del_response = self.http_client.delete(f"task/{task_id}")
-                self.assertEqual(del_response.status_code, 200)
-
-    def test_download_requires_cache(self):
-        client = HTTPClient(
-            server=self.http_client.server,
-            base_url=self.http_client.base_url,
-            api_key=self.http_client.api_key,
-            retries=1,
-            retry_policy=self.http_client.retry_policy,
-            cache=None,
-        )
-
-        with pytest.raises(OpenMLCacheRequiredError):
-            client.download("https://www.openml.org")
 
     @pytest.mark.uses_test_server()
     def test_download_creates_file(self):
@@ -240,3 +171,44 @@ class TestHTTPClient(TestAPIBase):
 
         assert path.exists()
         assert path.read_text() == "HANDLED"
+
+    def test_post(self):
+        resource_name = "resource"
+        resource_files = {"description": """Resource Description File"""}
+
+        with patch.object(Session, "request") as mock_request:
+            mock_request.return_value = Response()
+            mock_request.return_value.status_code = 200
+
+            self.http_client.post(
+                resource_name,
+                files=resource_files,
+            )
+
+            mock_request.assert_called_once_with(
+                method="POST",
+                url=self.http_client.server + self.http_client.base_url + resource_name,
+                params={},
+                data={'api_key': self.http_client.api_key},
+                headers=self.http_client.headers,
+                files=resource_files,
+            )
+
+    def test_delete(self):
+        resource_name = "resource"
+        resource_id = 123
+
+        with patch.object(Session, "request") as mock_request:
+            mock_request.return_value = Response()
+            mock_request.return_value.status_code = 200
+
+            self.http_client.delete(f"{resource_name}/{resource_id}")
+
+            mock_request.assert_called_once_with(
+                method="DELETE",
+                url=self.http_client.server + self.http_client.base_url + resource_name + "/" + str(resource_id),
+                params={'api_key': self.http_client.api_key},
+                data={},
+                headers=self.http_client.headers,
+                files=None,
+            )

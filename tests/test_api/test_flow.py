@@ -113,7 +113,7 @@ class TestFlowV1API(TestFlowAPIBase):
     def setUp(self):
         super().setUp()
         http_client = self.http_clients[APIVersion.V1]
-        self.resource = FlowV1API(http_client)
+        self.resource = FlowV1API(http=http_client, minio=self.minio_client)
 
     def test_get(self):
         self._get()
@@ -141,7 +141,7 @@ class TestFlowV2API(TestFlowAPIBase):
     def setUp(self):
         super().setUp()
         http_client = self.http_clients[APIVersion.V2]
-        self.resource = FlowV2API(http_client)
+        self.resource = FlowV2API(http=http_client, minio=self.minio_client)
 
     def test_get(self):
         self._get()
@@ -185,8 +185,14 @@ class TestFlowV2API(TestFlowAPIBase):
 class TestFlowCombinedAPI(TestAPIBase):
     def setUp(self):
         super().setUp()
-        self.resource_v1 = FlowV1API(self.http_clients[APIVersion.V1])
-        self.resource_v2 = FlowV2API(self.http_clients[APIVersion.V2])
+        self.resource_v1 = FlowV1API(
+            http=self.http_clients[APIVersion.V1],
+            minio=self.minio_client,
+        )
+        self.resource_v2 = FlowV2API(
+            http=self.http_clients[APIVersion.V2],
+            minio=self.minio_client,
+        )
 
     def test_get_matches_output(self):
         flow_v1 = self.resource_v1.get(flow_id=1)
