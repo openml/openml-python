@@ -44,8 +44,8 @@ class RunV1API(ResourceV1API, RunAPI):
         path = f"run/{run_id}"
         response = self._http.get(
             path,
-            use_cache=True,
-            reset_cache=reset_cache,
+            enable_cache=True,
+            refresh_cache=reset_cache,
             use_api_key=True,
         )
         xml_content = response.text

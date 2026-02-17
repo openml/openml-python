@@ -60,7 +60,7 @@ class TestRunV1API(TestRunAPIBase):
 	def setUp(self):
 		super().setUp()
 		http_client = self.http_clients[APIVersion.V1]
-		self.resource = RunV1API(http_client)
+		self.resource = RunV1API(http=http_client, minio=self.minio_client)
 
 	def test_get(self):
 		self._get()
@@ -76,7 +76,7 @@ class TestRunV2API(TestRunAPIBase):
 	def setUp(self):
 		super().setUp()
 		http_client = self.http_clients[APIVersion.V2]
-		self.resource = RunV2API(http_client)
+		self.resource = RunV2API(http=http_client, minio=self.minio_client)
 
 	def test_get(self):
 		with pytest.raises(
@@ -103,8 +103,14 @@ class TestRunV2API(TestRunAPIBase):
 class TestRunCombinedAPI(TestAPIBase):
 	def setUp(self):
 		super().setUp()
-		self.resource_v1 = RunV1API(self.http_clients[APIVersion.V1])
-		self.resource_v2 = RunV2API(self.http_clients[APIVersion.V2])
+		self.resource_v1 = RunV1API(
+			http=self.http_clients[APIVersion.V1],
+			minio=self.minio_client,
+		)
+		self.resource_v2 = RunV2API(
+			http=self.http_clients[APIVersion.V2],
+			minio=self.minio_client,
+		)
 
 	def test_get_contracts(self):
 		run_v1 = self.resource_v1.get(run_id=1)
