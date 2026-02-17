@@ -19,7 +19,6 @@ from requests import Response
 from openml.__version__ import __version__
 from openml.enums import RetryPolicy
 from openml.exceptions import (
-    OpenMLCacheRequiredError,
     OpenMLHashException,
     OpenMLNotAuthorizedError,
     OpenMLServerError,
@@ -231,7 +230,7 @@ class HTTPClient:
         api_key: str,
         retries: int,
         retry_policy: RetryPolicy,
-        cache: HTTPCache | None = None,
+        cache: HTTPCache,
     ) -> None:
         self.server = server
         self.base_url = base_url
@@ -608,7 +607,7 @@ class HTTPClient:
 
         files = request_kwargs.pop("files", None)
 
-        if use_cache and not reset_cache and self.cache is not None:
+        if use_cache and not reset_cache:
             cache_key = self.cache.get_key(url, params)
             try:
                 return self.cache.load(cache_key)
@@ -647,7 +646,7 @@ class HTTPClient:
         if md5_checksum is not None:
             self._verify_checksum(response, md5_checksum)
 
-        if use_cache and self.cache is not None:
+        if use_cache:
             cache_key = self.cache.get_key(url, params)
             self.cache.save(cache_key, response)
 
@@ -812,15 +811,9 @@ class HTTPClient:
 
         Raises
         ------
-        OpenMLCacheRequiredError
-            If no cache instance is configured.
         OpenMLHashException
             If checksum verification fails.
         """
-        if self.cache is None:
-            raise OpenMLCacheRequiredError(
-                "A cache object is required for download, but none was provided in the HTTPClient."
-            )
         base = self.cache.path
         file_path = base / "downloads" / urlparse(url).path.lstrip("/") / file_name
         file_path = file_path.expanduser()

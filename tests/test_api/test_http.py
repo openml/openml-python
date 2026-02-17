@@ -8,7 +8,6 @@ from pathlib import Path
 from urllib.parse import urljoin
 from openml.enums import APIVersion
 from openml._api import HTTPClient
-from openml.exceptions import OpenMLCacheRequiredError
 
 
 class TestHTTPClient(TestAPIBase):
@@ -148,19 +147,6 @@ class TestHTTPClient(TestAPIBase):
         # delete
         response = self.http_client.delete(f"task/{task_id}")
         self.assertEqual(response.status_code, 200)
-
-    def test_download_requires_cache(self):
-        client = HTTPClient(
-            server=self.http_client.server,
-            base_url=self.http_client.base_url,
-            api_key=self.http_client.api_key,
-            retries=1,
-            retry_policy=self.http_client.retry_policy,
-            cache=None,
-        )
-
-        with pytest.raises(OpenMLCacheRequiredError):
-            client.download("https://www.openml.org")
 
     @pytest.mark.uses_test_server()
     def test_download_creates_file(self):
