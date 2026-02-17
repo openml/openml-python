@@ -15,8 +15,8 @@ from typing import ClassVar
 import requests
 
 import openml
-from openml._api import HTTPCache, HTTPClient, MinIOClient
-from openml.enums import APIVersion, RetryPolicy
+from openml._api import API_REGISTRY, HTTPCache, HTTPClient, MinIOClient, ResourceAPI
+from openml.enums import APIVersion, ResourceType, RetryPolicy
 from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType
 
@@ -50,7 +50,7 @@ class TestBase(unittest.TestCase):
     }
     flow_name_tracker: ClassVar[list[str]] = []
     test_server = "https://test.openml.org/api/v1/xml"
-    admin_key = "abc"
+    admin_key = os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR)
     user_key = openml.config._TEST_SERVER_NORMAL_USER_KEY
 
     # creating logger for tracking files uploaded to test server
@@ -291,18 +291,20 @@ class TestAPIBase(TestBase):
 
         retries = self.connection_n_retries
         retry_policy = RetryPolicy.HUMAN if self.retry_policy == "human" else RetryPolicy.ROBOT
-        ttl = openml._backend.get_config_value("cache.ttl")
         cache_dir = self.static_cache_dir
+
+        v1_server = self.test_server.split("api/")[0]
+        v1_base_url = self.test_server.replace(v1_server, "").rstrip("/") + "/"
+        v1_api_key = self.user_key
 
         self.cache = HTTPCache(
             path=cache_dir,
-            ttl=ttl,
         )
         self.http_clients = {
             APIVersion.V1: HTTPClient(
-                server="https://test.openml.org/",
-                base_url="api/v1/xml/",
-                api_key="normaluser",
+                server=v1_server,
+                base_url=v1_base_url,
+                api_key=v1_api_key,
                 retries=retries,
                 retry_policy=retry_policy,
                 cache=self.cache,
@@ -317,6 +319,11 @@ class TestAPIBase(TestBase):
             ),
         }
         self.minio_client = MinIOClient(path=cache_dir)
+
+    def _create_resource(self, api_version: APIVersion, resource_type: ResourceType) -> ResourceAPI:
+        http_client = self.http_clients[api_version]
+        resource_cls = API_REGISTRY[api_version][resource_type]
+        return resource_cls(http=http_client, minio=self.minio_client)
 
 
 def check_task_existence(

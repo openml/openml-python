@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import timedelta
 
 from openml.enums import APIVersion, RetryPolicy
 
@@ -46,23 +45,6 @@ class ConnectionConfig:
 
 
 @dataclass
-class CacheConfig:
-    """
-    Configuration for caching API responses locally.
-
-    Parameters
-    ----------
-    dir : str
-        Path to the directory where cached files will be stored.
-    ttl : int
-        Time-to-live for cached entries, in seconds.
-    """
-
-    dir: str
-    ttl: int
-
-
-@dataclass
 class Config:
     """
     Global configuration for the OpenML Python client.
@@ -75,16 +57,17 @@ class Config:
         Primary API version to use (default is V1).
     fallback_api_version : APIVersion or None
         Optional fallback API version if the primary API does not support certain operations.
+    cache_dir : str
+        Path to the directory where cached files will be stored.
     api_configs : dict of APIVersion to APIConfig
         Mapping from API version to its server/base URL and API key configuration.
     connection : ConnectionConfig
         Settings for request retries and retry policy.
-    cache : CacheConfig
-        Settings for local caching of API responses.
     """
 
     api_version: APIVersion = APIVersion.V1
     fallback_api_version: APIVersion | None = None
+    cache_dir: str = str(_resolve_default_cache_dir())
 
     api_configs: dict[APIVersion, APIConfig] = field(
         default_factory=lambda: {
@@ -105,12 +88,5 @@ class Config:
         default_factory=lambda: ConnectionConfig(
             retries=5,
             retry_policy=RetryPolicy.HUMAN,
-        )
-    )
-
-    cache: CacheConfig = field(
-        default_factory=lambda: CacheConfig(
-            dir=str(_resolve_default_cache_dir()),
-            ttl=int(timedelta(weeks=1).total_seconds()),
         )
     )
