@@ -121,7 +121,7 @@ in the PR description.
 
 We integrated automated Copilot reviews for new pull requests as an experimental features. 
 If you have tokens available the Copilot bot will automatically submit a review.
-If you experience issues with this feature, please create an issue
+If you experience issues with this feature, please create an issue.
 
 --- 
 
