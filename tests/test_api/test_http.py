@@ -1,8 +1,7 @@
-from requests import Response, Request
-import time
-import xmltodict
+from requests import Response, Request, Session
+from unittest.mock import patch
 import pytest
-from openml.testing import TestBase, TestAPIBase
+from openml.testing import TestAPIBase
 import os
 from pathlib import Path
 from urllib.parse import urljoin
@@ -123,32 +122,6 @@ class TestHTTPClient(TestAPIBase):
         self.assertEqual(response1.content, response2.content)
 
     @pytest.mark.uses_test_server()
-    def test_post_and_delete(self):
-        task_xml = """
-        <oml:task_inputs xmlns:oml="http://openml.org/openml">
-            <oml:task_type_id>5</oml:task_type_id>
-            <oml:input name="source_data">193</oml:input>
-            <oml:input name="estimation_procedure">17</oml:input>
-        </oml:task_inputs>
-        """
-        # post
-        response = self.http_client.post(
-            "task",
-            files={"description": task_xml},
-        )
-        self.assertEqual(response.status_code, 200)
-        xml_resp = xmltodict.parse(response.content)
-        task_id = int(xml_resp["oml:upload_task"]["oml:id"])
-
-        # cleanup incase of failure
-        TestBase._mark_entity_for_removal("task", task_id)
-        TestBase.logger.info(f"collected from {__file__}: {task_id}")
-
-        # delete
-        response = self.http_client.delete(f"task/{task_id}")
-        self.assertEqual(response.status_code, 200)
-
-    @pytest.mark.uses_test_server()
     def test_download_creates_file(self):
         # small stable resource
         url = self.http_client.server
@@ -198,3 +171,44 @@ class TestHTTPClient(TestAPIBase):
 
         assert path.exists()
         assert path.read_text() == "HANDLED"
+
+    def test_post(self):
+        resource_name = "resource"
+        resource_files = {"description": """Resource Description File"""}
+
+        with patch.object(Session, "request") as mock_request:
+            mock_request.return_value = Response()
+            mock_request.return_value.status_code = 200
+
+            self.http_client.post(
+                resource_name,
+                files=resource_files,
+            )
+
+            mock_request.assert_called_once_with(
+                method="POST",
+                url=self.http_client.server + self.http_client.base_url + resource_name,
+                params={},
+                data={'api_key': self.http_client.api_key},
+                headers=self.http_client.headers,
+                files=resource_files,
+            )
+
+    def test_delete(self):
+        resource_name = "resource"
+        resource_id = 123
+
+        with patch.object(Session, "request") as mock_request:
+            mock_request.return_value = Response()
+            mock_request.return_value.status_code = 200
+
+            self.http_client.delete(f"{resource_name}/{resource_id}")
+
+            mock_request.assert_called_once_with(
+                method="DELETE",
+                url=self.http_client.server + self.http_client.base_url + resource_name + "/" + str(resource_id),
+                params={'api_key': self.http_client.api_key},
+                data={},
+                headers=self.http_client.headers,
+                files=None,
+            )
