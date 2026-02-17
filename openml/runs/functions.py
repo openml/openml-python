@@ -88,22 +88,30 @@ def _validate_flow_and_task_inputs(
     if isinstance(flow, OpenMLTask) and isinstance(task, OpenMLFlow):
         # We want to allow either order of argument (to avoid confusion).
         warnings.warn(
-            "The old argument order (Flow, model) is deprecated and "
+            "run_flow_on_task: the old argument order (task, flow) is deprecated and "
             "will not be supported in the future. Please use the "
-            "order (model, Flow).",
+            "order (flow, task).",
             DeprecationWarning,
             stacklevel=3,
         )
         task, flow = flow, task
 
     if not isinstance(flow, OpenMLFlow):
-        raise TypeError("Flow must be OpenMLFlow after validation")
+        raise TypeError(
+            f"run_flow_on_task: expected argument 'flow' to be OpenMLFlow, "
+            f"got {type(flow).__name__}",
+        )
 
     if not isinstance(task, OpenMLTask):
-        raise TypeError("Task must be OpenMLTask after validation")
+        raise TypeError(
+            f"run_flow_on_task: expected argument 'task' to be OpenMLTask, "
+            f"got {type(task).__name__}",
+        )
 
     if task.task_id is None:
-        raise ValueError("The task should be published at OpenML")
+        raise ValueError(
+            "run_flow_on_task: argument 'task.task_id' is None; task must be published on OpenML"
+        )
 
     return flow, task
 
@@ -143,38 +151,36 @@ def _sync_flow_with_server(
     # We only need to sync with the server right now if we want to upload the flow,
     # or ensure no duplicate runs exist. Otherwise it can be synced at upload time.
     flow_id = None
-    if upload_flow or avoid_duplicate_runs:
-        flow_id = flow_exists(flow.name, flow.external_version)
-        if isinstance(flow.flow_id, int) and flow_id != flow.flow_id:
-            if flow_id is not False:
-                raise PyOpenMLError(
-                    f"Local flow_id does not match server flow_id: '{flow.flow_id}' vs '{flow_id}'",
-                )
-            raise PyOpenMLError(
-                "Flow does not exist on the server, but 'flow.flow_id' is not None."
-            )
-        if upload_flow and flow_id is False:
-            flow.publish()
-            flow_id = flow.flow_id
-        elif flow_id:
-            flow_from_server = get_flow(flow_id)
-            _copy_server_fields(flow_from_server, flow)
-            if avoid_duplicate_runs:
-                flow_from_server.model = flow.model
-                setup_id = setup_exists(flow_from_server)
-                task_id = task.task_id
-                ids = run_exists(cast("int", task_id), setup_id)
-                if ids:
-                    error_message = (
-                        "One or more runs of this setup were already performed on the task."
-                    )
-                    raise OpenMLRunsExistError(ids, error_message)
-        else:
-            # Flow does not exist on server and we do not want to upload it.
-            # No sync with the server happens.
-            flow_id = None
+    if not upload_flow and not avoid_duplicate_runs:
+        return flow_id
 
-    return flow_id
+    flow_id = flow_exists(flow.name, flow.external_version)
+    if isinstance(flow.flow_id, int) and flow_id != flow.flow_id:
+        if flow_id is not False:
+            raise PyOpenMLError(
+                f"Local flow_id does not match server flow_id: '{flow.flow_id}' vs '{flow_id}'",
+            )
+        raise PyOpenMLError("Flow does not exist on the server, but 'flow.flow_id' is not None.")
+
+    if upload_flow and flow_id is False:
+        flow.publish()
+        return flow.flow_id
+
+    if flow_id:
+        flow_from_server = get_flow(flow_id)
+        _copy_server_fields(flow_from_server, flow)
+        if avoid_duplicate_runs:
+            flow_from_server.model = flow.model
+            setup_id = setup_exists(flow_from_server)
+            ids = run_exists(cast("int", task.task_id), setup_id)
+            if ids:
+                error_message = "One or more runs of this setup were already performed on the task."
+                raise OpenMLRunsExistError(ids, error_message)
+        return flow_id
+
+    # Flow does not exist on server and we do not want to upload it.
+    # No sync with the server happens.
+    return None
 
 
 def _prepare_run_environment(flow: OpenMLFlow) -> tuple[list[str], list[str]]:
@@ -241,20 +247,25 @@ def _create_run_from_results(  # noqa: PLR0913
         The created run object.
     """
     dataset = task.get_dataset()
+    task_id = cast("int", task.task_id)
+    dataset_id = dataset.dataset_id
+    model = flow.model
+    flow_name = flow.name
+    setup_string = flow.extension.create_setup_string(flow.model)
     fields = [*run_environment, time.strftime("%c"), "Created by run_flow_on_task"]
     generated_description = "\n".join(fields)
 
     run = OpenMLRun(
-        task_id=cast("int", task.task_id),
+        task_id=task_id,
         flow_id=flow_id,
-        dataset_id=dataset.dataset_id,
-        model=flow.model,
-        flow_name=flow.name,
+        dataset_id=dataset_id,
+        model=model,
+        flow_name=flow_name,
         tags=tags,
         trace=trace,
         data_content=data_content,
         flow=flow,
-        setup_string=flow.extension.create_setup_string(flow.model),
+        setup_string=setup_string,
         description_text=generated_description,
     )
 
