@@ -44,7 +44,7 @@ class ResourceAPI(ABC):
     api_version: APIVersion
     resource_type: ResourceType
 
-    def __init__(self, http: HTTPClient, minio: MinIOClient | None = None):
+    def __init__(self, http: HTTPClient, minio: MinIOClient):
         self._http = http
         self._minio = minio
 
