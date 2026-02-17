@@ -15,8 +15,8 @@ from typing import ClassVar
 import requests
 
 import openml
-from openml._api import HTTPCache, HTTPClient, MinIOClient
-from openml.enums import APIVersion, RetryPolicy
+from openml._api import API_REGISTRY, HTTPCache, HTTPClient, MinIOClient, ResourceAPI
+from openml.enums import APIVersion, ResourceType, RetryPolicy
 from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType
 
@@ -315,6 +315,11 @@ class TestAPIBase(TestBase):
             ),
         }
         self.minio_client = MinIOClient(path=cache_dir)
+
+    def _create_resource(self, api_version: APIVersion, resource_type: ResourceType) -> ResourceAPI:
+        http_client = self.http_clients[api_version]
+        resource_cls = API_REGISTRY[api_version][resource_type]
+        return resource_cls(http=http_client, minio=self.minio_client)
 
 
 def check_task_existence(

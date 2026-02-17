@@ -48,9 +48,10 @@ class TestResourceAPIBase(TestAPIBase):
 class TestResourceV1API(TestResourceAPIBase):
     def setUp(self):
         super().setUp()
-        http_client = self.http_clients[APIVersion.V1]
-        self.resource = ResourceV1API(http_client)
-        self.resource.resource_type = ResourceType.TASK
+        self.resource = self._create_resource(
+            api_version=APIVersion.V1,
+            resource_type=ResourceType.TASK,
+        )
 
     def test_publish_and_delete(self):
         self._publish_and_delete()
@@ -62,9 +63,10 @@ class TestResourceV1API(TestResourceAPIBase):
 class TestResourceV2API(TestResourceAPIBase):
     def setUp(self):
         super().setUp()
-        http_client = self.http_clients[APIVersion.V2]
-        self.resource = ResourceV2API(http_client)
-        self.resource.resource_type = ResourceType.TASK
+        self.resource = self._create_resource(
+            api_version=APIVersion.V2,
+            resource_type=ResourceType.TASK,
+        )
 
     def test_publish_and_delete(self):
         with pytest.raises(OpenMLNotSupportedError):
@@ -78,14 +80,14 @@ class TestResourceV2API(TestResourceAPIBase):
 class TestResourceFallbackAPI(TestResourceAPIBase):
     def setUp(self):
         super().setUp()
-        http_client_v1 = self.http_clients[APIVersion.V1]
-        resource_v1 = ResourceV1API(http_client_v1)
-        resource_v1.resource_type = ResourceType.TASK
-
-        http_client_v2 = self.http_clients[APIVersion.V2]
-        resource_v2 = ResourceV2API(http_client_v2)
-        resource_v2.resource_type = ResourceType.TASK
-
+        resource_v1 = self._create_resource(
+            api_version=APIVersion.V1,
+            resource_type=ResourceType.TASK,
+        )
+        resource_v2 = self._create_resource(
+            api_version=APIVersion.V2,
+            resource_type=ResourceType.TASK,
+        )
         self.resource = FallbackProxy(resource_v2, resource_v1)
 
     def test_publish_and_delete(self):
