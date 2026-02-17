@@ -293,14 +293,18 @@ class TestAPIBase(TestBase):
         retry_policy = RetryPolicy.HUMAN if self.retry_policy == "human" else RetryPolicy.ROBOT
         cache_dir = self.static_cache_dir
 
+        v1_server = self.test_server.split("api/")[0]
+        v1_base_url = self.test_server.replace(v1_server, "").rstrip("/") + "/"
+        v1_api_key = self.user_key
+
         self.cache = HTTPCache(
             path=cache_dir,
         )
         self.http_clients = {
             APIVersion.V1: HTTPClient(
-                server="https://test.openml.org/",
-                base_url="api/v1/xml/",
-                api_key="normaluser",
+                server=v1_server,
+                base_url=v1_base_url,
+                api_key=v1_api_key,
                 retries=retries,
                 retry_policy=retry_policy,
                 cache=self.cache,
