@@ -134,7 +134,8 @@ filterwarnings=[
 ]
 markers = [
   "upload: anything that uploads to a server",
-  "production: any interaction with the production server",
+      "production_server: any interaction with the production server",
+  
   "cache: anything that interacts with the (test) cache",
   "test_server: tests that require the OpenML test server",
 ]

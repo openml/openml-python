@@ -20,14 +20,14 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         self.task_type = TaskType.CLUSTERING
         self.estimation_procedure = 17
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_dataset(self):
         # no clustering tasks on test server
         self.use_production_server()
         task = openml.tasks.get_task(self.task_id)
         task.get_dataset()
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     @pytest.mark.test_server()
     def test_download_task(self):
         # no clustering tasks on test server

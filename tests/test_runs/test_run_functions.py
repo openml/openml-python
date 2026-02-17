@@ -1096,7 +1096,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_online_run_metric_score(self):
         self.use_production_server()
 
@@ -1407,7 +1407,7 @@ class TestRun(TestBase):
             trace_arff = arff.load(arff_file)
         OpenMLRunTrace.trace_from_arff(trace_arff)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_run(self):
         # this run is not available on test
         self.use_production_server()
@@ -1442,7 +1442,7 @@ class TestRun(TestBase):
         assert isinstance(run, dict)
         assert len(run) == 8, str(run)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_runs_list(self):
         # TODO: comes from live, no such lists on test
         self.use_production_server()
@@ -1456,7 +1456,7 @@ class TestRun(TestBase):
         runs = openml.runs.list_runs(task=[0])
         assert runs.empty
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_runs_list_by_task(self):
         # TODO: comes from live, no such lists on test
         self.use_production_server()
@@ -1475,7 +1475,7 @@ class TestRun(TestBase):
             assert run["task_id"] in task_ids
             self._check_run(run)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_runs_list_by_uploader(self):
         # TODO: comes from live, no such lists on test
         self.use_production_server()
@@ -1497,7 +1497,7 @@ class TestRun(TestBase):
             assert run["uploader"] in uploader_ids
             self._check_run(run)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_runs_list_by_flow(self):
         # TODO: comes from live, no such lists on test
         self.use_production_server()
@@ -1516,7 +1516,7 @@ class TestRun(TestBase):
             assert run["flow_id"] in flow_ids
             self._check_run(run)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_runs_pagination(self):
         # TODO: comes from live, no such lists on test
         self.use_production_server()
@@ -1529,7 +1529,7 @@ class TestRun(TestBase):
             for run in runs.to_dict(orient="index").values():
                 assert run["uploader"] in uploader_ids
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_runs_list_by_filters(self):
         # TODO: comes from live, no such lists on test
         self.use_production_server()
@@ -1566,7 +1566,7 @@ class TestRun(TestBase):
         )
         assert len(runs) == 2
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_runs_list_by_tag(self):
         # We don't have tagged runs on the test server
@@ -1687,7 +1687,7 @@ class TestRun(TestBase):
         TestBase._mark_entity_for_removal("run", run.run_id)
         TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {run.run_id}")
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_format_prediction_non_supervised(self):
         # non-supervised tasks don't exist on the test server
         self.use_production_server()

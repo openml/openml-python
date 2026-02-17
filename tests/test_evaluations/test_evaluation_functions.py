@@ -50,7 +50,7 @@ class TestEvaluationFunctions(TestBase):
             self.assertSequenceEqual(sorted(list1), sorted(list2))
         return evals_setups
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_filter_task(self):
         self.use_production_server()
 
@@ -70,7 +70,7 @@ class TestEvaluationFunctions(TestBase):
             assert evaluations[run_id].value is not None
             assert evaluations[run_id].values is None
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_filter_uploader_ID_16(self):
         self.use_production_server()
 
@@ -85,7 +85,7 @@ class TestEvaluationFunctions(TestBase):
 
         assert len(evaluations) > 50
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_filter_uploader_ID_10(self):
         self.use_production_server()
 
@@ -104,7 +104,7 @@ class TestEvaluationFunctions(TestBase):
             assert evaluations[run_id].value is not None
             assert evaluations[run_id].values is None
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_filter_flow(self):
         self.use_production_server()
 
@@ -124,7 +124,7 @@ class TestEvaluationFunctions(TestBase):
             assert evaluations[run_id].value is not None
             assert evaluations[run_id].values is None
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_filter_run(self):
         self.use_production_server()
 
@@ -144,7 +144,7 @@ class TestEvaluationFunctions(TestBase):
             assert evaluations[run_id].value is not None
             assert evaluations[run_id].values is None
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_limit(self):
         self.use_production_server()
 
@@ -163,7 +163,7 @@ class TestEvaluationFunctions(TestBase):
 
         assert isinstance(evaluations, dict)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_per_fold(self):
         self.use_production_server()
         size = 1000
@@ -201,7 +201,7 @@ class TestEvaluationFunctions(TestBase):
             assert evaluations[run_id].value is not None
             assert evaluations[run_id].values is None
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_evaluation_list_sort(self):
         self.use_production_server()
         size = 10
@@ -239,7 +239,7 @@ class TestEvaluationFunctions(TestBase):
         assert isinstance(measures, list) is True
         assert all(isinstance(s, str) for s in measures) is True
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_evaluations_setups_filter_flow(self):
         self.use_production_server()
         flow_id = [405]
@@ -257,7 +257,7 @@ class TestEvaluationFunctions(TestBase):
         keys = list(evals["parameters"].values[0].keys())
         assert all(elem in columns for elem in keys)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_list_evaluations_setups_filter_task(self):
         self.use_production_server()

@@ -47,7 +47,7 @@ class TestFlowFunctions(TestBase):
         )
         assert ext_version_str_or_none
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_flows(self):
         self.use_production_server()
         # We can only perform a smoke test here because we test on dynamic
@@ -58,7 +58,7 @@ class TestFlowFunctions(TestBase):
         for flow in flows.to_dict(orient="index").values():
             self._check_flow(flow)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_flows_output_format(self):
         self.use_production_server()
         # We can only perform a smoke test here because we test on dynamic
@@ -67,13 +67,13 @@ class TestFlowFunctions(TestBase):
         assert isinstance(flows, pd.DataFrame)
         assert len(flows) >= 1500
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_flows_empty(self):
         self.use_production_server()
         flows = openml.flows.list_flows(tag="NoOneEverUsesThisTag123")
         assert flows.empty
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_flows_by_tag(self):
         self.use_production_server()
         flows = openml.flows.list_flows(tag="weka")
@@ -81,7 +81,7 @@ class TestFlowFunctions(TestBase):
         for flow in flows.to_dict(orient="index").values():
             self._check_flow(flow)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_flows_paginate(self):
         self.use_production_server()
         size = 10
@@ -301,7 +301,7 @@ class TestFlowFunctions(TestBase):
         assert server_flow.parameters["categories"] == "[[0, 1], [0, 1]]"
         assert server_flow.model.categories == flow.model.categories
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_flow1(self):
         # Regression test for issue #305
         # Basically, this checks that a flow without an external version can be loaded
@@ -338,7 +338,7 @@ class TestFlowFunctions(TestBase):
         Version(sklearn.__version__) == Version("0.19.1"),
         reason="Requires scikit-learn!=0.19.1, because target flow is from that version.",
     )
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_flow_with_reinstantiate_strict_with_wrong_version_raises_exception(self):
         self.use_production_server()
         flow = 8175
@@ -359,7 +359,7 @@ class TestFlowFunctions(TestBase):
         # Because scikit-learn dropped min_impurity_split hyperparameter in 1.0,
         # and the requested flow is from 1.0.0 exactly.
     )
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_flow_reinstantiate_flow_not_strict_post_1(self):
         self.use_production_server()
         flow = openml.flows.get_flow(flow_id=19190, reinstantiate=True, strict_version=False)
@@ -373,7 +373,7 @@ class TestFlowFunctions(TestBase):
         reason="Requires scikit-learn 0.23.2 or ~0.24.",
         # Because these still have min_impurity_split, but with new scikit-learn module structure."
     )
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_flow_reinstantiate_flow_not_strict_023_and_024(self):
         self.use_production_server()
         flow = openml.flows.get_flow(flow_id=18587, reinstantiate=True, strict_version=False)
@@ -385,7 +385,7 @@ class TestFlowFunctions(TestBase):
         Version(sklearn.__version__) > Version("0.23"),
         reason="Requires scikit-learn<=0.23, because the scikit-learn module structure changed.",
     )
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_flow_reinstantiate_flow_not_strict_pre_023(self):
         self.use_production_server()
         flow = openml.flows.get_flow(flow_id=8175, reinstantiate=True, strict_version=False)

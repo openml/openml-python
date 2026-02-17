@@ -44,7 +44,7 @@ class TestFlow(TestBase):
     def tearDown(self):
         super().tearDown()
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_flow(self):
         # We need to use the production server here because 4024 is not the
         # test server
@@ -77,7 +77,7 @@ class TestFlow(TestBase):
         assert subflow_3.parameters["L"] == "-1"
         assert len(subflow_3.components) == 0
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_structure(self):
         # also responsible for testing: flow.get_subflow
@@ -565,7 +565,7 @@ class TestFlow(TestBase):
         tags = openml.utils.extract_xml_tags("oml:tag", flow_dict["oml:flow"])
         assert tags == ["OpenmlWeka", "weka"]
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_download_non_scikit_learn_flows(self):
         self.use_production_server()
 

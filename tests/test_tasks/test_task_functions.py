@@ -56,7 +56,7 @@ class TestTask(TestBase):
         assert isinstance(estimation_procedures[0], dict)
         assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_list_clustering_task(self):
         self.use_production_server()
@@ -144,7 +144,7 @@ class TestTask(TestBase):
     @unittest.skip(
         "Please await outcome of discussion: https://github.com/openml/OpenML/issues/776",
     )
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test__get_task_live(self):
         self.use_production_server()
         # Test the following task as it used to throw an Unicode Error.
@@ -212,7 +212,7 @@ class TestTask(TestBase):
         task = openml.tasks.get_task(1)
         assert isinstance(task, OpenMLTask)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_task_different_types(self):
         self.use_production_server()
         # Regression task

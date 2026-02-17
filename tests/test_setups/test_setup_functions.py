@@ -118,7 +118,7 @@ class TestSetupFunctions(TestBase):
             ),
         )
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_setup(self):
         self.use_production_server()
         # no setups in default test server
@@ -135,7 +135,7 @@ class TestSetupFunctions(TestBase):
             else:
                 assert len(current.parameters) == num_params[idx]
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_setup_list_filter_flow(self):
         self.use_production_server()
 
@@ -155,7 +155,7 @@ class TestSetupFunctions(TestBase):
 
         assert isinstance(setups, dict)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_list_setups_output_format(self):
         self.use_production_server()
         flow_id = 6794

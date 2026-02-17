@@ -102,15 +102,15 @@ def configure_apikey(value: str) -> None:
 
 def configure_server(value: str) -> None:
     def check_server(server: str) -> str:
-        is_shorthand = server in ["test", "production"]
+        is_shorthand = server in ["test", "production_server"]
         if is_shorthand or looks_like_url(server):
             return ""
-        return "Must be 'test', 'production' or a url."
+        return "Must be 'test', 'production_server' or a url."
 
     def replace_shorthand(server: str) -> str:
         if server == "test":
             return "https://test.openml.org/api/v1/xml"
-        if server == "production":
+        if server == "production_server":
             return "https://www.openml.org/api/v1/xml"
         return server
 
@@ -119,7 +119,7 @@ def configure_server(value: str) -> None:
         value=value,
         check_with_message=check_server,
         intro_message="Specify which server you wish to connect to.",
-        input_message="Specify a url or use 'test' or 'production' as a shorthand: ",
+        input_message="Specify a url or use 'test' or 'production_server' as a shorthand: ",
         sanitize=replace_shorthand,
     )
 

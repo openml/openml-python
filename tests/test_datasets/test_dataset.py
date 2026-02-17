@@ -18,7 +18,7 @@ from openml.testing import TestBase
 import pytest
 
 
-@pytest.mark.production()
+@pytest.mark.production_server()
 class OpenMLDatasetTest(TestBase):
     _multiprocess_can_split_ = True
 
@@ -347,7 +347,7 @@ def test_add_illegal_url_ontology():
         assert e.code == 1106
 
 
-@pytest.mark.production()
+@pytest.mark.production_server()
 class OpenMLDatasetTestSparse(TestBase):
     _multiprocess_can_split_ = True
 
