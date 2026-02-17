@@ -599,6 +599,10 @@ class TestOpenMLDataset(TestBase):
         assert len(result) == 1
         assert result[did]["status"] == status
 
+    @pytest.mark.skipif(
+        not os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR),
+        reason="Test requires admin key. Set OPENML_TEST_SERVER_ADMIN_KEY environment variable.",
+    )
     @pytest.mark.flaky()
     @pytest.mark.uses_test_server()
     def test_data_status(self):
