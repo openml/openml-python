@@ -41,7 +41,7 @@ class OpenMLSetup(OpenMLBase, ReprMixin):
             raise ValueError("parameters should be dict")
 
     @property
-    def id(self) -> int | None:
+    def id(self) -> int:
         """The id of the setup."""
         return self.setup_id
 
