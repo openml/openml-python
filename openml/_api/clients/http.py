@@ -36,8 +36,7 @@ class HTTPCache:
     This class stores HTTP responses on disk using a structured directory layout
     derived from the request URL and parameters. Each cached response consists of
     three files: metadata (``meta.json``), headers (``headers.json``), and the raw
-    body (``body.bin``). Entries are considered valid until their time-to-live
-    (TTL) expires.
+    body (``body.bin``).
 
     Parameters
     ----------
@@ -115,8 +114,6 @@ class HTTPCache:
         ------
         FileNotFoundError
             If the cache entry or required files are missing.
-        TimeoutError
-            If the cached entry has expired based on the configured TTL.
         ValueError
             If required metadata is missing or malformed.
         """
@@ -134,10 +131,6 @@ class HTTPCache:
 
         with meta_path.open("r", encoding="utf-8") as f:
             meta = json.load(f)
-
-        created_at = meta.get("created_at")
-        if created_at is None:
-            raise ValueError("Cache metadata missing 'created_at'")
 
         with headers_path.open("r", encoding="utf-8") as f:
             headers = json.load(f)
@@ -612,8 +605,8 @@ class HTTPClient:
             cache_key = self.cache.get_key(url, params)
             try:
                 return self.cache.load(cache_key)
-            except (FileNotFoundError, TimeoutError):
-                pass  # cache miss or expired, continue
+            except FileNotFoundError:
+                pass  # cache miss, continue
             except Exception:
                 raise  # propagate unexpected cache errors
 
