@@ -7,10 +7,11 @@ from typing import Any
 
 import openml.flows
 from openml.base import OpenMLBase
+from openml.utils import ReprMixin
 
 
 @dataclass(repr=False)
-class OpenMLSetup(OpenMLBase):
+class OpenMLSetup(OpenMLBase, ReprMixin):
     """Setup object (a.k.a. Configuration).
 
     A setup is the combination of a flow with all its hyperparameters set.
