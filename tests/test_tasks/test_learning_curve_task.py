@@ -18,7 +18,7 @@ class OpenMLLearningCurveTaskTest(OpenMLSupervisedTaskTest):
         self.task_type = TaskType.LEARNING_CURVE
         self.estimation_procedure = 13
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_get_X_and_Y(self):
         X, Y = super().test_get_X_and_Y()
         assert X.shape == (768, 8)
@@ -27,14 +27,14 @@ class OpenMLLearningCurveTaskTest(OpenMLSupervisedTaskTest):
         assert isinstance(Y, pd.Series)
         assert pd.api.types.is_categorical_dtype(Y)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_download_task(self):
         task = super().test_download_task()
         assert task.task_id == self.task_id
         assert task.task_type_id == TaskType.LEARNING_CURVE
         assert task.dataset_id == 20
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_class_labels(self):
         task = get_task(self.task_id)
         assert task.class_labels == ["tested_negative", "tested_positive"]
