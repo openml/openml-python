@@ -26,8 +26,8 @@ class ResourceAPI(ABC):
     ----------
     http : HTTPClient
         Configured HTTP client used for communication with the OpenML API.
-    minio : MinIOClient or None, optional
-        Optional MinIO client used for object storage operations.
+    minio : MinIOClient
+        Configured MinIO client used for object storage operations.
 
     Attributes
     ----------
