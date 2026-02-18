@@ -4,7 +4,7 @@ import pytest
 from openml.testing import TestAPIBase
 import os
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 from openml.enums import APIVersion
 from openml._api import HTTPClient
 
@@ -22,20 +22,22 @@ class TestHTTPClient(TestAPIBase):
         return urljoin(server, urljoin(base_url, path))
 
     def test_cache(self):
-        url = self._prepare_url(path="task/31")
+        path = "task/31"
         params = {"param1": "value1", "param2": "value2"}
+
+        url = self._prepare_url(path=path)
+
+        server_keys = urlparse(self.http_client.server).netloc.split(".")[::-1]
+        base_url_keys = self.http_client.base_url.strip("/").split("/")
+        path_keys = path.split("/")
+        params_key = "&".join([f"{k}={v}" for k, v in params.items()])
 
         key = self.cache.get_key(url, params)
         expected_key = os.path.join(
-            "org",
-            "openml",
-            "test",
-            "api",
-            "v1",
-            "xml",
-            "task",
-            "31",
-            "param1=value1&param2=value2",
+            *server_keys,
+            *base_url_keys,
+            *path_keys,
+            params_key,
         )
 
         # validate key
