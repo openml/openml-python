@@ -10,7 +10,7 @@ import openml.flows
 from openml.utils import ReprMixin
 
 
-@dataclass
+@dataclass(repr=False)
 class OpenMLSetup(ReprMixin):
     """Setup object (a.k.a. Configuration).
 
@@ -61,7 +61,7 @@ class OpenMLSetup(ReprMixin):
         return [(key, fields[key]) for key in order if key in fields]
 
 
-@dataclass
+@dataclass(repr=False)
 class OpenMLParameter(ReprMixin):
     """Parameter object (used in setup).
 
