@@ -34,7 +34,8 @@ def _resolve_default_cache_dir() -> Path:
     - Uses ``$XDG_CACHE_HOME/openml`` if ``XDG_CACHE_HOME`` is set.
     - Falls back to ``~/.cache/openml`` if ``XDG_CACHE_HOME`` is not set.
     - If an old cache directory exists at ``$XDG_CACHE_HOME/org/openml``,
-    a warning is logged for backward compatibility.
+    a warning is logged for backward compatibility. In this case,
+    ``$XDG_CACHE_HOME`` is returned instead of ``$XDG_CACHE_HOME/openml``.
     """
     user_defined_cache_dir = os.environ.get("OPENML_CACHE_DIR")
     if user_defined_cache_dir is not None:
