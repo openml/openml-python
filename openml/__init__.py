@@ -89,6 +89,9 @@ def populate_cache(
             runs.functions.get_run(run_id)
 
 
+__version__ = "0.16.0"
+
+
 __all__ = [
     "OpenMLBenchmarkSuite",
     "OpenMLClassificationTask",
@@ -106,6 +109,7 @@ __all__ = [
     "OpenMLStudy",
     "OpenMLSupervisedTask",
     "OpenMLTask",
+    "__version__",
     "_api_calls",
     "config",
     "datasets",
@@ -119,6 +123,3 @@ __all__ = [
     "tasks",
     "utils",
 ]
-
-
-__version__ = "0.16.0"
