@@ -189,7 +189,6 @@ def pytest_sessionfinish() -> None:
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "sklearn: marks tests that use scikit-learn")
-    config.addinivalue_line("markers", "production_server: marks tests that use the production server")
 
 
 def pytest_addoption(parser):
