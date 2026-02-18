@@ -54,17 +54,16 @@ class OpenMLSetup(OpenMLBase, ReprMixin):
             else None,
         }
 
-    def _get_repr_body_fields(self) -> Sequence[tuple]:
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
         """Collect all information to display in the __repr__ body."""
-        fields = {
+        fields: dict[str, int | str | None] = {
             "Setup ID": self.setup_id,
             "Flow ID": self.flow_id,
             "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
-            "# of Parameters": (
-                len(self.parameters) if self.parameters is not None else float("nan")
-            ),
+            "# of Parameters": (len(self.parameters) if self.parameters is not None else "nan"),
         }
 
+        # determines the order in which the information will be printed
         order = ["Setup ID", "Flow ID", "Flow URL", "# of Parameters"]
         return [(key, fields[key]) for key in order if key in fields]
 
