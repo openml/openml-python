@@ -44,7 +44,6 @@ class OpenMLSetup(OpenMLBase):
         """The id of the setup."""
         return self.setup_id
 
-
     def _to_dict(self) -> dict[str, Any]:
         return {
             "setup_id": self.setup_id,
@@ -54,9 +53,8 @@ class OpenMLSetup(OpenMLBase):
             else None,
         }
 
-    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | None]]:
-        """Collect all information to display in the __repr__ body.
-        """
+    def _get_repr_body_fields(self) -> Sequence[tuple]:
+        """Collect all information to display in the __repr__ body."""
         fields = {
             "Setup ID": self.setup_id,
             "Flow ID": self.flow_id,
@@ -167,9 +165,9 @@ class OpenMLParameter:
             parameter_default,
             parameter_value,
         ]
-        _fields = [(key, fields[key]) for key in order if key in fields]
+        fields_ = [(key, fields[key]) for key in order if key in fields]
 
-        longest_field_name_length = max(len(name) for name, _ in _fields)
+        longest_field_name_length = max(len(name) for name, _ in fields_)
         field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
+        body = "\n".join(field_line_format.format(name, value) for name, value in fields_)
         return header + body
