@@ -26,7 +26,7 @@ class TestTask(TestBase):
     def tearDown(self):
         super().tearDown()
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test__get_cached_tasks(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         tasks = openml.tasks.functions._get_cached_tasks()
@@ -34,7 +34,7 @@ class TestTask(TestBase):
         assert len(tasks) == 3
         assert isinstance(next(iter(tasks.values())), OpenMLTask)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test__get_cached_task(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         task = openml.tasks.functions._get_cached_task(1)
@@ -49,14 +49,14 @@ class TestTask(TestBase):
             2,
         )
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test__get_estimation_procedure_list(self):
         estimation_procedures = openml.tasks.functions._get_estimation_procedure_list()
         assert isinstance(estimation_procedures, list)
         assert isinstance(estimation_procedures[0], dict)
         assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_list_clustering_task(self):
         self.use_production_server()
@@ -73,7 +73,7 @@ class TestTask(TestBase):
         assert isinstance(task["status"], str)
         assert task["status"] in ["in_preparation", "active", "deactivated"]
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks_by_type(self):
         num_curves_tasks = 198  # number is flexible, check server if fails
         ttid = TaskType.LEARNING_CURVE
@@ -83,18 +83,18 @@ class TestTask(TestBase):
             assert ttid == task["ttid"]
             self._check_task(task)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks_length(self):
         ttid = TaskType.LEARNING_CURVE
         tasks = openml.tasks.list_tasks(task_type=ttid)
         assert len(tasks) > 100
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks_empty(self):
         tasks = openml.tasks.list_tasks(tag="NoOneWillEverUseThisTag")
         assert tasks.empty
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks_by_tag(self):
         num_basic_tasks = 100  # number is flexible, check server if fails
         tasks = openml.tasks.list_tasks(tag="OpenML100")
@@ -102,14 +102,14 @@ class TestTask(TestBase):
         for task in tasks.to_dict(orient="index").values():
             self._check_task(task)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks(self):
         tasks = openml.tasks.list_tasks()
         assert len(tasks) >= 900
         for task in tasks.to_dict(orient="index").values():
             self._check_task(task)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks_paginate(self):
         size = 10
         max = 100
@@ -119,7 +119,7 @@ class TestTask(TestBase):
             for task in tasks.to_dict(orient="index").values():
                 self._check_task(task)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks_per_type_paginate(self):
         size = 40
         max = 100
@@ -136,7 +136,7 @@ class TestTask(TestBase):
                     assert j == task["ttid"]
                     self._check_task(task)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test__get_task(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         openml.tasks.get_task(1882)
@@ -144,14 +144,14 @@ class TestTask(TestBase):
     @unittest.skip(
         "Please await outcome of discussion: https://github.com/openml/OpenML/issues/776",
     )
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test__get_task_live(self):
         self.use_production_server()
         # Test the following task as it used to throw an Unicode Error.
         # https://github.com/openml/openml-python/issues/378
         openml.tasks.get_task(34536)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_get_task(self):
         task = openml.tasks.get_task(1, download_data=True)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
@@ -165,7 +165,7 @@ class TestTask(TestBase):
             os.path.join(self.workdir, "org", "openml", "test", "datasets", "1", "dataset.arff")
         )
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_get_task_lazy(self):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
@@ -188,7 +188,7 @@ class TestTask(TestBase):
         )
 
     @mock.patch("openml.tasks.functions.get_dataset")
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_removal_upon_download_failure(self, get_dataset):
         class WeirdException(Exception):
             pass
@@ -206,13 +206,13 @@ class TestTask(TestBase):
         # Now the file should no longer exist
         assert not os.path.exists(os.path.join(os.getcwd(), "tasks", "1", "tasks.xml"))
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_get_task_with_cache(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         task = openml.tasks.get_task(1)
         assert isinstance(task, OpenMLTask)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_task_different_types(self):
         self.use_production_server()
         # Regression task
@@ -222,7 +222,7 @@ class TestTask(TestBase):
         # Issue 538, get_task failing with clustering task.
         openml.tasks.functions.get_task(126033)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_download_split(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         split = task.download_split()
