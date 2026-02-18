@@ -19,8 +19,7 @@ import requests.utils
 import xmltodict
 from urllib3 import ProxyManager
 
-from . import config
-from .__version__ import __version__
+from . import __version__, config
 from .exceptions import (
     OpenMLHashException,
     OpenMLNotAuthorizedError,

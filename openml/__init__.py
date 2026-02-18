@@ -32,7 +32,6 @@ from . import (
     tasks,
     utils,
 )
-from .__version__ import __version__
 from .datasets import OpenMLDataFeature, OpenMLDataset
 from .evaluations import OpenMLEvaluation
 from .flows import OpenMLFlow
@@ -107,7 +106,6 @@ __all__ = [
     "OpenMLStudy",
     "OpenMLSupervisedTask",
     "OpenMLTask",
-    "__version__",
     "_api_calls",
     "config",
     "datasets",
@@ -121,3 +119,6 @@ __all__ = [
     "tasks",
     "utils",
 ]
+
+
+__version__ = "0.16.0"

@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openml"
-dynamic = ["version"]  # Will take it from the __version__ file, update there
+dynamic = ["version"]  # Will take it from the __init__ file, update there
 dependencies = [
   "liac-arff>=2.4.0",
   "xmltodict",
@@ -122,7 +122,7 @@ namespaces = false
 openml = ["*.txt", "*.md", "py.typed"]
 
 [tool.setuptools.dynamic]
-version = {attr = "openml.__version__.__version__"}
+version = {attr = "openml.__init__.__version__"}
 
 # https://docs.pytest.org/en/7.2.x/reference/reference.html#ini-options-ref
 [tool.pytest.ini_options]
@@ -191,9 +191,6 @@ exclude = [
 "openml/cli.py" = [
   "T201",   # print found
   "T203",   # pprint found
-]
-"openml/__version__.py" = [
-  "D100",   # Undocumented public module
 ]
 "__init__.py" = [
   "I002",   # Missing required import (i.e. from __future__ import annotations)
