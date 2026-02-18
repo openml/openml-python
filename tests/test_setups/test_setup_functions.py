@@ -192,7 +192,7 @@ class TestSetupFunctions(TestBase):
         with pytest.raises(openml.exceptions.OpenMLCacheException):
             openml.setups.functions._get_cached_setup(10)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_tag_untag_setup(self):
         setups = openml.setups.list_setups(size=1)
         if not setups:
@@ -204,7 +204,7 @@ class TestSetupFunctions(TestBase):
         all_tags = _tag_entity("setup", setup_id, tag, untag=True)
         assert tag not in all_tags
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_tagging(self):
         setups = openml.setups.list_setups(size=1)
         if not setups:
