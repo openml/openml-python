@@ -122,7 +122,7 @@ namespaces = false
 openml = ["*.txt", "*.md", "py.typed"]
 
 [tool.setuptools.dynamic]
-version = {attr = "openml.__init__.__version__"}
+version = {attr = "openml.__version__"}
 
 # https://docs.pytest.org/en/7.2.x/reference/reference.html#ini-options-ref
 [tool.pytest.ini_options]
