@@ -170,8 +170,8 @@ The OpenML Python SDK utilizes `pytest` markers to categorize tests based on dep
 | Marker            | Description                                                                 |
 |-------------------|-----------------------------------------------------------------------------|
 | `sklearn`          | Tests requiring `scikit-learn`. Skipped if the library is missing.          |
-| `production`      | Tests that interact with the live OpenML server (real API calls).         |
-| `uses_test_server`  | Tests requiring the OpenML test server environment.                       |
+| `production_server`| Tests that interact with the live OpenML server (real API calls).         |
+| `test_server`     | Tests requiring the OpenML test server environment.                       |
 
 ### Execution Examples
 
@@ -190,7 +190,7 @@ pytest -m sklearn
 Exclude production tests (local only):
 
 ```bash
-pytest -m "not production"
+pytest -m "not production_server"
 ```
 
 ### Admin Privilege Tests
