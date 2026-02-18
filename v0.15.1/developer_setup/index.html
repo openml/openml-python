@@ -3123,11 +3123,11 @@
 <td>Tests requiring <code>scikit-learn</code>. Skipped if the library is missing.</td>
 </tr>
 <tr>
-<td><code>production</code></td>
+<td><code>production_server</code></td>
 <td>Tests that interact with the live OpenML server (real API calls).</td>
 </tr>
 <tr>
-<td><code>uses_test_server</code></td>
+<td><code>test_server</code></td>
 <td>Tests requiring the OpenML test server environment.</td>
 </tr>
 </tbody>
@@ -3140,7 +3140,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>pytest<span class="w"> </span>-m<span class="w"> </span>sklearn
 </code></pre></div>
 <p>Exclude production tests (local only):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not production&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not production_server&quot;</span>
 </code></pre></div>
 <h3 id="admin-privilege-tests">Admin Privilege Tests<a class="headerlink" href="#admin-privilege-tests" title="Permanent link">#</a></h3>
 <p>Certain tests require administrative privileges on the test server. These are skipped automatically unless an admin API key is provided via environment variables.</p>
