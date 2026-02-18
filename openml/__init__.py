@@ -18,6 +18,8 @@ In particular, this module implements a python interface for the
 # License: BSD 3-Clause
 from __future__ import annotations
 
+__version__ = "0.16.0"
+
 from . import (
     _api_calls,
     config,
@@ -87,9 +89,6 @@ def populate_cache(
     if run_ids is not None:
         for run_id in run_ids:
             runs.functions.get_run(run_id)
-
-
-__version__ = "0.16.0"
 
 
 __all__ = [
