@@ -46,7 +46,7 @@ def _resolve_default_cache_dir() -> Path:
 
     xdg_cache_home = os.environ.get("XDG_CACHE_HOME")
     if xdg_cache_home is None:
-        return Path("~", ".cache", "openml")
+        return Path("~", ".cache", "openml").expanduser()
 
     # This is the proper XDG_CACHE_HOME directory, but
     # we unfortunately had a problem where we used XDG_CACHE_HOME/org,
