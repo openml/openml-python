@@ -1,10 +1,13 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from unittest import mock
+
 import pytest
 
 import openml
 from openml.setups import OpenMLParameter, OpenMLSetup
+from openml.utils import _get_rest_api_type_alias, _tag_entity
 
 
 @pytest.fixture
@@ -88,3 +91,36 @@ def test_invalid_init(field, value, match):
     kwargs = {"setup_id": 1, "flow_id": 1, "parameters": None, field: value}
     with pytest.raises(ValueError, match=match):
         OpenMLSetup(**kwargs)
+
+
+def test_get_rest_api_type_alias_returns_setup(sample_parameters):
+    setup = OpenMLSetup(setup_id=42, flow_id=100, parameters=sample_parameters)
+    assert _get_rest_api_type_alias(setup) == "setup"
+
+
+def test_tag_entity_setup_tag_response_parsing():
+    """Verify _tag_entity correctly parses setup tag API response."""
+    tag_response = (
+        '<?xml version="1.0"?><oml:setup_tag xmlns:oml="http://openml.org/openml">'
+        "<oml:tag>mytag</oml:tag><oml:tag>other</oml:tag></oml:setup_tag>"
+    )
+    with mock.patch(
+        "openml._api_calls._perform_api_call",
+        return_value=tag_response,
+    ):
+        tags = _tag_entity("setup", 1, "mytag")
+    assert tags == ["mytag", "other"]
+
+
+def test_tag_entity_setup_untag_response_parsing():
+    """Verify _tag_entity correctly parses setup untag API response (empty)."""
+    untag_response = (
+        '<?xml version="1.0"?><oml:setup_untag xmlns:oml="http://openml.org/openml">'
+        "</oml:setup_untag>"
+    )
+    with mock.patch(
+        "openml._api_calls._perform_api_call",
+        return_value=untag_response,
+    ):
+        tags = _tag_entity("setup", 1, "mytag", untag=True)
+    assert tags == []

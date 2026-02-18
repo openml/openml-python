@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import random
 import time
 import unittest.mock
 
@@ -15,6 +16,7 @@ from openml_sklearn import SklearnExtension
 import openml
 import openml.exceptions
 from openml.testing import TestBase
+from openml.utils import _tag_entity
 
 
 def get_sentinel():
@@ -189,3 +191,33 @@ class TestSetupFunctions(TestBase):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         with pytest.raises(openml.exceptions.OpenMLCacheException):
             openml.setups.functions._get_cached_setup(10)
+
+    @pytest.mark.uses_test_server()
+    def test_tag_untag_setup(self):
+        setups = openml.setups.list_setups(size=1)
+        if not setups:
+            pytest.skip("Test server has no setups")
+        setup_id = next(iter(setups.keys()))
+        tag = f"test_tag_{random.randint(1, 1000000)}"
+        all_tags = _tag_entity("setup", setup_id, tag)
+        assert tag in all_tags
+        all_tags = _tag_entity("setup", setup_id, tag, untag=True)
+        assert tag not in all_tags
+
+    @pytest.mark.uses_test_server()
+    def test_tagging(self):
+        setups = openml.setups.list_setups(size=1)
+        if not setups:
+            pytest.skip("Test server has no setups")
+        setup_id = next(iter(setups.keys()))
+        setup = setups[setup_id]
+        tag = f"test_tag_TestSetupFunctions_{str(time.time()).replace('.', '')}"
+        tagged = openml.setups.list_setups(tag=tag)
+        assert len(tagged) == 0
+        setup.push_tag(tag)
+        tagged = openml.setups.list_setups(tag=tag)
+        assert len(tagged) == 1
+        assert setup_id in tagged
+        setup.remove_tag(tag)
+        tagged = openml.setups.list_setups(tag=tag)
+        assert len(tagged) == 0
