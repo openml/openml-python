@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import inspect
 import os
+import shutil
+import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -18,8 +20,7 @@ class OpenMLSplitTest(TestBase):
     def setUp(self):
         __file__ = inspect.getfile(OpenMLSplitTest)
         self.directory = os.path.dirname(__file__)
-        # This is for dataset
-        self.arff_filepath = (
+        source_arff = (
             Path(self.directory).parent
             / "files"
             / "org"
@@ -29,13 +30,15 @@ class OpenMLSplitTest(TestBase):
             / "1882"
             / "datasplits.arff"
         )
-        self.pd_filename = self.arff_filepath.with_suffix(".pkl.py3")
+        # Use temporary directory to avoid conflicts with other tests
+        self.temp_dir = Path(tempfile.mkdtemp())
+        self.arff_filepath = self.temp_dir / "datasplits.arff"
+        shutil.copy2(source_arff, self.arff_filepath)
 
     def tearDown(self):
         try:
-            os.remove(self.pd_filename)
-        except (OSError, FileNotFoundError):
-            #  Replaced bare except. Not sure why these exceptions are acceptable.
+            shutil.rmtree(self.temp_dir, ignore_errors=True)
+        except OSError:
             pass
 
     def test_eq(self):
