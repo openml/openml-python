@@ -37,6 +37,8 @@ class _Config(TypedDict):
     retry_policy: Literal["human", "robot"]
     connection_n_retries: int
     show_progress: bool
+    connect_timeout: float
+    read_timeout: float
 
 
 def _create_log_handlers(create_file_handler: bool = True) -> None:  # noqa: FBT002
@@ -157,6 +159,8 @@ _defaults: _Config = {
     "retry_policy": "human",
     "connection_n_retries": 5,
     "show_progress": False,
+    "connect_timeout": 9.05,
+    "read_timeout": 300.0,
 }
 
 # Default values are actually added here in the _setup() function which is
@@ -186,6 +190,8 @@ avoid_duplicate_runs = _defaults["avoid_duplicate_runs"]
 
 retry_policy: Literal["human", "robot"] = _defaults["retry_policy"]
 connection_n_retries: int = _defaults["connection_n_retries"]
+connect_timeout: float = _defaults["connect_timeout"]
+read_timeout: float = _defaults["read_timeout"]
 
 
 def set_retry_policy(value: Literal["human", "robot"], n_retries: int | None = None) -> None:
@@ -343,6 +349,8 @@ def _setup(config: _Config | None = None) -> None:
     global _root_cache_directory  # noqa: PLW0603
     global avoid_duplicate_runs  # noqa: PLW0603
     global show_progress  # noqa: PLW0603
+    global connect_timeout  # noqa: PLW0603
+    global read_timeout  # noqa: PLW0603
 
     config_file = determine_config_file_path()
     config_dir = config_file.parent
@@ -364,6 +372,8 @@ def _setup(config: _Config | None = None) -> None:
     apikey = config["apikey"]
     server = config["server"]
     show_progress = config["show_progress"]
+    connect_timeout = float(config.get("connect_timeout", _defaults["connect_timeout"]))  # type: ignore[union-attr]
+    read_timeout = float(config.get("read_timeout", _defaults["read_timeout"]))  # type: ignore[union-attr]
     n_retries = int(config["connection_n_retries"])
 
     set_retry_policy(config["retry_policy"], n_retries)
@@ -445,6 +455,8 @@ def get_config_as_dict() -> _Config:
         "connection_n_retries": connection_n_retries,
         "retry_policy": retry_policy,
         "show_progress": show_progress,
+        "connect_timeout": connect_timeout,
+        "read_timeout": read_timeout,
     }
 
 
