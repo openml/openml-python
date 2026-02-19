@@ -21,7 +21,7 @@ dependencies = [
   "pyarrow",
   "tqdm",  # For MinIO download progress bars
 ]
-requires-python = ">=3.10,<3.15"    
+requires-python = ">=3.10,<3.15"
 maintainers = [
   { name = "Pieter Gijsbers", email="p.gijsbers@tue.nl"},
   { name = "Lennart Purucker"},
@@ -63,6 +63,8 @@ openml = "openml.cli:main"
 
 [project.optional-dependencies]
 test=[
+    "openml",
+    "minio",
     "nbconvert",
     "jupyter_client",
     "matplotlib",
@@ -78,10 +80,8 @@ test=[
     "mypy",
     "ruff",
     "requests-mock",
-    "openml-sklearn",
     "packaging",
     "pytest-mock",
-    "openml-sklearn",
 ]
 examples=[
     "matplotlib",
