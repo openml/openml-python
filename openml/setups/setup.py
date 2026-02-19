@@ -144,7 +144,7 @@ class OpenMLParameter:
         self.id = self.input_id
 
     def _to_dict(self) -> dict[str, Any]:
-        result = {
+        return {
             "id": self.input_id,
             "flow_id": self.flow_id,
             "flow_name": self.flow_name,
@@ -154,7 +154,6 @@ class OpenMLParameter:
             "default_value": self.default_value,
             "value": self.value,
         }
-        return result
 
     def __repr__(self) -> str:
         header = "OpenML Parameter"
@@ -192,7 +191,5 @@ class OpenMLParameter:
 
         longest_field_name_length = max(len(name) for name, _ in _fields)
         field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(
-            field_line_format.format(name, value) for name, value in _fields
-        )
+        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
         return header + body

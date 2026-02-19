@@ -32,6 +32,7 @@ from . import (
     tasks,
     utils,
 )
+
 __version__ = "0.16.0"  # defined here directly, see issue #1642
 from .datasets import OpenMLDataFeature, OpenMLDataset
 from .evaluations import OpenMLEvaluation
