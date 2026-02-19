@@ -26,8 +26,7 @@ from tqdm import tqdm
 import openml
 import openml._api_calls
 import openml.exceptions
-
-from . import config
+from openml import config
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
