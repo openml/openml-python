@@ -1461,7 +1461,7 @@ class TestOpenMLDataset(TestBase):
                     raise e
                 time.sleep(10)
                 # Delete the cache dir to get the newer version of the dataset
-                
+
                 shutil.rmtree(
                     os.path.join(openml.config.get_cache_directory(), "datasets", str(did)),
                 )
