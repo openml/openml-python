@@ -58,7 +58,9 @@ class OpenMLSplit:  # noqa: PLW1641
 
         # TODO(eddiebergman): Better error message
         if any(len(self.split[0]) != len(self.split[i]) for i in range(self.repeats)):
-            raise ValueError("")
+            raise ValueError(
+                "Each repetition must contain the same number of folds."
+            )
 
         self.folds = len(self.split[0])
         self.samples = len(self.split[0][0])
@@ -116,6 +118,13 @@ class OpenMLSplit:  # noqa: PLW1641
             attrnames = [attr[0] for attr in file_data["attributes"]]
 
             repetitions = OrderedDict()
+
+            required_attributes = {"type", "rowid", "repeat", "fold"}
+            missing = required_attributes - set(attrnames)
+            if missing:
+                raise ValueError(
+                    f"Split ARFF file is missing required attribute(s): {', '.join(sorted(missing))}"
+                )
 
             type_idx = attrnames.index("type")
             rowid_idx = attrnames.index("rowid")
