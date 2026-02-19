@@ -17,7 +17,7 @@ class OpenMLSplitTest(TestBase):
 
     def setUp(self):
         __file__ = inspect.getfile(OpenMLSplitTest)
-        self.directory = os.path.dirname(__file__)
+        self.directory = os.path.dirname(__file__)  # noqa: PTH120
         # This is for dataset
         self.arff_filepath = (
             Path(self.directory).parent
@@ -32,15 +32,15 @@ class OpenMLSplitTest(TestBase):
         self.pd_filename = self.arff_filepath.with_suffix(".pkl.py3")
 
     def tearDown(self):
-        try:
-            os.remove(self.pd_filename)
+        try:  # noqa: SIM105
+            os.remove(self.pd_filename)  # noqa: PTH107
         except (OSError, FileNotFoundError):
             #  Replaced bare except. Not sure why these exceptions are acceptable.
             pass
 
     def test_eq(self):
         split = OpenMLSplit._from_arff_file(self.arff_filepath)
-        assert split == split
+        assert split == split  # noqa: PLR0124
 
         split2 = OpenMLSplit._from_arff_file(self.arff_filepath)
         split2.name = "a"
@@ -82,14 +82,14 @@ class OpenMLSplitTest(TestBase):
         train_split, test_split = split.get(fold=5, repeat=2)
         assert train_split.shape[0] == 808
         assert test_split.shape[0] == 90
-        self.assertRaisesRegex(
+        self.assertRaisesRegex(  # noqa: PT027
             ValueError,
             "Repeat 10 not known",
             split.get,
             10,
             2,
         )
-        self.assertRaisesRegex(
+        self.assertRaisesRegex(  # noqa: PT027
             ValueError,
             "Fold 10 not known",
             split.get,

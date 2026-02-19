@@ -20,7 +20,7 @@ class Split(NamedTuple):
     test: np.ndarray
 
 
-class OpenMLSplit:  # noqa: PLW1641
+class OpenMLSplit:  # noqa: PLW1641, RUF100
     """OpenML Split object.
 
     This class manages train-test splits for a dataset across multiple

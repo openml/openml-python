@@ -607,7 +607,7 @@ class OpenMLRun(OpenMLBase):
             values_correct[rep][fold][samp].append(correct)
 
         scores = []
-        for rep in values_predict:  # noqa: PLC0206
+        for rep in values_predict:  # noqa: PLC0206, RUF100
             for fold in values_predict[rep]:
                 last_sample = len(values_predict[rep][fold]) - 1
                 y_pred = values_predict[rep][fold][last_sample]

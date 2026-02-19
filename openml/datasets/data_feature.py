@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from IPython.lib import pretty
 
 
-class OpenMLDataFeature:  # noqa: PLW1641
+class OpenMLDataFeature:  # noqa: PLW1641, RUF100
     """
     Data Feature (a.k.a. Attribute) object.
 

@@ -147,9 +147,6 @@ output-format = "grouped"
 unsafe-fixes = true
 
 exclude = [
-  # TODO(eddiebergman): Tests should be re-enabled after the refactor
-  "tests",
-  #
   ".bzr",
   ".direnv",
   ".eggs",

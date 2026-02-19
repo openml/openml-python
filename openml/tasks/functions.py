@@ -38,7 +38,7 @@ def _get_cached_tasks() -> dict[int, OpenMLTask]:
         OpenMLTask.
     """
     task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
-    directory_content = os.listdir(task_cache_dir)  # noqa: PTH208
+    directory_content = os.listdir(task_cache_dir)  # noqa: PTH208, RUF100
     directory_content.sort()
 
     # Find all dataset ids for which we have downloaded the dataset
