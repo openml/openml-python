@@ -58,9 +58,7 @@ class OpenMLSplit:  # noqa: PLW1641
 
         # TODO(eddiebergman): Better error message
         if any(len(self.split[0]) != len(self.split[i]) for i in range(self.repeats)):
-            raise ValueError(
-                "Each repetition must contain the same number of folds."
-            )
+            raise ValueError("Each repetition must contain the same number of folds.")
 
         self.folds = len(self.split[0])
         self.samples = len(self.split[0][0])
