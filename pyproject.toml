@@ -174,7 +174,7 @@ exclude = [
 
 # Exclude a variety of commonly ignored directories.
 [tool.ruff.lint.per-file-ignores]
-"tests/*.py" = [
+"tests/**/*.py" = [
   "D100",   # Undocumented public module
   "D101",   # Missing docstring in public class
   "D102",   # Missing docstring in public method
@@ -309,6 +309,7 @@ convention = "numpy"
 [tool.mypy]
 python_version = "3.10"
 packages = ["openml"]
+explicit_package_bases = true
 
 show_error_codes = true
 
@@ -327,11 +328,61 @@ check_untyped_defs = true
 warn_return_any = true
 
 [[tool.mypy.overrides]]
-module = ["tests.*", "openml.extensions.sklearn.*"]
+module = [
+  # Files that are being skipped because of the mypy version upgrade from v1.13.0 to v1.19.1
+  "examples._external_or_deprecated.upload_amlb_flows_and_runs",
+  "examples._external_or_deprecated.run_setup_tutorial",
+  "examples._external_or_deprecated.flows_and_runs_tutorial",
+  "examples._external_or_deprecated.flow_id_tutorial",
+  "examples._external_or_deprecated.fetch_runtimes_tutorial",
+  "examples._external_or_deprecated.benchmark_with_optunahub",
+  "examples._external_or_deprecated.2018_neurips_perrone_example",
+  "examples._external_or_deprecated.2018_ida_strang_example",
+  "examples._external_or_deprecated.2015_neurips_feurer_example",
+  "examples.Basics.simple_tasks_tutorial",
+  "examples.Basics.simple_suites_tutorial",
+  "examples.Basics.simple_flows_and_runs_tutorial",
+  "examples.Basics.simple_datasets_tutorial",
+  "examples.Advanced.task_manual_iteration_tutorial",
+  "examples.Advanced.study_tutorial",
+  "examples.Advanced.fetch_evaluations_tutorial",
+  "examples.Advanced.datasets_tutorial",
+  "examples.Advanced.create_upload_tutorial",
+
+  # Files that need to be fixed after removing the entire tests directory from skipping mypy checks
+  "tests.conftest",
+  "tests.test_datasets.test_dataset",
+  "tests.test_datasets.test_dataset_functions",
+  "tests.test_evaluations.test_evaluation_functions",
+  "tests.test_evaluations.test_evaluations_example",
+  "tests.test_extensions.test_functions",
+  "tests.test_flows.dummy_learn.dummy_forest",
+  "tests.test_flows.test_flow",
+  "tests.test_flows.test_flow_functions",
+  "tests.test_openml.test_api_calls",
+  "tests.test_openml.test_cli",
+  "tests.test_openml.test_config",
+  "tests.test_openml.test_openml",
+  "tests.test_runs.test_run",
+  "tests.test_runs.test_run_functions",
+  "tests.test_runs.test_trace",
+  "tests.test_setups.test_setup_functions",
+  "tests.test_study.test_study_functions",
+  "tests.test_tasks.test_classification_task",
+  "tests.test_tasks.test_clustering_task",
+  "tests.test_tasks.test_learning_curve_task",
+  "tests.test_tasks.test_regression_task",
+  "tests.test_tasks.test_split",
+  "tests.test_tasks.test_supervised_task",
+  "tests.test_tasks.test_task",
+  "tests.test_tasks.test_task_functions",
+  "tests.test_tasks.test_task_methods",
+  "tests.test_utils.test_utils",
+  ]
 
 # TODO(eddiebergman): This should be re-enabled after tests get refactored
 ignore_errors = true
-#disallow_untyped_defs = false          # Sometimes we just want to ignore verbose types
-#disallow_untyped_decorators = false    # Test decorators are not properly typed
-#disallow_incomplete_defs = false       # Sometimes we just want to ignore verbose types
-#disable_error_code = ["var-annotated"]
+disallow_untyped_defs = false          # Sometimes we just want to ignore verbose types
+disallow_untyped_decorators = false    # Test decorators are not properly typed
+disallow_incomplete_defs = false       # Sometimes we just want to ignore verbose types
+disable_error_code = ["var-annotated"]
