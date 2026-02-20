@@ -3,10 +3,12 @@ from __future__ import annotations
 
 import pytest
 import unittest
+from unittest import mock
 
 import openml
 import openml.study
 from openml.testing import TestBase
+from pathlib import Path
 
 
 class TestStudyFunctions(TestBase):
@@ -74,8 +76,25 @@ class TestStudyFunctions(TestBase):
         ):
             openml.study.get_suite(123)
 
-    @pytest.mark.test_server()
-    def test_publish_benchmark_suite(self):
+    @mock.patch("openml._api_calls._perform_api_call")
+    def test_publish_benchmark_suite(self,mock_api):
+        base = Path(__file__).parents[1] / "files" / "mock_responses" / "studies" / "benchmark_suite"
+
+        def read_xml(name):
+            xml_path = base / name
+            xml = xml_path.read_text()
+            return xml
+
+        mock_api.side_effect = [  
+            read_xml("study_publish_benchmark_suite.xml"),  # publish  
+            read_xml("study_get_suite_created.xml"),        # first get_suite  
+            read_xml("study_attach_to_study.xml"),          # attach  
+            read_xml("study_get_suite_after_attach.xml"),   # get_suite after attach  
+            read_xml("study_detach_from_study.xml"),        # detach  
+            read_xml("study_get_suite_after_detach.xml"),   # get_suite after detach  
+            read_xml("study_update_suite_status.xml"),      # update status  
+            read_xml("study_get_suite_final.xml"),          # final get_suite  
+        ]
         fixture_alias = None
         fixture_name = "unit tested benchmark suite"
         fixture_descr = "bla"
@@ -143,17 +162,58 @@ class TestStudyFunctions(TestBase):
         assert study_downloaded.main_entity_type == "run"
         assert study_downloaded.runs is None
 
-    @pytest.mark.test_server()
-    def test_publish_empty_study_explicit(self):
+    @mock.patch("openml._api_calls._perform_api_call")
+    def test_publish_empty_study_explicit(self,mock_api):
+        base = Path(__file__).parents[1] / "files" / "mock_responses" / "studies" / "empty_study"
+
+        def read_xml(name):
+            return (base / name).read_text()
+        mock_api.side_effect = [
+            read_xml("post_study_empty.xml"),
+            read_xml("get_study_empty.xml"),
+            
+        ]
         self._test_publish_empty_study_is_allowed(explicit=True)
 
-    @pytest.mark.test_server()
-    def test_publish_empty_study_implicit(self):
+
+    @mock.patch("openml._api_calls._perform_api_call")
+    def test_publish_empty_study_implicit(self,mock_api):
+        base = Path(__file__).parents[1] / "files" / "mock_responses" / "studies" / "empty_study"
+
+        def read_xml(name):
+            return (base / name).read_text()
+
+        mock_api.side_effect = [
+            read_xml("post_study_empty.xml"),
+            read_xml("get_study_empty.xml"),
+            
+        ]
         self._test_publish_empty_study_is_allowed(explicit=False)
 
     @pytest.mark.flaky()
-    @pytest.mark.test_server()
-    def test_publish_study(self):
+    @mock.patch("openml._api_calls._perform_api_call")
+    def test_publish_study(self,mock_api):
+        base = Path(__file__).parents[1] / "files" / "mock_responses" / "studies" / "publish_study"
+
+        def read_xml(name):
+            return (base / name).read_text()
+        mock_api.side_effect = [
+            read_xml("get_evaluation_list_function_predictive_accuracy_limit_10_offset_0.xml"),
+            read_xml("get_user_list_user_id_3229.xml"),
+            read_xml("post_study_.xml"),
+            read_xml("get_study_157.xml"),
+            read_xml("get_run_list_limit_10000_offset_0_study_157.xml"),
+            read_xml("get_evaluation_list_function_predictive_accuracy_limit_10000_offset_0_study_157.xml"),
+            read_xml("get_user_list_user_id_3229.xml"),
+            read_xml("get_run_list_limit_11_offset_10.xml"),
+            read_xml("post_study_157_attach.xml"),
+            read_xml("get_study_157_after_attach.xml"),
+            read_xml("post_study_157_detach.xml"),
+            read_xml("get_study_157_after_detach.xml"),
+            read_xml("post_study_status_update.xml"),
+            read_xml("get_study_157_final.xml"),
+            read_xml("delete_study_157.xml"),
+        ]
         # get some random runs to attach
         run_list = openml.evaluations.list_evaluations("predictive_accuracy", size=10)
         assert len(run_list) == 10
@@ -222,8 +282,24 @@ class TestStudyFunctions(TestBase):
         res = openml.study.delete_study(study.id)
         assert res
 
-    @pytest.mark.test_server()
-    def test_study_attach_illegal(self):
+    @mock.patch("openml._api_calls._perform_api_call")
+    def test_study_attach_illegal(self,mock_api):
+        base = Path(__file__).parents[1] / "files" / "mock_responses" / "studies" /"illegal_attach"
+        def read_xml(name):
+            return (base / name).read_text()
+        mock_api.side_effect = [
+            read_xml("get_run_list_limit_10_offset_0.xml"),   # list_runs(10)
+            read_xml("get_run_list_limit_20_offset_0.xml"),   # list_runs(20)
+            read_xml("post_study_illegal.xml"),                      # publish
+            read_xml("get_study_created.xml"),                # get_study after publish
+
+            # attach illegal → raises server error
+            openml.exceptions.OpenMLServerException("Problem attaching entities."),
+            openml.exceptions.OpenMLServerException("Problem attaching entities."),
+
+            read_xml("get_study_after_illegal_attach.xml"),   # final get_study
+            read_xml("delete_study.xml"),                     # delete
+        ]
         run_list = openml.runs.list_runs(size=10)
         assert len(run_list) == 10
         run_list_more = openml.runs.list_runs(size=20)

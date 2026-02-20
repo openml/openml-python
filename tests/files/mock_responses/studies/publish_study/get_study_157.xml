@@ -1,0 +1,62 @@
+<oml:study xmlns:oml="http://openml.org/openml">
+  <oml:id>157</oml:id>
+    <oml:main_entity_type>run</oml:main_entity_type>
+    <oml:name>unit tested study</oml:name>
+  <oml:description>bla</oml:description>
+  <oml:visibility>public</oml:visibility>
+  <oml:status>in_preparation</oml:status>
+  <oml:creation_date>2026-02-20T02:19:45</oml:creation_date>
+  <oml:creator>3229</oml:creator>
+    
+    <oml:data>
+        <oml:data_id>20</oml:data_id>
+        <oml:data_id>2</oml:data_id>
+        <oml:data_id>128</oml:data_id>
+        <oml:data_id>4</oml:data_id>
+      </oml:data>
+    
+    <oml:tasks>
+        <oml:task_id>119</oml:task_id>
+        <oml:task_id>115</oml:task_id>
+        <oml:task_id>11</oml:task_id>
+        <oml:task_id>1196</oml:task_id>
+        <oml:task_id>19</oml:task_id>
+      </oml:tasks>
+    
+    <oml:flows>
+        <oml:flow_id>44</oml:flow_id>
+        <oml:flow_id>54</oml:flow_id>
+        <oml:flow_id>64</oml:flow_id>
+        <oml:flow_id>65</oml:flow_id>
+        <oml:flow_id>67</oml:flow_id>
+        <oml:flow_id>70</oml:flow_id>
+        <oml:flow_id>73</oml:flow_id>
+        <oml:flow_id>469</oml:flow_id>
+      </oml:flows>
+    
+    <oml:setups>
+        <oml:setup_id>1</oml:setup_id>
+        <oml:setup_id>3</oml:setup_id>
+        <oml:setup_id>5</oml:setup_id>
+        <oml:setup_id>6</oml:setup_id>
+        <oml:setup_id>7</oml:setup_id>
+        <oml:setup_id>8</oml:setup_id>
+        <oml:setup_id>10</oml:setup_id>
+        <oml:setup_id>11</oml:setup_id>
+        <oml:setup_id>89</oml:setup_id>
+      </oml:setups>
+    
+    <oml:runs>
+        <oml:run_id>1</oml:run_id>
+        <oml:run_id>3</oml:run_id>
+        <oml:run_id>5</oml:run_id>
+        <oml:run_id>6</oml:run_id>
+        <oml:run_id>7</oml:run_id>
+        <oml:run_id>8</oml:run_id>
+        <oml:run_id>10</oml:run_id>
+        <oml:run_id>11</oml:run_id>
+        <oml:run_id>95</oml:run_id>
+        <oml:run_id>96</oml:run_id>
+      </oml:runs>
+    
+</oml:study>

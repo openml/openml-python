@@ -1,0 +1,112 @@
+<oml:evaluations xmlns:oml="http://openml.org/openml">
+    <oml:evaluation>
+    <oml:run_id>1</oml:run_id>
+    <oml:uploader>3229</oml:uploader>
+    <oml:task_id>119</oml:task_id>
+    <oml:setup_id>1</oml:setup_id>
+    <oml:flow_id>44</oml:flow_id>
+    <oml:flow_name>TEST5b99b6a6b2sklearn.pipeline.Pipeline(cat_handling=sklearn.compose._column_transformer.ColumnTransformer(cat=sklearn.preprocessing._encoders.OneHotEncoder),imp=sklearn.impute._base.SimpleImputer,classifier=sklearn.dummy.DummyClassifier)(1)</oml:flow_name>
+        <oml:data_id>20</oml:data_id>    <oml:data_name>diabetes</oml:data_name>    <oml:evaluation_engine_id>1</oml:evaluation_engine_id>
+    <oml:function>predictive_accuracy</oml:function>
+    <oml:upload_time>2026-01-20 10:50:04</oml:upload_time>
+    <oml:value>0.6363636363636364</oml:value>          </oml:evaluation>
+    <oml:evaluation>
+    <oml:run_id>3</oml:run_id>
+    <oml:uploader>3229</oml:uploader>
+    <oml:task_id>119</oml:task_id>
+    <oml:setup_id>3</oml:setup_id>
+    <oml:flow_id>54</oml:flow_id>
+    <oml:flow_name>TEST159a17beacsklearn.pipeline.Pipeline(cat_handling=sklearn.compose._column_transformer.ColumnTransformer(cat=sklearn.preprocessing._encoders.OneHotEncoder),imp=sklearn.impute._base.SimpleImputer,classifier=sklearn.dummy.DummyClassifier)(1)</oml:flow_name>
+        <oml:data_id>20</oml:data_id>    <oml:data_name>diabetes</oml:data_name>    <oml:evaluation_engine_id>1</oml:evaluation_engine_id>
+    <oml:function>predictive_accuracy</oml:function>
+    <oml:upload_time>2026-01-20 10:50:12</oml:upload_time>
+    <oml:value>0.6363636363636364</oml:value>          </oml:evaluation>
+    <oml:evaluation>
+    <oml:run_id>5</oml:run_id>
+    <oml:uploader>3229</oml:uploader>
+    <oml:task_id>119</oml:task_id>
+    <oml:setup_id>5</oml:setup_id>
+    <oml:flow_id>64</oml:flow_id>
+    <oml:flow_name>sklearn.model_selection._search.GridSearchCV(estimator=sklearn.pipeline.Pipeline(imputer=sklearn.impute._base.SimpleImputer,classifier=sklearn.tree._classes.DecisionTreeClassifier))(1)</oml:flow_name>
+        <oml:data_id>20</oml:data_id>    <oml:data_name>diabetes</oml:data_name>    <oml:evaluation_engine_id>1</oml:evaluation_engine_id>
+    <oml:function>predictive_accuracy</oml:function>
+    <oml:upload_time>2026-01-20 10:50:21</oml:upload_time>
+    <oml:value>0.7193675889328063</oml:value>          </oml:evaluation>
+    <oml:evaluation>
+    <oml:run_id>6</oml:run_id>
+    <oml:uploader>3229</oml:uploader>
+    <oml:task_id>119</oml:task_id>
+    <oml:setup_id>6</oml:setup_id>
+    <oml:flow_id>65</oml:flow_id>
+    <oml:flow_name>sklearn.pipeline.Pipeline(imputer=sklearn.impute._base.SimpleImputer,classifier=sklearn.tree._classes.DecisionTreeClassifier)(1)</oml:flow_name>
+        <oml:data_id>20</oml:data_id>    <oml:data_name>diabetes</oml:data_name>    <oml:evaluation_engine_id>1</oml:evaluation_engine_id>
+    <oml:function>predictive_accuracy</oml:function>
+    <oml:upload_time>2026-01-20 10:50:23</oml:upload_time>
+    <oml:value>0.6956521739130435</oml:value>          </oml:evaluation>
+    <oml:evaluation>
+    <oml:run_id>7</oml:run_id>
+    <oml:uploader>3229</oml:uploader>
+    <oml:task_id>115</oml:task_id>
+    <oml:setup_id>7</oml:setup_id>
+    <oml:flow_id>67</oml:flow_id>
+    <oml:flow_name>sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,VarianceThreshold=sklearn.feature_selection._variance_threshold.VarianceThreshold,Estimator=sklearn.tree._classes.DecisionTreeClassifier)(1)</oml:flow_name>
+        <oml:data_id>20</oml:data_id>    <oml:data_name>diabetes</oml:data_name>    <oml:evaluation_engine_id>1</oml:evaluation_engine_id>
+    <oml:function>predictive_accuracy</oml:function>
+    <oml:upload_time>2026-01-20 10:50:26</oml:upload_time>
+    <oml:value>0.7317708333333333</oml:value>          </oml:evaluation>
+    <oml:evaluation>
+    <oml:run_id>8</oml:run_id>
+    <oml:uploader>3229</oml:uploader>
+    <oml:task_id>115</oml:task_id>
+    <oml:setup_id>8</oml:setup_id>
+    <oml:flow_id>67</oml:flow_id>
+    <oml:flow_name>sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,VarianceThreshold=sklearn.feature_selection._variance_threshold.VarianceThreshold,Estimator=sklearn.tree._classes.DecisionTreeClassifier)(1)</oml:flow_name>
+        <oml:data_id>20</oml:data_id>    <oml:data_name>diabetes</oml:data_name>    <oml:evaluation_engine_id>1</oml:evaluation_engine_id>
+    <oml:function>predictive_accuracy</oml:function>
+    <oml:upload_time>2026-01-20 10:50:28</oml:upload_time>
+    <oml:value>0.7317708333333333</oml:value>          </oml:evaluation>
+    <oml:evaluation>
+    <oml:run_id>10</oml:run_id>
+    <oml:uploader>3229</oml:uploader>
+    <oml:task_id>11</oml:task_id>
+    <oml:setup_id>10</oml:setup_id>
+    <oml:flow_id>70</oml:flow_id>
+    <oml:flow_name>sklearn.pipeline.Pipeline(enc=sklearn.preprocessing._encoders.OneHotEncoder,rs=sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier))(1)</oml:flow_name>
+        <oml:data_id>2</oml:data_id>    <oml:data_name>kr-vs-kp</oml:data_name>    <oml:evaluation_engine_id>1</oml:evaluation_engine_id>
+    <oml:function>predictive_accuracy</oml:function>
+    <oml:upload_time>2026-01-20 10:51:19</oml:upload_time>
+    <oml:value>0.903225806451613</oml:value>          </oml:evaluation>
+    <oml:evaluation>
+    <oml:run_id>11</oml:run_id>
+    <oml:uploader>3229</oml:uploader>
+    <oml:task_id>1196</oml:task_id>
+    <oml:setup_id>11</oml:setup_id>
+    <oml:flow_id>73</oml:flow_id>
+    <oml:flow_name>sklearn.pipeline.Pipeline(Imputer=sklearn.impute._base.SimpleImputer,VarianceThreshold=sklearn.feature_selection._variance_threshold.VarianceThreshold,Estimator=sklearn.naive_bayes.GaussianNB)(1)</oml:flow_name>
+        <oml:data_id>128</oml:data_id>    <oml:data_name>iris</oml:data_name>    <oml:evaluation_engine_id>1</oml:evaluation_engine_id>
+    <oml:function>predictive_accuracy</oml:function>
+    <oml:upload_time>2026-01-20 10:51:22</oml:upload_time>
+    <oml:value>0.96</oml:value>          </oml:evaluation>
+    <oml:evaluation>
+    <oml:run_id>95</oml:run_id>
+    <oml:uploader>3229</oml:uploader>
+    <oml:task_id>19</oml:task_id>
+    <oml:setup_id>89</oml:setup_id>
+    <oml:flow_id>469</oml:flow_id>
+    <oml:flow_name>sklearn.neighbors._classification.KNeighborsClassifier(1)</oml:flow_name>
+        <oml:data_id>4</oml:data_id>    <oml:data_name>balance-scale</oml:data_name>    <oml:evaluation_engine_id>1</oml:evaluation_engine_id>
+    <oml:function>predictive_accuracy</oml:function>
+    <oml:upload_time>2026-01-30 07:15:48</oml:upload_time>
+    <oml:value>0.8416</oml:value>          </oml:evaluation>
+    <oml:evaluation>
+    <oml:run_id>96</oml:run_id>
+    <oml:uploader>3229</oml:uploader>
+    <oml:task_id>19</oml:task_id>
+    <oml:setup_id>89</oml:setup_id>
+    <oml:flow_id>469</oml:flow_id>
+    <oml:flow_name>sklearn.neighbors._classification.KNeighborsClassifier(1)</oml:flow_name>
+        <oml:data_id>4</oml:data_id>    <oml:data_name>balance-scale</oml:data_name>    <oml:evaluation_engine_id>1</oml:evaluation_engine_id>
+    <oml:function>predictive_accuracy</oml:function>
+    <oml:upload_time>2026-01-30 07:16:59</oml:upload_time>
+    <oml:value>0.8416</oml:value>          </oml:evaluation>
+  </oml:evaluations>

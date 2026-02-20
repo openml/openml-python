@@ -1,0 +1,27 @@
+<oml:study xmlns:oml="http://openml.org/openml">
+  <oml:id>146</oml:id>
+    <oml:main_entity_type>task</oml:main_entity_type>
+    <oml:name>unit tested benchmark suite</oml:name>
+  <oml:description>bla</oml:description>
+  <oml:visibility>public</oml:visibility>
+  <oml:status>in_preparation</oml:status>
+  <oml:creation_date>2026-02-19T17:27:58</oml:creation_date>
+  <oml:creator>3229</oml:creator>
+    
+    <oml:data>
+        <oml:data_id>1</oml:data_id>
+      </oml:data>
+    
+    <oml:tasks>
+        <oml:task_id>1</oml:task_id>
+        <oml:task_id>2</oml:task_id>
+        <oml:task_id>3</oml:task_id>
+        <oml:task_id>4</oml:task_id>
+        <oml:task_id>5</oml:task_id>
+        <oml:task_id>6</oml:task_id>
+      </oml:tasks>
+    
+    
+    
+    
+</oml:study>

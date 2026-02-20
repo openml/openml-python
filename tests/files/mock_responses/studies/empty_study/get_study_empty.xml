@@ -1,0 +1,26 @@
+<oml:study xmlns:oml="http://openml.org/openml">
+  <oml:id>160</oml:id>
+    <oml:main_entity_type>run</oml:main_entity_type>
+    <oml:name>empty-study-explicit</oml:name>
+  <oml:description>a study with no runs attached explicitly</oml:description>
+  <oml:visibility>public</oml:visibility>
+  <oml:status>in_preparation</oml:status>
+  <oml:creation_date>2026-02-20T02:44:50</oml:creation_date>
+  <oml:creator>3229</oml:creator>
+    
+    <oml:data>
+      </oml:data>
+    
+    <oml:tasks>
+      </oml:tasks>
+    
+    <oml:flows>
+      </oml:flows>
+    
+    <oml:setups>
+      </oml:setups>
+    
+    <oml:runs>
+      </oml:runs>
+    
+</oml:study>
