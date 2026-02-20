@@ -253,7 +253,7 @@ class HTTPClient:
         """
         content_type = response.headers.get("Content-Type", "").lower()
 
-        if "json" in content_type:
+        if "application/json" in content_type:
             server_exception = response.json()
             server_error = server_exception["detail"]
             code = server_error.get("code")
