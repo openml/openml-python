@@ -61,5 +61,9 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         task = task.publish()
 
         assert task.id == 1
-        mock_create_task.assert_called()
+        mock_create_task.assert_called_once_with(
+            task_type=self.task_type,
+            dataset_id=36,
+            estimation_procedure_id=self.estimation_procedure,
+        )
         mock_task.publish.assert_called_once()
