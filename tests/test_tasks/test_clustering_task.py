@@ -30,8 +30,6 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
 
 
     @mock.patch("tests.test_tasks.test_task.get_task")
-
-    @mock.patch("tests.test_tasks.test_task.get_task")
     def test_download_task(self, mock_get_task):
         mock_task = mock.Mock()
         mock_task.task_id = self.task_id
