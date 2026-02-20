@@ -46,23 +46,20 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         mock_get_task.assert_called_with(self.task_id)
 
     @mock.patch("openml.tasks.create_task")
-    @mock.patch("openml.datasets.list_datasets")
-    def test_upload_task(self, mock_list_datasets, mock_create_task):
-        # Mocking _get_compatible_rand_dataset return value
-        with mock.patch.object(self, "_get_compatible_rand_dataset", return_value=[36]):
-            mock_task = mock.Mock()
-            mock_task.publish.return_value = mock_task
-            mock_task.id = 1
-            mock_create_task.return_value = mock_task
+    def test_upload_task(self, mock_create_task):
+        mock_task = mock.Mock()
+        mock_task.publish.return_value = mock_task
+        mock_task.id = 1
+        mock_create_task.return_value = mock_task
 
-            # Triggering the test
-            task = openml.tasks.create_task(
-                task_type=self.task_type,
-                dataset_id=36,
-                estimation_procedure_id=self.estimation_procedure,
-            )
-            task = task.publish()
+        # Triggering the test
+        task = openml.tasks.create_task(
+            task_type=self.task_type,
+            dataset_id=36,
+            estimation_procedure_id=self.estimation_procedure,
+        )
+        task = task.publish()
 
-            assert task.id == 1
-            mock_create_task.assert_called()
-            mock_task.publish.assert_called_once()
+        assert task.id == 1
+        mock_create_task.assert_called()
+        mock_task.publish.assert_called_once()
