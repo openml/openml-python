@@ -18,13 +18,14 @@ class APIConfig:
         Base server URL for the API.
     base_url : str
         API-specific base path appended to the server URL.
-    api_key : str
-        API key used for authentication.
+    api_key : str | None, default=None
+        API key used for authentication. If None, requests are made
+        without authentication.
     """
 
     server: str
     base_url: str
-    api_key: str
+    api_key: str | None = None
 
 
 @dataclass
@@ -74,12 +75,12 @@ class Config:
             APIVersion.V1: APIConfig(
                 server="https://www.openml.org/",
                 base_url="api/v1/xml/",
-                api_key="",
+                api_key=None,
             ),
             APIVersion.V2: APIConfig(
                 server="http://localhost:8002/",
                 base_url="",
-                api_key="",
+                api_key=None,
             ),
         }
     )

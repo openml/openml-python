@@ -19,8 +19,8 @@ from requests import Response
 from openml.__version__ import __version__
 from openml.enums import RetryPolicy
 from openml.exceptions import (
+    OpenMLAuthenticationError,
     OpenMLHashException,
-    OpenMLNotAuthorizedError,
     OpenMLServerError,
     OpenMLServerException,
     OpenMLServerNoResult,
@@ -203,8 +203,9 @@ class HTTPClient:
         Base server URL (e.g., ``https://www.openml.org``).
     base_url : str
         Base API path appended to the server URL.
-    api_key : str
-        API key used for authenticated endpoints.
+    api_key : str | None
+        API key used for authenticated endpoints. If None, authenticated
+        requests cannot be performed.
     retries : int
         Maximum number of retry attempts for failed requests.
     retry_policy : RetryPolicy
@@ -218,7 +219,7 @@ class HTTPClient:
         *,
         server: str,
         base_url: str,
-        api_key: str,
+        api_key: str | None,
         retries: int,
         retry_policy: RetryPolicy,
         cache: HTTPCache,
@@ -361,23 +362,6 @@ class HTTPClient:
         if code in [163] and files is not None and "description" in files:
             # file_elements['description'] is the XML file description of the flow
             message = f"\n{files['description']}\n{message}"
-
-        if code in [
-            102,  # flow/exists post
-            137,  # dataset post
-            350,  # dataset/42 delete
-            310,  # flow/<something> post
-            320,  # flow/42 delete
-            400,  # run/42 delete
-            460,  # task/42 delete
-        ]:
-            raise OpenMLNotAuthorizedError(
-                message=(
-                    f"The API call {url} requires authentication via an API key.\nPlease configure "
-                    "OpenML-Python to use your API as described in this example:"
-                    "\nhttps://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/#authentication"
-                )
-            )
 
         # Propagate all server errors to the calling functions, except
         # for 107 which represents a database connection error.
@@ -589,6 +573,15 @@ class HTTPClient:
         data = request_kwargs.pop("data", {}).copy()
 
         if use_api_key:
+            if self.api_key is None:
+                raise OpenMLAuthenticationError(
+                    message=(
+                        f"The API call {url} requires authentication via an API key. "
+                        "Please configure OpenML-Python to use your API "
+                        "as described in this example: "
+                        "https://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/#authentication"
+                    )
+                )
             params["api_key"] = self.api_key
 
         if method.upper() in {"POST", "PUT", "PATCH"}:
