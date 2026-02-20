@@ -371,6 +371,7 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         return self_keys == other_keys and all(
             self.__dict__[key] == other.__dict__[key] for key in self_keys
         )
+
     def _download_data(self) -> None:
         """Download ARFF data file to standard cache directory. Set `self.data_file`."""
         # import required here to avoid circular import.
