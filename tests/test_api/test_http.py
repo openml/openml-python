@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 from openml.enums import APIVersion
+from openml.exceptions import OpenMLAuthenticationError
 from openml._api import HTTPClient
 
 
@@ -122,6 +123,23 @@ class TestHTTPClient(TestAPIBase):
         self.assertNotEqual(response1_cache_time_stamp, response2_cache_time_stamp)
         self.assertEqual(response2.status_code, 200)
         self.assertEqual(response1.content, response2.content)
+
+    @pytest.mark.uses_test_server()
+    def test_get_with_api_key(self):
+        response = self.http_client.get("task/1", use_api_key=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"<oml:task", response.content)
+
+    @pytest.mark.uses_test_server()
+    def test_get_without_api_key_raises(self):
+        api_key = self.http_client.api_key
+        self.http_client.api_key = None
+
+        with pytest.raises(OpenMLAuthenticationError):
+            self.http_client.get("task/1", use_api_key=True)
+
+        self.http_client.api_key = api_key
 
     @pytest.mark.uses_test_server()
     def test_download_creates_file(self):
