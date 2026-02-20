@@ -138,6 +138,9 @@ markers = [
   "cache: anything that interacts with the (test) cache",
   "test_server: tests that require the OpenML test server",
 ]
+norecursedirs = [
+    "tests/files/localhost_8000",
+]
 
 # https://github.com/charliermarsh/ruff
 [tool.ruff]
