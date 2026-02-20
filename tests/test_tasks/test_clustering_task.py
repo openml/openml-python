@@ -22,13 +22,19 @@ class OpenMLClusteringTaskTest(OpenMLTaskTest):
         self.task_type = TaskType.CLUSTERING
         self.estimation_procedure = 17
 
+    @mock.patch("openml.tasks.get_task")
     @mock.patch("openml.datasets.get_dataset")
-    def test_get_dataset(self, mock_get_dataset):
+    def test_get_dataset(self, mock_get_dataset, mock_get_task):
+        mock_task = mock.Mock()
+        mock_task.dataset_id = 36
+        mock_task.get_dataset = lambda: openml.datasets.get_dataset(mock_task.dataset_id)
+        mock_get_task.return_value = mock_task
+
         task = openml.tasks.get_task(self.task_id)
         task.get_dataset()
-        mock_get_dataset.assert_called_once_with(task.dataset_id)
 
-
+        mock_get_task.assert_called_once_with(self.task_id)
+        mock_get_dataset.assert_called_once_with(mock_task.dataset_id)
     @mock.patch("tests.test_tasks.test_task.get_task")
     def test_download_task(self, mock_get_task):
         mock_task = mock.Mock()
