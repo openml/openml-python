@@ -3,6 +3,8 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import math
+import random
 import time
 import xml
 from collections.abc import Callable, Mapping
@@ -232,6 +234,45 @@ class HTTPClient:
             self._human_delay if retry_policy == RetryPolicy.HUMAN else self._robot_delay
         )
         self.headers: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
+
+    def _robot_delay(self, n: int) -> float:
+        """
+        Compute delay for automated retry policy.
+
+        Parameters
+        ----------
+        n : int
+            Current retry attempt number (1-based).
+
+        Returns
+        -------
+        float
+            Number of seconds to wait before the next retry.
+
+        Notes
+        -----
+        Uses a sigmoid-based growth curve with Gaussian noise to gradually
+        increase waiting time.
+        """
+        wait = (1 / (1 + math.exp(-(n * 0.5 - 4)))) * 60
+        variation = random.gauss(0, wait / 10)
+        return max(1.0, wait + variation)
+
+    def _human_delay(self, n: int) -> float:
+        """
+        Compute delay for human-like retry policy.
+
+        Parameters
+        ----------
+        n : int
+            Current retry attempt number (1-based).
+
+        Returns
+        -------
+        float
+            Number of seconds to wait before the next retry.
+        """
+        return max(1.0, n)
 
     def _parse_exception_response(
         self,
