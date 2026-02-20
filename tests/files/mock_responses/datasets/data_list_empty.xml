@@ -1,0 +1,4 @@
+<oml:error xmlns:oml="http://openml.org/openml">
+  <oml:code>111</oml:code>
+  <oml:message>No results</oml:message>
+</oml:error>

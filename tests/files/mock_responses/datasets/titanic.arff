@@ -1,0 +1,1327 @@
+@relation titanic
+
+@attribute pclass INTEGER
+@attribute survived {0,1}
+@attribute name STRING
+@attribute sex {male,female}
+@attribute age REAL
+@attribute sibsp INTEGER
+@attribute parch INTEGER
+@attribute ticket STRING
+@attribute fare REAL
+@attribute cabin STRING
+@attribute embarked {S,C,Q}
+@attribute boat STRING
+@attribute body REAL
+@attribute 'home.dest' STRING
+
+@data
+3,0,"Passenger, No1",male,17.9,1,0,"T98696",111.3465,?,S,?,?,"New York, NY"
+1,0,"Passenger, No2",female,41.7,0,1,"T65392",35.3185,"C96",S,?,?,"New York, NY"
+3,1,"Passenger, No3",male,38.0,3,0,"T82357",127.5848,"C102",Q,?,?,"New York, NY"
+2,0,"Passenger, No4",male,27.2,3,2,"T31319",45.8539,?,Q,"Boat6",?,?
+2,1,"Passenger, No5",female,45.2,4,1,"T99733",154.8211,?,S,"Boat13",?,?
+3,1,"Passenger, No6",male,28.3,3,1,"T44718",150.2729,?,Q,?,131.6,?
+1,1,"Passenger, No7",male,60.4,1,1,"T99192",17.3879,?,C,?,282.5,?
+3,0,"Passenger, No8",female,24.5,2,3,"T30730",190.9941,"C77",Q,"Boat4",98.6,"New York, NY"
+3,0,"Passenger, No9",male,12.1,4,0,"T88504",8.798,"C88",S,?,310.7,?
+2,0,"Passenger, No10",male,?,3,4,"T31643",175.1244,?,S,"Boat7",?,?
+3,1,"Passenger, No11",female,32.2,1,1,"T18392",119.7202,?,S,?,?,?
+1,0,"Passenger, No12",female,?,1,2,"T97684",110.1506,"C131",S,"Boat14",?,?
+2,1,"Passenger, No13",female,60.6,0,0,"T17944",71.164,"C73",S,?,?,"New York, NY"
+2,1,"Passenger, No14",male,6.2,4,0,"T16630",110.4146,?,S,"Boat8",?,"New York, NY"
+1,1,"Passenger, No15",male,?,0,3,"T44760",158.1002,?,Q,"Boat16",?,?
+1,0,"Passenger, No16",female,?,4,3,"T75909",108.5696,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No17",female,?,4,1,"T85880",125.7794,?,Q,?,?,?
+3,1,"Passenger, No18",male,10.0,2,3,"T51441",187.4682,?,Q,"Boat4",?,?
+2,0,"Passenger, No19",female,61.7,2,2,"T30676",110.9275,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No20",male,62.4,4,1,"T45697",46.0728,?,Q,"Boat9",?,?
+1,0,"Passenger, No21",female,4.0,2,1,"T93507",36.5085,?,Q,?,?,?
+3,0,"Passenger, No22",male,41.2,1,3,"T26704",76.107,"C20",C,?,?,?
+3,1,"Passenger, No23",male,17.3,1,1,"T64040",148.6301,?,C,"Boat8",?,"New York, NY"
+1,1,"Passenger, No24",male,16.3,3,2,"T50001",174.908,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No25",female,59.2,2,0,"T25118",55.937,?,C,?,?,?
+2,1,"Passenger, No26",male,40.8,2,0,"T67154",?,"C147",Q,"Boat7",?,?
+3,1,"Passenger, No27",female,9.6,2,4,"T50538",68.6057,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No28",female,58.5,2,2,"T37549",118.097,?,C,?,?,"New York, NY"
+3,0,"Passenger, No29",male,46.8,4,2,"T22240",151.4719,?,S,"Boat5",?,?
+2,0,"Passenger, No30",female,44.5,1,3,"T74799",33.7764,?,S,"Boat8",?,"New York, NY"
+3,1,"Passenger, No31",male,64.3,0,3,"T27477",135.1777,"C91",C,"Boat14",180.2,"New York, NY"
+3,1,"Passenger, No32",female,18.1,2,4,"T73517",58.5465,?,C,?,?,"New York, NY"
+1,0,"Passenger, No33",male,48.9,1,0,"T64377",110.8092,?,S,"Boat13",192.0,"New York, NY"
+3,1,"Passenger, No34",female,?,2,2,"T61116",190.9189,?,Q,"Boat8",?,?
+2,0,"Passenger, No35",female,47.9,3,1,"T71261",196.2408,?,C,?,?,?
+2,0,"Passenger, No36",female,?,2,3,"T52906",68.7349,"C107",C,"Boat14",?,?
+1,0,"Passenger, No37",female,5.7,0,0,"T42411",8.9741,?,S,?,?,"New York, NY"
+2,1,"Passenger, No38",female,?,4,0,"T31465",26.0793,?,C,?,123.7,"New York, NY"
+1,0,"Passenger, No39",male,?,2,4,"T25866",115.3568,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No40",female,8.3,2,3,"T30052",148.0901,"C79",Q,"Boat16",?,"New York, NY"
+3,1,"Passenger, No41",female,58.3,0,2,"T69087",95.6182,?,C,?,?,?
+2,0,"Passenger, No42",female,24.5,4,2,"T82848",189.8722,?,Q,?,?,?
+2,1,"Passenger, No43",female,7.4,1,3,"T41890",118.4033,?,Q,?,181.0,?
+2,1,"Passenger, No44",female,9.3,1,2,"T25670",190.4211,?,S,?,?,"New York, NY"
+3,1,"Passenger, No45",male,21.4,2,1,"T49618",109.1563,?,S,?,?,?
+2,0,"Passenger, No46",male,33.4,3,2,"T34164",54.2333,"C39",S,?,?,"New York, NY"
+1,0,"Passenger, No47",male,66.5,0,1,"T25525",86.1539,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No48",female,43.9,4,0,"T37235",56.606,?,S,?,?,?
+2,1,"Passenger, No49",female,?,2,2,"T69510",50.5176,?,Q,?,65.7,?
+1,0,"Passenger, No50",female,5.9,1,2,"T87993",115.9954,?,S,?,?,"New York, NY"
+2,1,"Passenger, No51",female,?,0,3,"T52247",10.0437,?,Q,"Boat1",220.8,?
+1,0,"Passenger, No52",female,31.5,2,1,"T86720",163.7778,"C130",C,?,?,?
+1,1,"Passenger, No53",female,20.9,3,4,"T14809",66.3308,?,C,"Boat1",?,"New York, NY"
+2,0,"Passenger, No54",male,44.0,3,3,"T16764",112.0978,"C122",Q,?,?,"New York, NY"
+1,0,"Passenger, No55",female,39.1,0,1,"T24871",27.9059,"C137",Q,?,?,"New York, NY"
+2,1,"Passenger, No56",male,11.0,1,4,"T76616",31.6191,?,C,?,?,?
+1,1,"Passenger, No57",female,41.0,3,1,"T68529",72.2992,?,Q,?,285.4,"New York, NY"
+1,1,"Passenger, No58",male,29.3,2,3,"T59968",134.4193,"C48",C,"Boat5",?,"New York, NY"
+1,1,"Passenger, No59",male,32.5,1,3,"T95823",19.5915,"C77",C,"Boat13",?,"New York, NY"
+3,1,"Passenger, No60",female,62.2,3,4,"T14705",50.7802,?,C,"Boat3",?,?
+3,0,"Passenger, No61",female,?,2,0,"T16028",15.9432,?,C,?,?,"New York, NY"
+1,0,"Passenger, No62",male,?,3,4,"T99539",183.0017,?,C,"Boat15",?,?
+2,1,"Passenger, No63",male,?,2,4,"T49210",87.7402,?,C,?,?,"New York, NY"
+1,1,"Passenger, No64",female,69.5,2,0,"T96275",6.5791,"C22",Q,"Boat10",?,?
+2,0,"Passenger, No65",male,47.8,1,0,"T92242",65.2419,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No66",male,55.3,2,4,"T75771",166.9422,?,C,"Boat10",?,?
+1,1,"Passenger, No67",male,?,1,3,"T83048",159.183,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No68",female,?,1,3,"T13280",188.918,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No69",female,?,0,0,"T49893",27.6435,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No70",male,46.2,3,4,"T63492",59.5493,?,S,?,280.7,?
+3,1,"Passenger, No71",female,?,2,1,"T26011",165.7173,?,S,"Boat1",?,?
+1,0,"Passenger, No72",male,39.2,4,1,"T40539",33.7731,"C10",C,"Boat5",177.7,"New York, NY"
+1,0,"Passenger, No73",male,?,1,4,"T52437",56.7467,?,C,?,?,"New York, NY"
+2,0,"Passenger, No74",female,66.2,0,4,"T49535",192.9851,?,C,"Boat14",?,"New York, NY"
+2,0,"Passenger, No75",male,11.2,1,2,"T91830",111.9295,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No76",male,62.3,3,2,"T69441",147.2744,?,C,"Boat12",225.6,"New York, NY"
+1,0,"Passenger, No77",male,52.4,2,1,"T82924",191.5418,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No78",female,25.3,4,4,"T37884",99.0269,"C99",Q,?,?,"New York, NY"
+2,0,"Passenger, No79",female,?,2,2,"T54541",40.3741,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No80",male,32.3,1,2,"T50846",156.4829,?,S,"Boat5",?,"New York, NY"
+3,0,"Passenger, No81",female,30.3,4,3,"T64287",152.2139,?,C,?,?,"New York, NY"
+3,1,"Passenger, No82",male,68.9,0,0,"T36794",46.1906,?,C,?,?,"New York, NY"
+2,0,"Passenger, No83",male,49.6,4,4,"T97562",19.0547,"C20",C,?,282.9,"New York, NY"
+3,1,"Passenger, No84",female,28.9,2,1,"T91018",139.474,?,C,"Boat8",?,"New York, NY"
+1,1,"Passenger, No85",female,16.3,1,0,"T76910",108.4679,?,C,?,212.1,?
+1,0,"Passenger, No86",female,?,4,1,"T95918",190.502,?,C,"Boat15",?,"New York, NY"
+3,1,"Passenger, No87",female,?,0,3,"T67961",160.2843,?,C,?,?,"New York, NY"
+1,1,"Passenger, No88",female,?,0,4,"T87867",95.2288,?,Q,"Boat15",187.9,?
+3,1,"Passenger, No89",male,32.1,2,0,"T76132",12.6327,"C122",Q,?,?,?
+2,1,"Passenger, No90",female,47.8,0,2,"T18639",113.8028,?,C,"Boat5",?,"New York, NY"
+1,1,"Passenger, No91",female,49.2,3,1,"T87993",21.5202,?,Q,"Boat5",?,"New York, NY"
+3,0,"Passenger, No92",female,2.3,2,1,"T38074",154.4005,?,S,?,?,"New York, NY"
+3,0,"Passenger, No93",female,43.6,4,3,"T30218",167.1123,"C52",Q,?,?,"New York, NY"
+1,1,"Passenger, No94",female,55.1,1,4,"T41348",162.6817,?,S,?,322.9,"New York, NY"
+2,1,"Passenger, No95",female,57.4,4,1,"T42768",98.7152,?,S,"Boat4",?,"New York, NY"
+2,1,"Passenger, No96",male,7.3,1,3,"T55820",85.9049,?,C,?,123.6,?
+1,1,"Passenger, No97",male,?,2,3,"T28191",96.4765,?,S,?,?,?
+3,1,"Passenger, No98",male,17.4,0,0,"T41252",159.8103,?,S,"Boat16",?,?
+3,0,"Passenger, No99",male,1.1,2,1,"T84798",134.5524,?,C,?,?,"New York, NY"
+3,0,"Passenger, No100",female,4.0,3,2,"T43246",74.6333,?,S,"Boat4",?,"New York, NY"
+2,0,"Passenger, No101",male,24.4,1,3,"T72722",163.242,?,C,?,?,"New York, NY"
+1,1,"Passenger, No102",female,69.2,4,3,"T43202",131.1456,?,S,"Boat11",?,"New York, NY"
+2,1,"Passenger, No103",female,27.7,1,3,"T75211",160.4717,?,S,"Boat3",?,"New York, NY"
+1,1,"Passenger, No104",female,?,2,2,"T50173",144.9443,?,C,?,?,"New York, NY"
+2,1,"Passenger, No105",female,55.6,0,0,"T97973",75.8457,"C50",S,?,?,"New York, NY"
+1,0,"Passenger, No106",male,45.5,2,3,"T84349",34.9204,?,C,?,?,"New York, NY"
+3,1,"Passenger, No107",female,20.2,0,0,"T34385",80.4625,?,C,"Boat15",?,"New York, NY"
+3,1,"Passenger, No108",male,?,0,3,"T32630",91.7967,?,Q,"Boat11",?,"New York, NY"
+3,1,"Passenger, No109",female,50.1,1,2,"T76683",197.1008,"C70",C,?,?,?
+3,0,"Passenger, No110",male,?,3,3,"T78903",84.8395,?,S,"Boat3",?,"New York, NY"
+2,0,"Passenger, No111",male,9.9,4,0,"T26274",64.3043,?,Q,?,170.7,?
+1,1,"Passenger, No112",male,39.0,1,2,"T90534",103.0018,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No113",male,3.0,0,4,"T44688",154.557,?,Q,?,179.4,"New York, NY"
+2,1,"Passenger, No114",male,48.3,2,3,"T19564",35.8257,?,C,?,?,?
+3,1,"Passenger, No115",female,10.0,2,4,"T83616",52.1389,?,C,?,?,?
+2,1,"Passenger, No116",male,63.3,2,4,"T50988",36.0718,"C129",C,"Boat16",?,"New York, NY"
+3,1,"Passenger, No117",male,25.3,0,2,"T74866",169.3557,?,C,?,141.9,"New York, NY"
+3,1,"Passenger, No118",female,28.6,4,4,"T35513",61.2773,?,C,"Boat9",204.8,"New York, NY"
+1,0,"Passenger, No119",female,69.1,4,2,"T28909",104.2789,?,S,?,?,"New York, NY"
+3,1,"Passenger, No120",male,36.6,2,4,"T51750",198.1701,"C86",Q,?,175.1,"New York, NY"
+2,1,"Passenger, No121",male,47.5,3,4,"T50327",146.4382,?,S,?,?,"New York, NY"
+3,0,"Passenger, No122",male,12.8,4,3,"T29369",52.2283,?,Q,?,?,?
+1,1,"Passenger, No123",male,54.5,3,0,"T28098",114.3729,"C132",Q,?,151.3,"New York, NY"
+3,1,"Passenger, No124",female,14.3,1,2,"T83149",188.5897,"C83",Q,?,?,?
+2,1,"Passenger, No125",female,?,4,3,"T61712",191.1487,"C84",S,?,?,?
+2,1,"Passenger, No126",female,58.1,2,4,"T45601",125.057,?,S,?,74.8,?
+1,1,"Passenger, No127",female,7.9,1,0,"T82135",35.7985,?,C,?,?,"New York, NY"
+2,1,"Passenger, No128",male,7.2,4,1,"T80143",170.815,?,S,?,306.4,?
+2,1,"Passenger, No129",male,67.4,2,0,"T11214",122.5427,"C95",C,?,?,"New York, NY"
+1,1,"Passenger, No130",female,?,0,2,"T31298",131.4156,"C13",Q,?,?,"New York, NY"
+1,0,"Passenger, No131",female,36.6,0,3,"T97720",196.4286,?,S,?,?,"New York, NY"
+2,1,"Passenger, No132",female,40.5,2,2,"T40972",28.0538,?,C,"Boat10",?,"New York, NY"
+2,1,"Passenger, No133",male,10.2,1,3,"T89395",141.8784,"C147",Q,"Boat8",?,"New York, NY"
+1,1,"Passenger, No134",female,?,4,0,"T18094",181.0632,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No135",female,?,4,3,"T17292",105.0833,?,S,?,?,?
+1,1,"Passenger, No136",female,52.5,4,0,"T15936",141.5751,?,S,"Boat3",155.4,?
+1,0,"Passenger, No137",female,62.5,3,3,"T59236",193.0082,"C44",Q,"Boat4",?,"New York, NY"
+3,0,"Passenger, No138",male,53.2,2,3,"T98276",87.705,?,S,?,?,?
+3,0,"Passenger, No139",male,29.9,0,1,"T37011",120.8191,?,Q,"Boat2",?,?
+2,0,"Passenger, No140",male,54.5,1,4,"T47914",183.6974,?,Q,?,?,?
+2,0,"Passenger, No141",male,20.0,4,4,"T32955",88.3041,?,C,"Boat13",?,?
+2,1,"Passenger, No142",male,13.7,4,3,"T41584",63.6436,"C128",S,?,183.2,?
+1,1,"Passenger, No143",male,6.5,3,2,"T22119",166.7342,?,C,"Boat2",62.5,"New York, NY"
+3,0,"Passenger, No144",female,63.6,2,0,"T37762",192.6051,?,C,"Boat7",?,?
+2,1,"Passenger, No145",female,45.8,2,2,"T57139",101.9691,?,Q,?,300.0,?
+2,0,"Passenger, No146",male,2.1,4,4,"T85909",62.5625,?,S,?,164.3,"New York, NY"
+3,1,"Passenger, No147",female,34.7,3,3,"T32050",73.6744,?,Q,?,178.3,"New York, NY"
+1,0,"Passenger, No148",male,47.1,0,3,"T28021",50.1295,"C12",S,?,?,"New York, NY"
+3,1,"Passenger, No149",female,?,4,4,"T63914",108.2364,?,C,?,221.4,"New York, NY"
+1,0,"Passenger, No150",male,17.6,4,4,"T43084",57.1283,?,C,"Boat15",?,"New York, NY"
+1,1,"Passenger, No151",male,60.2,0,0,"T63120",112.7768,?,S,"Boat3",?,"New York, NY"
+2,0,"Passenger, No152",male,63.2,4,3,"T45532",19.4979,"C149",Q,"Boat6",103.8,"New York, NY"
+3,0,"Passenger, No153",female,21.7,4,1,"T84277",80.8855,"C94",C,"Boat5",?,"New York, NY"
+1,1,"Passenger, No154",male,?,1,0,"T54642",124.7037,?,C,?,?,"New York, NY"
+2,0,"Passenger, No155",female,26.9,1,4,"T96595",155.5726,?,S,"Boat3",?,?
+3,0,"Passenger, No156",female,8.4,0,2,"T68292",57.6045,?,S,?,?,"New York, NY"
+1,0,"Passenger, No157",male,7.4,4,2,"T60493",85.693,"C72",Q,?,?,?
+2,1,"Passenger, No158",female,5.4,3,2,"T65194",157.62,?,S,"Boat16",?,?
+1,0,"Passenger, No159",female,?,3,2,"T91289",173.1287,?,C,"Boat5",?,"New York, NY"
+3,0,"Passenger, No160",female,67.6,2,2,"T92955",117.2965,?,C,?,?,?
+3,0,"Passenger, No161",male,39.0,3,1,"T67469",167.1,?,C,"Boat5",?,?
+3,0,"Passenger, No162",female,6.1,4,3,"T86315",103.7895,"C117",Q,?,230.4,"New York, NY"
+3,0,"Passenger, No163",male,46.4,2,1,"T94803",114.828,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No164",male,?,1,4,"T77999",139.0946,?,C,?,?,"New York, NY"
+3,0,"Passenger, No165",female,34.3,2,3,"T21253",188.4319,?,C,?,?,"New York, NY"
+2,1,"Passenger, No166",male,49.1,2,0,"T49356",143.6019,?,C,"Boat6",243.1,"New York, NY"
+3,0,"Passenger, No167",female,67.1,1,3,"T92543",129.8934,?,S,"Boat7",?,"New York, NY"
+1,0,"Passenger, No168",male,49.6,0,4,"T23336",109.6934,?,S,?,?,"New York, NY"
+3,1,"Passenger, No169",female,41.5,2,2,"T70012",163.679,"C86",Q,?,?,?
+1,1,"Passenger, No170",male,?,1,4,"T60916",31.8841,?,S,?,?,"New York, NY"
+1,0,"Passenger, No171",female,13.9,3,4,"T17026",190.6092,?,S,"Boat16",?,"New York, NY"
+3,1,"Passenger, No172",female,?,4,0,"T38905",58.5963,?,S,"Boat16",?,?
+1,1,"Passenger, No173",female,53.2,3,4,"T38644",24.9712,"C73",C,"Boat2",?,?
+1,1,"Passenger, No174",male,17.3,4,2,"T89988",37.3664,?,S,"Boat2",?,"New York, NY"
+3,0,"Passenger, No175",female,21.2,4,2,"T77425",137.4634,?,C,"Boat9",42.5,"New York, NY"
+1,0,"Passenger, No176",female,53.5,3,3,"T28634",57.3998,?,C,?,?,"New York, NY"
+2,1,"Passenger, No177",female,34.7,4,0,"T22208",94.3976,?,C,"Boat13",?,"New York, NY"
+1,1,"Passenger, No178",female,20.6,4,4,"T27117",99.6409,?,Q,"Boat2",?,"New York, NY"
+2,0,"Passenger, No179",male,11.9,3,0,"T66072",139.2754,?,Q,?,287.6,?
+2,1,"Passenger, No180",male,63.4,1,0,"T61949",146.5677,"C119",Q,?,?,?
+1,0,"Passenger, No181",male,31.7,0,2,"T25806",87.3512,?,S,?,?,"New York, NY"
+1,1,"Passenger, No182",female,10.5,1,1,"T18966",6.6526,?,C,?,?,"New York, NY"
+2,1,"Passenger, No183",male,?,0,1,"T26142",79.8862,"C90",S,?,?,?
+3,1,"Passenger, No184",male,46.4,2,1,"T77862",41.7861,?,Q,?,313.2,"New York, NY"
+1,0,"Passenger, No185",female,5.9,0,2,"T51480",172.8587,?,C,?,?,"New York, NY"
+1,0,"Passenger, No186",male,?,1,0,"T17925",82.6051,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No187",female,?,0,4,"T36633",35.2985,?,Q,"Boat3",?,"New York, NY"
+1,0,"Passenger, No188",male,?,3,0,"T69424",15.7306,?,Q,"Boat4",?,?
+1,0,"Passenger, No189",female,37.1,2,1,"T58741",157.3192,?,S,"Boat1",?,"New York, NY"
+3,0,"Passenger, No190",female,40.8,0,3,"T69663",15.8106,"C52",C,?,?,"New York, NY"
+3,0,"Passenger, No191",male,1.2,0,1,"T16026",79.681,?,S,?,243.2,"New York, NY"
+2,0,"Passenger, No192",female,23.1,0,4,"T58864",136.2985,?,S,"Boat2",23.5,"New York, NY"
+2,1,"Passenger, No193",female,?,3,0,"T58354",114.9423,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No194",male,?,3,0,"T40539",129.0087,?,S,"Boat1",?,?
+3,1,"Passenger, No195",male,68.8,3,3,"T17850",32.7628,?,S,"Boat14",?,?
+3,0,"Passenger, No196",male,45.0,3,0,"T87580",89.8217,"C70",C,?,?,"New York, NY"
+3,1,"Passenger, No197",female,17.1,1,1,"T86638",25.6033,?,C,?,?,"New York, NY"
+1,1,"Passenger, No198",female,59.8,0,1,"T99922",142.4174,?,S,"Boat11",?,"New York, NY"
+2,1,"Passenger, No199",male,19.0,1,0,"T63004",113.411,?,S,?,46.7,?
+1,0,"Passenger, No200",male,26.7,0,4,"T86823",163.4857,?,S,?,?,"New York, NY"
+1,1,"Passenger, No201",male,?,3,0,"T32018",89.4655,"C137",S,?,?,?
+1,1,"Passenger, No202",female,11.3,4,4,"T90868",62.5455,?,Q,?,?,?
+2,0,"Passenger, No203",male,56.3,0,3,"T57069",157.3798,?,Q,?,?,?
+2,0,"Passenger, No204",male,54.7,0,3,"T79393",118.8778,?,S,?,?,?
+3,0,"Passenger, No205",male,68.8,3,2,"T32768",120.5413,"C101",Q,?,?,"New York, NY"
+3,0,"Passenger, No206",male,56.9,3,4,"T50508",12.4029,?,Q,?,?,?
+3,0,"Passenger, No207",male,13.2,2,0,"T12872",142.4158,?,S,"Boat12",123.2,"New York, NY"
+2,0,"Passenger, No208",female,10.4,1,3,"T93789",131.5902,?,Q,"Boat12",?,"New York, NY"
+1,1,"Passenger, No209",female,21.3,1,0,"T85082",198.8852,"C18",S,"Boat8",?,?
+2,0,"Passenger, No210",female,17.4,2,1,"T93386",22.3016,"C95",C,?,?,"New York, NY"
+2,1,"Passenger, No211",male,4.3,3,3,"T31802",101.151,?,Q,?,258.9,"New York, NY"
+3,0,"Passenger, No212",male,56.1,0,2,"T12631",190.5741,?,S,"Boat6",?,"New York, NY"
+1,1,"Passenger, No213",female,30.8,1,4,"T66911",24.7453,?,S,?,?,"New York, NY"
+3,1,"Passenger, No214",female,7.6,3,4,"T82045",34.95,?,C,?,205.4,"New York, NY"
+1,0,"Passenger, No215",male,?,2,0,"T72071",65.1289,?,C,"Boat9",?,"New York, NY"
+1,1,"Passenger, No216",female,31.8,2,3,"T70956",168.2304,?,S,"Boat4",?,?
+3,1,"Passenger, No217",male,59.0,4,3,"T80190",187.5905,?,S,?,?,"New York, NY"
+3,0,"Passenger, No218",male,?,3,1,"T31910",162.6498,?,C,?,?,?
+3,0,"Passenger, No219",female,51.2,0,0,"T60868",112.6506,"C143",C,"Boat1",?,"New York, NY"
+3,1,"Passenger, No220",male,11.2,4,4,"T23133",114.7233,?,C,"Boat12",87.4,"New York, NY"
+3,1,"Passenger, No221",male,?,3,1,"T91034",140.2639,?,C,"Boat2",?,"New York, NY"
+2,0,"Passenger, No222",female,21.9,2,3,"T99764",174.4355,?,Q,?,89.1,"New York, NY"
+3,0,"Passenger, No223",male,64.0,3,3,"T77698",165.0984,?,S,?,?,"New York, NY"
+3,0,"Passenger, No224",male,?,1,0,"T42701",14.8591,?,S,?,166.2,"New York, NY"
+1,0,"Passenger, No225",male,42.0,1,3,"T86923",72.1286,"C76",Q,"Boat3",?,?
+1,0,"Passenger, No226",male,47.8,2,3,"T77276",157.1592,"C12",C,"Boat6",?,?
+2,1,"Passenger, No227",female,27.0,2,3,"T43029",63.9183,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No228",female,8.5,0,2,"T46239",172.9909,?,Q,"Boat10",?,"New York, NY"
+1,0,"Passenger, No229",female,48.0,0,3,"T48745",86.6203,?,S,?,267.8,?
+3,0,"Passenger, No230",female,47.4,4,2,"T32280",175.9165,?,S,?,?,"New York, NY"
+3,0,"Passenger, No231",female,16.3,1,2,"T65112",69.6068,?,C,?,?,?
+3,0,"Passenger, No232",female,35.5,3,4,"T49106",174.8156,?,S,?,293.0,"New York, NY"
+1,1,"Passenger, No233",male,34.6,1,2,"T93165",93.1504,?,S,?,?,"New York, NY"
+1,0,"Passenger, No234",female,28.8,3,3,"T10611",43.8858,?,S,"Boat7",?,?
+3,0,"Passenger, No235",male,24.8,1,0,"T60272",64.6924,?,S,?,?,"New York, NY"
+3,1,"Passenger, No236",female,69.7,2,3,"T57087",37.1523,"C113",S,?,?,?
+3,0,"Passenger, No237",male,?,0,3,"T93928",109.273,?,S,"Boat1",?,?
+2,1,"Passenger, No238",male,33.7,1,1,"T99881",63.7177,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No239",male,55.1,3,1,"T89823",56.2838,?,S,?,?,?
+3,1,"Passenger, No240",male,34.2,1,0,"T11671",181.8416,"C136",S,"Boat3",?,?
+2,0,"Passenger, No241",female,21.4,3,0,"T23082",175.4574,"C102",Q,?,?,?
+1,0,"Passenger, No242",male,12.8,2,3,"T91501",147.9482,?,C,?,?,"New York, NY"
+2,1,"Passenger, No243",female,45.8,1,0,"T27368",16.436,"C50",S,?,?,"New York, NY"
+3,1,"Passenger, No244",male,54.8,4,0,"T99714",146.8193,"C133",C,?,?,?
+2,1,"Passenger, No245",male,47.8,4,4,"T39358",135.6196,?,Q,"Boat4",?,"New York, NY"
+2,1,"Passenger, No246",female,?,4,4,"T17152",187.2024,?,C,"Boat6",?,"New York, NY"
+1,1,"Passenger, No247",female,?,1,4,"T94320",164.3351,?,C,"Boat15",?,"New York, NY"
+2,0,"Passenger, No248",female,2.2,3,3,"T14696",5.0331,?,Q,"Boat10",184.9,"New York, NY"
+2,1,"Passenger, No249",female,57.3,3,2,"T83420",121.9905,"C103",Q,?,?,"New York, NY"
+1,1,"Passenger, No250",female,67.5,2,4,"T78417",25.7328,"C136",S,"Boat14",?,"New York, NY"
+1,0,"Passenger, No251",female,57.9,1,2,"T24125",14.0676,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No252",female,?,0,4,"T66729",99.1717,?,S,"Boat6",?,?
+2,1,"Passenger, No253",female,43.0,1,2,"T62149",194.2459,?,S,?,?,"New York, NY"
+3,1,"Passenger, No254",female,65.6,1,1,"T37487",61.663,?,Q,?,?,"New York, NY"
+1,1,"Passenger, No255",male,39.8,4,4,"T97445",136.4775,"C146",C,"Boat14",171.9,?
+1,0,"Passenger, No256",male,?,1,2,"T99573",168.6795,?,C,?,?,?
+2,0,"Passenger, No257",male,39.7,1,4,"T47701",14.1611,?,C,"Boat11",18.6,"New York, NY"
+1,1,"Passenger, No258",male,49.6,2,4,"T81645",43.3115,"C59",C,?,25.4,"New York, NY"
+3,0,"Passenger, No259",female,?,2,4,"T44634",118.8773,?,C,?,14.1,"New York, NY"
+3,0,"Passenger, No260",female,40.5,2,0,"T51662",191.6126,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No261",male,23.8,2,1,"T91039",199.3431,"C12",S,"Boat15",?,"New York, NY"
+3,0,"Passenger, No262",male,23.1,0,3,"T43631",60.1517,"C105",Q,"Boat15",?,?
+3,0,"Passenger, No263",female,66.4,1,4,"T79888",?,?,Q,"Boat7",139.7,?
+3,1,"Passenger, No264",male,11.6,3,2,"T14965",15.5823,"C28",Q,"Boat9",?,"New York, NY"
+2,1,"Passenger, No265",female,?,0,4,"T10773",125.5781,"C21",Q,"Boat12",35.7,"New York, NY"
+2,0,"Passenger, No266",female,31.2,3,0,"T72126",47.8738,"C149",C,"Boat5",?,"New York, NY"
+3,1,"Passenger, No267",male,39.3,0,0,"T10659",81.8459,?,S,?,?,"New York, NY"
+2,0,"Passenger, No268",female,59.8,1,1,"T34116",167.7759,?,S,"Boat2",305.9,"New York, NY"
+2,0,"Passenger, No269",female,18.3,1,4,"T73857",74.642,?,S,?,?,"New York, NY"
+2,1,"Passenger, No270",female,46.5,4,1,"T84128",162.5015,"C53",S,?,?,"New York, NY"
+3,1,"Passenger, No271",female,10.3,2,3,"T70666",156.0796,?,S,?,?,"New York, NY"
+1,0,"Passenger, No272",female,44.2,0,0,"T76476",163.4653,?,Q,?,?,?
+3,1,"Passenger, No273",male,16.4,4,2,"T27548",104.5303,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No274",male,13.4,4,1,"T73373",12.8819,"C69",S,?,?,"New York, NY"
+3,1,"Passenger, No275",female,32.4,0,0,"T95003",142.2286,?,C,"Boat9",?,"New York, NY"
+2,1,"Passenger, No276",female,63.0,0,4,"T42975",181.9123,?,C,"Boat12",?,"New York, NY"
+3,0,"Passenger, No277",male,16.9,4,2,"T37723",35.6847,?,S,"Boat14",236.5,"New York, NY"
+2,1,"Passenger, No278",male,45.7,3,0,"T41938",116.8299,?,Q,?,49.0,?
+1,1,"Passenger, No279",male,51.2,2,0,"T38389",198.5913,"C53",S,"Boat5",?,"New York, NY"
+1,1,"Passenger, No280",male,24.6,3,4,"T87410",78.7512,?,S,?,165.9,"New York, NY"
+1,0,"Passenger, No281",male,43.4,0,4,"T75972",23.172,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No282",female,4.0,4,3,"T40079",99.0141,"C99",Q,"Boat4",?,?
+1,0,"Passenger, No283",female,38.5,2,1,"T10716",158.9374,?,S,?,?,?
+2,1,"Passenger, No284",female,?,3,4,"T43244",109.5405,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No285",male,39.3,2,2,"T85713",142.5714,"C40",Q,?,?,"New York, NY"
+1,0,"Passenger, No286",female,56.3,4,0,"T31068",128.9959,"C47",C,"Boat14",?,?
+2,0,"Passenger, No287",male,65.2,3,4,"T96006",143.7631,?,S,"Boat15",?,"New York, NY"
+3,1,"Passenger, No288",male,?,4,4,"T77608",124.962,?,C,?,?,?
+2,1,"Passenger, No289",female,29.0,1,4,"T12014",18.3803,?,C,"Boat12",?,"New York, NY"
+1,0,"Passenger, No290",female,40.7,2,1,"T63363",113.933,?,C,"Boat9",266.9,"New York, NY"
+3,1,"Passenger, No291",female,54.1,2,3,"T99337",119.4312,?,S,?,?,"New York, NY"
+1,0,"Passenger, No292",female,25.4,4,0,"T44517",23.1368,?,C,?,156.8,?
+3,1,"Passenger, No293",male,48.1,1,3,"T36170",52.201,?,S,?,?,"New York, NY"
+1,0,"Passenger, No294",male,47.6,3,4,"T10868",110.5874,?,C,?,?,"New York, NY"
+3,1,"Passenger, No295",female,?,4,2,"T62150",117.4497,?,C,?,?,"New York, NY"
+2,0,"Passenger, No296",female,49.2,3,2,"T11103",46.0967,?,C,?,62.2,?
+2,1,"Passenger, No297",female,35.4,1,3,"T58799",83.1156,?,Q,?,?,?
+1,1,"Passenger, No298",male,60.1,1,1,"T29601",6.8997,?,S,"Boat11",?,?
+3,0,"Passenger, No299",female,?,1,0,"T38241",97.9252,?,C,"Boat9",?,"New York, NY"
+2,1,"Passenger, No300",male,25.2,4,1,"T85609",131.5805,?,C,?,?,"New York, NY"
+3,1,"Passenger, No301",male,20.8,1,1,"T93962",70.7907,?,Q,?,26.9,?
+2,1,"Passenger, No302",female,42.8,3,2,"T68313",188.0601,"C143",C,?,?,?
+3,0,"Passenger, No303",female,49.3,0,1,"T31877",23.633,"C131",Q,?,?,"New York, NY"
+1,0,"Passenger, No304",female,6.8,3,2,"T40062",60.4142,?,S,?,?,?
+2,1,"Passenger, No305",female,61.1,2,4,"T68306",189.9548,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No306",female,34.2,1,0,"T67915",85.3797,?,S,?,278.3,?
+2,0,"Passenger, No307",female,33.9,0,3,"T48393",160.3696,?,S,?,?,?
+1,1,"Passenger, No308",female,6.5,1,4,"T90375",138.5049,?,Q,?,?,?
+1,0,"Passenger, No309",male,44.9,4,3,"T45669",100.9392,?,S,?,?,?
+1,1,"Passenger, No310",female,?,3,0,"T40514",7.8713,?,C,?,?,"New York, NY"
+2,0,"Passenger, No311",female,?,1,0,"T44931",18.92,?,S,"Boat9",271.8,?
+3,0,"Passenger, No312",female,31.6,0,1,"T70402",23.3223,?,S,?,?,?
+2,0,"Passenger, No313",male,38.9,0,2,"T73075",43.7511,"C65",S,?,?,?
+2,0,"Passenger, No314",female,1.6,0,4,"T72294",35.2234,"C73",S,?,?,?
+3,0,"Passenger, No315",male,11.6,4,0,"T26492",66.7642,?,Q,"Boat15",?,?
+2,1,"Passenger, No316",male,3.7,3,4,"T48628",100.5679,?,Q,?,?,?
+3,0,"Passenger, No317",male,32.0,2,4,"T58118",156.304,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No318",female,46.4,4,3,"T34886",102.0221,?,Q,?,?,?
+1,0,"Passenger, No319",male,10.0,0,1,"T24031",24.2569,?,C,"Boat9",?,?
+3,0,"Passenger, No320",male,15.4,3,0,"T71349",16.8365,?,C,"Boat2",87.9,?
+1,1,"Passenger, No321",male,67.3,0,0,"T40279",41.9448,?,S,?,183.6,"New York, NY"
+3,0,"Passenger, No322",female,49.5,3,0,"T31864",112.2433,?,Q,?,145.9,?
+2,1,"Passenger, No323",female,44.7,2,4,"T41551",46.716,"C75",C,"Boat15",1.1,?
+2,0,"Passenger, No324",male,21.8,2,1,"T38157",9.2318,"C80",Q,?,?,"New York, NY"
+1,0,"Passenger, No325",female,10.6,2,4,"T42749",163.1595,?,C,?,?,?
+2,1,"Passenger, No326",male,63.0,4,0,"T88018",12.2875,"C107",S,"Boat11",?,"New York, NY"
+2,0,"Passenger, No327",male,59.6,0,3,"T17094",13.0305,?,S,?,?,?
+3,1,"Passenger, No328",female,40.7,0,1,"T66614",81.8929,?,S,?,?,"New York, NY"
+2,0,"Passenger, No329",female,54.4,1,1,"T73035",100.1329,?,S,?,172.4,?
+2,1,"Passenger, No330",female,40.7,0,3,"T65514",42.1455,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No331",male,64.8,1,1,"T99831",152.7581,"C38",Q,?,304.0,"New York, NY"
+2,0,"Passenger, No332",female,8.7,3,3,"T12981",149.3025,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No333",male,63.5,4,0,"T43483",60.3826,"C79",S,?,22.8,"New York, NY"
+3,1,"Passenger, No334",male,?,3,1,"T59899",143.3893,"C134",Q,?,?,"New York, NY"
+2,0,"Passenger, No335",male,37.5,2,3,"T61563",8.5826,?,C,"Boat8",321.0,?
+1,1,"Passenger, No336",female,57.2,0,4,"T46725",71.6483,?,S,?,?,"New York, NY"
+3,0,"Passenger, No337",female,11.5,2,4,"T53160",30.6956,?,Q,?,283.1,?
+3,0,"Passenger, No338",female,68.3,1,4,"T30715",113.6814,"C40",S,?,238.8,"New York, NY"
+2,1,"Passenger, No339",female,65.4,2,1,"T34632",41.0256,"C78",Q,?,?,?
+3,0,"Passenger, No340",female,?,3,1,"T75840",96.4089,?,S,"Boat16",?,?
+1,0,"Passenger, No341",female,2.0,2,3,"T39170",197.7075,"C26",S,"Boat15",161.2,?
+2,0,"Passenger, No342",female,3.9,3,2,"T61662",149.7812,?,Q,"Boat2",?,"New York, NY"
+1,0,"Passenger, No343",female,3.7,3,4,"T92660",42.0208,?,C,"Boat10",?,"New York, NY"
+3,0,"Passenger, No344",male,45.6,0,4,"T24833",119.1623,"C149",S,?,?,?
+2,0,"Passenger, No345",female,?,2,1,"T26193",142.7142,?,S,?,?,"New York, NY"
+3,0,"Passenger, No346",female,4.0,1,2,"T84120",173.2211,?,S,?,?,"New York, NY"
+2,1,"Passenger, No347",female,9.1,1,1,"T10463",54.3566,?,C,?,?,"New York, NY"
+1,0,"Passenger, No348",female,31.5,4,4,"T10861",111.7316,?,Q,"Boat7",?,?
+3,1,"Passenger, No349",male,?,0,4,"T89073",184.475,?,C,"Boat6",?,"New York, NY"
+3,0,"Passenger, No350",female,25.9,0,0,"T49229",180.0183,"C119",Q,?,?,?
+2,1,"Passenger, No351",female,49.0,4,0,"T24326",195.9732,?,S,?,?,"New York, NY"
+3,1,"Passenger, No352",female,22.8,4,4,"T91689",30.2941,?,Q,"Boat16",?,?
+3,0,"Passenger, No353",female,1.1,0,3,"T91980",148.8063,?,Q,"Boat14",?,?
+3,0,"Passenger, No354",male,48.6,2,0,"T50340",112.2488,"C39",Q,?,?,"New York, NY"
+1,0,"Passenger, No355",male,24.3,3,3,"T14660",98.8916,?,Q,"Boat15",?,"New York, NY"
+3,0,"Passenger, No356",female,47.8,4,4,"T12453",138.6712,"C100",S,"Boat9",111.9,?
+3,0,"Passenger, No357",female,?,0,2,"T51222",57.942,?,S,?,100.0,"New York, NY"
+1,0,"Passenger, No358",female,54.7,0,3,"T76321",99.1193,?,S,?,?,"New York, NY"
+2,1,"Passenger, No359",male,7.8,4,1,"T36894",94.5768,"C143",S,?,225.7,"New York, NY"
+1,1,"Passenger, No360",female,8.1,2,0,"T85701",129.5759,?,S,?,?,?
+2,0,"Passenger, No361",female,?,2,0,"T11999",114.127,?,Q,?,?,?
+3,1,"Passenger, No362",male,?,2,4,"T54399",14.8916,?,Q,?,?,?
+2,0,"Passenger, No363",female,22.6,1,4,"T20295",152.3699,?,S,?,229.4,?
+2,1,"Passenger, No364",female,16.4,4,2,"T57638",141.4249,?,C,?,?,"New York, NY"
+2,1,"Passenger, No365",female,20.5,2,4,"T85324",25.0718,"C37",C,?,?,?
+2,1,"Passenger, No366",female,17.8,1,3,"T60307",45.6064,?,C,"Boat14",?,?
+3,0,"Passenger, No367",male,6.4,4,3,"T24984",95.2671,?,C,?,23.8,?
+3,1,"Passenger, No368",female,46.6,0,1,"T28208",181.1349,?,S,"Boat5",?,?
+3,1,"Passenger, No369",male,61.5,2,4,"T99071",188.95,?,C,"Boat1",?,"New York, NY"
+1,1,"Passenger, No370",male,38.9,0,0,"T83404",75.0527,"C17",S,?,?,"New York, NY"
+3,1,"Passenger, No371",female,38.6,1,3,"T28228",79.996,"C116",S,?,42.1,?
+3,0,"Passenger, No372",male,34.6,3,1,"T21097",162.1586,"C118",Q,?,?,"New York, NY"
+2,1,"Passenger, No373",female,30.3,0,4,"T75294",51.1662,?,C,"Boat12",?,?
+2,1,"Passenger, No374",male,67.4,0,1,"T78997",196.8153,"C129",Q,?,29.9,"New York, NY"
+3,0,"Passenger, No375",female,63.3,4,0,"T71455",181.6807,?,C,?,262.0,?
+1,1,"Passenger, No376",female,?,3,4,"T32161",132.9824,?,Q,"Boat10",?,?
+1,1,"Passenger, No377",female,?,2,2,"T43679",26.7521,?,Q,"Boat15",?,?
+3,0,"Passenger, No378",female,?,4,0,"T54937",193.6324,?,S,"Boat14",?,?
+2,0,"Passenger, No379",male,59.1,0,2,"T25203",95.4829,?,C,"Boat8",?,"New York, NY"
+2,1,"Passenger, No380",male,31.0,2,3,"T60070",192.5437,?,S,?,?,?
+2,1,"Passenger, No381",female,56.4,2,4,"T61269",136.6818,?,Q,?,?,?
+3,0,"Passenger, No382",female,47.4,0,0,"T63903",25.2619,?,S,"Boat9",?,?
+1,0,"Passenger, No383",male,45.0,0,0,"T89257",132.997,"C57",S,"Boat9",?,"New York, NY"
+1,1,"Passenger, No384",female,48.8,2,2,"T31229",59.0711,?,C,?,?,"New York, NY"
+2,0,"Passenger, No385",female,?,1,4,"T61463",100.9512,?,C,?,?,"New York, NY"
+3,1,"Passenger, No386",male,?,0,4,"T42846",8.6591,?,Q,"Boat2",?,?
+3,1,"Passenger, No387",female,36.6,3,3,"T67154",146.9146,"C27",Q,?,?,"New York, NY"
+2,0,"Passenger, No388",female,21.9,0,0,"T57887",192.3805,?,C,"Boat10",?,?
+1,1,"Passenger, No389",male,27.9,0,2,"T73766",128.3943,"C45",S,?,?,"New York, NY"
+2,1,"Passenger, No390",male,45.4,3,4,"T68891",8.2016,?,C,"Boat2",?,?
+3,1,"Passenger, No391",male,17.1,0,0,"T28558",8.7173,"C21",S,"Boat5",?,"New York, NY"
+2,0,"Passenger, No392",female,58.6,0,0,"T24965",160.8392,?,S,?,322.2,"New York, NY"
+2,0,"Passenger, No393",male,67.6,1,0,"T87736",17.3283,?,C,?,?,?
+1,0,"Passenger, No394",male,?,4,3,"T30677",99.9587,?,S,"Boat10",?,"New York, NY"
+2,0,"Passenger, No395",male,?,2,4,"T69037",187.9275,?,S,?,?,"New York, NY"
+1,1,"Passenger, No396",female,39.5,1,0,"T79494",125.6896,"C148",Q,?,?,"New York, NY"
+2,0,"Passenger, No397",male,?,1,3,"T75210",135.6778,?,Q,?,?,?
+3,1,"Passenger, No398",male,?,0,4,"T33053",10.6677,?,S,"Boat15",?,?
+1,1,"Passenger, No399",male,23.5,0,1,"T64079",78.2288,?,C,?,?,"New York, NY"
+1,1,"Passenger, No400",male,10.4,1,2,"T45349",29.8063,?,S,?,?,"New York, NY"
+2,0,"Passenger, No401",female,21.4,1,4,"T32273",112.7873,?,C,"Boat16",71.8,"New York, NY"
+2,1,"Passenger, No402",male,51.8,1,1,"T52899",48.3693,"C48",Q,"Boat14",14.1,"New York, NY"
+3,0,"Passenger, No403",female,34.1,0,3,"T74918",113.905,?,Q,?,?,?
+1,0,"Passenger, No404",male,22.0,3,4,"T86501",93.694,"C113",S,"Boat12",?,"New York, NY"
+1,0,"Passenger, No405",female,24.0,0,2,"T65823",141.1207,?,Q,"Boat3",?,?
+1,1,"Passenger, No406",male,?,2,3,"T91151",76.4544,?,Q,?,?,?
+2,0,"Passenger, No407",male,51.9,4,1,"T39548",180.0969,?,C,?,?,?
+2,0,"Passenger, No408",female,47.8,4,2,"T69241",160.9813,"C26",S,"Boat15",?,?
+1,1,"Passenger, No409",male,?,2,0,"T29392",175.6237,?,Q,?,?,"New York, NY"
+1,1,"Passenger, No410",female,51.9,0,2,"T34780",174.9998,?,Q,"Boat14",?,"New York, NY"
+2,1,"Passenger, No411",female,40.1,2,1,"T44079",77.521,?,S,?,?,"New York, NY"
+3,0,"Passenger, No412",female,?,1,1,"T31135",13.0245,?,S,?,?,?
+3,0,"Passenger, No413",female,11.2,3,4,"T31311",28.6906,?,C,"Boat15",52.0,"New York, NY"
+3,1,"Passenger, No414",female,21.0,4,1,"T84086",184.847,?,S,"Boat2",?,"New York, NY"
+2,0,"Passenger, No415",female,16.2,2,0,"T52777",130.056,?,S,"Boat9",?,?
+2,0,"Passenger, No416",female,?,2,4,"T89308",15.9293,?,C,?,121.9,?
+2,1,"Passenger, No417",female,31.7,4,0,"T38271",91.623,"C123",C,?,?,"New York, NY"
+3,1,"Passenger, No418",male,42.3,1,1,"T49745",174.1675,"C26",Q,"Boat3",?,"New York, NY"
+2,1,"Passenger, No419",male,50.0,1,1,"T34380",61.4453,?,C,"Boat10",?,"New York, NY"
+1,0,"Passenger, No420",male,?,2,3,"T26276",179.0739,?,C,"Boat8",?,"New York, NY"
+2,0,"Passenger, No421",female,40.0,2,3,"T25674",147.9267,?,C,?,?,?
+3,0,"Passenger, No422",female,?,2,2,"T64986",191.2555,?,C,?,169.0,"New York, NY"
+1,0,"Passenger, No423",male,61.2,2,2,"T99842",75.6919,?,C,"Boat1",?,?
+2,1,"Passenger, No424",female,12.2,1,1,"T75979",41.7413,"C144",Q,"Boat4",?,"New York, NY"
+1,0,"Passenger, No425",male,22.5,2,1,"T67925",121.5415,"C97",S,"Boat1",?,?
+1,0,"Passenger, No426",male,15.5,0,3,"T24643",156.065,"C20",S,?,?,"New York, NY"
+1,1,"Passenger, No427",male,4.0,2,0,"T22648",184.4191,?,S,?,?,?
+3,1,"Passenger, No428",female,60.0,4,1,"T76179",24.3256,?,S,?,?,"New York, NY"
+1,0,"Passenger, No429",male,64.5,3,2,"T87251",136.3375,?,C,"Boat14",?,?
+1,1,"Passenger, No430",male,36.9,3,2,"T47784",12.9187,?,S,?,?,"New York, NY"
+3,1,"Passenger, No431",male,21.1,3,1,"T19123",161.4751,"C104",S,?,?,"New York, NY"
+2,1,"Passenger, No432",male,?,3,3,"T87405",149.5793,"C53",S,?,?,?
+2,0,"Passenger, No433",male,51.0,2,4,"T87810",158.9511,?,C,?,?,"New York, NY"
+2,1,"Passenger, No434",male,8.5,2,3,"T75178",188.7686,?,Q,?,?,"New York, NY"
+1,1,"Passenger, No435",female,?,4,4,"T22626",133.9107,?,C,"Boat7",?,"New York, NY"
+3,1,"Passenger, No436",female,38.3,0,0,"T66414",28.2312,?,C,?,?,?
+3,1,"Passenger, No437",male,10.3,3,3,"T24336",100.658,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No438",female,41.8,3,4,"T98668",195.6677,?,S,?,?,?
+3,0,"Passenger, No439",female,30.5,2,3,"T56041",52.6246,?,C,?,22.4,?
+2,0,"Passenger, No440",male,3.6,3,4,"T77470",56.9907,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No441",female,?,1,2,"T75107",154.1563,?,Q,?,67.0,"New York, NY"
+1,0,"Passenger, No442",female,21.5,4,3,"T39607",191.7985,"C34",Q,?,?,"New York, NY"
+2,1,"Passenger, No443",male,6.3,2,4,"T49309",110.2898,?,C,?,?,"New York, NY"
+3,0,"Passenger, No444",male,36.6,1,4,"T75431",192.6128,"C129",C,"Boat14",238.6,?
+1,1,"Passenger, No445",female,?,1,2,"T67067",172.7363,"C62",C,?,?,?
+3,0,"Passenger, No446",female,11.3,0,1,"T50703",114.1659,?,Q,"Boat7",?,?
+2,1,"Passenger, No447",male,3.9,3,0,"T17251",21.3663,?,S,"Boat14",220.6,"New York, NY"
+2,0,"Passenger, No448",male,?,4,0,"T78414",118.1818,"C144",C,?,?,"New York, NY"
+2,1,"Passenger, No449",female,52.3,3,1,"T28910",46.7512,?,C,?,?,"New York, NY"
+2,0,"Passenger, No450",female,33.8,1,2,"T28993",144.5559,"C15",Q,"Boat2",217.5,"New York, NY"
+3,0,"Passenger, No451",female,22.3,2,0,"T80111",172.2412,?,C,"Boat9",?,"New York, NY"
+1,1,"Passenger, No452",male,12.1,3,2,"T94466",11.6069,"C135",C,"Boat11",?,"New York, NY"
+1,0,"Passenger, No453",female,25.3,4,4,"T52830",10.3334,?,Q,?,?,"New York, NY"
+1,1,"Passenger, No454",male,22.6,0,0,"T30686",144.145,"C43",Q,"Boat11",?,"New York, NY"
+1,1,"Passenger, No455",male,58.0,2,1,"T21062",40.4684,"C67",S,"Boat8",319.5,?
+3,0,"Passenger, No456",male,30.6,2,1,"T21673",38.174,?,S,"Boat14",?,"New York, NY"
+3,1,"Passenger, No457",male,15.0,2,2,"T74771",89.1052,?,S,"Boat10",?,?
+1,1,"Passenger, No458",male,?,2,1,"T90960",53.422,?,Q,?,?,?
+2,1,"Passenger, No459",male,49.9,4,2,"T19575",16.4567,?,S,?,?,"New York, NY"
+3,0,"Passenger, No460",male,43.8,2,3,"T97983",193.7713,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No461",male,?,4,3,"T28585",66.0876,"C137",C,"Boat14",?,"New York, NY"
+3,1,"Passenger, No462",female,12.4,3,1,"T82833",133.1968,"C23",S,?,?,?
+2,0,"Passenger, No463",female,69.7,3,0,"T67870",143.2607,?,C,?,?,?
+2,0,"Passenger, No464",male,13.5,1,4,"T45755",134.3118,?,S,?,?,"New York, NY"
+1,0,"Passenger, No465",female,62.2,0,2,"T99300",28.7882,?,S,"Boat5",?,"New York, NY"
+3,1,"Passenger, No466",female,19.6,0,2,"T15747",190.4247,?,Q,"Boat5",?,?
+3,1,"Passenger, No467",female,52.3,4,4,"T59989",54.757,?,C,?,54.3,"New York, NY"
+2,0,"Passenger, No468",male,56.3,2,4,"T27208",23.7417,?,S,?,156.8,"New York, NY"
+2,0,"Passenger, No469",female,43.4,3,3,"T22182",71.6402,?,S,"Boat5",173.4,"New York, NY"
+1,1,"Passenger, No470",female,63.6,3,2,"T29478",138.4412,?,S,?,?,?
+1,0,"Passenger, No471",male,29.5,3,4,"T43211",119.1857,"C14",S,"Boat15",?,?
+2,0,"Passenger, No472",male,49.6,2,4,"T69637",92.7398,"C97",S,?,?,"New York, NY"
+2,0,"Passenger, No473",female,1.4,0,0,"T32509",94.7318,?,Q,"Boat16",?,"New York, NY"
+3,1,"Passenger, No474",female,7.0,1,0,"T35008",8.0976,"C16",S,?,?,?
+3,0,"Passenger, No475",male,33.0,3,3,"T12859",180.971,"C123",C,?,192.4,?
+3,1,"Passenger, No476",male,8.1,3,3,"T74972",121.1887,?,C,?,?,"New York, NY"
+3,1,"Passenger, No477",male,37.5,3,4,"T51399",57.2305,?,C,?,?,"New York, NY"
+2,1,"Passenger, No478",male,?,1,3,"T55068",103.989,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No479",male,50.9,3,3,"T98225",75.2498,?,S,"Boat10",?,?
+2,0,"Passenger, No480",male,?,4,3,"T23225",188.8957,?,S,?,?,?
+2,1,"Passenger, No481",male,?,4,0,"T18344",27.224,?,Q,?,?,?
+2,0,"Passenger, No482",female,59.9,4,4,"T97750",14.8323,"C127",S,"Boat4",14.7,?
+3,0,"Passenger, No483",male,11.8,2,3,"T76308",174.7461,?,C,?,?,"New York, NY"
+2,1,"Passenger, No484",male,56.8,2,2,"T76194",56.873,"C116",C,"Boat8",?,"New York, NY"
+2,0,"Passenger, No485",male,29.5,3,3,"T77653",75.546,?,S,"Boat3",?,?
+1,1,"Passenger, No486",male,3.6,1,4,"T17577",196.1092,"C143",C,?,230.2,"New York, NY"
+3,1,"Passenger, No487",female,?,2,4,"T90006",141.5575,?,S,"Boat15",?,"New York, NY"
+3,1,"Passenger, No488",male,6.8,4,2,"T61117",149.3102,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No489",male,?,4,4,"T43907",155.9608,"C139",S,"Boat12",?,"New York, NY"
+1,0,"Passenger, No490",male,40.5,0,3,"T54430",162.0506,"C146",Q,?,?,"New York, NY"
+3,0,"Passenger, No491",female,18.1,2,4,"T86332",156.8172,?,S,"Boat14",?,?
+1,1,"Passenger, No492",male,26.5,4,3,"T87101",156.8708,"C137",Q,?,?,"New York, NY"
+2,1,"Passenger, No493",male,?,1,3,"T69993",142.3823,"C40",Q,?,?,"New York, NY"
+3,1,"Passenger, No494",male,29.2,0,2,"T84942",106.9416,?,C,"Boat10",?,?
+1,0,"Passenger, No495",female,?,2,2,"T38256",149.2338,?,Q,?,137.5,"New York, NY"
+3,1,"Passenger, No496",female,33.8,4,1,"T28156",94.8826,?,C,?,?,?
+3,1,"Passenger, No497",female,28.3,4,0,"T97876",148.503,?,S,"Boat10",?,?
+3,0,"Passenger, No498",male,38.4,0,4,"T78387",97.788,"C40",Q,"Boat6",90.9,?
+3,1,"Passenger, No499",male,42.9,3,4,"T15896",187.1005,?,S,?,104.8,?
+1,0,"Passenger, No500",male,13.6,0,1,"T50212",137.3287,?,C,?,?,?
+1,1,"Passenger, No501",male,23.4,3,0,"T16799",151.6661,?,C,?,?,"New York, NY"
+2,0,"Passenger, No502",female,29.1,3,0,"T63411",183.1783,?,Q,"Boat4",?,"New York, NY"
+1,1,"Passenger, No503",female,59.4,4,1,"T28660",197.1352,"C147",C,"Boat15",?,"New York, NY"
+3,1,"Passenger, No504",male,?,3,2,"T88363",137.5996,"C64",Q,"Boat10",?,"New York, NY"
+3,0,"Passenger, No505",female,?,0,1,"T82938",176.2645,?,Q,"Boat11",310.1,"New York, NY"
+3,1,"Passenger, No506",female,68.8,2,1,"T70266",69.0492,"C44",Q,"Boat16",?,?
+1,1,"Passenger, No507",female,38.1,0,4,"T14056",164.131,?,S,?,271.6,?
+1,0,"Passenger, No508",male,65.6,3,0,"T39035",152.8921,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No509",male,67.7,0,2,"T74597",142.8588,?,S,"Boat13",?,?
+3,1,"Passenger, No510",male,46.5,4,4,"T84074",119.6921,"C42",C,"Boat8",239.3,?
+3,0,"Passenger, No511",female,61.9,0,3,"T94012",131.7559,"C92",C,"Boat14",?,"New York, NY"
+2,1,"Passenger, No512",female,4.0,1,0,"T46429",108.82,?,C,?,?,"New York, NY"
+1,0,"Passenger, No513",female,64.3,1,1,"T53152",127.069,?,C,?,?,"New York, NY"
+2,1,"Passenger, No514",male,?,1,2,"T17134",106.3366,?,S,"Boat15",?,"New York, NY"
+3,0,"Passenger, No515",male,64.3,3,2,"T18523",17.0904,"C24",C,"Boat14",?,"New York, NY"
+3,0,"Passenger, No516",female,28.7,4,3,"T40554",158.5576,?,C,?,?,"New York, NY"
+3,0,"Passenger, No517",female,47.6,0,3,"T77792",42.5339,?,Q,"Boat7",42.2,"New York, NY"
+2,1,"Passenger, No518",female,31.7,1,1,"T15776",65.775,?,Q,"Boat10",?,"New York, NY"
+1,0,"Passenger, No519",female,24.7,2,0,"T77853",137.2686,?,Q,"Boat2",?,?
+1,0,"Passenger, No520",male,47.1,3,4,"T53403",115.3889,?,C,?,?,"New York, NY"
+1,1,"Passenger, No521",male,45.1,1,3,"T91778",98.7455,"C94",Q,?,?,"New York, NY"
+1,1,"Passenger, No522",male,?,0,4,"T25098",90.8796,?,C,?,?,?
+1,0,"Passenger, No523",female,24.4,4,1,"T33401",39.3351,?,S,?,?,?
+1,1,"Passenger, No524",male,17.6,2,1,"T79065",199.5505,"C26",S,?,260.9,?
+2,1,"Passenger, No525",female,68.4,1,0,"T90744",171.6149,?,S,?,?,"New York, NY"
+1,1,"Passenger, No526",male,55.1,4,0,"T31945",151.5051,?,Q,?,?,?
+3,1,"Passenger, No527",female,35.1,2,4,"T62552",159.1718,?,S,?,?,"New York, NY"
+2,0,"Passenger, No528",female,27.0,1,2,"T43361",31.1944,?,C,?,?,?
+3,1,"Passenger, No529",female,30.8,2,3,"T51552",9.82,?,C,"Boat12",97.3,"New York, NY"
+3,0,"Passenger, No530",female,7.8,0,2,"T15017",70.0828,?,C,?,224.5,?
+3,0,"Passenger, No531",female,?,2,2,"T55433",83.7432,?,Q,"Boat1",?,"New York, NY"
+1,1,"Passenger, No532",male,52.7,3,1,"T77610",112.76,?,C,?,?,"New York, NY"
+2,1,"Passenger, No533",male,59.9,0,2,"T28212",30.0274,"C12",C,"Boat12",?,"New York, NY"
+3,1,"Passenger, No534",female,2.6,0,1,"T30144",198.8802,?,Q,"Boat13",67.8,?
+3,1,"Passenger, No535",male,23.7,3,2,"T22221",136.6027,?,Q,"Boat1",?,?
+2,1,"Passenger, No536",male,46.5,0,3,"T17530",7.1542,?,C,?,43.2,"New York, NY"
+3,0,"Passenger, No537",female,60.7,1,1,"T50600",143.386,?,Q,?,?,?
+3,1,"Passenger, No538",female,69.4,3,0,"T62328",53.1338,?,Q,"Boat15",?,?
+1,1,"Passenger, No539",female,59.1,2,3,"T90350",170.7196,?,S,"Boat14",?,"New York, NY"
+1,0,"Passenger, No540",female,4.0,1,2,"T92324",134.9981,?,Q,"Boat7",135.5,"New York, NY"
+1,1,"Passenger, No541",male,35.8,2,3,"T69105",45.4376,?,S,?,?,"New York, NY"
+2,1,"Passenger, No542",female,28.4,0,2,"T25031",31.6137,?,C,?,?,"New York, NY"
+1,1,"Passenger, No543",male,20.3,1,1,"T12367",39.5611,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No544",male,13.3,0,4,"T38333",14.3124,?,Q,"Boat4",?,?
+1,0,"Passenger, No545",male,53.9,1,2,"T41265",8.1275,?,S,?,?,"New York, NY"
+1,0,"Passenger, No546",male,4.0,4,0,"T52879",127.2234,?,Q,?,?,?
+1,1,"Passenger, No547",female,?,3,2,"T11570",94.4613,?,C,"Boat12",?,"New York, NY"
+2,1,"Passenger, No548",female,8.0,4,4,"T32473",23.4752,?,Q,"Boat5",?,"New York, NY"
+3,1,"Passenger, No549",female,?,0,4,"T86681",104.6501,"C138",Q,"Boat1",?,"New York, NY"
+1,1,"Passenger, No550",male,53.2,4,0,"T17854",102.2517,?,C,?,?,"New York, NY"
+3,1,"Passenger, No551",female,?,2,0,"T78271",85.9042,"C16",S,"Boat11",?,?
+1,0,"Passenger, No552",male,27.3,2,1,"T67981",17.6003,?,S,?,307.8,?
+1,0,"Passenger, No553",male,30.4,3,2,"T31516",52.7604,?,S,?,?,"New York, NY"
+1,1,"Passenger, No554",female,?,2,3,"T59508",91.0683,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No555",female,6.7,2,4,"T80411",146.6964,?,C,?,?,"New York, NY"
+2,0,"Passenger, No556",female,?,3,1,"T30280",5.8152,"C105",C,?,?,?
+3,1,"Passenger, No557",female,45.2,4,0,"T63580",198.5321,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No558",female,26.4,0,3,"T65579",52.2588,?,C,"Boat1",?,"New York, NY"
+2,1,"Passenger, No559",male,42.5,1,0,"T25300",130.6575,"C111",Q,?,170.6,?
+2,0,"Passenger, No560",female,21.9,4,3,"T86818",85.2638,"C32",S,"Boat12",89.0,?
+3,1,"Passenger, No561",female,?,1,3,"T10206",155.88,?,C,"Boat14",?,?
+3,0,"Passenger, No562",male,35.7,0,3,"T84329",41.1994,?,S,"Boat7",?,"New York, NY"
+2,1,"Passenger, No563",male,12.5,2,0,"T59509",17.5312,?,S,?,?,?
+1,1,"Passenger, No564",male,55.5,0,0,"T37665",6.4161,?,C,"Boat16",?,"New York, NY"
+2,1,"Passenger, No565",female,57.4,2,3,"T59602",195.1845,"C35",S,?,?,"New York, NY"
+1,0,"Passenger, No566",male,20.3,1,2,"T69233",133.4808,?,C,"Boat1",314.1,"New York, NY"
+1,1,"Passenger, No567",male,51.8,3,1,"T89529",149.1449,"C99",C,"Boat16",281.3,"New York, NY"
+3,1,"Passenger, No568",female,50.1,4,4,"T76143",102.0954,?,Q,"Boat15",?,"New York, NY"
+1,1,"Passenger, No569",male,12.8,0,0,"T67002",10.6982,"C93",C,"Boat8",?,"New York, NY"
+3,0,"Passenger, No570",male,44.7,3,0,"T53620",186.6971,"C26",Q,?,244.0,"New York, NY"
+3,1,"Passenger, No571",male,9.0,0,0,"T21683",120.4791,?,S,?,?,?
+2,0,"Passenger, No572",female,?,4,1,"T60875",67.3304,?,Q,"Boat5",?,"New York, NY"
+1,0,"Passenger, No573",female,?,3,2,"T28966",62.8806,?,Q,?,?,?
+3,0,"Passenger, No574",female,69.3,0,2,"T85231",166.594,?,Q,"Boat2",109.9,"New York, NY"
+1,0,"Passenger, No575",male,54.5,3,3,"T49203",133.5538,"C15",Q,?,?,"New York, NY"
+2,1,"Passenger, No576",female,?,2,2,"T35571",111.862,?,C,"Boat2",233.0,"New York, NY"
+1,0,"Passenger, No577",female,21.1,1,1,"T38591",43.1527,?,C,"Boat4",?,"New York, NY"
+1,1,"Passenger, No578",female,12.6,0,0,"T56607",40.0284,?,Q,"Boat14",206.0,"New York, NY"
+1,0,"Passenger, No579",male,21.9,4,1,"T95563",156.2907,"C32",C,"Boat13",?,"New York, NY"
+2,0,"Passenger, No580",male,?,0,3,"T94070",104.401,?,Q,"Boat16",?,"New York, NY"
+3,0,"Passenger, No581",female,45.5,3,2,"T84897",68.4197,"C147",S,?,?,?
+3,1,"Passenger, No582",male,41.3,0,1,"T96321",40.2295,?,S,?,?,?
+1,0,"Passenger, No583",male,7.1,2,0,"T21090",103.6989,?,Q,?,216.2,?
+1,1,"Passenger, No584",female,?,3,2,"T78506",199.3754,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No585",male,?,1,1,"T88924",120.3977,?,Q,"Boat3",?,?
+3,0,"Passenger, No586",female,66.2,3,1,"T80242",127.7658,?,Q,"Boat7",?,"New York, NY"
+3,0,"Passenger, No587",female,22.8,3,3,"T13396",53.262,?,Q,?,?,?
+3,0,"Passenger, No588",female,54.7,1,1,"T45867",?,?,S,?,?,"New York, NY"
+1,1,"Passenger, No589",female,?,2,4,"T46961",123.4561,"C53",C,"Boat13",?,"New York, NY"
+3,1,"Passenger, No590",female,18.9,4,1,"T96188",78.8661,"C23",Q,"Boat12",?,?
+3,1,"Passenger, No591",female,?,2,3,"T75828",190.7602,?,Q,"Boat8",?,"New York, NY"
+2,1,"Passenger, No592",female,44.8,0,1,"T22272",16.1952,"C136",S,"Boat14",?,"New York, NY"
+1,1,"Passenger, No593",female,69.9,4,0,"T63145",42.0859,"C11",Q,?,?,?
+3,0,"Passenger, No594",female,47.5,4,1,"T32913",168.6847,?,S,?,?,?
+1,1,"Passenger, No595",male,59.7,0,2,"T49213",56.6264,?,Q,?,?,?
+3,0,"Passenger, No596",female,59.5,0,2,"T10772",69.0676,?,S,?,?,"New York, NY"
+1,0,"Passenger, No597",female,6.8,4,1,"T63833",100.0454,?,Q,?,?,?
+2,1,"Passenger, No598",male,19.6,3,3,"T31211",150.6828,?,Q,?,?,?
+2,1,"Passenger, No599",female,12.1,1,3,"T97194",28.1645,?,C,"Boat5",?,"New York, NY"
+2,1,"Passenger, No600",male,?,0,0,"T26531",102.5002,"C70",S,"Boat11",?,"New York, NY"
+1,1,"Passenger, No601",female,34.5,3,1,"T90951",104.6918,?,S,"Boat8",?,"New York, NY"
+2,0,"Passenger, No602",male,?,4,1,"T40065",83.2502,?,S,"Boat14",?,?
+1,1,"Passenger, No603",female,49.3,1,1,"T54063",16.9632,?,S,?,?,?
+2,1,"Passenger, No604",male,4.3,0,0,"T16832",67.7197,?,C,"Boat4",?,?
+2,1,"Passenger, No605",female,7.7,0,4,"T27079",149.552,?,Q,?,?,"New York, NY"
+1,1,"Passenger, No606",male,10.0,4,0,"T15379",182.8745,?,S,?,?,?
+3,1,"Passenger, No607",female,69.3,1,4,"T30142",42.3828,?,C,"Boat12",147.7,"New York, NY"
+2,0,"Passenger, No608",female,65.3,4,0,"T31880",140.8577,?,S,"Boat2",?,"New York, NY"
+3,1,"Passenger, No609",female,61.0,0,1,"T67376",79.9093,"C112",Q,?,?,?
+1,0,"Passenger, No610",female,50.7,2,2,"T38879",57.3604,?,S,?,?,?
+1,1,"Passenger, No611",male,55.6,1,1,"T80070",131.4859,?,C,?,290.1,?
+1,1,"Passenger, No612",female,5.0,0,2,"T38741",59.5395,?,S,?,255.5,"New York, NY"
+1,1,"Passenger, No613",female,44.8,4,1,"T67958",57.4147,?,C,?,?,"New York, NY"
+2,0,"Passenger, No614",female,?,1,3,"T34251",39.3416,?,Q,?,?,?
+1,1,"Passenger, No615",male,?,0,3,"T42145",130.7982,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No616",female,8.6,0,0,"T27324",21.3011,?,Q,?,?,?
+1,1,"Passenger, No617",male,34.1,4,3,"T31383",98.3871,?,Q,"Boat4",?,?
+3,1,"Passenger, No618",male,58.7,1,0,"T39401",88.2914,?,Q,?,224.8,"New York, NY"
+3,0,"Passenger, No619",female,?,0,1,"T23334",59.9538,?,C,?,301.8,"New York, NY"
+3,0,"Passenger, No620",male,24.1,1,3,"T29689",138.9963,?,C,?,?,"New York, NY"
+3,1,"Passenger, No621",female,50.1,0,0,"T29482",33.5849,?,C,"Boat16",38.0,"New York, NY"
+3,1,"Passenger, No622",male,?,1,1,"T60465",101.3703,?,C,"Boat11",?,"New York, NY"
+1,1,"Passenger, No623",female,38.2,3,4,"T80282",80.0023,?,C,?,?,"New York, NY"
+1,0,"Passenger, No624",male,15.0,0,2,"T83187",31.0506,?,C,?,255.6,?
+2,0,"Passenger, No625",female,58.1,0,1,"T25366",142.2728,?,S,"Boat14",?,"New York, NY"
+3,0,"Passenger, No626",female,61.1,0,1,"T57873",52.7839,?,C,?,?,"New York, NY"
+3,1,"Passenger, No627",female,24.3,0,2,"T24583",176.8256,?,S,?,?,"New York, NY"
+3,1,"Passenger, No628",female,35.6,1,3,"T30552",22.9276,?,S,"Boat13",?,?
+1,0,"Passenger, No629",female,46.0,3,3,"T31603",77.4382,?,C,?,?,"New York, NY"
+2,0,"Passenger, No630",male,38.4,0,1,"T88264",182.389,?,S,"Boat2",?,?
+3,0,"Passenger, No631",female,?,2,0,"T50449",?,?,C,"Boat7",?,?
+2,0,"Passenger, No632",male,62.9,4,0,"T75821",34.2864,?,C,?,13.2,?
+3,1,"Passenger, No633",male,7.4,1,1,"T99320",154.921,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No634",male,25.9,3,0,"T99505",45.72,?,S,"Boat16",?,?
+2,0,"Passenger, No635",female,?,2,1,"T48745",59.6229,?,S,?,?,"New York, NY"
+2,1,"Passenger, No636",female,10.7,0,4,"T73997",172.5056,?,Q,"Boat5",?,"New York, NY"
+3,1,"Passenger, No637",female,?,3,4,"T68994",175.7296,?,Q,"Boat2",?,?
+3,0,"Passenger, No638",male,21.1,1,4,"T62334",48.495,"C33",C,?,?,"New York, NY"
+2,0,"Passenger, No639",male,?,0,3,"T66769",69.1005,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No640",male,66.4,1,1,"T51967",197.6231,"C25",C,"Boat16",?,?
+1,1,"Passenger, No641",female,13.2,1,0,"T45901",63.1757,"C117",Q,?,61.2,?
+2,1,"Passenger, No642",female,?,2,3,"T73127",139.3219,?,Q,?,187.5,"New York, NY"
+3,0,"Passenger, No643",male,40.9,1,2,"T97040",188.099,"C91",S,?,?,?
+2,0,"Passenger, No644",female,50.8,3,1,"T93138",194.0442,?,S,"Boat7",?,"New York, NY"
+1,1,"Passenger, No645",male,66.7,4,0,"T58530",8.1573,"C138",S,"Boat15",?,?
+3,1,"Passenger, No646",female,?,1,3,"T66149",112.7869,?,C,?,226.2,"New York, NY"
+2,0,"Passenger, No647",male,8.2,0,4,"T63907",151.239,?,Q,?,?,"New York, NY"
+1,1,"Passenger, No648",female,54.6,4,3,"T25007",96.567,?,C,?,231.2,"New York, NY"
+1,1,"Passenger, No649",male,19.5,2,2,"T64357",5.8107,"C18",S,?,?,"New York, NY"
+3,1,"Passenger, No650",female,?,4,3,"T41697",81.3157,?,C,"Boat14",?,"New York, NY"
+3,0,"Passenger, No651",female,36.7,3,1,"T23051",29.6344,?,Q,"Boat9",53.0,?
+1,0,"Passenger, No652",male,44.4,4,1,"T13646",111.0161,"C107",S,"Boat5",208.5,"New York, NY"
+1,0,"Passenger, No653",male,37.9,1,3,"T44141",58.6181,"C15",Q,"Boat4",?,"New York, NY"
+1,0,"Passenger, No654",male,62.7,0,0,"T74781",182.9802,?,S,?,?,?
+3,0,"Passenger, No655",male,26.9,2,3,"T31116",6.9774,?,Q,"Boat2",?,?
+2,1,"Passenger, No656",male,?,2,0,"T35276",109.5111,?,S,?,?,"New York, NY"
+1,1,"Passenger, No657",male,51.2,1,2,"T45870",190.8797,?,Q,"Boat15",?,"New York, NY"
+3,1,"Passenger, No658",male,14.7,2,3,"T23486",154.4575,?,S,"Boat16",?,"New York, NY"
+3,1,"Passenger, No659",female,42.9,3,1,"T84336",180.0895,"C125",S,"Boat9",?,?
+3,1,"Passenger, No660",female,?,1,2,"T66280",74.7602,?,Q,?,?,?
+1,1,"Passenger, No661",male,15.8,4,2,"T40493",80.1902,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No662",female,31.0,2,1,"T35837",101.3172,?,C,?,?,?
+2,1,"Passenger, No663",male,20.7,4,0,"T70525",169.1204,?,Q,"Boat2",?,?
+2,0,"Passenger, No664",female,20.0,2,3,"T20455",66.0691,?,C,?,162.3,"New York, NY"
+1,1,"Passenger, No665",male,?,0,0,"T28184",67.9575,?,C,?,?,"New York, NY"
+2,0,"Passenger, No666",male,55.2,0,0,"T49883",69.2191,?,C,?,?,?
+2,0,"Passenger, No667",male,11.2,4,3,"T93480",28.8628,?,Q,?,?,?
+3,1,"Passenger, No668",male,?,2,0,"T56269",175.2101,?,Q,"Boat3",?,"New York, NY"
+1,0,"Passenger, No669",male,27.6,3,0,"T54623",120.152,?,C,"Boat10",?,"New York, NY"
+3,0,"Passenger, No670",male,26.1,3,4,"T77300",83.04,?,C,?,?,"New York, NY"
+3,0,"Passenger, No671",male,8.4,0,1,"T12174",41.4708,?,Q,?,?,?
+3,0,"Passenger, No672",female,11.4,4,3,"T76574",91.0614,?,S,"Boat14",?,?
+1,1,"Passenger, No673",female,8.5,0,1,"T24559",15.3619,?,C,?,?,?
+3,1,"Passenger, No674",female,16.2,2,3,"T36962",44.6972,?,Q,?,?,?
+3,1,"Passenger, No675",female,48.5,1,2,"T99318",41.5322,"C46",S,"Boat14",?,?
+2,0,"Passenger, No676",male,59.9,4,2,"T72105",100.2199,?,S,?,?,"New York, NY"
+2,0,"Passenger, No677",male,54.5,0,2,"T53997",148.2889,"C75",Q,?,?,?
+2,1,"Passenger, No678",female,54.4,4,3,"T24779",106.2652,?,S,"Boat8",?,?
+2,0,"Passenger, No679",male,49.0,3,2,"T37041",42.7992,"C37",C,"Boat15",287.5,?
+3,1,"Passenger, No680",female,29.8,2,2,"T34978",106.4152,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No681",male,35.4,1,3,"T99249",193.5009,?,Q,?,?,?
+2,0,"Passenger, No682",female,?,2,4,"T26178",64.6352,?,Q,"Boat2",?,?
+2,0,"Passenger, No683",male,10.8,1,3,"T86706",61.7064,?,C,?,?,?
+2,0,"Passenger, No684",female,42.2,1,4,"T67123",67.8836,?,Q,"Boat9",?,"New York, NY"
+2,1,"Passenger, No685",male,65.0,3,4,"T34034",175.8047,?,S,?,?,"New York, NY"
+3,1,"Passenger, No686",female,33.2,3,3,"T13627",10.1523,"C32",S,"Boat10",?,"New York, NY"
+2,0,"Passenger, No687",female,?,3,1,"T62814",95.2475,"C142",C,"Boat3",?,"New York, NY"
+3,0,"Passenger, No688",female,57.7,4,3,"T53425",28.6813,?,Q,"Boat2",?,"New York, NY"
+3,1,"Passenger, No689",male,47.6,1,2,"T92344",197.8859,?,C,"Boat7",?,?
+3,0,"Passenger, No690",male,8.1,0,4,"T68171",185.5787,?,C,"Boat8",179.8,"New York, NY"
+3,1,"Passenger, No691",male,44.9,1,1,"T96175",104.7454,?,S,?,?,"New York, NY"
+3,1,"Passenger, No692",female,28.0,0,3,"T64643",33.8925,?,S,?,?,?
+3,1,"Passenger, No693",male,25.5,1,3,"T70076",196.442,?,Q,?,172.7,"New York, NY"
+1,0,"Passenger, No694",female,39.9,3,1,"T46482",133.3966,"C27",Q,?,199.1,?
+3,1,"Passenger, No695",male,41.6,4,2,"T86610",83.7359,?,Q,?,?,?
+3,1,"Passenger, No696",female,68.7,1,0,"T32806",79.8963,"C26",S,"Boat4",?,"New York, NY"
+2,1,"Passenger, No697",male,23.2,3,3,"T27460",116.887,?,C,?,?,?
+3,0,"Passenger, No698",female,56.8,1,0,"T86298",192.1673,?,S,"Boat1",?,"New York, NY"
+3,0,"Passenger, No699",female,?,4,3,"T34921",116.2222,?,C,?,280.1,"New York, NY"
+2,1,"Passenger, No700",female,40.3,1,4,"T49089",102.2489,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No701",female,?,1,2,"T19801",52.0727,?,Q,?,?,?
+3,0,"Passenger, No702",female,69.0,0,0,"T54308",44.0997,"C25",S,?,108.8,"New York, NY"
+1,0,"Passenger, No703",female,?,4,4,"T14634",18.7988,?,Q,"Boat3",157.6,?
+3,0,"Passenger, No704",male,?,4,1,"T95240",98.1306,"C68",S,"Boat1",?,"New York, NY"
+3,1,"Passenger, No705",male,4.6,3,1,"T66324",112.1613,?,S,"Boat12",?,?
+1,0,"Passenger, No706",male,?,0,1,"T64141",178.2254,"C21",S,"Boat8",26.1,?
+1,1,"Passenger, No707",male,42.6,1,2,"T27002",98.3468,?,S,?,68.3,"New York, NY"
+2,0,"Passenger, No708",female,66.0,4,2,"T95674",179.1308,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No709",female,?,1,4,"T40216",112.8283,?,Q,"Boat5",?,?
+2,1,"Passenger, No710",male,?,0,2,"T46433",63.5805,"C25",C,"Boat13",?,"New York, NY"
+2,1,"Passenger, No711",male,27.2,3,4,"T16849",11.1047,"C16",Q,"Boat11",297.7,"New York, NY"
+3,0,"Passenger, No712",male,58.2,3,3,"T17486",112.8924,"C83",Q,?,?,"New York, NY"
+3,1,"Passenger, No713",male,33.2,1,1,"T11990",138.1068,?,S,"Boat10",?,?
+3,1,"Passenger, No714",female,18.3,4,0,"T26293",133.8514,"C55",C,?,?,"New York, NY"
+2,1,"Passenger, No715",male,41.0,0,2,"T89996",190.8922,?,C,"Boat9",?,"New York, NY"
+1,0,"Passenger, No716",male,46.3,1,0,"T95799",138.4661,"C91",S,?,?,"New York, NY"
+2,1,"Passenger, No717",male,60.2,2,4,"T15863",73.1973,?,C,?,?,?
+3,1,"Passenger, No718",female,?,3,2,"T28753",123.3585,?,C,"Boat12",?,"New York, NY"
+3,0,"Passenger, No719",male,21.1,1,4,"T13346",46.2385,?,Q,"Boat12",124.9,"New York, NY"
+3,0,"Passenger, No720",female,45.8,0,1,"T84108",117.0157,?,C,?,?,"New York, NY"
+1,1,"Passenger, No721",female,14.5,4,2,"T41985",160.8062,"C69",C,?,227.6,"New York, NY"
+2,1,"Passenger, No722",male,35.9,2,3,"T89327",158.3293,?,S,"Boat8",?,"New York, NY"
+3,0,"Passenger, No723",female,24.6,0,0,"T63543",196.7333,?,Q,"Boat7",287.6,?
+1,1,"Passenger, No724",female,50.1,3,0,"T26567",167.6024,?,S,"Boat5",?,"New York, NY"
+2,1,"Passenger, No725",female,?,4,1,"T48455",179.9981,"C37",Q,?,?,?
+2,1,"Passenger, No726",female,31.1,3,1,"T34045",119.9638,"C140",S,?,?,"New York, NY"
+3,1,"Passenger, No727",female,13.2,4,2,"T22700",101.1922,?,Q,"Boat14",?,?
+1,0,"Passenger, No728",male,51.7,1,3,"T78044",176.5188,?,C,?,?,?
+2,0,"Passenger, No729",male,64.3,4,0,"T40366",32.4956,?,Q,"Boat1",?,?
+3,0,"Passenger, No730",male,57.7,2,1,"T46941",116.3772,"C143",S,"Boat10",235.2,"New York, NY"
+1,1,"Passenger, No731",female,7.0,1,2,"T97649",73.9756,?,S,"Boat11",?,?
+2,0,"Passenger, No732",female,3.6,0,4,"T51618",113.8432,"C19",Q,"Boat8",?,?
+1,0,"Passenger, No733",female,34.4,1,3,"T47040",128.7807,?,Q,"Boat7",?,?
+3,0,"Passenger, No734",male,?,2,4,"T59845",50.7696,?,Q,"Boat6",275.9,"New York, NY"
+3,1,"Passenger, No735",female,28.1,2,4,"T73040",47.6915,"C83",C,"Boat11",?,"New York, NY"
+1,1,"Passenger, No736",female,25.0,3,1,"T73404",173.4818,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No737",female,22.9,3,3,"T65731",182.9119,?,Q,?,?,?
+2,1,"Passenger, No738",male,12.5,1,0,"T90386",30.197,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No739",male,36.8,2,4,"T36009",168.4391,?,Q,?,298.8,?
+1,0,"Passenger, No740",male,?,0,4,"T23437",159.312,?,C,?,?,"New York, NY"
+1,0,"Passenger, No741",female,57.1,3,3,"T27195",175.9412,"C29",S,?,?,"New York, NY"
+1,0,"Passenger, No742",male,?,4,3,"T35465",172.5641,"C118",Q,"Boat10",?,?
+2,1,"Passenger, No743",female,7.4,3,4,"T46511",181.9948,?,S,?,238.9,"New York, NY"
+3,0,"Passenger, No744",female,68.3,3,1,"T68600",114.8149,?,C,?,?,?
+3,0,"Passenger, No745",male,34.8,1,0,"T28524",168.4237,?,Q,"Boat2",?,?
+2,1,"Passenger, No746",male,?,4,4,"T63285",57.2883,?,Q,"Boat16",?,"New York, NY"
+2,1,"Passenger, No747",female,60.2,0,0,"T65797",78.2588,"C51",Q,"Boat6",?,"New York, NY"
+1,0,"Passenger, No748",female,44.2,4,3,"T28332",111.6816,?,C,?,236.4,"New York, NY"
+2,1,"Passenger, No749",female,12.5,2,4,"T99787",124.73,"C142",Q,?,?,"New York, NY"
+3,0,"Passenger, No750",male,58.2,0,2,"T64565",96.7462,"C11",C,"Boat7",?,"New York, NY"
+2,0,"Passenger, No751",male,42.0,0,2,"T93406",49.0758,?,S,?,284.9,"New York, NY"
+2,1,"Passenger, No752",female,39.7,1,0,"T87678",147.4783,?,C,?,?,"New York, NY"
+3,1,"Passenger, No753",female,59.9,4,2,"T90725",97.3143,?,S,"Boat3",202.1,?
+2,0,"Passenger, No754",female,?,0,1,"T77070",87.9541,?,C,?,?,"New York, NY"
+2,1,"Passenger, No755",female,58.9,2,4,"T20249",169.2273,"C81",Q,?,?,"New York, NY"
+3,1,"Passenger, No756",male,31.0,2,1,"T13315",171.7976,"C98",Q,?,?,"New York, NY"
+1,1,"Passenger, No757",female,?,0,1,"T67944",43.0033,?,C,?,?,?
+1,1,"Passenger, No758",male,45.3,3,0,"T43166",16.1593,?,S,"Boat16",207.7,"New York, NY"
+2,0,"Passenger, No759",male,43.3,1,1,"T27255",167.6426,?,C,"Boat2",?,"New York, NY"
+2,0,"Passenger, No760",male,47.4,2,1,"T86919",76.42,?,Q,?,220.0,?
+3,0,"Passenger, No761",female,?,3,0,"T46113",139.2998,?,Q,"Boat1",?,"New York, NY"
+1,1,"Passenger, No762",female,49.0,4,3,"T21555",22.6595,"C57",C,?,251.7,"New York, NY"
+1,1,"Passenger, No763",female,?,1,2,"T99245",180.7884,?,Q,?,?,"New York, NY"
+1,1,"Passenger, No764",male,29.6,1,2,"T36112",62.5118,?,C,?,?,?
+3,1,"Passenger, No765",male,?,4,3,"T30408",46.0792,"C98",Q,"Boat10",?,"New York, NY"
+3,1,"Passenger, No766",male,15.5,1,3,"T44189",27.4831,?,S,?,?,?
+3,1,"Passenger, No767",male,8.2,2,0,"T30807",70.2689,?,S,?,?,?
+3,0,"Passenger, No768",male,43.5,4,4,"T67012",97.3466,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No769",male,63.2,4,0,"T65179",57.5254,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No770",male,?,2,0,"T21848",154.3355,"C127",C,?,?,?
+1,1,"Passenger, No771",female,?,1,1,"T67219",52.7228,?,C,?,?,?
+3,1,"Passenger, No772",male,47.1,3,1,"T22559",67.0796,"C112",C,"Boat14",?,"New York, NY"
+2,1,"Passenger, No773",male,43.0,1,2,"T57484",165.5314,?,C,"Boat8",?,?
+1,1,"Passenger, No774",female,?,3,1,"T65798",65.663,?,C,?,138.9,?
+3,0,"Passenger, No775",female,24.9,0,3,"T11602",30.1042,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No776",male,18.8,0,4,"T69017",157.2957,"C146",C,?,?,"New York, NY"
+2,0,"Passenger, No777",male,?,4,2,"T35901",124.8314,"C121",S,?,?,"New York, NY"
+2,1,"Passenger, No778",male,48.4,2,3,"T54231",154.5326,?,C,?,?,?
+2,1,"Passenger, No779",male,25.6,0,4,"T61932",21.3891,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No780",male,63.3,4,4,"T70085",68.6848,?,Q,"Boat4",?,"New York, NY"
+1,1,"Passenger, No781",female,2.5,2,0,"T66811",159.7607,?,C,"Boat8",?,?
+3,1,"Passenger, No782",male,31.1,1,2,"T75740",122.9014,"C82",C,?,?,"New York, NY"
+3,0,"Passenger, No783",female,42.3,2,0,"T39009",143.2567,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No784",female,33.8,4,0,"T54951",72.5414,?,C,"Boat16",?,"New York, NY"
+3,1,"Passenger, No785",female,46.6,4,0,"T92756",197.0647,?,Q,"Boat12",?,"New York, NY"
+2,1,"Passenger, No786",male,?,4,1,"T91823",89.1485,"C15",C,?,?,?
+3,0,"Passenger, No787",female,59.6,0,3,"T38613",26.5734,?,S,"Boat13",?,?
+1,1,"Passenger, No788",female,26.1,0,2,"T75838",81.4738,"C136",C,?,52.3,"New York, NY"
+2,1,"Passenger, No789",male,24.0,3,1,"T99568",79.7539,?,C,?,?,"New York, NY"
+1,0,"Passenger, No790",female,23.4,1,1,"T84620",138.4508,"C15",Q,"Boat13",?,"New York, NY"
+1,1,"Passenger, No791",female,17.5,3,1,"T52300",17.6385,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No792",female,8.7,4,2,"T30875",145.799,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No793",male,67.1,4,0,"T89557",109.1633,?,C,"Boat2",?,?
+3,0,"Passenger, No794",female,65.0,3,3,"T26260",170.1787,"C38",Q,?,?,?
+1,1,"Passenger, No795",male,23.8,0,3,"T74431",152.6112,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No796",male,11.2,2,0,"T38969",114.8902,"C88",Q,?,?,"New York, NY"
+2,1,"Passenger, No797",male,49.0,1,4,"T48316",55.1746,?,S,?,?,?
+2,1,"Passenger, No798",female,12.8,2,1,"T86957",66.2878,?,C,"Boat16",?,"New York, NY"
+1,0,"Passenger, No799",female,15.2,1,2,"T89775",158.9085,?,C,?,?,"New York, NY"
+1,0,"Passenger, No800",male,3.3,0,2,"T76508",112.8905,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No801",male,52.0,1,1,"T69777",195.9786,?,C,?,?,"New York, NY"
+1,0,"Passenger, No802",female,?,1,1,"T86765",98.07,?,S,?,?,?
+1,1,"Passenger, No803",male,7.9,4,1,"T88419",116.0192,?,S,"Boat15",?,?
+3,1,"Passenger, No804",male,29.1,2,3,"T92723",103.9221,?,Q,?,82.4,?
+3,1,"Passenger, No805",female,?,1,3,"T10854",194.9991,?,S,?,?,"New York, NY"
+1,1,"Passenger, No806",female,38.2,1,1,"T24249",46.5772,?,C,"Boat16",?,?
+3,0,"Passenger, No807",male,14.2,3,1,"T30701",35.6409,"C131",Q,?,?,"New York, NY"
+1,1,"Passenger, No808",female,58.6,2,1,"T50138",74.017,"C125",C,?,?,"New York, NY"
+2,0,"Passenger, No809",female,56.6,3,2,"T12553",44.4316,?,C,?,?,?
+2,1,"Passenger, No810",male,43.6,3,2,"T24003",36.2815,"C130",S,"Boat13",?,"New York, NY"
+2,0,"Passenger, No811",female,41.4,0,0,"T17355",58.829,?,C,?,?,"New York, NY"
+2,1,"Passenger, No812",male,41.7,4,1,"T83641",52.8192,?,Q,?,?,?
+1,0,"Passenger, No813",male,49.2,2,2,"T68437",46.8885,?,S,?,?,"New York, NY"
+3,1,"Passenger, No814",female,65.4,1,0,"T94179",82.2801,?,S,"Boat2",168.5,?
+2,0,"Passenger, No815",female,34.9,4,2,"T93148",19.7328,?,Q,"Boat6",?,"New York, NY"
+1,1,"Passenger, No816",male,53.9,3,2,"T71042",176.7054,"C94",S,?,?,"New York, NY"
+3,1,"Passenger, No817",male,21.3,4,3,"T12473",?,?,S,?,?,"New York, NY"
+2,1,"Passenger, No818",male,40.6,2,4,"T30002",33.9153,?,S,?,?,"New York, NY"
+1,1,"Passenger, No819",male,22.8,1,1,"T36437",87.7353,?,S,"Boat1",?,"New York, NY"
+2,0,"Passenger, No820",female,?,1,3,"T16450",82.8397,?,C,?,?,"New York, NY"
+3,0,"Passenger, No821",male,9.3,3,4,"T56974",66.7915,?,S,"Boat12",?,"New York, NY"
+2,0,"Passenger, No822",male,30.0,0,2,"T57237",168.1243,?,Q,?,28.6,"New York, NY"
+2,1,"Passenger, No823",male,20.0,2,0,"T28446",39.5849,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No824",female,29.6,1,3,"T32599",106.1269,?,Q,?,36.8,?
+2,0,"Passenger, No825",female,26.7,2,4,"T52083",10.0369,?,C,?,299.7,?
+2,0,"Passenger, No826",male,?,2,1,"T22074",17.9335,"C128",C,"Boat15",?,"New York, NY"
+3,0,"Passenger, No827",female,63.1,2,1,"T52320",76.2886,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No828",male,10.0,1,1,"T96403",23.4839,?,Q,?,?,?
+3,1,"Passenger, No829",female,32.9,4,4,"T77751",177.2987,"C43",C,?,?,"New York, NY"
+1,1,"Passenger, No830",male,68.6,0,1,"T93182",159.9806,?,C,?,?,"New York, NY"
+1,1,"Passenger, No831",female,32.3,2,4,"T67653",59.4645,"C96",C,"Boat6",?,"New York, NY"
+2,1,"Passenger, No832",male,24.6,4,2,"T18272",88.1703,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No833",female,?,2,2,"T69318",196.9408,?,Q,?,290.6,"New York, NY"
+1,0,"Passenger, No834",male,?,2,4,"T88765",114.7622,?,S,"Boat12",?,"New York, NY"
+3,0,"Passenger, No835",female,?,1,4,"T39656",151.4653,?,Q,?,?,?
+2,1,"Passenger, No836",female,68.1,3,3,"T52194",187.9379,?,C,"Boat10",?,"New York, NY"
+3,0,"Passenger, No837",male,10.7,3,1,"T41780",36.0914,?,Q,?,24.1,"New York, NY"
+2,0,"Passenger, No838",female,?,4,1,"T36978",136.0864,"C12",Q,?,?,?
+3,1,"Passenger, No839",male,21.6,0,4,"T89958",18.7285,"C97",C,"Boat2",?,"New York, NY"
+1,1,"Passenger, No840",female,61.5,3,2,"T39443",22.2717,"C102",S,"Boat16",316.0,"New York, NY"
+3,0,"Passenger, No841",female,51.5,2,4,"T53100",168.0778,"C31",S,?,80.4,"New York, NY"
+3,1,"Passenger, No842",female,?,3,4,"T89513",78.2854,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No843",male,?,1,2,"T86037",181.239,?,C,"Boat2",?,"New York, NY"
+2,0,"Passenger, No844",female,44.3,3,0,"T38316",9.7082,"C35",C,"Boat1",?,"New York, NY"
+2,1,"Passenger, No845",female,67.6,2,3,"T16265",141.3254,?,S,?,?,"New York, NY"
+2,1,"Passenger, No846",female,12.9,3,0,"T53747",109.9558,"C68",C,"Boat4",30.6,"New York, NY"
+3,1,"Passenger, No847",male,14.9,3,2,"T54171",179.6771,"C53",C,?,?,?
+3,1,"Passenger, No848",male,49.0,1,0,"T21867",183.366,?,C,?,?,?
+1,1,"Passenger, No849",male,51.8,2,4,"T84725",68.1481,?,S,?,?,"New York, NY"
+1,1,"Passenger, No850",male,68.8,1,1,"T67718",47.1138,?,S,"Boat16",136.5,"New York, NY"
+3,0,"Passenger, No851",female,?,4,4,"T62378",178.2778,"C76",Q,"Boat12",87.2,?
+1,1,"Passenger, No852",female,?,1,2,"T42361",117.8969,?,Q,"Boat11",?,"New York, NY"
+1,1,"Passenger, No853",male,40.6,0,3,"T91108",120.2573,?,S,?,?,"New York, NY"
+2,1,"Passenger, No854",male,?,2,0,"T46187",189.7335,"C135",C,"Boat5",71.4,"New York, NY"
+3,1,"Passenger, No855",female,56.1,4,3,"T28904",196.1348,?,S,"Boat2",?,?
+1,0,"Passenger, No856",male,51.4,1,1,"T88843",197.9701,"C17",Q,"Boat4",?,?
+2,1,"Passenger, No857",female,33.7,2,1,"T22564",39.5951,?,C,?,?,"New York, NY"
+1,1,"Passenger, No858",male,52.9,4,2,"T12673",16.8757,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No859",male,22.1,4,4,"T59130",191.3638,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No860",female,62.5,1,4,"T29510",91.7958,?,Q,"Boat4",102.9,?
+2,0,"Passenger, No861",male,35.3,4,1,"T90372",187.8746,"C150",C,"Boat4",?,?
+1,1,"Passenger, No862",male,57.4,1,3,"T15451",183.739,"C35",Q,?,?,"New York, NY"
+3,1,"Passenger, No863",male,10.3,1,2,"T92095",89.8521,?,S,?,?,"New York, NY"
+2,1,"Passenger, No864",female,54.2,0,4,"T15456",22.3916,"C148",S,"Boat2",?,?
+2,1,"Passenger, No865",male,38.1,3,4,"T78679",104.2054,?,S,"Boat4",?,?
+1,1,"Passenger, No866",male,35.2,4,4,"T12043",79.3903,"C39",C,?,?,"New York, NY"
+2,0,"Passenger, No867",female,26.7,3,0,"T30437",53.0038,?,C,"Boat10",?,"New York, NY"
+3,1,"Passenger, No868",female,29.7,3,3,"T46449",41.9518,"C74",Q,?,?,?
+2,0,"Passenger, No869",male,?,0,0,"T30830",100.2647,?,C,?,?,"New York, NY"
+3,1,"Passenger, No870",female,20.6,4,2,"T24220",82.0067,"C61",S,?,?,?
+1,1,"Passenger, No871",female,?,1,0,"T60864",153.6956,"C71",C,"Boat15",?,"New York, NY"
+1,0,"Passenger, No872",male,4.0,0,1,"T54741",53.9064,?,C,?,?,?
+1,1,"Passenger, No873",male,44.3,2,3,"T13317",18.5297,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No874",male,29.3,4,0,"T91079",146.1955,?,S,?,?,?
+2,0,"Passenger, No875",male,54.0,0,1,"T92350",111.3886,?,C,"Boat13",?,"New York, NY"
+2,0,"Passenger, No876",female,24.8,3,3,"T30072",176.4916,?,C,"Boat6",128.0,?
+1,1,"Passenger, No877",male,21.7,0,3,"T63788",110.5922,?,C,?,?,?
+2,1,"Passenger, No878",female,32.2,3,3,"T57652",134.7478,?,Q,?,?,?
+1,1,"Passenger, No879",female,53.7,3,2,"T94410",81.6018,?,Q,"Boat10",313.5,"New York, NY"
+2,0,"Passenger, No880",male,39.1,1,3,"T77829",188.9239,?,S,?,?,?
+3,0,"Passenger, No881",female,56.3,1,3,"T51483",174.2659,?,C,?,201.2,"New York, NY"
+1,0,"Passenger, No882",male,?,0,0,"T53451",66.0923,"C61",Q,?,?,"New York, NY"
+2,1,"Passenger, No883",female,49.5,2,2,"T23303",36.1634,"C51",C,?,135.0,"New York, NY"
+3,1,"Passenger, No884",female,63.4,0,1,"T68314",12.6788,"C131",C,?,?,"New York, NY"
+2,1,"Passenger, No885",male,2.4,3,4,"T55066",197.624,"C27",S,?,?,?
+1,0,"Passenger, No886",male,23.1,0,2,"T89011",101.4762,?,Q,?,?,"New York, NY"
+1,1,"Passenger, No887",male,63.5,0,1,"T50191",199.25,?,C,"Boat15",?,?
+1,0,"Passenger, No888",male,2.3,3,1,"T71619",12.0167,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No889",female,?,2,2,"T82401",59.92,?,C,"Boat3",299.7,"New York, NY"
+1,0,"Passenger, No890",male,8.4,0,1,"T58940",116.5222,?,S,"Boat1",?,"New York, NY"
+2,0,"Passenger, No891",male,67.6,3,2,"T97154",28.7858,"C61",Q,"Boat6",?,"New York, NY"
+1,1,"Passenger, No892",male,50.5,3,2,"T91979",97.8286,?,C,"Boat6",?,"New York, NY"
+3,0,"Passenger, No893",female,?,0,0,"T33049",56.336,"C58",Q,?,?,?
+2,0,"Passenger, No894",male,58.7,2,4,"T64038",60.6536,?,C,"Boat1",?,"New York, NY"
+2,1,"Passenger, No895",male,?,0,3,"T55118",16.7788,"C120",S,"Boat15",?,"New York, NY"
+1,1,"Passenger, No896",female,42.8,0,4,"T44398",67.2175,?,C,?,?,"New York, NY"
+3,0,"Passenger, No897",male,3.9,2,3,"T70941",68.2517,"C113",C,"Boat15",?,?
+2,1,"Passenger, No898",male,55.4,3,1,"T62352",89.7043,"C54",S,?,?,?
+2,1,"Passenger, No899",male,14.6,3,3,"T30750",191.2632,?,S,?,?,"New York, NY"
+2,0,"Passenger, No900",female,5.1,0,0,"T52373",123.5244,?,Q,"Boat7",?,?
+2,0,"Passenger, No901",female,48.2,3,4,"T25970",108.2792,?,C,"Boat5",?,"New York, NY"
+1,0,"Passenger, No902",female,18.0,2,1,"T50964",180.8588,?,C,?,?,?
+1,0,"Passenger, No903",female,40.5,1,4,"T89873",164.8331,?,C,"Boat11",?,?
+1,1,"Passenger, No904",male,32.9,2,0,"T68914",42.6704,"C46",C,"Boat2",?,?
+1,1,"Passenger, No905",female,34.3,1,2,"T51947",66.2628,"C61",Q,?,198.9,?
+1,0,"Passenger, No906",female,26.9,0,2,"T44208",62.7402,?,Q,"Boat3",?,"New York, NY"
+1,1,"Passenger, No907",female,42.0,2,0,"T45855",43.5672,?,C,?,?,"New York, NY"
+1,0,"Passenger, No908",female,26.4,2,3,"T82106",89.6806,?,S,?,12.3,?
+3,0,"Passenger, No909",male,50.2,3,0,"T18899",24.9394,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No910",female,5.8,3,4,"T18146",130.1546,?,S,?,?,?
+1,0,"Passenger, No911",female,4.9,4,0,"T16879",140.9711,?,S,?,?,?
+1,1,"Passenger, No912",female,44.8,3,0,"T76879",100.9843,?,Q,?,?,?
+1,0,"Passenger, No913",male,1.5,0,4,"T58249",166.6622,?,S,?,244.4,?
+3,1,"Passenger, No914",female,?,1,4,"T43590",68.7763,?,S,"Boat15",?,"New York, NY"
+3,1,"Passenger, No915",male,?,0,3,"T23989",175.4757,?,Q,"Boat10",221.5,"New York, NY"
+2,1,"Passenger, No916",female,?,1,4,"T43073",9.6434,?,S,"Boat7",?,"New York, NY"
+3,1,"Passenger, No917",female,42.5,1,3,"T72937",60.6418,"C73",S,"Boat1",203.5,"New York, NY"
+2,0,"Passenger, No918",female,51.3,1,0,"T17017",130.9256,"C105",S,?,?,?
+1,0,"Passenger, No919",female,?,3,1,"T25771",150.1308,?,S,"Boat16",?,?
+3,0,"Passenger, No920",female,41.0,4,2,"T45398",114.83,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No921",female,33.1,1,0,"T85597",133.039,"C81",Q,?,?,"New York, NY"
+1,1,"Passenger, No922",male,31.9,0,0,"T83821",89.8922,"C135",S,"Boat2",?,?
+2,1,"Passenger, No923",female,26.8,2,4,"T80879",148.363,?,S,?,?,"New York, NY"
+2,0,"Passenger, No924",female,29.1,3,0,"T88925",31.8401,"C129",C,"Boat6",113.3,"New York, NY"
+3,0,"Passenger, No925",female,58.4,1,4,"T28287",159.4942,"C111",S,"Boat4",178.9,"New York, NY"
+3,0,"Passenger, No926",female,46.9,1,1,"T99654",70.3054,?,Q,"Boat12",?,?
+3,1,"Passenger, No927",male,52.7,0,1,"T93947",35.3617,?,S,"Boat4",?,"New York, NY"
+3,1,"Passenger, No928",male,21.9,1,4,"T93656",163.8264,?,S,?,?,"New York, NY"
+3,0,"Passenger, No929",male,66.6,3,2,"T96715",141.0746,?,C,?,?,"New York, NY"
+2,0,"Passenger, No930",female,35.5,2,0,"T43525",172.9291,?,Q,"Boat14",?,"New York, NY"
+2,1,"Passenger, No931",male,67.4,0,3,"T43050",21.1781,"C34",C,?,?,"New York, NY"
+2,0,"Passenger, No932",female,54.6,3,1,"T90441",7.0073,?,Q,"Boat15",?,?
+2,1,"Passenger, No933",male,9.1,4,3,"T32795",62.2109,?,C,"Boat14",?,?
+1,0,"Passenger, No934",female,1.4,1,3,"T15750",48.5674,"C136",S,"Boat4",?,?
+3,0,"Passenger, No935",female,55.8,3,0,"T78835",76.8162,?,C,?,?,"New York, NY"
+2,0,"Passenger, No936",male,?,2,3,"T62602",52.4302,"C45",S,?,?,?
+1,1,"Passenger, No937",female,34.0,1,4,"T64166",12.7524,?,C,?,?,?
+1,0,"Passenger, No938",male,19.3,4,0,"T49759",31.727,"C132",S,?,?,"New York, NY"
+1,0,"Passenger, No939",female,44.3,0,1,"T97435",104.4242,"C27",C,?,186.1,?
+2,1,"Passenger, No940",male,29.0,3,0,"T52006",10.3947,?,C,?,?,"New York, NY"
+3,0,"Passenger, No941",female,55.5,3,1,"T41632",61.0874,"C120",Q,?,?,?
+1,0,"Passenger, No942",female,20.4,2,2,"T80161",184.2687,"C130",Q,?,?,"New York, NY"
+3,0,"Passenger, No943",female,48.7,2,4,"T77763",17.2722,?,C,"Boat8",?,"New York, NY"
+1,0,"Passenger, No944",female,14.2,2,4,"T98617",56.4625,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No945",male,25.9,4,4,"T52092",95.2246,?,S,"Boat10",?,?
+3,1,"Passenger, No946",male,56.9,2,1,"T61331",57.7944,?,Q,?,?,?
+1,1,"Passenger, No947",female,?,1,2,"T74887",198.2165,?,C,?,?,?
+2,1,"Passenger, No948",male,27.7,0,1,"T33737",153.2243,"C20",S,?,?,?
+1,1,"Passenger, No949",male,?,4,0,"T11291",195.4831,"C82",C,?,?,"New York, NY"
+2,1,"Passenger, No950",male,?,4,4,"T51512",38.5093,"C108",S,?,?,?
+3,1,"Passenger, No951",female,?,1,3,"T38963",123.8734,"C66",C,?,?,?
+3,1,"Passenger, No952",female,7.9,0,3,"T68213",149.1371,?,Q,"Boat1",?,?
+3,1,"Passenger, No953",female,37.2,2,0,"T75409",80.6406,?,S,?,?,"New York, NY"
+3,1,"Passenger, No954",male,15.3,2,2,"T63097",144.4121,"C107",Q,"Boat1",?,"New York, NY"
+3,0,"Passenger, No955",female,2.5,4,2,"T57123",100.7367,"C118",S,?,?,?
+2,1,"Passenger, No956",male,?,4,4,"T88525",43.1639,?,C,?,?,?
+1,0,"Passenger, No957",male,37.2,2,3,"T29533",172.4075,?,S,?,?,"New York, NY"
+1,0,"Passenger, No958",male,55.0,1,2,"T81819",87.5365,?,S,"Boat7",?,?
+1,1,"Passenger, No959",male,54.8,4,2,"T33451",186.7693,?,S,?,?,?
+1,0,"Passenger, No960",female,?,0,3,"T30435",52.1755,?,C,?,?,?
+1,0,"Passenger, No961",male,?,4,0,"T18791",31.5013,?,Q,"Boat13",?,"New York, NY"
+3,1,"Passenger, No962",female,40.8,3,2,"T78612",37.5446,"C42",S,?,?,?
+2,0,"Passenger, No963",female,21.7,0,2,"T73861",8.1281,?,Q,"Boat15",259.5,"New York, NY"
+3,1,"Passenger, No964",female,2.1,1,3,"T43150",95.9381,?,S,?,?,?
+1,0,"Passenger, No965",female,25.2,3,3,"T20239",74.181,?,C,?,278.0,?
+2,0,"Passenger, No966",female,12.5,0,1,"T83608",9.8133,?,Q,?,?,?
+3,1,"Passenger, No967",female,20.7,0,4,"T86758",90.4876,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No968",male,27.1,3,2,"T28868",183.424,?,C,?,?,?
+1,0,"Passenger, No969",male,14.4,1,3,"T81703",198.1331,?,S,?,?,"New York, NY"
+1,0,"Passenger, No970",female,12.4,3,0,"T20481",163.2795,?,Q,"Boat16",85.4,"New York, NY"
+3,1,"Passenger, No971",female,47.1,4,4,"T99469",120.8008,"C67",S,?,?,"New York, NY"
+2,1,"Passenger, No972",female,?,4,2,"T43769",33.8545,?,S,"Boat8",?,?
+1,1,"Passenger, No973",female,29.9,2,2,"T20633",126.4963,"C26",C,"Boat2",?,"New York, NY"
+1,1,"Passenger, No974",female,24.0,2,0,"T50371",176.4256,?,C,?,?,"New York, NY"
+2,0,"Passenger, No975",male,42.3,4,3,"T20863",21.0505,"C48",Q,?,306.5,"New York, NY"
+3,0,"Passenger, No976",male,?,1,0,"T27495",169.4981,?,Q,?,?,?
+2,1,"Passenger, No977",male,?,4,0,"T15179",165.1788,?,S,"Boat16",?,"New York, NY"
+3,0,"Passenger, No978",female,?,3,4,"T44076",156.3347,?,C,"Boat10",?,"New York, NY"
+3,0,"Passenger, No979",female,25.8,4,2,"T48489",163.8544,?,S,"Boat10",?,?
+2,0,"Passenger, No980",male,?,0,4,"T25429",199.654,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No981",female,9.5,4,4,"T49655",45.9055,?,S,?,?,?
+1,0,"Passenger, No982",female,57.1,3,3,"T52412",164.0773,"C118",Q,?,186.3,"New York, NY"
+1,0,"Passenger, No983",female,34.6,2,1,"T15508",51.8046,?,C,"Boat6",?,"New York, NY"
+3,1,"Passenger, No984",female,26.7,0,0,"T73281",194.0084,?,S,?,?,"New York, NY"
+3,1,"Passenger, No985",female,69.6,4,4,"T35776",190.2143,"C126",Q,?,?,"New York, NY"
+2,0,"Passenger, No986",female,29.1,0,3,"T64689",183.2505,?,S,"Boat8",?,?
+3,0,"Passenger, No987",male,41.0,3,2,"T10561",12.9061,"C125",S,?,?,"New York, NY"
+2,1,"Passenger, No988",male,66.7,2,4,"T96941",197.8293,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No989",male,14.8,3,0,"T53093",189.5828,?,S,"Boat9",?,?
+2,1,"Passenger, No990",male,15.1,1,2,"T22793",61.3118,"C150",Q,?,286.5,"New York, NY"
+1,0,"Passenger, No991",male,55.8,2,1,"T24859",70.8183,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No992",female,25.4,3,1,"T81474",146.4365,"C32",S,?,?,"New York, NY"
+3,0,"Passenger, No993",female,53.3,2,0,"T54588",159.5697,?,Q,"Boat13",?,?
+3,1,"Passenger, No994",male,52.4,3,4,"T70011",130.2928,?,S,?,?,"New York, NY"
+1,1,"Passenger, No995",female,58.8,2,3,"T21170",23.7156,?,S,?,?,"New York, NY"
+3,1,"Passenger, No996",male,3.2,2,1,"T50902",87.9999,?,S,?,?,"New York, NY"
+1,1,"Passenger, No997",female,20.4,3,0,"T79594",102.166,"C114",S,?,?,?
+1,0,"Passenger, No998",male,7.6,2,2,"T51721",40.6107,?,S,?,?,"New York, NY"
+3,0,"Passenger, No999",female,46.4,0,3,"T15339",176.203,?,C,?,?,?
+3,0,"Passenger, No1000",male,3.9,2,3,"T81036",35.9674,"C73",S,?,?,"New York, NY"
+3,0,"Passenger, No1001",male,51.3,1,1,"T99449",197.9811,?,Q,"Boat7",?,?
+2,0,"Passenger, No1002",female,?,4,2,"T55123",194.8757,?,Q,?,?,"New York, NY"
+1,1,"Passenger, No1003",female,35.3,0,3,"T87429",54.3226,?,S,"Boat4",82.4,"New York, NY"
+1,0,"Passenger, No1004",male,48.2,1,1,"T46247",117.0421,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No1005",female,?,0,2,"T52613",78.8513,?,C,?,?,"New York, NY"
+1,1,"Passenger, No1006",female,?,1,3,"T74082",90.3029,?,C,?,?,"New York, NY"
+1,1,"Passenger, No1007",female,8.6,2,1,"T47151",88.0997,?,Q,?,?,?
+1,1,"Passenger, No1008",male,20.0,3,3,"T45342",48.0103,"C14",S,"Boat13",?,"New York, NY"
+3,0,"Passenger, No1009",male,26.6,2,0,"T45626",105.7137,?,C,?,?,"New York, NY"
+1,1,"Passenger, No1010",female,53.3,4,4,"T85289",108.3343,?,C,"Boat1",?,?
+3,1,"Passenger, No1011",female,?,1,1,"T24216",145.5717,?,Q,"Boat7",?,"New York, NY"
+3,1,"Passenger, No1012",male,44.1,1,2,"T16003",74.5917,"C146",C,?,?,"New York, NY"
+3,0,"Passenger, No1013",male,10.5,3,0,"T36864",109.3212,"C36",Q,"Boat15",?,?
+1,0,"Passenger, No1014",female,?,2,0,"T87004",198.3065,?,C,"Boat3",?,?
+1,0,"Passenger, No1015",female,38.0,1,0,"T72391",110.5097,?,Q,"Boat16",71.7,"New York, NY"
+2,0,"Passenger, No1016",male,16.8,4,2,"T10012",73.047,?,C,?,?,"New York, NY"
+3,0,"Passenger, No1017",female,?,1,1,"T15925",43.1919,?,S,?,?,"New York, NY"
+3,0,"Passenger, No1018",male,?,1,2,"T92199",153.4131,"C120",S,"Boat6",?,?
+2,0,"Passenger, No1019",male,62.6,0,0,"T30648",34.9792,?,S,"Boat6",?,"New York, NY"
+3,1,"Passenger, No1020",female,?,4,4,"T96575",190.9555,?,Q,"Boat15",?,?
+1,0,"Passenger, No1021",male,26.9,4,3,"T21930",27.4928,?,S,?,?,"New York, NY"
+1,1,"Passenger, No1022",female,41.1,1,0,"T77889",175.7808,"C71",S,?,?,"New York, NY"
+1,0,"Passenger, No1023",female,7.5,2,2,"T81946",39.7705,?,S,?,?,"New York, NY"
+1,0,"Passenger, No1024",female,?,4,0,"T52184",137.8611,"C96",S,?,?,?
+3,0,"Passenger, No1025",male,?,1,4,"T20625",42.1323,"C35",C,"Boat12",?,"New York, NY"
+3,0,"Passenger, No1026",male,22.6,0,4,"T94621",61.9669,?,Q,"Boat16",?,"New York, NY"
+1,0,"Passenger, No1027",male,20.9,4,0,"T51171",12.8747,?,S,?,?,"New York, NY"
+1,1,"Passenger, No1028",female,7.1,4,2,"T79472",78.6556,?,C,?,?,?
+2,1,"Passenger, No1029",male,57.7,4,3,"T15488",12.6783,?,C,?,?,"New York, NY"
+3,1,"Passenger, No1030",female,2.2,4,4,"T34217",16.8388,"C41",C,?,?,"New York, NY"
+3,0,"Passenger, No1031",female,18.8,1,4,"T72081",186.5255,?,C,"Boat7",?,?
+2,0,"Passenger, No1032",male,10.8,3,4,"T98854",38.3199,?,Q,"Boat10",?,?
+1,1,"Passenger, No1033",male,51.0,4,3,"T38032",192.3509,?,C,"Boat13",?,"New York, NY"
+2,0,"Passenger, No1034",female,26.8,2,0,"T34456",49.6704,?,C,?,?,?
+3,0,"Passenger, No1035",male,22.2,2,2,"T77237",163.8708,?,S,"Boat4",?,"New York, NY"
+3,0,"Passenger, No1036",female,68.1,3,4,"T18064",71.2862,?,Q,?,79.1,"New York, NY"
+1,1,"Passenger, No1037",male,18.8,2,0,"T61736",162.3075,"C33",S,"Boat15",?,"New York, NY"
+1,0,"Passenger, No1038",male,7.3,1,3,"T38414",130.5855,"C20",C,"Boat3",301.2,"New York, NY"
+3,1,"Passenger, No1039",female,7.6,4,3,"T82423",107.2724,?,S,?,?,"New York, NY"
+3,0,"Passenger, No1040",female,8.7,1,4,"T78664",52.6552,?,C,"Boat16",?,?
+3,0,"Passenger, No1041",female,61.9,1,3,"T58222",72.4296,"C29",C,"Boat4",210.0,"New York, NY"
+1,1,"Passenger, No1042",male,37.6,2,0,"T86881",199.4019,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No1043",male,24.1,3,0,"T22088",12.1142,"C85",S,?,?,"New York, NY"
+2,0,"Passenger, No1044",female,65.6,3,3,"T16076",23.7171,"C119",S,"Boat7",19.1,"New York, NY"
+2,1,"Passenger, No1045",female,7.1,0,3,"T30184",19.1725,"C64",S,"Boat7",?,?
+1,1,"Passenger, No1046",male,8.5,3,3,"T83580",32.8062,?,Q,"Boat10",?,?
+1,1,"Passenger, No1047",male,69.0,1,2,"T49117",173.2526,"C145",S,?,?,"New York, NY"
+3,0,"Passenger, No1048",male,?,2,3,"T12366",14.2608,?,Q,?,?,?
+3,0,"Passenger, No1049",male,32.3,2,4,"T31705",121.5808,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No1050",female,?,4,2,"T29029",76.4052,?,Q,?,?,?
+1,1,"Passenger, No1051",male,62.4,0,1,"T39232",32.552,"C113",Q,?,134.4,"New York, NY"
+3,1,"Passenger, No1052",male,9.1,3,0,"T94139",151.1089,?,Q,?,?,?
+3,1,"Passenger, No1053",male,36.9,4,0,"T47316",179.9639,"C40",S,"Boat14",?,"New York, NY"
+1,1,"Passenger, No1054",female,11.1,2,0,"T82170",78.7677,?,S,"Boat7",?,"New York, NY"
+2,0,"Passenger, No1055",male,56.7,2,4,"T54151",151.3322,?,S,"Boat13",?,?
+2,1,"Passenger, No1056",male,58.4,1,3,"T39325",?,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No1057",male,53.7,4,1,"T19837",42.6999,?,S,?,?,"New York, NY"
+3,1,"Passenger, No1058",male,42.9,2,0,"T69393",39.5519,?,S,"Boat15",?,"New York, NY"
+1,1,"Passenger, No1059",male,19.6,3,3,"T68024",81.1939,?,C,"Boat13",?,"New York, NY"
+1,0,"Passenger, No1060",female,?,0,3,"T91971",184.9516,"C51",Q,"Boat3",?,?
+2,1,"Passenger, No1061",male,14.7,3,1,"T21689",191.0677,?,Q,"Boat7",?,"New York, NY"
+1,1,"Passenger, No1062",male,15.1,1,0,"T20301",5.0906,?,C,?,?,"New York, NY"
+1,1,"Passenger, No1063",female,68.4,3,0,"T34954",19.4955,?,C,?,?,"New York, NY"
+1,1,"Passenger, No1064",male,?,3,2,"T76881",164.405,?,C,"Boat8",?,"New York, NY"
+1,1,"Passenger, No1065",female,65.0,3,3,"T97461",183.4583,?,S,"Boat16",193.6,"New York, NY"
+1,0,"Passenger, No1066",female,68.2,1,4,"T81581",166.8007,"C122",S,"Boat8",177.4,"New York, NY"
+3,0,"Passenger, No1067",female,24.4,4,3,"T13003",142.0498,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No1068",male,65.7,1,3,"T77931",33.5761,"C103",S,?,?,"New York, NY"
+1,0,"Passenger, No1069",male,23.6,1,0,"T61558",133.6133,?,C,?,?,?
+2,1,"Passenger, No1070",male,37.1,1,0,"T84792",115.7341,"C20",Q,?,?,?
+2,1,"Passenger, No1071",male,9.8,0,2,"T14444",139.8997,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No1072",male,42.8,4,4,"T82553",131.2178,?,C,"Boat15",246.6,?
+3,1,"Passenger, No1073",male,13.4,4,3,"T68665",43.2178,"C57",S,"Boat15",?,"New York, NY"
+3,0,"Passenger, No1074",female,37.7,3,4,"T29649",117.0456,?,C,"Boat5",43.3,"New York, NY"
+1,1,"Passenger, No1075",male,37.7,4,0,"T62244",138.0561,"C104",S,"Boat1",?,"New York, NY"
+2,1,"Passenger, No1076",female,40.3,0,0,"T32009",110.6452,"C97",C,?,?,"New York, NY"
+2,1,"Passenger, No1077",male,?,4,2,"T34338",128.6201,?,Q,"Boat9",?,"New York, NY"
+1,0,"Passenger, No1078",male,12.3,0,2,"T34458",70.8881,"C133",S,"Boat11",?,"New York, NY"
+1,1,"Passenger, No1079",male,16.3,4,4,"T99972",48.593,"C139",S,?,?,?
+3,1,"Passenger, No1080",female,66.5,4,2,"T12048",152.4176,"C83",C,?,?,"New York, NY"
+1,0,"Passenger, No1081",male,42.3,1,0,"T36102",142.4138,?,C,"Boat3",69.7,?
+2,1,"Passenger, No1082",female,?,2,1,"T24053",38.8344,?,S,"Boat16",?,"New York, NY"
+1,0,"Passenger, No1083",female,22.9,0,4,"T44832",34.1889,"C37",C,"Boat3",?,?
+2,1,"Passenger, No1084",male,37.1,4,0,"T89307",30.6687,?,C,?,?,"New York, NY"
+3,1,"Passenger, No1085",female,?,1,2,"T83060",162.8314,?,S,"Boat14",?,"New York, NY"
+2,1,"Passenger, No1086",female,10.5,2,4,"T54208",179.1683,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No1087",male,22.0,4,0,"T20876",88.4809,?,S,"Boat1",15.0,"New York, NY"
+2,0,"Passenger, No1088",male,?,1,1,"T94233",177.2014,"C93",C,?,?,?
+1,0,"Passenger, No1089",female,13.6,0,2,"T49749",106.3628,?,C,?,161.4,"New York, NY"
+3,0,"Passenger, No1090",female,45.0,3,2,"T94298",150.6455,?,Q,"Boat6",95.1,"New York, NY"
+1,0,"Passenger, No1091",male,56.7,0,1,"T34959",29.6276,?,Q,?,?,?
+2,0,"Passenger, No1092",male,29.7,3,1,"T36733",95.3213,?,S,"Boat13",?,?
+2,0,"Passenger, No1093",male,34.1,2,2,"T57603",56.7979,?,S,"Boat2",?,"New York, NY"
+3,1,"Passenger, No1094",female,39.2,0,3,"T16959",40.4222,?,S,"Boat6",?,"New York, NY"
+1,1,"Passenger, No1095",male,46.2,1,0,"T52706",35.2624,"C64",Q,?,?,?
+2,1,"Passenger, No1096",male,17.3,4,1,"T40992",68.395,?,S,"Boat7",?,"New York, NY"
+2,1,"Passenger, No1097",male,45.5,3,1,"T31176",61.5193,"C95",C,"Boat16",?,"New York, NY"
+1,1,"Passenger, No1098",female,?,4,1,"T67690",15.8103,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No1099",female,57.4,1,4,"T83179",106.1943,?,S,"Boat4",?,?
+3,0,"Passenger, No1100",male,?,0,2,"T82641",163.1124,?,C,?,?,"New York, NY"
+2,0,"Passenger, No1101",female,25.7,1,4,"T61687",160.745,"C20",S,?,78.3,?
+1,1,"Passenger, No1102",male,24.9,1,1,"T84778",174.1805,?,S,"Boat6",?,"New York, NY"
+3,1,"Passenger, No1103",male,?,1,3,"T46331",148.3098,?,Q,"Boat1",?,"New York, NY"
+1,0,"Passenger, No1104",female,?,0,1,"T62142",34.4317,?,S,?,303.1,"New York, NY"
+2,1,"Passenger, No1105",male,?,4,0,"T25195",83.5258,?,S,?,?,?
+1,1,"Passenger, No1106",female,14.7,4,1,"T14852",42.5267,?,S,?,?,"New York, NY"
+3,1,"Passenger, No1107",male,?,2,1,"T23167",9.4283,?,C,"Boat5",282.2,"New York, NY"
+2,0,"Passenger, No1108",male,26.9,0,4,"T35382",76.5118,"C107",S,"Boat1",71.2,"New York, NY"
+3,1,"Passenger, No1109",male,41.3,0,0,"T39997",28.1368,?,C,"Boat11",?,?
+1,0,"Passenger, No1110",male,6.2,1,0,"T28460",186.3861,?,C,"Boat16",?,"New York, NY"
+1,0,"Passenger, No1111",male,50.8,0,3,"T65862",9.3642,?,S,"Boat4",?,?
+1,0,"Passenger, No1112",male,60.8,0,1,"T17687",125.1468,"C113",C,?,?,"New York, NY"
+2,1,"Passenger, No1113",male,41.7,2,2,"T47361",38.6341,?,C,"Boat5",83.1,"New York, NY"
+1,0,"Passenger, No1114",male,56.0,4,0,"T15076",162.1889,"C115",Q,?,?,?
+1,1,"Passenger, No1115",male,3.9,0,4,"T22770",135.6879,?,S,?,36.4,?
+1,1,"Passenger, No1116",male,?,0,3,"T69370",15.5072,"C95",S,"Boat10",?,"New York, NY"
+2,1,"Passenger, No1117",female,?,3,1,"T24969",9.8341,?,S,?,222.2,"New York, NY"
+3,1,"Passenger, No1118",female,15.1,4,0,"T53746",135.8549,"C61",Q,?,301.7,"New York, NY"
+2,1,"Passenger, No1119",female,11.3,2,4,"T18398",166.9851,?,C,?,?,?
+2,1,"Passenger, No1120",male,23.8,4,0,"T18888",14.8626,?,Q,?,13.2,"New York, NY"
+2,0,"Passenger, No1121",male,39.8,2,4,"T10396",135.2034,"C91",S,?,?,"New York, NY"
+3,1,"Passenger, No1122",female,28.3,4,4,"T74595",131.3652,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No1123",male,27.4,0,1,"T38348",190.7465,?,Q,?,?,?
+2,1,"Passenger, No1124",male,48.5,4,4,"T88003",115.8502,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No1125",female,66.9,1,0,"T38094",105.5364,"C148",S,?,?,"New York, NY"
+3,0,"Passenger, No1126",female,?,4,0,"T40829",141.8543,?,Q,?,256.1,"New York, NY"
+1,0,"Passenger, No1127",male,67.4,4,4,"T92045",61.5045,?,S,"Boat3",304.5,"New York, NY"
+2,0,"Passenger, No1128",male,32.1,2,4,"T77258",50.4619,"C139",C,?,?,?
+1,1,"Passenger, No1129",male,23.1,0,1,"T34761",21.6,?,S,"Boat3",168.1,"New York, NY"
+3,1,"Passenger, No1130",male,30.2,4,1,"T70733",81.4604,"C132",Q,"Boat9",?,?
+3,0,"Passenger, No1131",female,7.1,4,3,"T24744",13.5841,"C73",S,?,?,"New York, NY"
+3,0,"Passenger, No1132",female,25.4,3,4,"T96328",82.6408,?,S,"Boat14",?,?
+3,1,"Passenger, No1133",female,50.7,4,3,"T13358",104.7816,?,C,?,?,?
+1,0,"Passenger, No1134",female,17.8,3,2,"T81122",5.0669,"C66",C,?,?,"New York, NY"
+3,0,"Passenger, No1135",female,?,2,3,"T72852",197.567,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No1136",female,?,0,4,"T42543",152.3208,?,S,"Boat7",?,?
+1,1,"Passenger, No1137",female,24.6,1,0,"T43359",104.6535,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No1138",female,?,0,4,"T22761",131.8057,"C84",C,?,?,"New York, NY"
+1,1,"Passenger, No1139",female,65.3,0,4,"T26616",120.9367,?,Q,"Boat1",152.0,"New York, NY"
+1,1,"Passenger, No1140",male,29.5,0,1,"T52788",184.2278,?,C,?,?,"New York, NY"
+1,1,"Passenger, No1141",female,36.0,4,2,"T21835",119.7287,"C22",S,?,?,"New York, NY"
+1,0,"Passenger, No1142",female,18.0,3,0,"T56040",97.5238,?,Q,?,176.9,"New York, NY"
+2,0,"Passenger, No1143",female,29.3,1,0,"T77458",68.8925,?,C,?,?,"New York, NY"
+3,1,"Passenger, No1144",male,68.0,2,1,"T16154",78.3854,?,C,"Boat14",?,"New York, NY"
+2,1,"Passenger, No1145",female,?,2,2,"T65520",100.5557,?,Q,"Boat15",?,?
+2,0,"Passenger, No1146",male,56.6,0,3,"T27151",157.535,?,C,"Boat5",61.3,"New York, NY"
+3,1,"Passenger, No1147",male,?,2,4,"T89723",185.4437,?,Q,?,39.7,?
+1,1,"Passenger, No1148",female,34.0,3,2,"T62590",66.621,?,S,?,?,"New York, NY"
+1,0,"Passenger, No1149",female,59.8,2,4,"T77773",198.7078,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No1150",female,9.8,0,1,"T85738",188.6449,?,S,"Boat9",?,"New York, NY"
+2,1,"Passenger, No1151",male,30.3,1,0,"T31577",108.1086,?,C,?,?,"New York, NY"
+3,1,"Passenger, No1152",male,25.2,1,2,"T44698",39.0915,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No1153",female,?,3,2,"T50042",60.6154,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No1154",male,?,3,2,"T80420",148.6134,"C31",C,?,?,"New York, NY"
+1,1,"Passenger, No1155",male,3.1,4,4,"T59742",164.8313,"C100",Q,?,?,"New York, NY"
+1,1,"Passenger, No1156",male,18.6,1,0,"T60674",159.6011,?,Q,?,88.2,"New York, NY"
+2,0,"Passenger, No1157",female,?,0,4,"T19060",82.2861,?,C,?,?,"New York, NY"
+1,1,"Passenger, No1158",female,47.2,2,2,"T44326",166.0411,?,Q,"Boat3",?,"New York, NY"
+2,0,"Passenger, No1159",male,45.9,2,1,"T94364",33.6813,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No1160",male,53.7,4,0,"T50117",66.3279,?,S,"Boat4",?,"New York, NY"
+1,1,"Passenger, No1161",female,56.9,4,4,"T59982",39.1308,?,S,"Boat8",?,?
+1,0,"Passenger, No1162",male,?,0,4,"T75531",184.3904,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No1163",male,?,0,0,"T11953",39.2672,?,S,"Boat13",?,?
+1,0,"Passenger, No1164",female,9.4,4,0,"T48728",79.8246,?,S,"Boat8",95.6,?
+1,0,"Passenger, No1165",male,20.1,4,1,"T35557",84.6903,"C90",Q,"Boat2",?,"New York, NY"
+1,1,"Passenger, No1166",female,1.2,2,2,"T87113",167.6478,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No1167",female,?,0,3,"T58623",21.8756,?,S,"Boat1",178.1,?
+3,1,"Passenger, No1168",female,?,4,0,"T58140",153.2407,?,Q,?,?,?
+3,1,"Passenger, No1169",male,32.7,0,4,"T40681",113.8159,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No1170",male,26.6,4,3,"T33672",169.5591,?,C,?,?,?
+1,0,"Passenger, No1171",female,53.7,2,3,"T92714",114.0182,"C107",S,?,?,"New York, NY"
+3,1,"Passenger, No1172",male,55.1,2,2,"T76911",191.6807,?,C,?,?,"New York, NY"
+2,1,"Passenger, No1173",female,55.1,0,4,"T98208",130.7713,?,S,"Boat13",143.5,?
+1,1,"Passenger, No1174",female,6.1,0,2,"T58030",30.7186,"C98",Q,?,?,"New York, NY"
+2,1,"Passenger, No1175",male,?,4,1,"T26558",76.5979,"C14",Q,?,?,?
+3,1,"Passenger, No1176",female,4.6,1,1,"T27827",173.5808,"C138",S,"Boat11",290.6,?
+1,0,"Passenger, No1177",female,66.2,4,1,"T31091",144.83,?,S,"Boat3",?,"New York, NY"
+2,0,"Passenger, No1178",female,?,2,4,"T94080",190.0143,?,Q,?,?,?
+2,0,"Passenger, No1179",male,30.5,0,2,"T39807",173.128,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No1180",male,?,3,2,"T95674",103.3151,"C93",Q,?,47.1,"New York, NY"
+2,1,"Passenger, No1181",male,29.4,1,4,"T43697",97.0824,?,Q,?,?,"New York, NY"
+1,1,"Passenger, No1182",male,57.0,0,1,"T19269",69.7966,?,Q,"Boat13",?,?
+2,1,"Passenger, No1183",male,55.1,2,3,"T43558",176.8552,?,S,?,?,"New York, NY"
+3,1,"Passenger, No1184",male,31.9,4,4,"T38708",199.3089,"C148",Q,?,?,?
+1,1,"Passenger, No1185",female,10.5,0,2,"T53777",164.1794,"C22",C,?,?,?
+2,1,"Passenger, No1186",male,13.6,0,4,"T14458",69.9948,"C37",S,?,?,"New York, NY"
+3,0,"Passenger, No1187",male,?,0,0,"T70646",188.5737,?,Q,?,?,?
+2,1,"Passenger, No1188",male,13.2,0,3,"T91393",50.5925,"C78",Q,"Boat6",293.0,"New York, NY"
+1,1,"Passenger, No1189",female,63.1,2,0,"T11386",86.4477,"C22",S,?,?,"New York, NY"
+1,1,"Passenger, No1190",female,62.5,2,0,"T67417",191.393,?,C,"Boat5",?,"New York, NY"
+2,1,"Passenger, No1191",male,47.0,0,0,"T11274",61.1299,?,S,"Boat1",?,"New York, NY"
+1,0,"Passenger, No1192",female,65.7,1,3,"T15977",141.2523,"C26",S,?,?,"New York, NY"
+1,1,"Passenger, No1193",male,25.8,1,2,"T99918",33.569,?,S,?,?,"New York, NY"
+3,0,"Passenger, No1194",male,30.6,4,0,"T19658",144.8401,?,S,"Boat8",164.8,"New York, NY"
+1,0,"Passenger, No1195",male,20.9,4,2,"T39494",81.5629,?,S,?,?,?
+2,0,"Passenger, No1196",male,69.0,2,2,"T27040",40.8108,?,Q,?,?,"New York, NY"
+3,0,"Passenger, No1197",male,22.2,0,0,"T11996",11.2299,?,C,"Boat2",?,?
+3,1,"Passenger, No1198",female,11.5,0,0,"T60335",47.8891,?,S,?,?,"New York, NY"
+2,1,"Passenger, No1199",female,40.0,1,0,"T32412",120.7514,?,S,?,?,"New York, NY"
+2,0,"Passenger, No1200",male,10.8,2,2,"T78244",54.8877,"C16",Q,?,?,"New York, NY"
+1,1,"Passenger, No1201",male,52.9,0,1,"T34778",191.6999,?,Q,"Boat6",?,"New York, NY"
+3,0,"Passenger, No1202",female,48.4,4,0,"T66850",26.8526,?,Q,?,?,?
+3,1,"Passenger, No1203",female,33.5,0,3,"T82877",143.2218,"C96",S,?,?,"New York, NY"
+1,0,"Passenger, No1204",female,11.7,4,3,"T32593",58.8416,"C89",S,"Boat5",?,"New York, NY"
+1,0,"Passenger, No1205",male,?,1,4,"T48606",126.9281,"C68",S,"Boat5",?,?
+2,1,"Passenger, No1206",female,51.4,4,0,"T18655",190.9298,?,Q,"Boat1",?,"New York, NY"
+3,0,"Passenger, No1207",male,?,1,0,"T46306",140.6963,?,S,?,?,?
+1,0,"Passenger, No1208",male,14.4,1,4,"T22260",177.8355,?,C,?,?,"New York, NY"
+2,0,"Passenger, No1209",female,25.6,4,0,"T90098",30.7437,?,S,"Boat3",?,"New York, NY"
+3,0,"Passenger, No1210",female,60.7,0,1,"T86289",108.5228,?,S,?,243.6,"New York, NY"
+1,1,"Passenger, No1211",female,?,4,0,"T36610",86.8609,?,S,?,?,?
+2,1,"Passenger, No1212",female,61.5,0,3,"T40653",186.323,?,Q,"Boat12",?,?
+2,1,"Passenger, No1213",female,31.4,3,3,"T35735",122.9085,?,S,?,?,?
+3,1,"Passenger, No1214",male,9.9,1,3,"T27654",167.6345,?,S,?,?,"New York, NY"
+3,1,"Passenger, No1215",female,11.4,4,4,"T93392",12.6617,"C35",Q,"Boat14",?,?
+2,0,"Passenger, No1216",female,14.9,2,1,"T27560",192.6691,?,C,"Boat6",219.0,?
+1,0,"Passenger, No1217",male,15.0,0,1,"T20164",167.7185,"C145",C,?,?,"New York, NY"
+2,1,"Passenger, No1218",female,39.9,2,3,"T53361",83.2684,"C78",Q,"Boat11",118.9,?
+2,1,"Passenger, No1219",female,65.3,4,4,"T60109",17.3985,?,C,?,?,?
+1,0,"Passenger, No1220",female,65.6,2,4,"T21473",41.1461,?,S,?,189.3,?
+2,0,"Passenger, No1221",male,17.5,3,2,"T27918",156.4993,?,S,?,?,"New York, NY"
+2,0,"Passenger, No1222",female,41.3,1,1,"T64454",63.6945,?,C,?,149.1,"New York, NY"
+3,1,"Passenger, No1223",male,?,0,0,"T80013",147.5198,?,Q,"Boat6",?,?
+2,1,"Passenger, No1224",male,39.4,2,1,"T37409",194.0449,?,S,?,261.8,?
+3,1,"Passenger, No1225",male,?,1,1,"T94948",136.9576,?,C,"Boat5",?,"New York, NY"
+2,0,"Passenger, No1226",female,23.4,1,1,"T71345",?,?,S,"Boat2",206.8,?
+1,1,"Passenger, No1227",male,?,2,2,"T95075",196.8963,?,S,?,?,"New York, NY"
+1,1,"Passenger, No1228",male,46.7,1,0,"T65760",63.7192,"C41",S,"Boat3",?,?
+1,0,"Passenger, No1229",male,?,4,2,"T56014",106.029,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No1230",male,50.6,4,2,"T96412",182.3612,?,S,"Boat15",?,"New York, NY"
+3,0,"Passenger, No1231",male,59.8,1,2,"T39556",87.5292,?,C,"Boat16",?,"New York, NY"
+3,1,"Passenger, No1232",male,27.8,3,0,"T76278",166.8042,?,S,?,?,?
+1,1,"Passenger, No1233",male,39.5,4,1,"T21749",101.1341,"C121",Q,"Boat9",?,"New York, NY"
+2,1,"Passenger, No1234",female,?,1,1,"T30023",36.4702,"C14",Q,?,?,?
+1,1,"Passenger, No1235",male,46.9,1,1,"T56365",78.5203,"C96",S,?,?,?
+3,1,"Passenger, No1236",male,?,0,4,"T17264",138.3165,?,S,"Boat1",?,?
+3,1,"Passenger, No1237",male,23.4,0,0,"T38803",39.0304,?,Q,"Boat13",?,"New York, NY"
+2,1,"Passenger, No1238",female,?,2,3,"T15902",54.0283,?,S,"Boat3",?,"New York, NY"
+3,1,"Passenger, No1239",male,?,2,2,"T66133",116.0672,?,Q,"Boat7",?,"New York, NY"
+2,1,"Passenger, No1240",male,?,0,1,"T12380",89.7464,?,S,?,163.2,?
+3,0,"Passenger, No1241",male,65.9,4,1,"T66360",125.9593,?,Q,"Boat13",?,"New York, NY"
+2,0,"Passenger, No1242",male,?,3,3,"T40320",122.3787,"C43",C,"Boat1",?,?
+3,1,"Passenger, No1243",female,59.0,1,4,"T50470",122.5105,?,C,?,?,"New York, NY"
+3,1,"Passenger, No1244",male,11.0,1,0,"T86820",169.2222,"C134",C,?,?,"New York, NY"
+2,1,"Passenger, No1245",male,1.1,3,4,"T70852",65.2914,?,C,?,?,"New York, NY"
+2,1,"Passenger, No1246",male,14.9,2,3,"T14426",69.472,?,S,?,?,"New York, NY"
+1,1,"Passenger, No1247",female,43.5,3,3,"T20364",128.823,?,S,?,?,?
+1,1,"Passenger, No1248",female,13.4,2,0,"T31169",95.2211,?,C,?,280.0,"New York, NY"
+3,1,"Passenger, No1249",female,20.4,3,1,"T49129",151.9753,"C84",Q,?,?,"New York, NY"
+2,0,"Passenger, No1250",female,42.6,1,4,"T41779",189.2262,?,Q,?,?,"New York, NY"
+2,1,"Passenger, No1251",male,47.6,4,1,"T29150",120.6976,?,S,"Boat16",?,?
+3,1,"Passenger, No1252",male,8.1,0,4,"T68398",139.798,?,C,"Boat16",?,"New York, NY"
+3,1,"Passenger, No1253",male,50.0,3,2,"T54129",119.193,"C42",S,?,?,?
+2,1,"Passenger, No1254",female,11.2,4,1,"T84261",10.3402,"C101",S,?,?,"New York, NY"
+2,1,"Passenger, No1255",female,37.5,4,3,"T34944",70.7895,?,C,"Boat14",26.8,"New York, NY"
+1,0,"Passenger, No1256",female,39.1,1,2,"T52894",48.151,?,Q,?,?,?
+1,0,"Passenger, No1257",female,?,1,0,"T42592",94.2163,?,C,?,?,?
+3,1,"Passenger, No1258",female,48.8,3,4,"T13672",159.3366,"C90",Q,"Boat5",?,?
+3,0,"Passenger, No1259",male,46.1,3,3,"T47492",56.3817,"C87",S,"Boat2",?,"New York, NY"
+2,0,"Passenger, No1260",male,?,4,4,"T46743",70.9764,?,C,"Boat6",?,?
+1,0,"Passenger, No1261",male,?,1,2,"T62595",26.0224,?,S,?,?,?
+2,1,"Passenger, No1262",male,9.5,3,3,"T57867",7.0877,"C46",C,"Boat12",?,?
+3,0,"Passenger, No1263",male,26.5,0,0,"T32680",148.2696,?,C,"Boat6",?,?
+3,0,"Passenger, No1264",male,?,2,3,"T18926",160.9132,"C14",S,?,?,?
+1,1,"Passenger, No1265",male,5.0,3,2,"T96580",95.2011,"C36",C,"Boat16",?,?
+1,0,"Passenger, No1266",female,?,2,4,"T39804",184.4971,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No1267",male,3.8,4,2,"T60499",109.0864,"C139",Q,"Boat8",?,"New York, NY"
+2,0,"Passenger, No1268",male,?,0,0,"T16179",94.2885,?,S,"Boat14",243.9,?
+1,1,"Passenger, No1269",male,34.4,0,1,"T88415",25.196,"C74",Q,?,?,"New York, NY"
+1,1,"Passenger, No1270",male,?,1,3,"T60831",53.7058,?,S,?,?,?
+1,0,"Passenger, No1271",female,?,2,2,"T87477",79.5875,"C59",Q,"Boat7",?,?
+2,1,"Passenger, No1272",male,59.0,3,4,"T88541",69.4658,?,S,"Boat1",201.7,?
+3,1,"Passenger, No1273",male,61.4,1,3,"T75121",141.8882,?,C,"Boat7",?,"New York, NY"
+3,1,"Passenger, No1274",female,13.8,3,3,"T51799",36.2035,?,S,?,?,?
+3,0,"Passenger, No1275",male,10.2,2,4,"T30665",60.7383,?,C,?,?,?
+3,1,"Passenger, No1276",male,33.0,1,3,"T32591",145.9304,?,S,?,?,?
+2,0,"Passenger, No1277",female,?,1,0,"T39233",153.2552,?,C,?,74.4,"New York, NY"
+1,0,"Passenger, No1278",male,7.5,1,0,"T58773",104.7156,"C38",Q,?,?,"New York, NY"
+2,1,"Passenger, No1279",female,1.6,4,0,"T79578",113.473,?,C,"Boat5",221.3,?
+2,0,"Passenger, No1280",female,37.2,1,2,"T78259",148.666,?,C,?,245.9,"New York, NY"
+1,1,"Passenger, No1281",male,46.4,0,4,"T28469",90.0431,?,S,?,?,"New York, NY"
+1,1,"Passenger, No1282",male,37.7,0,2,"T73648",183.8221,?,Q,"Boat3",?,"New York, NY"
+1,1,"Passenger, No1283",female,37.4,1,4,"T36104",112.1628,?,C,?,?,"New York, NY"
+1,0,"Passenger, No1284",male,?,1,1,"T80679",111.0745,?,S,?,?,?
+1,1,"Passenger, No1285",male,63.0,4,0,"T56567",36.5586,?,Q,?,?,"New York, NY"
+1,0,"Passenger, No1286",female,49.1,1,3,"T67166",172.2699,?,Q,"Boat7",165.0,"New York, NY"
+3,0,"Passenger, No1287",male,29.1,0,4,"T54069",177.2382,"C113",S,?,?,"New York, NY"
+2,0,"Passenger, No1288",male,14.1,4,1,"T36361",144.7948,?,Q,?,?,"New York, NY"
+2,0,"Passenger, No1289",female,51.3,0,4,"T72504",187.8896,"C15",C,"Boat16",?,?
+1,1,"Passenger, No1290",female,12.5,4,4,"T23166",163.5776,?,S,"Boat15",?,"New York, NY"
+1,1,"Passenger, No1291",male,41.9,4,4,"T94312",140.0919,?,C,?,?,"New York, NY"
+3,0,"Passenger, No1292",female,49.0,3,4,"T60393",124.2689,?,S,?,?,?
+3,0,"Passenger, No1293",female,42.6,3,0,"T68240",177.8859,?,Q,?,?,"New York, NY"
+3,1,"Passenger, No1294",female,69.8,0,3,"T85247",99.4641,?,Q,"Boat15",?,"New York, NY"
+2,1,"Passenger, No1295",female,6.2,4,1,"T89726",170.1611,?,C,?,170.7,"New York, NY"
+1,1,"Passenger, No1296",male,21.2,4,4,"T13664",66.6272,"C52",Q,"Boat13",107.8,?
+1,0,"Passenger, No1297",female,?,3,0,"T61997",112.811,"C14",Q,?,?,?
+3,0,"Passenger, No1298",male,?,4,4,"T82816",134.8165,?,C,?,181.2,"New York, NY"
+3,1,"Passenger, No1299",female,52.3,0,4,"T55564",173.7713,?,C,"Boat1",?,?
+3,1,"Passenger, No1300",female,28.8,4,4,"T56647",8.371,"C101",C,?,?,"New York, NY"
+1,1,"Passenger, No1301",female,40.3,4,3,"T12556",108.5098,?,Q,"Boat1",?,"New York, NY"
+2,1,"Passenger, No1302",male,?,2,2,"T49716",54.1527,?,S,?,?,?
+2,1,"Passenger, No1303",female,?,0,3,"T28581",29.579,?,C,"Boat14",45.8,"New York, NY"
+1,0,"Passenger, No1304",male,?,0,2,"T40921",128.8644,?,C,"Boat9",?,"New York, NY"
+2,1,"Passenger, No1305",female,23.5,4,1,"T88745",38.2909,"C69",Q,?,?,"New York, NY"
+1,1,"Passenger, No1306",female,16.1,1,4,"T17386",?,?,S,"Boat3",23.2,"New York, NY"
+2,0,"Passenger, No1307",male,33.0,1,3,"T45481",111.3877,?,C,?,?,?
+2,0,"Passenger, No1308",male,22.1,2,1,"T50976",27.553,?,C,?,?,?
+2,0,"Passenger, No1309",male,42.4,2,3,"T69520",96.9651,"C64",C,"Boat10",?,"New York, NY"

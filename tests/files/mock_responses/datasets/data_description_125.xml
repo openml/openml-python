@@ -1,0 +1,15 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>125</oml:id>
+  <oml:name>kdd_internet_usage</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>KDD internet usage dataset</oml:description>
+  <oml:format>ARFF</oml:format>
+  <oml:upload_date>2014-10-06T23:19:24</oml:upload_date>
+  <oml:licence>Public</oml:licence>
+  <oml:url>https://test.openml.org/data/v1/download/125/kdd_internet_usage.arff</oml:url>
+  <oml:file_id>125</oml:file_id>
+  <oml:default_target_attribute>Who_Pays_for_Access_Work</oml:default_target_attribute>
+  <oml:version_label>1</oml:version_label>
+  <oml:visibility>public</oml:visibility>
+  <oml:status>active</oml:status>
+</oml:data_set_description>
