@@ -1,0 +1,10 @@
+<oml:setups xmlns:oml="http://openml.org/openml">
+  <oml:setup>
+    <oml:setup_id>1001</oml:setup_id>
+    <oml:flow_id>5873</oml:flow_id>
+  </oml:setup>
+  <oml:setup>
+    <oml:setup_id>1002</oml:setup_id>
+    <oml:flow_id>5873</oml:flow_id>
+  </oml:setup>
+</oml:setups>
