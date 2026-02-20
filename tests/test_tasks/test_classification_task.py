@@ -46,14 +46,13 @@ class OpenMLClassificationTaskTest(OpenMLSupervisedTaskTest):
         task = get_task(self.task_id)
         assert task.class_labels == ["tested_negative", "tested_positive"]
 
-
-@mock.patch.object(requests.Session, "get")
-def test_get_X_and_Y(mock_get):
-    mock_get.side_effect = _TASK_RESPONSES
-    task = get_task(119)
-    X, Y = task.get_X_and_y()
-    assert X.shape == (768, 8)
-    assert isinstance(X, pd.DataFrame)
-    assert Y.shape == (768,)
-    assert isinstance(Y, pd.Series)
-    assert pd.api.types.is_categorical_dtype(Y)
+    @mock.patch.object(requests.Session, "get")
+    def test_get_X_and_Y(self, mock_get):
+        mock_get.side_effect = _TASK_RESPONSES
+        task = get_task(self.task_id)
+        X, Y = task.get_X_and_y()
+        assert X.shape == (768, 8)
+        assert isinstance(X, pd.DataFrame)
+        assert Y.shape == (768,)
+        assert isinstance(Y, pd.Series)
+        assert pd.api.types.is_categorical_dtype(Y)
