@@ -279,7 +279,7 @@ def with_server(request):
         openml.config._sync_api_config()
         yield
         return
-    openml.config.server = "https://test.openml.org/api/v1/xml"
+    openml.config.server = f"{openml.config.TEST_SERVER_URL}/api/v1/xml"
     openml.config.apikey = TestBase.user_key
     openml.config._sync_api_config()
     yield

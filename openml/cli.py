@@ -109,7 +109,7 @@ def configure_server(value: str) -> None:
 
     def replace_shorthand(server: str) -> str:
         if server == "test":
-            return "https://test.openml.org/api/v1/xml"
+            return f"{config.TEST_SERVER_URL}/api/v1/xml"
         if server == "production_server":
             return "https://www.openml.org/api/v1/xml"
         return server

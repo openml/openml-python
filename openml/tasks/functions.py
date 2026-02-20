@@ -415,9 +415,10 @@ def get_task(
     if not isinstance(task_id, int):
         raise TypeError(f"Task id should be integer, is {type(task_id)}")
 
-    cache_key_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, task_id)
-    tid_cache_dir = cache_key_dir / str(task_id)
-    tid_cache_dir_existed = tid_cache_dir.exists()
+    task_cache_directory = openml.utils._create_cache_directory_for_id(
+        TASKS_CACHE_DIR_NAME, task_id
+    )
+    task_cache_directory_existed = task_cache_directory.exists()
     try:
         task = _get_task_description(task_id)
         dataset = get_dataset(task.dataset_id, **get_dataset_kwargs)
@@ -431,8 +432,8 @@ def get_task(
         if download_splits and isinstance(task, OpenMLSupervisedTask):
             task.download_split()
     except Exception as e:
-        if not tid_cache_dir_existed:
-            openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
+        if not task_cache_directory_existed:
+            openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, task_cache_directory)
         raise e
 
     return task
