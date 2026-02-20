@@ -31,15 +31,13 @@ class OpenMLSplitTest(TestBase):
             / "datasplits.arff"
         )
         # Use temporary directory to avoid conflicts with other tests
-        self.temp_dir = Path(tempfile.mkdtemp())
-        self.arff_filepath = self.temp_dir / "datasplits.arff"
-        shutil.copy2(source_arff, self.arff_filepath)
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.arff_filepath = Path(self.temp_dir.name) / "datasplits.arff"
+        shutil.copy(source_arff, self.arff_filepath)
 
     def tearDown(self):
-        try:
-            shutil.rmtree(self.temp_dir, ignore_errors=True)
-        except OSError:
-            pass
+        if hasattr(self, "temp_dir"):
+            self.temp_dir.cleanup()
 
     def test_eq(self):
         split = OpenMLSplit._from_arff_file(self.arff_filepath)
