@@ -12,10 +12,10 @@ import shutil
 import warnings
 from collections.abc import Iterator
 from contextlib import contextmanager
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field, fields, replace
 from io import StringIO
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, ClassVar, Literal, cast
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
@@ -102,15 +102,7 @@ class OpenMLConfigManager:
             return getattr(self._config, name)
         raise AttributeError(f"{type(self).__name__!r} object has no attribute {name!r}")
 
-    _FIELDS = {  # noqa: RUF012
-        "apikey",
-        "server",
-        "cachedir",
-        "avoid_duplicate_runs",
-        "retry_policy",
-        "connection_n_retries",
-        "show_progress",
-    }
+    _FIELDS: ClassVar[set[str]] = {f.name for f in fields(OpenMLConfig)}
 
     def __setattr__(self, name: str, value: Any) -> None:
         # during __init__ before _config exists
