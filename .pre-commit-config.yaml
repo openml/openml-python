@@ -29,6 +29,7 @@ repos:
       - id: check-case-conflict
       - id: check-merge-conflict
       - id: check-yaml
+        exclude: ^mkdocs\.yml$
       - id: end-of-file-fixer
       - id: check-toml
         types: ["toml"]
