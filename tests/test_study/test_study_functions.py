@@ -4,6 +4,9 @@ from __future__ import annotations
 import pytest
 import unittest
 from unittest import mock
+import requests
+from openml.testing import create_request_response
+
 
 import openml
 import openml.study
@@ -13,6 +16,42 @@ from pathlib import Path
 
 class TestStudyFunctions(TestBase):
     _multiprocess_can_split_ = True
+    BASE_PATH = Path(__file__).parents[1] / "files" / "mock_responses" / "studies"
+    @staticmethod
+    def setup_session_mocks(
+        base,
+        mock_get=None,
+        mock_post=None,
+        mock_delete=None,
+        get=None,
+        post=None,
+        delete=None,
+        ):
+        def make(xml):
+            return create_request_response(
+                status_code=200,
+                content_filepath=base / xml,
+            )
+        def build_side_effect(items):
+            if not items:
+                return None
+            items = items if isinstance(items, list) else [items]
+            result = []
+            for item in items:
+                if isinstance(item, Exception):
+                    result.append(item)
+                else:
+                    result.append(make(item))
+            return result
+
+        if mock_get and get:
+            mock_get.side_effect = build_side_effect(get)
+
+        if mock_post and post:
+            mock_post.side_effect = build_side_effect(post)
+
+        if mock_delete and delete:
+            mock_delete.side_effect = build_side_effect(delete)
 
     @pytest.mark.production_server()
     @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
@@ -76,25 +115,27 @@ class TestStudyFunctions(TestBase):
         ):
             openml.study.get_suite(123)
 
-    @mock.patch("openml._api_calls._perform_api_call")
-    def test_publish_benchmark_suite(self,mock_api):
-        base = Path(__file__).parents[1] / "files" / "mock_responses" / "studies" / "benchmark_suite"
-
-        def read_xml(name):
-            xml_path = base / name
-            xml = xml_path.read_text()
-            return xml
-
-        mock_api.side_effect = [  
-            read_xml("study_publish_benchmark_suite.xml"),  # publish  
-            read_xml("study_get_suite_created.xml"),        # first get_suite  
-            read_xml("study_attach_to_study.xml"),          # attach  
-            read_xml("study_get_suite_after_attach.xml"),   # get_suite after attach  
-            read_xml("study_detach_from_study.xml"),        # detach  
-            read_xml("study_get_suite_after_detach.xml"),   # get_suite after detach  
-            read_xml("study_update_suite_status.xml"),      # update status  
-            read_xml("study_get_suite_final.xml"),          # final get_suite  
-        ]
+    @mock.patch.object(requests.Session, "post")
+    @mock.patch.object(requests.Session, "get")
+    def test_publish_benchmark_suite(self,mock_get,mock_post):
+        base = self.BASE_PATH / "benchmark_suite"
+        self.setup_session_mocks(
+            base,
+            mock_get,
+            mock_post,
+            post=[
+                "study_publish_benchmark_suite.xml",
+                "study_attach_to_study.xml",
+                "study_detach_from_study.xml",
+                "study_update_suite_status.xml",
+            ],
+            get=[
+                "study_get_suite_created.xml",
+                "study_get_suite_after_attach.xml",
+                "study_get_suite_after_detach.xml",
+                "study_get_suite_final.xml",
+            ],
+        )
         fixture_alias = None
         fixture_name = "unit tested benchmark suite"
         fixture_descr = "bla"
@@ -162,58 +203,65 @@ class TestStudyFunctions(TestBase):
         assert study_downloaded.main_entity_type == "run"
         assert study_downloaded.runs is None
 
-    @mock.patch("openml._api_calls._perform_api_call")
-    def test_publish_empty_study_explicit(self,mock_api):
-        base = Path(__file__).parents[1] / "files" / "mock_responses" / "studies" / "empty_study"
-
-        def read_xml(name):
-            return (base / name).read_text()
-        mock_api.side_effect = [
-            read_xml("post_study_empty.xml"),
-            read_xml("get_study_empty.xml"),
-            
-        ]
+    @mock.patch.object(requests.Session, "post")
+    @mock.patch.object(requests.Session, "get")
+    def test_publish_empty_study_explicit(self,mock_get,mock_post):
+        base = self.BASE_PATH / "empty_study"
+        self.setup_session_mocks(
+            base,
+            mock_get=mock_get,
+            mock_post=mock_post,
+            get="get_study_empty.xml",
+            post="post_study_empty.xml",
+        )
         self._test_publish_empty_study_is_allowed(explicit=True)
 
 
-    @mock.patch("openml._api_calls._perform_api_call")
-    def test_publish_empty_study_implicit(self,mock_api):
-        base = Path(__file__).parents[1] / "files" / "mock_responses" / "studies" / "empty_study"
-
-        def read_xml(name):
-            return (base / name).read_text()
-
-        mock_api.side_effect = [
-            read_xml("post_study_empty.xml"),
-            read_xml("get_study_empty.xml"),
-            
-        ]
+    @mock.patch.object(requests.Session, "post")
+    @mock.patch.object(requests.Session, "get")
+    def test_publish_empty_study_implicit(self,mock_get,mock_post):
+        base = self.BASE_PATH / "empty_study"
+        self.setup_session_mocks(
+            base,
+            mock_get=mock_get,
+            mock_post=mock_post,
+            get="get_study_empty.xml",
+            post="post_study_empty.xml",
+        )
         self._test_publish_empty_study_is_allowed(explicit=False)
 
     @pytest.mark.flaky()
-    @mock.patch("openml._api_calls._perform_api_call")
-    def test_publish_study(self,mock_api):
-        base = Path(__file__).parents[1] / "files" / "mock_responses" / "studies" / "publish_study"
+    @mock.patch.object(requests.Session, "delete")
+    @mock.patch.object(requests.Session, "post")
+    @mock.patch.object(requests.Session, "get")
+    def test_publish_study(self,mock_get, mock_post, mock_delete):
+        base = self.BASE_PATH / "publish_study"
+        self.setup_session_mocks(
+            base,
+            mock_get,
+            mock_post,
+            mock_delete,
+            get=[
+                "get_evaluation_list_function_predictive_accuracy_limit_10_offset_0.xml",
+                "get_user_list_user_id_3229.xml",
+                "get_study_157.xml",
+                "get_run_list_limit_10000_offset_0_study_157.xml",
+                "get_evaluation_list_function_predictive_accuracy_limit_10000_offset_0_study_157.xml",
+                "get_user_list_user_id_3229.xml",
+                "get_run_list_limit_11_offset_10.xml",
+                "get_study_157_after_attach.xml",
+                "get_study_157_after_detach.xml",
+                "get_study_157_final.xml",
+            ],
+            post=[
+                "post_study_.xml",
+                "post_study_157_attach.xml",
+                "post_study_157_detach.xml",
+                "post_study_status_update.xml",
+            ],
+            delete="delete_study_157.xml",
 
-        def read_xml(name):
-            return (base / name).read_text()
-        mock_api.side_effect = [
-            read_xml("get_evaluation_list_function_predictive_accuracy_limit_10_offset_0.xml"),
-            read_xml("get_user_list_user_id_3229.xml"),
-            read_xml("post_study_.xml"),
-            read_xml("get_study_157.xml"),
-            read_xml("get_run_list_limit_10000_offset_0_study_157.xml"),
-            read_xml("get_evaluation_list_function_predictive_accuracy_limit_10000_offset_0_study_157.xml"),
-            read_xml("get_user_list_user_id_3229.xml"),
-            read_xml("get_run_list_limit_11_offset_10.xml"),
-            read_xml("post_study_157_attach.xml"),
-            read_xml("get_study_157_after_attach.xml"),
-            read_xml("post_study_157_detach.xml"),
-            read_xml("get_study_157_after_detach.xml"),
-            read_xml("post_study_status_update.xml"),
-            read_xml("get_study_157_final.xml"),
-            read_xml("delete_study_157.xml"),
-        ]
+        )
         # get some random runs to attach
         run_list = openml.evaluations.list_evaluations("predictive_accuracy", size=10)
         assert len(run_list) == 10
@@ -282,24 +330,33 @@ class TestStudyFunctions(TestBase):
         res = openml.study.delete_study(study.id)
         assert res
 
-    @mock.patch("openml._api_calls._perform_api_call")
-    def test_study_attach_illegal(self,mock_api):
-        base = Path(__file__).parents[1] / "files" / "mock_responses" / "studies" /"illegal_attach"
-        def read_xml(name):
-            return (base / name).read_text()
-        mock_api.side_effect = [
-            read_xml("get_run_list_limit_10_offset_0.xml"),   # list_runs(10)
-            read_xml("get_run_list_limit_20_offset_0.xml"),   # list_runs(20)
-            read_xml("post_study_illegal.xml"),                      # publish
-            read_xml("get_study_created.xml"),                # get_study after publish
+    @mock.patch.object(requests.Session, "delete")
+    @mock.patch.object(requests.Session, "post")
+    @mock.patch.object(requests.Session, "get")
+    def test_study_attach_illegal(self,mock_get,mock_post,mock_delete):
+        base = self.BASE_PATH / "illegal_attach"
+        #calls the helper funtion for mock setup
+        self.setup_session_mocks(
+            base,
+            mock_get,
+            mock_post,
+            mock_delete,
+            get=[
+                "get_run_list_limit_10_offset_0.xml",
+                "get_run_list_limit_20_offset_0.xml",
+                "get_study_created.xml",
+                "get_study_after_illegal_attach.xml",
+            ],
+            post=[
+                "post_study_illegal.xml",
+                openml.exceptions.OpenMLServerException("Problem attaching entities."),
+                openml.exceptions.OpenMLServerException("Problem attaching entities."),
+            ],
+            delete="delete_study.xml",
+        )
 
-            # attach illegal → raises server error
-            openml.exceptions.OpenMLServerException("Problem attaching entities."),
-            openml.exceptions.OpenMLServerException("Problem attaching entities."),
 
-            read_xml("get_study_after_illegal_attach.xml"),   # final get_study
-            read_xml("delete_study.xml"),                     # delete
-        ]
+
         run_list = openml.runs.list_runs(size=10)
         assert len(run_list) == 10
         run_list_more = openml.runs.list_runs(size=20)
