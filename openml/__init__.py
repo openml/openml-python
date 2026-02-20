@@ -54,7 +54,7 @@ from .tasks import (
 if TYPE_CHECKING:
     from ._config import OpenMLConfigManager
 
-config: OpenMLConfigManager = _config_module._config
+config: OpenMLConfigManager = _config_module.__config
 
 
 def populate_cache(

@@ -135,7 +135,7 @@ class TestConfigurationForExamples(openml.testing.TestBase):
         error_regex = ".*stop_use_example_configuration.*start_use_example_configuration.*first"
         # Tests do not reset the state of this class. Thus, we ensure it is in
         # the original state before the test.
-        openml.config.ConfigurationForExamples._start_last_called = False
+        openml.config._examples._start_last_called = False
         self.assertRaisesRegex(
             RuntimeError,
             error_regex,

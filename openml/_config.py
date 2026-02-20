@@ -28,11 +28,11 @@ def _resolve_default_cache_dir() -> Path:
         return Path(user_defined_cache_dir)
 
     if platform.system().lower() != "linux":
-        return Path("~", ".openml")
+        return Path("~", ".openml").expanduser()
 
     xdg_cache_home = os.environ.get("XDG_CACHE_HOME")
     if xdg_cache_home is None:
-        return Path("~", ".cache", "openml")
+        return Path("~", ".cache", "openml").expanduser()
 
     cache_dir = Path(xdg_cache_home) / "openml"
     if cache_dir.exists():
@@ -57,7 +57,7 @@ def _resolve_default_cache_dir() -> Path:
 class OpenMLConfig:
     """Dataclass storing the OpenML configuration."""
 
-    apikey: str = ""
+    apikey: str | None = ""
     server: str = "https://www.openml.org/api/v1/xml"
     cachedir: Path = field(default_factory=_resolve_default_cache_dir)
     avoid_duplicate_runs: bool = False
@@ -83,8 +83,6 @@ class OpenMLConfigManager:
         self.OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
         self._TEST_SERVER_NORMAL_USER_KEY = "normaluser"
 
-        self._user_path = Path("~").expanduser().absolute()
-
         self._config: OpenMLConfig = OpenMLConfig()
         # for legacy test `test_non_writable_home`
         self._defaults: dict[str, Any] = OpenMLConfig().__dict__.copy()
@@ -93,7 +91,7 @@ class OpenMLConfigManager:
         self.logger = logger
         self.openml_logger = openml_logger
 
-        self._examples = self.ConfigurationForExamples(self)
+        self._examples = ConfigurationForExamples(self)
 
         self._setup()
 
@@ -125,7 +123,6 @@ class OpenMLConfigManager:
             "OPENML_CACHE_DIR_ENV_VAR",
             "OPENML_SKIP_PARQUET_ENV_VAR",
             "_TEST_SERVER_NORMAL_USER_KEY",
-            "_user_path",
         }:
             return object.__setattr__(self, name, value)
 
@@ -397,70 +394,71 @@ class OpenMLConfigManager:
         yield merged_config
         self._setup(existing_config)
 
-    class ConfigurationForExamples:
-        """Allows easy switching to and from a test configuration, used for examples."""
 
-        _last_used_server = None
-        _last_used_key = None
-        _start_last_called = False
+class ConfigurationForExamples:
+    """Allows easy switching to and from a test configuration, used for examples."""
 
-        def __init__(self, manager: OpenMLConfigManager):
-            self._manager = manager
-            self._test_apikey = manager._TEST_SERVER_NORMAL_USER_KEY
-            self._test_server = "https://test.openml.org/api/v1/xml"
+    _last_used_server = None
+    _last_used_key = None
+    _start_last_called = False
 
-        def start_using_configuration_for_example(self) -> None:
-            """Sets the configuration to connect to the test server with valid apikey.
+    def __init__(self, manager: OpenMLConfigManager):
+        self._manager = manager
+        self._test_apikey = manager._TEST_SERVER_NORMAL_USER_KEY
+        self._test_server = "https://test.openml.org/api/v1/xml"
 
-            To configuration as was before this call is stored, and can be recovered
-            by using the `stop_use_example_configuration` method.
-            """
-            if (
-                self._start_last_called
-                and self._manager._config.server == self._test_server
-                and self._manager._config.apikey == self._test_apikey
-            ):
-                # Method is called more than once in a row without modifying the server or apikey.
-                # We don't want to save the current test configuration as a last used configuration.
-                return
+    def start_using_configuration_for_example(self) -> None:
+        """Sets the configuration to connect to the test server with valid apikey.
 
-            self._last_used_server = self._manager._config.server
-            self._last_used_key = self._manager._config.apikey
-            type(self)._start_last_called = True
+        To configuration as was before this call is stored, and can be recovered
+        by using the `stop_use_example_configuration` method.
+        """
+        if (
+            self._start_last_called
+            and self._manager._config.server == self._test_server
+            and self._manager._config.apikey == self._test_apikey
+        ):
+            # Method is called more than once in a row without modifying the server or apikey.
+            # We don't want to save the current test configuration as a last used configuration.
+            return
 
-            # Test server key for examples
-            self._manager._config = replace(
-                self._manager._config,
-                server=self._test_server,
-                apikey=self._test_apikey,
+        self._last_used_server = self._manager._config.server
+        self._last_used_key = self._manager._config.apikey
+        type(self)._start_last_called = True
+
+        # Test server key for examples
+        self._manager._config = replace(
+            self._manager._config,
+            server=self._test_server,
+            apikey=self._test_apikey,
+        )
+        warnings.warn(
+            f"Switching to the test server {self._test_server} to not upload results to "
+            "the live server. Using the test server may result in reduced performance of the "
+            "API!",
+            stacklevel=2,
+        )
+
+    def stop_using_configuration_for_example(self) -> None:
+        """Return to configuration as it was before `start_use_example_configuration`."""
+        if not type(self)._start_last_called:
+            # We don't want to allow this because it will (likely) result in the `server` and
+            # `apikey` variables being set to None.
+            raise RuntimeError(
+                "`stop_use_example_configuration` called without a saved config."
+                "`start_use_example_configuration` must be called first.",
             )
-            warnings.warn(
-                f"Switching to the test server {self._test_server} to not upload results to "
-                "the live server. Using the test server may result in reduced performance of the "
-                "API!",
-                stacklevel=2,
-            )
 
-        def stop_using_configuration_for_example(self) -> None:
-            """Return to configuration as it was before `start_use_example_configuration`."""
-            if not type(self)._start_last_called:
-                # We don't want to allow this because it will (likely) result in the `server` and
-                # `apikey` variables being set to None.
-                raise RuntimeError(
-                    "`stop_use_example_configuration` called without a saved config."
-                    "`start_use_example_configuration` must be called first.",
-                )
-
-            self._manager._config = replace(
-                self._manager._config,
-                server=cast("str", self._last_used_server),
-                apikey=cast("str", self._last_used_key),
-            )
-            type(self)._start_last_called = False
+        self._manager._config = replace(
+            self._manager._config,
+            server=cast("str", self._last_used_server),
+            apikey=cast("str", self._last_used_key),
+        )
+        type(self)._start_last_called = False
 
 
-_config = OpenMLConfigManager()
+__config = OpenMLConfigManager()
 
 
 def __getattr__(name: str) -> Any:
-    return getattr(_config, name)
+    return getattr(__config, name)
