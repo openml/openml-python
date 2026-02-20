@@ -28,6 +28,8 @@ OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
 OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR = "OPENML_TEST_SERVER_ADMIN_KEY"
 _TEST_SERVER_NORMAL_USER_KEY = "normaluser"
 
+TEST_SERVER_URL = "https://test.openml.org"
+
 
 class _Config(TypedDict):
     apikey: str
@@ -214,7 +216,7 @@ class ConfigurationForExamples:
     _last_used_server = None
     _last_used_key = None
     _start_last_called = False
-    _test_server = "https://test.openml.org/api/v1/xml"
+    _test_server = f"{TEST_SERVER_URL}/api/v1/xml"
     _test_apikey = _TEST_SERVER_NORMAL_USER_KEY
 
     @classmethod
@@ -470,7 +472,8 @@ def get_cache_directory() -> str:
 
     """
     url_suffix = urlparse(server).netloc
-    reversed_url_suffix = os.sep.join(url_suffix.split(".")[::-1])  # noqa: PTH118
+    url_parts = url_suffix.replace(":", "_").split(".")[::-1]
+    reversed_url_suffix = os.sep.join(url_parts)  # noqa: PTH118
     return os.path.join(_root_cache_directory, reversed_url_suffix)  # noqa: PTH118
 
 
