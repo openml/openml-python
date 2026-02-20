@@ -2,29 +2,116 @@
 from __future__ import annotations
 
 import os
-import unittest.mock
+from pathlib import Path
 from time import time
+from unittest import mock
 
 import numpy as np
 import pandas as pd
 import pytest
-from scipy import sparse
+import requests
 
 import openml
 from openml.datasets import OpenMLDataFeature, OpenMLDataset
-from openml.exceptions import PyOpenMLError
-from openml.testing import TestBase
+from openml.testing import TestBase, create_request_response
 
-import pytest
+_MOCK_DIR = Path(__file__).parent.parent / "files" / "mock_responses"
+_STATIC_DIR = Path(__file__).parent.parent / "files" / "org" / "openml" / "test" / "datasets"
+
+# Dataset 2 (anneal) mock responses
+_D2_DESC = create_request_response(
+    status_code=200,
+    content_filepath=_MOCK_DIR / "datasets" / "data_description_2.xml",
+)
+_D2_ARFF = create_request_response(
+    status_code=200,
+    content_filepath=_STATIC_DIR / "2" / "dataset.arff",
+)
+_D2_FEATURES = create_request_response(
+    status_code=200,
+    content_filepath=_STATIC_DIR / "2" / "features.xml",
+)
+_D2_QUALITIES = create_request_response(
+    status_code=200,
+    content_filepath=_STATIC_DIR / "2" / "qualities.xml",
+)
+
+# Dataset 61 (iris) mock responses
+_D61_DESC = create_request_response(
+    status_code=200,
+    content_filepath=_MOCK_DIR / "datasets" / "data_description_61.xml",
+)
+_D61_ARFF = create_request_response(
+    status_code=200,
+    content_filepath=_MOCK_DIR / "datasets" / "iris.arff",
+)
+
+# Dataset 40945 (titanic) mock responses
+_D40945_DESC = create_request_response(
+    status_code=200,
+    content_filepath=_MOCK_DIR / "datasets" / "data_description_40945.xml",
+)
+_D40945_ARFF = create_request_response(
+    status_code=200,
+    content_filepath=_MOCK_DIR / "datasets" / "titanic.arff",
+)
+_D40945_FEATURES = create_request_response(
+    status_code=200,
+    content_filepath=_MOCK_DIR / "datasets" / "data_features_40945.xml",
+)
+
+# Dataset 125 mock responses (tagging test)
+_D125_DESC = create_request_response(
+    status_code=200,
+    content_filepath=_MOCK_DIR / "datasets" / "data_description_125.xml",
+)
+_D125_LIST_EMPTY = create_request_response(
+    status_code=412,
+    content_filepath=_MOCK_DIR / "datasets" / "data_list_empty.xml",
+)
+_D125_LIST_WITH_125 = create_request_response(
+    status_code=200,
+    content_filepath=_MOCK_DIR / "datasets" / "data_list_with_125.xml",
+)
+_D125_TAG = create_request_response(
+    status_code=200,
+    content_filepath=_MOCK_DIR / "datasets" / "data_tag_success.xml",
+)
+_D125_UNTAG = create_request_response(
+    status_code=200,
+    content_filepath=_MOCK_DIR / "datasets" / "data_untag_success.xml",
+)
+
+# Dataset 11 (car) mock responses (ontology test)
+_D11_DESC = create_request_response(
+    status_code=200,
+    content_filepath=_MOCK_DIR / "datasets" / "data_description_11.xml",
+)
+_D11_FEATURES = create_request_response(
+    status_code=200,
+    content_filepath=_MOCK_DIR / "datasets" / "data_features_11.xml",
+)
+
+# Ontology operation mock responses
+_ONTOLOGY_SUCCESS = create_request_response(
+    status_code=200,
+    content_filepath=_MOCK_DIR / "datasets" / "data_feature_ontology_success.xml",
+)
+_ONTOLOGY_ERROR_1105 = create_request_response(
+    status_code=412,
+    content_filepath=_MOCK_DIR / "datasets" / "data_feature_ontology_error_1105.xml",
+)
+_ONTOLOGY_ERROR_1106 = create_request_response(
+    status_code=412,
+    content_filepath=_MOCK_DIR / "datasets" / "data_feature_ontology_error_1106.xml",
+)
 
 
-@pytest.mark.production_server()
 class OpenMLDatasetTest(TestBase):
     _multiprocess_can_split_ = True
 
     def setUp(self):
         super().setUp()
-        self.use_production_server()
 
         # Load dataset id 2 - dataset 2 is interesting because it contains
         # missing values, categorical features etc.
@@ -97,7 +184,9 @@ class OpenMLDatasetTest(TestBase):
         self.assertListEqual(list(clean_series.values), expected_values)
         self.assertListEqual(list(clean_series.cat.categories.values), list("ab"))
 
-    def test_get_data_pandas(self):
+    @mock.patch.object(requests.Session, "get")
+    def test_get_data_pandas(self, mock_get):
+        mock_get.side_effect = [_D40945_DESC, _D40945_ARFF, _D40945_FEATURES]
         data, _, _, _ = self.titanic.get_data()
         assert isinstance(data, pd.DataFrame)
         assert data.shape[1] == len(self.titanic.features)
@@ -189,10 +278,12 @@ class OpenMLDatasetTest(TestBase):
 
         assert "class" not in attribute_names
 
-    def test_get_data_rowid_and_ignore_and_target(self):
+    @mock.patch.object(requests.Session, "get")
+    def test_get_data_rowid_and_ignore_and_target(self, mock_get):
+        mock_get.side_effect = [_D2_DESC, _D2_ARFF]
         self.dataset.ignore_attribute = ["condition"]
         self.dataset.row_id_attribute = ["hardness"]
-        X, y, categorical, names = self.dataset.get_data(target="class")
+        X, y, categorical, _ = self.dataset.get_data(target="class")
         assert X.shape == (898, 36)
         assert len(categorical) == 36
         cats = [True] * 3 + [False, True, True, False] + [True] * 23 + [False] * 3 + [True] * 3
@@ -214,14 +305,18 @@ class OpenMLDatasetTest(TestBase):
         assert rval.shape == (898, 38)
         assert len(categorical) == 38
 
-    def test_get_data_with_nonexisting_class(self):
+    @mock.patch.object(requests.Session, "get")
+    def test_get_data_with_nonexisting_class(self, mock_get):
+        mock_get.side_effect = [_D2_DESC, _D2_ARFF]
         # This class is using the anneal dataset with labels [1, 2, 3, 4, 5, 'U']. However,
         # label 4 does not exist and we test that the features 5 and 'U' are correctly mapped to
         # indices 4 and 5, and that nothing is mapped to index 3.
         _, y, _, _ = self.dataset.get_data("class")
         assert list(y.dtype.categories) == ["1", "2", "3", "4", "5", "U"]
 
-    def test_get_data_corrupt_pickle(self):
+    @mock.patch.object(requests.Session, "get")
+    def test_get_data_corrupt_pickle(self, mock_get):
+        mock_get.side_effect = [_D61_DESC, _D61_ARFF]
         # Lazy loaded dataset, populate cache.
         self.iris.get_data()
         # Corrupt pickle file, overwrite as empty.
@@ -233,7 +328,12 @@ class OpenMLDatasetTest(TestBase):
         assert isinstance(xy, pd.DataFrame)
         assert xy.shape == (150, 5)
 
-    def test_lazy_loading_metadata(self):
+    @mock.patch.object(requests.Session, "get")
+    def test_lazy_loading_metadata(self, mock_get):
+        mock_get.side_effect = [
+            _D2_DESC, _D2_FEATURES, _D2_QUALITIES,  # first get_dataset (with features+qualities)
+            _D2_DESC, _D2_FEATURES, _D2_QUALITIES,  # third get_dataset (after cache removal) + lazy loads
+        ]
         # Initial Setup
         did_cache_dir = openml.utils._create_cache_directory_for_id(
             openml.datasets.functions.DATASETS_CACHE_DIR_NAME,
@@ -275,14 +375,27 @@ class OpenMLDatasetTest(TestBase):
         assert _dataset.features == _compare_dataset.features
         assert _dataset.qualities == _compare_dataset.qualities
 
-    def test_equality_comparison(self):
+    @mock.patch.object(requests.Session, "get")
+    def test_equality_comparison(self, mock_get):
+        mock_get.side_effect = [_D61_DESC, _D40945_DESC]
         self.assertEqual(self.iris, self.iris)
         self.assertNotEqual(self.iris, self.titanic)
         self.assertNotEqual(self.titanic, "Wrong_object")
 
+@mock.patch.object(requests.Session, "post")
+@mock.patch.object(requests.Session, "get")
+def test_tagging(mock_get, mock_post):
+    mock_get.side_effect = [
+        _D125_DESC,          # get_dataset(125)
+        _D125_LIST_EMPTY,    # list_datasets(tag=tag) - empty
+        _D125_LIST_WITH_125, # list_datasets(tag=tag) - with dataset 125
+        _D125_LIST_EMPTY,    # list_datasets(tag=tag) - empty again
+    ]
+    mock_post.side_effect = [
+        _D125_TAG,   # push_tag
+        _D125_UNTAG, # remove_tag
+    ]
 
-@pytest.mark.test_server()
-def test_tagging():
     dataset = openml.datasets.get_dataset(125, download_data=False)
 
     # tags can be at most 64 alphanumeric (+ underscore) chars
@@ -298,34 +411,38 @@ def test_tagging():
     datasets = openml.datasets.list_datasets(tag=tag)
     assert datasets.empty
 
-@pytest.mark.test_server()
-def test_get_feature_with_ontology_data_id_11():
+@mock.patch.object(requests.Session, "get")
+def test_get_feature_with_ontology_data_id_11(mock_get):
+    mock_get.side_effect = [_D11_DESC, _D11_FEATURES]
     # test on car dataset, which has built-in ontology references
     dataset = openml.datasets.get_dataset(11)
     assert len(dataset.features) == 7
     assert len(dataset.features[1].ontologies) >= 2
     assert len(dataset.features[2].ontologies) >= 1
-    assert len(dataset.features[3].ontologies) >= 1   
+    assert len(dataset.features[3].ontologies) >= 1
 
-@pytest.mark.test_server()
-def test_add_remove_ontology_to_dataset():
+@mock.patch.object(requests.Session, "post")
+def test_add_remove_ontology_to_dataset(mock_post):
+    mock_post.side_effect = [_ONTOLOGY_SUCCESS, _ONTOLOGY_SUCCESS]
     did = 1
     feature_index = 1
     ontology = "https://www.openml.org/unittest/" + str(time())
     openml.datasets.functions.data_feature_add_ontology(did, feature_index, ontology)
-    openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)    
+    openml.datasets.functions.data_feature_remove_ontology(did, feature_index, ontology)
 
-@pytest.mark.test_server()
-def test_add_same_ontology_multiple_features():
+@mock.patch.object(requests.Session, "post")
+def test_add_same_ontology_multiple_features(mock_post):
+    mock_post.side_effect = [_ONTOLOGY_SUCCESS, _ONTOLOGY_SUCCESS, _ONTOLOGY_SUCCESS]
     did = 1
     ontology = "https://www.openml.org/unittest/" + str(time())
 
     for i in range(3):
-        openml.datasets.functions.data_feature_add_ontology(did, i, ontology)    
+        openml.datasets.functions.data_feature_add_ontology(did, i, ontology)
 
 
-@pytest.mark.test_server()
-def test_add_illegal_long_ontology():
+@mock.patch.object(requests.Session, "post")
+def test_add_illegal_long_ontology(mock_post):
+    mock_post.side_effect = [_ONTOLOGY_ERROR_1105]
     did = 1
     ontology = "http://www.google.com/" + ("a" * 257)
     try:
@@ -336,8 +453,9 @@ def test_add_illegal_long_ontology():
     
 
 
-@pytest.mark.test_server()
-def test_add_illegal_url_ontology():
+@mock.patch.object(requests.Session, "post")
+def test_add_illegal_url_ontology(mock_post):
+    mock_post.side_effect = [_ONTOLOGY_ERROR_1106]
     did = 1
     ontology = "not_a_url" + str(time())
     try:
@@ -408,7 +526,6 @@ class OpenMLDatasetTestSparse(TestBase):
         assert len(feature.nominal_values) == 25
 
 
-@pytest.mark.test_server()
 def test__read_features(mocker, workdir, static_cache_dir):
     """Test we read the features from the xml if no cache pickle is available.
     This test also does some simple checks to verify that the features are read correctly
@@ -440,7 +557,6 @@ def test__read_features(mocker, workdir, static_cache_dir):
     assert pickle_mock.dump.call_count == 1
 
 
-@pytest.mark.test_server()
 def test__read_qualities(static_cache_dir, workdir, mocker):
     """Test we read the qualities from the xml if no cache pickle is available.
     This test also does some minor checks to ensure that the qualities are read correctly.
@@ -449,7 +565,7 @@ def test__read_qualities(static_cache_dir, workdir, mocker):
     filename_mock = mocker.patch("openml.datasets.dataset._get_qualities_pickle_file")
     pickle_mock = mocker.patch("openml.datasets.dataset.pickle")
 
-    filename_mock.return_value=os.path.join(workdir, "qualities.xml.pkl")
+    filename_mock.return_value = os.path.join(workdir, "qualities.xml.pkl")
     pickle_mock.load.side_effect = FileNotFoundError
 
     qualities = openml.datasets.dataset._read_qualities(

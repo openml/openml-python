@@ -1,0 +1,12 @@
+<oml:data xmlns:oml="http://openml.org/openml">
+  <oml:dataset>
+    <oml:did>125</oml:did>
+    <oml:name>kdd_internet_usage</oml:name>
+    <oml:version>1</oml:version>
+    <oml:status>active</oml:status>
+    <oml:format>ARFF</oml:format>
+    <oml:file_id>125</oml:file_id>
+    <oml:quality name="NumberOfInstances">9711</oml:quality>
+    <oml:quality name="NumberOfFeatures">69</oml:quality>
+  </oml:dataset>
+</oml:data>
