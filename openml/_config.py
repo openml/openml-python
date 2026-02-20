@@ -82,6 +82,7 @@ class OpenMLConfigManager:
         self.OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
         self.OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
         self._TEST_SERVER_NORMAL_USER_KEY = "normaluser"
+        self.TEST_SERVER_URL = "https://test.openml.org"
 
         self._config: OpenMLConfig = OpenMLConfig()
         # for legacy test `test_non_writable_home`
@@ -376,7 +377,8 @@ class OpenMLConfigManager:
     def get_cache_directory(self) -> str:
         """Get the cache directory for the current server."""
         url_suffix = urlparse(self._config.server).netloc
-        reversed_url_suffix = os.sep.join(url_suffix.split(".")[::-1])  # noqa: PTH118
+        url_parts = url_suffix.replace(":", "_").split(".")[::-1]
+        reversed_url_suffix = os.sep.join(url_parts)  # noqa: PTH118
         return os.path.join(self._root_cache_directory, reversed_url_suffix)  # noqa: PTH118
 
     def set_root_cache_directory(self, root_cache_directory: str | Path) -> None:
@@ -405,7 +407,7 @@ class ConfigurationForExamples:
     def __init__(self, manager: OpenMLConfigManager):
         self._manager = manager
         self._test_apikey = manager._TEST_SERVER_NORMAL_USER_KEY
-        self._test_server = "https://test.openml.org/api/v1/xml"
+        self._test_server = f"{manager.TEST_SERVER_URL}/api/v1/xml"
 
     def start_using_configuration_for_example(self) -> None:
         """Sets the configuration to connect to the test server with valid apikey.
