@@ -251,7 +251,7 @@ class TestTask(TestBase):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         task = openml.tasks.get_task(1)
         assert isinstance(task, OpenMLTask)
-
+#intentionally left unmocked (*10)
     @pytest.mark.production_server()
     def test_get_task_different_types(self):
         self.use_production_server()
@@ -262,6 +262,7 @@ class TestTask(TestBase):
         # Issue 538, get_task failing with clustering task.
         openml.tasks.functions.get_task(126033)
 
+#intentionally left unmocked (*11)
     @pytest.mark.test_server()
     def test_download_split(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
