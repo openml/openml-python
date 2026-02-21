@@ -48,7 +48,13 @@ from openml.runs.functions import (
     run_exists,
 )
 from openml.runs.trace import OpenMLRunTrace
-from openml.tasks import TaskType
+from openml.tasks import (
+    OpenMLClassificationTask,
+    OpenMLLearningCurveTask,
+    OpenMLRegressionTask,
+    TaskType,
+)
+from openml.exceptions import OpenMLServerNoResult
 from openml.testing import (
     CustomImputer,
     SimpleImputer,
@@ -1451,8 +1457,11 @@ class TestRun(TestBase):
         for run in runs.to_dict(orient="index").values():
             self._check_run(run)
 
-    @pytest.mark.test_server()
-    def test_list_runs_empty(self):
+    @mock.patch("openml._api_calls._perform_api_call")
+    def test_list_runs_empty(self, mock_api_call):
+        mock_api_call.side_effect = OpenMLServerNoResult(
+            code=512, message="No results", url=""
+        )
         runs = openml.runs.list_runs(task=[0])
         assert runs.empty
 
@@ -1656,7 +1665,6 @@ class TestRun(TestBase):
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             assert len(row) == 12
 
-    @pytest.mark.test_server()
     def test_get_cached_run(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         openml.runs.functions._get_cached_run(1)
@@ -1698,70 +1706,68 @@ class TestRun(TestBase):
         ):
             format_prediction(clustering, *ignored_input)
 
-    @pytest.mark.test_server()
     def test_format_prediction_classification_no_probabilities(self):
-        classification = openml.tasks.get_task(
-            self.TEST_SERVER_TASK_SIMPLE["task_id"],
-            download_data=False,
+        classification = OpenMLClassificationTask(
+            task_type_id=TaskType.SUPERVISED_CLASSIFICATION,
+            task_type="Supervised Classification",
+            data_set_id=self.TEST_SERVER_TASK_SIMPLE["task_meta_data"]["dataset_id"],
+            target_name=self.TEST_SERVER_TASK_SIMPLE["task_meta_data"]["target_name"],
+            task_id=self.TEST_SERVER_TASK_SIMPLE["task_id"],
+            class_labels=["tested_negative", "tested_positive"],
         )
         ignored_input = [0] * 5
         with pytest.raises(ValueError, match="`proba` is required for classification task"):
             format_prediction(classification, *ignored_input, proba=None)
 
-    @pytest.mark.test_server()
     def test_format_prediction_classification_incomplete_probabilities(self):
-        classification = openml.tasks.get_task(
-            self.TEST_SERVER_TASK_SIMPLE["task_id"],
-            download_data=False,
+        classification = OpenMLClassificationTask(
+            task_type_id=TaskType.SUPERVISED_CLASSIFICATION,
+            task_type="Supervised Classification",
+            data_set_id=self.TEST_SERVER_TASK_SIMPLE["task_meta_data"]["dataset_id"],
+            target_name=self.TEST_SERVER_TASK_SIMPLE["task_meta_data"]["target_name"],
+            task_id=self.TEST_SERVER_TASK_SIMPLE["task_id"],
+            class_labels=["tested_negative", "tested_positive"],
         )
         ignored_input = [0] * 5
         incomplete_probabilities = {c: 0.2 for c in classification.class_labels[1:]}
         with pytest.raises(ValueError, match="Each class should have a predicted probability"):
             format_prediction(classification, *ignored_input, proba=incomplete_probabilities)
 
-    @pytest.mark.test_server()
     def test_format_prediction_task_without_classlabels_set(self):
-        classification = openml.tasks.get_task(
-            self.TEST_SERVER_TASK_SIMPLE["task_id"],
-            download_data=False,
+        classification = OpenMLClassificationTask(
+            task_type_id=TaskType.SUPERVISED_CLASSIFICATION,
+            task_type="Supervised Classification",
+            data_set_id=self.TEST_SERVER_TASK_SIMPLE["task_meta_data"]["dataset_id"],
+            target_name=self.TEST_SERVER_TASK_SIMPLE["task_meta_data"]["target_name"],
+            task_id=self.TEST_SERVER_TASK_SIMPLE["task_id"],
+            class_labels=None,
         )
-        classification.class_labels = None
         ignored_input = [0] * 5
         with pytest.raises(ValueError, match="The classification task must have class labels set"):
             format_prediction(classification, *ignored_input, proba={})
 
-    @pytest.mark.test_server()
     def test_format_prediction_task_learning_curve_sample_not_set(self):
-        learning_curve = openml.tasks.get_task(801, download_data=False)  # diabetes;crossvalidation
+        learning_curve = OpenMLLearningCurveTask(
+            task_type_id=TaskType.LEARNING_CURVE,
+            task_type="Learning Curve",
+            data_set_id=20,
+            target_name="class",
+            task_id=801,
+            class_labels=["tested_negative", "tested_positive"],
+        )
         probabilities = {c: 0.2 for c in learning_curve.class_labels}
         ignored_input = [0] * 5
         with pytest.raises(ValueError, match="`sample` can not be none for LearningCurveTask"):
             format_prediction(learning_curve, *ignored_input, sample=None, proba=probabilities)
 
-    @pytest.mark.test_server()
     def test_format_prediction_task_regression(self):
-        task_meta_data = self.TEST_SERVER_TASK_REGRESSION["task_meta_data"]
-        _task_id = check_task_existence(**task_meta_data)
-        if _task_id is not None:
-            task_id = _task_id
-        else:
-            new_task = openml.tasks.create_task(**task_meta_data)
-            # publishes the new task
-            try:
-                new_task = new_task.publish()
-                task_id = new_task.task_id
-            except OpenMLServerException as e:
-                if e.code == 614:  # Task already exists
-                    # the exception message contains the task_id that was matched in the format
-                    # 'Task already exists. - matched id(s): [xxxx]'
-                    task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
-                else:
-                    raise Exception(repr(e))
-            # mark to remove the uploaded task
-            TestBase._mark_entity_for_removal("task", task_id)
-            TestBase.logger.info(f"collected from test_run_functions: {task_id}")
-
-        regression = openml.tasks.get_task(task_id, download_data=False)
+        regression = OpenMLRegressionTask(
+            task_type_id=TaskType.SUPERVISED_REGRESSION,
+            task_type="Supervised Regression",
+            data_set_id=self.TEST_SERVER_TASK_REGRESSION["task_meta_data"]["dataset_id"],
+            target_name=self.TEST_SERVER_TASK_REGRESSION["task_meta_data"]["target_name"],
+            task_id=self.TEST_SERVER_TASK_REGRESSION["task_id"],
+        )
         ignored_input = [0] * 5
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
