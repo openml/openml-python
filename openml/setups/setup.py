@@ -1,25 +1,29 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from typing import Any
 
-import openml.config
 import openml.flows
+from openml.base import OpenMLBase
+from openml.utils import ReprMixin
 
 
-@dataclass
-class OpenMLSetup:
+@dataclass(repr=False)
+class OpenMLSetup(OpenMLBase, ReprMixin):
     """Setup object (a.k.a. Configuration).
+
+    A setup is the combination of a flow with all its hyperparameters set.
 
     Parameters
     ----------
     setup_id : int
-        The OpenML setup id
+        The OpenML setup id.
     flow_id : int
-        The flow that it is build upon
-    parameters : dict
-        The setting of the parameters
+        The id of the flow that this setup is built upon.
+    parameters : dict[int, Any] or None
+        The hyperparameter settings, keyed by parameter input id.
     """
 
     setup_id: int
@@ -36,6 +40,11 @@ class OpenMLSetup:
         if self.parameters is not None and not isinstance(self.parameters, dict):
             raise ValueError("parameters should be dict")
 
+    @property
+    def id(self) -> int:
+        """The id of the setup."""
+        return self.setup_id
+
     def _to_dict(self) -> dict[str, Any]:
         return {
             "setup_id": self.setup_id,
@@ -45,27 +54,37 @@ class OpenMLSetup:
             else None,
         }
 
-    def __repr__(self) -> str:
-        header = "OpenML Setup"
-        header = f"{header}\n{'=' * len(header)}\n"
-
-        fields = {
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
+        """Collect all information to display in the __repr__ body."""
+        fields: dict[str, int | str | None] = {
             "Setup ID": self.setup_id,
             "Flow ID": self.flow_id,
             "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
-            "# of Parameters": (
-                len(self.parameters) if self.parameters is not None else float("nan")
-            ),
+            "# of Parameters": (len(self.parameters) if self.parameters is not None else "nan"),
         }
 
         # determines the order in which the information will be printed
         order = ["Setup ID", "Flow ID", "Flow URL", "# of Parameters"]
-        _fields = [(key, fields[key]) for key in order if key in fields]
+        return [(key, fields[key]) for key in order if key in fields]
 
-        longest_field_name_length = max(len(name) for name, _ in _fields)
-        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
-        return header + body
+    def _parse_publish_response(self, xml_response: dict[str, str]) -> None:
+        """Not supported for setups.
+
+        Setups are created implicitly when a run is published and cannot be
+        published directly.
+        """
+        raise NotImplementedError("Setups cannot be published directly.")
+
+    def publish(self) -> OpenMLBase:
+        """Not supported for setups.
+
+        Setups are created implicitly when a run is published to the server
+        and cannot be published directly.
+        """
+        raise NotImplementedError(
+            "Setups cannot be published directly. "
+            "A setup is created automatically when a run is published."
+        )
 
 
 @dataclass
@@ -146,9 +165,9 @@ class OpenMLParameter:
             parameter_default,
             parameter_value,
         ]
-        _fields = [(key, fields[key]) for key in order if key in fields]
+        fields_ = [(key, fields[key]) for key in order if key in fields]
 
-        longest_field_name_length = max(len(name) for name, _ in _fields)
+        longest_field_name_length = max(len(name) for name, _ in fields_)
         field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
+        body = "\n".join(field_line_format.format(name, value) for name, value in fields_)
         return header + body
