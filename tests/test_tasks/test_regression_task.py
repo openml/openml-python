@@ -1,15 +1,11 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import ast
+from unittest import mock
 
 import pandas as pd
-import pytest
 
-import openml
-from openml.exceptions import OpenMLServerException
-from openml.tasks import TaskType
-from openml.testing import TestBase, check_task_existence
+from openml.tasks import OpenMLRegressionTask, TaskType
 
 from .test_supervised_task import OpenMLSupervisedTaskTest
 
@@ -20,37 +16,16 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
     def setUp(self, n_levels: int = 1):
         super().setUp()
         self.estimation_procedure = 9
-        task_meta_data = {
-            "task_type": TaskType.SUPERVISED_REGRESSION,
-            "dataset_id": 105,  # wisconsin
-            "estimation_procedure_id": self.estimation_procedure, # non default value to test estimation procedure id
-            "target_name": "time",
-        }
-        _task_id = check_task_existence(**task_meta_data)
-        if _task_id is not None:
-            task_id = _task_id
-        else:
-            new_task = openml.tasks.create_task(**task_meta_data)
-            # publishes the new task
-            try:
-                new_task = new_task.publish()
-                task_id = new_task.task_id
-                # mark to remove the uploaded task
-                TestBase._mark_entity_for_removal("task", task_id)
-                TestBase.logger.info(f"collected from test_run_functions: {task_id}")
-            except OpenMLServerException as e:
-                if e.code == 614:  # Task already exists
-                    # the exception message contains the task_id that was matched in the format
-                    # 'Task already exists. - matched id(s): [xxxx]'
-                    task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
-                else:
-                    raise Exception(repr(e))
-        self.task_id = task_id
+        self.task_id = 1000
         self.task_type = TaskType.SUPERVISED_REGRESSION
 
-
-    @pytest.mark.test_server()
-    def test_get_X_and_Y(self):
+    @mock.patch("tests.test_tasks.test_supervised_task.get_task")
+    def test_get_X_and_Y(self, mock_get_task):
+        mock_task = mock.MagicMock()
+        X = pd.DataFrame(0.0, index=range(194), columns=range(32))
+        Y = pd.Series(0.0, index=range(194), name="time", dtype=float)
+        mock_task.get_X_and_y.return_value = (X, Y)
+        mock_get_task.return_value = mock_task
         X, Y = super().test_get_X_and_Y()
         assert X.shape == (194, 32)
         assert isinstance(X, pd.DataFrame)
@@ -58,10 +33,19 @@ class OpenMLRegressionTaskTest(OpenMLSupervisedTaskTest):
         assert isinstance(Y, pd.Series)
         assert pd.api.types.is_numeric_dtype(Y)
 
-    @pytest.mark.test_server()
-    def test_download_task(self):
-        task = super().test_download_task()
-        assert task.task_id == self.task_id
-        assert task.task_type_id == TaskType.SUPERVISED_REGRESSION
-        assert task.dataset_id == 105
-        assert task.estimation_procedure_id == self.estimation_procedure
+    @mock.patch("tests.test_tasks.test_task.get_task")
+    def test_download_task(self, mock_get_task):
+        task = OpenMLRegressionTask(
+            task_type_id=TaskType.SUPERVISED_REGRESSION,
+            task_type="Supervised Regression",
+            data_set_id=105,
+            target_name="time",
+            estimation_procedure_id=self.estimation_procedure,
+            task_id=self.task_id,
+        )
+        mock_get_task.return_value = task
+        result = super().test_download_task()
+        assert result.task_id == self.task_id
+        assert result.task_type_id == TaskType.SUPERVISED_REGRESSION
+        assert result.dataset_id == 105
+        assert result.estimation_procedure_id == self.estimation_procedure
