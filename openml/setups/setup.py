@@ -57,9 +57,7 @@ class OpenMLSetup(OpenMLBase):
         self,
     ) -> list[tuple[str, str | int | list[str] | None]]:
         """Return fields shown in :meth:`__repr__`."""
-        n_params: int | str = (
-            len(self.parameters) if self.parameters is not None else "nan"
-        )
+        n_params: int | str = len(self.parameters) if self.parameters is not None else "nan"
         return [
             ("Setup ID", self.setup_id),
             ("Flow ID", self.flow_id),
