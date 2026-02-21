@@ -57,7 +57,9 @@ class OpenMLSetup(OpenMLBase):
         self,
     ) -> list[tuple[str, str | int | list[str] | None]]:
         """Return fields shown in :meth:`__repr__`."""
-        n_params = len(self.parameters) if self.parameters is not None else float("nan")
+        n_params: int | str = (
+            len(self.parameters) if self.parameters is not None else "nan"
+        )
         return [
             ("Setup ID", self.setup_id),
             ("Flow ID", self.flow_id),
@@ -121,7 +123,7 @@ class OpenMLParameter:
         If the parameter was set, the value that it was set to.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         input_id: int,
         flow_id: int,
