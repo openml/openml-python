@@ -1,6 +1,4 @@
 # License: BSD 3-Clause
-# TODO(eddbergman): Seems like a lot of the subclasses could just get away with setting
-# a `ClassVar` for whatever changes as their `__init__` defaults, less duplicated code.
 from __future__ import annotations
 
 import warnings
@@ -8,7 +6,7 @@ from abc import ABC
 from collections.abc import Sequence
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 from typing_extensions import TypedDict
 
 import openml._api_calls
@@ -71,30 +69,44 @@ class OpenMLTask(OpenMLBase):
         Refers to the URL of the data splits used for the OpenML task.
     """
 
+    DEFAULT_ESTIMATION_PROCEDURE_ID: ClassVar[int] = 1
+
     def __init__(  # noqa: PLR0913
         self,
         task_id: int | None,
         task_type_id: TaskType,
         task_type: str,
         data_set_id: int,
-        estimation_procedure_id: int = 1,
+        estimation_procedure_id: int | None = None,
         estimation_procedure_type: str | None = None,
         estimation_parameters: dict[str, str] | None = None,
         evaluation_measure: str | None = None,
         data_splits_url: str | None = None,
+        target_name: str | None = None,
     ):
         self.task_id = int(task_id) if task_id is not None else None
         self.task_type_id = task_type_id
         self.task_type = task_type
         self.dataset_id = int(data_set_id)
+        self.target_name = target_name
+        resolved_estimation_procedure_id = self._resolve_estimation_procedure_id(
+            estimation_procedure_id,
+        )
         self.evaluation_measure = evaluation_measure
         self.estimation_procedure: _EstimationProcedure = {
             "type": estimation_procedure_type,
             "parameters": estimation_parameters,
             "data_splits_url": data_splits_url,
         }
-        self.estimation_procedure_id = estimation_procedure_id
+        self.estimation_procedure_id = resolved_estimation_procedure_id
         self.split: OpenMLSplit | None = None
+
+    def _resolve_estimation_procedure_id(self, estimation_procedure_id: int | None) -> int:
+        return (
+            estimation_procedure_id
+            if estimation_procedure_id is not None
+            else self.DEFAULT_ESTIMATION_PROCEDURE_ID
+        )
 
     @classmethod
     def _entity_letter(cls) -> str:
@@ -129,7 +141,8 @@ class OpenMLTask(OpenMLBase):
             if class_labels is not None:
                 fields["# of Classes"] = len(class_labels)
 
-            if hasattr(self, "cost_matrix"):
+            cost_matrix = getattr(self, "cost_matrix", None)
+            if cost_matrix is not None:
                 fields["Cost Matrix"] = "Available"
 
         # determines the order in which the information will be printed
@@ -250,13 +263,15 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
         Refers to the unique identifier of task.
     """
 
+    DEFAULT_ESTIMATION_PROCEDURE_ID: ClassVar[int] = 1
+
     def __init__(  # noqa: PLR0913
         self,
         task_type_id: TaskType,
         task_type: str,
         data_set_id: int,
         target_name: str,
-        estimation_procedure_id: int = 1,
+        estimation_procedure_id: int | None = None,
         estimation_procedure_type: str | None = None,
         estimation_parameters: dict[str, str] | None = None,
         evaluation_measure: str | None = None,
@@ -273,9 +288,8 @@ class OpenMLSupervisedTask(OpenMLTask, ABC):
             estimation_parameters=estimation_parameters,
             evaluation_measure=evaluation_measure,
             data_splits_url=data_splits_url,
+            target_name=target_name,
         )
-
-        self.target_name = target_name
 
     def get_X_and_y(self) -> tuple[pd.DataFrame, pd.Series | pd.DataFrame | None]:
         """Get data associated with the current task.
@@ -331,6 +345,8 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
 
     Parameters
     ----------
+    task_id : Union[int, None]
+        ID of the Classification task (if it already exists on OpenML).
     task_type_id : TaskType
         ID of the Classification task type.
     task_type : str
@@ -339,7 +355,7 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
         ID of the OpenML dataset associated with the Classification task.
     target_name : str
         Name of the target variable.
-    estimation_procedure_id : int, default=None
+    estimation_procedure_id : int, default=1
         ID of the estimation procedure for the Classification task.
     estimation_procedure_type : str, default=None
         Type of the estimation procedure.
@@ -349,13 +365,13 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
         Name of the evaluation measure.
     data_splits_url : str, default=None
         URL of the data splits for the Classification task.
-    task_id : Union[int, None]
-        ID of the Classification task (if it already exists on OpenML).
     class_labels : List of str, default=None
         A list of class labels (for classification tasks).
     cost_matrix : array, default=None
         A cost matrix (for classification tasks).
     """
+
+    DEFAULT_ESTIMATION_PROCEDURE_ID: ClassVar[int] = 1
 
     def __init__(  # noqa: PLR0913
         self,
@@ -363,7 +379,7 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
         task_type: str,
         data_set_id: int,
         target_name: str,
-        estimation_procedure_id: int = 1,
+        estimation_procedure_id: int | None = None,
         estimation_procedure_type: str | None = None,
         estimation_parameters: dict[str, str] | None = None,
         evaluation_measure: str | None = None,
@@ -373,20 +389,19 @@ class OpenMLClassificationTask(OpenMLSupervisedTask):
         cost_matrix: np.ndarray | None = None,
     ):
         super().__init__(
-            task_id=task_id,
             task_type_id=task_type_id,
             task_type=task_type,
             data_set_id=data_set_id,
+            target_name=target_name,
             estimation_procedure_id=estimation_procedure_id,
             estimation_procedure_type=estimation_procedure_type,
             estimation_parameters=estimation_parameters,
             evaluation_measure=evaluation_measure,
-            target_name=target_name,
             data_splits_url=data_splits_url,
+            task_id=task_id,
         )
         self.class_labels = class_labels
         self.cost_matrix = cost_matrix
-
         if cost_matrix is not None:
             raise NotImplementedError("Costmatrix functionality is not yet implemented.")
 
@@ -396,6 +411,8 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
 
     Parameters
     ----------
+    task_id : Union[int, None]
+        ID of the OpenML Regression task.
     task_type_id : TaskType
         Task type ID of the OpenML Regression task.
     task_type : str
@@ -404,7 +421,7 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
         ID of the OpenML dataset.
     target_name : str
         Name of the target feature used in the Regression task.
-    estimation_procedure_id : int, default=None
+    estimation_procedure_id : int, default=7
         ID of the OpenML estimation procedure.
     estimation_procedure_type : str, default=None
         Type of the OpenML estimation procedure.
@@ -412,37 +429,11 @@ class OpenMLRegressionTask(OpenMLSupervisedTask):
         Parameters used by the OpenML estimation procedure.
     data_splits_url : str, default=None
         URL of the OpenML data splits for the Regression task.
-    task_id : Union[int, None]
-        ID of the OpenML Regression task.
     evaluation_measure : str, default=None
         Evaluation measure used in the Regression task.
     """
 
-    def __init__(  # noqa: PLR0913
-        self,
-        task_type_id: TaskType,
-        task_type: str,
-        data_set_id: int,
-        target_name: str,
-        estimation_procedure_id: int = 7,
-        estimation_procedure_type: str | None = None,
-        estimation_parameters: dict[str, str] | None = None,
-        data_splits_url: str | None = None,
-        task_id: int | None = None,
-        evaluation_measure: str | None = None,
-    ):
-        super().__init__(
-            task_id=task_id,
-            task_type_id=task_type_id,
-            task_type=task_type,
-            data_set_id=data_set_id,
-            estimation_procedure_id=estimation_procedure_id,
-            estimation_procedure_type=estimation_procedure_type,
-            estimation_parameters=estimation_parameters,
-            evaluation_measure=evaluation_measure,
-            target_name=target_name,
-            data_splits_url=data_splits_url,
-        )
+    DEFAULT_ESTIMATION_PROCEDURE_ID: ClassVar[int] = 7
 
 
 class OpenMLClusteringTask(OpenMLTask):
@@ -450,16 +441,16 @@ class OpenMLClusteringTask(OpenMLTask):
 
     Parameters
     ----------
+    task_id : Union[int, None]
+        ID of the OpenML clustering task.
     task_type_id : TaskType
         Task type ID of the OpenML clustering task.
     task_type : str
         Task type of the OpenML clustering task.
     data_set_id : int
         ID of the OpenML dataset used in clustering the task.
-    estimation_procedure_id : int, default=None
+    estimation_procedure_id : int, default=17
         ID of the OpenML estimation procedure.
-    task_id : Union[int, None]
-        ID of the OpenML clustering task.
     estimation_procedure_type : str, default=None
         Type of the OpenML estimation procedure used in the clustering task.
     estimation_parameters : dict, default=None
@@ -473,32 +464,7 @@ class OpenMLClusteringTask(OpenMLTask):
         feature set for the clustering task.
     """
 
-    def __init__(  # noqa: PLR0913
-        self,
-        task_type_id: TaskType,
-        task_type: str,
-        data_set_id: int,
-        estimation_procedure_id: int = 17,
-        task_id: int | None = None,
-        estimation_procedure_type: str | None = None,
-        estimation_parameters: dict[str, str] | None = None,
-        data_splits_url: str | None = None,
-        evaluation_measure: str | None = None,
-        target_name: str | None = None,
-    ):
-        super().__init__(
-            task_id=task_id,
-            task_type_id=task_type_id,
-            task_type=task_type,
-            data_set_id=data_set_id,
-            evaluation_measure=evaluation_measure,
-            estimation_procedure_id=estimation_procedure_id,
-            estimation_procedure_type=estimation_procedure_type,
-            estimation_parameters=estimation_parameters,
-            data_splits_url=data_splits_url,
-        )
-
-        self.target_name = target_name
+    DEFAULT_ESTIMATION_PROCEDURE_ID: ClassVar[int] = 17
 
     def get_X(self) -> pd.DataFrame:
         """Get data associated with the current task.
@@ -534,6 +500,8 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
 
     Parameters
     ----------
+    task_id : Union[int, None]
+        ID of the Learning Curve task.
     task_type_id : TaskType
         ID of the Learning Curve task.
     task_type : str
@@ -542,7 +510,7 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
         ID of the dataset that this task is associated with.
     target_name : str
         Name of the target feature in the dataset.
-    estimation_procedure_id : int, default=None
+    estimation_procedure_id : int, default=13
         ID of the estimation procedure to use for evaluating models.
     estimation_procedure_type : str, default=None
         Type of the estimation procedure.
@@ -550,8 +518,6 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
         Additional parameters for the estimation procedure.
     data_splits_url : str, default=None
         URL of the file containing the data splits for Learning Curve task.
-    task_id : Union[int, None]
-        ID of the Learning Curve task.
     evaluation_measure : str, default=None
         Name of the evaluation measure to use for evaluating models.
     class_labels : list of str, default=None
@@ -560,32 +526,4 @@ class OpenMLLearningCurveTask(OpenMLClassificationTask):
         Cost matrix for Learning Curve tasks.
     """
 
-    def __init__(  # noqa: PLR0913
-        self,
-        task_type_id: TaskType,
-        task_type: str,
-        data_set_id: int,
-        target_name: str,
-        estimation_procedure_id: int = 13,
-        estimation_procedure_type: str | None = None,
-        estimation_parameters: dict[str, str] | None = None,
-        data_splits_url: str | None = None,
-        task_id: int | None = None,
-        evaluation_measure: str | None = None,
-        class_labels: list[str] | None = None,
-        cost_matrix: np.ndarray | None = None,
-    ):
-        super().__init__(
-            task_id=task_id,
-            task_type_id=task_type_id,
-            task_type=task_type,
-            data_set_id=data_set_id,
-            estimation_procedure_id=estimation_procedure_id,
-            estimation_procedure_type=estimation_procedure_type,
-            estimation_parameters=estimation_parameters,
-            evaluation_measure=evaluation_measure,
-            target_name=target_name,
-            data_splits_url=data_splits_url,
-            class_labels=class_labels,
-            cost_matrix=cost_matrix,
-        )
+    DEFAULT_ESTIMATION_PROCEDURE_ID: ClassVar[int] = 13
