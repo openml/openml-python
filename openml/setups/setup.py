@@ -57,7 +57,7 @@ class OpenMLSetup(OpenMLBase):
             ),
         ]
 
-    def _to_dict(self) -> dict[str, dict]:
+    def _to_dict(self) -> dict[str, Any]:  # type: ignore[override]
         return {
             "setup_id": self.setup_id,
             "flow_id": self.flow_id,
