@@ -102,6 +102,7 @@ def _get_rest_api_type_alias(oml_object: OpenMLBase) -> str:
         (openml.tasks.OpenMLTask, "task"),
         (openml.runs.OpenMLRun, "run"),
         ((openml.study.OpenMLStudy, openml.study.OpenMLBenchmarkSuite), "study"),
+        (openml.setups.OpenMLSetup, "setup"),
     ]
     _, api_type_alias = next(
         (python_type, api_alias)

@@ -1,15 +1,17 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from typing import Any
 
 import openml.config
 import openml.flows
+from openml.base import OpenMLBase
 
 
-@dataclass
-class OpenMLSetup:
+@dataclass(repr=False)
+class OpenMLSetup(OpenMLBase):
     """Setup object (a.k.a. Configuration).
 
     Parameters
@@ -36,7 +38,26 @@ class OpenMLSetup:
         if self.parameters is not None and not isinstance(self.parameters, dict):
             raise ValueError("parameters should be dict")
 
-    def _to_dict(self) -> dict[str, Any]:
+    @property
+    def id(self) -> int | None:
+        """The id of the entity, it is unique for its entity type."""
+        return self.setup_id
+
+    def _get_repr_body_fields(
+        self,
+    ) -> Sequence[tuple[str, str | int | list[str] | None]]:
+        """Collect all information to display in the __repr__ body."""
+        return [
+            ("Setup ID", self.setup_id),
+            ("Flow ID", self.flow_id),
+            ("Flow URL", openml.flows.OpenMLFlow.url_for_id(self.flow_id)),
+            (
+                "# of Parameters",
+                len(self.parameters) if self.parameters is not None else None,
+            ),
+        ]
+
+    def _to_dict(self) -> dict[str, dict]:
         return {
             "setup_id": self.setup_id,
             "flow_id": self.flow_id,
@@ -45,27 +66,19 @@ class OpenMLSetup:
             else None,
         }
 
-    def __repr__(self) -> str:
-        header = "OpenML Setup"
-        header = f"{header}\n{'=' * len(header)}\n"
+    def _parse_publish_response(self, xml_response: dict[str, str]) -> None:
+        """Not supported for setups."""
+        raise NotImplementedError(
+            "Setups cannot be published directly. "
+            "They are created automatically when a run is published."
+        )
 
-        fields = {
-            "Setup ID": self.setup_id,
-            "Flow ID": self.flow_id,
-            "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
-            "# of Parameters": (
-                len(self.parameters) if self.parameters is not None else float("nan")
-            ),
-        }
-
-        # determines the order in which the information will be printed
-        order = ["Setup ID", "Flow ID", "Flow URL", "# of Parameters"]
-        _fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, _ in _fields)
-        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
-        return header + body
+    def publish(self) -> OpenMLBase:
+        """Not supported for setups."""
+        raise NotImplementedError(
+            "Setups cannot be published directly. "
+            "They are created automatically when a run is published."
+        )
 
 
 @dataclass
