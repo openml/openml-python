@@ -170,7 +170,7 @@ jobs:
       env:
         OPENML_TEST_SERVER_ADMIN_KEY: ${{ secrets.OPENML_TEST_SERVER_ADMIN_KEY }}
       run: |  # we need a separate step because of the bash-specific if-statement in the previous one.
-        pytest -n 4 --durations=20 --dist load -sv --reruns 5 --reruns-delay 1 -m "not uses_test_server"
+        pytest -n 4 --durations=20 --dist load -sv --reruns 5 --reruns-delay 1 -m "not test_server"
 
     - name: Upload coverage
       if: matrix.code-cov && always()
