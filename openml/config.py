@@ -9,7 +9,6 @@ import logging.handlers
 import os
 import platform
 import shutil
-import sys
 import warnings
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -29,10 +28,7 @@ OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
 OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR = "OPENML_TEST_SERVER_ADMIN_KEY"
 _TEST_SERVER_NORMAL_USER_KEY = "normaluser"
 
-if sys.platform.startswith("win"):
-    TEST_SERVER_URL = "http://localhost"
-else:
-    TEST_SERVER_URL = "http://localhost:8000"
+TEST_SERVER_URL = "https://test.openml.org"
 
 
 class _Config(TypedDict):

@@ -101,32 +101,11 @@ jobs:
         echo "BEFORE=$git_status" >> $GITHUB_ENV
         echo "Repository status before tests: $git_status"
 
-    # - name: Configure Host Network
-    #   if: matrix.os == 'ubuntu-latest'
-    #   run: |
-    #     # Map 'nginx' to localhost so the Host machine can resolve the URLs in the database
-    #     echo "127.0.0.1 nginx" | sudo tee -a /etc/hosts
-
     - name: Clone Services & Apply Universal Patch
       if: matrix.os == 'ubuntu-latest'
       run: |
         git clone --depth 1 https://github.com/openml/services.git
         cd services
-        git config user.email "ci@openml.org"
-        git config user.name "CI"
-        git fetch origin pull/13/head:pr-13 && git merge pr-13 --no-edit
-        git fetch origin pull/15/head:pr-15 && git merge pr-15 --no-edit
-        
-        # # === PATCH 1: Use 'nginx' hostname ===
-        # # This works inside Docker (DNS) and on Host (via /etc/hosts hack above)
-        # sed -i 's/localhost:8000/nginx:8000/g' config/database/update.sh
-        
-        # # === PATCH 2: Fix Path Mismatch ===
-        # # Ensure we use /data/ which Nginx recognizes
-        # sed -i 's|/minio/|/data/|g' config/database/update.sh
-        
-        # echo "=== Patched Update Script ==="
-        # cat config/database/update.sh | grep "nginx"
 
     - name: Show installed dependencies
       run: python -m pip list
@@ -141,9 +120,9 @@ jobs:
         fi
 
         if [ "${{ matrix.sklearn-only }}" = "true" ]; then
-          marks="sklearn and not production"
+          marks="sklearn and not production_server"
         else
-          marks="not production"
+          marks="not production_server"
         fi
 
         pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
@@ -152,15 +131,16 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       env:
         OPENML_TEST_SERVER_ADMIN_KEY: ${{ secrets.OPENML_TEST_SERVER_ADMIN_KEY }}
+        OPENML_USE_LOCAL_SERVICES: "true"
       run: |
         if [ "${{ matrix.code-cov }}" = "true" ]; then
           codecov="--cov=openml --long --cov-report=xml"
         fi
 
         if [ "${{ matrix.sklearn-only }}" = "true" ]; then
-          marks="sklearn and production"
+          marks="sklearn and production_server"
         else
-          marks="production"
+          marks="production_server"
         fi
 
         pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"

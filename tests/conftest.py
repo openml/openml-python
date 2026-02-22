@@ -272,6 +272,8 @@ def as_robot() -> Iterator[None]:
 
 @pytest.fixture(autouse=True)
 def with_server(request):
+    if os.getenv("OPENML_USE_LOCAL_SERVICES") == "true":
+        openml.config.TEST_SERVER_URL = "http://localhost:8000"
     if "production_server" in request.keywords:
         openml.config.server = "https://www.openml.org/api/v1/xml"
         openml.config.apikey = None
@@ -295,8 +297,8 @@ def with_test_cache(test_files_directory, request):
     openml.config.set_root_cache_directory(_root_cache_directory)
     if tmp_cache.exists():
         shutil.rmtree(tmp_cache)
+        
 
- 
 @pytest.fixture
 def static_cache_dir():
     return Path(__file__).parent / "files" 
