@@ -44,7 +44,7 @@ class TestHTTPClient(TestBase):
         # validate key
         self.assertEqual(key, expected_key)
 
-        # create fake response
+        # create mock response
         req = Request("GET", url).prepare()
         response = Response()
         response.status_code = 200
@@ -54,7 +54,7 @@ class TestHTTPClient(TestBase):
         response.headers = {"Content-Type": "text/xml"}
         response.encoding = "utf-8"
         response.request = req
-        response.elapsed = type("Elapsed", (), {"total_seconds": lambda self: 0.1})()
+        response.elapsed = type("Elapsed", (), {"total_seconds": lambda x: 0.1})()
 
         # save to cache
         self.cache.save(key, response)
