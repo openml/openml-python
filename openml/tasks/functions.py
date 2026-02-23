@@ -380,7 +380,11 @@ def get_tasks(
     tasks = []
     for task_id in task_ids:
         tasks.append(
-            get_task(task_id, download_data=download_data, download_qualities=download_qualities)
+            get_task(
+                task_id,
+                download_data=download_data,
+                download_qualities=download_qualities,
+            )
         )
     return tasks
 
@@ -411,6 +415,12 @@ def get_task(
     Returns
     -------
     task: OpenMLTask
+
+    Examples
+    --------
+    >>> import openml
+    >>> task = openml.tasks.get_task(1)  # doctest: +SKIP
+    >>> task = openml.tasks.get_task(1, download_splits=True)  # doctest: +SKIP
     """
     if not isinstance(task_id, int):
         raise TypeError(f"Task id should be integer, is {type(task_id)}")

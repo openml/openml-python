@@ -104,6 +104,15 @@ def run_model_on_task(  # noqa: PLR0913
         Result of the run.
     flow : OpenMLFlow (optional, only if `return_flow` is True).
         Flow generated from the model.
+
+    Examples
+    --------
+    >>> import openml
+    >>> import openml_sklearn  # doctest: +SKIP
+    >>> from sklearn.tree import DecisionTreeClassifier  # doctest: +SKIP
+    >>> clf = DecisionTreeClassifier()  # doctest: +SKIP
+    >>> task = openml.tasks.get_task(1)  # doctest: +SKIP
+    >>> run = openml.runs.run_model_on_task(clf, task)  # doctest: +SKIP
     """
     if avoid_duplicate_runs is None:
         avoid_duplicate_runs = openml.config.avoid_duplicate_runs
@@ -273,9 +282,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
                 setup_id = setup_exists(flow_from_server)
                 ids = run_exists(task.task_id, setup_id)
                 if ids:
-                    error_message = (
-                        "One or more runs of this setup were already performed on the task."
-                    )
+                    error_message = "One or more runs of this setup were already performed on the task."
                     raise OpenMLRunsExistError(ids, error_message)
         else:
             # Flow does not exist on server and we do not want to upload it.
@@ -505,11 +512,15 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
     # this information is multiple times overwritten, but due to the ordering
     # of tne loops, eventually it contains the information based on the full
     # dataset size
-    user_defined_measures_per_fold = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
+    user_defined_measures_per_fold = (
+        OrderedDict()
+    )  # type: 'OrderedDict[str, OrderedDict]'
     # stores sample-based evaluation measures (sublevel of fold-based)
     # will also be filled on a non sample-based task, but the information
     # is the same as the fold-based measures, and disregarded in that case
-    user_defined_measures_per_sample = OrderedDict()  # type: 'OrderedDict[str, OrderedDict]'
+    user_defined_measures_per_sample = (
+        OrderedDict()
+    )  # type: 'OrderedDict[str, OrderedDict]'
 
     # TODO use different iterator to only provide a single iterator (less
     # methods, less maintenance, less confusion)
@@ -557,9 +568,14 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
     )  # job_rvals contain the output of all the runs with one-to-one correspondence with `jobs`
 
     for n_fit, rep_no, fold_no, sample_no in jobs:
-        pred_y, proba_y, test_indices, test_y, inner_trace, user_defined_measures_fold = job_rvals[
-            n_fit - 1
-        ]
+        (
+            pred_y,
+            proba_y,
+            test_indices,
+            test_y,
+            inner_trace,
+            user_defined_measures_fold,
+        ) = job_rvals[n_fit - 1]
 
         if inner_trace is not None:
             traces.append(inner_trace)
@@ -598,7 +614,11 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
                             if isinstance(test_y[i], (int, np.integer))
                             else test_y[i]
                         )
-                    pred_prob = proba_y.iloc[i] if isinstance(proba_y, pd.DataFrame) else proba_y[i]
+                    pred_prob = (
+                        proba_y.iloc[i]
+                        if isinstance(proba_y, pd.DataFrame)
+                        else proba_y[i]
+                    )
 
                     arff_line = format_prediction(
                         task=task,
@@ -661,11 +681,13 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
             if rep_no not in user_defined_measures_per_sample[measure]:
                 user_defined_measures_per_sample[measure][rep_no] = OrderedDict()
             if fold_no not in user_defined_measures_per_sample[measure][rep_no]:
-                user_defined_measures_per_sample[measure][rep_no][fold_no] = OrderedDict()
+                user_defined_measures_per_sample[measure][rep_no][
+                    fold_no
+                ] = OrderedDict()
 
-            user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[
-                measure
-            ]
+            user_defined_measures_per_fold[measure][rep_no][fold_no] = (
+                user_defined_measures_fold[measure]
+            )
             user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = (
                 user_defined_measures_fold[measure]
             )
@@ -821,7 +843,9 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    run_dir = Path(openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id))
+    run_dir = Path(
+        openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id)
+    )
     run_file = run_dir / "description.xml"
 
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -840,7 +864,9 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
     return _create_run_from_xml(run_xml)
 
 
-def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT002
+def _create_run_from_xml(
+    xml: str, from_server: bool = True
+) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT002
     """Create a run object from xml returned from server.
 
     Parameters
@@ -870,11 +896,13 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
         if not from_server:
             return None
 
-        raise AttributeError("Run XML does not contain required (server) field: ", fieldname)
+        raise AttributeError(
+            "Run XML does not contain required (server) field: ", fieldname
+        )
 
-    run = xmltodict.parse(xml, force_list=["oml:file", "oml:evaluation", "oml:parameter_setting"])[
-        "oml:run"
-    ]
+    run = xmltodict.parse(
+        xml, force_list=["oml:file", "oml:evaluation", "oml:parameter_setting"]
+    )["oml:run"]
     run_id = obtain_field(run, "oml:run_id", from_server, cast=int)
     uploader = obtain_field(run, "oml:uploader", from_server, cast=int)
     uploader_name = obtain_field(run, "oml:uploader_name", from_server)
@@ -1029,7 +1057,9 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
 
 def _get_cached_run(run_id: int) -> OpenMLRun:
     """Load a run from the cache."""
-    run_cache_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id)
+    run_cache_dir = openml.utils._create_cache_directory_for_id(
+        RUNS_CACHE_DIR_NAME, run_id
+    )
     run_file = run_cache_dir / "description.xml"
     try:
         with run_file.open(encoding="utf8") as fh:
@@ -1199,7 +1229,9 @@ def __list_runs(api_call: str) -> pd.DataFrame:
     runs_dict = xmltodict.parse(xml_string, force_list=("oml:run",))
     # Minimalistic check if the XML is useful
     if "oml:runs" not in runs_dict:
-        raise ValueError(f'Error in return XML, does not contain "oml:runs": {runs_dict}')
+        raise ValueError(
+            f'Error in return XML, does not contain "oml:runs": {runs_dict}'
+        )
 
     if "@xmlns:oml" not in runs_dict["oml:runs"]:
         raise ValueError(
@@ -1213,7 +1245,9 @@ def __list_runs(api_call: str) -> pd.DataFrame:
             f'"http://openml.org/openml": {runs_dict}',
         )
 
-    assert isinstance(runs_dict["oml:runs"]["oml:run"], list), type(runs_dict["oml:runs"])
+    assert isinstance(runs_dict["oml:runs"]["oml:run"], list), type(
+        runs_dict["oml:runs"]
+    )
 
     runs = {
         int(r["oml:run_id"]): {
