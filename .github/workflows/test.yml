@@ -101,7 +101,7 @@ jobs:
         echo "BEFORE=$git_status" >> $GITHUB_ENV
         echo "Repository status before tests: $git_status"
 
-    - name: Clone Services & Apply Universal Patch
+    - name: Clone Services
       if: matrix.os == 'ubuntu-latest'
       run: |
         git clone --depth 1 https://github.com/openml/services.git
@@ -116,7 +116,7 @@ jobs:
         timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} openml-php-rest-api)" == "healthy" ]; do sleep 5; done'
 
         echo "Final Verification: Gateway Connectivity..."
-        curl -sSf http://localhost:8000/api/v1/xml/data/1 > /dev/null
+        curl -sSfL http://localhost:8000/api/v1/xml/data/1 | head -n 15
 
     - name: Show installed dependencies
       run: python -m pip list
