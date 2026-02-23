@@ -247,6 +247,7 @@ class HTTPClient:
         self.retry_func = (
             self._human_delay if retry_policy == RetryPolicy.HUMAN else self._robot_delay
         )
+        self.headers = _HEADERS
 
     def _robot_delay(self, n: int) -> float:
         """
