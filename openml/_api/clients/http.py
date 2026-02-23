@@ -187,7 +187,6 @@ class HTTPCache:
             "url": response.url,
             "reason": response.reason,
             "encoding": response.encoding,
-            "elapsed": response.elapsed.total_seconds(),
             "created_at": time.time(),
             "request": {
                 "method": response.request.method if response.request else None,
