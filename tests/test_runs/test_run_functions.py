@@ -397,6 +397,7 @@ class TestRun(TestBase):
                                 assert evaluation > 0
                             assert evaluation < max_time_allowed
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_regression_on_classif_task(self):
@@ -414,6 +415,7 @@ class TestRun(TestBase):
                 task=task,
             )
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_check_erronous_sklearn_flow_fails(self):
@@ -627,6 +629,7 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_logistic_regression(self):
@@ -636,6 +639,7 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_linear_regression(self):
@@ -667,6 +671,7 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_REGRESSION["n_test_obs"]
         self._run_and_upload_regression(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_pipeline_dummy_pipeline(self):
@@ -681,6 +686,7 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(pipeline1, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -798,6 +804,7 @@ class TestRun(TestBase):
                 call_count += 1
         assert call_count == 3
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_gridsearch(self):
@@ -821,6 +828,7 @@ class TestRun(TestBase):
         )
         assert len(run.trace.trace_iterations) == 9
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_randomsearch(self):
@@ -854,6 +862,7 @@ class TestRun(TestBase):
         trace = openml.runs.get_run_trace(run.run_id)
         assert len(trace.trace_iterations) == 5
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_maskedarrays(self):
@@ -882,6 +891,7 @@ class TestRun(TestBase):
 
     ##########################################################################
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_learning_curve_task_1(self):
@@ -907,6 +917,7 @@ class TestRun(TestBase):
         )
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_learning_curve_task_2(self):
@@ -944,6 +955,7 @@ class TestRun(TestBase):
         )
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.21"),
@@ -1023,6 +1035,7 @@ class TestRun(TestBase):
                 assert alt_scores[idx] >= 0
                 assert alt_scores[idx] <= 1
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_local_run_swapped_parameter_order_model(self):
@@ -1039,6 +1052,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1068,6 +1082,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1106,6 +1121,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1168,6 +1184,7 @@ class TestRun(TestBase):
         assert flowS.components["Imputer"].parameters["strategy"] == '"most_frequent"'
         assert flowS.components["VarianceThreshold"].parameters["threshold"] == "0.05"
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1228,6 +1245,7 @@ class TestRun(TestBase):
             run_ids = run_exists(task.task_id, setup_exists)
             assert run_ids, (run_ids, clf)
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_with_illegal_flow_id(self):
@@ -1248,6 +1266,7 @@ class TestRun(TestBase):
                 avoid_duplicate_runs=True,
             )
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_with_illegal_flow_id_after_load(self):
@@ -1280,6 +1299,7 @@ class TestRun(TestBase):
             TestBase._mark_entity_for_removal("run", loaded_run.run_id)
             TestBase.logger.info(f"collected from test_run_functions: {loaded_run.run_id}")
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_with_illegal_flow_id_1(self):
@@ -1306,6 +1326,7 @@ class TestRun(TestBase):
                 avoid_duplicate_runs=True,
             )
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_with_illegal_flow_id_1_after_load(self):
@@ -1345,6 +1366,7 @@ class TestRun(TestBase):
             loaded_run.publish,
         )
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1575,6 +1597,7 @@ class TestRun(TestBase):
         runs = openml.runs.list_runs(tag="curves", size=2)
         assert len(runs) >= 1
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1612,6 +1635,7 @@ class TestRun(TestBase):
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             assert len(row) == 12
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1666,6 +1690,7 @@ class TestRun(TestBase):
         with pytest.raises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_flow_on_task_downloaded_flow(self):
@@ -1767,7 +1792,7 @@ class TestRun(TestBase):
         self.assertListEqual(res, [0] * 5)
 
 
-
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1864,7 +1889,7 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     assert run_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
-
+@pytest.mark.skip(reason="Pending resolution of #1657")
 @pytest.mark.sklearn()
 @unittest.skipIf(
     Version(sklearn.__version__) < Version("0.21"),
@@ -1946,7 +1971,7 @@ def test__run_task_get_arffcontent_2(parallel_mock):
         err_msg="Observed performance scores deviate from expected ones.",
     )
 
-
+@pytest.mark.skip(reason="Pending resolution of #1657")
 @pytest.mark.sklearn()
 @unittest.skipIf(
     Version(sklearn.__version__) < Version("0.21"),

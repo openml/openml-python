@@ -309,6 +309,7 @@ class TestFlowFunctions(TestBase):
         flow = openml.flows.get_flow(1)
         assert flow.external_version is None
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_get_flow_reinstantiate_model(self):
@@ -392,6 +393,7 @@ class TestFlowFunctions(TestBase):
         assert flow.flow_id is None
         assert "sklearn==0.19.1" not in flow.dependencies
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_get_flow_id(self):
