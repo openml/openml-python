@@ -467,7 +467,7 @@ class HTTPClient:
 
         return exception
 
-    def _request(  # noqa: PLR0913
+    def __request(  # noqa: PLR0913
         self,
         session: requests.Session,
         method: str,
@@ -535,7 +535,7 @@ class HTTPClient:
 
         return response, exception
 
-    def request(  # noqa: PLR0913, C901
+    def _request(  # noqa: PLR0913, C901
         self,
         method: str,
         path: str,
@@ -618,7 +618,7 @@ class HTTPClient:
 
         with requests.Session() as session:
             for retry_counter in range(1, retries + 1):
-                response, exception = self._request(
+                response, exception = self.__request(
                     session=session,
                     method=method,
                     url=url,
@@ -709,7 +709,7 @@ class HTTPClient:
         requests.Response
             HTTP response.
         """
-        return self.request(
+        return self._request(
             method="GET",
             path=path,
             enable_cache=enable_cache,
@@ -743,7 +743,7 @@ class HTTPClient:
         requests.Response
             HTTP response.
         """
-        return self.request(
+        return self._request(
             method="POST",
             path=path,
             enable_cache=False,
@@ -771,7 +771,7 @@ class HTTPClient:
         requests.Response
             HTTP response.
         """
-        return self.request(
+        return self._request(
             method="DELETE",
             path=path,
             enable_cache=False,
