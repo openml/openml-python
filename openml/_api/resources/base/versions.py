@@ -143,9 +143,8 @@ class ResourceV1API(ResourceAPI):
         data = {f"{endpoint_name}_id": resource_id, "tag": tag}
         response = self._http.post(path, data=data)
 
-        main_tag = f"oml:{endpoint_name}_tag"
         parsed_response = xmltodict.parse(response.content, force_list={"oml:tag"})
-        result = parsed_response[main_tag]
+        result = parsed_response[f"oml:{endpoint_name}_tag"]
         tags: list[str] = result.get("oml:tag", [])
 
         return tags
@@ -181,9 +180,8 @@ class ResourceV1API(ResourceAPI):
         data = {f"{endpoint_name}_id": resource_id, "tag": tag}
         response = self._http.post(path, data=data)
 
-        main_tag = f"oml:{endpoint_name}_untag"
         parsed_response = xmltodict.parse(response.content, force_list={"oml:tag"})
-        result = parsed_response[main_tag]
+        result = parsed_response[f"oml:{endpoint_name}_untag"]
         tags: list[str] = result.get("oml:tag", [])
 
         return tags
