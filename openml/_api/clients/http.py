@@ -26,6 +26,8 @@ from openml.exceptions import (
     OpenMLServerNoResult,
 )
 
+_HEADERS = {"user-agent": f"openml-python/{__version__}"}
+
 
 class HTTPCache:
     """
@@ -245,7 +247,6 @@ class HTTPClient:
         self.retry_func = (
             self._human_delay if retry_policy == RetryPolicy.HUMAN else self._robot_delay
         )
-        self.headers: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
 
     def _robot_delay(self, n: int) -> float:
         """
@@ -601,7 +602,7 @@ class HTTPClient:
 
         # prepare headers
         headers = request_kwargs.pop("headers", {}).copy()
-        headers.update(self.headers)
+        headers.update(_HEADERS)
 
         files = request_kwargs.pop("files", None)
 
