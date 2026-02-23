@@ -125,6 +125,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       env:
         OPENML_TEST_SERVER_ADMIN_KEY: ${{ secrets.OPENML_TEST_SERVER_ADMIN_KEY }}
+        OPENML_USE_LOCAL_SERVICES: "true"
       run: |
         if [ "${{ matrix.code-cov }}" = "true" ]; then
           codecov="--cov=openml --long --cov-report=xml"

@@ -297,8 +297,8 @@ def with_test_cache(test_files_directory, request):
     openml.config.set_root_cache_directory(_root_cache_directory)
     if tmp_cache.exists():
         shutil.rmtree(tmp_cache)
-        
 
+ 
 @pytest.fixture
 def static_cache_dir():
     return Path(__file__).parent / "files" 
