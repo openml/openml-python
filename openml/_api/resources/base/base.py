@@ -3,7 +3,12 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, NoReturn
 
-from openml.exceptions import OpenMLNotSupportedError
+from openml.exceptions import (
+    OpenMLNotAuthorizedError,
+    OpenMLNotSupportedError,
+    OpenMLServerError,
+    OpenMLServerException,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -134,6 +139,77 @@ class ResourceAPI(ABC):
         -----
         Concrete subclasses must implement this method.
         """
+
+    @abstractmethod
+    def _get_endpoint_name(self) -> str:
+        """
+        Return the endpoint name for the current resource type.
+
+        Returns
+        -------
+        str
+            Endpoint segment used in API paths.
+
+        Notes
+        -----
+        Datasets use the special endpoint name ``"data"`` instead of
+        their enum value.
+        """
+
+    def _handle_delete_exception(
+        self, resource_type: str, exception: OpenMLServerException
+    ) -> None:
+        """
+        Map V1 deletion error codes to more specific exceptions.
+
+        Parameters
+        ----------
+        resource_type : str
+            Endpoint name of the resource type.
+        exception : OpenMLServerException
+            Original exception raised during deletion.
+
+        Raises
+        ------
+        OpenMLNotAuthorizedError
+            If the resource cannot be deleted due to ownership or
+            dependent entities.
+        OpenMLServerError
+            If deletion fails for an unknown reason.
+        OpenMLServerException
+            If the error code is not specially handled.
+        """
+        # https://github.com/openml/OpenML/blob/21f6188d08ac24fcd2df06ab94cf421c946971b0/openml_OS/views/pages/api_new/v1/xml/pre.php
+        # Most exceptions are descriptive enough to be raised as their standard
+        # OpenMLServerException, however there are two cases where we add information:
+        #  - a generic "failed" message, we direct them to the right issue board
+        #  - when the user successfully authenticates with the server,
+        #    but user is not allowed to take the requested action,
+        #    in which case we specify a OpenMLNotAuthorizedError.
+        by_other_user = [323, 353, 393, 453, 594]
+        has_dependent_entities = [324, 326, 327, 328, 354, 454, 464, 595]
+        unknown_reason = [325, 355, 394, 455, 593]
+        if exception.code in by_other_user:
+            raise OpenMLNotAuthorizedError(
+                message=(
+                    f"The {resource_type} can not be deleted because it was not uploaded by you."
+                ),
+            ) from exception
+        if exception.code in has_dependent_entities:
+            raise OpenMLNotAuthorizedError(
+                message=(
+                    f"The {resource_type} can not be deleted because "
+                    f"it still has associated entities: {exception.message}"
+                ),
+            ) from exception
+        if exception.code in unknown_reason:
+            raise OpenMLServerError(
+                message=(
+                    f"The {resource_type} can not be deleted for unknown reason,"
+                    " please open an issue at: https://github.com/openml/openml/issues/new"
+                ),
+            ) from exception
+        raise exception
 
     def _not_supported(self, *, method: str) -> NoReturn:
         """
