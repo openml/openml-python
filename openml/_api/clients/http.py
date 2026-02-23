@@ -41,6 +41,18 @@ class HTTPCache:
     path : pathlib.Path
         Base directory where cache entries are stored.
 
+        Each request (cache enabled) is mapped to a subdirectory
+        under this path using the following scheme:
+
+        - The domain is split into components and reversed
+        (e.g. ``www.openml.org`` → ``org/openml/www``).
+        - URL path segments are appended as directories.
+        - Query parameters (excluding ``api_key``) are URL-encoded
+        and appended as the final path component.
+
+        The resulting directory contains three files:
+        ``meta.json``, ``headers.json``, and ``body.bin``.
+
     Notes
     -----
     The cache key is derived from the URL (domain and path components) and query
