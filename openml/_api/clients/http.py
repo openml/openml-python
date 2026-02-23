@@ -371,7 +371,7 @@ class HTTPClient:
             raise OpenMLServerNoResult(code=code, message=message, url=url)
 
         # 163: failure to validate flow XML (https://www.openml.org/api_docs#!/flow/post_flow)
-        if code in [163] and files is not None and "description" in files:
+        if code == 163 and files is not None and "description" in files:
             # file_elements['description'] is the XML file description of the flow
             message = f"\n{files['description']}\n{message}"
 
