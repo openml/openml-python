@@ -115,10 +115,10 @@ class TestHTTPClient(TestBase):
         cache_path = self.cache._key_to_path(key) / "meta.json"
 
         response1 = self.http_client.get(path, enable_cache=True)
-        response1_cache_time_stamp = cache_path.stat().st_ctime
+        response1_cache_time_stamp = cache_path.stat().st_mtime
 
         response2 = self.http_client.get(path, enable_cache=True, refresh_cache=True)
-        response2_cache_time_stamp = cache_path.stat().st_ctime
+        response2_cache_time_stamp = cache_path.stat().st_mtime
 
         self.assertNotEqual(response1_cache_time_stamp, response2_cache_time_stamp)
         self.assertEqual(response2.status_code, 200)
