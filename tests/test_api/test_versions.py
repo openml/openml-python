@@ -164,10 +164,7 @@ class TestResourceFallbackAPI(TestResourceAPIBase):
             api_version=APIVersion.V2,
             resource_type=ResourceType.TASK,
         )
-        self.resource = FallbackProxy(
-            primary_api=resource_v2,
-            fallback_api=resource_v1,
-        )
+        self.resource = FallbackProxy(resource_v2, resource_v1)
 
     def test_publish(self):
         self._publish()

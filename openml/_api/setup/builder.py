@@ -121,10 +121,7 @@ class APIBackendBuilder:
             )
 
         merged: dict[ResourceType, FallbackProxy] = {
-            name: FallbackProxy(
-                primary_api=resource_apis[name],
-                fallback_api=fallback_resource_apis[name],
-            )
+            name: FallbackProxy(resource_apis[name], fallback_resource_apis[name])
             for name in resource_apis
         }
 
