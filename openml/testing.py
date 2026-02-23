@@ -57,6 +57,11 @@ class TestBase(unittest.TestCase):
     logger = logging.getLogger("unit_tests_published_entities")
     logger.setLevel(logging.DEBUG)
 
+    # migration-specific attributes
+    cache: HTTPCache
+    http_clients: dict[APIVersion, HTTPClient]
+    minio_client: MinIOClient
+
     def setUp(self, n_levels: int = 1, tmpdir_suffix: str = "") -> None:
         """Setup variables and temporary directories.
 
@@ -110,6 +115,38 @@ class TestBase(unittest.TestCase):
         self.connection_n_retries = openml.config.connection_n_retries
         openml.config.set_retry_policy("robot", n_retries=20)
         openml.config._sync_api_config()
+
+        # migration-specific attributes
+        retries = self.connection_n_retries
+        retry_policy = RetryPolicy.HUMAN if self.retry_policy == "human" else RetryPolicy.ROBOT
+        cache_dir = self.static_cache_dir
+
+        v1_server = self.test_server.split("api/")[0]
+        v1_base_url = self.test_server.replace(v1_server, "").rstrip("/") + "/"
+        v1_api_key = self.user_key
+
+        self.cache = HTTPCache(
+            path=cache_dir,
+        )
+        self.http_clients = {
+            APIVersion.V1: HTTPClient(
+                server=v1_server,
+                base_url=v1_base_url,
+                api_key=v1_api_key,
+                retries=retries,
+                retry_policy=retry_policy,
+                cache=self.cache,
+            ),
+            APIVersion.V2: HTTPClient(
+                server="http://localhost:8002/",
+                base_url="",
+                api_key="",
+                retries=retries,
+                retry_policy=retry_policy,
+                cache=self.cache,
+            ),
+        }
+        self.minio_client = MinIOClient(path=cache_dir)
 
     def use_production_server(self) -> None:
         """
@@ -279,46 +316,6 @@ class TestBase(unittest.TestCase):
                         assert isinstance(evaluation, float)
                         assert evaluation >= min_val
                         assert evaluation <= max_val
-
-
-class TestAPIBase(TestBase):
-    cache: HTTPCache
-    http_clients: dict[APIVersion, HTTPClient]
-    minio_client: MinIOClient
-
-    def setUp(self, n_levels: int = 1, tmpdir_suffix: str = "") -> None:
-        super().setUp(n_levels=n_levels, tmpdir_suffix=tmpdir_suffix)
-
-        retries = self.connection_n_retries
-        retry_policy = RetryPolicy.HUMAN if self.retry_policy == "human" else RetryPolicy.ROBOT
-        cache_dir = self.static_cache_dir
-
-        v1_server = self.test_server.split("api/")[0]
-        v1_base_url = self.test_server.replace(v1_server, "").rstrip("/") + "/"
-        v1_api_key = self.user_key
-
-        self.cache = HTTPCache(
-            path=cache_dir,
-        )
-        self.http_clients = {
-            APIVersion.V1: HTTPClient(
-                server=v1_server,
-                base_url=v1_base_url,
-                api_key=v1_api_key,
-                retries=retries,
-                retry_policy=retry_policy,
-                cache=self.cache,
-            ),
-            APIVersion.V2: HTTPClient(
-                server="http://localhost:8002/",
-                base_url="",
-                api_key="",
-                retries=retries,
-                retry_policy=retry_policy,
-                cache=self.cache,
-            ),
-        }
-        self.minio_client = MinIOClient(path=cache_dir)
 
     def _create_resource(self, api_version: APIVersion, resource_type: ResourceType) -> ResourceAPI:
         http_client = self.http_clients[api_version]

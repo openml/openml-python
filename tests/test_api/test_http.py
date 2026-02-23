@@ -1,7 +1,7 @@
 from requests import Response, Request, Session
 from unittest.mock import patch
 import pytest
-from openml.testing import TestAPIBase
+from openml.testing import TestBase
 import os
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
@@ -10,7 +10,7 @@ from openml.exceptions import OpenMLAuthenticationError
 from openml._api import HTTPClient
 
 
-class TestHTTPClient(TestAPIBase):
+class TestHTTPClient(TestBase):
     http_client: HTTPClient
 
     def setUp(self):

@@ -1,13 +1,13 @@
 import pytest
 from requests import Session, Response
 from unittest.mock import patch
-from openml.testing import TestAPIBase
+from openml.testing import TestBase
 from openml._api import FallbackProxy, ResourceAPI
 from openml.enums import ResourceType, APIVersion
 from openml.exceptions import OpenMLNotSupportedError
 
 
-class TestResourceAPIBase(TestAPIBase):
+class TestResourceAPIBase(TestBase):
     resource: ResourceAPI | FallbackProxy
 
     @property
