@@ -118,7 +118,7 @@ class HTTPCache:
         path = self._key_to_path(key)
 
         if not path.exists():
-            raise FileNotFoundError(f"Cache directory not found: {path}")
+            raise FileNotFoundError(f"Cache entry not found: {path}")
 
         meta_path = path / "meta.json"
         headers_path = path / "headers.json"
