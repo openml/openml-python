@@ -510,7 +510,7 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
     ]
     ignored_by_python_api = ["binary_url", "binary_format", "binary_md5", "model", "_entity_id"]
 
-    for key in set(flow1.__dict__.keys()).union(flow2.__dict__.keys()):
+    for key in set(flow1.__dict__).union(flow2.__dict__):
         if key in generated_by_the_server + ignored_by_python_api:
             continue
         attr1 = getattr(flow1, key, None)
@@ -519,7 +519,7 @@ def assert_flows_equal(  # noqa: C901, PLR0912, PLR0913, PLR0915
             if not (isinstance(attr1, dict) and isinstance(attr2, dict)):
                 raise TypeError("Cannot compare components because they are not dictionary.")
 
-            for name in set(attr1.keys()).union(attr2.keys()):
+            for name in set(attr1).union(attr2):
                 if name not in attr1:
                     raise ValueError(
                         f"Component {name} only available in argument2, but not in argument1.",
