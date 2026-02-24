@@ -1097,7 +1097,11 @@ def _get_dataset_description(did_cache_dir: Path, dataset_id: int) -> dict[str, 
         with description_file.open(encoding="utf8") as fh:
             dataset_xml = fh.read()
         description = xmltodict.parse(dataset_xml)["oml:data_set_description"]
-    except Exception:  # noqa: BLE001
+    except (FileNotFoundError, KeyError, ExpatError):
+        logger.debug(
+            f"Falling back to API call for dataset {dataset_id} due to cache load failure."
+        )
+
         url_extension = f"data/{dataset_id}"
         dataset_xml = openml._api_calls._perform_api_call(url_extension, "get")
         try:
