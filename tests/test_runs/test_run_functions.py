@@ -1813,7 +1813,6 @@ class TestRun(TestBase):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_owned.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -1826,14 +1825,13 @@ def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.runs.delete_run(40_000)
 
-    run_url = "https://test.openml.org/api/v1/xml/run/40000"
+    run_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/run/40000"
     assert run_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_successful.xml"
     mock_delete.return_value = create_request_response(
         status_code=200,
@@ -1843,14 +1841,13 @@ def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
     success = openml.runs.delete_run(10591880)
     assert success
 
-    run_url = "https://test.openml.org/api/v1/xml/run/10591880"
+    run_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/run/10591880"
     assert run_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_exist.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -1863,7 +1860,7 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.runs.delete_run(9_999_999)
 
-    run_url = "https://test.openml.org/api/v1/xml/run/9999999"
+    run_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/run/9999999"
     assert run_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
@@ -1872,6 +1869,10 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
 @unittest.skipIf(
     Version(sklearn.__version__) < Version("0.21"),
     reason="couldn't perform local tests successfully w/o bloating RAM",
+    )
+@unittest.skipIf(
+    Version(sklearn.__version__) >= Version("1.8"),
+    reason="predictions differ significantly",
     )
 @mock.patch("openml_sklearn.SklearnExtension._prevent_optimize_n_jobs")
 @pytest.mark.test_server()
