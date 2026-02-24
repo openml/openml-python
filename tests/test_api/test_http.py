@@ -8,6 +8,7 @@ from urllib.parse import urljoin, urlparse
 from openml.enums import APIVersion
 from openml.exceptions import OpenMLAuthenticationError
 from openml._api import HTTPClient
+import openml
 
 
 class TestHTTPClient(TestBase):
@@ -19,8 +20,7 @@ class TestHTTPClient(TestBase):
 
     def _prepare_url(self, path: str | None = None) -> str:
         server = self.http_client.server
-        base_url = self.http_client.base_url
-        return urljoin(server, urljoin(base_url, path))
+        return urljoin(server, path)
 
     def test_cache(self):
         path = "task/31"
@@ -28,16 +28,15 @@ class TestHTTPClient(TestBase):
 
         url = self._prepare_url(path=path)
 
-        server_keys = urlparse(self.http_client.server).netloc.split(".")[::-1]
-        base_url_keys = self.http_client.base_url.strip("/").split("/")
-        path_keys = path.split("/")
+        parsed_url = urlparse(url)
+        netloc_parts = parsed_url.netloc.split(".")[::-1]
+        path_parts = parsed_url.path.strip("/").split("/")
         params_key = "&".join([f"{k}={v}" for k, v in params.items()])
 
         key = self.cache.get_key(url, params)
         expected_key = os.path.join(
-            *server_keys,
-            *base_url_keys,
-            *path_keys,
+            *netloc_parts,
+            *path_parts,
             params_key,
         )
 
@@ -133,13 +132,13 @@ class TestHTTPClient(TestBase):
 
     @pytest.mark.uses_test_server()
     def test_get_without_api_key_raises(self):
-        api_key = self.http_client.api_key
-        self.http_client.api_key = None
+        api_key = openml.config.SERVERS[APIVersion.V1]["api_key"]
+        openml.config.SERVERS[APIVersion.V1]["api_key"] = None
 
         with pytest.raises(OpenMLAuthenticationError):
             self.http_client.get("task/1", use_api_key=True)
 
-        self.http_client.api_key = api_key
+        openml.config.SERVERS[APIVersion.V1]["api_key"] = api_key
 
     @pytest.mark.uses_test_server()
     def test_download_creates_file(self):
@@ -207,7 +206,7 @@ class TestHTTPClient(TestBase):
 
             mock_request.assert_called_once_with(
                 method="POST",
-                url=self.http_client.server + self.http_client.base_url + resource_name,
+                url=urljoin(self.http_client.server, resource_name),
                 params={},
                 data={'api_key': self.http_client.api_key},
                 headers=self.http_client.headers,

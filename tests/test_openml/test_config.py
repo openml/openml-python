@@ -15,6 +15,7 @@ import pytest
 import openml.config
 import openml.testing
 from openml.testing import TestBase
+from openml.enums import APIVersion, ServerType
 
 
 @contextmanager
@@ -77,6 +78,9 @@ class TestConfig(openml.testing.TestBase):
         """Checks if the current configuration is returned accurately as a dict."""
         config = openml.config.get_config_as_dict()
         _config = {}
+        _config["api_version"] = APIVersion.V1
+        _config["fallback_api_version"] = None
+        _config["server_type"] = ServerType.PRODUCTION
         _config["apikey"] = TestBase.user_key
         _config["server"] = f"{openml.config.TEST_SERVER_URL}/api/v1/xml"
         _config["cachedir"] = self.workdir
@@ -85,12 +89,15 @@ class TestConfig(openml.testing.TestBase):
         _config["retry_policy"] = "robot"
         _config["show_progress"] = False
         assert isinstance(config, dict)
-        assert len(config) == 7
+        assert len(config) == 10
         self.assertDictEqual(config, _config)
 
     def test_setup_with_config(self):
         """Checks if the OpenML configuration can be updated using _setup()."""
         _config = {}
+        _config["api_version"] = APIVersion.V1
+        _config["fallback_api_version"] = None
+        _config["server_type"] = ServerType.PRODUCTION
         _config["apikey"] = TestBase.user_key
         _config["server"] = "https://www.openml.org/api/v1/xml"
         _config["cachedir"] = self.workdir

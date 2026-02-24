@@ -40,9 +40,6 @@ from .resources import (
 from .setup import (
     APIBackend,
     APIBackendBuilder,
-    APIConfig,
-    Config,
-    ConnectionConfig,
     _backend,
 )
 
@@ -50,9 +47,6 @@ __all__ = [
     "API_REGISTRY",
     "APIBackend",
     "APIBackendBuilder",
-    "APIConfig",
-    "Config",
-    "ConnectionConfig",
     "DatasetAPI",
     "DatasetV1API",
     "DatasetV2API",

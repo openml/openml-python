@@ -16,8 +16,9 @@ import requests
 import xmltodict
 from requests import Response
 
+import openml
 from openml.__version__ import __version__
-from openml.enums import RetryPolicy
+from openml.enums import APIVersion, RetryPolicy
 from openml.exceptions import (
     OpenMLAuthenticationError,
     OpenMLHashException,
@@ -26,7 +27,7 @@ from openml.exceptions import (
     OpenMLServerNoResult,
 )
 
-_HEADERS = {"user-agent": f"openml-python/{__version__}"}
+_HEADERS: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
 
 
 class HTTPCache:
@@ -38,31 +39,15 @@ class HTTPCache:
     three files: metadata (``meta.json``), headers (``headers.json``), and the raw
     body (``body.bin``).
 
-    Parameters
-    ----------
-    path : pathlib.Path
-        Base directory where cache entries are stored.
-
-        Each request (cache enabled) is mapped to a subdirectory
-        under this path using the following scheme:
-
-        - The domain is split into components and reversed
-        (e.g. ``www.openml.org`` → ``org/openml/www``).
-        - URL path segments are appended as directories.
-        - Query parameters (excluding ``api_key``) are URL-encoded
-        and appended as the final path component.
-
-        The resulting directory contains three files:
-        ``meta.json``, ``headers.json``, and ``body.bin``.
-
     Notes
     -----
     The cache key is derived from the URL (domain and path components) and query
     parameters, excluding the ``api_key`` parameter.
     """
 
-    def __init__(self, *, path: Path) -> None:
-        self.path = path
+    @property
+    def path(self) -> Path:
+        return Path(openml.config.get_cache_directory())
 
     def get_key(self, url: str, params: dict[str, Any]) -> str:
         """
@@ -212,42 +197,48 @@ class HTTPClient:
 
     Parameters
     ----------
-    server : str
-        Base server URL (e.g., ``https://www.openml.org``).
-    base_url : str
-        Base API path appended to the server URL.
-    api_key : str | None
-        API key used for authenticated endpoints. If None, authenticated
-        requests cannot be performed.
-    retries : int
-        Maximum number of retry attempts for failed requests.
-    retry_policy : RetryPolicy
-        Strategy controlling delay between retries.
-    cache : HTTPCache or None, optional
-        Cache instance for storing and retrieving responses.
+    api_version : APIVersion
+        Backend API Version.
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         *,
-        server: str,
-        base_url: str,
-        api_key: str | None,
-        retries: int,
-        retry_policy: RetryPolicy,
-        cache: HTTPCache,
+        api_version: APIVersion,
     ) -> None:
-        self.server = server
-        self.base_url = base_url
-        self.api_key = api_key
-        self.retries = retries
-        self.retry_policy = retry_policy
-        self.cache = cache
+        self.api_version = api_version
 
-        self.retry_func = (
-            self._human_delay if retry_policy == RetryPolicy.HUMAN else self._robot_delay
-        )
-        self.headers = _HEADERS
+        self.cache = HTTPCache()
+
+    @property
+    def server(self) -> str:
+        server = openml.config.SERVERS[self.api_version]["server"]
+        if server is None:
+            raise ValueError(
+                f"server found to be None for api_version={self.api_version}"
+                f" in {openml.config.SERVERS}"
+            )
+        return server
+
+    @property
+    def api_key(self) -> str | None:
+        return openml.config.SERVERS[self.api_version]["apikey"]
+
+    @property
+    def retries(self) -> int:
+        return openml.config.connection_n_retries
+
+    @property
+    def retry_policy(self) -> RetryPolicy:
+        return RetryPolicy.HUMAN if openml.config.retry_policy == "human" else RetryPolicy.ROBOT
+
+    @property
+    def retry_func(self) -> Callable:
+        return self._human_delay if self.retry_policy == RetryPolicy.HUMAN else self._robot_delay
+
+    @property
+    def headers(self) -> dict[str, str]:
+        return _HEADERS
 
     def _robot_delay(self, n: int) -> float:
         """
@@ -579,7 +570,7 @@ class HTTPClient:
         OpenMLHashException
             If checksum verification fails.
         """
-        url = urljoin(self.server, urljoin(self.base_url, path))
+        url = urljoin(self.server, path)
         retries = max(1, self.retries)
 
         params = request_kwargs.pop("params", {}).copy()
