@@ -563,13 +563,18 @@ def attributes_arff_from_df(df: pd.DataFrame) -> list[tuple[str, list[str] | str
             categories = df[column_name].cat.categories
             categories_dtype = pd.api.types.infer_dtype(categories)
             if categories_dtype not in ("string", "unicode"):
-                raise ValueError(
-                    f"The column '{column_name}' of the dataframe is of "
-                    "'category' dtype. Therefore, all values in "
-                    "this columns should be string. Please "
-                    "convert the entries which are not string. "
-                    f"Got {categories_dtype} dtype in this column.",
-                )
+                try:
+                    # [ENH] Attempt to convert categories to string automatically
+                    new_categories = categories.astype(str)
+                    df[column_name] = df[column_name].cat.rename_categories(new_categories)
+                    categories = df[column_name].cat.categories
+                except Exception as e:
+                    raise ValueError(
+                        f"The column '{column_name}' of the dataframe is of "
+                        "'category' dtype. Therefore, all values in "
+                        "this columns should be string. Automatic conversion failed. "
+                        f"Got {categories_dtype} dtype in this column.",
+                    ) from e
             attributes_arff.append((column_name, categories.tolist()))
         elif column_dtype == "boolean":
             # boolean are encoded as categorical.
