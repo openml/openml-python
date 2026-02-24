@@ -20,7 +20,10 @@ class TestConfig(openml.testing.TestBase):
         with pytest.raises(openml.exceptions.OpenMLServerError, match="URI too long!"):
             openml.datasets.list_datasets(data_id=list(range(10000)))
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @unittest.mock.patch("time.sleep")
     @unittest.mock.patch("requests.Session")
     @pytest.mark.test_server()
@@ -34,11 +37,17 @@ class TestConfig(openml.testing.TestBase):
             "Please wait for N seconds and try again.</oml:message>\n"
             "</oml:error>"
         )
-        Session_class_mock.return_value.__enter__.return_value.get.return_value = response_mock
-        with pytest.raises(openml.exceptions.OpenMLServerException, match="/abc returned code 107"):
+        Session_class_mock.return_value.__enter__.return_value.get.return_value = (
+            response_mock
+        )
+        with pytest.raises(
+            openml.exceptions.OpenMLServerException, match="/abc returned code 107"
+        ):
             openml._api_calls._send_request("get", "/abc", {})
 
-        assert Session_class_mock.return_value.__enter__.return_value.get.call_count == 20
+        assert (
+            Session_class_mock.return_value.__enter__.return_value.get.call_count == 20
+        )
 
 
 class FakeObject(NamedTuple):
@@ -125,5 +134,9 @@ def test_authentication_endpoints_requiring_api_key_show_relevant_help_link(
 ) -> None:
     # We need to temporarily disable the API key to test the error message
     with openml.config.overwrite_config_context({"apikey": None}):
-        with pytest.raises(openml.exceptions.OpenMLAuthenticationError, match=API_TOKEN_HELP_LINK):
-            openml._api_calls._perform_api_call(call=endpoint, request_method=method, data=None)
+        with pytest.raises(
+            openml.exceptions.OpenMLAuthenticationError, match=API_TOKEN_HELP_LINK
+        ):
+            openml._api_calls._perform_api_call(
+                call=endpoint, request_method=method, data=None
+            )

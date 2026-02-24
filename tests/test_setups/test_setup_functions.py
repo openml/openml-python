@@ -34,7 +34,10 @@ class TestSetupFunctions(TestBase):
         self.extension = SklearnExtension()
         super().setUp()
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_nonexisting_setup_exists(self):
@@ -46,7 +49,9 @@ class TestSetupFunctions(TestBase):
         flow.name = f"TEST{sentinel}{flow.name}"
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
+        TestBase.logger.info(
+            f"collected from {__file__.split('/')[-1]}: {flow.flow_id}"
+        )
 
         # although the flow exists (created as of previous statement),
         # we can be sure there are no setups (yet) as it was just created
@@ -59,7 +64,9 @@ class TestSetupFunctions(TestBase):
         flow.name = f"TEST{get_sentinel()}{flow.name}"
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
+        TestBase.logger.info(
+            f"collected from {__file__.split('/')[-1]}: {flow.flow_id}"
+        )
 
         # although the flow exists, we can be sure there are no
         # setups (yet) as it hasn't been ran
@@ -83,7 +90,10 @@ class TestSetupFunctions(TestBase):
         setup_id = openml.setups.setup_exists(flow)
         assert setup_id == run.setup_id
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_existing_setup_exists_1(self):
@@ -100,14 +110,20 @@ class TestSetupFunctions(TestBase):
             nb = sklearn.naive_bayes.GaussianNB()
             self._existing_setup_exists(nb)
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_exisiting_setup_exists_2(self):
         # Check a flow with one hyperparameter
         self._existing_setup_exists(sklearn.naive_bayes.GaussianNB())
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_existing_setup_exists_3(self):
@@ -165,10 +181,14 @@ class TestSetupFunctions(TestBase):
         flow_id = 6794
         setups = openml.setups.list_setups(flow=flow_id, size=10)
         assert isinstance(setups, dict)
-        assert isinstance(setups[next(iter(setups.keys()))], openml.setups.setup.OpenMLSetup)
+        assert isinstance(
+            setups[next(iter(setups.keys()))], openml.setups.setup.OpenMLSetup
+        )
         assert len(setups) == 10
 
-        setups = openml.setups.list_setups(flow=flow_id, size=10, output_format="dataframe")
+        setups = openml.setups.list_setups(
+            flow=flow_id, size=10, output_format="dataframe"
+        )
         assert isinstance(setups, pd.DataFrame)
         assert len(setups) == 10
 

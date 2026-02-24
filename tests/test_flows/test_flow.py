@@ -33,7 +33,6 @@ from openml._api_calls import _perform_api_call
 from openml.testing import SimpleImputer, TestBase
 
 
-
 class TestFlow(TestBase):
     _multiprocess_can_split_ = True
 
@@ -162,12 +161,16 @@ class TestFlow(TestBase):
     def test_to_xml_from_xml(self):
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         estimator_name = (
-            "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+            "base_estimator"
+            if Version(sklearn.__version__) < Version("1.4")
+            else "estimator"
         )
         boosting = sklearn.ensemble.AdaBoostClassifier(
             **{estimator_name: sklearn.tree.DecisionTreeClassifier()},
         )
-        model = sklearn.pipeline.Pipeline(steps=(("scaler", scaler), ("boosting", boosting)))
+        model = sklearn.pipeline.Pipeline(
+            steps=(("scaler", scaler), ("boosting", boosting))
+        )
         flow = self.extension.model_to_flow(model)
         flow.flow_id = -234
         # end of setup
@@ -180,7 +183,10 @@ class TestFlow(TestBase):
         openml.flows.functions.assert_flows_equal(new_flow, flow)
         assert new_flow is not flow
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_publish_flow(self):
@@ -205,7 +211,9 @@ class TestFlow(TestBase):
 
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
+        TestBase.logger.info(
+            f"collected from {__file__.split('/')[-1]}: {flow.flow_id}"
+        )
         assert isinstance(flow.flow_id, int)
 
     @pytest.mark.sklearn()
@@ -215,7 +223,9 @@ class TestFlow(TestBase):
         flow = self.extension.model_to_flow(clf)
         flow_exists_mock.return_value = 1
 
-        with pytest.raises(openml.exceptions.PyOpenMLError, match="OpenMLFlow already exists"):
+        with pytest.raises(
+            openml.exceptions.PyOpenMLError, match="OpenMLFlow already exists"
+        ):
             flow.publish(raise_error_if_exists=True)
 
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
@@ -223,7 +233,10 @@ class TestFlow(TestBase):
             f"collected from {__file__.split('/')[-1]}: {flow.flow_id}",
         )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_publish_flow_with_similar_components(self):
@@ -234,7 +247,9 @@ class TestFlow(TestBase):
         flow, _ = self._add_sentinel_to_flow_name(flow, None)
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
+        TestBase.logger.info(
+            f"collected from {__file__.split('/')[-1]}: {flow.flow_id}"
+        )
         # For a flow where both components are published together, the upload
         # date should be equal
         assert flow.upload_date == flow.components["lr"].upload_date, (
@@ -249,7 +264,9 @@ class TestFlow(TestBase):
         flow1, sentinel = self._add_sentinel_to_flow_name(flow1, None)
         flow1.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow1.flow_id}")
+        TestBase.logger.info(
+            f"collected from {__file__.split('/')[-1]}: {flow1.flow_id}"
+        )
 
         # In order to assign different upload times to the flows!
         time.sleep(1)
@@ -261,21 +278,30 @@ class TestFlow(TestBase):
         flow2, _ = self._add_sentinel_to_flow_name(flow2, sentinel)
         flow2.publish()
         TestBase._mark_entity_for_removal("flow", flow2.flow_id, flow2.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow2.flow_id}")
+        TestBase.logger.info(
+            f"collected from {__file__.split('/')[-1]}: {flow2.flow_id}"
+        )
         # If one component was published before the other, the components in
         # the flow should have different upload dates
         assert flow2.upload_date != flow2.components["dt"].upload_date
 
-        clf3 = sklearn.ensemble.AdaBoostClassifier(sklearn.tree.DecisionTreeClassifier(max_depth=3))
+        clf3 = sklearn.ensemble.AdaBoostClassifier(
+            sklearn.tree.DecisionTreeClassifier(max_depth=3)
+        )
         flow3 = self.extension.model_to_flow(clf3)
         flow3, _ = self._add_sentinel_to_flow_name(flow3, sentinel)
         # Child flow has different parameter. Check for storing the flow
         # correctly on the server should thus not check the child's parameters!
         flow3.publish()
         TestBase._mark_entity_for_removal("flow", flow3.flow_id, flow3.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow3.flow_id}")
+        TestBase.logger.info(
+            f"collected from {__file__.split('/')[-1]}: {flow3.flow_id}"
+        )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_semi_legal_flow(self):
@@ -283,7 +309,9 @@ class TestFlow(TestBase):
         # should not throw error as it contains two differentiable forms of
         # Bagging i.e., Bagging(Bagging(J48)) and Bagging(J48)
         estimator_name = (
-            "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+            "base_estimator"
+            if Version(sklearn.__version__) < Version("1.4")
+            else "estimator"
         )
         semi_legal = sklearn.ensemble.BaggingClassifier(
             **{
@@ -299,7 +327,9 @@ class TestFlow(TestBase):
 
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
+        TestBase.logger.info(
+            f"collected from {__file__.split('/')[-1]}: {flow.flow_id}"
+        )
 
     @pytest.mark.sklearn()
     @mock.patch("openml.flows.functions.get_flow")
@@ -386,14 +416,21 @@ class TestFlow(TestBase):
         flow_id = openml.flows.flow_exists(name, version)
         assert not flow_id
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_existing_flow_exists(self):
         # create a flow
         nb = sklearn.naive_bayes.GaussianNB()
 
-        sparse = "sparse" if Version(sklearn.__version__) < Version("1.4") else "sparse_output"
+        sparse = (
+            "sparse"
+            if Version(sklearn.__version__) < Version("1.4")
+            else "sparse_output"
+        )
         ohe_params = {sparse: False, "handle_unknown": "ignore"}
         if Version(sklearn.__version__) >= Version("0.20"):
             ohe_params["categories"] = "auto"
@@ -428,7 +465,10 @@ class TestFlow(TestBase):
             )
             assert downloaded_flow_id == flow.flow_id
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_sklearn_to_upload_to_flow(self):
@@ -449,13 +489,20 @@ class TestFlow(TestBase):
         )
         fu = sklearn.pipeline.FeatureUnion(transformer_list=[("pca", pca), ("fs", fs)])
         estimator_name = (
-            "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+            "base_estimator"
+            if Version(sklearn.__version__) < Version("1.4")
+            else "estimator"
         )
         boosting = sklearn.ensemble.AdaBoostClassifier(
             **{estimator_name: sklearn.tree.DecisionTreeClassifier()},
         )
         model = sklearn.pipeline.Pipeline(
-            steps=[("ohe", ohe), ("scaler", scaler), ("fu", fu), ("boosting", boosting)],
+            steps=[
+                ("ohe", ohe),
+                ("scaler", scaler),
+                ("fu", fu),
+                ("boosting", boosting),
+            ],
         )
         parameter_grid = {
             "boosting__n_estimators": [1, 5, 10, 100],
@@ -482,7 +529,9 @@ class TestFlow(TestBase):
 
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
+        TestBase.logger.info(
+            f"collected from {__file__.split('/')[-1]}: {flow.flow_id}"
+        )
         assert isinstance(flow.flow_id, int)
 
         # Check whether we can load the flow again
@@ -565,7 +614,10 @@ class TestFlow(TestBase):
         tags = openml.utils.extract_xml_tags("oml:tag", flow_dict)
         assert tags == ["study_14"]
 
-        flow_xml = "<oml:flow><oml:tag>OpenmlWeka</oml:tag>\n" "<oml:tag>weka</oml:tag></oml:flow>"
+        flow_xml = (
+            "<oml:flow><oml:tag>OpenmlWeka</oml:tag>\n"
+            "<oml:tag>weka</oml:tag></oml:flow>"
+        )
         flow_dict = xmltodict.parse(flow_xml)
         tags = openml.utils.extract_xml_tags("oml:tag", flow_dict["oml:flow"])
         assert tags == ["OpenmlWeka", "weka"]

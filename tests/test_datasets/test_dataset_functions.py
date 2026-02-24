@@ -291,7 +291,9 @@ class TestOpenMLDataset(TestBase):
     @pytest.mark.skip("Need to find dataset name of private dataset")
     def test_dataset_by_name_cannot_access_private_data(self):
         self.use_production_server()
-        self.assertRaises(OpenMLPrivateDatasetError, openml.datasets.get_dataset, "NAME_GOES_HERE")
+        self.assertRaises(
+            OpenMLPrivateDatasetError, openml.datasets.get_dataset, "NAME_GOES_HERE"
+        )
 
     @pytest.mark.test_server()
     def test_get_dataset_lazy_all_functions(self):
@@ -301,7 +303,9 @@ class TestOpenMLDataset(TestBase):
 
         def ensure_absence_of_real_data():
             assert not os.path.exists(
-                os.path.join(openml.config.get_cache_directory(), "datasets", "1", "dataset.arff")
+                os.path.join(
+                    openml.config.get_cache_directory(), "datasets", "1", "dataset.arff"
+                )
             )
 
         tag = "test_lazy_tag_%d" % random.randint(1, 1000000)
@@ -405,7 +409,6 @@ class TestOpenMLDataset(TestBase):
         assert os.path.isfile(
             file_destination
         ), "_download_minio_file can download from subdirectories"
-
 
     @mock.patch("openml._api_calls._download_minio_file")
     @pytest.mark.test_server()
@@ -526,14 +529,29 @@ class TestOpenMLDataset(TestBase):
     @pytest.mark.test_server()
     def test_deletion_of_cache_dir_faulty_download(self, patch):
         patch.side_effect = Exception("Boom!")
-        self.assertRaisesRegex(Exception, "Boom!", openml.datasets.get_dataset, dataset_id=1)
-        datasets_cache_dir = os.path.join(openml.config.get_cache_directory(), "datasets")
+        self.assertRaisesRegex(
+            Exception, "Boom!", openml.datasets.get_dataset, dataset_id=1
+        )
+        datasets_cache_dir = os.path.join(
+            openml.config.get_cache_directory(), "datasets"
+        )
         assert len(os.listdir(datasets_cache_dir)) == 0
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_publish_dataset(self):
-        arff_file_path = self.static_cache_dir / "org" / "openml" / "test" / "datasets" / "2" / "dataset.arff"
+        arff_file_path = (
+            self.static_cache_dir
+            / "org"
+            / "openml"
+            / "test"
+            / "datasets"
+            / "2"
+            / "dataset.arff"
+        )
         dataset = OpenMLDataset(
             "anneal",
             "test",
@@ -564,7 +582,9 @@ class TestOpenMLDataset(TestBase):
         # Test workaround for string-typed class labels
         custom_ds = openml.datasets.get_dataset(2)
         custom_ds.features[31].data_type = "string"
-        labels = custom_ds.retrieve_class_labels(target_name=custom_ds.features[31].name)
+        labels = custom_ds.retrieve_class_labels(
+            target_name=custom_ds.features[31].name
+        )
         assert labels == ["COIL", "SHEET"]
 
     @pytest.mark.test_server()
@@ -685,12 +705,16 @@ class TestOpenMLDataset(TestBase):
         for arr, dt in zip(data, dtype):
             df = pd.DataFrame(arr)
             err_msg = (
-                f"The dtype '{dt}' of the column '0' is not currently " "supported by liac-arff"
+                f"The dtype '{dt}' of the column '0' is not currently "
+                "supported by liac-arff"
             )
             with pytest.raises(ValueError, match=err_msg):
                 attributes_arff_from_df(df)
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_create_dataset_numpy(self):
         data = np.array([[1, 2, 3], [1.2, 2.5, 3.8], [2, 5, 8], [0, 1, 0]]).T
@@ -723,9 +747,14 @@ class TestOpenMLDataset(TestBase):
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
         ), "Uploaded arff does not match original one"
-        assert _get_online_dataset_format(dataset.id) == "arff", "Wrong format for dataset"
+        assert (
+            _get_online_dataset_format(dataset.id) == "arff"
+        ), "Wrong format for dataset"
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_create_dataset_list(self):
         data = [
@@ -779,9 +808,14 @@ class TestOpenMLDataset(TestBase):
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
         ), "Uploaded ARFF does not match original one"
-        assert _get_online_dataset_format(dataset.id) == "arff", "Wrong format for dataset"
+        assert (
+            _get_online_dataset_format(dataset.id) == "arff"
+        ), "Wrong format for dataset"
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_create_dataset_sparse(self):
         # test the scipy.sparse.coo_matrix
@@ -930,7 +964,10 @@ class TestOpenMLDataset(TestBase):
             dataset_id
         ), "The format of the ARFF files is different"
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_create_dataset_pandas(self):
         data = [
@@ -998,7 +1035,9 @@ class TestOpenMLDataset(TestBase):
         column_names = ["input1", "input2", "y"]
         df = pd.DataFrame.sparse.from_spmatrix(sparse_data, columns=column_names)
         # meta-information
-        description = "Synthetic dataset created from a Pandas DataFrame with Sparse columns"
+        description = (
+            "Synthetic dataset created from a Pandas DataFrame with Sparse columns"
+        )
         dataset = openml.datasets.functions.create_dataset(
             name=name,
             description=description,
@@ -1023,7 +1062,9 @@ class TestOpenMLDataset(TestBase):
         assert (
             _get_online_dataset_arff(dataset.id) == dataset._dataset
         ), "Uploaded ARFF does not match original one"
-        assert _get_online_dataset_format(dataset.id) == "sparse_arff", "Wrong format for dataset"
+        assert (
+            _get_online_dataset_format(dataset.id) == "sparse_arff"
+        ), "Wrong format for dataset"
 
         # Check that we can overwrite the attributes
         data = [["a"], ["b"], ["c"], ["d"], ["e"]]
@@ -1053,7 +1094,9 @@ class TestOpenMLDataset(TestBase):
         TestBase._mark_entity_for_removal("data", dataset.id)
         TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {dataset.id}")
         downloaded_data = _get_online_dataset_arff(dataset.id)
-        assert downloaded_data == dataset._dataset, "Uploaded ARFF does not match original one"
+        assert (
+            downloaded_data == dataset._dataset
+        ), "Uploaded ARFF does not match original one"
         assert "@ATTRIBUTE rnd_str {a, b, c, d, e, f, g}" in downloaded_data
 
     def test_ignore_attributes_dataset(self):
@@ -1156,7 +1199,10 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url,
             )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_publish_fetch_ignore_attribute(self):
         """Test to upload and retrieve dataset and check ignore_attributes"""
@@ -1276,7 +1322,10 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url,
             )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_create_dataset_row_id_attribute_inference(self):
         # meta-information
@@ -1405,7 +1454,9 @@ class TestOpenMLDataset(TestBase):
         cache_dir = openml.config.get_cache_directory()
         cache_dir_for_id = os.path.join(cache_dir, "datasets", "128")
         feather_file = os.path.join(cache_dir_for_id, "dataset.feather")
-        pickle_file = os.path.join(cache_dir_for_id, "dataset.feather.attributes.pkl.py3")
+        pickle_file = os.path.join(
+            cache_dir_for_id, "dataset.feather.attributes.pkl.py3"
+        )
         data = pd.read_feather(feather_file)
         assert os.path.isfile(feather_file), "Feather file is missing"
         assert os.path.isfile(pickle_file), "Attributes pickle file is missing"
@@ -1445,7 +1496,10 @@ class TestOpenMLDataset(TestBase):
         edited_dataset = openml.datasets.get_dataset(did)
         assert edited_dataset.description == desc
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_data_edit_critical_field(self):
         # Case 2
@@ -1453,7 +1507,9 @@ class TestOpenMLDataset(TestBase):
         # for this, we need to first clone a dataset to do changes
         did = fork_dataset(1)
         self._wait_for_dataset_being_processed(did)
-        result = edit_dataset(did, default_target_attribute="shape", ignore_attribute="oil")
+        result = edit_dataset(
+            did, default_target_attribute="shape", ignore_attribute="oil"
+        )
         assert did == result
 
         n_tries = 10
@@ -1461,7 +1517,9 @@ class TestOpenMLDataset(TestBase):
         for i in range(n_tries):
             edited_dataset = openml.datasets.get_dataset(did)
             try:
-                assert edited_dataset.default_target_attribute == "shape", edited_dataset
+                assert (
+                    edited_dataset.default_target_attribute == "shape"
+                ), edited_dataset
                 assert edited_dataset.ignore_attribute == ["oil"], edited_dataset
                 break
             except AssertionError as e:
@@ -1469,9 +1527,11 @@ class TestOpenMLDataset(TestBase):
                     raise e
                 time.sleep(10)
                 # Delete the cache dir to get the newer version of the dataset
-                
+
                 shutil.rmtree(
-                    os.path.join(openml.config.get_cache_directory(), "datasets", str(did)),
+                    os.path.join(
+                        openml.config.get_cache_directory(), "datasets", str(did)
+                    ),
                 )
 
     @pytest.mark.test_server()
@@ -1498,7 +1558,10 @@ class TestOpenMLDataset(TestBase):
             description="xor operation dataset",
         )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_data_edit_cannot_edit_critical_field_if_dataset_has_task(self):
         # Need to own a dataset to be able to edit meta-data
@@ -1550,7 +1613,6 @@ class TestOpenMLDataset(TestBase):
             fork_dataset,
             data_id=999999,
         )
-
 
     @pytest.mark.production_server()
     def test_list_datasets_with_high_size_parameter(self):
@@ -1638,7 +1700,9 @@ def test_invalid_attribute_validations(
         (None, None, ["outlook", "windy"]),
     ],
 )
-def test_valid_attribute_validations(default_target_attribute, row_id_attribute, ignore_attribute):
+def test_valid_attribute_validations(
+    default_target_attribute, row_id_attribute, ignore_attribute
+):
     data = [
         ["a", "sunny", 85.0, 85.0, "FALSE", "no"],
         ["b", "sunny", 80.0, 90.0, "TRUE", "no"],
@@ -1738,7 +1802,10 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
 @mock.patch.object(requests.Session, "delete")
 def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_key):
     content_file = (
-        test_files_directory / "mock_responses" / "datasets" / "data_delete_not_owned.xml"
+        test_files_directory
+        / "mock_responses"
+        / "datasets"
+        / "data_delete_not_owned.xml"
     )
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -1759,7 +1826,10 @@ def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_ke
 @mock.patch.object(requests.Session, "delete")
 def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key):
     content_file = (
-        test_files_directory / "mock_responses" / "datasets" / "data_delete_has_tasks.xml"
+        test_files_directory
+        / "mock_responses"
+        / "datasets"
+        / "data_delete_has_tasks.xml"
     )
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -1780,7 +1850,10 @@ def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key
 @mock.patch.object(requests.Session, "delete")
 def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key):
     content_file = (
-        test_files_directory / "mock_responses" / "datasets" / "data_delete_successful.xml"
+        test_files_directory
+        / "mock_responses"
+        / "datasets"
+        / "data_delete_successful.xml"
     )
     mock_delete.return_value = create_request_response(
         status_code=200,
@@ -1798,7 +1871,10 @@ def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key)
 @mock.patch.object(requests.Session, "delete")
 def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key):
     content_file = (
-        test_files_directory / "mock_responses" / "datasets" / "data_delete_not_exist.xml"
+        test_files_directory
+        / "mock_responses"
+        / "datasets"
+        / "data_delete_not_exist.xml"
     )
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -1968,9 +2044,15 @@ def test_get_dataset_lazy_behavior(
         with_features=with_features,
         with_data=with_data,
     )
-    assert dataset.features, "Features should be downloaded on-demand if not during get_dataset"
-    assert dataset.qualities, "Qualities should be downloaded on-demand if not during get_dataset"
-    assert dataset.get_data(), "Data should be downloaded on-demand if not during get_dataset"
+    assert (
+        dataset.features
+    ), "Features should be downloaded on-demand if not during get_dataset"
+    assert (
+        dataset.qualities
+    ), "Qualities should be downloaded on-demand if not during get_dataset"
+    assert (
+        dataset.get_data()
+    ), "Data should be downloaded on-demand if not during get_dataset"
     _assert_datasets_retrieved_successfully(
         [1], with_qualities=True, with_features=True, with_data=True
     )
@@ -1989,7 +2071,9 @@ def test__get_dataset_parquet_not_cached():
         "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
         "oml:id": "20",
     }
-    path = _get_dataset_parquet(description, cache_directory=Path(openml.config.get_cache_directory()))
+    path = _get_dataset_parquet(
+        description, cache_directory=Path(openml.config.get_cache_directory())
+    )
     assert isinstance(path, Path), "_get_dataset_parquet returns a path"
     assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
@@ -1998,7 +2082,10 @@ def test_read_features_from_xml_with_whitespace() -> None:
     from openml.datasets.dataset import _read_features
 
     features_file = (
-        Path(__file__).parent.parent / "files" / "misc" / "features_with_whitespaces.xml"
+        Path(__file__).parent.parent
+        / "files"
+        / "misc"
+        / "features_with_whitespaces.xml"
     )
     dict = _read_features(features_file)
     assert dict[1].nominal_values == [" - 50000.", " 50000+."]
@@ -2009,10 +2096,13 @@ def test_get_dataset_parquet(requests_mock, test_files_directory):
     # Parquet functionality is disabled on the test server
     # There is no parquet-copy of the test server yet.
     content_file = (
-            test_files_directory / "mock_responses" / "datasets" / "data_description_61.xml"
+        test_files_directory / "mock_responses" / "datasets" / "data_description_61.xml"
     )
     # While the mocked example is from production, unit tests by default connect to the test server.
-    requests_mock.get(f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/61", text=content_file.read_text())
+    requests_mock.get(
+        f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/61",
+        text=content_file.read_text(),
+    )
     dataset = openml.datasets.get_dataset(61, download_data=True)
     assert dataset._parquet_url is not None
     assert dataset.parquet_file is not None

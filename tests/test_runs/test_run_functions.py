@@ -40,7 +40,8 @@ from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerException,
 )
-#from openml.extensions.sklearn import cat, cont
+
+# from openml.extensions.sklearn import cat, cont
 from openml.runs.functions import (
     _run_task_get_arffcontent,
     delete_run,
@@ -132,9 +133,9 @@ class TestRun(TestBase):
                 time.sleep(10)
                 continue
 
-            assert len(run.evaluations) > 0, (
-                "Expect not-None evaluations to always contain elements."
-            )
+            assert (
+                len(run.evaluations) > 0
+            ), "Expect not-None evaluations to always contain elements."
             return
 
         raise RuntimeError(
@@ -143,7 +144,10 @@ class TestRun(TestBase):
         )
 
     def _assert_predictions_equal(self, predictions, predictions_prime):
-        assert np.array(predictions_prime["data"]).shape == np.array(predictions["data"]).shape
+        assert (
+            np.array(predictions_prime["data"]).shape
+            == np.array(predictions["data"]).shape
+        )
 
         # The original search model does not submit confidence
         # bounds, so we can not compare the arff line
@@ -164,7 +168,9 @@ class TestRun(TestBase):
                 else:
                     assert val_1 == val_2
 
-    def _rerun_model_and_compare_predictions(self, run_id, model_prime, seed, create_task_obj):
+    def _rerun_model_and_compare_predictions(
+        self, run_id, model_prime, seed, create_task_obj
+    ):
         run = openml.runs.get_run(run_id)
 
         # TODO: assert holdout task
@@ -251,9 +257,13 @@ class TestRun(TestBase):
             "sklearn.pipeline.Pipeline",
         ]
         if Version(sklearn.__version__) < Version("0.22"):
-            classes_without_random_state.append("sklearn.linear_model.base.LinearRegression")
+            classes_without_random_state.append(
+                "sklearn.linear_model.base.LinearRegression"
+            )
         else:
-            classes_without_random_state.append("sklearn.linear_model._base.LinearRegression")
+            classes_without_random_state.append(
+                "sklearn.linear_model._base.LinearRegression"
+            )
 
         def _remove_random_state(flow):
             if "random_state" in flow.parameters:
@@ -305,9 +315,12 @@ class TestRun(TestBase):
             flow_server = self.extension.model_to_flow(clf_server)
 
             if flow.class_name not in classes_without_random_state:
-                error_msg = "Flow class %s (id=%d) does not have a random state parameter" % (
-                    flow.class_name,
-                    flow.flow_id,
+                error_msg = (
+                    "Flow class %s (id=%d) does not have a random state parameter"
+                    % (
+                        flow.class_name,
+                        flow.flow_id,
+                    )
                 )
                 assert "random_state" in flow.parameters, error_msg
                 # If the flow is initialized from a model without a random
@@ -397,7 +410,10 @@ class TestRun(TestBase):
                                 assert evaluation > 0
                             assert evaluation < max_time_allowed
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_regression_on_classif_task(self):
@@ -408,14 +424,18 @@ class TestRun(TestBase):
         # internally dataframe is loaded and targets are categorical
         # which LinearRegression() cannot handle
         with pytest.raises(
-            AttributeError, match="'LinearRegression' object has no attribute 'classes_'"
+            AttributeError,
+            match="'LinearRegression' object has no attribute 'classes_'",
         ):
             openml.runs.run_model_on_task(
                 model=clf,
                 task=task,
             )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_check_erronous_sklearn_flow_fails(self):
@@ -481,7 +501,9 @@ class TestRun(TestBase):
                     grid_iterations += determine_grid_size(sub_grid)
                 return grid_iterations
             else:
-                raise TypeError("Param Grid should be of type list (GridSearch only) or dict")
+                raise TypeError(
+                    "Param Grid should be of type list (GridSearch only) or dict"
+                )
 
         run = self._perform_run(
             task_id,
@@ -629,7 +651,10 @@ class TestRun(TestBase):
             sentinel=sentinel,
         )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_logistic_regression(self):
@@ -637,9 +662,14 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE["task_id"]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE["n_missing_vals"]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
-        self._run_and_upload_classification(lr, task_id, n_missing_vals, n_test_obs, "62501")
+        self._run_and_upload_classification(
+            lr, task_id, n_missing_vals, n_test_obs, "62501"
+        )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_linear_regression(self):
@@ -660,7 +690,9 @@ class TestRun(TestBase):
                 if e.code == 614:  # Task already exists
                     # the exception message contains the task_id that was matched in the format
                     # 'Task already exists. - matched id(s): [xxxx]'
-                    task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
+                    task_id = ast.literal_eval(
+                        e.message.split("matched id(s):")[-1].strip()
+                    )[0]
                 else:
                     raise Exception(repr(e))
             # mark to remove the uploaded task
@@ -669,9 +701,14 @@ class TestRun(TestBase):
 
         n_missing_vals = self.TEST_SERVER_TASK_REGRESSION["n_missing_vals"]
         n_test_obs = self.TEST_SERVER_TASK_REGRESSION["n_test_obs"]
-        self._run_and_upload_regression(lr, task_id, n_missing_vals, n_test_obs, "62501")
+        self._run_and_upload_regression(
+            lr, task_id, n_missing_vals, n_test_obs, "62501"
+        )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_pipeline_dummy_pipeline(self):
@@ -684,9 +721,14 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_SIMPLE["task_id"]
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE["n_missing_vals"]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
-        self._run_and_upload_classification(pipeline1, task_id, n_missing_vals, n_test_obs, "62501")
+        self._run_and_upload_classification(
+            pipeline1, task_id, n_missing_vals, n_test_obs, "62501"
+        )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -712,7 +754,9 @@ class TestRun(TestBase):
                         "nominal",
                         make_pipeline(
                             CustomImputer(strategy="most_frequent"),
-                            sklearn.preprocessing.OneHotEncoder(handle_unknown="ignore"),
+                            sklearn.preprocessing.OneHotEncoder(
+                                handle_unknown="ignore"
+                            ),
                         ),
                         nominal_indices,
                     ),
@@ -788,7 +832,9 @@ class TestRun(TestBase):
         task_id = self.TEST_SERVER_TASK_MISSING_VALS["task_id"]
         n_missing_vals = self.TEST_SERVER_TASK_MISSING_VALS["n_missing_vals"]
         n_test_obs = self.TEST_SERVER_TASK_MISSING_VALS["n_test_obs"]
-        self._run_and_upload_classification(pipeline2, task_id, n_missing_vals, n_test_obs, "62501")
+        self._run_and_upload_classification(
+            pipeline2, task_id, n_missing_vals, n_test_obs, "62501"
+        )
         # The warning raised is:
         # "The total space of parameters 8 is smaller than n_iter=10.
         # Running 8 iterations. For exhaustive searches, use GridSearchCV."
@@ -804,16 +850,24 @@ class TestRun(TestBase):
                 call_count += 1
         assert call_count == 3
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_gridsearch(self):
         estimator_name = (
-            "base_estimator" if Version(sklearn.__version__) < Version("1.4") else "estimator"
+            "base_estimator"
+            if Version(sklearn.__version__) < Version("1.4")
+            else "estimator"
         )
         gridsearch = GridSearchCV(
             BaggingClassifier(**{estimator_name: SVC()}),
-            {f"{estimator_name}__C": [0.01, 0.1, 10], f"{estimator_name}__gamma": [0.01, 0.1, 10]},
+            {
+                f"{estimator_name}__C": [0.01, 0.1, 10],
+                f"{estimator_name}__gamma": [0.01, 0.1, 10],
+            },
             cv=3,
         )
         task_id = self.TEST_SERVER_TASK_SIMPLE["task_id"]
@@ -828,7 +882,10 @@ class TestRun(TestBase):
         )
         assert len(run.trace.trace_iterations) == 9
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_randomsearch(self):
@@ -862,7 +919,10 @@ class TestRun(TestBase):
         trace = openml.runs.get_run_trace(run.run_id)
         assert len(trace.trace_iterations) == 5
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_maskedarrays(self):
@@ -891,7 +951,10 @@ class TestRun(TestBase):
 
     ##########################################################################
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_learning_curve_task_1(self):
@@ -915,9 +978,14 @@ class TestRun(TestBase):
             pipeline1,
             flow_expected_rsv="62501",
         )
-        self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
+        self._check_sample_evaluations(
+            run.sample_evaluations, num_repeats, num_folds, num_samples
+        )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_learning_curve_task_2(self):
@@ -953,9 +1021,14 @@ class TestRun(TestBase):
             pipeline2,
             flow_expected_rsv="62501",
         )
-        self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
+        self._check_sample_evaluations(
+            run.sample_evaluations, num_repeats, num_folds, num_samples
+        )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.21"),
@@ -1035,7 +1108,10 @@ class TestRun(TestBase):
                 assert alt_scores[idx] >= 0
                 assert alt_scores[idx] <= 1
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_local_run_swapped_parameter_order_model(self):
@@ -1052,7 +1128,10 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1082,7 +1161,10 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1121,7 +1203,10 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1155,7 +1240,9 @@ class TestRun(TestBase):
                 if e.code == 614:  # Task already exists
                     # the exception message contains the task_id that was matched in the format
                     # 'Task already exists. - matched id(s): [xxxx]'
-                    task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
+                    task_id = ast.literal_eval(
+                        e.message.split("matched id(s):")[-1].strip()
+                    )[0]
                 else:
                     raise Exception(repr(e))
             # mark to remove the uploaded task
@@ -1184,7 +1271,10 @@ class TestRun(TestBase):
         assert flowS.components["Imputer"].parameters["strategy"] == '"most_frequent"'
         assert flowS.components["VarianceThreshold"].parameters["threshold"] == "0.05"
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1245,7 +1335,10 @@ class TestRun(TestBase):
             run_ids = run_exists(task.task_id, setup_exists)
             assert run_ids, (run_ids, clf)
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_with_illegal_flow_id(self):
@@ -1259,14 +1352,19 @@ class TestRun(TestBase):
         expected_message_regex = (
             r"Flow does not exist on the server, but 'flow.flow_id' is not None."
         )
-        with pytest.raises(openml.exceptions.PyOpenMLError, match=expected_message_regex):
+        with pytest.raises(
+            openml.exceptions.PyOpenMLError, match=expected_message_regex
+        ):
             openml.runs.run_flow_on_task(
                 task=task,
                 flow=flow,
                 avoid_duplicate_runs=True,
             )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_with_illegal_flow_id_after_load(self):
@@ -1294,12 +1392,19 @@ class TestRun(TestBase):
         expected_message_regex = (
             r"Flow does not exist on the server, but 'flow.flow_id' is not None."
         )
-        with pytest.raises(openml.exceptions.PyOpenMLError, match=expected_message_regex):
+        with pytest.raises(
+            openml.exceptions.PyOpenMLError, match=expected_message_regex
+        ):
             loaded_run.publish()
             TestBase._mark_entity_for_removal("run", loaded_run.run_id)
-            TestBase.logger.info(f"collected from test_run_functions: {loaded_run.run_id}")
+            TestBase.logger.info(
+                f"collected from test_run_functions: {loaded_run.run_id}"
+            )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_with_illegal_flow_id_1(self):
@@ -1311,22 +1416,31 @@ class TestRun(TestBase):
         try:
             flow_orig.publish()  # ensures flow exist on server
             TestBase._mark_entity_for_removal("flow", flow_orig.flow_id, flow_orig.name)
-            TestBase.logger.info(f"collected from test_run_functions: {flow_orig.flow_id}")
+            TestBase.logger.info(
+                f"collected from test_run_functions: {flow_orig.flow_id}"
+            )
         except openml.exceptions.OpenMLServerException:
             # flow already exists
             pass
         flow_new = self.extension.model_to_flow(clf)
 
         flow_new.flow_id = -1
-        expected_message_regex = "Local flow_id does not match server flow_id: '-1' vs '[0-9]+'"
-        with pytest.raises(openml.exceptions.PyOpenMLError, match=expected_message_regex):
+        expected_message_regex = (
+            "Local flow_id does not match server flow_id: '-1' vs '[0-9]+'"
+        )
+        with pytest.raises(
+            openml.exceptions.PyOpenMLError, match=expected_message_regex
+        ):
             openml.runs.run_flow_on_task(
                 task=task,
                 flow=flow_new,
                 avoid_duplicate_runs=True,
             )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_with_illegal_flow_id_1_after_load(self):
@@ -1338,7 +1452,9 @@ class TestRun(TestBase):
         try:
             flow_orig.publish()  # ensures flow exist on server
             TestBase._mark_entity_for_removal("flow", flow_orig.flow_id, flow_orig.name)
-            TestBase.logger.info(f"collected from test_run_functions: {flow_orig.flow_id}")
+            TestBase.logger.info(
+                f"collected from test_run_functions: {flow_orig.flow_id}"
+            )
         except openml.exceptions.OpenMLServerException:
             # flow already exists
             pass
@@ -1359,14 +1475,19 @@ class TestRun(TestBase):
         run.to_filesystem(cache_path)
         loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 
-        expected_message_regex = "Local flow_id does not match server flow_id: '-1' vs '[0-9]+'"
+        expected_message_regex = (
+            "Local flow_id does not match server flow_id: '-1' vs '[0-9]+'"
+        )
         self.assertRaisesRegex(
             openml.exceptions.PyOpenMLError,
             expected_message_regex,
             loaded_run.publish,
         )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1597,7 +1718,10 @@ class TestRun(TestBase):
         runs = openml.runs.list_runs(tag="curves", size=2)
         assert len(runs) >= 1
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1619,7 +1743,10 @@ class TestRun(TestBase):
         cont_imp = make_pipeline(CustomImputer(), StandardScaler())
         ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
         model = Pipeline(
-            steps=[("preprocess", ct), ("estimator", sklearn.tree.DecisionTreeClassifier())],
+            steps=[
+                ("preprocess", ct),
+                ("estimator", sklearn.tree.DecisionTreeClassifier()),
+            ],
         )  # build a sklearn classifier
 
         data_content, _, _, _ = _run_task_get_arffcontent(
@@ -1635,7 +1762,10 @@ class TestRun(TestBase):
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             assert len(row) == 12
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1664,7 +1794,10 @@ class TestRun(TestBase):
         cont_imp = make_pipeline(CustomImputer(), StandardScaler())
         ct = ColumnTransformer([("cat", cat_imp, cat), ("cont", cont_imp, cont)])
         model = Pipeline(
-            steps=[("preprocess", ct), ("estimator", sklearn.tree.DecisionTreeClassifier())],
+            steps=[
+                ("preprocess", ct),
+                ("estimator", sklearn.tree.DecisionTreeClassifier()),
+            ],
         )  # build a sklearn classifier
 
         data_content, _, _, _ = _run_task_get_arffcontent(
@@ -1690,7 +1823,10 @@ class TestRun(TestBase):
         with pytest.raises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_flow_on_task_downloaded_flow(self):
@@ -1719,7 +1855,8 @@ class TestRun(TestBase):
         clustering = openml.tasks.get_task(126033, download_data=False)
         ignored_input = [0] * 5
         with pytest.raises(
-            NotImplementedError, match=r"Formatting for <class '[\w.]+'> is not supported."
+            NotImplementedError,
+            match=r"Formatting for <class '[\w.]+'> is not supported.",
         ):
             format_prediction(clustering, *ignored_input)
 
@@ -1730,7 +1867,9 @@ class TestRun(TestBase):
             download_data=False,
         )
         ignored_input = [0] * 5
-        with pytest.raises(ValueError, match="`proba` is required for classification task"):
+        with pytest.raises(
+            ValueError, match="`proba` is required for classification task"
+        ):
             format_prediction(classification, *ignored_input, proba=None)
 
     @pytest.mark.test_server()
@@ -1741,8 +1880,12 @@ class TestRun(TestBase):
         )
         ignored_input = [0] * 5
         incomplete_probabilities = {c: 0.2 for c in classification.class_labels[1:]}
-        with pytest.raises(ValueError, match="Each class should have a predicted probability"):
-            format_prediction(classification, *ignored_input, proba=incomplete_probabilities)
+        with pytest.raises(
+            ValueError, match="Each class should have a predicted probability"
+        ):
+            format_prediction(
+                classification, *ignored_input, proba=incomplete_probabilities
+            )
 
     @pytest.mark.test_server()
     def test_format_prediction_task_without_classlabels_set(self):
@@ -1752,16 +1895,24 @@ class TestRun(TestBase):
         )
         classification.class_labels = None
         ignored_input = [0] * 5
-        with pytest.raises(ValueError, match="The classification task must have class labels set"):
+        with pytest.raises(
+            ValueError, match="The classification task must have class labels set"
+        ):
             format_prediction(classification, *ignored_input, proba={})
 
     @pytest.mark.test_server()
     def test_format_prediction_task_learning_curve_sample_not_set(self):
-        learning_curve = openml.tasks.get_task(801, download_data=False)  # diabetes;crossvalidation
+        learning_curve = openml.tasks.get_task(
+            801, download_data=False
+        )  # diabetes;crossvalidation
         probabilities = {c: 0.2 for c in learning_curve.class_labels}
         ignored_input = [0] * 5
-        with pytest.raises(ValueError, match="`sample` can not be none for LearningCurveTask"):
-            format_prediction(learning_curve, *ignored_input, sample=None, proba=probabilities)
+        with pytest.raises(
+            ValueError, match="`sample` can not be none for LearningCurveTask"
+        ):
+            format_prediction(
+                learning_curve, *ignored_input, sample=None, proba=probabilities
+            )
 
     @pytest.mark.test_server()
     def test_format_prediction_task_regression(self):
@@ -1779,7 +1930,9 @@ class TestRun(TestBase):
                 if e.code == 614:  # Task already exists
                     # the exception message contains the task_id that was matched in the format
                     # 'Task already exists. - matched id(s): [xxxx]'
-                    task_id = ast.literal_eval(e.message.split("matched id(s):")[-1].strip())[0]
+                    task_id = ast.literal_eval(
+                        e.message.split("matched id(s):")[-1].strip()
+                    )[0]
                 else:
                     raise Exception(repr(e))
             # mark to remove the uploaded task
@@ -1791,8 +1944,10 @@ class TestRun(TestBase):
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
 
-
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1810,12 +1965,16 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(32)  # diabetes; crossvalidation
 
         run = openml.runs.run_model_on_task(
-            model=clf, task=task, seed=rs,
+            model=clf,
+            task=task,
+            seed=rs,
         )
         run.publish()
 
         with pytest.raises(openml.exceptions.OpenMLRunsExistError):
-            openml.runs.run_model_on_task(model=clf, task=task, seed=rs, avoid_duplicate_runs=True)
+            openml.runs.run_model_on_task(
+                model=clf, task=task, seed=rs, avoid_duplicate_runs=True
+            )
 
         TestBase._mark_entity_for_removal("run", run.run_id)
         TestBase.logger.info(f"collected from test_run_functions: {run.run_id}")
@@ -1823,7 +1982,9 @@ class TestRun(TestBase):
         _run_id = run.run_id
         assert delete_run(_run_id)
 
-    @pytest.mark.skip(reason="run id is in problematic state on test server due to PR#1454")
+    @pytest.mark.skip(
+        reason="run id is in problematic state on test server due to PR#1454"
+    )
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1838,7 +1999,9 @@ class TestRun(TestBase):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
-    content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_owned.xml"
+    content_file = (
+        test_files_directory / "mock_responses" / "runs" / "run_delete_not_owned.xml"
+    )
     mock_delete.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
@@ -1857,7 +2020,9 @@ def test_delete_run_not_owned(mock_delete, test_files_directory, test_api_key):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
-    content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_successful.xml"
+    content_file = (
+        test_files_directory / "mock_responses" / "runs" / "run_delete_successful.xml"
+    )
     mock_delete.return_value = create_request_response(
         status_code=200,
         content_filepath=content_file,
@@ -1873,7 +2038,9 @@ def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
-    content_file = test_files_directory / "mock_responses" / "runs" / "run_delete_not_exist.xml"
+    content_file = (
+        test_files_directory / "mock_responses" / "runs" / "run_delete_not_exist.xml"
+    )
     mock_delete.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
@@ -1889,16 +2056,20 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     assert run_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
-@pytest.mark.skip(reason="Pending resolution of #1657")
+
+@pytest.mark.skipif(
+    os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+    reason="Pending resolution of #1657",
+)
 @pytest.mark.sklearn()
 @unittest.skipIf(
     Version(sklearn.__version__) < Version("0.21"),
     reason="couldn't perform local tests successfully w/o bloating RAM",
-    )
+)
 @unittest.skipIf(
     Version(sklearn.__version__) >= Version("1.8"),
     reason="predictions differ significantly",
-    )
+)
 @mock.patch("openml_sklearn.SklearnExtension._prevent_optimize_n_jobs")
 @pytest.mark.test_server()
 def test__run_task_get_arffcontent_2(parallel_mock):
@@ -1927,8 +2098,11 @@ def test__run_task_get_arffcontent_2(parallel_mock):
         ]
     )
     n_jobs = 2
-    backend = "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"
+    backend = (
+        "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"
+    )
     from openml_sklearn import SklearnExtension
+
     extension = SklearnExtension()
     with parallel_backend(backend, n_jobs=n_jobs):
         res = openml.runs.functions._run_task_get_arffcontent(
@@ -1971,12 +2145,16 @@ def test__run_task_get_arffcontent_2(parallel_mock):
         err_msg="Observed performance scores deviate from expected ones.",
     )
 
-@pytest.mark.skip(reason="Pending resolution of #1657")
+
+@pytest.mark.skipif(
+    os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+    reason="Pending resolution of #1657",
+)
 @pytest.mark.sklearn()
 @unittest.skipIf(
     Version(sklearn.__version__) < Version("0.21"),
     reason="couldn't perform local tests successfully w/o bloating RAM",
-    )
+)
 @mock.patch("openml_sklearn.SklearnExtension._prevent_optimize_n_jobs")
 @pytest.mark.parametrize(
     ("n_jobs", "backend", "call_count"),
@@ -1985,18 +2163,28 @@ def test__run_task_get_arffcontent_2(parallel_mock):
         # spawns multiple processes if n_jobs != 1, which means the mock is not applied.
         (2, None, 0),
         (-1, None, 0),
-        (1, None, 10),  # with n_jobs=1 the mock *is* applied, since there is no new subprocess
+        (
+            1,
+            None,
+            10,
+        ),  # with n_jobs=1 the mock *is* applied, since there is no new subprocess
         (1, "sequential", 10),
         (1, "threading", 10),
-        (-1, "threading", 10),  # the threading backend does preserve mocks even with parallelizing
-    ]
+        (
+            -1,
+            "threading",
+            10,
+        ),  # the threading backend does preserve mocks even with parallelizing
+    ],
 )
 @pytest.mark.test_server()
 def test_joblib_backends(parallel_mock, n_jobs, backend, call_count):
     """Tests evaluation of a run using various joblib backends and n_jobs."""
     if backend is None:
         backend = (
-            "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"
+            "loky"
+            if Version(joblib.__version__) > Version("0.11")
+            else "multiprocessing"
         )
 
     task = openml.tasks.get_task(7)  # Supervised Classification on kr-vs-kp
@@ -2041,6 +2229,7 @@ def test_joblib_backends(parallel_mock, n_jobs, backend, call_count):
         n_jobs=n_jobs,
     )
     from openml_sklearn import SklearnExtension
+
     extension = SklearnExtension()
     with parallel_backend(backend, n_jobs=n_jobs):
         res = openml.runs.functions._run_task_get_arffcontent(

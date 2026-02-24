@@ -12,7 +12,11 @@ import requests
 
 import openml
 from openml import OpenMLSplit, OpenMLTask
-from openml.exceptions import OpenMLCacheException, OpenMLNotAuthorizedError, OpenMLServerException
+from openml.exceptions import (
+    OpenMLCacheException,
+    OpenMLNotAuthorizedError,
+    OpenMLServerException,
+)
 from openml.tasks import TaskType
 from openml.testing import TestBase, create_request_response
 
@@ -54,7 +58,10 @@ class TestTask(TestBase):
         estimation_procedures = openml.tasks.functions._get_estimation_procedure_list()
         assert isinstance(estimation_procedures, list)
         assert isinstance(estimation_procedures[0], dict)
-        assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
+        assert (
+            estimation_procedures[0]["task_type_id"]
+            == TaskType.SUPERVISED_CLASSIFICATION
+        )
 
     @pytest.mark.production_server()
     @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
@@ -161,13 +168,20 @@ class TestTask(TestBase):
             os.path.join(openml.config.get_cache_directory(), "tasks", "1", "task.xml")
         )
         assert not os.path.exists(
-            os.path.join(openml.config.get_cache_directory(), "tasks", "1", "datasplits.arff")
+            os.path.join(
+                openml.config.get_cache_directory(), "tasks", "1", "datasplits.arff"
+            )
         )
         assert os.path.exists(
-            os.path.join(openml.config.get_cache_directory(), "datasets", "1", "dataset_1.pq")
+            os.path.join(
+                openml.config.get_cache_directory(), "datasets", "1", "dataset_1.pq"
+            )
         )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_get_task_lazy(self):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
@@ -178,16 +192,22 @@ class TestTask(TestBase):
         assert task.class_labels == ["1", "2", "3", "4", "5", "U"]
 
         assert not os.path.exists(
-            os.path.join(openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff")
+            os.path.join(
+                openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff"
+            )
         )
         # Since the download_data=False is propagated to get_dataset
         assert not os.path.exists(
-            os.path.join(openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")
+            os.path.join(
+                openml.config.get_cache_directory(), "datasets", "2", "dataset.arff"
+            )
         )
 
         task.download_split()
         assert os.path.exists(
-            os.path.join(openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff")
+            os.path.join(
+                openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff"
+            )
         )
 
     @mock.patch("openml.tasks.functions.get_dataset")
@@ -225,14 +245,19 @@ class TestTask(TestBase):
         # Issue 538, get_task failing with clustering task.
         openml.tasks.functions.get_task(126033)
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_download_split(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
         split = task.download_split()
         assert type(split) == OpenMLSplit
         assert os.path.exists(
-            os.path.join(openml.config.get_cache_directory(), "tasks", "1", "datasplits.arff")
+            os.path.join(
+                openml.config.get_cache_directory(), "tasks", "1", "datasplits.arff"
+            )
         )
 
     def test_deletion_of_cache_dir(self):
@@ -248,7 +273,9 @@ class TestTask(TestBase):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_task_not_owned(mock_delete, test_files_directory, test_api_key):
-    content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_not_owned.xml"
+    content_file = (
+        test_files_directory / "mock_responses" / "tasks" / "task_delete_not_owned.xml"
+    )
     mock_delete.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
@@ -267,7 +294,9 @@ def test_delete_task_not_owned(mock_delete, test_files_directory, test_api_key):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_task_with_run(mock_delete, test_files_directory, test_api_key):
-    content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_has_runs.xml"
+    content_file = (
+        test_files_directory / "mock_responses" / "tasks" / "task_delete_has_runs.xml"
+    )
     mock_delete.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
@@ -286,7 +315,9 @@ def test_delete_task_with_run(mock_delete, test_files_directory, test_api_key):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_success(mock_delete, test_files_directory, test_api_key):
-    content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_successful.xml"
+    content_file = (
+        test_files_directory / "mock_responses" / "tasks" / "task_delete_successful.xml"
+    )
     mock_delete.return_value = create_request_response(
         status_code=200,
         content_filepath=content_file,
@@ -302,7 +333,9 @@ def test_delete_success(mock_delete, test_files_directory, test_api_key):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_unknown_task(mock_delete, test_files_directory, test_api_key):
-    content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_not_exist.xml"
+    content_file = (
+        test_files_directory / "mock_responses" / "tasks" / "task_delete_not_exist.xml"
+    )
     mock_delete.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,

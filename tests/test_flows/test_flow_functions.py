@@ -152,7 +152,9 @@ class TestFlowFunctions(TestBase):
         openml.flows.functions.assert_flows_equal(flow, flow)
         new_flow = copy.deepcopy(flow)
         new_flow.parameters["abc"] = 3.0
-        self.assertRaises(ValueError, openml.flows.functions.assert_flows_equal, flow, new_flow)
+        self.assertRaises(
+            ValueError, openml.flows.functions.assert_flows_equal, flow, new_flow
+        )
 
         # Now test for components (subflows)
         parent_flow = copy.deepcopy(flow)
@@ -194,24 +196,28 @@ class TestFlowFunctions(TestBase):
         )
 
         openml.flows.functions.assert_flows_equal(flow, flow)
-        openml.flows.functions.assert_flows_equal(flow, flow, ignore_parameter_values=True)
+        openml.flows.functions.assert_flows_equal(
+            flow, flow, ignore_parameter_values=True
+        )
 
         new_flow = copy.deepcopy(flow)
         new_flow.parameters["a"] = 7
         with pytest.raises(ValueError) as excinfo:
             openml.flows.functions.assert_flows_equal(flow, new_flow)
-        assert str(paramaters) in str(excinfo.value) and str(new_flow.parameters) in str(
-            excinfo.value
-        )
+        assert str(paramaters) in str(excinfo.value) and str(
+            new_flow.parameters
+        ) in str(excinfo.value)
 
-        openml.flows.functions.assert_flows_equal(flow, new_flow, ignore_parameter_values=True)
+        openml.flows.functions.assert_flows_equal(
+            flow, new_flow, ignore_parameter_values=True
+        )
 
         del new_flow.parameters["a"]
         with pytest.raises(ValueError) as excinfo:
             openml.flows.functions.assert_flows_equal(flow, new_flow)
-        assert str(paramaters) in str(excinfo.value) and str(new_flow.parameters) in str(
-            excinfo.value
-        )
+        assert str(paramaters) in str(excinfo.value) and str(
+            new_flow.parameters
+        ) in str(excinfo.value)
 
         self.assertRaisesRegex(
             ValueError,
@@ -245,7 +251,9 @@ class TestFlowFunctions(TestBase):
             upload_date=flow_upload_date,
         )
 
-        assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=flow_upload_date)
+        assert_flows_equal(
+            flow, flow, ignore_parameter_values_on_older_children=flow_upload_date
+        )
         assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=None)
         new_flow = copy.deepcopy(flow)
         new_flow.parameters["a"] = 7
@@ -295,7 +303,9 @@ class TestFlowFunctions(TestBase):
         self._add_sentinel_to_flow_name(flow)
         flow.publish()
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
+        TestBase.logger.info(
+            f"collected from {__file__.split('/')[-1]}: {flow.flow_id}"
+        )
         # Test deserialization works
         server_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
         assert server_flow.parameters["categories"] == "[[0, 1], [0, 1]]"
@@ -309,7 +319,10 @@ class TestFlowFunctions(TestBase):
         flow = openml.flows.get_flow(1)
         assert flow.external_version is None
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_get_flow_reinstantiate_model(self):
@@ -318,10 +331,14 @@ class TestFlowFunctions(TestBase):
         flow = extension.model_to_flow(model)
         flow.publish(raise_error_if_exists=False)
         TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-        TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
+        TestBase.logger.info(
+            f"collected from {__file__.split('/')[-1]}: {flow.flow_id}"
+        )
 
         downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
-        assert isinstance(downloaded_flow.model, sklearn.ensemble.RandomForestClassifier)
+        assert isinstance(
+            downloaded_flow.model, sklearn.ensemble.RandomForestClassifier
+        )
 
     @pytest.mark.test_server()
     def test_get_flow_reinstantiate_model_no_extension(self):
@@ -340,7 +357,9 @@ class TestFlowFunctions(TestBase):
         reason="Requires scikit-learn!=0.19.1, because target flow is from that version.",
     )
     @pytest.mark.production_server()
-    def test_get_flow_with_reinstantiate_strict_with_wrong_version_raises_exception(self):
+    def test_get_flow_with_reinstantiate_strict_with_wrong_version_raises_exception(
+        self,
+    ):
         self.use_production_server()
         flow = 8175
         expected = "Trying to deserialize a model with dependency sklearn==0.19.1 not satisfied."
@@ -363,7 +382,9 @@ class TestFlowFunctions(TestBase):
     @pytest.mark.production_server()
     def test_get_flow_reinstantiate_flow_not_strict_post_1(self):
         self.use_production_server()
-        flow = openml.flows.get_flow(flow_id=19190, reinstantiate=True, strict_version=False)
+        flow = openml.flows.get_flow(
+            flow_id=19190, reinstantiate=True, strict_version=False
+        )
         assert flow.flow_id is None
         assert "sklearn==1.0.0" not in flow.dependencies
 
@@ -377,7 +398,9 @@ class TestFlowFunctions(TestBase):
     @pytest.mark.production_server()
     def test_get_flow_reinstantiate_flow_not_strict_023_and_024(self):
         self.use_production_server()
-        flow = openml.flows.get_flow(flow_id=18587, reinstantiate=True, strict_version=False)
+        flow = openml.flows.get_flow(
+            flow_id=18587, reinstantiate=True, strict_version=False
+        )
         assert flow.flow_id is None
         assert "sklearn==0.23.1" not in flow.dependencies
 
@@ -389,11 +412,16 @@ class TestFlowFunctions(TestBase):
     @pytest.mark.production_server()
     def test_get_flow_reinstantiate_flow_not_strict_pre_023(self):
         self.use_production_server()
-        flow = openml.flows.get_flow(flow_id=8175, reinstantiate=True, strict_version=False)
+        flow = openml.flows.get_flow(
+            flow_id=8175, reinstantiate=True, strict_version=False
+        )
         assert flow.flow_id is None
         assert "sklearn==0.19.1" not in flow.dependencies
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_get_flow_id(self):
@@ -403,13 +431,19 @@ class TestFlowFunctions(TestBase):
             list_all = functools.lru_cache()(openml.utils._list_all)
         with patch("openml.utils._list_all", list_all):
             clf = sklearn.tree.DecisionTreeClassifier()
-            flow = openml.extensions.get_extension_by_model(clf).model_to_flow(clf).publish()
+            flow = (
+                openml.extensions.get_extension_by_model(clf)
+                .model_to_flow(clf)
+                .publish()
+            )
             TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
             TestBase.logger.info(
                 f"collected from {__file__.split('/')[-1]}: {flow.flow_id}",
             )
 
-            assert openml.flows.get_flow_id(model=clf, exact_version=True) == flow.flow_id
+            assert (
+                openml.flows.get_flow_id(model=clf, exact_version=True) == flow.flow_id
+            )
             flow_ids = openml.flows.get_flow_id(model=clf, exact_version=False)
             assert flow.flow_id in flow_ids
             assert len(flow_ids) > 0
@@ -425,9 +459,13 @@ class TestFlowFunctions(TestBase):
                 exact_version=False,
             )
             assert flow.flow_id in flow_ids_exact_version_True
-            assert set(flow_ids_exact_version_True).issubset(set(flow_ids_exact_version_False))
+            assert set(flow_ids_exact_version_True).issubset(
+                set(flow_ids_exact_version_False)
+            )
             # instead of the assertion above, the assertion below used to be used.
-            pytest.skip(reason="Not sure why there should only be one version of this flow.")
+            pytest.skip(
+                reason="Not sure why there should only be one version of this flow."
+            )
             assert flow_ids_exact_version_True == flow_ids_exact_version_False
 
     @pytest.mark.test_server()
@@ -455,7 +493,9 @@ class TestFlowFunctions(TestBase):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_flow_not_owned(mock_delete, test_files_directory, test_api_key):
-    content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_owned.xml"
+    content_file = (
+        test_files_directory / "mock_responses" / "flows" / "flow_delete_not_owned.xml"
+    )
     mock_delete.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
@@ -474,7 +514,9 @@ def test_delete_flow_not_owned(mock_delete, test_files_directory, test_api_key):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_flow_with_run(mock_delete, test_files_directory, test_api_key):
-    content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_has_runs.xml"
+    content_file = (
+        test_files_directory / "mock_responses" / "flows" / "flow_delete_has_runs.xml"
+    )
     mock_delete.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
@@ -493,7 +535,9 @@ def test_delete_flow_with_run(mock_delete, test_files_directory, test_api_key):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_subflow(mock_delete, test_files_directory, test_api_key):
-    content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_is_subflow.xml"
+    content_file = (
+        test_files_directory / "mock_responses" / "flows" / "flow_delete_is_subflow.xml"
+    )
     mock_delete.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
@@ -512,7 +556,9 @@ def test_delete_subflow(mock_delete, test_files_directory, test_api_key):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
-    content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_successful.xml"
+    content_file = (
+        test_files_directory / "mock_responses" / "flows" / "flow_delete_successful.xml"
+    )
     mock_delete.return_value = create_request_response(
         status_code=200,
         content_filepath=content_file,
@@ -529,7 +575,9 @@ def test_delete_flow_success(mock_delete, test_files_directory, test_api_key):
 @mock.patch.object(requests.Session, "delete")
 @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
 def test_delete_unknown_flow(mock_delete, test_files_directory, test_api_key):
-    content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_exist.xml"
+    content_file = (
+        test_files_directory / "mock_responses" / "flows" / "flow_delete_not_exist.xml"
+    )
     mock_delete.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,

@@ -157,7 +157,7 @@ _defaults: _Config = {
     "cachedir": _resolve_default_cache_dir(),
     "avoid_duplicate_runs": False,
     "retry_policy": "human",
-    "connection_n_retries": 1,
+    "connection_n_retries": 5,
     "show_progress": False,
 }
 
