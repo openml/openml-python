@@ -15,7 +15,7 @@ import pytest
 import openml
 import openml.testing
 from openml.testing import TestBase
-from openml.enums import APIVersion, ServerType
+from openml.enums import APIVersion
 
 
 @contextmanager
@@ -80,16 +80,14 @@ class TestConfig(openml.testing.TestBase):
         _config = {}
         _config["api_version"] = APIVersion.V1
         _config["fallback_api_version"] = None
-        _config["server_type"] = ServerType.PRODUCTION
-        _config["apikey"] = TestBase.user_key
-        _config["server"] = f"{openml.config.TEST_SERVER_URL}/api/v1/xml"
+        _config["servers"] = openml._config.SERVERS_REGISTRY['production']
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = False
         _config["connection_n_retries"] = 20
         _config["retry_policy"] = "robot"
         _config["show_progress"] = False
         assert isinstance(config, dict)
-        assert len(config) == 10
+        assert len(config) == 8
         self.assertDictEqual(config, _config)
 
     def test_setup_with_config(self):
@@ -97,9 +95,7 @@ class TestConfig(openml.testing.TestBase):
         _config = {}
         _config["api_version"] = APIVersion.V1
         _config["fallback_api_version"] = None
-        _config["server_type"] = ServerType.PRODUCTION
-        _config["apikey"] = TestBase.user_key
-        _config["server"] = "https://www.openml.org/api/v1/xml"
+        _config["servers"] = openml._config.SERVERS_REGISTRY['production']
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = True
         _config["retry_policy"] = "human"

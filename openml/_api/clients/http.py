@@ -212,21 +212,21 @@ class HTTPClient:
 
     @property
     def server(self) -> str:
-        server = openml.config.SERVERS[self.api_version]["server"]
+        server = openml.config.servers[self.api_version]["server"]
         if server is None:
+            servers_repr = {k.value: v for k, v in openml.config.servers}
             raise ValueError(
-                f"server found to be None for api_version={self.api_version}"
-                f" in {openml.config.SERVERS}"
+                f'server found to be None for api_version="{self.api_version}" in {servers_repr}'
             )
-        return server
+        return cast("str", server)
 
     @property
     def api_key(self) -> str | None:
-        return openml.config.SERVERS[self.api_version]["apikey"]
+        return cast("str | None", openml.config.SERVERS[self.api_version]["apikey"])
 
     @property
     def retries(self) -> int:
-        return openml.config.connection_n_retries
+        return cast("int", openml.config.connection_n_retries)
 
     @property
     def retry_policy(self) -> RetryPolicy:
