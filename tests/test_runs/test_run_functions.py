@@ -1839,11 +1839,13 @@ def test_delete_run_success(mock_delete, test_files_directory, test_api_key):
     )
 
     success = openml.runs.delete_run(10591880)
-    assert success
+    assert success is True
+    assert mock_delete.call_count == 1
 
     run_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/run/10591880"
     assert run_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+   
 
 
 @mock.patch.object(requests.Session, "delete")
