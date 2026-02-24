@@ -9,6 +9,7 @@ from copy import copy
 from typing import Any, Iterator
 from pathlib import Path
 import platform
+from urllib.parse import urlparse
 
 import pytest
 
@@ -192,6 +193,10 @@ def test_openml_cache_dir_env_var(tmp_path: Path) -> None:
     expected_path = tmp_path / "test-cache"
 
     with safe_environ_patcher("OPENML_CACHE_DIR", str(expected_path)):
+        server_parts = urlparse(openml.config.server).netloc
+        server_parts = server_parts.split(".")[::-1]
+        server_parts = "/".join(server_parts)
+
         openml.config._setup()
         assert openml.config._root_cache_directory == expected_path
-        assert openml.config.get_cache_directory() == str(expected_path / "org" / "openml" / "www")
+        assert openml.config.get_cache_directory() == str(expected_path / server_parts)
