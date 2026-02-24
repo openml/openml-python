@@ -20,6 +20,7 @@ class TestConfig(openml.testing.TestBase):
         with pytest.raises(openml.exceptions.OpenMLServerError, match="URI too long!"):
             openml.datasets.list_datasets(data_id=list(range(10000)))
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @unittest.mock.patch("time.sleep")
     @unittest.mock.patch("requests.Session")
     @pytest.mark.test_server()

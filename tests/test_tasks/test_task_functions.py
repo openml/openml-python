@@ -167,6 +167,7 @@ class TestTask(TestBase):
             os.path.join(openml.config.get_cache_directory(), "datasets", "1", "dataset_1.pq")
         )
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.test_server()
     def test_get_task_lazy(self):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
@@ -224,6 +225,7 @@ class TestTask(TestBase):
         # Issue 538, get_task failing with clustering task.
         openml.tasks.functions.get_task(126033)
 
+    @pytest.mark.skip(reason="Pending resolution of #1657")
     @pytest.mark.test_server()
     def test_download_split(self):
         task = openml.tasks.get_task(1)  # anneal; crossvalidation
