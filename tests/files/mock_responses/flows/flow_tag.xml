@@ -1,0 +1,4 @@
+<oml:flow_tag xmlns:oml="http://openml.org/openml">
+  <oml:id>100</oml:id>
+  <oml:tag>test_tag_TestFlow_1234567890</oml:tag>
+</oml:flow_tag>

@@ -1,0 +1,14 @@
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>100</oml:id>
+  <oml:uploader>1</oml:uploader>
+  <oml:name>weka.J48</oml:name>
+  <oml:version>1</oml:version>
+  <oml:external_version>Weka_3.7.12</oml:external_version>
+  <oml:description>A simple J48 flow for testing</oml:description>
+  <oml:upload_date>2015-01-01T00:00:00</oml:upload_date>
+  <oml:language>English</oml:language>
+  <oml:dependencies>Weka_3.7.12</oml:dependencies>
+  <oml:parameter><oml:name>C</oml:name><oml:default_value>0.25</oml:default_value></oml:parameter>
+  <oml:parameter><oml:name>M</oml:name><oml:default_value>2</oml:default_value></oml:parameter>
+  <oml:tag>test_tag_TestFlow_1234567890</oml:tag>
+</oml:flow>
