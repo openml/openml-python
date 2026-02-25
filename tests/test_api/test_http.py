@@ -11,13 +11,13 @@ import openml
 
 
 @pytest.fixture
-def cache() -> HTTPCache:
-    return HTTPCache()
+def cache(http_client_v1) -> HTTPCache:
+    return http_client_v1.cache
 
 
 @pytest.fixture
-def http_client() -> HTTPClient:
-    return HTTPClient(api_version=APIVersion.V1)
+def http_client(http_client_v1) -> HTTPClient:
+    return http_client_v1
 
 
 @pytest.fixture
