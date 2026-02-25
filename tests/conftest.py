@@ -34,6 +34,8 @@ import shutil
 from pathlib import Path
 import pytest
 import openml_sklearn
+from openml._api import HTTPClient, MinIOClient
+from openml.enums import APIVersion
 
 import openml
 from openml.testing import TestBase
@@ -307,3 +309,28 @@ def workdir(tmp_path):
     os.chdir(tmp_path)
     yield tmp_path
     os.chdir(original_cwd)
+
+
+@pytest.fixture
+def use_api_v1() -> None:
+    openml.config.set_api_version(api_version=APIVersion.V1)
+
+
+@pytest.fixture
+def use_api_v2() -> None:
+    openml.config.set_api_version(api_version=APIVersion.V2)
+
+
+@pytest.fixture
+def http_client_v1() -> HTTPClient:
+    return HTTPClient(api_version=APIVersion.V1)
+
+
+@pytest.fixture
+def http_client_v2() -> HTTPClient:
+    return HTTPClient(api_version=APIVersion.V2)
+
+
+@pytest.fixture
+def minio_client() -> MinIOClient:
+    return MinIOClient()
