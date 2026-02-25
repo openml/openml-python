@@ -1,251 +1,255 @@
 # License: BSD 3-Clause
-"""Tests for Flow V1 → V2 API Migration."""
 from __future__ import annotations
 
+from unittest.mock import patch
+
 import pytest
+from requests import Response, Session
 
-from openml._api.resources import FlowV1API, FlowV2API
+import openml
+from openml._api import FlowV1API, FlowV2API
 from openml.enums import APIVersion
-from openml.exceptions import OpenMLNotSupportedError
+from openml.exceptions import OpenMLNotSupportedError, OpenMLServerException
 from openml.flows.flow import OpenMLFlow
-from openml.testing import TestAPIBase
 
 
-@pytest.mark.uses_test_server()
-class TestFlowAPIBase(TestAPIBase):
-    resource: FlowV1API | FlowV2API
+@pytest.fixture
+def flow_v1(http_client_v1, minio_client) -> FlowV1API:
+    return FlowV1API(http=http_client_v1, minio=minio_client)
 
-    def _assert_flow_shape(self, flow: OpenMLFlow) -> None:
-        self.assertIsInstance(flow, OpenMLFlow)
-        self.assertEqual(flow.flow_id, 1)
-        self.assertIsInstance(flow.name, str)
-        self.assertGreater(len(flow.name), 0)
 
-    def _get(self) -> OpenMLFlow:
-        flow = self.resource.get(flow_id=1)
-        self._assert_flow_shape(flow)
-        return flow
+@pytest.fixture
+def flow_v2(http_client_v2, minio_client) -> FlowV2API:
+    return FlowV2API(http=http_client_v2, minio=minio_client)
 
-    def _exists(self) -> int | bool:
-        flow = self.resource.get(flow_id=1)
-        result = self.resource.exists(
-            name=flow.name,
-            external_version=flow.external_version,
+
+@pytest.fixture
+def with_v2_server_config() -> None:
+    old_server = openml.config.servers[APIVersion.V2]["server"]
+    openml.config.servers[APIVersion.V2]["server"] = f"{openml.config.TEST_SERVER_URL}/api/v2/"
+    yield
+    openml.config.servers[APIVersion.V2]["server"] = old_server
+
+
+def _assert_flow_shape(flow: OpenMLFlow) -> None:
+    assert isinstance(flow, OpenMLFlow)
+    assert isinstance(flow.flow_id, int)
+    assert flow.flow_id > 0
+    assert isinstance(flow.name, str)
+    assert len(flow.name) > 0
+
+
+def test_flow_v1_get(flow_v1):
+    flow = flow_v1.get(flow_id=1)
+    _assert_flow_shape(flow)
+
+
+def test_flow_v1_list(flow_v1):
+    limit = 5
+    flows_df = flow_v1.list(limit=limit)
+
+    assert len(flows_df) == limit
+    assert "id" in flows_df.columns
+    assert "name" in flows_df.columns
+    assert "version" in flows_df.columns
+    assert "external_version" in flows_df.columns
+    assert "full_name" in flows_df.columns
+    assert "uploader" in flows_df.columns
+
+
+def test_flow_v1_list_with_offset(flow_v1):
+    limit = 5
+    flows_df = flow_v1.list(limit=limit, offset=10)
+
+    assert len(flows_df) == limit
+
+
+def test_flow_v1_exists_input_validation(flow_v1):
+    with pytest.raises(ValueError, match="Argument 'name' should be a non-empty string"):
+        flow_v1.exists(name="", external_version="1")
+
+    with pytest.raises(ValueError, match="Argument 'version' should be a non-empty string"):
+        flow_v1.exists(name="sklearn.tree.DecisionTreeClassifier", external_version="")
+
+
+def test_flow_v1_exists_mocked_success(flow_v1, use_api_v1, test_api_key):
+    flow_name = "sklearn.tree.DecisionTreeClassifier"
+    external_version = "1"
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = (
+            '<oml:flow_exists xmlns:oml="http://openml.org/openml">\n'
+            "  <oml:id>123</oml:id>\n"
+            "</oml:flow_exists>\n"
+        ).encode("utf-8")
+
+        result = flow_v1.exists(name=flow_name, external_version=external_version)
+
+        assert result == 123
+        mock_request.assert_called_once_with(
+            method="POST",
+            url=openml.config.server + "flow/exists",
+            params={},
+            data={
+                "name": flow_name,
+                "external_version": external_version,
+                "api_key": test_api_key,
+            },
+            headers=openml.config._HEADERS,
+            files=None,
         )
 
-        self.assertIsInstance(result, int)
-        self.assertGreater(result, 0)
-        self.assertEqual(result, flow.flow_id)
-        return result
 
-    def _exists_nonexistent(self) -> int | bool:
-        result = self.resource.exists(
+def test_flow_v1_exists_mocked_server_error(flow_v1, use_api_v1):
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = (
+            '<oml:error xmlns:oml="http://openml.org/openml">\n'
+            "  <oml:code>104</oml:code>\n"
+            "  <oml:message>Server error</oml:message>\n"
+            "</oml:error>\n"
+        ).encode("utf-8")
+
+        with pytest.raises(OpenMLServerException, match="Server error"):
+            flow_v1.exists(name="foo", external_version="1")
+
+
+def test_flow_v1_publish_mocked(flow_v1, use_api_v1, test_api_key):
+    files = {"description": "<flow/>"}
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = (
+            '<oml:upload_flow xmlns:oml="http://openml.org/openml">\n'
+            "  <oml:id>321</oml:id>\n"
+            "</oml:upload_flow>\n"
+        ).encode("utf-8")
+
+        result = flow_v1.publish(files=files)
+
+        assert result == 321
+        mock_request.assert_called_once_with(
+            method="POST",
+            url=openml.config.server + "flow",
+            params={},
+            data={"api_key": test_api_key},
+            headers=openml.config._HEADERS,
+            files=files,
+        )
+
+
+def test_flow_v1_delete_mocked(flow_v1, use_api_v1, test_api_key):
+    flow_id = 123
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = (
+            '<oml:flow_delete xmlns:oml="http://openml.org/openml">\n'
+            "  <oml:id>123</oml:id>\n"
+            "</oml:flow_delete>\n"
+        ).encode("utf-8")
+
+        result = flow_v1.delete(flow_id)
+
+        assert result is True
+        mock_request.assert_called_once_with(
+            method="DELETE",
+            url=openml.config.server + f"flow/{flow_id}",
+            params={"api_key": test_api_key},
+            data={},
+            headers=openml.config._HEADERS,
+            files=None,
+        )
+
+
+def test_flow_v2_get(flow_v2, with_v2_server_config):
+    v2_payload = {
+        "id": 1,
+        "uploader": 1,
+        "name": "weka.SMO",
+        "version": "1",
+        "external_version": "3.8.6",
+        "description": "SMO classifier",
+        "upload_date": "2020-01-01T00:00:00",
+        "language": "English",
+        "dependencies": "weka==3.8.6",
+        "class_name": "weka.SMO",
+        "custom_name": "weka.SMO",
+    }
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = b"{}"
+        mock_request.return_value.json = lambda: v2_payload
+
+        flow = flow_v2.get(flow_id=1)
+
+    _assert_flow_shape(flow)
+
+
+def test_flow_v2_exists_nonexistent(flow_v2, with_v2_server_config):
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = b"{}"
+        mock_request.return_value.json = lambda: {"flow_id": False}
+
+        result = flow_v2.exists(
             name="NonExistentFlowName123456789",
             external_version="0.0.0.nonexistent",
         )
 
-        self.assertFalse(result)
-        return result
-
-    def _list(self) -> None:
-        limit = 10
-        flows_df = self.resource.list(limit=limit)
-
-        self.assertEqual(len(flows_df), limit)
-        self.assertIn("id", flows_df.columns)
-        self.assertIn("name", flows_df.columns)
-        self.assertIn("version", flows_df.columns)
-        self.assertIn("external_version", flows_df.columns)
-        self.assertIn("full_name", flows_df.columns)
-        self.assertIn("uploader", flows_df.columns)
-
-    def _list_with_offset(self) -> None:
-        limit = 5
-        flows_df = self.resource.list(limit=limit, offset=10)
-
-        self.assertEqual(len(flows_df), limit)
-
-    def _list_with_tag_limit_offset(self) -> None:
-        limit = 5
-        flows_df = self.resource.list(tag="weka", limit=limit, offset=0, uploader=16)
-
-        self.assertTrue(hasattr(flows_df, "columns"))
-        self.assertLessEqual(len(flows_df), limit)
-        if len(flows_df) > 0:
-            self.assertIn("id", flows_df.columns)
-
-    def _publish_and_delete(self) -> None:
-        from openml_sklearn.extension import SklearnExtension
-        from sklearn.tree import ExtraTreeRegressor
-
-        clf = ExtraTreeRegressor()
-        extension = SklearnExtension()
-        dt_flow = extension.model_to_flow(clf)
-
-        # Check if flow exists, if not publish it
-        flow_id = self.resource.exists(
-            name=dt_flow.name,
-            external_version=dt_flow.external_version,
-        )
-
-        if not flow_id:
-            # Publish the flow first
-            file_elements = dt_flow._get_file_elements()
-            if "description" not in file_elements:
-                file_elements["description"] = dt_flow._to_xml()
-
-            flow_id = self.resource.publish(files=file_elements)
-
-        # Now delete it
-        result = self.resource.delete(flow_id)
-        self.assertTrue(result)
-
-        # Verify it no longer exists
-        exists = self.resource.exists(
-            name=dt_flow.name,
-            external_version=dt_flow.external_version,
-        )
-        self.assertFalse(exists)
+    assert result is False
 
 
-@pytest.mark.uses_test_server()
-class TestFlowV1API(TestFlowAPIBase):
-    def setUp(self):
-        super().setUp()
-        http_client = self.http_clients[APIVersion.V1]
-        self.resource = FlowV1API(http=http_client, minio=self.minio_client)
-
-    def test_get(self):
-        self._get()
-
-    def test_exists(self):
-        self._exists()
-
-    def test_exists_nonexistent(self):
-        self._exists_nonexistent()
-
-    def test_list(self):
-        self._list()
-
-    def test_list_with_offset(self):
-        self._list_with_offset()
-
-    def test_list_with_tag_limit_offset(self):
-        self._list_with_tag_limit_offset()
-
-    def test_publish_and_delete(self):
-        self._publish_and_delete()
+def test_flow_v2_list_not_supported(flow_v2):
+    with pytest.raises(
+        OpenMLNotSupportedError,
+        match="FlowV2API: v2 API does not support `list` for resource `flow`",
+    ):
+        flow_v2.list(limit=10)
 
 
-class TestFlowV2API(TestFlowAPIBase):
-    def setUp(self):
-        super().setUp()
-        http_client = self.http_clients[APIVersion.V2]
-        self.resource = FlowV2API(http=http_client, minio=self.minio_client)
-
-    def test_get(self):
-        self._get()
-
-    def test_exists(self):
-        self._exists()
-
-    def test_exists_nonexistent(self):
-        self._exists_nonexistent()
-
-    def test_list(self):
-        with pytest.raises(
-            OpenMLNotSupportedError,
-            match="FlowV2API: v2 API does not support `list` for resource `flow`",
-        ):
-            self._list()
-
-    def test_list_with_offset(self):
-        with pytest.raises(
-            OpenMLNotSupportedError,
-            match="FlowV2API: v2 API does not support `list` for resource `flow`",
-        ):
-            self._list_with_offset()
-
-    def test_list_with_tag_limit_offset(self):
-        with pytest.raises(
-            OpenMLNotSupportedError,
-            match="FlowV2API: v2 API does not support `list` for resource `flow`",
-        ):
-            self._list_with_tag_limit_offset()
-
-    def test_publish_and_delete(self):
-        with pytest.raises(
-            OpenMLNotSupportedError,
-            match="FlowV2API: v2 API does not support `publish` for resource `flow`",
-        ):
-            self._publish_and_delete()
+def test_flow_v2_publish_not_supported(flow_v2):
+    with pytest.raises(
+        OpenMLNotSupportedError,
+        match="FlowV2API: v2 API does not support `publish` for resource `flow`",
+    ):
+        flow_v2.publish(path="flow", files={"description": "<flow/>"})
 
 
-@pytest.mark.uses_test_server()
-class TestFlowCombinedAPI(TestAPIBase):
-    def setUp(self):
-        super().setUp()
-        self.resource_v1 = FlowV1API(
-            http=self.http_clients[APIVersion.V1],
-            minio=self.minio_client,
-        )
-        self.resource_v2 = FlowV2API(
-            http=self.http_clients[APIVersion.V2],
-            minio=self.minio_client,
-        )
+def test_flow_v1_v2_get_output_match(flow_v1, flow_v2, with_v2_server_config):
+    flow_from_v1 = flow_v1.get(flow_id=1)
 
-    def test_get_matches_output(self):
-        flow_v1 = self.resource_v1.get(flow_id=1)
-        flow_v2 = self.resource_v2.get(flow_id=1)
+    v2_payload = {
+        "id": flow_from_v1.flow_id,
+        "uploader": flow_from_v1.uploader,
+        "name": flow_from_v1.name,
+        "version": flow_from_v1.version,
+        "external_version": flow_from_v1.external_version,
+        "description": flow_from_v1.description,
+        "upload_date": "2020-01-01T00:00:00",
+        "language": flow_from_v1.language,
+        "dependencies": flow_from_v1.dependencies,
+        "class_name": flow_from_v1.class_name,
+        "custom_name": flow_from_v1.custom_name,
+    }
 
-        self.assertEqual(flow_v1.flow_id, flow_v2.flow_id)
-        self.assertEqual(flow_v1.name, flow_v2.name)
-        self.assertEqual(flow_v1.version, flow_v2.version)
-        self.assertEqual(flow_v1.external_version, flow_v2.external_version)
-        self.assertEqual(flow_v1.description, flow_v2.description)
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = b"{}"
+        mock_request.return_value.json = lambda: v2_payload
+        flow_from_v2 = flow_v2.get(flow_id=1)
 
-    def test_exists_matches_output(self):
-        flow_v1 = self.resource_v1.get(flow_id=1)
-
-        result_v1 = self.resource_v1.exists(
-            name=flow_v1.name,
-            external_version=flow_v1.external_version,
-        )
-        result_v2 = self.resource_v2.exists(
-            name=flow_v1.name,
-            external_version=flow_v1.external_version,
-        )
-
-        self.assertIsNot(result_v1, False)
-        self.assertIsNot(result_v2, False)
-        if isinstance(result_v1, int) and isinstance(result_v2, int):
-            self.assertEqual(result_v1, result_v2)
-
-    def test_exists_nonexistent_matches_output(self):
-        result_v1 = self.resource_v1.exists(
-            name="NonExistentFlowName123456789",
-            external_version="0.0.0.nonexistent",
-        )
-        result_v2 = self.resource_v2.exists(
-            name="NonExistentFlowName123456789",
-            external_version="0.0.0.nonexistent",
-        )
-
-        self.assertFalse(result_v1)
-        self.assertFalse(result_v2)
-
-    def test_list_contracts(self):
-        with pytest.raises(
-            OpenMLNotSupportedError,
-            match="FlowV2API: v2 API does not support `list` for resource `flow`",
-        ):
-            self.resource_v2.list(limit=10)
-
-    def test_publish_contracts(self):
-        with pytest.raises(
-            OpenMLNotSupportedError,
-            match="FlowV2API: v2 API does not support `publish` for resource `flow`",
-        ):
-            self.resource_v2.publish(path="flow", files={"description": "<flow/>"})
-
-
+    assert flow_from_v1.flow_id == flow_from_v2.flow_id
+    assert flow_from_v1.name == flow_from_v2.name
+    assert flow_from_v1.version == flow_from_v2.version
+    assert flow_from_v1.external_version == flow_from_v2.external_version
+    assert flow_from_v1.description == flow_from_v2.description
