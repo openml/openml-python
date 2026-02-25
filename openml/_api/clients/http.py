@@ -222,7 +222,7 @@ class HTTPClient:
 
     @property
     def api_key(self) -> str | None:
-        return cast("str | None", openml.config.SERVERS[self.api_version]["apikey"])
+        return cast("str | None", openml.config.servers[self.api_version]["apikey"])
 
     @property
     def retries(self) -> int:
