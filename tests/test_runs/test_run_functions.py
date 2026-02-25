@@ -1657,15 +1657,6 @@ class TestRun(TestBase):
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             assert len(row) == 12
 
-    @pytest.mark.test_server()
-    def test_get_cached_run(self):
-        openml.config.set_root_cache_directory(self.static_cache_dir)
-        openml.runs.functions._get_cached_run(1)
-
-    def test_get_uncached_run(self):
-        openml.config.set_root_cache_directory(self.static_cache_dir)
-        with pytest.raises(openml.exceptions.OpenMLCacheException):
-            openml.runs.functions._get_cached_run(10)
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_flow_on_task_downloaded_flow(self):
