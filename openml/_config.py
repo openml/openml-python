@@ -12,6 +12,7 @@ import shutil
 import warnings
 from collections.abc import Iterator
 from contextlib import contextmanager
+from copy import deepcopy
 from dataclasses import dataclass, field, fields, replace
 from io import StringIO
 from pathlib import Path
@@ -94,7 +95,7 @@ class OpenMLConfig:
     """Dataclass storing the OpenML configuration."""
 
     servers: dict[APIVersion, dict[str, str | None]] = field(
-        default_factory=lambda: SERVERS_REGISTRY["production"]
+        default_factory=lambda: deepcopy(SERVERS_REGISTRY["production"])
     )
     api_version: APIVersion = APIVersion.V1
     fallback_api_version: APIVersion | None = None
@@ -134,8 +135,8 @@ class OpenMLConfigManager:
         self.console_handler: logging.StreamHandler | None = None
         self.file_handler: logging.handlers.RotatingFileHandler | None = None
 
-        server_test_v1_apikey = SERVERS_REGISTRY["test"][APIVersion.V1]["apikey"]
-        server_test_v1_server = SERVERS_REGISTRY["test"][APIVersion.V1]["server"]
+        server_test_v1_apikey = self.get_servers("test")[APIVersion.V1]["apikey"]
+        server_test_v1_server = self.get_servers("test")[APIVersion.V1]["server"]
 
         self.OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
         self.OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
@@ -252,12 +253,16 @@ class OpenMLConfigManager:
         domain, _ = self._config.server.split("/api", maxsplit=1)
         return domain.replace("api", "www")
 
-    def set_server_mode(self, mode: str) -> None:
+    def get_servers(self, mode: str) -> dict[APIVersion, dict[str, str | None]]:
         if mode not in SERVERS_REGISTRY:
             raise ValueError(
                 f'invalid mode="{mode}" allowed modes: {", ".join(list(SERVERS_REGISTRY.keys()))}'
             )
-        self._config = replace(self._config, servers=SERVERS_REGISTRY[mode])
+        return deepcopy(SERVERS_REGISTRY[mode])
+
+    def set_servers(self, mode: str) -> None:
+        servers = self.get_servers(mode)
+        self._config = replace(self._config, servers=servers)
 
     def set_api_version(self, api_version: APIVersion) -> None:
         if api_version not in APIVersion:
@@ -480,7 +485,7 @@ class ConfigurationForExamples:
 
     def __init__(self, manager: OpenMLConfigManager):
         self._manager = manager
-        self._test_servers = SERVERS_REGISTRY["test"]
+        self._test_servers = manager.get_servers("test")
 
     def start_using_configuration_for_example(self) -> None:
         """Sets the configuration to connect to the test server with valid apikey.
