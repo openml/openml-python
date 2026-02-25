@@ -195,9 +195,5 @@ def test_openml_cache_dir_env_var(tmp_path: Path) -> None:
     with safe_environ_patcher("OPENML_CACHE_DIR", str(expected_path)):
         openml.config._setup()
 
-        server_parts = urlparse(openml.config.server).netloc
-        server_parts = server_parts.split(".")[::-1]
-        server_parts = "/".join(server_parts)
-
         assert openml.config._root_cache_directory == expected_path
-        assert openml.config.get_cache_directory() == str(expected_path / server_parts)
+        assert openml.config.get_cache_directory() == str(expected_path / "org" / "openml" / "www")
