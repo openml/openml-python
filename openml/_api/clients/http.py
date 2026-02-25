@@ -17,7 +17,6 @@ import xmltodict
 from requests import Response
 
 import openml
-from openml.__version__ import __version__
 from openml.enums import APIVersion, RetryPolicy
 from openml.exceptions import (
     OpenMLAuthenticationError,
@@ -26,8 +25,6 @@ from openml.exceptions import (
     OpenMLServerException,
     OpenMLServerNoResult,
 )
-
-_HEADERS: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
 
 
 class HTTPCache:
@@ -235,10 +232,6 @@ class HTTPClient:
     @property
     def retry_func(self) -> Callable:
         return self._human_delay if self.retry_policy == RetryPolicy.HUMAN else self._robot_delay
-
-    @property
-    def headers(self) -> dict[str, str]:
-        return _HEADERS
 
     def _robot_delay(self, n: int) -> float:
         """
@@ -594,7 +587,7 @@ class HTTPClient:
 
         # prepare headers
         headers = request_kwargs.pop("headers", {}).copy()
-        headers.update(_HEADERS)
+        headers.update(openml.config._HEADERS)
 
         files = request_kwargs.pop("files", None)
 

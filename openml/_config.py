@@ -21,6 +21,8 @@ from urllib.parse import urlparse
 
 from openml.enums import APIVersion
 
+from .__version__ import __version__
+
 logger = logging.getLogger(__name__)
 openml_logger = logging.getLogger("openml")
 
@@ -141,6 +143,7 @@ class OpenMLConfigManager:
         self.OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
         self.OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
         self._TEST_SERVER_NORMAL_USER_KEY = server_test_v1_apikey
+        self._HEADERS: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
         self.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR = "OPENML_TEST_SERVER_ADMIN_KEY"
         self.TEST_SERVER_URL = cast("str", server_test_v1_server).split("/api/v1/xml")[0]
 
@@ -176,6 +179,7 @@ class OpenMLConfigManager:
             "OPENML_CACHE_DIR_ENV_VAR",
             "OPENML_SKIP_PARQUET_ENV_VAR",
             "_TEST_SERVER_NORMAL_USER_KEY",
+            "_HEADERS",
         }:
             return object.__setattr__(self, name, value)
 

@@ -1,7 +1,6 @@
 from requests import Response, Request, Session
 from unittest.mock import patch
 import pytest
-from openml.testing import TestBase
 import os
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
@@ -209,7 +208,7 @@ def test_post(http_client):
             url=urljoin(openml.config.server, resource_name),
             params={},
             data={"api_key": openml.config.apikey},
-            headers=http_client.headers,
+            headers=openml.config._HEADERS,
             files=resource_files,
         )
 
@@ -234,6 +233,6 @@ def test_delete(http_client):
             ),
             params={"api_key": openml.config.apikey},
             data={},
-            headers=http_client.headers,
+            headers=openml.config._HEADERS,
             files=None,
         )

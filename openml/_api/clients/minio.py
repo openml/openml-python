@@ -3,9 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import openml
-from openml.__version__ import __version__
-
-_HEADERS: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
 
 
 class MinIOClient:
@@ -29,7 +26,3 @@ class MinIOClient:
     @property
     def path(self) -> Path:
         return Path(openml.config.get_cache_directory())
-
-    @property
-    def headers(self) -> dict[str, str]:
-        return _HEADERS
