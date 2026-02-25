@@ -1,81 +1,250 @@
-from __future__ import annotations
-
 import pytest
 import pandas as pd
+from requests import Session, Response
+from unittest.mock import patch
+
+import openml
 from openml._api.resources.task import TaskV1API, TaskV2API
 from openml._api.resources.base.fallback import FallbackProxy
 from openml.exceptions import OpenMLNotSupportedError
-from openml.testing import TestAPIBase
-from openml.enums import APIVersion
 from openml.tasks.task import TaskType
 
 
-class TestTaskAPIBase(TestAPIBase):
-    """Common utilities for Task API tests."""
-    def _get_first_tid(self, api_resource, task_type: TaskType) -> int:
-        tasks = api_resource.list(limit=1, offset=0, task_type=task_type)
-        if tasks.empty:
-            pytest.skip(f"No tasks of type {task_type} found.")
-        return int(tasks.iloc[0]["tid"])
+@pytest.fixture
+def task_v1(http_client_v1, minio_client) -> TaskV1API:
+    return TaskV1API(http=http_client_v1, minio=minio_client)
 
-class TestTaskV1API(TestTaskAPIBase):
-    def setUp(self):
-        super().setUp()
-        self.client = self.http_clients[APIVersion.V1]
-        self.task = TaskV1API(self.client)
 
-    @pytest.mark.uses_test_server()
-    def test_list_tasks(self):
-        """Verify V1 list endpoint returns a populated DataFrame."""
-        tasks_df = self.task.list(limit=5, offset=0)
-        assert isinstance(tasks_df, pd.DataFrame)
-        assert not tasks_df.empty
-        assert "tid" in tasks_df.columns
+@pytest.fixture
+def task_v2(http_client_v2, minio_client) -> TaskV2API:
+    return TaskV2API(http=http_client_v2, minio=minio_client)
 
-class TestTaskV2API(TestTaskAPIBase):
-    def setUp(self):
-        super().setUp()
-        self.client = self.http_clients[APIVersion.V2]
-        self.task = TaskV2API(self.client)
 
-    @pytest.mark.uses_test_server()
-    def test_list_tasks(self):
-        """Verify V2 list endpoint returns a populated DataFrame."""
-        with pytest.raises(OpenMLNotSupportedError):
-            self.task.list(limit=5, offset=0)
+@pytest.fixture
+def task_fallback(task_v1, task_v2) -> FallbackProxy:
+    return FallbackProxy(task_v2, task_v1)
 
-class TestTasksCombined(TestTaskAPIBase):
-    def setUp(self):
-        super().setUp()
-        self.v1_client = self.http_clients[APIVersion.V1]
-        self.v2_client = self.http_clients[APIVersion.V2]
-        self.task_v1 = TaskV1API(self.v1_client)
-        self.task_v2 = TaskV2API(self.v2_client)
-        self.task_fallback = FallbackProxy(self.task_v1, self.task_v2)
 
-    def _get_first_tid(self, task_type: TaskType) -> int:
-        """Helper to find an existing task ID for a given type using the V1 resource."""
-        tasks = self.task_v1.list(limit=1, offset=0, task_type=task_type)
-        if tasks.empty:
-            pytest.skip(f"No tasks of type {task_type} found on test server.")
-        return int(tasks.iloc[0]["tid"])
+def _get_first_tid(task_api: TaskV1API, task_type: TaskType) -> int:
+    """Helper to find an existing task ID for a given type using the V1 resource."""
+    tasks = task_api.list(limit=1, offset=0, task_type=task_type)
+    if tasks.empty:
+        pytest.skip(f"No tasks of type {task_type} found on test server.")
+    return int(tasks.iloc[0]["tid"])
 
-    @pytest.mark.uses_test_server()
-    def test_get_matches(self):
-        """Verify that we can get a task from V2 API and it matches V1."""
-        tid = self._get_first_tid(TaskType.SUPERVISED_CLASSIFICATION)
-        
-        output_v1 = self.task_v1.get(tid)
-        output_v2 = self.task_v2.get(tid)
 
-        assert int(output_v1.task_id) == tid
-        assert int(output_v2.task_id) == tid
-        assert output_v1.task_id == output_v2.task_id
-        assert output_v1.task_type == output_v2.task_type
+@pytest.mark.uses_test_server()
+def test_v1_list_tasks(task_v1):
+    """Verify V1 list endpoint returns a populated DataFrame."""
+    tasks_df = task_v1.list(limit=5, offset=0)
+    assert isinstance(tasks_df, pd.DataFrame)
+    assert not tasks_df.empty
+    assert "tid" in tasks_df.columns
 
-    @pytest.mark.uses_test_server()
-    def test_get_fallback(self):
-        """Verify the fallback proxy works for retrieving tasks."""
-        tid = self._get_first_tid(TaskType.SUPERVISED_CLASSIFICATION)
-        output_fallback = self.task_fallback.get(tid)
-        assert int(output_fallback.task_id) == tid
+
+@pytest.mark.uses_test_server()
+def test_v2_list_tasks(task_v2):
+    """Verify V2 list endpoint raises NotSupported."""
+    with pytest.raises(OpenMLNotSupportedError):
+        task_v2.list(limit=5, offset=0)
+
+
+@pytest.mark.uses_test_server()
+def test_fallback_get_matches(task_v1, task_v2):
+    """Verify that we can get a task from V2 API and it matches V1."""
+    tid = _get_first_tid(task_v1, TaskType.SUPERVISED_CLASSIFICATION)
+    
+    output_v1 = task_v1.get(tid)
+    output_v2 = task_v2.get(tid)
+
+    assert int(output_v1.task_id) == tid
+    assert int(output_v2.task_id) == tid
+    assert output_v1.task_id == output_v2.task_id
+    assert output_v1.task_type == output_v2.task_type
+
+
+@pytest.mark.uses_test_server()
+def test_fallback_get(task_v1, task_fallback):
+    """Verify the fallback proxy works for retrieving tasks."""
+    tid = _get_first_tid(task_v1, TaskType.SUPERVISED_CLASSIFICATION)
+    output_fallback = task_fallback.get(tid)
+    assert int(output_fallback.task_id) == tid
+
+
+def test_v1_publish(task_v1):
+    resource_name = task_v1.resource_type.value
+    resource_files = {"description": "Resource Description File"}
+    resource_id = 123
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = (
+            f'<oml:upload_task xmlns:oml="http://openml.org/openml">\n'
+            f"\t<oml:id>{resource_id}</oml:id>\n"
+            f"</oml:upload_task>\n"
+        ).encode("utf-8")
+
+        published_resource_id = task_v1.publish(
+            resource_name,
+            files=resource_files,
+        )
+
+        assert resource_id == published_resource_id
+
+        mock_request.assert_called_once_with(
+            method="POST",
+            url=openml.config.server + resource_name,
+            params={},
+            data={"api_key": openml.config.apikey},
+            headers=openml.config._HEADERS,
+            files=resource_files,
+        )
+
+
+def test_v1_delete(task_v1):
+    resource_name = task_v1.resource_type.value
+    resource_id = 123
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = (
+            f'<oml:task_delete xmlns:oml="http://openml.org/openml">\n'
+            f"  <oml:id>{resource_id}</oml:id>\n"
+            f"</oml:task_delete>\n"
+        ).encode("utf-8")
+
+        task_v1.delete(resource_id)
+
+        mock_request.assert_called_once_with(
+            method="DELETE",
+            url=(
+                openml.config.server
+                + resource_name
+                + "/"
+                + str(resource_id)
+            ),
+            params={"api_key": openml.config.apikey},
+            data={},
+            headers=openml.config._HEADERS,
+            files=None,
+        )
+
+
+def test_v1_tag(task_v1):
+    resource_id = 123
+    resource_tag = "TAG"
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = (
+            f'<oml:task_tag xmlns:oml="http://openml.org/openml">'
+            f"<oml:id>{resource_id}</oml:id>"
+            f"<oml:tag>{resource_tag}</oml:tag>"
+            f"</oml:task_tag>"
+        ).encode("utf-8")
+
+        tags = task_v1.tag(resource_id, resource_tag)
+
+        assert resource_tag in tags
+
+        mock_request.assert_called_once_with(
+            method="POST",
+            url=(
+                openml.config.server
+                + task_v1.resource_type.value
+                + "/tag"
+            ),
+            params={},
+            data={
+                "api_key": openml.config.apikey,
+                "task_id": resource_id,
+                "tag": resource_tag,
+            },
+            headers=openml.config._HEADERS,
+            files=None,
+        )
+
+
+def test_v1_untag(task_v1):
+    resource_id = 123
+    resource_tag = "TAG"
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = (
+            f'<oml:task_untag xmlns:oml="http://openml.org/openml">'
+            f"<oml:id>{resource_id}</oml:id>"
+            f"</oml:task_untag>"
+        ).encode("utf-8")
+
+        tags = task_v1.untag(resource_id, resource_tag)
+
+        assert resource_tag not in tags
+
+        mock_request.assert_called_once_with(
+            method="POST",
+            url=(
+                openml.config.server
+                + task_v1.resource_type.value
+                + "/untag"
+            ),
+            params={},
+            data={
+                "api_key": openml.config.apikey,
+                "task_id": resource_id,
+                "tag": resource_tag,
+            },
+            headers=openml.config._HEADERS,
+            files=None,
+        )
+
+
+def test_v2_publish(task_v2):
+    with pytest.raises(OpenMLNotSupportedError):
+        task_v2.publish(path=None, files=None)
+
+
+def test_v2_delete(task_v2):
+    with pytest.raises(OpenMLNotSupportedError):
+        task_v2.delete(resource_id=None)
+
+
+def test_v2_tag(task_v2):
+    with pytest.raises(OpenMLNotSupportedError):
+        task_v2.tag(resource_id=None, tag=None)
+
+
+def test_v2_untag(task_v2):
+    with pytest.raises(OpenMLNotSupportedError):
+        task_v2.untag(resource_id=None, tag=None)
+
+def test_fallback_publish(task_fallback):
+    with patch.object(TaskV1API, "publish") as mock_publish:
+        mock_publish.return_value = None
+        task_fallback.publish(path=None, files=None)
+        mock_publish.assert_called_once_with(path=None, files=None)
+
+
+def test_fallback_delete(task_fallback):
+    with patch.object(TaskV1API, "delete") as mock_delete:
+        mock_delete.return_value = None
+        task_fallback.delete(resource_id=None)
+        mock_delete.assert_called_once_with(resource_id=None)
+
+
+def test_fallback_tag(task_fallback):
+    with patch.object(TaskV1API, "tag") as mock_tag:
+        mock_tag.return_value = None
+        task_fallback.tag(resource_id=None, tag=None)
+        mock_tag.assert_called_once_with(resource_id=None, tag=None)
+
+
+def test_fallback_untag(task_fallback):
+    with patch.object(TaskV1API, "untag") as mock_untag:
+        mock_untag.return_value = None
+        task_fallback.untag(resource_id=None, tag=None)
+        mock_untag.assert_called_once_with(resource_id=None, tag=None)
