@@ -81,7 +81,7 @@ class TestConfig(openml.testing.TestBase):
         _config = {}
         _config["api_version"] = APIVersion.V1
         _config["fallback_api_version"] = None
-        _config["servers"] = openml._config.SERVERS_REGISTRY['production']
+        _config["servers"] = openml.config.get_servers("production")
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = False
         _config["connection_n_retries"] = 20
@@ -96,7 +96,7 @@ class TestConfig(openml.testing.TestBase):
         _config = {}
         _config["api_version"] = APIVersion.V1
         _config["fallback_api_version"] = None
-        _config["servers"] = openml._config.SERVERS_REGISTRY['production']
+        _config["servers"] = openml.config.get_servers("production")
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = True
         _config["retry_policy"] = "human"
@@ -193,10 +193,11 @@ def test_openml_cache_dir_env_var(tmp_path: Path) -> None:
     expected_path = tmp_path / "test-cache"
 
     with safe_environ_patcher("OPENML_CACHE_DIR", str(expected_path)):
+        openml.config._setup()
+
         server_parts = urlparse(openml.config.server).netloc
         server_parts = server_parts.split(".")[::-1]
         server_parts = "/".join(server_parts)
 
-        openml.config._setup()
         assert openml.config._root_cache_directory == expected_path
         assert openml.config.get_cache_directory() == str(expected_path / server_parts)
