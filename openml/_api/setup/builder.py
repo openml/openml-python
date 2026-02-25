@@ -1,15 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from pathlib import Path
-from typing import TYPE_CHECKING
 
-from openml._api.clients import HTTPCache, HTTPClient, MinIOClient
+from openml._api.clients import HTTPClient, MinIOClient
 from openml._api.resources import API_REGISTRY, FallbackProxy, ResourceAPI
-from openml.enums import ResourceType
-
-if TYPE_CHECKING:
-    from .config import Config
+from openml.enums import APIVersion, ResourceType
 
 
 class APIBackendBuilder:
@@ -63,7 +58,11 @@ class APIBackendBuilder:
         self.setup = resource_apis[ResourceType.SETUP]
 
     @classmethod
-    def build(cls, config: Config) -> APIBackendBuilder:
+    def build(
+        cls,
+        api_version: APIVersion,
+        fallback_api_version: APIVersion | None,
+    ) -> APIBackendBuilder:
         """
         Construct an APIBackendBuilder instance from a configuration.
 
@@ -82,40 +81,21 @@ class APIBackendBuilder:
         APIBackendBuilder
             Builder instance with all resource API interfaces initialized.
         """
-        cache_dir = Path(config.cache_dir).expanduser()
+        minio_client = MinIOClient()
 
-        http_cache = HTTPCache(path=cache_dir)
-        minio_client = MinIOClient(path=cache_dir)
-
-        primary_api_config = config.api_configs[config.api_version]
-        primary_http_client = HTTPClient(
-            server=primary_api_config.server,
-            base_url=primary_api_config.base_url,
-            api_key=primary_api_config.api_key,
-            retries=config.connection.retries,
-            retry_policy=config.connection.retry_policy,
-            cache=http_cache,
-        )
+        primary_http_client = HTTPClient(api_version=api_version)
 
         resource_apis: dict[ResourceType, ResourceAPI] = {}
-        for resource_type, resource_api_cls in API_REGISTRY[config.api_version].items():
+        for resource_type, resource_api_cls in API_REGISTRY[api_version].items():
             resource_apis[resource_type] = resource_api_cls(primary_http_client, minio_client)
 
-        if config.fallback_api_version is None:
+        if fallback_api_version is None:
             return cls(resource_apis)
 
-        fallback_api_config = config.api_configs[config.fallback_api_version]
-        fallback_http_client = HTTPClient(
-            server=fallback_api_config.server,
-            base_url=fallback_api_config.base_url,
-            api_key=fallback_api_config.api_key,
-            retries=config.connection.retries,
-            retry_policy=config.connection.retry_policy,
-            cache=http_cache,
-        )
+        fallback_http_client = HTTPClient(api_version=fallback_api_version)
 
         fallback_resource_apis: dict[ResourceType, ResourceAPI] = {}
-        for resource_type, resource_api_cls in API_REGISTRY[config.fallback_api_version].items():
+        for resource_type, resource_api_cls in API_REGISTRY[fallback_api_version].items():
             fallback_resource_apis[resource_type] = resource_api_cls(
                 fallback_http_client, minio_client
             )

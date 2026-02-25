@@ -15,6 +15,7 @@ import pandas as pd
 import xmltodict
 from scipy.sparse import coo_matrix
 
+import openml
 import openml._api_calls
 import openml.utils
 from openml.exceptions import (

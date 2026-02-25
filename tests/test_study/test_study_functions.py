@@ -12,7 +12,7 @@ from openml.testing import TestBase
 class TestStudyFunctions(TestBase):
     _multiprocess_can_split_ = True
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_study_old(self):
         self.use_production_server()
@@ -24,7 +24,7 @@ class TestStudyFunctions(TestBase):
         assert len(study.setups) == 30
         assert study.runs is None
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_study_new(self):
         self.use_production_server()
 
@@ -35,7 +35,7 @@ class TestStudyFunctions(TestBase):
         assert len(study.setups) == 1253
         assert len(study.runs) == 1693
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_openml100(self):
         self.use_production_server()
 
@@ -45,7 +45,7 @@ class TestStudyFunctions(TestBase):
         assert isinstance(study_2, openml.study.OpenMLBenchmarkSuite)
         assert study.study_id == study_2.study_id
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_study_error(self):
         self.use_production_server()
 
@@ -54,7 +54,7 @@ class TestStudyFunctions(TestBase):
         ):
             openml.study.get_study(99)
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_suite(self):
         self.use_production_server()
 
@@ -65,7 +65,7 @@ class TestStudyFunctions(TestBase):
         assert study.runs is None
         assert study.setups is None
 
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test_get_suite_error(self):
         self.use_production_server()
 
@@ -74,7 +74,7 @@ class TestStudyFunctions(TestBase):
         ):
             openml.study.get_suite(123)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_publish_benchmark_suite(self):
         fixture_alias = None
         fixture_name = "unit tested benchmark suite"
@@ -143,16 +143,16 @@ class TestStudyFunctions(TestBase):
         assert study_downloaded.main_entity_type == "run"
         assert study_downloaded.runs is None
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_publish_empty_study_explicit(self):
         self._test_publish_empty_study_is_allowed(explicit=True)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_publish_empty_study_implicit(self):
         self._test_publish_empty_study_is_allowed(explicit=False)
 
     @pytest.mark.flaky()
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_publish_study(self):
         # get some random runs to attach
         run_list = openml.evaluations.list_evaluations("predictive_accuracy", size=10)
@@ -222,7 +222,7 @@ class TestStudyFunctions(TestBase):
         res = openml.study.delete_study(study.id)
         assert res
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_study_attach_illegal(self):
         run_list = openml.runs.list_runs(size=10)
         assert len(run_list) == 10

@@ -114,9 +114,9 @@ jobs:
         fi
 
         if [ "${{ matrix.sklearn-only }}" = "true" ]; then
-          marks="sklearn and not production and not uses_test_server"
+          marks="sklearn and not production_server and not test_server"
         else
-          marks="not production and not uses_test_server"
+          marks="not production_server and not test_server"
         fi
 
         pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
@@ -131,9 +131,9 @@ jobs:
         fi
 
         if [ "${{ matrix.sklearn-only }}" = "true" ]; then
-          marks="sklearn and production and not uses_test_server"
+          marks="sklearn and production_server and not test_server"
         else
-          marks="production and not uses_test_server"
+          marks="production_server and not test_server"
         fi
 
         pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
@@ -143,7 +143,7 @@ jobs:
       env:
         OPENML_TEST_SERVER_ADMIN_KEY: ${{ secrets.OPENML_TEST_SERVER_ADMIN_KEY }}
       run: |  # we need a separate step because of the bash-specific if-statement in the previous one.
-        pytest -n 4 --durations=20 --dist load -sv --reruns 5 --reruns-delay 1 -m "not uses_test_server"
+        pytest -n 4 --durations=20 --dist load -sv --reruns 5 --reruns-delay 1 -m "not test_server"
 
     - name: Check for files left behind by test
       if: matrix.os != 'windows-latest' && always()
