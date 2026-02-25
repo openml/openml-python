@@ -34,6 +34,8 @@ import shutil
 from pathlib import Path
 import pytest
 import openml_sklearn
+from openml._api import HTTPClient, MinIOClient
+from openml.enums import APIVersion
 
 import openml
 from openml.testing import TestBase
@@ -99,7 +101,6 @@ def delete_remote_files(tracker, flow_names) -> None:
     """
     openml.config.server = TestBase.test_server
     openml.config.apikey = TestBase.user_key
-    openml.config._sync_api_config()
 
     # reordering to delete sub flows at the end of flows
     # sub-flows have shorter names, hence, sorting by descending order of flow name length
@@ -273,15 +274,13 @@ def as_robot() -> Iterator[None]:
 
 @pytest.fixture(autouse=True)
 def with_server(request):
-    if "production" in request.keywords:
-        openml.config.server = "https://www.openml.org/api/v1/xml"
+    if "production_server" in request.keywords:
+        openml.config.server = "https://www.openml.org/api/v1/xml/"
         openml.config.apikey = None
-        openml.config._sync_api_config()
         yield
         return
-    openml.config.server = "https://test.openml.org/api/v1/xml"
+    openml.config.server = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/"
     openml.config.apikey = TestBase.user_key
-    openml.config._sync_api_config()
     yield
 
 
@@ -310,3 +309,28 @@ def workdir(tmp_path):
     os.chdir(tmp_path)
     yield tmp_path
     os.chdir(original_cwd)
+
+
+@pytest.fixture
+def use_api_v1() -> None:
+    openml.config.set_api_version(api_version=APIVersion.V1)
+
+
+@pytest.fixture
+def use_api_v2() -> None:
+    openml.config.set_api_version(api_version=APIVersion.V2)
+
+
+@pytest.fixture
+def http_client_v1() -> HTTPClient:
+    return HTTPClient(api_version=APIVersion.V1)
+
+
+@pytest.fixture
+def http_client_v2() -> HTTPClient:
+    return HTTPClient(api_version=APIVersion.V2)
+
+
+@pytest.fixture
+def minio_client() -> MinIOClient:
+    return MinIOClient()
