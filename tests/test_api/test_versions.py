@@ -34,7 +34,8 @@ def dummy_task_fallback(dummy_task_v1, dummy_task_v2) -> DummyTaskV1API:
     return FallbackProxy(dummy_task_v2, dummy_task_v1)
 
 
-def _publish(resource):
+def test_v1_publish(dummy_task_v1, use_api_v1):
+    resource = dummy_task_v1
     resource_name = resource.resource_type.value
     resource_files = {"description": "Resource Description File"}
     resource_id = 123
@@ -65,7 +66,8 @@ def _publish(resource):
         )
 
 
-def _delete(resource):
+def test_v1_delete(dummy_task_v1, use_api_v1):
+    resource = dummy_task_v1
     resource_name = resource.resource_type.value
     resource_id = 123
 
@@ -94,7 +96,9 @@ def _delete(resource):
             files=None,
         )
 
-def _tag(resource):
+
+def test_v1_tag(dummy_task_v1, use_api_v1):
+    resource = dummy_task_v1
     resource_id = 123
     resource_tag = "TAG"
 
@@ -130,7 +134,8 @@ def _tag(resource):
         )
 
 
-def _untag(resource):
+def test_v1_untag(dummy_task_v1, use_api_v1):
+    resource = dummy_task_v1
     resource_id = 123
     resource_tag = "TAG"
 
@@ -165,54 +170,49 @@ def _untag(resource):
         )
 
 
-
-def test_v1_publish(dummy_task_v1, use_api_v1):
-    _publish(dummy_task_v1)
-
-
-def test_v1_delete(dummy_task_v1, use_api_v1):
-    _delete(dummy_task_v1)
-
-
-def test_v1_tag(dummy_task_v1, use_api_v1):
-    _tag(dummy_task_v1)
-
-
-def test_v1_untag(dummy_task_v1, use_api_v1):
-    _untag(dummy_task_v1)
-
-
-def test_v2_publish_not_supported(dummy_task_v2, use_api_v2):
+def test_v2_publish(dummy_task_v2, use_api_v2):
     with pytest.raises(OpenMLNotSupportedError):
-        _publish(dummy_task_v2)
+        dummy_task_v2.publish(path=None, files=None)
 
 
-def test_v2_delete_not_supported(dummy_task_v2, use_api_v2):
+def test_v2_delete(dummy_task_v2, use_api_v2):
     with pytest.raises(OpenMLNotSupportedError):
-        _delete(dummy_task_v2)
+        dummy_task_v2.delete(resource_id=None)
 
 
-def test_v2_tag_not_supported(dummy_task_v2, use_api_v2):
+def test_v2_tag(dummy_task_v2, use_api_v2):
     with pytest.raises(OpenMLNotSupportedError):
-        _tag(dummy_task_v2)
+        dummy_task_v2.tag(resource_id=None, tag=None)
 
 
-def test_v2_untag_not_supported(dummy_task_v2, use_api_v2):
+def test_v2_untag(dummy_task_v2, use_api_v2):
     with pytest.raises(OpenMLNotSupportedError):
-        _untag(dummy_task_v2)
+        dummy_task_v2.untag(resource_id=None, tag=None)
 
 
-def test_fallback_publish(dummy_task_fallback, use_api_v1):
-    _publish(dummy_task_fallback)
+def test_fallback_publish(dummy_task_fallback):
+    with patch.object(ResourceV1API, "publish") as mock_publish:
+        mock_publish.return_value = None
+        dummy_task_fallback.publish(path=None, files=None)
+        mock_publish.assert_called_once_with(path=None, files=None)
 
 
-def test_fallback_delete(dummy_task_fallback, use_api_v1):
-    _delete(dummy_task_fallback)
+def test_fallback_delete(dummy_task_fallback):
+    with patch.object(ResourceV1API, "delete") as mock_delete:
+        mock_delete.return_value = None
+        dummy_task_fallback.delete(resource_id=None)
+        mock_delete.assert_called_once_with(resource_id=None)
 
 
-def test_fallback_tag(dummy_task_fallback, use_api_v1):
-    _tag(dummy_task_fallback)
+def test_fallback_tag(dummy_task_fallback):
+    with patch.object(ResourceV1API, "tag") as mock_tag:
+        mock_tag.return_value = None
+        dummy_task_fallback.tag(resource_id=None, tag=None)
+        mock_tag.assert_called_once_with(resource_id=None, tag=None)
 
 
-def test_fallback_untag(dummy_task_fallback, use_api_v1):
-    _untag(dummy_task_fallback)
+def test_fallback_untag(dummy_task_fallback):
+    with patch.object(ResourceV1API, "untag") as mock_untag:
+        mock_untag.return_value = None
+        dummy_task_fallback.untag(resource_id=None, tag=None)
+        mock_untag.assert_called_once_with(resource_id=None, tag=None)
