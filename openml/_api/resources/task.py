@@ -40,7 +40,7 @@ class TaskV1API(ResourceV1API, TaskAPI):
         if not isinstance(task_id, int):
             raise TypeError(f"Task id should be integer, is {type(task_id)}")
 
-        response = self._http.get(f"task/{task_id}", use_cache=True)
+        response = self._http.get(f"task/{task_id}", enable_cache=True)
         return self._create_task_from_xml(response.text)
 
     def _create_task_from_xml(self, xml: str) -> OpenMLTask:
@@ -348,7 +348,7 @@ class TaskV2API(ResourceV2API, TaskAPI):
         -------
         task: OpenMLTask
         """
-        response = self._http.get(f"tasks/{task_id}", use_cache=True)
+        response = self._http.get(f"tasks/{task_id}", enable_cache=True)
         return self._create_task_from_json(response.json())
 
     def _create_task_from_json(self, task_json: dict) -> OpenMLTask:

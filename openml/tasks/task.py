@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 from typing_extensions import TypedDict
 
-import openml.config
+import openml
 from openml import datasets
 from openml.base import OpenMLBase
 from openml.utils import _create_cache_directory_for_id
