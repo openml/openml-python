@@ -81,7 +81,7 @@ class TestConfig(openml.testing.TestBase):
         _config = {}
         _config["api_version"] = APIVersion.V1
         _config["fallback_api_version"] = None
-        _config["servers"] = openml.config.get_servers("production")
+        _config["servers"] = openml.config.get_servers("test")
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = False
         _config["connection_n_retries"] = 20
@@ -96,7 +96,7 @@ class TestConfig(openml.testing.TestBase):
         _config = {}
         _config["api_version"] = APIVersion.V1
         _config["fallback_api_version"] = None
-        _config["servers"] = openml.config.get_servers("production")
+        _config["servers"] = openml.config.get_servers("test")
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = True
         _config["retry_policy"] = "human"
