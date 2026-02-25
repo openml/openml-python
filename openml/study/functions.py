@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 import xmltodict
 
+import openml
 import openml._api_calls
-import openml.config
 import openml.utils
 from openml.study.study import OpenMLBenchmarkSuite, OpenMLStudy
 
