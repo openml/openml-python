@@ -41,7 +41,7 @@ class TestTask(TestBase):
         assert isinstance(task["status"], str)
         assert task["status"] in ["in_preparation", "active", "deactivated"]
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks_by_type(self):
         num_curves_tasks = 198  # number is flexible, check server if fails
         ttid = TaskType.LEARNING_CURVE
@@ -51,33 +51,35 @@ class TestTask(TestBase):
             assert ttid == task["ttid"]
             self._check_task(task)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks_length(self):
         ttid = TaskType.LEARNING_CURVE
         tasks = openml.tasks.list_tasks(task_type=ttid)
         assert len(tasks) > 100
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks_empty(self):
         tasks = openml.tasks.list_tasks(tag="NoOneWillEverUseThisTag")
         assert tasks.empty
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks_by_tag(self):
-        num_basic_tasks = 100  # number is flexible, check server if fails
+        # Server starts with 99 active tasks with the tag, and one 'in_preparation',
+        # so depending on the processing of the last dataset, there may be 99 or 100 matches.
+        num_basic_tasks = 99
         tasks = openml.tasks.list_tasks(tag="OpenML100")
         assert len(tasks) >= num_basic_tasks
         for task in tasks.to_dict(orient="index").values():
             self._check_task(task)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks(self):
         tasks = openml.tasks.list_tasks()
         assert len(tasks) >= 900
         for task in tasks.to_dict(orient="index").values():
             self._check_task(task)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks_paginate(self):
         size = 10
         max = 100
@@ -87,7 +89,7 @@ class TestTask(TestBase):
             for task in tasks.to_dict(orient="index").values():
                 self._check_task(task)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_list_tasks_per_type_paginate(self):
         size = 40
         max = 100
@@ -107,38 +109,38 @@ class TestTask(TestBase):
     @unittest.skip(
         "Please await outcome of discussion: https://github.com/openml/OpenML/issues/776",
     )
-    @pytest.mark.production()
+    @pytest.mark.production_server()
     def test__get_task_live(self):
         self.use_production_server()
         # Test the following task as it used to throw an Unicode Error.
         # https://github.com/openml/openml-python/issues/378
         openml.tasks.get_task(34536)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_get_task(self):
         task = openml.tasks.get_task(1, download_data=True)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
 
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_get_task_lazy(self):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "task.xml")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "2", "task.xml")
         )
         assert task.class_labels == ["1", "2", "3", "4", "5", "U"]
 
         assert not os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff")
         )
         # Since the download_data=False is propagated to get_dataset
         assert not os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "datasets", "2", "dataset.arff")
+            os.path.join(openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")
         )
 
         task.download_split()
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff")
         )
 
 @mock.patch.object(requests.Session, "request")

@@ -174,7 +174,10 @@ def get_task(
     task = openml._backend.task.get(task_id)
     dataset = get_dataset(task.dataset_id, **get_dataset_kwargs)
 
-    if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
+    if (
+        isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask))
+        and task.target_name is not None
+    ):
         task.class_labels = dataset.retrieve_class_labels(task.target_name)
 
     if (
@@ -252,6 +255,7 @@ def create_task(
         )
 
     return task_cls(
+        task_id=None,
         task_type_id=task_type,
         task_type="None",  # TODO: refactor to get task type string from ID.
         data_set_id=dataset_id,

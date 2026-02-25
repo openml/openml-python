@@ -9,20 +9,19 @@ import minio
 import pytest
 
 import openml
-from openml.config import ConfigurationForExamples
 import openml.testing
 from openml._api_calls import _download_minio_bucket, API_TOKEN_HELP_LINK
 
 
 class TestConfig(openml.testing.TestBase):
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_too_long_uri(self):
         with pytest.raises(openml.exceptions.OpenMLServerError, match="URI too long!"):
             openml.datasets.list_datasets(data_id=list(range(10000)))
 
     @unittest.mock.patch("time.sleep")
     @unittest.mock.patch("requests.Session")
-    @pytest.mark.uses_test_server()
+    @pytest.mark.test_server()
     def test_retry_on_database_error(self, Session_class_mock, _):
         response_mock = unittest.mock.Mock()
         response_mock.text = (
@@ -117,12 +116,12 @@ def test_download_minio_failure(mock_minio, tmp_path: Path) -> None:
         ("task/42", "delete"),  # 460
     ],
 )
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_authentication_endpoints_requiring_api_key_show_relevant_help_link(
     endpoint: str,
     method: str,
 ) -> None:
     # We need to temporarily disable the API key to test the error message
     with openml.config.overwrite_config_context({"apikey": None}):
-        with pytest.raises(openml.exceptions.OpenMLNotAuthorizedError, match=API_TOKEN_HELP_LINK):
+        with pytest.raises(openml.exceptions.OpenMLAuthenticationError, match=API_TOKEN_HELP_LINK):
             openml._api_calls._perform_api_call(call=endpoint, request_method=method, data=None)

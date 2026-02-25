@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from copy import deepcopy
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, ClassVar, cast
+
+import openml
 
 from .builder import APIBackendBuilder
-from .config import Config
 
 if TYPE_CHECKING:
     from openml._api.resources import (
@@ -21,11 +21,59 @@ if TYPE_CHECKING:
 
 
 class APIBackend:
-    _instance: APIBackend | None = None
+    """
+    Central backend for accessing all OpenML API resource interfaces.
 
-    def __init__(self, config: Config | None = None):
-        self._config: Config = config or Config()
-        self._backend = APIBackendBuilder.build(self._config)
+    This class provides a singleton interface to dataset, task, flow,
+    evaluation, run, setup, study, and other resource APIs. It also
+    manages configuration through a nested ``Config`` object and
+    allows dynamic retrieval and updating of configuration values.
+
+    Parameters
+    ----------
+    config : Config, optional
+        Optional configuration object. If not provided, a default
+        ``Config`` instance is created.
+
+    Attributes
+    ----------
+    dataset : DatasetAPI
+        Interface for dataset-related API operations.
+    task : TaskAPI
+        Interface for task-related API operations.
+    evaluation_measure : EvaluationMeasureAPI
+        Interface for evaluation measure-related API operations.
+    estimation_procedure : EstimationProcedureAPI
+        Interface for estimation procedure-related API operations.
+    evaluation : EvaluationAPI
+        Interface for evaluation-related API operations.
+    flow : FlowAPI
+        Interface for flow-related API operations.
+    study : StudyAPI
+        Interface for study-related API operations.
+    run : RunAPI
+        Interface for run-related API operations.
+    setup : SetupAPI
+        Interface for setup-related API operations.
+    """
+
+    _instance: ClassVar[APIBackend | None] = None
+    _backends: ClassVar[dict[str, APIBackendBuilder]] = {}
+
+    @property
+    def _backend(self) -> APIBackendBuilder:
+        api_version = openml.config.api_version
+        fallback_api_version = openml.config.fallback_api_version
+        key = f"{api_version}_{fallback_api_version}"
+
+        if key not in self._backends:
+            _backend = APIBackendBuilder.build(
+                api_version=api_version,
+                fallback_api_version=fallback_api_version,
+            )
+            self._backends[key] = _backend
+
+        return self._backends[key]
 
     @property
     def dataset(self) -> DatasetAPI:
@@ -65,64 +113,14 @@ class APIBackend:
 
     @classmethod
     def get_instance(cls) -> APIBackend:
+        """
+        Get the singleton instance of the APIBackend.
+
+        Returns
+        -------
+        APIBackend
+            Singleton instance of the backend.
+        """
         if cls._instance is None:
             cls._instance = cls()
         return cls._instance
-
-    @classmethod
-    def get_config(cls) -> Config:
-        return deepcopy(cls.get_instance()._config)
-
-    @classmethod
-    def set_config(cls, config: Config) -> None:
-        instance = cls.get_instance()
-        instance._config = config
-        instance._backend = APIBackendBuilder.build(config)
-
-    @classmethod
-    def get_config_value(cls, key: str) -> Any:
-        keys = key.split(".")
-        config_value = cls.get_instance()._config
-        for k in keys:
-            if isinstance(config_value, dict):
-                config_value = config_value[k]
-            else:
-                config_value = getattr(config_value, k)
-        return deepcopy(config_value)
-
-    @classmethod
-    def set_config_value(cls, key: str, value: Any) -> None:
-        keys = key.split(".")
-        config = cls.get_instance()._config
-        parent = config
-        for k in keys[:-1]:
-            parent = parent[k] if isinstance(parent, dict) else getattr(parent, k)
-        if isinstance(parent, dict):
-            parent[keys[-1]] = value
-        else:
-            setattr(parent, keys[-1], value)
-        cls.set_config(config)
-
-    @classmethod
-    def get_config_values(cls, keys: list[str]) -> list[Any]:
-        values = []
-        for key in keys:
-            value = cls.get_config_value(key)
-            values.append(value)
-        return values
-
-    @classmethod
-    def set_config_values(cls, config_dict: dict[str, Any]) -> None:
-        config = cls.get_instance()._config
-
-        for key, value in config_dict.items():
-            keys = key.split(".")
-            parent = config
-            for k in keys[:-1]:
-                parent = parent[k] if isinstance(parent, dict) else getattr(parent, k)
-            if isinstance(parent, dict):
-                parent[keys[-1]] = value
-            else:
-                setattr(parent, keys[-1], value)
-
-        cls.set_config(config)

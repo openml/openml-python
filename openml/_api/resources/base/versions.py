@@ -7,70 +7,181 @@ import xmltodict
 
 from openml.enums import APIVersion, ResourceType
 from openml.exceptions import (
-    OpenMLNotAuthorizedError,
-    OpenMLServerError,
     OpenMLServerException,
 )
 
 from .base import ResourceAPI
 
+_LEGAL_RESOURCES_DELETE = [
+    ResourceType.DATASET,
+    ResourceType.TASK,
+    ResourceType.FLOW,
+    ResourceType.STUDY,
+    ResourceType.RUN,
+    ResourceType.USER,
+]
+
+_LEGAL_RESOURCES_TAG = [
+    ResourceType.DATASET,
+    ResourceType.TASK,
+    ResourceType.FLOW,
+    ResourceType.SETUP,
+    ResourceType.RUN,
+]
+
 
 class ResourceV1API(ResourceAPI):
+    """
+    Version 1 implementation of the OpenML resource API.
+
+    This class provides XML-based implementations for publishing,
+    deleting, tagging, and untagging resources using the V1 API
+    endpoints. Responses are parsed using ``xmltodict``.
+
+    Notes
+    -----
+    V1 endpoints expect and return XML. Error handling follows the
+    legacy OpenML server behavior and maps specific error codes to
+    more descriptive exceptions where appropriate.
+    """
+
     api_version: APIVersion = APIVersion.V1
 
     def publish(self, path: str, files: Mapping[str, Any] | None) -> int:
+        """
+        Publish a new resource using the V1 API.
+
+        Parameters
+        ----------
+        path : str
+            API endpoint path for the upload.
+        files : Mapping of str to Any or None
+            Files to upload as part of the request payload.
+
+        Returns
+        -------
+        int
+            Identifier of the newly created resource.
+
+        Raises
+        ------
+        ValueError
+            If the server response does not contain a valid resource ID.
+        OpenMLServerException
+            If the server returns an error during upload.
+        """
         response = self._http.post(path, files=files)
         parsed_response = xmltodict.parse(response.content)
         return self._extract_id_from_upload(parsed_response)
 
     def delete(self, resource_id: int) -> bool:
-        resource_type = self._get_endpoint_name()
+        """
+        Delete a resource using the V1 API.
 
-        legal_resources = {"data", "flow", "task", "run", "study", "user"}
-        if resource_type not in legal_resources:
-            raise ValueError(f"Can't delete a {resource_type}")
+        Parameters
+        ----------
+        resource_id : int
+            Identifier of the resource to delete.
 
-        path = f"{resource_type}/{resource_id}"
+        Returns
+        -------
+        bool
+            ``True`` if the server confirms successful deletion.
+
+        Raises
+        ------
+        ValueError
+            If the resource type is not supported for deletion.
+        OpenMLNotAuthorizedError
+            If the user is not permitted to delete the resource.
+        OpenMLServerError
+            If deletion fails for an unknown reason.
+        OpenMLServerException
+            For other server-side errors.
+        """
+        if self.resource_type not in _LEGAL_RESOURCES_DELETE:
+            raise ValueError(f"Can't delete a {self.resource_type.value}")
+
+        endpoint_name = self._get_endpoint_name()
+        path = f"{endpoint_name}/{resource_id}"
         try:
             response = self._http.delete(path)
             result = xmltodict.parse(response.content)
-            return f"oml:{resource_type}_delete" in result
+            return f"oml:{endpoint_name}_delete" in result
         except OpenMLServerException as e:
-            self._handle_delete_exception(resource_type, e)
+            self._handle_delete_exception(endpoint_name, e)
             raise
 
     def tag(self, resource_id: int, tag: str) -> list[str]:
-        resource_type = self._get_endpoint_name()
+        """
+        Add a tag to a resource using the V1 API.
 
-        legal_resources = {"data", "task", "flow", "setup", "run"}
-        if resource_type not in legal_resources:
-            raise ValueError(f"Can't tag a {resource_type}")
+        Parameters
+        ----------
+        resource_id : int
+            Identifier of the resource to tag.
+        tag : str
+            Tag to associate with the resource.
 
-        path = f"{resource_type}/tag"
-        data = {f"{resource_type}_id": resource_id, "tag": tag}
+        Returns
+        -------
+        list of str
+            Updated list of tags assigned to the resource.
+
+        Raises
+        ------
+        ValueError
+            If the resource type does not support tagging.
+        OpenMLServerException
+            If the server returns an error.
+        """
+        if self.resource_type not in _LEGAL_RESOURCES_TAG:
+            raise ValueError(f"Can't tag a {self.resource_type.value}")
+
+        endpoint_name = self._get_endpoint_name()
+        path = f"{endpoint_name}/tag"
+        data = {f"{endpoint_name}_id": resource_id, "tag": tag}
         response = self._http.post(path, data=data)
 
-        main_tag = f"oml:{resource_type}_tag"
         parsed_response = xmltodict.parse(response.content, force_list={"oml:tag"})
-        result = parsed_response[main_tag]
+        result = parsed_response[f"oml:{endpoint_name}_tag"]
         tags: list[str] = result.get("oml:tag", [])
 
         return tags
 
     def untag(self, resource_id: int, tag: str) -> list[str]:
-        resource_type = self._get_endpoint_name()
+        """
+        Remove a tag from a resource using the V1 API.
 
-        legal_resources = {"data", "task", "flow", "setup", "run"}
-        if resource_type not in legal_resources:
-            raise ValueError(f"Can't tag a {resource_type}")
+        Parameters
+        ----------
+        resource_id : int
+            Identifier of the resource to untag.
+        tag : str
+            Tag to remove from the resource.
 
-        path = f"{resource_type}/untag"
-        data = {f"{resource_type}_id": resource_id, "tag": tag}
+        Returns
+        -------
+        list of str
+            Updated list of tags assigned to the resource.
+
+        Raises
+        ------
+        ValueError
+            If the resource type does not support tagging.
+        OpenMLServerException
+            If the server returns an error.
+        """
+        if self.resource_type not in _LEGAL_RESOURCES_TAG:
+            raise ValueError(f"Can't untag a {self.resource_type.value}")
+
+        endpoint_name = self._get_endpoint_name()
+        path = f"{endpoint_name}/untag"
+        data = {f"{endpoint_name}_id": resource_id, "tag": tag}
         response = self._http.post(path, data=data)
 
-        main_tag = f"oml:{resource_type}_untag"
         parsed_response = xmltodict.parse(response.content, force_list={"oml:tag"})
-        result = parsed_response[main_tag]
+        result = parsed_response[f"oml:{endpoint_name}_untag"]
         tags: list[str] = result.get("oml:tag", [])
 
         return tags
@@ -80,42 +191,26 @@ class ResourceV1API(ResourceAPI):
             return "data"
         return cast("str", self.resource_type.value)
 
-    def _handle_delete_exception(
-        self, resource_type: str, exception: OpenMLServerException
-    ) -> None:
-        # https://github.com/openml/OpenML/blob/21f6188d08ac24fcd2df06ab94cf421c946971b0/openml_OS/views/pages/api_new/v1/xml/pre.php
-        # Most exceptions are descriptive enough to be raised as their standard
-        # OpenMLServerException, however there are two cases where we add information:
-        #  - a generic "failed" message, we direct them to the right issue board
-        #  - when the user successfully authenticates with the server,
-        #    but user is not allowed to take the requested action,
-        #    in which case we specify a OpenMLNotAuthorizedError.
-        by_other_user = [323, 353, 393, 453, 594]
-        has_dependent_entities = [324, 326, 327, 328, 354, 454, 464, 595]
-        unknown_reason = [325, 355, 394, 455, 593]
-        if exception.code in by_other_user:
-            raise OpenMLNotAuthorizedError(
-                message=(
-                    f"The {resource_type} can not be deleted because it was not uploaded by you."
-                ),
-            ) from exception
-        if exception.code in has_dependent_entities:
-            raise OpenMLNotAuthorizedError(
-                message=(
-                    f"The {resource_type} can not be deleted because "
-                    f"it still has associated entities: {exception.message}"
-                ),
-            ) from exception
-        if exception.code in unknown_reason:
-            raise OpenMLServerError(
-                message=(
-                    f"The {resource_type} can not be deleted for unknown reason,"
-                    " please open an issue at: https://github.com/openml/openml/issues/new"
-                ),
-            ) from exception
-        raise exception
-
     def _extract_id_from_upload(self, parsed: Mapping[str, Any]) -> int:
+        """
+        Extract the resource identifier from an XML upload response.
+
+        Parameters
+        ----------
+        parsed : Mapping of str to Any
+            Parsed XML response as returned by ``xmltodict.parse``.
+
+        Returns
+        -------
+        int
+            Extracted resource identifier.
+
+        Raises
+        ------
+        ValueError
+            If the response structure is unexpected or no identifier
+            can be found.
+        """
         # reads id from upload response
         # actual parsed dict: {"oml:upload_flow": {"@xmlns:oml": "...", "oml:id": "42"}}
 
@@ -140,6 +235,14 @@ class ResourceV1API(ResourceAPI):
 
 
 class ResourceV2API(ResourceAPI):
+    """
+    Version 2 implementation of the OpenML resource API.
+
+    This class represents the V2 API for resources. Operations such as
+    publishing, deleting, tagging, and untagging are currently not
+    supported and will raise ``OpenMLNotSupportedError``.
+    """
+
     api_version: APIVersion = APIVersion.V2
 
     def publish(self, path: str, files: Mapping[str, Any] | None) -> int:  # noqa: ARG002
@@ -153,3 +256,6 @@ class ResourceV2API(ResourceAPI):
 
     def untag(self, resource_id: int, tag: str) -> list[str]:  # noqa: ARG002
         self._not_supported(method="untag")
+
+    def _get_endpoint_name(self) -> str:
+        return cast("str", self.resource_type.value)
