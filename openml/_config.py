@@ -264,13 +264,28 @@ class OpenMLConfigManager:
         servers = self.get_servers(mode)
         self._config = replace(self._config, servers=servers)
 
-    def set_api_version(self, api_version: APIVersion) -> None:
+    def set_api_version(
+        self,
+        api_version: APIVersion,
+        fallback_api_version: APIVersion | None = None,
+    ) -> None:
         if api_version not in APIVersion:
             raise ValueError(
                 f'invalid api_version="{api_version}" '
                 f"allowed versions: {', '.join(list(APIVersion))}"
             )
-        self._config = replace(self._config, api_version=api_version)
+
+        if fallback_api_version is not None and fallback_api_version not in APIVersion:
+            raise ValueError(
+                f'invalid fallback_api_version="{fallback_api_version}" '
+                f"allowed versions: {', '.join(list(APIVersion))}"
+            )
+
+        self._config = replace(
+            self._config,
+            api_version=api_version,
+            fallback_api_version=fallback_api_version,
+        )
 
     def set_retry_policy(
         self, value: Literal["human", "robot"], n_retries: int | None = None
