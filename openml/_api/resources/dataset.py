@@ -1520,7 +1520,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
             Dataset format.
         """
         dataset_json = self._http.get(f"datasets/{dataset_id}").json()
-        # build a dict from the xml and get the format from the dataset description
+        # build a dict from the json and get the format from the dataset description
         return dataset_json["data_set_description"]["format"].lower()  # type: ignore
 
     def get_online_dataset_arff(self, dataset_id: int) -> str | None:
@@ -1538,6 +1538,6 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
             A string representation of an ARFF file. Or None if file already exists.
         """
         dataset_json = self._http.get(f"datasets/{dataset_id}").json()
-        # build a dict from the xml.
+        # build a dict from the json.
         # use the url from the dataset description and return the ARFF string
         return str(self.download_dataset_arff(dataset_json))

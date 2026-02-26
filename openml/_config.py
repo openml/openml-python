@@ -34,8 +34,8 @@ SERVERS_REGISTRY: dict[str, dict[APIVersion, dict[str, str | None]]] = {
             "apikey": None,
         },
         APIVersion.V2: {
-            "server": None,
-            "apikey": None,
+            "server": "http://localhost:8001/",
+            "apikey": "AD000000000000000000000000000000",
         },
     },
     "test": {
@@ -44,8 +44,8 @@ SERVERS_REGISTRY: dict[str, dict[APIVersion, dict[str, str | None]]] = {
             "apikey": "normaluser",
         },
         APIVersion.V2: {
-            "server": None,
-            "apikey": None,
+            "server": "http://localhost:8001/",
+            "apikey": "AD000000000000000000000000000000",
         },
     },
     "local": {

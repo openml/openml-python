@@ -14,7 +14,7 @@ from openml.testing import TestBase
 from openml.exceptions import OpenMLNotSupportedError
 from openml._api import DatasetV1API, DatasetV2API
 
-ADMIN_KEY = os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR,"")
+ADMIN_KEY = os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR, "")
 
 @pytest.fixture
 def admin_dataset_v1(minio_client):
@@ -36,24 +36,24 @@ def dataset_v2(http_client_v2, minio_client) -> DatasetV2API:
     return DatasetV2API(http=http_client_v2, minio=minio_client)
 
 
-def _wait_for_dataset_being_processed(dataset,did,status='active',n_tries=10,wait_time=10):
+def _wait_for_dataset_being_processed(dataset, did, status='active', n_tries=10, wait_time=10):
     for _ in range(n_tries):
         try:
             time.sleep(wait_time)
-            result = dataset.list(limit=1,offset=0,data_id=[did], status="all")
+            result = dataset.list(limit=1, offset=0, data_id=[did], status="all")
             result = result.to_dict(orient="index")
-            if result[did]["status"]==status:
+            if result[did]["status"] == status:
                 return
-        except:pass
+        except: pass
     raise TimeoutError(f"Dataset did not become {status} within given time")
 
-def _status_update_check(dataset,dataset_id,status):
-    dataset.status_update(dataset_id,status)
-    _wait_for_dataset_being_processed(dataset,dataset_id,status)
+def _status_update_check(dataset, dataset_id, status):
+    dataset.status_update(dataset_id, status)
+    _wait_for_dataset_being_processed(dataset, dataset_id, status)
 
 
 def test_v1_get(dataset_v1):
-    dataset_id= 2
+    dataset_id = 2
     output = dataset_v1.get(dataset_id)
     assert output.dataset_id == dataset_id
 
@@ -65,18 +65,18 @@ def test_v1_list(dataset_v1):
     assert output["status"].unique()[0] == "active"
 
 def test_v1_download_arff_from_get(dataset_v1):
-    output = dataset_v1.get(2,download_data=True)
+    output = dataset_v1.get(2, download_data=True)
 
     assert output.data_file is not None
     assert Path(output.data_file).exists()
 
 def test_v1_download_qualities_from_get(dataset_v1):
-    output = dataset_v1.get(2,download_qualities=True)
+    output = dataset_v1.get(2, download_qualities=True)
 
     assert output._qualities is not None
 
 def test_v1_download_features_from_get(dataset_v1):
-    output = dataset_v1.get(2,download_features_meta_data=True)
+    output = dataset_v1.get(2, download_features_meta_data=True)
 
     assert output._features is not None
 
@@ -103,21 +103,21 @@ def test_v1_status_update(admin_dataset_v1):
     new_dataset.publish()
     # admin key for test server (only admins can activate datasets.
     # all users can deactivate their own datasets)
-    _status_update_check(admin_dataset_v1,new_dataset.dataset_id,"deactivated")
-    _status_update_check(admin_dataset_v1,new_dataset.dataset_id,"active")
+    _status_update_check(admin_dataset_v1, new_dataset.dataset_id, "deactivated")
+    _status_update_check(admin_dataset_v1, new_dataset.dataset_id, "active")
     TestBase._mark_entity_for_removal("data", new_dataset.dataset_id)
 
 def test_v1_edit(dataset_v1):
     did = 2
     result = dataset_v1.fork(did)
-    _wait_for_dataset_being_processed(dataset_v1,result)
+    _wait_for_dataset_being_processed(dataset_v1, result)
 
-    edited_did = dataset_v1.edit(result,description="Forked dataset", default_target_attribute="shape")
+    edited_did = dataset_v1.edit(result, description="Forked dataset", default_target_attribute="shape")
     assert result == edited_did
     n_tries = 10
     # we need to wait for the edit to be reflected on the server
     for i in range(n_tries):
-        edited_dataset = dataset_v1.get(result,force_refresh_cache=True)
+        edited_dataset = dataset_v1.get(result, force_refresh_cache=True)
         try:
             assert edited_dataset.default_target_attribute == "shape", edited_dataset
             assert edited_dataset.description == "Forked dataset", edited_dataset
@@ -131,26 +131,26 @@ def test_v1_fork(dataset_v1):
     did = 2
     result = dataset_v1.fork(did)
     assert did != result
-    _wait_for_dataset_being_processed(dataset_v1,result)
+    _wait_for_dataset_being_processed(dataset_v1, result)
 
-    listing = dataset_v1.list(limit=2,offset=0,data_id=[did,result])
-    assert listing.iloc[0]["name"]== listing.iloc[1]["name"]
+    listing = dataset_v1.list(limit=2, offset=0, data_id=[did, result])
+    assert listing.iloc[0]["name"] == listing.iloc[1]["name"]
 
     dataset_v1.delete(result)
 
 def test_v1_list_qualities(dataset_v1):
     output = dataset_v1.list_qualities()
     assert len(output) == 19
-    assert isinstance(output[0],str)
+    assert isinstance(output[0], str)
 
 def test_v1_feature_add_remove_ontology(dataset_v1):
     did = 11
     fid = 0
     ontology = "https://www.openml.org/unittest/" + str(time.time())
-    output = dataset_v1.feature_add_ontology(did,fid,ontology)
+    output = dataset_v1.feature_add_ontology(did, fid, ontology)
     assert output
 
-    output = dataset_v1.feature_remove_ontology(did,fid,ontology)
+    output = dataset_v1.feature_remove_ontology(did, fid, ontology)
     assert output
 
 def test_v1_add_delete_topic(admin_dataset_v1):
@@ -161,7 +161,7 @@ def test_v1_add_delete_topic(admin_dataset_v1):
 
 
 def test_v2_get(dataset_v2):
-    dataset_id= 2
+    dataset_id = 2
     output = dataset_v2.get(dataset_id)
     assert output.dataset_id == dataset_id
 
@@ -173,18 +173,18 @@ def test_v2_list(dataset_v2):
     assert output["status"].unique()[0] == "active"
 
 def test_v2_download_arff_from_get(dataset_v2):
-    output = dataset_v2.get(2,download_data=True)
+    output = dataset_v2.get(2, download_data=True)
 
     assert output.data_file is not None
     assert Path(output.data_file).exists()
 
 def test_v2_download_qualities_from_get(dataset_v2):
-    output = dataset_v2.get(2,download_qualities=True)
+    output = dataset_v2.get(2, download_qualities=True)
 
     assert output._qualities is not None
 
 def test_v2_download_features_from_get(dataset_v2):
-    output = dataset_v2.get(2,download_features_meta_data=True)
+    output = dataset_v2.get(2, download_features_meta_data=True)
 
     assert output._features is not None
 
@@ -196,7 +196,7 @@ def test_v2_get_features(dataset_v2):
 
 def test_v2_edit(dataset_v2):
     with pytest.raises(OpenMLNotSupportedError):
-        dataset_v2.edit(2,description='Test')
+        dataset_v2.edit(2, description='Test')
 
 def test_v2_fork(dataset_v2):
     with pytest.raises(OpenMLNotSupportedError):
@@ -208,7 +208,7 @@ def test_v2_feature_add_remove_ontology(dataset_v2):
 
 def test_v2_add_delete_topic(dataset_v2):
     with pytest.raises(OpenMLNotSupportedError):
-        dataset_v2.add_topic(2,'test_topic_' + str(time.time()))
+        dataset_v2.add_topic(2, 'test_topic_' + str(time.time()))
 
 def test_v2_get_qualities(dataset_v2):
     # can be removed from here once v2 qualities are same as v1
@@ -224,8 +224,8 @@ def test_v2_list_qualities(dataset_v2):
 
 def test_v2_status_update(dataset_v2):
     # publish and fork is not supported in v2
-    _status_update_check(dataset_v2,2,"deactivated")
-    _status_update_check(dataset_v2,2,"active")
+    _status_update_check(dataset_v2, 2, "deactivated")
+    _status_update_check(dataset_v2, 2, "active")
 
 def test_get_matches(dataset_v1, dataset_v2):
     output_v1 = dataset_v1.get(2)
@@ -249,8 +249,8 @@ def test_list_matches(dataset_v1, dataset_v2):
     output_v2 = dataset_v2.list(limit=2, offset=1)
 
     pd.testing.assert_frame_equal(
-        output_v1[["did","name","version"]],
-        output_v2[["did","name","version"]],
+        output_v1[["did", "name", "version"]],
+        output_v2[["did", "name", "version"]],
         check_like=True
         )
     
