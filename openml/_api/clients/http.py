@@ -211,7 +211,7 @@ class HTTPClient:
     def server(self) -> str:
         server = openml.config.servers[self.api_version]["server"]
         if server is None:
-            servers_repr = {k.value: v for k, v in openml.config.servers}
+            servers_repr = {k.value: v for k, v in openml.config.servers.items()}
             raise ValueError(
                 f'server found to be None for api_version="{self.api_version}" in {servers_repr}'
             )
