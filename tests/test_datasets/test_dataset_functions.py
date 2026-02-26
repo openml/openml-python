@@ -1742,7 +1742,8 @@ def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_ke
         openml.datasets.delete_dataset(40_000)
 
     dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/40000"
-    assert dataset_url == mock_delete.call_args.args[0]
+    assert dataset_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
@@ -1763,7 +1764,8 @@ def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key
         openml.datasets.delete_dataset(40_000)
 
     dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/40000"
-    assert dataset_url == mock_delete.call_args.args[0]
+    assert dataset_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
@@ -1781,7 +1783,8 @@ def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key)
     assert success
 
     dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/40000"
-    assert dataset_url == mock_delete.call_args.args[0]
+    assert dataset_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
@@ -1802,7 +1805,8 @@ def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key)
         openml.datasets.delete_dataset(9_999_999)
 
     dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/9999999"
-    assert dataset_url == mock_delete.call_args.args[0]
+    assert dataset_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
     
 
