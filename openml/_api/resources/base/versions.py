@@ -7,12 +7,27 @@ import xmltodict
 
 from openml.enums import APIVersion, ResourceType
 from openml.exceptions import (
-    OpenMLNotAuthorizedError,
-    OpenMLServerError,
     OpenMLServerException,
 )
 
 from .base import ResourceAPI
+
+_LEGAL_RESOURCES_DELETE = [
+    ResourceType.DATASET,
+    ResourceType.TASK,
+    ResourceType.FLOW,
+    ResourceType.STUDY,
+    ResourceType.RUN,
+    ResourceType.USER,
+]
+
+_LEGAL_RESOURCES_TAG = [
+    ResourceType.DATASET,
+    ResourceType.TASK,
+    ResourceType.FLOW,
+    ResourceType.SETUP,
+    ResourceType.RUN,
+]
 
 
 class ResourceV1API(ResourceAPI):
@@ -84,19 +99,17 @@ class ResourceV1API(ResourceAPI):
         OpenMLServerException
             For other server-side errors.
         """
-        resource_type = self._get_endpoint_name()
+        if self.resource_type not in _LEGAL_RESOURCES_DELETE:
+            raise ValueError(f"Can't delete a {self.resource_type.value}")
 
-        legal_resources = {"data", "flow", "task", "run", "study", "user"}
-        if resource_type not in legal_resources:
-            raise ValueError(f"Can't delete a {resource_type}")
-
-        path = f"{resource_type}/{resource_id}"
+        endpoint_name = self._get_endpoint_name()
+        path = f"{endpoint_name}/{resource_id}"
         try:
             response = self._http.delete(path)
             result = xmltodict.parse(response.content)
-            return f"oml:{resource_type}_delete" in result
+            return f"oml:{endpoint_name}_delete" in result
         except OpenMLServerException as e:
-            self._handle_delete_exception(resource_type, e)
+            self._handle_delete_exception(endpoint_name, e)
             raise
 
     def tag(self, resource_id: int, tag: str) -> list[str]:
@@ -122,19 +135,16 @@ class ResourceV1API(ResourceAPI):
         OpenMLServerException
             If the server returns an error.
         """
-        resource_type = self._get_endpoint_name()
+        if self.resource_type not in _LEGAL_RESOURCES_TAG:
+            raise ValueError(f"Can't tag a {self.resource_type.value}")
 
-        legal_resources = {"data", "task", "flow", "setup", "run"}
-        if resource_type not in legal_resources:
-            raise ValueError(f"Can't tag a {resource_type}")
-
-        path = f"{resource_type}/tag"
-        data = {f"{resource_type}_id": resource_id, "tag": tag}
+        endpoint_name = self._get_endpoint_name()
+        path = f"{endpoint_name}/tag"
+        data = {f"{endpoint_name}_id": resource_id, "tag": tag}
         response = self._http.post(path, data=data)
 
-        main_tag = f"oml:{resource_type}_tag"
         parsed_response = xmltodict.parse(response.content, force_list={"oml:tag"})
-        result = parsed_response[main_tag]
+        result = parsed_response[f"oml:{endpoint_name}_tag"]
         tags: list[str] = result.get("oml:tag", [])
 
         return tags
@@ -162,95 +172,24 @@ class ResourceV1API(ResourceAPI):
         OpenMLServerException
             If the server returns an error.
         """
-        resource_type = self._get_endpoint_name()
+        if self.resource_type not in _LEGAL_RESOURCES_TAG:
+            raise ValueError(f"Can't untag a {self.resource_type.value}")
 
-        legal_resources = {"data", "task", "flow", "setup", "run"}
-        if resource_type not in legal_resources:
-            raise ValueError(f"Can't untag a {resource_type}")
-
-        path = f"{resource_type}/untag"
-        data = {f"{resource_type}_id": resource_id, "tag": tag}
+        endpoint_name = self._get_endpoint_name()
+        path = f"{endpoint_name}/untag"
+        data = {f"{endpoint_name}_id": resource_id, "tag": tag}
         response = self._http.post(path, data=data)
 
-        main_tag = f"oml:{resource_type}_untag"
         parsed_response = xmltodict.parse(response.content, force_list={"oml:tag"})
-        result = parsed_response[main_tag]
+        result = parsed_response[f"oml:{endpoint_name}_untag"]
         tags: list[str] = result.get("oml:tag", [])
 
         return tags
 
     def _get_endpoint_name(self) -> str:
-        """
-        Return the V1 endpoint name for the current resource type.
-
-        Returns
-        -------
-        str
-            Endpoint segment used in V1 API paths.
-
-        Notes
-        -----
-        Datasets use the special endpoint name ``"data"`` instead of
-        their enum value.
-        """
         if self.resource_type == ResourceType.DATASET:
             return "data"
         return cast("str", self.resource_type.value)
-
-    def _handle_delete_exception(
-        self, resource_type: str, exception: OpenMLServerException
-    ) -> None:
-        """
-        Map V1 deletion error codes to more specific exceptions.
-
-        Parameters
-        ----------
-        resource_type : str
-            Endpoint name of the resource type.
-        exception : OpenMLServerException
-            Original exception raised during deletion.
-
-        Raises
-        ------
-        OpenMLNotAuthorizedError
-            If the resource cannot be deleted due to ownership or
-            dependent entities.
-        OpenMLServerError
-            If deletion fails for an unknown reason.
-        OpenMLServerException
-            If the error code is not specially handled.
-        """
-        # https://github.com/openml/OpenML/blob/21f6188d08ac24fcd2df06ab94cf421c946971b0/openml_OS/views/pages/api_new/v1/xml/pre.php
-        # Most exceptions are descriptive enough to be raised as their standard
-        # OpenMLServerException, however there are two cases where we add information:
-        #  - a generic "failed" message, we direct them to the right issue board
-        #  - when the user successfully authenticates with the server,
-        #    but user is not allowed to take the requested action,
-        #    in which case we specify a OpenMLNotAuthorizedError.
-        by_other_user = [323, 353, 393, 453, 594]
-        has_dependent_entities = [324, 326, 327, 328, 354, 454, 464, 595]
-        unknown_reason = [325, 355, 394, 455, 593]
-        if exception.code in by_other_user:
-            raise OpenMLNotAuthorizedError(
-                message=(
-                    f"The {resource_type} can not be deleted because it was not uploaded by you."
-                ),
-            ) from exception
-        if exception.code in has_dependent_entities:
-            raise OpenMLNotAuthorizedError(
-                message=(
-                    f"The {resource_type} can not be deleted because "
-                    f"it still has associated entities: {exception.message}"
-                ),
-            ) from exception
-        if exception.code in unknown_reason:
-            raise OpenMLServerError(
-                message=(
-                    f"The {resource_type} can not be deleted for unknown reason,"
-                    " please open an issue at: https://github.com/openml/openml/issues/new"
-                ),
-            ) from exception
-        raise exception
 
     def _extract_id_from_upload(self, parsed: Mapping[str, Any]) -> int:
         """
@@ -317,3 +256,6 @@ class ResourceV2API(ResourceAPI):
 
     def untag(self, resource_id: int, tag: str) -> list[str]:  # noqa: ARG002
         self._not_supported(method="untag")
+
+    def _get_endpoint_name(self) -> str:
+        return cast("str", self.resource_type.value)

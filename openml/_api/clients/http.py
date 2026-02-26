@@ -16,18 +16,15 @@ import requests
 import xmltodict
 from requests import Response
 
-from openml.__version__ import __version__
-from openml.enums import RetryPolicy
+import openml
+from openml.enums import APIVersion, RetryPolicy
 from openml.exceptions import (
-    OpenMLCacheRequiredError,
+    OpenMLAuthenticationError,
     OpenMLHashException,
-    OpenMLNotAuthorizedError,
     OpenMLServerError,
     OpenMLServerException,
     OpenMLServerNoResult,
 )
-
-from .utils import human_delay, robot_delay
 
 
 class HTTPCache:
@@ -37,16 +34,7 @@ class HTTPCache:
     This class stores HTTP responses on disk using a structured directory layout
     derived from the request URL and parameters. Each cached response consists of
     three files: metadata (``meta.json``), headers (``headers.json``), and the raw
-    body (``body.bin``). Entries are considered valid until their time-to-live
-    (TTL) expires.
-
-    Parameters
-    ----------
-    path : pathlib.Path
-        Base directory where cache entries are stored.
-    ttl : int
-        Time-to-live in seconds. Cached entries older than this value are treated
-        as expired.
+    body (``body.bin``).
 
     Notes
     -----
@@ -54,9 +42,9 @@ class HTTPCache:
     parameters, excluding the ``api_key`` parameter.
     """
 
-    def __init__(self, *, path: Path, ttl: int) -> None:
-        self.path = path
-        self.ttl = ttl
+    @property
+    def path(self) -> Path:
+        return Path(openml.config.get_cache_directory())
 
     def get_key(self, url: str, params: dict[str, Any]) -> str:
         """
@@ -120,15 +108,13 @@ class HTTPCache:
         ------
         FileNotFoundError
             If the cache entry or required files are missing.
-        TimeoutError
-            If the cached entry has expired based on the configured TTL.
         ValueError
             If required metadata is missing or malformed.
         """
         path = self._key_to_path(key)
 
         if not path.exists():
-            raise FileNotFoundError(f"Cache directory not found: {path}")
+            raise FileNotFoundError(f"Cache entry not found: {path}")
 
         meta_path = path / "meta.json"
         headers_path = path / "headers.json"
@@ -139,13 +125,6 @@ class HTTPCache:
 
         with meta_path.open("r", encoding="utf-8") as f:
             meta = json.load(f)
-
-        created_at = meta.get("created_at")
-        if created_at is None:
-            raise ValueError("Cache metadata missing 'created_at'")
-
-        if time.time() - created_at > self.ttl:
-            raise TimeoutError(f"Cache expired for {path}")
 
         with headers_path.open("r", encoding="utf-8") as f:
             headers = json.load(f)
@@ -192,7 +171,6 @@ class HTTPCache:
             "url": response.url,
             "reason": response.reason,
             "encoding": response.encoding,
-            "elapsed": response.elapsed.total_seconds(),
             "created_at": time.time(),
             "request": {
                 "method": response.request.method if response.request else None,
@@ -216,39 +194,44 @@ class HTTPClient:
 
     Parameters
     ----------
-    server : str
-        Base server URL (e.g., ``https://www.openml.org``).
-    base_url : str
-        Base API path appended to the server URL.
-    api_key : str
-        API key used for authenticated endpoints.
-    retries : int
-        Maximum number of retry attempts for failed requests.
-    retry_policy : RetryPolicy
-        Strategy controlling delay between retries.
-    cache : HTTPCache or None, optional
-        Cache instance for storing and retrieving responses.
+    api_version : APIVersion
+        Backend API Version.
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         *,
-        server: str,
-        base_url: str,
-        api_key: str,
-        retries: int,
-        retry_policy: RetryPolicy,
-        cache: HTTPCache | None = None,
+        api_version: APIVersion,
     ) -> None:
-        self.server = server
-        self.base_url = base_url
-        self.api_key = api_key
-        self.retries = retries
-        self.retry_policy = retry_policy
-        self.cache = cache
+        self.api_version = api_version
 
-        self.retry_func = human_delay if retry_policy == RetryPolicy.HUMAN else robot_delay
-        self.headers: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
+        self.cache = HTTPCache()
+
+    @property
+    def server(self) -> str:
+        server = openml.config.servers[self.api_version]["server"]
+        if server is None:
+            servers_repr = {k.value: v for k, v in openml.config.servers.items()}
+            raise ValueError(
+                f'server found to be None for api_version="{self.api_version}" in {servers_repr}'
+            )
+        return cast("str", server)
+
+    @property
+    def api_key(self) -> str | None:
+        return cast("str | None", openml.config.servers[self.api_version]["apikey"])
+
+    @property
+    def retries(self) -> int:
+        return cast("int", openml.config.connection_n_retries)
+
+    @property
+    def retry_policy(self) -> RetryPolicy:
+        return RetryPolicy.HUMAN if openml.config.retry_policy == "human" else RetryPolicy.ROBOT
+
+    @property
+    def retry_func(self) -> Callable:
+        return self._human_delay if self.retry_policy == RetryPolicy.HUMAN else self._robot_delay
 
     def _robot_delay(self, n: int) -> float:
         """
@@ -309,7 +292,7 @@ class HTTPClient:
         """
         content_type = response.headers.get("Content-Type", "").lower()
 
-        if "json" in content_type:
+        if "application/json" in content_type:
             server_exception = response.json()
             server_error = server_exception["detail"]
             code = server_error.get("code")
@@ -373,26 +356,9 @@ class HTTPClient:
             raise OpenMLServerNoResult(code=code, message=message, url=url)
 
         # 163: failure to validate flow XML (https://www.openml.org/api_docs#!/flow/post_flow)
-        if code in [163] and files is not None and "description" in files:
+        if code == 163 and files is not None and "description" in files:
             # file_elements['description'] is the XML file description of the flow
             message = f"\n{files['description']}\n{message}"
-
-        if code in [
-            102,  # flow/exists post
-            137,  # dataset post
-            350,  # dataset/42 delete
-            310,  # flow/<something> post
-            320,  # flow/42 delete
-            400,  # run/42 delete
-            460,  # task/42 delete
-        ]:
-            raise OpenMLNotAuthorizedError(
-                message=(
-                    f"The API call {url} requires authentication via an API key.\nPlease configure "
-                    "OpenML-Python to use your API as described in this example:"
-                    "\nhttps://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/#authentication"
-                )
-            )
 
         # Propagate all server errors to the calling functions, except
         # for 107 which represents a database connection error.
@@ -485,7 +451,7 @@ class HTTPClient:
 
         return exception
 
-    def _request(  # noqa: PLR0913
+    def __request(  # noqa: PLR0913
         self,
         session: requests.Session,
         method: str,
@@ -553,13 +519,13 @@ class HTTPClient:
 
         return response, exception
 
-    def request(  # noqa: PLR0913, C901
+    def _request(  # noqa: PLR0913, C901
         self,
         method: str,
         path: str,
         *,
-        use_cache: bool = False,
-        reset_cache: bool = False,
+        enable_cache: bool = False,
+        refresh_cache: bool = False,
         use_api_key: bool = False,
         md5_checksum: str | None = None,
         **request_kwargs: Any,
@@ -573,10 +539,11 @@ class HTTPClient:
             HTTP method to use.
         path : str
             API path relative to the base URL.
-        use_cache : bool, optional
-            Whether to load/store responses from cache.
-        reset_cache : bool, optional
-            If True, bypass existing cache entries.
+        enable_cache : bool, optional
+            Whether to load/store response from cache.
+        refresh_cache : bool, optional
+            Only used when `enable_cache=True`. If True, ignore any existing
+            cached response and overwrite it with a fresh one.
         use_api_key : bool, optional
             Whether to include the API key in query parameters.
         md5_checksum : str or None, optional
@@ -596,13 +563,22 @@ class HTTPClient:
         OpenMLHashException
             If checksum verification fails.
         """
-        url = urljoin(self.server, urljoin(self.base_url, path))
+        url = urljoin(self.server, path)
         retries = max(1, self.retries)
 
         params = request_kwargs.pop("params", {}).copy()
         data = request_kwargs.pop("data", {}).copy()
 
         if use_api_key:
+            if self.api_key is None:
+                raise OpenMLAuthenticationError(
+                    message=(
+                        f"The API call {url} requires authentication via an API key. "
+                        "Please configure OpenML-Python to use your API "
+                        "as described in this example: "
+                        "https://openml.github.io/openml-python/latest/examples/Basics/introduction_tutorial/#authentication"
+                    )
+                )
             params["api_key"] = self.api_key
 
         if method.upper() in {"POST", "PUT", "PATCH"}:
@@ -611,22 +587,22 @@ class HTTPClient:
 
         # prepare headers
         headers = request_kwargs.pop("headers", {}).copy()
-        headers.update(self.headers)
+        headers.update(openml.config._HEADERS)
 
         files = request_kwargs.pop("files", None)
 
-        if use_cache and not reset_cache and self.cache is not None:
+        if enable_cache and not refresh_cache:
             cache_key = self.cache.get_key(url, params)
             try:
                 return self.cache.load(cache_key)
-            except (FileNotFoundError, TimeoutError):
-                pass  # cache miss or expired, continue
+            except FileNotFoundError:
+                pass  # cache miss, continue
             except Exception:
                 raise  # propagate unexpected cache errors
 
         with requests.Session() as session:
             for retry_counter in range(1, retries + 1):
-                response, exception = self._request(
+                response, exception = self.__request(
                     session=session,
                     method=method,
                     url=url,
@@ -654,7 +630,7 @@ class HTTPClient:
         if md5_checksum is not None:
             self._verify_checksum(response, md5_checksum)
 
-        if use_cache and self.cache is not None:
+        if enable_cache:
             cache_key = self.cache.get_key(url, params)
             self.cache.save(cache_key, response)
 
@@ -688,8 +664,8 @@ class HTTPClient:
         self,
         path: str,
         *,
-        use_cache: bool = False,
-        reset_cache: bool = False,
+        enable_cache: bool = False,
+        refresh_cache: bool = False,
         use_api_key: bool = False,
         md5_checksum: str | None = None,
         **request_kwargs: Any,
@@ -701,9 +677,9 @@ class HTTPClient:
         ----------
         path : str
             API path relative to the base URL.
-        use_cache : bool, optional
+        enable_cache : bool, optional
             Whether to use the response cache.
-        reset_cache : bool, optional
+        refresh_cache : bool, optional
             Whether to ignore existing cached entries.
         use_api_key : bool, optional
             Whether to include the API key.
@@ -717,11 +693,11 @@ class HTTPClient:
         requests.Response
             HTTP response.
         """
-        return self.request(
+        return self._request(
             method="GET",
             path=path,
-            use_cache=use_cache,
-            reset_cache=reset_cache,
+            enable_cache=enable_cache,
+            refresh_cache=refresh_cache,
             use_api_key=use_api_key,
             md5_checksum=md5_checksum,
             **request_kwargs,
@@ -751,10 +727,10 @@ class HTTPClient:
         requests.Response
             HTTP response.
         """
-        return self.request(
+        return self._request(
             method="POST",
             path=path,
-            use_cache=False,
+            enable_cache=False,
             use_api_key=use_api_key,
             **request_kwargs,
         )
@@ -779,10 +755,10 @@ class HTTPClient:
         requests.Response
             HTTP response.
         """
-        return self.request(
+        return self._request(
             method="DELETE",
             path=path,
-            use_cache=False,
+            enable_cache=False,
             use_api_key=True,
             **request_kwargs,
         )
@@ -819,15 +795,9 @@ class HTTPClient:
 
         Raises
         ------
-        OpenMLCacheRequiredError
-            If no cache instance is configured.
         OpenMLHashException
             If checksum verification fails.
         """
-        if self.cache is None:
-            raise OpenMLCacheRequiredError(
-                "A cache object is required for download, but none was provided in the HTTPClient."
-            )
         base = self.cache.path
         file_path = base / "downloads" / urlparse(url).path.lstrip("/") / file_name
         file_path = file_path.expanduser()
