@@ -324,16 +324,6 @@ def workdir(tmp_path):
 
 
 @pytest.fixture
-def use_api_v1() -> None:
-    openml.config.set_api_version(api_version=APIVersion.V1)
-
-
-@pytest.fixture
-def use_api_v2() -> None:
-    openml.config.set_api_version(api_version=APIVersion.V2)
-
-
-@pytest.fixture
 def http_client_v1() -> HTTPClient:
     return HTTPClient(api_version=APIVersion.V1)
 
