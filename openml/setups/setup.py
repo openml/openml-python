@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Any
 
-import openml.config
+import openml
 import openml.flows
 
 
@@ -66,6 +66,40 @@ class OpenMLSetup:
         field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
         body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
         return header + body
+
+    def push_tag(self, tag: str) -> None:
+        """
+        Annotate this setup with a tag on the OpenML server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the setup.
+        """
+        if self.setup_id is None:
+            raise openml.exceptions.PyOpenMLError(
+                "Cannot tag a setup that has not been published yet. "
+                "Please publish the setup first before being able to tag it."
+                f"\n{self}"
+            )
+
+        openml._backend.setup.tag(resource_id=self.setup_id, tag=tag)
+
+    def remove_tag(self, tag: str) -> None:
+        """
+        Remove a tag from this setup on the OpenML server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to remove from the setup.
+        """
+        if self.setup_id is None:
+            raise openml.exceptions.PyOpenMLError(
+                f"Cannot untag a setup that has not been published yet. \n{self}"
+            )
+
+        openml._backend.setup.untag(resource_id=self.setup_id, tag=tag)
 
 
 @dataclass
