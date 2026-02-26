@@ -23,8 +23,8 @@ def admin_dataset_v1(minio_client):
     original_key = openml.config.servers[APIVersion.V1]["apikey"]
     openml.config.servers[APIVersion.V1]["apikey"] = ADMIN_KEY
     admin_http = HTTPClient(api_version=APIVersion.V1)
-    api = DatasetV1API(http=admin_http, minio=minio_client)
-    yield api
+    dataset = DatasetV1API(http=admin_http, minio=minio_client)
+    yield dataset
     openml.config.servers[APIVersion.V1]["apikey"] = original_key
 
 @pytest.fixture

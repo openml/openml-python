@@ -349,7 +349,7 @@ class TestOpenMLDataset(TestBase):
     def test__getarff_path_dataset_arff(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         description = _get_dataset_description(self.workdir, 2)
-        arff_path = _get_dataset_arff(description, cache_directory=self.workdir)
+        arff_path = _get_dataset_arff(description)
         assert isinstance(arff_path, Path)
         assert arff_path.exists()
 
@@ -419,7 +419,7 @@ class TestOpenMLDataset(TestBase):
             "oml:parquet_url": "http://data.openml.org/dataset30/dataset_30.pq",
             "oml:id": "30",
         }
-        path = _get_dataset_parquet(description, cache_directory=None)
+        path = _get_dataset_parquet(description)
         assert isinstance(path, Path), "_get_dataset_parquet returns a path"
         assert path.is_file(), "_get_dataset_parquet returns path to real file"
 

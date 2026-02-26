@@ -878,7 +878,11 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         dataset_xml = self._http.get(f"data/{dataset_id}").text
         # build a dict from the xml.
         # use the url from the dataset description and return the ARFF string
-        return str(self.download_dataset_arff(xmltodict.parse(dataset_xml)))
+        arff_file = self.download_dataset_arff(
+            xmltodict.parse(dataset_xml)["oml:data_set_description"]
+        )
+        with arff_file.open("r", encoding="utf8") as f:
+            return f.read()
 
 
 class DatasetV2API(ResourceV2API, DatasetAPI):
@@ -1540,4 +1544,6 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         dataset_json = self._http.get(f"datasets/{dataset_id}").json()
         # build a dict from the json.
         # use the url from the dataset description and return the ARFF string
-        return str(self.download_dataset_arff(dataset_json))
+        arff_file = self.download_dataset_arff(dataset_json)
+        with arff_file.open("r", encoding="utf8") as f:
+            return f.read()
