@@ -426,6 +426,9 @@ def get_task(
         # Including class labels as part of task meta data handles
         #   the case where data download was initially disabled
         if isinstance(task, (OpenMLClassificationTask, OpenMLLearningCurveTask)):
+            assert task.target_name is not None, (
+                "Supervised tasks must define a target feature before retrieving class labels."
+            )
             task.class_labels = dataset.retrieve_class_labels(task.target_name)
         # Clustering tasks do not have class labels
         # and do not offer download_split
@@ -599,6 +602,7 @@ def create_task(
         )
 
     return task_cls(
+        task_id=None,
         task_type_id=task_type,
         task_type="None",  # TODO: refactor to get task type string from ID.
         data_set_id=dataset_id,
