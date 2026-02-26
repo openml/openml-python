@@ -5,6 +5,7 @@ import collections
 import copy
 import hashlib
 import re
+import os
 import time
 from packaging.version import Version
 from unittest import mock
@@ -31,7 +32,6 @@ import openml.exceptions
 import openml.utils
 from openml._api_calls import _perform_api_call
 from openml.testing import SimpleImputer, TestBase
-
 
 
 class TestFlow(TestBase):
@@ -180,7 +180,10 @@ class TestFlow(TestBase):
         openml.flows.functions.assert_flows_equal(new_flow, flow)
         assert new_flow is not flow
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_publish_flow(self):
@@ -223,7 +226,10 @@ class TestFlow(TestBase):
             f"collected from {__file__.split('/')[-1]}: {flow.flow_id}",
         )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_publish_flow_with_similar_components(self):
@@ -275,7 +281,10 @@ class TestFlow(TestBase):
         TestBase._mark_entity_for_removal("flow", flow3.flow_id, flow3.name)
         TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow3.flow_id}")
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_semi_legal_flow(self):
@@ -386,7 +395,10 @@ class TestFlow(TestBase):
         flow_id = openml.flows.flow_exists(name, version)
         assert not flow_id
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_existing_flow_exists(self):
@@ -428,7 +440,10 @@ class TestFlow(TestBase):
             )
             assert downloaded_flow_id == flow.flow_id
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_sklearn_to_upload_to_flow(self):

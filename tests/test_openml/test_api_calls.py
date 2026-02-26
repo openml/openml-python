@@ -7,6 +7,7 @@ from unittest import mock
 
 import minio
 import pytest
+import os
 
 import openml
 from openml.config import ConfigurationForExamples
@@ -20,7 +21,10 @@ class TestConfig(openml.testing.TestBase):
         with pytest.raises(openml.exceptions.OpenMLServerError, match="URI too long!"):
             openml.datasets.list_datasets(data_id=list(range(10000)))
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @unittest.mock.patch("time.sleep")
     @unittest.mock.patch("requests.Session")
     @pytest.mark.test_server()

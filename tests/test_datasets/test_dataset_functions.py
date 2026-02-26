@@ -406,7 +406,6 @@ class TestOpenMLDataset(TestBase):
             file_destination
         ), "_download_minio_file can download from subdirectories"
 
-
     @mock.patch("openml._api_calls._download_minio_file")
     @pytest.mark.test_server()
     def test__get_dataset_parquet_is_cached(self, patch):
@@ -530,7 +529,10 @@ class TestOpenMLDataset(TestBase):
         datasets_cache_dir = os.path.join(openml.config.get_cache_directory(), "datasets")
         assert len(os.listdir(datasets_cache_dir)) == 0
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_publish_dataset(self):
         arff_file_path = self.static_cache_dir / "org" / "openml" / "test" / "datasets" / "2" / "dataset.arff"
@@ -690,7 +692,10 @@ class TestOpenMLDataset(TestBase):
             with pytest.raises(ValueError, match=err_msg):
                 attributes_arff_from_df(df)
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_create_dataset_numpy(self):
         data = np.array([[1, 2, 3], [1.2, 2.5, 3.8], [2, 5, 8], [0, 1, 0]]).T
@@ -725,7 +730,10 @@ class TestOpenMLDataset(TestBase):
         ), "Uploaded arff does not match original one"
         assert _get_online_dataset_format(dataset.id) == "arff", "Wrong format for dataset"
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_create_dataset_list(self):
         data = [
@@ -781,7 +789,10 @@ class TestOpenMLDataset(TestBase):
         ), "Uploaded ARFF does not match original one"
         assert _get_online_dataset_format(dataset.id) == "arff", "Wrong format for dataset"
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_create_dataset_sparse(self):
         # test the scipy.sparse.coo_matrix
@@ -930,7 +941,10 @@ class TestOpenMLDataset(TestBase):
             dataset_id
         ), "The format of the ARFF files is different"
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_create_dataset_pandas(self):
         data = [
@@ -1156,7 +1170,10 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url,
             )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_publish_fetch_ignore_attribute(self):
         """Test to upload and retrieve dataset and check ignore_attributes"""
@@ -1276,7 +1293,10 @@ class TestOpenMLDataset(TestBase):
                 paper_url=paper_url,
             )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_create_dataset_row_id_attribute_inference(self):
         # meta-information
@@ -1445,7 +1465,10 @@ class TestOpenMLDataset(TestBase):
         edited_dataset = openml.datasets.get_dataset(did)
         assert edited_dataset.description == desc
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_data_edit_critical_field(self):
         # Case 2
@@ -1498,7 +1521,10 @@ class TestOpenMLDataset(TestBase):
             description="xor operation dataset",
         )
 
-    @pytest.mark.skip(reason="Pending resolution of #1657")
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_data_edit_cannot_edit_critical_field_if_dataset_has_task(self):
         # Need to own a dataset to be able to edit meta-data
@@ -1550,7 +1576,6 @@ class TestOpenMLDataset(TestBase):
             fork_dataset,
             data_id=999999,
         )
-
 
     @pytest.mark.production_server()
     def test_list_datasets_with_high_size_parameter(self):

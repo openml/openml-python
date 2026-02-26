@@ -362,7 +362,7 @@ def _send_request(  # noqa: C901, PLR0912
     files: FILE_ELEMENTS_TYPE | None = None,
     md5_checksum: str | None = None,
 ) -> requests.Response:
-    n_retries = 1
+    n_retries = max(1, config.connection_n_retries)
 
     response: requests.Response | None = None
     delay_method = _human_delay if config.retry_policy == "human" else _robot_delay
