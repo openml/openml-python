@@ -106,7 +106,8 @@ def delete_remote_files(tracker, flow_names) -> None:
     if "flow" in tracker:
         to_sort = list(zip(tracker["flow"], flow_names))
         flow_deletion_order = [
-            entity_id for entity_id, _ in sorted(to_sort, key=lambda x: len(x[1]), reverse=True)
+            entity_id
+            for entity_id, _ in sorted(to_sort, key=lambda x: len(x[1]), reverse=True)
         ]
         tracker["flow"] = [flow_deletion_order[1] for flow_id, _ in flow_deletion_order]
 
@@ -275,7 +276,7 @@ def test_apikey_v2() -> str:
     return openml.config.get_test_servers()[APIVersion.V2]["apikey"]
 
 
-@pytest.fixture(autouse=True, scope="function")
+@pytest.fixture(autouse=True, scope="module")
 def verify_cache_state(test_files_directory) -> Iterator[None]:
     assert_static_test_cache_correct(test_files_directory)
     yield
@@ -324,11 +325,12 @@ def with_test_cache(test_files_directory, request):
     openml.config.set_root_cache_directory(_root_cache_directory)
     if tmp_cache.exists():
         shutil.rmtree(tmp_cache)
-        
+
 
 @pytest.fixture
 def static_cache_dir():
-    return Path(__file__).parent / "files" 
+    return Path(__file__).parent / "files"
+
 
 @pytest.fixture
 def workdir(tmp_path):
