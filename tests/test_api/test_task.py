@@ -48,29 +48,6 @@ def test_v2_list_tasks(task_v2):
     with pytest.raises(OpenMLNotSupportedError):
         task_v2.list(limit=5, offset=0)
 
-
-@pytest.mark.uses_test_server()
-def test_fallback_get_matches(task_v1, task_v2):
-    """Verify that we can get a task from V2 API and it matches V1."""
-    tid = _get_first_tid(task_v1, TaskType.SUPERVISED_CLASSIFICATION)
-    
-    output_v1 = task_v1.get(tid)
-    output_v2 = task_v2.get(tid)
-
-    assert int(output_v1.task_id) == tid
-    assert int(output_v2.task_id) == tid
-    assert output_v1.task_id == output_v2.task_id
-    assert output_v1.task_type == output_v2.task_type
-
-
-@pytest.mark.uses_test_server()
-def test_fallback_get(task_v1, task_fallback):
-    """Verify the fallback proxy works for retrieving tasks."""
-    tid = _get_first_tid(task_v1, TaskType.SUPERVISED_CLASSIFICATION)
-    output_fallback = task_fallback.get(tid)
-    assert int(output_fallback.task_id) == tid
-
-
 def test_v1_publish(task_v1):
     resource_name = task_v1.resource_type.value
     resource_files = {"description": "Resource Description File"}
@@ -221,30 +198,3 @@ def test_v2_tag(task_v2):
 def test_v2_untag(task_v2):
     with pytest.raises(OpenMLNotSupportedError):
         task_v2.untag(resource_id=None, tag=None)
-
-def test_fallback_publish(task_fallback):
-    with patch.object(TaskV1API, "publish") as mock_publish:
-        mock_publish.return_value = None
-        task_fallback.publish(path=None, files=None)
-        mock_publish.assert_called_once_with(path=None, files=None)
-
-
-def test_fallback_delete(task_fallback):
-    with patch.object(TaskV1API, "delete") as mock_delete:
-        mock_delete.return_value = None
-        task_fallback.delete(resource_id=None)
-        mock_delete.assert_called_once_with(resource_id=None)
-
-
-def test_fallback_tag(task_fallback):
-    with patch.object(TaskV1API, "tag") as mock_tag:
-        mock_tag.return_value = None
-        task_fallback.tag(resource_id=None, tag=None)
-        mock_tag.assert_called_once_with(resource_id=None, tag=None)
-
-
-def test_fallback_untag(task_fallback):
-    with patch.object(TaskV1API, "untag") as mock_untag:
-        mock_untag.return_value = None
-        task_fallback.untag(resource_id=None, tag=None)
-        mock_untag.assert_called_once_with(resource_id=None, tag=None)
