@@ -14,7 +14,6 @@ import minio
 import urllib3
 
 import openml
-from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 from openml.datasets.data_feature import OpenMLDataFeature
 from openml.datasets.dataset import OpenMLDataset
 from openml.exceptions import (
@@ -93,7 +92,10 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
                 qualities_file = self.download_qualities_file(dataset_id)
 
             parquet_file = None
-            skip_parquet = os.environ.get(OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+            skip_parquet = (
+                os.environ.get(openml.config.OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold()
+                == "true"
+            )
             download_parquet = "oml:parquet_url" in description and not skip_parquet
             if download_parquet and (download_data or download_all_files):
                 try:
@@ -932,7 +934,10 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
                 qualities_file = self.download_qualities_file(dataset_id)
 
             parquet_file = None
-            skip_parquet = os.environ.get(OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+            skip_parquet = (
+                os.environ.get(openml.config.OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold()
+                == "true"
+            )
             download_parquet = "parquet_url" in json_content and not skip_parquet
             if download_parquet and (download_data or download_all_files):
                 try:
