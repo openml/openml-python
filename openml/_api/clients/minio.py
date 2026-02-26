@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from openml.__version__ import __version__
+import openml
 
 
 class MinIOClient:
@@ -14,12 +14,6 @@ class MinIOClient:
     default HTTP headers. It is intended to be extended with actual request
     or storage logic elsewhere.
 
-    Parameters
-    ----------
-    path : pathlib.Path or None, optional
-        Base path used for local storage or downloads. If ``None``, no
-        default path is configured.
-
     Attributes
     ----------
     path : pathlib.Path or None
@@ -29,6 +23,6 @@ class MinIOClient:
         OpenML Python client version.
     """
 
-    def __init__(self, path: Path) -> None:
-        self.path = path
-        self.headers: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
+    @property
+    def path(self) -> Path:
+        return Path(openml.config.get_cache_directory())
