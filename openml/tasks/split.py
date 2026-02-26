@@ -68,7 +68,7 @@ class OpenMLSplit(ReprMixin):
 
     def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
         """Collect all information to display in the __repr__ body."""
-        fields = {
+        fields: dict[str, int | str | None] = {
             "Name": self.name,
             "Description": (
                 self.description if len(self.description) <= 80 else self.description[:77] + "..."
