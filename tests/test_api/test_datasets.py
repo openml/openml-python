@@ -44,7 +44,8 @@ def _wait_for_dataset_being_processed(dataset, did, status='active', n_tries=10,
             result = result.to_dict(orient="index")
             if result[did]["status"] == status:
                 return
-        except: pass
+        except Exception:
+            pass
     raise TimeoutError(f"Dataset did not become {status} within given time")
 
 def _status_update_check(dataset, dataset_id, status):
