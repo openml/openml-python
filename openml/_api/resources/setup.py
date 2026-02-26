@@ -178,7 +178,7 @@ class SetupV1API(ResourceV1API, SetupAPI):
             An initialized OpenMLSetup object parsed from the XML
         """
         url_suffix = f"setup/{setup_id}"
-        setup_response = self._http.get(url_suffix, use_cache=True)
+        setup_response = self._http.get(url_suffix, enable_cache=True)
         xml_content = setup_response.text
         result_dict = xmltodict.parse(xml_content)
 
