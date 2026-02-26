@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from copy import deepcopy
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, ClassVar, cast
+
+import openml
 
 from .builder import APIBackendBuilder
-from .config import Config
 
 if TYPE_CHECKING:
+    from openml._api.clients import HTTPClient, MinIOClient
     from openml._api.resources import (
         DatasetAPI,
         EstimationProcedureAPI,
@@ -57,11 +58,23 @@ class APIBackend:
         Interface for setup-related API operations.
     """
 
-    _instance: APIBackend | None = None
+    _instance: ClassVar[APIBackend | None] = None
+    _backends: ClassVar[dict[str, APIBackendBuilder]] = {}
 
-    def __init__(self, config: Config | None = None):
-        self._config: Config = config or Config()
-        self._backend = APIBackendBuilder.build(self._config)
+    @property
+    def _backend(self) -> APIBackendBuilder:
+        api_version = openml.config.api_version
+        fallback_api_version = openml.config.fallback_api_version
+        key = f"{api_version}_{fallback_api_version}"
+
+        if key not in self._backends:
+            _backend = APIBackendBuilder.build(
+                api_version=api_version,
+                fallback_api_version=fallback_api_version,
+            )
+            self._backends[key] = _backend
+
+        return self._backends[key]
 
     @property
     def dataset(self) -> DatasetAPI:
@@ -99,6 +112,18 @@ class APIBackend:
     def setup(self) -> SetupAPI:
         return cast("SetupAPI", self._backend.setup)
 
+    @property
+    def http_client(self) -> HTTPClient:
+        return cast("HTTPClient", self._backend.http_client)
+
+    @property
+    def fallback_http_client(self) -> HTTPClient | None:
+        return cast("HTTPClient | None", self._backend.fallback_http_client)
+
+    @property
+    def minio_client(self) -> MinIOClient:
+        return cast("MinIOClient", self._backend.minio_client)
+
     @classmethod
     def get_instance(cls) -> APIBackend:
         """
@@ -112,124 +137,3 @@ class APIBackend:
         if cls._instance is None:
             cls._instance = cls()
         return cls._instance
-
-    @classmethod
-    def get_config(cls) -> Config:
-        """
-        Get a deep copy of the current configuration.
-
-        Returns
-        -------
-        Config
-            Current configuration object.
-        """
-        return deepcopy(cls.get_instance()._config)
-
-    @classmethod
-    def set_config(cls, config: Config) -> None:
-        """
-        Set a new configuration for the backend.
-
-        This updates both the internal ``_config`` object and rebuilds
-        the internal API backend using ``APIBackendBuilder``.
-
-        Parameters
-        ----------
-        config : Config
-            Configuration object to set.
-        """
-        instance = cls.get_instance()
-        instance._config = config
-        instance._backend = APIBackendBuilder.build(config)
-
-    @classmethod
-    def get_config_value(cls, key: str) -> Any:
-        """
-        Retrieve a specific configuration value by key.
-
-        Parameters
-        ----------
-        key : str
-            Dot-separated key specifying the configuration field.
-
-        Returns
-        -------
-        Any
-            Deep copy of the requested configuration value.
-        """
-        keys = key.split(".")
-        config_value = cls.get_instance()._config
-        for k in keys:
-            if isinstance(config_value, dict):
-                config_value = config_value[k]
-            else:
-                config_value = getattr(config_value, k)
-        return deepcopy(config_value)
-
-    @classmethod
-    def set_config_value(cls, key: str, value: Any) -> None:
-        """
-        Set a specific configuration value by key.
-
-        Parameters
-        ----------
-        key : str
-            Dot-separated key specifying the configuration field.
-        value : Any
-            Value to assign to the configuration field.
-        """
-        keys = key.split(".")
-        config = cls.get_instance()._config
-        parent = config
-        for k in keys[:-1]:
-            parent = parent[k] if isinstance(parent, dict) else getattr(parent, k)
-        if isinstance(parent, dict):
-            parent[keys[-1]] = value
-        else:
-            setattr(parent, keys[-1], value)
-        cls.set_config(config)
-
-    @classmethod
-    def get_config_values(cls, keys: list[str]) -> list[Any]:
-        """
-        Retrieve multiple configuration values by a list of keys.
-
-        Parameters
-        ----------
-        keys : list of str
-            List of dot-separated keys specifying configuration fields.
-
-        Returns
-        -------
-        list of Any
-            List of deep copies of the requested configuration values.
-        """
-        values = []
-        for key in keys:
-            value = cls.get_config_value(key)
-            values.append(value)
-        return values
-
-    @classmethod
-    def set_config_values(cls, config_dict: dict[str, Any]) -> None:
-        """
-        Set multiple configuration values using a dictionary.
-
-        Parameters
-        ----------
-        config_dict : dict of str to Any
-            Mapping of dot-separated configuration keys to their values.
-        """
-        config = cls.get_instance()._config
-
-        for key, value in config_dict.items():
-            keys = key.split(".")
-            parent = config
-            for k in keys[:-1]:
-                parent = parent[k] if isinstance(parent, dict) else getattr(parent, k)
-            if isinstance(parent, dict):
-                parent[keys[-1]] = value
-            else:
-                setattr(parent, keys[-1], value)
-
-        cls.set_config(config)
