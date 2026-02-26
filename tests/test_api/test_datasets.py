@@ -1,241 +1,270 @@
 from __future__ import annotations
 from pathlib import Path
 import time
+import os
 
 from openml import OpenMLDataset
 import pytest
 import pandas as pd
-from openml._api.resources.base.resources import DatasetAPI
+
+import openml
+from openml._api.clients.http import HTTPClient
 from openml.enums import APIVersion
-from openml.testing import TestAPIBase, TestBase
-from openml._api.resources.dataset import DatasetV1API, DatasetV2API
+from openml.testing import TestBase
 from openml.exceptions import OpenMLNotSupportedError
+from openml._api import DatasetV1API, DatasetV2API
+
+ADMIN_KEY = os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR,"")
+
+@pytest.fixture
+def admin_dataset_v1(minio_client):
+    if not ADMIN_KEY:
+        pytest.skip("Admin API key not set")
+    original_key = openml.config.servers[APIVersion.V1]["apikey"]
+    openml.config.servers[APIVersion.V1]["apikey"] = ADMIN_KEY
+    admin_http = HTTPClient(api_version=APIVersion.V1)
+    api = DatasetV1API(http=admin_http, minio=minio_client)
+    yield api
+    openml.config.servers[APIVersion.V1]["apikey"] = original_key
+
+@pytest.fixture
+def dataset_v1(http_client_v1, minio_client) -> DatasetV1API:
+    return DatasetV1API(http=http_client_v1, minio=minio_client)
+
+@pytest.fixture
+def dataset_v2(http_client_v2, minio_client) -> DatasetV2API:
+    return DatasetV2API(http=http_client_v2, minio=minio_client)
 
 
-@pytest.mark.uses_test_server()
-class TestDatasetBase(TestAPIBase):
-    dataset: DatasetAPI
-    
-    def _wait_for_dataset_being_processed(self,did,status='active',n_tries=10,wait_time=10):
-        for i in range(n_tries):
-            try:
-                time.sleep(wait_time)
-                result = self.dataset.list(limit=1,offset=0,data_id=[did], status="all")
-                result = result.to_dict(orient="index")
-                if result[did]["status"]==status:
-                    return
-            except:pass
-        raise TimeoutError(f"Dataset did not become {status} within given time")
-    
-    def _status_update_check(self,dataset_id,status):
-        self.dataset.status_update(dataset_id,status)
-        self._wait_for_dataset_being_processed(dataset_id,status)
+def _wait_for_dataset_being_processed(dataset,did,status='active',n_tries=10,wait_time=10):
+    for _ in range(n_tries):
+        try:
+            time.sleep(wait_time)
+            result = dataset.list(limit=1,offset=0,data_id=[did], status="all")
+            result = result.to_dict(orient="index")
+            if result[did]["status"]==status:
+                return
+        except:pass
+    raise TimeoutError(f"Dataset did not become {status} within given time")
+
+def _status_update_check(dataset,dataset_id,status):
+    dataset.status_update(dataset_id,status)
+    _wait_for_dataset_being_processed(dataset,dataset_id,status)
 
 
-class TestDatasetV1API(TestDatasetBase):
-    def setUp(self):
-        super().setUp()
-        http_client = self.http_clients[APIVersion.V1]
-        self.dataset = DatasetV1API(http_client)
+def test_v1_get(dataset_v1):
+    dataset_id= 2
+    output = dataset_v1.get(dataset_id)
+    assert output.dataset_id == dataset_id
 
-    def test_get(self):
-        output = self.dataset.get(2)
-        self.assertEqual(output.dataset_id, 2)
+def test_v1_list(dataset_v1):
+    output = dataset_v1.list(limit=2, offset=0, status="active")
+    assert not output.empty
+    assert output.shape[0] == 2
+    assert output["status"].nunique() == 1
+    assert output["status"].unique()[0] == "active"
 
-    def test_list(self):
-        output =self.dataset.list(limit=2, offset=0, status="active")
-        self.assertFalse(output.empty)
-        self.assertEqual(output.shape[0], 2)
-        self.assertEqual(output["status"].nunique(), 1)
-        self.assertEqual(output["status"].unique()[0], "active")
+def test_v1_download_arff_from_get(dataset_v1):
+    output = dataset_v1.get(2,download_data=True)
 
-    def test_download_arff_from_get(self):
-        output = self.dataset.get(2,download_data=True)
+    assert output.data_file is not None
+    assert Path(output.data_file).exists()
 
-        self.assertIsNotNone(output.data_file)
-        self.assertTrue(Path(output.data_file).exists())
+def test_v1_download_qualities_from_get(dataset_v1):
+    output = dataset_v1.get(2,download_qualities=True)
 
-    def test_download_qualities_from_get(self):
-        output = self.dataset.get(2,download_qualities=True)
+    assert output._qualities is not None
 
-        self.assertIsNotNone(output._qualities)
+def test_v1_download_features_from_get(dataset_v1):
+    output = dataset_v1.get(2,download_features_meta_data=True)
 
-    def test_download_features_from_get(self):
-        output = self.dataset.get(2,download_features_meta_data=True)
+    assert output._features is not None
 
-        self.assertIsNotNone(output._features)
+def test_v1_get_features(dataset_v1):
+    output = dataset_v1.get_features(2)
 
-    def test_get_features(self):
-        output = self.dataset.get_features(2)
+    assert isinstance(output, dict)
+    assert len(output.keys()) == 37
 
-        self.assertIsInstance(output,dict)
-        self.assertEqual(len(output.keys()), 37)
+def test_v1_get_qualities(dataset_v1):
+    output = dataset_v1.get_qualities(2)
 
-    def test_get_qualities(self):
-        output = self.dataset.get_qualities(2)
+    assert isinstance(output, dict)
+    assert len(output.keys()) == 19
 
-        self.assertIsInstance(output,dict)
-        self.assertEqual(len(output.keys()), 19)
+def test_v1_status_update(admin_dataset_v1):
+    new_dataset = OpenMLDataset(
+        f"TEST-{str(time.time())}-UploadTestWithURL",
+        "test",
+        "ARFF",
+        version=1,
+        url="https://www.openml.org/data/download/61/dataset_61_iris.arff",
+    )
+    new_dataset.publish()
+    # admin key for test server (only admins can activate datasets.
+    # all users can deactivate their own datasets)
+    _status_update_check(admin_dataset_v1,new_dataset.dataset_id,"deactivated")
+    _status_update_check(admin_dataset_v1,new_dataset.dataset_id,"active")
+    TestBase._mark_entity_for_removal("data", new_dataset.dataset_id)
 
-    def test_status_update(self):
-        dataset = OpenMLDataset(
-            f"TEST-{str(time.time())}-UploadTestWithURL",
-            "test",
-            "ARFF",
-            version=1,
-            url="https://www.openml.org/data/download/61/dataset_61_iris.arff",
+def test_v1_edit(dataset_v1):
+    did = 2
+    result = dataset_v1.fork(did)
+    _wait_for_dataset_being_processed(dataset_v1,result)
+
+    edited_did = dataset_v1.edit(result,description="Forked dataset", default_target_attribute="shape")
+    assert result == edited_did
+    n_tries = 10
+    # we need to wait for the edit to be reflected on the server
+    for i in range(n_tries):
+        edited_dataset = dataset_v1.get(result,force_refresh_cache=True)
+        try:
+            assert edited_dataset.default_target_attribute == "shape", edited_dataset
+            assert edited_dataset.description == "Forked dataset", edited_dataset
+            break
+        except AssertionError as e:
+            if i == n_tries - 1:
+                raise e
+            time.sleep(10)
+
+def test_v1_fork(dataset_v1):
+    did = 2
+    result = dataset_v1.fork(did)
+    assert did != result
+    _wait_for_dataset_being_processed(dataset_v1,result)
+
+    listing = dataset_v1.list(limit=2,offset=0,data_id=[did,result])
+    assert listing.iloc[0]["name"]== listing.iloc[1]["name"]
+
+    dataset_v1.delete(result)
+
+def test_v1_list_qualities(dataset_v1):
+    output = dataset_v1.list_qualities()
+    assert len(output) == 19
+    assert isinstance(output[0],str)
+
+def test_v1_feature_add_remove_ontology(dataset_v1):
+    did = 11
+    fid = 0
+    ontology = "https://www.openml.org/unittest/" + str(time.time())
+    output = dataset_v1.feature_add_ontology(did,fid,ontology)
+    assert output
+
+    output = dataset_v1.feature_remove_ontology(did,fid,ontology)
+    assert output
+
+def test_v1_add_delete_topic(admin_dataset_v1):
+    topic = f"test_topic_{str(time.time())}"
+    # only admin can add or delete topics
+    admin_dataset_v1.add_topic(31, topic)
+    admin_dataset_v1.delete_topic(31, topic)
+
+
+def test_v2_get(dataset_v2):
+    dataset_id= 2
+    output = dataset_v2.get(dataset_id)
+    assert output.dataset_id == dataset_id
+
+def test_v2_list(dataset_v2):
+    output = dataset_v2.list(limit=2, offset=0, status="active")
+    assert not output.empty
+    assert output.shape[0] == 2
+    assert output["status"].nunique() == 1
+    assert output["status"].unique()[0] == "active"
+
+def test_v2_download_arff_from_get(dataset_v2):
+    output = dataset_v2.get(2,download_data=True)
+
+    assert output.data_file is not None
+    assert Path(output.data_file).exists()
+
+def test_v2_download_qualities_from_get(dataset_v2):
+    output = dataset_v2.get(2,download_qualities=True)
+
+    assert output._qualities is not None
+
+def test_v2_download_features_from_get(dataset_v2):
+    output = dataset_v2.get(2,download_features_meta_data=True)
+
+    assert output._features is not None
+
+def test_v2_get_features(dataset_v2):
+    output = dataset_v2.get_features(2)
+
+    assert isinstance(output, dict)
+    assert len(output.keys()) == 37
+
+def test_v2_edit(dataset_v2):
+    with pytest.raises(OpenMLNotSupportedError):
+        dataset_v2.edit(2,description='Test')
+
+def test_v2_fork(dataset_v2):
+    with pytest.raises(OpenMLNotSupportedError):
+        dataset_v2.fork(2)
+
+def test_v2_feature_add_remove_ontology(dataset_v2):
+    with pytest.raises(OpenMLNotSupportedError):
+        dataset_v2.feature_add_ontology(2, 0, "https://www.openml.org/unittest/" + str(time.time()))
+
+def test_v2_add_delete_topic(dataset_v2):
+    with pytest.raises(OpenMLNotSupportedError):
+        dataset_v2.add_topic(2,'test_topic_' + str(time.time()))
+
+def test_v2_get_qualities(dataset_v2):
+    # can be removed from here once v2 qualities are same as v1
+    output = dataset_v2.get_qualities(2)
+    assert isinstance(output, dict)
+    assert len(output.keys()) == 107
+
+def test_v2_list_qualities(dataset_v2):
+    # can be removed from here once v2 qualities are same as v1
+    output = dataset_v2.list_qualities()
+    assert len(output) == 107
+    assert isinstance(output[0], str)
+
+def test_v2_status_update(dataset_v2):
+    # publish and fork is not supported in v2
+    _status_update_check(dataset_v2,2,"deactivated")
+    _status_update_check(dataset_v2,2,"active")
+
+def test_get_matches(dataset_v1, dataset_v2):
+    output_v1 = dataset_v1.get(2)
+    output_v2 = dataset_v2.get(2)
+
+    assert output_v1.dataset_id == output_v2.dataset_id
+    assert output_v1.name == output_v2.name
+    assert output_v1.data_file is None
+    assert output_v1.data_file == output_v2.data_file
+
+def test_get_features_matches(dataset_v1, dataset_v2):
+    output_v1 = dataset_v1.get_features(3)
+    output_v2 = dataset_v2.get_features(3)
+
+    assert output_v1.keys() == output_v2.keys()
+    # would not be same if v1 has ontology
+    assert output_v1 == output_v2
+
+def test_list_matches(dataset_v1, dataset_v2):
+    output_v1 = dataset_v1.list(limit=2, offset=1)
+    output_v2 = dataset_v2.list(limit=2, offset=1)
+
+    pd.testing.assert_frame_equal(
+        output_v1[["did","name","version"]],
+        output_v2[["did","name","version"]],
+        check_like=True
         )
-        dataset.publish()
-        # admin key for test server (only admins can activate datasets.
-        # all users can deactivate their own datasets)
-        self.api_key = self.dataset._http.api_key = self.admin_key
-        self._status_update_check(dataset.dataset_id,"deactivated")
-        self._status_update_check(dataset.dataset_id,"active")
-        TestBase._mark_entity_for_removal("data", dataset.dataset_id)
-
-    def test_edit(self):
-        did = 2
-        result = self.dataset.fork(did)
-        self._wait_for_dataset_being_processed(result)
-
-        edited_did = self.dataset.edit(result,description="Forked dataset", default_target_attribute="shape")
-        self.assertEqual(result,edited_did)
-        n_tries = 10
-        # we need to wait for the edit to be reflected on the server
-        for i in range(n_tries):
-            edited_dataset = self.dataset.get(result,force_refresh_cache=True)
-            try:
-                assert edited_dataset.default_target_attribute == "shape", edited_dataset
-                assert edited_dataset.description == "Forked dataset", edited_dataset
-                break
-            except AssertionError as e:
-                if i == n_tries - 1:
-                    raise e
-                time.sleep(10)
-
-    def test_fork(self):
-        did = 2
-        result = self.dataset.fork(did)
-        self.assertNotEqual(did, result)
-        self._wait_for_dataset_being_processed(result)
-
-        listing = self.dataset.list(limit=2,offset=0,data_id=[did,result])
-        self.assertEqual(listing.iloc[0]["name"], listing.iloc[1]["name"])
-
-        self.dataset.delete(result)
-
-    def test_list_qualities(self):
-        output = self.dataset.list_qualities()
-        self.assertEqual(len(output), 19)
-        self.assertIsInstance(output[0],str)
-
-    def test_feature_add_remove_ontology(self):
-        did = 11
-        fid = 0
-        ontology = "https://www.openml.org/unittest/" + str(time.time())
-        output = self.dataset.feature_add_ontology(did,fid,ontology)
-        self.assertTrue(output)
-
-        output = self.dataset.feature_remove_ontology(did,fid,ontology)
-        self.assertTrue(output)
-
-    def test_add_delete_topic(self):
-        topic = f"test_topic_{str(time.time())}"
-        # only admin can add or delete topics
-        self.api_key = self.dataset._http.api_key = self.admin_key
-
-        self.dataset.add_topic(31, topic)
-        self.dataset.delete_topic(31, topic)
-
-
-class TestDatasetV2API(TestDatasetV1API):
-    def setUp(self):
-        super().setUp()
-        http_client = self.http_clients[APIVersion.V2]
-        self.dataset = DatasetV2API(http_client,self.minio_client)
     
-    def test_edit(self):
-        with pytest.raises(OpenMLNotSupportedError):
-            super().test_edit()
+def test_get_qualities_matches(dataset_v1, dataset_v2):
+    #TODO Qualities in local python server and test server differ
+    output_v1 = dataset_v1.get_qualities(2)
+    output_v2 = dataset_v2.get_qualities(2)
+    assert  output_v1['AutoCorrelation'] == output_v2['AutoCorrelation']
 
-    def test_fork(self):
-        with pytest.raises(OpenMLNotSupportedError):
-            super().test_fork()
-    
-    def test_feature_add_remove_ontology(self):
-        with pytest.raises(OpenMLNotSupportedError):
-            super().test_feature_add_remove_ontology()
+def test_list_qualities_matches(dataset_v1, dataset_v2):
+    #TODO Qualities in local python server and test server differ
+    output_v1 = dataset_v1.list_qualities()
+    output_v2 = dataset_v2.list_qualities()
 
-    def test_add_delete_topic(self):
-        with pytest.raises(OpenMLNotSupportedError):
-            super().test_add_delete_topic()
-
-    def test_get_qualities(self):
-        # can be removed from here once v2 qualities are same as v1
-        output = self.dataset.get_qualities(2)
-        self.assertIsInstance(output,dict)
-        self.assertEqual(len(output.keys()), 107)
-
-    def test_list_qualities(self):
-        # can be removed from here once v2 qualities are same as v1
-        output = self.dataset.list_qualities()
-        self.assertEqual(len(output), 107)
-        self.assertIsInstance(output[0],str)
-
-    def test_status_update(self):
-        # publish and fork is not supported in v2
-        self._status_update_check(2,"deactivated")
-        self._status_update_check(2,"active")
-
-
-    
-class TestResourceCombinedAPI(TestDatasetBase):
-    def setUp(self):
-        super().setUp()
-        http_client_v1 = self.http_clients[APIVersion.V1]
-        self.dataset_v1 = DatasetV1API(http_client_v1)
-
-        http_client_v2 = self.http_clients[APIVersion.V2]
-        self.dataset_v2 = DatasetV2API(http_client_v2,self.minio_client)
-    
-    def test_get_matches(self):
-        output_v1 = self.dataset_v1.get(2)
-        output_v2 = self.dataset_v2.get(2)
-
-        self.assertEqual(output_v1.dataset_id, output_v2.dataset_id)
-        self.assertEqual(output_v1.name, output_v2.name)
-        self.assertIsNone(output_v1.data_file)
-        self.assertEqual(output_v1.data_file, output_v2.data_file)
-
-    def test_get_features_matches(self):
-        output_v1 = self.dataset_v1.get_features(3)
-        output_v2 = self.dataset_v2.get_features(3)
-
-        self.assertEqual(output_v1.keys(), output_v2.keys())
-        # would not be same if v1 has ontology
-        self.assertEqual(output_v1, output_v2)
-
-    def test_list_matches(self):
-        output_v1 = self.dataset_v1.list(limit=2, offset=1)
-        output_v2 = self.dataset_v2.list(limit=2, offset=1)
-
-        pd.testing.assert_frame_equal(
-            output_v1[["did","name","version"]],
-            output_v2[["did","name","version"]],
-            check_like=True
-            )
-    
-    def test_get_qualities_matches(self):
-        #TODO Qualities in local python server and test server differ
-        output_v1 = self.dataset_v1.get_qualities(2)
-        output_v2 = self.dataset_v2.get_qualities(2)
-        self.assertEqual(output_v1['AutoCorrelation'], output_v2['AutoCorrelation'])
-
-    def test_list_qualities_matches(self):
-        #TODO Qualities in local python server and test server differ
-        output_v1 = self.dataset_v1.list_qualities()
-        output_v2 = self.dataset_v2.list_qualities()
-
-        self.assertIn("AutoCorrelation", output_v1)
-        self.assertIn("AutoCorrelation", output_v2)
+    assert "AutoCorrelation" in output_v1
+    assert "AutoCorrelation" in output_v2
 
