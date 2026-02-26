@@ -119,7 +119,7 @@ jobs:
           marks="not production_server and not test_server"
         fi
 
-        pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
+        pytest -n 4 --durations=0 --timeout=600 --dist load -sv $codecov -o log_cli=true -m "$marks"
 
     - name: Run tests on Ubuntu Production
       if: matrix.os == 'ubuntu-latest'
@@ -136,14 +136,14 @@ jobs:
           marks="production_server and not test_server"
         fi
 
-        pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
+        pytest -n 4 --durations=0 --timeout=600 --dist load -sv $codecov -o log_cli=true -m "$marks"
 
     - name: Run tests on Windows
       if: matrix.os == 'windows-latest'
       env:
         OPENML_TEST_SERVER_ADMIN_KEY: ${{ secrets.OPENML_TEST_SERVER_ADMIN_KEY }}
       run: |  # we need a separate step because of the bash-specific if-statement in the previous one.
-        pytest -n 4 --durations=20 --dist load -sv --reruns 5 --reruns-delay 1 -m "not test_server"
+        pytest -n 4 --durations=0 --timeout=600 --dist load -sv --reruns 5 --reruns-delay 1 -m "not test_server"
 
     - name: Check for files left behind by test
       if: matrix.os != 'windows-latest' && always()
