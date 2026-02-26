@@ -10,7 +10,7 @@ def evaluation_measure_v1(http_client_v1, minio_client) -> EvaluationMeasureV1AP
 
 
 @pytest.fixture
-def evalutation_measure_v2(http_client_v2, minio_client) -> EvaluationMeasureV2API:
+def evaluation_measure_v2(http_client_v2, minio_client) -> EvaluationMeasureV2API:
     return EvaluationMeasureV2API(http=http_client_v2, minio=minio_client)
 
 
@@ -27,9 +27,9 @@ def test_v2_list(evaluation_measure_v2):
     assert all(isinstance(s, str) for s in measures) is True
 
 @pytest.mark.uses_test_server()
-def test_list_matches(evaluation_measure_v1,evalutation_measure_v2):
+def test_list_matches(evaluation_measure_v1,evaluation_measure_v2):
     output_v1 = evaluation_measure_v1.list()
-    output_v2 = evalutation_measure_v2.list()
+    output_v2 = evaluation_measure_v2.list()
 
     assert isinstance(output_v1, list)
     assert isinstance(output_v2, list)
