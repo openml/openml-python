@@ -648,6 +648,10 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_linear_regression(self):
@@ -679,6 +683,10 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_REGRESSION["n_test_obs"]
         self._run_and_upload_regression(lr, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_pipeline_dummy_pipeline(self):
@@ -693,6 +701,10 @@ class TestRun(TestBase):
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(pipeline1, task_id, n_missing_vals, n_test_obs, "62501")
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -810,6 +822,10 @@ class TestRun(TestBase):
                 call_count += 1
         assert call_count == 3
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_gridsearch(self):
@@ -931,6 +947,10 @@ class TestRun(TestBase):
         )
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_learning_curve_task_2(self):
@@ -968,6 +988,10 @@ class TestRun(TestBase):
         )
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.21"),
@@ -1358,6 +1382,10 @@ class TestRun(TestBase):
                 avoid_duplicate_runs=True,
             )
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_with_illegal_flow_id_1_after_load(self):
@@ -1835,7 +1863,10 @@ class TestRun(TestBase):
         self.assertListEqual(res, [0] * 5)
 
 
-
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1933,6 +1964,10 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
+@pytest.mark.skipif(
+    os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+    reason="Pending resolution of #1657",
+)
 @pytest.mark.sklearn()
 @unittest.skipIf(
     Version(sklearn.__version__) < Version("0.21"),
