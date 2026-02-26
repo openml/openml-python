@@ -406,6 +406,7 @@ class TestOpenMLDataset(TestBase):
             file_destination
         ), "_download_minio_file can download from subdirectories"
 
+
     @mock.patch("openml._api_calls._download_minio_file")
     @pytest.mark.test_server()
     def test__get_dataset_parquet_is_cached(self, patch):
@@ -1465,10 +1466,6 @@ class TestOpenMLDataset(TestBase):
         edited_dataset = openml.datasets.get_dataset(did)
         assert edited_dataset.description == desc
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
     @pytest.mark.test_server()
     def test_data_edit_critical_field(self):
         # Case 2
@@ -1521,10 +1518,6 @@ class TestOpenMLDataset(TestBase):
             description="xor operation dataset",
         )
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
     @pytest.mark.test_server()
     def test_data_edit_cannot_edit_critical_field_if_dataset_has_task(self):
         # Need to own a dataset to be able to edit meta-data
@@ -1576,6 +1569,7 @@ class TestOpenMLDataset(TestBase):
             fork_dataset,
             data_id=999999,
         )
+
 
     @pytest.mark.production_server()
     def test_list_datasets_with_high_size_parameter(self):
