@@ -272,12 +272,12 @@ def as_robot() -> Iterator[None]:
 
 @pytest.fixture(autouse=True)
 def with_server(request):
-    if "production" in request.keywords:
+    if "production_server" in request.keywords:
         openml.config.server = "https://www.openml.org/api/v1/xml"
         openml.config.apikey = None
         yield
         return
-    openml.config.server = "https://test.openml.org/api/v1/xml"
+    openml.config.server = f"{openml.config.TEST_SERVER_URL}/api/v1/xml"
     openml.config.apikey = TestBase.user_key
     yield
 
