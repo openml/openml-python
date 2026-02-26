@@ -1222,7 +1222,7 @@ def __list_runs(api_call: str) -> pd.DataFrame:
     if not isinstance(runs_dict["oml:runs"]["oml:run"], list):
         raise TypeError(
             f"Expected runs_dict['oml:runs']['oml:run'] to be a list, "
-            f"got {type(runs_dict['oml:runs']).__name__}"
+            f"got {type(runs_dict['oml:runs']['oml:run']).__name__}"
         )
 
     runs = {
