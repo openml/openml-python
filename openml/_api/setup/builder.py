@@ -1,10 +1,15 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import TYPE_CHECKING
 
 from openml._api.clients import HTTPClient, MinIOClient
-from openml._api.resources import API_REGISTRY, FallbackProxy, ResourceAPI
-from openml.enums import APIVersion, ResourceType
+from openml._api.resources import API_REGISTRY, FallbackProxy
+from openml.enums import ResourceType
+
+if TYPE_CHECKING:
+    from openml._api.resources import ResourceAPI
+    from openml.enums import APIVersion
 
 
 class APIBackendBuilder:
@@ -41,10 +46,17 @@ class APIBackendBuilder:
         API interface for run resources.
     setup : ResourceAPI | FallbackProxy
         API interface for setup resources.
+    http_client : HTTPClient
+        Client for HTTP Communication.
+    fallback_http_client : HTTPClient | None
+        Fallback Client for HTTP Communication.
+    minio_client : MinIOClient
+        Client for MinIO Communication.
     """
 
     def __init__(
         self,
+        clients: Mapping[str, HTTPClient | MinIOClient | None],
         resource_apis: Mapping[ResourceType, ResourceAPI | FallbackProxy],
     ):
         self.dataset = resource_apis[ResourceType.DATASET]
@@ -56,6 +68,9 @@ class APIBackendBuilder:
         self.study = resource_apis[ResourceType.STUDY]
         self.run = resource_apis[ResourceType.RUN]
         self.setup = resource_apis[ResourceType.SETUP]
+        self.http_client = clients["http_client"]
+        self.fallback_http_client = clients["fallback_http_client"]
+        self.minio_client = clients["minio_client"]
 
     @classmethod
     def build(
@@ -82,17 +97,22 @@ class APIBackendBuilder:
             Builder instance with all resource API interfaces initialized.
         """
         minio_client = MinIOClient()
-
         primary_http_client = HTTPClient(api_version=api_version)
+        clients: dict[str, HTTPClient | MinIOClient | None] = {
+            "http_client": primary_http_client,
+            "fallback_http_client": None,
+            "minio_client": minio_client,
+        }
 
         resource_apis: dict[ResourceType, ResourceAPI] = {}
         for resource_type, resource_api_cls in API_REGISTRY[api_version].items():
             resource_apis[resource_type] = resource_api_cls(primary_http_client, minio_client)
 
         if fallback_api_version is None:
-            return cls(resource_apis)
+            return cls(clients, resource_apis)
 
         fallback_http_client = HTTPClient(api_version=fallback_api_version)
+        clients["fallback_http_client"] = fallback_http_client
 
         fallback_resource_apis: dict[ResourceType, ResourceAPI] = {}
         for resource_type, resource_api_cls in API_REGISTRY[fallback_api_version].items():
@@ -105,4 +125,4 @@ class APIBackendBuilder:
             for name in resource_apis
         }
 
-        return cls(merged)
+        return cls(clients, merged)

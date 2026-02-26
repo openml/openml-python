@@ -1,7 +1,7 @@
 import pytest
 from requests import Session, Response
 from unittest.mock import patch
-from openml._api import FallbackProxy, ResourceAPI, ResourceV1API, ResourceV2API, TaskAPI
+from openml._api import FallbackProxy, ResourceAPI, ResourceV1API, ResourceV2API
 from openml.enums import ResourceType
 from openml.exceptions import OpenMLNotSupportedError
 import openml
@@ -11,11 +11,11 @@ class DummyTaskAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.TASK
 
 
-class DummyTaskV1API(ResourceV1API, TaskAPI):
+class DummyTaskV1API(ResourceV1API, DummyTaskAPI):
     pass
 
 
-class DummyTaskV2API(ResourceV2API, TaskAPI):
+class DummyTaskV2API(ResourceV2API, DummyTaskAPI):
     pass
 
 
