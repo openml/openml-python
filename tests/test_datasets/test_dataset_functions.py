@@ -570,6 +570,10 @@ class TestOpenMLDataset(TestBase):
         labels = custom_ds.retrieve_class_labels(target_name=custom_ds.features[31].name)
         assert labels == ["COIL", "SHEET"]
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_upload_dataset_with_url(self):
         dataset = OpenMLDataset(
