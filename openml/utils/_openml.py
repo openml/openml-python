@@ -26,7 +26,6 @@ from tqdm import tqdm
 import openml
 import openml._api_calls
 import openml.exceptions
-from openml import config
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
@@ -336,7 +335,7 @@ def _list_all(  # noqa: C901
 
 
 def _get_cache_dir_for_key(key: str) -> Path:
-    return Path(config.get_cache_directory()) / key
+    return Path(openml.config.get_cache_directory()) / key
 
 
 def _create_cache_directory(key: str) -> Path:
@@ -443,12 +442,12 @@ def get_cache_size() -> int:
     cache_size: int
         Total size of cache in bytes
     """
-    path = Path(config.get_cache_directory())
+    path = Path(openml.config.get_cache_directory())
     return sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
 
 
 def _create_lockfiles_dir() -> Path:
-    path = Path(config.get_cache_directory()) / "locks"
+    path = Path(openml.config.get_cache_directory()) / "locks"
     # TODO(eddiebergman): Not sure why this is allowed to error and ignore???
     with contextlib.suppress(OSError):
         path.mkdir(exist_ok=True, parents=True)
