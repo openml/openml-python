@@ -1466,6 +1466,10 @@ class TestOpenMLDataset(TestBase):
         edited_dataset = openml.datasets.get_dataset(did)
         assert edited_dataset.description == desc
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_data_edit_critical_field(self):
         # Case 2
@@ -1518,6 +1522,10 @@ class TestOpenMLDataset(TestBase):
             description="xor operation dataset",
         )
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.test_server()
     def test_data_edit_cannot_edit_critical_field_if_dataset_has_task(self):
         # Need to own a dataset to be able to edit meta-data
