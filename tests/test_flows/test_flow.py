@@ -133,7 +133,7 @@ class TestFlow(TestBase):
             7,
             9,
         ]:
-            flow_xml = openml.config.get_backend().http_client.get(f"flow/{flow_id}").text
+            flow_xml = openml._backend.http_client.get(f"flow/{flow_id}").text
             flow_dict = xmltodict.parse(flow_xml)
 
             flow = openml.OpenMLFlow._from_dict(flow_dict)
