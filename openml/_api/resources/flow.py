@@ -113,7 +113,7 @@ class FlowV1API(ResourceV1API, FlowAPI):
         if uploader is not None:
             api_call += f"/uploader/{uploader}"
 
-        response = self._http.get(api_call, use_api_key=True, enable_cache=True)
+        response = self._http.get(api_call, enable_cache=True)
         xml_string = response.text
         flows_dict = xmltodict.parse(xml_string, force_list=("oml:flow",))
 
