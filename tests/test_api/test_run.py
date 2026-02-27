@@ -47,7 +47,7 @@ def test_run_v1_list(run_v1):
     assert "flow_id" in runs_df.columns
 
 
-def test_run_v1_publish_mocked(run_v1, use_api_v1, test_api_key):
+def test_run_v1_publish_mocked(run_v1, test_apikey_v1):
     files = {"description": "<run/>"}
 
     with patch.object(Session, "request") as mock_request:
@@ -66,13 +66,13 @@ def test_run_v1_publish_mocked(run_v1, use_api_v1, test_api_key):
             method="POST",
             url=openml.config.server + "run",
             params={},
-            data={"api_key": test_api_key},
+            data={"api_key": test_apikey_v1},
             headers=openml.config._HEADERS,
             files=files,
         )
 
 
-def test_run_v1_delete_mocked(run_v1, use_api_v1, test_api_key):
+def test_run_v1_delete_mocked(run_v1, test_apikey_v1):
     run_id = 456
 
     with patch.object(Session, "request") as mock_request:
@@ -90,7 +90,7 @@ def test_run_v1_delete_mocked(run_v1, use_api_v1, test_api_key):
         mock_request.assert_called_once_with(
             method="DELETE",
             url=openml.config.server + f"run/{run_id}",
-            params={"api_key": test_api_key},
+            params={"api_key": test_apikey_v1},
             data={},
             headers=openml.config._HEADERS,
             files=None,
