@@ -452,7 +452,7 @@ class TestFlowFunctions(TestBase):
 
 
 @mock.patch.object(requests.Session, "request")
-def test_delete_flow_not_owned(mock_request, test_files_directory, test_api_key):
+def test_delete_flow_not_owned(mock_request, test_files_directory, test_apikey_v1):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_owned.xml"
     mock_request.return_value = create_request_response(
@@ -467,11 +467,11 @@ def test_delete_flow_not_owned(mock_request, test_files_directory, test_api_key)
         openml.flows.delete_flow(40_000)
 
     assert mock_request.call_args.kwargs.get("method") == "DELETE"
-    assert test_api_key == mock_request.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "request")
-def test_delete_flow_with_run(mock_request, test_files_directory, test_api_key):
+def test_delete_flow_with_run(mock_request, test_files_directory, test_apikey_v1):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_has_runs.xml"
     mock_request.return_value = create_request_response(
@@ -486,11 +486,11 @@ def test_delete_flow_with_run(mock_request, test_files_directory, test_api_key):
         openml.flows.delete_flow(40_000)
 
     assert mock_request.call_args.kwargs.get("method") == "DELETE"
-    assert test_api_key == mock_request.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "request")
-def test_delete_subflow(mock_request, test_files_directory, test_api_key):
+def test_delete_subflow(mock_request, test_files_directory, test_apikey_v1):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_is_subflow.xml"
     mock_request.return_value = create_request_response(
@@ -505,11 +505,11 @@ def test_delete_subflow(mock_request, test_files_directory, test_api_key):
         openml.flows.delete_flow(40_000)
 
     assert mock_request.call_args.kwargs.get("method") == "DELETE"
-    assert test_api_key == mock_request.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "request")
-def test_delete_flow_success(mock_request, test_files_directory, test_api_key):
+def test_delete_flow_success(mock_request, test_files_directory, test_apikey_v1):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_successful.xml"
     mock_request.return_value = create_request_response(
@@ -521,12 +521,12 @@ def test_delete_flow_success(mock_request, test_files_directory, test_api_key):
     assert success
 
     assert mock_request.call_args.kwargs.get("method") == "DELETE"
-    assert test_api_key == mock_request.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "request")
 @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
-def test_delete_unknown_flow(mock_request, test_files_directory, test_api_key):
+def test_delete_unknown_flow(mock_request, test_files_directory, test_apikey_v1):
     openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "flows" / "flow_delete_not_exist.xml"
     mock_request.return_value = create_request_response(
@@ -541,4 +541,4 @@ def test_delete_unknown_flow(mock_request, test_files_directory, test_api_key):
         openml.flows.delete_flow(9_999_999)
 
     assert mock_request.call_args.kwargs.get("method") == "DELETE"
-    assert test_api_key == mock_request.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
