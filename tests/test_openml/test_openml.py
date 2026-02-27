@@ -81,3 +81,37 @@ class TestInit(TestBase):
 
             openml.get(31, object_type="task")
             get_task_mock.assert_called_with(31)
+
+    def test_list_dispatch_flow_and_run(self):
+        flow_list_mock = mock.Mock()
+        run_list_mock = mock.Mock()
+        # Need to patch after import, so update dispatch dict for flow and run
+        with mock.patch.dict(
+            "openml.dispatchers._LIST_DISPATCH",
+            {
+                "flow": flow_list_mock,
+                "run": run_list_mock,
+            },
+        ):
+            openml.list_all("flow")
+            flow_list_mock.assert_called_once_with()
+
+            openml.list_all("run", size=10)
+            run_list_mock.assert_called_once_with(size=10)
+
+    def test_get_dispatch_flow_and_run(self):
+        get_flow_mock = mock.Mock()
+        get_run_mock = mock.Mock()
+        # Need to patch after import, so update dispatch dict for flow and run
+        with mock.patch.dict(
+            "openml.dispatchers._GET_DISPATCH",
+            {
+                "flow": get_flow_mock,
+                "run": get_run_mock,
+            },
+        ):
+            openml.get(5, object_type="flow")
+            get_flow_mock.assert_called_once_with(5)
+
+            openml.get(7, object_type="run")
+            get_run_mock.assert_called_once_with(7)
