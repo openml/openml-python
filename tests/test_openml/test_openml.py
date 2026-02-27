@@ -73,6 +73,37 @@ class TestInit(TestBase):
         assert obj.name == "new"
         assert obj.tags == ["a", "b"]  # dedup and preserve order from original
 
+    def test_publish_with_openml_object_non_string_tags_does_not_crash(self):
+        class Dummy(openml.base.OpenMLBase):
+            def __init__(self) -> None:
+                self.tags = [{"tag": "legacy"}]
+                self.name = "orig"
+                self.published = False
+
+            @property
+            def id(self):
+                return None
+
+            def _get_repr_body_fields(self):
+                return []
+
+            def _to_dict(self):
+                return {}
+
+            def _parse_publish_response(self, xml_response):
+                return None
+
+            def publish(self):
+                self.published = True
+                return self
+
+        obj = Dummy()
+        result = openml.publish(obj, name="new", tags=["x"])
+        assert result is obj
+        assert obj.published is True
+        assert obj.name == "new"
+        assert obj.tags == [{"tag": "legacy"}]
+
     @mock.patch("openml.extensions.functions.get_extension_by_model")
     def test_publish_with_extension(self, get_ext_mock):
         flow_mock = mock.MagicMock()

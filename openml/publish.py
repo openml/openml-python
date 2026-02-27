@@ -31,8 +31,8 @@ def publish(obj: Any, *, name: str | None = None, tags: Sequence[str] | None = N
         If not provided, uses the object's default naming convention.
     tags : Sequence[str], optional
         Additional tags to attach to the published object.
-        Will be merged with any existing tags, removing duplicates while
-        preserving order.
+        For objects exposing a list-style ``tags`` attribute with string values,
+        these are merged with existing tags while preserving order.
 
     Returns
     -------
@@ -49,7 +49,7 @@ def publish(obj: Any, *, name: str | None = None, tags: Sequence[str] | None = N
     Publishing an OpenML dataset:
 
     >>> dataset = openml.datasets.get_dataset(61)
-    >>> openml.publish(dataset, tags=["example"])
+    >>> openml.publish(dataset)
 
     Publishing a scikit-learn estimator:
 
@@ -72,6 +72,10 @@ def publish(obj: Any, *, name: str | None = None, tags: Sequence[str] | None = N
 
     Notes
     -----
+    Tag merging is applied only when an object has a string-list ``tags`` attribute.
+    Some OpenML entities expose tags differently (for example, dataset ``tag``),
+    so ``tags=...`` may not apply uniformly across all object types.
+
     For external estimators (e.g., scikit-learn), the corresponding extension must be
     installed (e.g., ``openml-sklearn``). The extension will be automatically imported
     if available.
@@ -80,16 +84,19 @@ def publish(obj: Any, *, name: str | None = None, tags: Sequence[str] | None = N
     if isinstance(obj, OpenMLBase):
         if tags is not None and hasattr(obj, "tags"):
             existing = list(getattr(obj, "tags", []) or [])
-            merged = list(dict.fromkeys([*existing, *tags]))
-            obj.tags = merged
+            if all(isinstance(tag, str) for tag in existing):
+                merged = list(existing)
+                for tag in tags:
+                    if tag not in merged:
+                        merged.append(tag)
+                obj.tags = merged
         if name is not None and hasattr(obj, "name"):
             obj.name = name
         return obj.publish()
 
     # Case 2: Object is an external estimator - use extension registry
     extension = extensions.functions.get_extension_by_model(obj, raise_if_no_extension=True)
-    if extension is None:  # Defensive check (should not occur with raise_if_no_extension=True)
-        raise ValueError("No extension registered to handle the provided object.")
+    assert extension is not None
     flow = extension.model_to_flow(obj)
 
     if name is not None:
