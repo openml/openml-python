@@ -49,6 +49,8 @@ def list_all(object_type: str, /, **kwargs: Any) -> Any:
 
     Raises
     ------
+    TypeError
+        If object_type is not a string.
     ValueError
         If object_type is not one of the supported types.
     """
