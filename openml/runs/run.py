@@ -436,12 +436,8 @@ class OpenMLRun(OpenMLBase):
             TaskType.LEARNING_CURVE,
         ]
         raise NotImplementedError(
-            "Task type {task_type!s} for task_id {task_id!s} is not yet supported. "
-            "Supported task types are: {supported!r}".format(
-                task_type=task.task_type,
-                task_id=getattr(task, "task_id", None),
-                supported=supported_task_types,
-            )
+            f"Task type {task.task_type!s} for task_id {getattr(task, 'task_id', None)!s} "
+            f"is not yet supported. Supported task types are: {supported_task_types!r}"
         )
 
     def _generate_arff_dict(self) -> OrderedDict[str, Any]:
