@@ -50,12 +50,12 @@ SERVERS_REGISTRY: dict[str, dict[APIVersion, dict[str, str | None]]] = {
     },
     "local": {
         APIVersion.V1: {
-            "server": "http://localhost:8000/api/v1/xml/",
+            "server": "http://localhost:8080/api/v1/xml/",
             "apikey": "normaluser",
         },
         APIVersion.V2: {
-            "server": "http://localhost:8002/api/v1/xml/",
-            "apikey": "normaluser",
+            "server": "http://localhost:8082/",
+            "apikey": "AD000000000000000000000000000000",
         },
     },
 }
@@ -137,15 +137,10 @@ class OpenMLConfigManager:
         self.console_handler: logging.StreamHandler | None = None
         self.file_handler: logging.handlers.RotatingFileHandler | None = None
 
-        server_test_v1_apikey = self.get_servers("test")[APIVersion.V1]["apikey"]
-        server_test_v1_server = self.get_servers("test")[APIVersion.V1]["server"]
-
         self.OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
         self.OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
-        self._TEST_SERVER_NORMAL_USER_KEY = server_test_v1_apikey
-        self._HEADERS: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
         self.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR = "OPENML_TEST_SERVER_ADMIN_KEY"
-        self.TEST_SERVER_URL = cast("str", server_test_v1_server).split("/api/v1/xml")[0]
+        self._HEADERS: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
 
         self._config: OpenMLConfig = OpenMLConfig()
         # for legacy test `test_non_writable_home`
@@ -178,7 +173,6 @@ class OpenMLConfigManager:
             "_examples",
             "OPENML_CACHE_DIR_ENV_VAR",
             "OPENML_SKIP_PARQUET_ENV_VAR",
-            "_TEST_SERVER_NORMAL_USER_KEY",
             "_HEADERS",
         }:
             return object.__setattr__(self, name, value)
