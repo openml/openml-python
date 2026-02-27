@@ -44,14 +44,14 @@ class TestInit(TestBase):
 
     def test_top_level_getters_aliases(self):
         # Ensure top-level convenience aliases point to existing implementations.
-        assert openml.list_datasets is openml.datasets.functions.list_datasets
-        assert openml.get_dataset is openml.datasets.functions.get_dataset
+        assert openml.list_datasets is openml.datasets.list_datasets
+        assert openml.get_dataset is openml.datasets.get_dataset
 
-        assert openml.list_flows is openml.flows.functions.list_flows
-        assert openml.get_flow is openml.flows.functions.get_flow
+        assert openml.list_flows is openml.flows.list_flows
+        assert openml.get_flow is openml.flows.get_flow
 
-        assert openml.list_runs is openml.runs.functions.list_runs
-        assert openml.get_run is openml.runs.functions.get_run
+        assert openml.list_runs is openml.runs.list_runs
+        assert openml.get_run is openml.runs.get_run
 
-        assert openml.list_tasks is openml.tasks.functions.list_tasks
-        assert openml.get_task is openml.tasks.functions.get_task
+        assert openml.list_tasks is openml.tasks.list_tasks
+        assert openml.get_task is openml.tasks.get_task
