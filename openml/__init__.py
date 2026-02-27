@@ -102,7 +102,6 @@ __all__ = [
     "OpenMLDataset",
     "OpenMLEvaluation",
     "OpenMLFlow",
-    "OpenMLFlow",
     "OpenMLLearningCurveTask",
     "OpenMLParameter",
     "OpenMLRegressionTask",
