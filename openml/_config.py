@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 openml_logger = logging.getLogger("openml")
 
 
-SERVERS_REGISTRY: dict[str, dict[APIVersion, dict[str, str | None]]] = {
+_SERVERS_REGISTRY: dict[str, dict[APIVersion, dict[str, str | None]]] = {
     "production": {
         APIVersion.V1: {
             "server": "https://www.openml.org/api/v1/xml/",
@@ -50,12 +50,12 @@ SERVERS_REGISTRY: dict[str, dict[APIVersion, dict[str, str | None]]] = {
     },
     "local": {
         APIVersion.V1: {
-            "server": "http://localhost:8000/api/v1/xml/",
+            "server": "http://localhost:8080/api/v1/xml/",
             "apikey": "normaluser",
         },
         APIVersion.V2: {
-            "server": "http://localhost:8002/api/v1/xml/",
-            "apikey": "normaluser",
+            "server": "http://localhost:8082/",
+            "apikey": "AD000000000000000000000000000000",
         },
     },
 }
@@ -97,7 +97,7 @@ class OpenMLConfig:
     """Dataclass storing the OpenML configuration."""
 
     servers: dict[APIVersion, dict[str, str | None]] = field(
-        default_factory=lambda: deepcopy(SERVERS_REGISTRY["production"])
+        default_factory=lambda: deepcopy(_SERVERS_REGISTRY["production"])
     )
     api_version: APIVersion = APIVersion.V1
     fallback_api_version: APIVersion | None = None
@@ -137,15 +137,10 @@ class OpenMLConfigManager:
         self.console_handler: logging.StreamHandler | None = None
         self.file_handler: logging.handlers.RotatingFileHandler | None = None
 
-        server_test_v1_apikey = self.get_servers("test")[APIVersion.V1]["apikey"]
-        server_test_v1_server = self.get_servers("test")[APIVersion.V1]["server"]
-
         self.OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
         self.OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
-        self._TEST_SERVER_NORMAL_USER_KEY = server_test_v1_apikey
-        self._HEADERS: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
         self.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR = "OPENML_TEST_SERVER_ADMIN_KEY"
-        self.TEST_SERVER_URL = cast("str", server_test_v1_server).split("/api/v1/xml")[0]
+        self._HEADERS: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
 
         self._config: OpenMLConfig = OpenMLConfig()
         # for legacy test `test_non_writable_home`
@@ -178,7 +173,6 @@ class OpenMLConfigManager:
             "_examples",
             "OPENML_CACHE_DIR_ENV_VAR",
             "OPENML_SKIP_PARQUET_ENV_VAR",
-            "_TEST_SERVER_NORMAL_USER_KEY",
             "_HEADERS",
         }:
             return object.__setattr__(self, name, value)
@@ -258,11 +252,11 @@ class OpenMLConfigManager:
         return domain.replace("api", "www")
 
     def get_servers(self, mode: str) -> dict[APIVersion, dict[str, str | None]]:
-        if mode not in SERVERS_REGISTRY:
+        if mode not in _SERVERS_REGISTRY:
             raise ValueError(
-                f'invalid mode="{mode}" allowed modes: {", ".join(list(SERVERS_REGISTRY.keys()))}'
+                f'invalid mode="{mode}" allowed modes: {", ".join(list(_SERVERS_REGISTRY.keys()))}'
             )
-        return deepcopy(SERVERS_REGISTRY[mode])
+        return deepcopy(_SERVERS_REGISTRY[mode])
 
     def set_servers(self, mode: str) -> None:
         servers = self.get_servers(mode)
@@ -525,8 +519,9 @@ class ConfigurationForExamples:
             self._manager._config,
             servers=self._test_servers,
         )
+        test_server = self._test_servers[self._manager._config.api_version]["server"]
         warnings.warn(
-            f"Switching to the test servers {self._test_servers} to not upload results to "
+            f"Switching to the test server {test_server} to not upload results to "
             "the live server. Using the test server may result in reduced performance of the "
             "API!",
             stacklevel=2,
