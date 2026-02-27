@@ -148,7 +148,6 @@ output-format = "grouped"
 unsafe-fixes = true
 
 exclude = [
-  "tests/files",
   ".bzr",
   ".direnv",
   ".eggs",
