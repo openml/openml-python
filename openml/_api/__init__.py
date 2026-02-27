@@ -27,14 +27,11 @@ from .resources import (
 )
 from .setup import (
     API_REGISTRY,
-    APIBackend,
     APIBackendBuilder,
-    _backend,
 )
 
 __all__ = [
     "API_REGISTRY",
-    "APIBackend",
     "APIBackendBuilder",
     "DatasetV1API",
     "DatasetV2API",
@@ -59,5 +56,4 @@ __all__ = [
     "StudyV2API",
     "TaskV1API",
     "TaskV2API",
-    "_backend",
 ]
