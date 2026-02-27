@@ -519,8 +519,9 @@ class ConfigurationForExamples:
             self._manager._config,
             servers=self._test_servers,
         )
+        test_server = self._test_servers[self._manager._config.api_version]["server"]
         warnings.warn(
-            f"Switching to the test servers {self._test_servers} to not upload results to "
+            f"Switching to the test server {test_server} to not upload results to "
             "the live server. Using the test server may result in reduced performance of the "
             "API!",
             stacklevel=2,
