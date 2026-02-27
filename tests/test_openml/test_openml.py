@@ -77,18 +77,18 @@ class TestInit(TestBase):
     def test_publish_with_extension(self, get_ext_mock):
         flow_mock = mock.MagicMock()
         flow_mock.tags = []
-        flow_mock.publish.return_value = "flow-id"
+        flow_mock.publish.return_value = flow_mock
 
         ext_instance = mock.MagicMock()
         ext_instance.model_to_flow.return_value = flow_mock
         get_ext_mock.return_value = ext_instance
 
         model = object()
-        flow_id = openml.publish(model, name="n", tags=["x"])
+        published_flow = openml.publish(model, name="n", tags=["x"])
 
         get_ext_mock.assert_called_once_with(model, raise_if_no_extension=True)
         ext_instance.model_to_flow.assert_called_once_with(model)
         assert flow_mock.name == "n"
         assert flow_mock.tags == ["x"]
         flow_mock.publish.assert_called_once_with()
-        assert flow_id == "flow-id"
+        assert published_flow is flow_mock

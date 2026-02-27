@@ -62,29 +62,31 @@ knn_flow = openml.publish(clf, tags=["openml_tutorial_knn"])
 print(f"Flow was auto-published with ID {knn_flow.flow_id}")
 
 # %% [markdown]
-# ### Option B: Manual flow construction (full control)
-# For advanced use cases, you can manually construct the flow:
+# ### Option B: Manual flow construction (full control, alternative)
+# For advanced use cases, you can manually construct the flow.
+# This block is intentionally left as a commented alternative to avoid
+# uploading a second flow in this tutorial run.
 
 # %%
-knn_flow = openml.flows.OpenMLFlow(
-    # Metadata
-    model=clf,  # or None, if you do not want to upload the model object.
-    name="CustomKNeighborsClassifier",
-    description="A custom KNeighborsClassifier flow for OpenML.",
-    external_version=f"{sklearn.__version__}",
-    language="English",
-    tags=["openml_tutorial_knn"],
-    dependencies=f"{sklearn.__version__}",
-    # Hyperparameters
-    parameters={k: str(v) for k, v in knn_parameters.items()},
-    parameters_meta_info={
-        "n_neighbors": {"description": "number of neighbors to use", "data_type": "int"}
-    },
-    # If you have a pipeline with subcomponents, such as preprocessing, add them here.
-    components={},
-)
-knn_flow.publish()
-print(f"knn_flow was published with the ID {knn_flow.flow_id}")
+# knn_flow_manual = openml.flows.OpenMLFlow(
+#     # Metadata
+#     model=clf,  # or None, if you do not want to upload the model object.
+#     name="CustomKNeighborsClassifier",
+#     description="A custom KNeighborsClassifier flow for OpenML.",
+#     external_version=f"{sklearn.__version__}",
+#     language="English",
+#     tags=["openml_tutorial_knn"],
+#     dependencies=f"{sklearn.__version__}",
+#     # Hyperparameters
+#     parameters={k: str(v) for k, v in knn_parameters.items()},
+#     parameters_meta_info={
+#         "n_neighbors": {"description": "number of neighbors to use", "data_type": "int"}
+#     },
+#     # If you have a pipeline with subcomponents, such as preprocessing, add them here.
+#     components={},
+# )
+# knn_flow_manual.publish()
+# print(f"knn_flow_manual was published with the ID {knn_flow_manual.flow_id}")
 
 # %% [markdown]
 # Now we'll use the auto-published flow to create and upload a run.
