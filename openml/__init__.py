@@ -109,8 +109,6 @@ __all__ = [
     "OpenMLSupervisedTask",
     "OpenMLTask",
     "__version__",
-    "__version__",
-    "_api_calls",
     "_api_calls",
     "config",
     "datasets",
