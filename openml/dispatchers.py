@@ -73,7 +73,8 @@ def get(identifier: int | str, *, object_type: str = "dataset", **kwargs: Any) -
     Parameters
     ----------
     identifier : int | str
-        The ID or name of the object to retrieve.
+        The ID or name of the object to retrieve. String identifiers are
+        supported for datasets; tasks, flows, and runs require integer IDs.
     object_type : str, default="dataset"
         The type of object to get. Must be one of 'dataset', 'task', 'flow', 'run'.
     **kwargs : Any
@@ -86,6 +87,8 @@ def get(identifier: int | str, *, object_type: str = "dataset", **kwargs: Any) -
 
     Raises
     ------
+    TypeError
+        If object_type is not a string.
     ValueError
         If object_type is not one of the supported types.
 

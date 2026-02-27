@@ -115,3 +115,35 @@ class TestInit(TestBase):
 
             openml.get(7, object_type="run")
             get_run_mock.assert_called_once_with(7)
+
+    def test_list_dispatch_invalid_object_type(self):
+        with self.assertRaisesRegex(ValueError, "Unsupported object_type"):
+            openml.list_all("invalid_type")
+
+        with self.assertRaisesRegex(TypeError, "object_type must be a string"):
+            openml.list_all(123)  # type: ignore[arg-type]
+
+    def test_get_dispatch_invalid_object_type(self):
+        with self.assertRaisesRegex(ValueError, "Unsupported object_type"):
+            openml.get(1, object_type="invalid_type")
+
+        with self.assertRaisesRegex(TypeError, "object_type must be a string"):
+            openml.get(1, object_type=123)  # type: ignore[arg-type]
+
+    def test_dispatch_object_type_case_insensitive(self):
+        list_tasks_mock = mock.Mock()
+        get_task_mock = mock.Mock()
+
+        with mock.patch.dict(
+            "openml.dispatchers._LIST_DISPATCH",
+            {"task": list_tasks_mock},
+        ):
+            openml.list_all("TASK", size=3)
+            list_tasks_mock.assert_called_once_with(size=3)
+
+        with mock.patch.dict(
+            "openml.dispatchers._GET_DISPATCH",
+            {"task": get_task_mock},
+        ):
+            openml.get(31, object_type="TASK")
+            get_task_mock.assert_called_once_with(31)
