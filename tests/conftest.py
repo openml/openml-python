@@ -290,6 +290,7 @@ def as_robot() -> Iterator[None]:
 
 @pytest.fixture(autouse=True)
 def with_server(request):
+    openml.config.set_api_version(APIVersion.V1)
     if "production_server" in request.keywords:
         openml.config.set_servers("production")
         yield

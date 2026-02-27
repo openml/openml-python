@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 openml_logger = logging.getLogger("openml")
 
 
-SERVERS_REGISTRY: dict[str, dict[APIVersion, dict[str, str | None]]] = {
+_SERVERS_REGISTRY: dict[str, dict[APIVersion, dict[str, str | None]]] = {
     "production": {
         APIVersion.V1: {
             "server": "https://www.openml.org/api/v1/xml/",
@@ -97,7 +97,7 @@ class OpenMLConfig:
     """Dataclass storing the OpenML configuration."""
 
     servers: dict[APIVersion, dict[str, str | None]] = field(
-        default_factory=lambda: deepcopy(SERVERS_REGISTRY["production"])
+        default_factory=lambda: deepcopy(_SERVERS_REGISTRY["production"])
     )
     api_version: APIVersion = APIVersion.V1
     fallback_api_version: APIVersion | None = None
@@ -252,11 +252,11 @@ class OpenMLConfigManager:
         return domain.replace("api", "www")
 
     def get_servers(self, mode: str) -> dict[APIVersion, dict[str, str | None]]:
-        if mode not in SERVERS_REGISTRY:
+        if mode not in _SERVERS_REGISTRY:
             raise ValueError(
-                f'invalid mode="{mode}" allowed modes: {", ".join(list(SERVERS_REGISTRY.keys()))}'
+                f'invalid mode="{mode}" allowed modes: {", ".join(list(_SERVERS_REGISTRY.keys()))}'
             )
-        return deepcopy(SERVERS_REGISTRY[mode])
+        return deepcopy(_SERVERS_REGISTRY[mode])
 
     def set_servers(self, mode: str) -> None:
         servers = self.get_servers(mode)
@@ -519,8 +519,9 @@ class ConfigurationForExamples:
             self._manager._config,
             servers=self._test_servers,
         )
+        test_server = self._test_servers[self._manager._config.api_version]["server"]
         warnings.warn(
-            f"Switching to the test servers {self._test_servers} to not upload results to "
+            f"Switching to the test server {test_server} to not upload results to "
             "the live server. Using the test server may result in reduced performance of the "
             "API!",
             stacklevel=2,
