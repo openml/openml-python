@@ -1722,7 +1722,7 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
         assert openml.datasets.delete_dataset(_dataset_id)
 
 
-@mock.patch.object(requests.Session, "delete")
+@mock.patch.object(requests.Session, "request")
 def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_owned.xml"
@@ -1744,7 +1744,7 @@ def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_server
     assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
+@mock.patch.object(requests.Session, "request")
 def test_delete_dataset_with_run(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_has_tasks.xml"
@@ -1766,7 +1766,7 @@ def test_delete_dataset_with_run(mock_delete, test_files_directory, test_server_
     assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
+@mock.patch.object(requests.Session, "request")
 def test_delete_dataset_success(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_successful.xml"
@@ -1785,7 +1785,7 @@ def test_delete_dataset_success(mock_delete, test_files_directory, test_server_v
     assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
+@mock.patch.object(requests.Session, "request")
 def test_delete_unknown_dataset(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_exist.xml"
