@@ -46,7 +46,6 @@ class RunV1API(ResourceV1API, RunAPI):
             path,
             enable_cache=True,
             refresh_cache=reset_cache,
-            use_api_key=True,
         )
         xml_content = response.text
         return openml.runs.functions._create_run_from_xml(xml_content)
@@ -117,7 +116,7 @@ class RunV1API(ResourceV1API, RunAPI):
             display_errors=display_errors,
             task_type=task_type,
         )
-        xml_string = self._http.get(path, use_api_key=True).text
+        xml_string = self._http.get(path).text
         return self._parse_list_xml(xml_string)
 
     def _build_url(  # noqa: PLR0913, C901
