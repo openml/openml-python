@@ -1,24 +1,63 @@
-"""OpenML API module."""
+from .clients import (
+    HTTPCache,
+    HTTPClient,
+    MinIOClient,
+)
+from .resources import (
+    DatasetV1API,
+    DatasetV2API,
+    EstimationProcedureV1API,
+    EstimationProcedureV2API,
+    EvaluationMeasureV1API,
+    EvaluationMeasureV2API,
+    EvaluationV1API,
+    EvaluationV2API,
+    FallbackProxy,
+    FlowV1API,
+    FlowV2API,
+    ResourceAPI,
+    RunV1API,
+    RunV2API,
+    SetupV1API,
+    SetupV2API,
+    StudyV1API,
+    StudyV2API,
+    TaskV1API,
+    TaskV2API,
+)
+from .setup import (
+    API_REGISTRY,
+    APIBackend,
+    APIBackendBuilder,
+    _backend,
+)
 
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-from openml._api.runtime.instance import _backend as backend
-
-if TYPE_CHECKING:
-    from openml._api.runtime.core import APIBackend
-
-__all__ = ["api_context"]
-
-
-class APIContext:
-    """API context for accessing the OpenML backend."""
-
-    @property
-    def backend(self) -> APIBackend:
-        """Get the API backend instance."""
-        return backend
-
-
-api_context = APIContext()
+__all__ = [
+    "API_REGISTRY",
+    "APIBackend",
+    "APIBackendBuilder",
+    "DatasetV1API",
+    "DatasetV2API",
+    "EstimationProcedureV1API",
+    "EstimationProcedureV2API",
+    "EvaluationMeasureV1API",
+    "EvaluationMeasureV2API",
+    "EvaluationV1API",
+    "EvaluationV2API",
+    "FallbackProxy",
+    "FlowV1API",
+    "FlowV2API",
+    "HTTPCache",
+    "HTTPClient",
+    "MinIOClient",
+    "ResourceAPI",
+    "RunV1API",
+    "RunV2API",
+    "SetupV1API",
+    "SetupV2API",
+    "StudyV1API",
+    "StudyV2API",
+    "TaskV1API",
+    "TaskV2API",
+    "_backend",
+]

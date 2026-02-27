@@ -4,8 +4,8 @@ from openml._api.resources.base import DatasetAPI, ResourceV1API, ResourceV2API
 
 
 class DatasetV1API(ResourceV1API, DatasetAPI):
-    pass
+    """Version 1 API implementation for dataset resources."""
 
 
 class DatasetV2API(ResourceV2API, DatasetAPI):
-    pass
+    """Version 2 API implementation for dataset resources."""

@@ -4,8 +4,8 @@ from openml._api.resources.base import EstimationProcedureAPI, ResourceV1API, Re
 
 
 class EstimationProcedureV1API(ResourceV1API, EstimationProcedureAPI):
-    pass
+    """Version 1 API implementation for estimation procedure resources."""
 
 
 class EstimationProcedureV2API(ResourceV2API, EstimationProcedureAPI):
-    pass
+    """Version 2 API implementation for estimation procedure resources."""

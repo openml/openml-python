@@ -26,6 +26,7 @@ from openml._api.resources import (
     TaskV1API,
     TaskV2API,
 )
+from openml.enums import APIVersion
 
 if TYPE_CHECKING:
     from openml._api.resources.base import (
@@ -85,6 +86,7 @@ class APIBackend:
         )
 
         v1_http_client = HTTPClient(
+            api_version=APIVersion.V1,
             server=v1_config.server,
             base_url=v1_config.base_url,
             api_key=v1_config.api_key,
@@ -132,6 +134,7 @@ class APIBackend:
             return v1
 
         v2_http_client = HTTPClient(
+            api_version=APIVersion.V2,
             server=v2_config.server,
             base_url=v2_config.base_url,
             api_key=v2_config.api_key,

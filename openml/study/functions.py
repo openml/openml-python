@@ -10,7 +10,6 @@ import xmltodict
 
 import openml
 import openml._api_calls
-import openml.config
 import openml.utils
 from openml.study.study import OpenMLBenchmarkSuite, OpenMLStudy
 
