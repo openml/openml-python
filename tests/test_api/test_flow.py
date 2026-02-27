@@ -24,9 +24,10 @@ def flow_v2(http_client_v2, minio_client) -> FlowV2API:
 
 
 @pytest.fixture
-def with_v2_server_config() -> None:
+def with_v2_server_config(test_server_v1, test_server_v2) -> None:
     old_server = openml.config.servers[APIVersion.V2]["server"]
-    openml.config.servers[APIVersion.V2]["server"] = f"{openml.config.TEST_SERVER_URL}/api/v2/"
+    derived_v2_server = test_server_v1.replace("/api/v1/xml/", "/api/v2/")
+    openml.config.servers[APIVersion.V2]["server"] = test_server_v2 or derived_v2_server
     yield
     openml.config.servers[APIVersion.V2]["server"] = old_server
 
@@ -72,7 +73,7 @@ def test_flow_v1_exists_input_validation(flow_v1):
         flow_v1.exists(name="sklearn.tree.DecisionTreeClassifier", external_version="")
 
 
-def test_flow_v1_exists_mocked_success(flow_v1, use_api_v1, test_api_key):
+def test_flow_v1_exists_mocked_success(flow_v1, test_apikey_v1):
     flow_name = "sklearn.tree.DecisionTreeClassifier"
     external_version = "1"
 
@@ -95,14 +96,14 @@ def test_flow_v1_exists_mocked_success(flow_v1, use_api_v1, test_api_key):
             data={
                 "name": flow_name,
                 "external_version": external_version,
-                "api_key": test_api_key,
+                "api_key": test_apikey_v1,
             },
             headers=openml.config._HEADERS,
             files=None,
         )
 
 
-def test_flow_v1_exists_mocked_server_error(flow_v1, use_api_v1):
+def test_flow_v1_exists_mocked_server_error(flow_v1):
     with patch.object(Session, "request") as mock_request:
         mock_request.return_value = Response()
         mock_request.return_value.status_code = 200
@@ -117,7 +118,7 @@ def test_flow_v1_exists_mocked_server_error(flow_v1, use_api_v1):
             flow_v1.exists(name="foo", external_version="1")
 
 
-def test_flow_v1_publish_mocked(flow_v1, use_api_v1, test_api_key):
+def test_flow_v1_publish_mocked(flow_v1, test_apikey_v1):
     files = {"description": "<flow/>"}
 
     with patch.object(Session, "request") as mock_request:
@@ -136,13 +137,13 @@ def test_flow_v1_publish_mocked(flow_v1, use_api_v1, test_api_key):
             method="POST",
             url=openml.config.server + "flow",
             params={},
-            data={"api_key": test_api_key},
+            data={"api_key": test_apikey_v1},
             headers=openml.config._HEADERS,
             files=files,
         )
 
 
-def test_flow_v1_delete_mocked(flow_v1, use_api_v1, test_api_key):
+def test_flow_v1_delete_mocked(flow_v1, test_apikey_v1):
     flow_id = 123
 
     with patch.object(Session, "request") as mock_request:
@@ -160,7 +161,7 @@ def test_flow_v1_delete_mocked(flow_v1, use_api_v1, test_api_key):
         mock_request.assert_called_once_with(
             method="DELETE",
             url=openml.config.server + f"flow/{flow_id}",
-            params={"api_key": test_api_key},
+            params={"api_key": test_apikey_v1},
             data={},
             headers=openml.config._HEADERS,
             files=None,
