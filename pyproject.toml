@@ -129,7 +129,6 @@ version = {attr = "openml.__version__.__version__"}
 testpaths = ["tests"]
 minversion = "7.0"
 xfail_strict = true
-timeout = 600
 filterwarnings=[
     "ignore:the matrix subclass:PendingDeprecationWarning"
 ]

@@ -255,7 +255,7 @@ def test_api_key() -> str:
     return TestBase.user_key
 
 
-@pytest.fixture(autouse=True, scope="module")
+@pytest.fixture(autouse=True, scope="function")
 def verify_cache_state(test_files_directory) -> Iterator[None]:
     assert_static_test_cache_correct(test_files_directory)
     yield
