@@ -109,9 +109,9 @@ def run_model_on_task(  # noqa: PLR0913
     --------
     >>> import openml
     >>> import openml_sklearn  # doctest: +SKIP
-    >>> from sklearn.ensemble import HistGradientBoostingClassifier  # doctest: +SKIP
-    >>> clf = HistGradientBoostingClassifier()  # doctest: +SKIP
-    >>> task = openml.tasks.get_task(1)  # doctest: +SKIP
+    >>> from sklearn.tree import DecisionTreeClassifier  # doctest: +SKIP
+    >>> clf = DecisionTreeClassifier()  # doctest: +SKIP
+    >>> task = openml.tasks.get_task(6)  # doctest: +SKIP
     >>> run = openml.runs.run_model_on_task(clf, task)  # doctest: +SKIP
     """
     if avoid_duplicate_runs is None:
