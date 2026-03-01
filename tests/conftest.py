@@ -276,7 +276,7 @@ def test_apikey_v2() -> str:
     return openml.config.get_test_servers()[APIVersion.V2]["apikey"]
 
 
-@pytest.fixture(autouse=True, scope="module")
+@pytest.fixture(autouse=True, scope="function")
 def verify_cache_state(test_files_directory) -> Iterator[None]:
     assert_static_test_cache_correct(test_files_directory)
     yield
