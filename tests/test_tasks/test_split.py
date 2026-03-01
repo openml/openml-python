@@ -36,8 +36,7 @@ class OpenMLSplitTest(TestBase):
         shutil.copy(source_arff, self.arff_filepath)
 
     def tearDown(self):
-        if hasattr(self, "temp_dir"):
-            self.temp_dir.cleanup()
+        self.temp_dir.cleanup()
 
     def test_eq(self):
         split = OpenMLSplit._from_arff_file(self.arff_filepath)
