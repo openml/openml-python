@@ -1,5 +1,6 @@
 from openml._api.resources.base.base import ResourceAPI
 from openml._api.resources.base.fallback import FallbackProxy
+from openml._api.resources.base.versions import ResourceV1API, ResourceV2API
 from openml._api.resources.dataset import DatasetV1API, DatasetV2API
 from openml._api.resources.estimation_procedure import (
     EstimationProcedureV1API,
@@ -26,6 +27,8 @@ __all__ = [
     "FlowV1API",
     "FlowV2API",
     "ResourceAPI",
+    "ResourceV1API",
+    "ResourceV2API",
     "RunV1API",
     "RunV2API",
     "SetupV1API",
