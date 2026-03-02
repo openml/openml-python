@@ -85,7 +85,7 @@ def test_v1_list_with_status_filter(study_v1, test_server_v1, test_apikey_v1):
 
         mock_request.assert_called_once()
         call_args = mock_request.call_args
-        assert "status=active" in call_args.kwargs.get("url", "")
+        assert "/status/active" in call_args.kwargs.get("url", "")
 
 
 def test_v1_list_pagination(study_v1, test_server_v1, test_apikey_v1):

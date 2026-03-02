@@ -157,8 +157,7 @@ class TestOpenMLDataset(TestBase):
             openml.datasets.check_datasets_active,
             [79],
         )
-        openml.config.server = self.test_server
-        openml.config._sync_api_config()
+        openml.config.set_servers("test")
 
     @pytest.mark.test_server()
     def test_illegal_character_tag(self):
@@ -186,8 +185,7 @@ class TestOpenMLDataset(TestBase):
         self.use_production_server()
         # /d/1 was deactivated
         assert openml.datasets.functions._name_to_id("anneal") == 2
-        openml.config.server = self.test_server
-        openml.config._sync_api_config()
+        openml.config.set_servers("test")
 
     @pytest.mark.production_server()
     def test__name_to_id_with_multiple_active(self):
@@ -1554,8 +1552,7 @@ class TestOpenMLDataset(TestBase):
         datasets_b = openml.datasets.list_datasets(size=np.inf)
 
         # Reverting to test server
-        openml.config.server = self.test_server
-        openml.config._sync_api_config()
+        openml.config.set_servers("test")
         assert len(datasets_a) == len(datasets_b)
 
 
