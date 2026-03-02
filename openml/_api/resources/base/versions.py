@@ -26,6 +26,7 @@ _LEGAL_RESOURCES_TAG = [
     ResourceType.FLOW,
     ResourceType.SETUP,
     ResourceType.RUN,
+    ResourceType.STUDY,
 ]
 
 

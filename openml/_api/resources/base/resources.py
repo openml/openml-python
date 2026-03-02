@@ -17,8 +17,7 @@ class DatasetAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.DATASET
 
     def __init__(self, http: HTTPClient, minio: MinIOClient):
-        self._minio = minio
-        super().__init__(http)
+        super().__init__(http, minio)
 
 
 class TaskAPI(ResourceAPI):

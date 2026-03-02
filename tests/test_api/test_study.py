@@ -26,7 +26,7 @@ def test_v1_list_basic(study_v1, test_server_v1, test_apikey_v1):
     """Test V1 list basic functionality with limit and offset."""
     # Mock response with study list
     mock_response = """<?xml version="1.0" encoding="UTF-8"?>
-    <oml:studies xmlns:oml="http://openml.org/openml">
+    <oml:study_list xmlns:oml="http://openml.org/openml">
         <oml:study>
             <oml:id>1</oml:id>
             <oml:alias>test-study-1</oml:alias>
@@ -41,7 +41,7 @@ def test_v1_list_basic(study_v1, test_server_v1, test_apikey_v1):
             <oml:name>Test Study 2</oml:name>
             <oml:status>active</oml:status>
         </oml:study>
-    </oml:studies>
+    </oml:study_list>
     """
     
     with patch.object(Session, "request") as mock_request:
@@ -62,7 +62,7 @@ def test_v1_list_basic(study_v1, test_server_v1, test_apikey_v1):
 def test_v1_list_with_status_filter(study_v1, test_server_v1, test_apikey_v1):
     """Test V1 list with status filter."""
     mock_response = """<?xml version="1.0" encoding="UTF-8"?>
-    <oml:studies xmlns:oml="http://openml.org/openml">
+    <oml:study_list xmlns:oml="http://openml.org/openml">
         <oml:study>
             <oml:id>1</oml:id>
             <oml:alias>active-study</oml:alias>
@@ -70,7 +70,7 @@ def test_v1_list_with_status_filter(study_v1, test_server_v1, test_apikey_v1):
             <oml:name>Active Study</oml:name>
             <oml:status>active</oml:status>
         </oml:study>
-    </oml:studies>
+    </oml:study_list>
     """
     
     with patch.object(Session, "request") as mock_request:
@@ -91,7 +91,7 @@ def test_v1_list_with_status_filter(study_v1, test_server_v1, test_apikey_v1):
 def test_v1_list_pagination(study_v1, test_server_v1, test_apikey_v1):
     """Test V1 list pagination with offset and limit."""
     page1_response = """<?xml version="1.0" encoding="UTF-8"?>
-    <oml:studies xmlns:oml="http://openml.org/openml">
+    <oml:study_list xmlns:oml="http://openml.org/openml">
         <oml:study>
             <oml:id>1</oml:id>
             <oml:alias>study-1</oml:alias>
@@ -113,11 +113,11 @@ def test_v1_list_pagination(study_v1, test_server_v1, test_apikey_v1):
             <oml:name>Study 3</oml:name>
             <oml:status>active</oml:status>
         </oml:study>
-    </oml:studies>
+    </oml:study_list>
     """
     
     page2_response = """<?xml version="1.0" encoding="UTF-8"?>
-    <oml:studies xmlns:oml="http://openml.org/openml">
+    <oml:study_list xmlns:oml="http://openml.org/openml">
         <oml:study>
             <oml:id>4</oml:id>
             <oml:alias>study-4</oml:alias>
@@ -132,7 +132,7 @@ def test_v1_list_pagination(study_v1, test_server_v1, test_apikey_v1):
             <oml:name>Study 5</oml:name>
             <oml:status>active</oml:status>
         </oml:study>
-    </oml:studies>
+    </oml:study_list>
     """
     
     with patch.object(Session, "request") as mock_request:

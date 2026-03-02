@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from typing import Any
 
-    from openml._api.clients import HTTPClient
+    from openml._api.clients import HTTPClient, MinIOClient
     from openml.enums import APIVersion, ResourceType
 
 
@@ -49,8 +49,9 @@ class ResourceAPI(ABC):
     api_version: APIVersion
     resource_type: ResourceType
 
-    def __init__(self, http: HTTPClient):
+    def __init__(self, http: HTTPClient, minio: MinIOClient | None = None):
         self._http = http
+        self._minio = minio
 
     @abstractmethod
     def delete(self, resource_id: int) -> bool:
