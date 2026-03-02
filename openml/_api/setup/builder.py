@@ -152,9 +152,10 @@ class APIBackendBuilder:
 
         Parameters
         ----------
-        config : Config
-            Configuration object containing API versions, endpoints, cache
-            settings, and connection parameters.
+        api_version : APIVersion
+            Primary API version to use for resource access.
+        fallback_api_version : APIVersion | None
+            Optional fallback API version for compatibility.
 
         Returns
         -------

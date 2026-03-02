@@ -173,7 +173,9 @@ class OpenMLConfigManager:
             "_examples",
             "OPENML_CACHE_DIR_ENV_VAR",
             "OPENML_SKIP_PARQUET_ENV_VAR",
+            "OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR",
             "_HEADERS",
+            "_defaults",
         }:
             return object.__setattr__(self, name, value)
 

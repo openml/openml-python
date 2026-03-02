@@ -351,7 +351,9 @@ def main() -> None:
     )
 
     configurable_fields = [
-        f.name for f in fields(openml._config.OpenMLConfig) if f.name not in ["max_retries"]
+        f.name
+        for f in fields(openml._config.OpenMLConfig)
+        if f.name not in ["connection_n_retries"]
     ]
 
     parser_configure.add_argument(

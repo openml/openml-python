@@ -26,12 +26,12 @@ def dummy_task_v1(http_client_v1, minio_client) -> DummyTaskV1API:
 
 
 @pytest.fixture
-def dummy_task_v2(http_client_v2, minio_client) -> DummyTaskV1API:
+def dummy_task_v2(http_client_v2, minio_client) -> DummyTaskV2API:
     return DummyTaskV2API(http=http_client_v2, minio=minio_client)
 
 
 @pytest.fixture
-def dummy_task_fallback(dummy_task_v1, dummy_task_v2) -> DummyTaskV1API:
+def dummy_task_fallback(dummy_task_v1, dummy_task_v2) -> FallbackProxy:
     return FallbackProxy(dummy_task_v2, dummy_task_v1)
 
 

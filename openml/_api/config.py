@@ -68,24 +68,25 @@ class Settings:
         # We read from openml.config to integrate with the existing config system
         # where users set their API key, server, cache directory, etc.
         # This avoids duplicating those settings with hardcoded values.
-        import openml.config as legacy
+        from openml import _config as _config_module
 
-        server_url = legacy.server
+        # Access the config manager instance - the module's __getattr__ forwards to it
+        server_url = _config_module.server
         server_base = server_url.rsplit("/api", 1)[0] + "/" if "/api" in server_url else server_url
 
         self.api_configs["v1"] = APIConfig(
             server=server_base,
             base_url="api/v1/xml/",
-            api_key=legacy.apikey,
+            api_key=_config_module.apikey,
         )
 
         # Sync connection- and cache- settings from legacy config
         self.connection = ConnectionConfig(
-            retries=legacy.connection_n_retries,
-            retry_policy=RetryPolicy(legacy.retry_policy),
+            retries=_config_module.connection_n_retries,
+            retry_policy=RetryPolicy(_config_module.retry_policy),
         )
         self.cache = CacheConfig(
-            dir=str(legacy._root_cache_directory),
+            dir=str(_config_module._root_cache_directory),
         )
 
         self._initialized = True

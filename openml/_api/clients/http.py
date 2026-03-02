@@ -10,13 +10,12 @@ import xml
 from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Any, cast
-from urllib.parse import urlencode, urljoin, urlparse
+from urllib.parse import urlencode, urlparse
 
 import requests
 import xmltodict
 from requests import Response
 
-import openml
 from openml.enums import APIVersion, RetryPolicy
 from openml.exceptions import (
     OpenMLAuthenticationError,
@@ -59,7 +58,9 @@ class HTTPCache:
     def path(self) -> Path:
         if self._path is not None:
             return self._path
-        return Path(openml.config.get_cache_directory())
+        from openml import _config as _config_module
+
+        return Path(_config_module.get_cache_directory())
 
     def get_key(self, url: str, params: dict[str, Any]) -> str:
         """
@@ -227,18 +228,30 @@ class HTTPClient:
     ) -> None:
         self.api_version = api_version
 
-        # Get config defaults
-        api_config = openml.config.servers.get(api_version, {})
+        # Get config defaults - use lazy import to avoid circular dependency
+        api_config: dict[str, Any] = {}
+        if server is None or base_url is None or api_key is None:
+            from openml import _config as _config_module
+
+            api_config = _config_module.servers.get(api_version, {})
 
         # Store provided values or read from config
         self._server = server if server is not None else api_config.get("server", "")
         self._base_url = base_url if base_url is not None else api_config.get("base_url", "")
         self._api_key = api_key if api_key is not None else api_config.get("apikey")
         self._timeout = timeout if timeout is not None else 10
-        self._retries = retries if retries is not None else openml.config.connection_n_retries
-        retry_policy_str = (
-            retry_policy.value if retry_policy is not None else openml.config.retry_policy
-        )
+
+        if retries is None or retry_policy is None:
+            from openml import _config as _config_module
+
+            self._retries = retries if retries is not None else _config_module.connection_n_retries
+            retry_policy_str = (
+                retry_policy.value if retry_policy is not None else _config_module.retry_policy
+            )
+        else:
+            self._retries = retries
+            retry_policy_str = retry_policy.value
+
         self._retry_policy = RetryPolicy.HUMAN if retry_policy_str == "human" else RetryPolicy.ROBOT
         self.cache = cache if cache is not None else HTTPCache()
 
@@ -600,7 +613,7 @@ class HTTPClient:
         OpenMLHashException
             If checksum verification fails.
         """
-        url = urljoin(self.server, path)
+        url = f"{self.server.rstrip('/')}/{path.lstrip('/')}"
         retries = max(1, self.retries)
 
         params = request_kwargs.pop("params", {}).copy()
@@ -623,8 +636,10 @@ class HTTPClient:
             params = {}
 
         # prepare headers
+        from openml import _config as _config_module
+
         headers = request_kwargs.pop("headers", {}).copy()
-        headers.update(openml.config._HEADERS)
+        headers.update(_config_module._HEADERS)
 
         request_kwargs.pop("timeout", self.timeout)
         files = request_kwargs.pop("files", None)
