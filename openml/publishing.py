@@ -96,6 +96,12 @@ def publish(obj: Any, *, name: str | None = None, tags: Sequence[str] | None = N
 
     # Case 2: Object is an external estimator - use extension registry
     extension = extensions.get_extension_by_model(obj, raise_if_no_extension=True)
+    if extension is None:
+        raise ValueError(
+            f"No extension found to publish object of type {type(obj).__name__}. "
+            "Please ensure the appropriate extension is installed and registered."
+        )
+
     flow = extension.model_to_flow(obj)
 
     if name is not None:
