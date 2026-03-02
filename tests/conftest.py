@@ -99,8 +99,6 @@ def delete_remote_files(tracker, flow_names) -> None:
     :param tracker: Dict
     :return: None
     """
-    openml.config.server = TestBase.test_server
-    openml.config.apikey = TestBase.user_key
     openml.config.set_servers("test")
 
     # reordering to delete sub flows at the end of flows
