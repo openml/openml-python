@@ -104,7 +104,7 @@ class TestInit(TestBase):
         assert obj.name == "new"
         assert obj.tags == [{"tag": "legacy"}]
 
-    @mock.patch("openml.extensions.functions.get_extension_by_model")
+    @mock.patch("openml.publishing.extensions.get_extension_by_model")
     def test_publish_with_extension(self, get_ext_mock):
         flow_mock = mock.MagicMock()
         flow_mock.tags = []
