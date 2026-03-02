@@ -66,8 +66,8 @@ class OpenMLConfig:
     show_progress: bool = False
 
     def __setattr__(self, name: str, value: Any) -> None:
-        if name == "apikey" and value is not None and not isinstance(value, str):
-            raise ValueError("apikey must be a string or None")
+        if name == "apikey" and not isinstance(value, (type(None), str)):
+            raise TypeError("apikey must be a string or None")
 
         super().__setattr__(name, value)
 

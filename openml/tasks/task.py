@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from typing_extensions import TypedDict
 
-import openml
 import openml._api_calls
 from openml import datasets
 from openml.base import OpenMLBase
