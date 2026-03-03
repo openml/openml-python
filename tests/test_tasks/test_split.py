@@ -30,13 +30,19 @@ class OpenMLSplitTest(TestBase):
             / "1882"
             / "datasplits.arff"
         )
-        # Use temporary directory to avoid conflicts with other tests
-        self.temp_dir = tempfile.TemporaryDirectory()
-        self.arff_filepath = Path(self.temp_dir.name) / "datasplits.arff"
+        # Use a unique temp directory for each test to avoid race conditions
+        # when running tests in parallel (see issue #1641)
+        self._temp_dir = tempfile.TemporaryDirectory()
+        self.arff_filepath = Path(self._temp_dir.name) / "datasplits.arff"
         shutil.copy(source_arff, self.arff_filepath)
+        self.pd_filename = self.arff_filepath.with_suffix(".pkl.py3")
 
     def tearDown(self):
-        self.temp_dir.cleanup()
+        # Clean up the entire temp directory
+        try:
+            self._temp_dir.cleanup()
+        except (OSError, FileNotFoundError):
+            pass
 
     def test_eq(self):
         split = OpenMLSplit._from_arff_file(self.arff_filepath)
