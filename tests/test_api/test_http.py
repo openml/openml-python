@@ -158,7 +158,7 @@ def test_get_without_api_key_raises(http_client):
 def test_download_creates_file(http_client, sample_download_url_v1):
     path = http_client.download(
         url=sample_download_url_v1,
-        file_name="downloaded.bin",
+        file_name="downloaded.arff",
     )
 
     assert path.exists()
@@ -170,13 +170,13 @@ def test_download_creates_file(http_client, sample_download_url_v1):
 def test_download_is_cached_on_disk(http_client, sample_download_url_v1):
     path1 = http_client.download(
         url=sample_download_url_v1,
-        file_name="cached.bin",
+        file_name="cached.arff",
     )
     mtime1 = path1.stat().st_mtime
 
     path2 = http_client.download(
         url=sample_download_url_v1,
-        file_name="cached.bin",
+        file_name="cached.arff",
     )
     mtime2 = path2.stat().st_mtime
 
@@ -192,7 +192,7 @@ def test_download_respects_custom_handler(http_client, sample_download_url_v1):
 
     path = http_client.download(
         url=sample_download_url_v1,
-        file_name="handler.bin",
+        file_name="handler.arff",
         handler=handler,
     )
 
