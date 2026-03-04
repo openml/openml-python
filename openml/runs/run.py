@@ -343,6 +343,37 @@ class OpenMLRun(OpenMLBase):
 
         return run
 
+    def publish(self) -> OpenMLRun:
+        """Publish the run object on the OpenML server."""
+        file_elements = self._get_file_elements()
+
+        if "description" not in file_elements:
+            file_elements["description"] = self._to_xml()
+
+        result = openml._backend.run.publish(path="run", files=file_elements)
+        self.run_id = result
+        return self
+
+    def push_tag(self, tag: str) -> None:
+        """Push a tag for this run on the OpenML server."""
+        if self.run_id is None:
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Cannot tag a run that has not been published yet."
+                " Please publish the run first before being able to tag it.",
+            )
+
+        openml._backend.run.tag(self.run_id, tag)
+
+    def remove_tag(self, tag: str) -> None:
+        """Remove a tag for this run on the OpenML server."""
+        if self.run_id is None:
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Cannot untag a run that has not been published yet."
+                " Please publish the run first before being able to untag it.",
+            )
+
+        openml._backend.run.untag(self.run_id, tag)
+
     def to_filesystem(
         self,
         directory: str | Path,
