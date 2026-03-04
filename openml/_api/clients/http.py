@@ -802,29 +802,9 @@ class HTTPClient:
             return file_path
 
         response = self.get(url, md5_checksum=md5_checksum)
-        if handler is not None:
-            return handler(response, file_path, encoding)
-
-        return self._text_handler(response, file_path, encoding)
-
-    def _text_handler(self, response: Response, path: Path, encoding: str) -> Path:
-        """
-        Write response text content to a file.
-
-        Parameters
-        ----------
-        response : requests.Response
-            HTTP response containing text data.
-        path : pathlib.Path
-            Destination file path.
-        encoding : str
-            Text encoding for writing the file.
-
-        Returns
-        -------
-        pathlib.Path
-            Path to the written file.
-        """
-        with path.open("w", encoding=encoding) as f:
-            f.write(response.text)
-        return path
+        def write_to_file(response, path, encoding):
+            path.write_text(response.text, encoding)
+            
+        handler = handler or write_to_file
+        handler(response, file_path, encoding)
+        return file_path
