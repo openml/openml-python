@@ -374,6 +374,45 @@ def handle_datasets(args: argparse.Namespace) -> None:
         actions[action](args)
 
 
+def list_tasks_cli(args: argparse.Namespace) -> None:
+    """List OpenML tasks with optional filtering."""
+    df = openml.tasks.list_tasks(
+        offset=args.offset,
+        size=args.size,
+        tag=args.tag,
+        task_type=args.task_type,
+    )
+    if df.empty:
+        print("No tasks found matching the given criteria.")
+    else:
+        print(df.to_string())
+
+
+def info_task_cli(args: argparse.Namespace) -> None:
+    """Display detailed information about a specific OpenML task."""
+    task = openml.tasks.get_task(
+        args.task_id,
+        download_splits=False,
+        download_data=False,
+        download_qualities=False,
+        download_features_meta_data=False,
+    )
+    print(task)
+
+
+def handle_tasks(args: argparse.Namespace) -> None:
+    """Dispatch tasks subcommands."""
+    actions = {
+        "list": list_tasks_cli,
+        "info": info_task_cli,
+    }
+    action = getattr(args, "tasks_action", None)
+    if action is None:
+        args._parser_tasks.print_help()
+    else:
+        actions[action](args)
+
+
 def configure(args: argparse.Namespace) -> None:
     """Calls the right submenu(s) to edit `args.field` in the configuration file."""
     set_functions = {
@@ -403,7 +442,12 @@ def configure(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    subroutines = {"configure": configure, "flows": handle_flows, "datasets": handle_datasets}
+    subroutines = {
+        "configure": configure,
+        "flows": handle_flows,
+        "datasets": handle_datasets,
+        "tasks": handle_tasks,
+    }
 
     parser = argparse.ArgumentParser()
     # Add a global --version flag to display installed version and exit
@@ -541,10 +585,58 @@ def main() -> None:
         help="The ID of the dataset to display.",
     )
 
+    # --- tasks subcommand ---
+    parser_tasks = subparsers.add_parser(
+        "tasks",
+        description="Browse and search OpenML tasks.",
+    )
+    tasks_subparsers = parser_tasks.add_subparsers(dest="tasks_action")
+
+    parser_tasks_list = tasks_subparsers.add_parser(
+        "list",
+        description="List OpenML tasks with optional filtering.",
+    )
+    parser_tasks_list.add_argument(
+        "--size",
+        type=int,
+        default=10,
+        help="Maximum number of tasks to return (default: 10).",
+    )
+    parser_tasks_list.add_argument(
+        "--offset",
+        type=int,
+        default=None,
+        help="Number of tasks to skip, for pagination.",
+    )
+    parser_tasks_list.add_argument(
+        "--tag",
+        type=str,
+        default=None,
+        help="Only list tasks with this tag.",
+    )
+    parser_tasks_list.add_argument(
+        "--task-type",
+        type=int,
+        default=None,
+        dest="task_type",
+        help="Filter by task type ID (e.g. 1 for Supervised Classification).",
+    )
+
+    parser_tasks_info = tasks_subparsers.add_parser(
+        "info",
+        description="Display detailed information about a specific task.",
+    )
+    parser_tasks_info.add_argument(
+        "task_id",
+        type=int,
+        help="The ID of the task to display.",
+    )
+
     args = parser.parse_args()
     # Attach subparsers so handlers can print help when no action is given
     args._parser_flows = parser_flows
     args._parser_datasets = parser_datasets
+    args._parser_tasks = parser_tasks
     subroutines.get(args.subroutine, lambda _: parser.print_help())(args)
 
 

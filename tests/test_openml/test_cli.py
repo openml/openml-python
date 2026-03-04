@@ -134,3 +134,49 @@ def test_cli_datasets_no_action_prints_help():
 
     assert result.returncode == 0
     assert "list" in result.stdout or "info" in result.stdout
+
+
+@pytest.mark.production_server()
+def test_cli_tasks_list():
+    """Test that 'openml tasks list --size 5' returns a table of tasks."""
+    result = subprocess.run(
+        [sys.executable, "-m", "openml.cli", "tasks", "list", "--size", "5"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0
+    # Output should contain task entries
+    assert "task_type" in result.stdout.lower() or len(result.stdout.strip()) > 0
+
+
+@pytest.mark.production_server()
+def test_cli_tasks_info():
+    """Test that 'openml tasks info <id>' prints task details."""
+    result = subprocess.run(
+        [sys.executable, "-m", "openml.cli", "tasks", "info", "1"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0
+    # Task 1 is the well-known Supervised Classification task on anneal
+    assert "OpenML" in result.stdout or "1" in result.stdout
+
+
+def test_cli_tasks_no_action_prints_help():
+    """Test that 'openml tasks' with no subcommand prints help text."""
+    result = subprocess.run(
+        [sys.executable, "-m", "openml.cli", "tasks"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0
+    assert "list" in result.stdout or "info" in result.stdout
