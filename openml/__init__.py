@@ -34,9 +34,12 @@ from . import (
 )
 from .__version__ import __version__
 from .datasets import OpenMLDataFeature, OpenMLDataset
+from .datasets.functions import get_dataset, list_datasets
 from .evaluations import OpenMLEvaluation
 from .flows import OpenMLFlow
+from .flows.functions import get_flow, list_flows
 from .runs import OpenMLRun
+from .runs.functions import get_run, list_runs
 from .setups import OpenMLParameter, OpenMLSetup
 from .study import OpenMLBenchmarkSuite, OpenMLStudy
 from .tasks import (
@@ -48,6 +51,7 @@ from .tasks import (
     OpenMLSupervisedTask,
     OpenMLTask,
 )
+from .tasks.functions import get_task, list_tasks
 
 
 def populate_cache(
@@ -115,6 +119,14 @@ __all__ = [
     "exceptions",
     "extensions",
     "flows",
+    "get_dataset",
+    "get_flow",
+    "get_run",
+    "get_task",
+    "list_datasets",
+    "list_flows",
+    "list_runs",
+    "list_tasks",
     "runs",
     "setups",
     "study",
