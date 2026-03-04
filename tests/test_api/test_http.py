@@ -2,6 +2,7 @@ from requests import Response, Request, Session
 from unittest.mock import patch
 import pytest
 import os
+import hashlib
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 from openml.enums import APIVersion
@@ -156,14 +157,23 @@ def test_get_without_api_key_raises(http_client):
 
 @pytest.mark.test_server()
 def test_download_creates_file(http_client, sample_download_url_v1):
-    path = http_client.download(
-        url=sample_download_url_v1,
-        file_name="downloaded.arff",
-    )
+    dummy_content = b"this is dummy content"
+    md5_checksum = hashlib.md5(dummy_content).hexdigest()
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = dummy_content
+
+        path = http_client.download(
+            url=sample_download_url_v1,
+            file_name="downloaded.arff",
+            md5_checksum=md5_checksum,
+        )
 
     assert path.exists()
     assert path.is_file()
-    assert path.read_text(encoding="utf-8")
+    assert path.read_bytes() == dummy_content
 
 
 @pytest.mark.test_server()
