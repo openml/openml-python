@@ -112,13 +112,15 @@ jobs:
       run: |
         chmod -R a+rw ./data
         chmod -R a+rw ./logs
-        docker compose --profile rest-api --profile minio up -d
+        docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
 
         echo "Waiting for PHP API to boot..."
         timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} openml-php-rest-api)" == "healthy" ]; do sleep 5; done'
 
         echo "Final Verification: Gateway Connectivity..."
         curl -sSfL http://localhost:8000/api/v1/xml/data/1 | head -n 15
+
+        docker container ls
 
     - name: Show installed dependencies
       run: python -m pip list
@@ -139,7 +141,7 @@ jobs:
           marks="not production_server"
         fi
 
-        pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks" tests/test_datasets/test_dataset_functions.py::TestOpenMLDataset
+        pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
 
     - name: Run tests on Ubuntu Production
       if: matrix.os == 'ubuntu-latest'
@@ -157,7 +159,7 @@ jobs:
           marks="production_server"
         fi
 
-        pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks" tests/test_datasets/test_dataset_functions.py::TestOpenMLDataset
+        pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
 
     - name: Run tests on Windows
       if: matrix.os == 'windows-latest'
