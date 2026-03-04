@@ -802,9 +802,10 @@ class HTTPClient:
             return file_path
 
         response = self.get(url, md5_checksum=md5_checksum)
+
         def write_to_file(response, path, encoding):
             path.write_text(response.text, encoding)
-            
+
         handler = handler or write_to_file
         handler(response, file_path, encoding)
         return file_path
