@@ -102,20 +102,23 @@ def test_get_with_cache_creates_cache(http_client, cache, sample_url_v1, sample_
 
 
 @pytest.mark.test_server()
-def test_get_uses_cached_response(http_client, cache, sample_url_v1, sample_path):
-    key = cache.get_key(sample_url_v1, params={})
-    meta_path = cache._key_to_path(key) / "meta.json"
+def test_get_uses_cached_response(http_client, cache, sample_url_v1, sample_path, monkeypatch):
+    response = Response()
+    response.status_code = 200
+    response._content = b"cached-response"
+    response.headers = {}
 
-    r1 = http_client.get(sample_path, enable_cache=True)
-    mtime1 = meta_path.stat().st_mtime
+    key = cache.get_key(url=sample_url_v1, params={})
+    cache.save(key=key, response=response)
 
-    r2 = http_client.get(sample_path, enable_cache=True)
-    mtime2 = meta_path.stat().st_mtime
+    def fail_request(*args, **kwargs):
+        raise AssertionError("HTTP request should not be called")
+    monkeypatch.setattr(Session, "request", fail_request)
 
-    assert mtime1 == mtime2
-    assert r2.status_code == 200
-    assert r1.content == r2.content
+    cached_response = http_client.get(sample_path, enable_cache=True)
 
+    assert cached_response.status_code == response.status_code
+    assert cached_response.content == response.content
 
 @pytest.mark.test_server()
 def test_get_refresh_cache(http_client, cache, sample_url_v1, sample_path):
