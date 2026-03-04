@@ -110,8 +110,8 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       working-directory: ./services
       run: |
-        sed -i 's@^.*data/php.*$@@g' docker-compose.yaml
-        sed -i 's@^.*logs/php.*$@@g' docker-compose.yaml
+        chmod -R a+rw ./data
+        chmod -R a+rw ./logs
         docker compose --profile rest-api --profile minio up -d
 
         echo "Waiting for PHP API to boot..."
