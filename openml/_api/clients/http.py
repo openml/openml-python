@@ -310,12 +310,8 @@ class HTTPClient:
 
         if message and additional_information:
             full_message = f"{message} - {additional_information}"
-        elif message:
-            full_message = message
-        elif additional_information:
-            full_message = additional_information
         else:
-            full_message = ""
+            full_message = message or additional_information or ""
 
         return code, full_message
 
