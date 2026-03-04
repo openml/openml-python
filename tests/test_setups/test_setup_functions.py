@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib
 import time
 import unittest.mock
-import os
+
 import pandas as pd
 import pytest
 import sklearn.base
@@ -33,6 +33,7 @@ class TestSetupFunctions(TestBase):
     def setUp(self):
         self.extension = SklearnExtension()
         super().setUp()
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_nonexisting_setup_exists(self):
@@ -80,6 +81,7 @@ class TestSetupFunctions(TestBase):
         # execute the function we are interested in
         setup_id = openml.setups.setup_exists(flow)
         assert setup_id == run.setup_id
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_existing_setup_exists_1(self):
@@ -95,11 +97,13 @@ class TestSetupFunctions(TestBase):
             # Check a flow with zero hyperparameters
             nb = sklearn.naive_bayes.GaussianNB()
             self._existing_setup_exists(nb)
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_exisiting_setup_exists_2(self):
         # Check a flow with one hyperparameter
         self._existing_setup_exists(sklearn.naive_bayes.GaussianNB())
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_existing_setup_exists_3(self):

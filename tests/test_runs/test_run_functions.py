@@ -396,6 +396,7 @@ class TestRun(TestBase):
                                 # Windows seems to get an eval-time of 0 sometimes.
                                 assert evaluation > 0
                             assert evaluation < max_time_allowed
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_regression_on_classif_task(self):
@@ -412,6 +413,7 @@ class TestRun(TestBase):
                 model=clf,
                 task=task,
             )
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_check_erronous_sklearn_flow_fails(self):
@@ -624,6 +626,7 @@ class TestRun(TestBase):
             task_type=task_type,
             sentinel=sentinel,
         )
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_logistic_regression(self):
@@ -632,6 +635,7 @@ class TestRun(TestBase):
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE["n_missing_vals"]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(lr, task_id, n_missing_vals, n_test_obs, "62501")
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_linear_regression(self):
@@ -662,6 +666,7 @@ class TestRun(TestBase):
         n_missing_vals = self.TEST_SERVER_TASK_REGRESSION["n_missing_vals"]
         n_test_obs = self.TEST_SERVER_TASK_REGRESSION["n_test_obs"]
         self._run_and_upload_regression(lr, task_id, n_missing_vals, n_test_obs, "62501")
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_pipeline_dummy_pipeline(self):
@@ -675,6 +680,7 @@ class TestRun(TestBase):
         n_missing_vals = self.TEST_SERVER_TASK_SIMPLE["n_missing_vals"]
         n_test_obs = self.TEST_SERVER_TASK_SIMPLE["n_test_obs"]
         self._run_and_upload_classification(pipeline1, task_id, n_missing_vals, n_test_obs, "62501")
+
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -791,6 +797,7 @@ class TestRun(TestBase):
             if _warnings[0][0] == warning_msg:
                 call_count += 1
         assert call_count == 3
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_gridsearch(self):
@@ -813,6 +820,7 @@ class TestRun(TestBase):
             flow_expected_rsv="62501",
         )
         assert len(run.trace.trace_iterations) == 9
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_randomsearch(self):
@@ -845,6 +853,7 @@ class TestRun(TestBase):
         assert len(run.trace.trace_iterations) == 5
         trace = openml.runs.get_run_trace(run.run_id)
         assert len(trace.trace_iterations) == 5
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_and_upload_maskedarrays(self):
@@ -872,6 +881,7 @@ class TestRun(TestBase):
         )
 
     ##########################################################################
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_learning_curve_task_1(self):
@@ -896,6 +906,7 @@ class TestRun(TestBase):
             flow_expected_rsv="62501",
         )
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_learning_curve_task_2(self):
@@ -932,6 +943,7 @@ class TestRun(TestBase):
             flow_expected_rsv="62501",
         )
         self._check_sample_evaluations(run.sample_evaluations, num_repeats, num_folds, num_samples)
+
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.21"),
@@ -1010,6 +1022,7 @@ class TestRun(TestBase):
             for idx in range(len(alt_scores)):
                 assert alt_scores[idx] >= 0
                 assert alt_scores[idx] <= 1
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_local_run_swapped_parameter_order_model(self):
@@ -1025,6 +1038,7 @@ class TestRun(TestBase):
         )
 
         self._test_local_evaluations(run)
+
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1053,6 +1067,7 @@ class TestRun(TestBase):
         )
 
         self._test_local_evaluations(run)
+
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1090,6 +1105,7 @@ class TestRun(TestBase):
         run = openml.runs.get_run(9864498)
 
         self._test_local_evaluations(run)
+
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1151,6 +1167,7 @@ class TestRun(TestBase):
 
         assert flowS.components["Imputer"].parameters["strategy"] == '"most_frequent"'
         assert flowS.components["VarianceThreshold"].parameters["threshold"] == "0.05"
+
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1210,6 +1227,7 @@ class TestRun(TestBase):
             assert setup_exists > 0, "Server says setup of run does not exist."
             run_ids = run_exists(task.task_id, setup_exists)
             assert run_ids, (run_ids, clf)
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_with_illegal_flow_id(self):
@@ -1229,6 +1247,7 @@ class TestRun(TestBase):
                 flow=flow,
                 avoid_duplicate_runs=True,
             )
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_with_illegal_flow_id_after_load(self):
@@ -1286,6 +1305,7 @@ class TestRun(TestBase):
                 flow=flow_new,
                 avoid_duplicate_runs=True,
             )
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_with_illegal_flow_id_1_after_load(self):
@@ -1324,6 +1344,7 @@ class TestRun(TestBase):
             expected_message_regex,
             loaded_run.publish,
         )
+
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1553,6 +1574,7 @@ class TestRun(TestBase):
         # Don't remove the size restriction: this query is too expensive without
         runs = openml.runs.list_runs(tag="curves", size=2)
         assert len(runs) >= 1
+
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1589,6 +1611,7 @@ class TestRun(TestBase):
         for row in data_content:
             # repeat, fold, row_id, 6 confidences, prediction and correct label
             assert len(row) == 12
+
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1642,6 +1665,7 @@ class TestRun(TestBase):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         with pytest.raises(openml.exceptions.OpenMLCacheException):
             openml.runs.functions._get_cached_run(10)
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_run_flow_on_task_downloaded_flow(self):
@@ -1741,6 +1765,9 @@ class TestRun(TestBase):
         ignored_input = [0] * 5
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
+
+
+
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1836,6 +1863,8 @@ def test_delete_unknown_run(mock_delete, test_files_directory, test_api_key):
     run_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/run/9999999"
     assert run_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+
+
 @pytest.mark.sklearn()
 @unittest.skipIf(
     Version(sklearn.__version__) < Version("0.21"),
@@ -1916,6 +1945,8 @@ def test__run_task_get_arffcontent_2(parallel_mock):
         decimal=2,
         err_msg="Observed performance scores deviate from expected ones.",
     )
+
+
 @pytest.mark.sklearn()
 @unittest.skipIf(
     Version(sklearn.__version__) < Version("0.21"),
@@ -1985,7 +2016,6 @@ def test_joblib_backends(parallel_mock, n_jobs, backend, call_count):
         n_jobs=n_jobs,
     )
     from openml_sklearn import SklearnExtension
-
     extension = SklearnExtension()
     with parallel_backend(backend, n_jobs=n_jobs):
         res = openml.runs.functions._run_task_get_arffcontent(

@@ -7,7 +7,6 @@ from unittest import mock
 
 import minio
 import pytest
-import os
 
 import openml
 from openml.config import ConfigurationForExamples
@@ -20,6 +19,7 @@ class TestConfig(openml.testing.TestBase):
     def test_too_long_uri(self):
         with pytest.raises(openml.exceptions.OpenMLServerError, match="URI too long!"):
             openml.datasets.list_datasets(data_id=list(range(10000)))
+
     @unittest.mock.patch("time.sleep")
     @unittest.mock.patch("requests.Session")
     @pytest.mark.test_server()

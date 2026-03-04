@@ -12,7 +12,6 @@ from packaging.version import Version
 from unittest import mock
 from unittest.mock import patch
 
-import os
 import pandas as pd
 import pytest
 import requests
@@ -309,6 +308,7 @@ class TestFlowFunctions(TestBase):
         self.use_production_server()
         flow = openml.flows.get_flow(1)
         assert flow.external_version is None
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_get_flow_reinstantiate_model(self):
@@ -391,6 +391,7 @@ class TestFlowFunctions(TestBase):
         flow = openml.flows.get_flow(flow_id=8175, reinstantiate=True, strict_version=False)
         assert flow.flow_id is None
         assert "sklearn==0.19.1" not in flow.dependencies
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_get_flow_id(self):

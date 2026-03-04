@@ -117,6 +117,7 @@ class TestRun(TestBase):
             np.testing.assert_array_equal(string_part, string_part_prime)
         else:
             assert run_prime_trace_content is None
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_to_from_filesystem_vanilla(self):
@@ -151,6 +152,7 @@ class TestRun(TestBase):
         TestBase.logger.info(
             f"collected from {__file__.split('/')[-1]}: {run_prime.run_id}",
         )
+
     @pytest.mark.sklearn()
     @pytest.mark.flaky()
     @pytest.mark.test_server()
@@ -186,6 +188,7 @@ class TestRun(TestBase):
         TestBase.logger.info(
             f"collected from {__file__.split('/')[-1]}: {run_prime.run_id}",
         )
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_to_from_filesystem_no_model(self):
@@ -291,6 +294,7 @@ class TestRun(TestBase):
             # Assert correctness
             assert_method(y_pred, saved_y_pred)
             assert_method(y_test, saved_y_test)
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_publish_with_local_loaded_flow(self):
@@ -334,6 +338,7 @@ class TestRun(TestBase):
             # make sure the flow is published as part of publishing the run.
             assert openml.flows.flow_exists(flow.name, flow.external_version)
             openml.runs.get_run(loaded_run.run_id)
+
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_offline_and_online_run_identical(self):
