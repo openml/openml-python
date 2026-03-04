@@ -103,7 +103,7 @@ def test_get_with_cache_creates_cache(http_client, cache, sample_url_v1, sample_
 
 @pytest.mark.test_server()
 def test_get_uses_cached_response(http_client, cache, sample_url_v1, sample_path):
-    key = cache.get_key(sample_url_v1, {})
+    key = cache.get_key(sample_url_v1, params={})
     meta_path = cache._key_to_path(key) / "meta.json"
 
     r1 = http_client.get(sample_path, enable_cache=True)
