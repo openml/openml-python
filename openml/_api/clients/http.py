@@ -762,7 +762,7 @@ class HTTPClient:
     def download(
         self,
         url: str,
-        handler: Callable[[Response, Path, str], Path] | None = None,
+        handler: Callable[[Response, Path, str], None] | None = None,
         encoding: str = "utf-8",
         file_name: str = "response.txt",
         md5_checksum: str | None = None,
@@ -803,7 +803,7 @@ class HTTPClient:
 
         response = self.get(url, md5_checksum=md5_checksum)
 
-        def write_to_file(response, path, encoding):
+        def write_to_file(response: Response, path: Path, encoding: str) -> None:
             path.write_text(response.text, encoding)
 
         handler = handler or write_to_file
