@@ -177,12 +177,16 @@ def test_download_creates_file(http_client, sample_download_url_v1):
 
 
 @pytest.mark.test_server()
-def test_download_is_cached_on_disk(http_client, sample_download_url_v1):
+def test_download_is_cached_on_disk(http_client, sample_download_url_v1, monkeypatch):
     path1 = http_client.download(
         url=sample_download_url_v1,
         file_name="cached.arff",
     )
     mtime1 = path1.stat().st_mtime
+
+    def fail_request(*args, **kwargs):
+        raise AssertionError("HTTP request should not be called")
+    monkeypatch.setattr(Session, "request", fail_request)
 
     path2 = http_client.download(
         url=sample_download_url_v1,
