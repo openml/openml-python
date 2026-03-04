@@ -137,11 +137,15 @@ def test_get_refresh_cache(http_client, cache, sample_url_v1, sample_path):
 
 
 @pytest.mark.test_server()
-def test_get_with_api_key(http_client, sample_path):
-    response = http_client.get(sample_path, use_api_key=True)
+def test_get_with_api_key(http_client, sample_path, test_apikey_v1):
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
 
-    assert response.status_code == 200
-    assert b"<oml:task" in response.content
+        http_client.get(sample_path, use_api_key=True)
+
+        _, kwargs = mock_request.call_args
+        assert kwargs.get("params", {}).get("api_key") == test_apikey_v1
 
 
 @pytest.mark.test_server()
