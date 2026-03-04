@@ -20,7 +20,6 @@ class OpenMLSplitTest(TestBase):
     def setUp(self):
         __file__ = inspect.getfile(OpenMLSplitTest)
         self.directory = os.path.dirname(__file__)
-        # This is for dataset
         source_arff = (
             Path(self.directory).parent
             / "files"
