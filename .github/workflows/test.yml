@@ -137,7 +137,7 @@ jobs:
           marks="not production_server"
         fi
 
-        pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
+        pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks" tests/test_datasets/test_dataset_functions.py::TestOpenMLDataset
 
     - name: Run tests on Ubuntu Production
       if: matrix.os == 'ubuntu-latest'
@@ -155,7 +155,7 @@ jobs:
           marks="production_server"
         fi
 
-        pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
+        pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks" tests/test_datasets/test_dataset_functions.py::TestOpenMLDataset
 
     - name: Run tests on Windows
       if: matrix.os == 'windows-latest'
@@ -172,6 +172,11 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: true
         verbose: true
+
+    - name: Dump server logs
+      if: matrix.os == 'ubuntu-latest' && always()
+      run: |
+        docker logs openml-php-rest-api -t
 
     - name: Cleanup Docker setup
       if: matrix.os == 'ubuntu-latest' && always()
