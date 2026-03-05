@@ -21,11 +21,11 @@ class OpenMLSplitTest(TestBase):
 
     def setUp(self):
         super().setUp()
-        self._temp_dir = tempfile.TemporaryDirectory()
+        self.test_dir = tempfile.mkdtemp()
         __file__ = inspect.getfile(OpenMLSplitTest)
         self.directory = os.path.dirname(__file__)
         # This is for dataset
-        source_arff = (
+        original_arff_filepath = (
             Path(self.directory).parent
             / "files"
             / "org"
@@ -35,12 +35,13 @@ class OpenMLSplitTest(TestBase):
             / "1882"
             / "datasplits.arff"
         )
-        self.arff_filepath = Path(self._temp_dir.name) / "datasplits.arff"
-        shutil.copy(source_arff, self.arff_filepath)
+        self.arff_filepath = Path(self.test_dir) / "datasplits.arff"
+        shutil.copy(original_arff_filepath, self.arff_filepath)
         self.pd_filename = self.arff_filepath.with_suffix(".pkl.py3")
 
     def tearDown(self):
-        self._temp_dir.cleanup()
+        shutil.rmtree(self.test_dir)
+        super().tearDown()
 
     def test_eq(self):
         split = OpenMLSplit._from_arff_file(self.arff_filepath)
