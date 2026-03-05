@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import inspect
+import os
 import shutil
 import tempfile
 from pathlib import Path
@@ -22,10 +23,10 @@ class OpenMLSplitTest(TestBase):
         super().setUp()
         self.test_dir = tempfile.mkdtemp()
         __file__ = inspect.getfile(OpenMLSplitTest)
-        self.directory = Path(__file__).parent
+        self.directory = os.path.dirname(__file__)
         # This is for dataset
         original_arff_filepath = (
-            self.directory.parent
+            Path(self.directory).parent
             / "files"
             / "org"
             / "openml"
@@ -39,8 +40,11 @@ class OpenMLSplitTest(TestBase):
         self.pd_filename = self.arff_filepath.with_suffix(".pkl.py3")
 
     def tearDown(self):
-        with contextlib.suppress(OSError):
+        try:
             shutil.rmtree(self.test_dir)
+        except OSError:
+            #  Replaced bare except. Not sure why these exceptions are acceptable.
+            pass
         super().tearDown()
 
     def test_eq(self):
