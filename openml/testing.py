@@ -10,11 +10,13 @@ import shutil
 import time
 import unittest
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, cast
 
 import requests
 
 import openml
+from openml._api import API_REGISTRY, HTTPCache, HTTPClient, MinIOClient, ResourceAPI
+from openml.enums import APIVersion, ResourceType, RetryPolicy
 from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType
 
@@ -47,13 +49,16 @@ class TestBase(unittest.TestCase):
         "user": [],
     }
     flow_name_tracker: ClassVar[list[str]] = []
-    test_server = f"{openml.config.TEST_SERVER_URL}/api/v1/xml"
     admin_key = os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR)
-    user_key = openml.config._TEST_SERVER_NORMAL_USER_KEY
 
     # creating logger for tracking files uploaded to test server
     logger = logging.getLogger("unit_tests_published_entities")
     logger.setLevel(logging.DEBUG)
+
+    # migration-specific attributes
+    cache: HTTPCache
+    http_clients: dict[APIVersion, HTTPClient]
+    minio_client: MinIOClient
 
     def setUp(self, n_levels: int = 1, tmpdir_suffix: str = "") -> None:
         """Setup variables and temporary directories.
@@ -99,8 +104,6 @@ class TestBase(unittest.TestCase):
         os.chdir(self.workdir)
 
         self.cached = True
-        openml.config.apikey = TestBase.user_key
-        self.production_server = "https://www.openml.org/api/v1/xml"
         openml.config.set_root_cache_directory(str(self.workdir))
 
         # Increase the number of retries to avoid spurious server failures
@@ -108,14 +111,20 @@ class TestBase(unittest.TestCase):
         self.connection_n_retries = openml.config.connection_n_retries
         openml.config.set_retry_policy("robot", n_retries=20)
 
+        self.cache = HTTPCache()
+        self.http_clients = {
+            APIVersion.V1: HTTPClient(api_version=APIVersion.V1),
+            APIVersion.V2: HTTPClient(api_version=APIVersion.V2),
+        }
+        self.minio_client = MinIOClient()
+
     def use_production_server(self) -> None:
         """
         Use the production server for the OpenML API calls.
 
         Please use this sparingly - it is better to use the test server.
         """
-        openml.config.server = self.production_server
-        openml.config.apikey = ""
+        openml.config.set_servers("production")
 
     def tearDown(self) -> None:
         """Tear down the test"""
@@ -274,6 +283,56 @@ class TestBase(unittest.TestCase):
                         assert isinstance(evaluation, float)
                         assert evaluation >= min_val
                         assert evaluation <= max_val
+
+
+class TestAPIBase(TestBase):
+    cache: HTTPCache
+    http_clients: dict[APIVersion, HTTPClient]
+    minio_client: MinIOClient
+
+    def setUp(self, n_levels: int = 1, tmpdir_suffix: str = "") -> None:
+        super().setUp(n_levels=n_levels, tmpdir_suffix=tmpdir_suffix)
+
+        timeout = 10
+        retries = self.connection_n_retries
+        retry_policy = RetryPolicy.HUMAN if self.retry_policy == "human" else RetryPolicy.ROBOT
+        ttl = 60 * 60 * 24 * 7  # one week
+        cache_dir = self.static_cache_dir
+
+        self.cache = HTTPCache(
+            path=cache_dir,
+            ttl=ttl,
+        )
+        self.http_clients = {
+            APIVersion.V1: HTTPClient(
+                api_version=APIVersion.V1,
+                server="https://test.openml.org/",
+                base_url="api/v1/xml/",
+                api_key="normaluser",
+                timeout=timeout,
+                retries=retries,
+                retry_policy=retry_policy,
+                cache=self.cache,
+            ),
+            APIVersion.V2: HTTPClient(
+                api_version=APIVersion.V2,
+                server="http://localhost:8002/",
+                base_url="",
+                api_key="",
+                timeout=timeout,
+                retries=retries,
+                retry_policy=retry_policy,
+                cache=self.cache,
+            ),
+        }
+        self.minio_client = MinIOClient(path=cache_dir)
+
+    def _create_resource(self, api_version: APIVersion, resource_type: ResourceType) -> ResourceAPI:
+        http_client = self.http_clients[api_version]
+        resource_cls = API_REGISTRY[api_version][resource_type]
+        if resource_type == ResourceType.DATASET:
+            return cast("ResourceAPI", resource_cls(http_client, self.minio_client))  # type: ignore[call-arg]
+        return cast("ResourceAPI", resource_cls(http_client))
 
 
 def check_task_existence(
