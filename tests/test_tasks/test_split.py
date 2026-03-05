@@ -1,7 +1,6 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import contextlib
 import inspect
 import os
 import shutil
@@ -9,7 +8,6 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
-import pytest
 
 from openml import OpenMLSplit
 from openml.testing import TestBase
@@ -20,12 +18,9 @@ class OpenMLSplitTest(TestBase):
     # than 5 seconds + rebuilding the test would potentially be costly
 
     def setUp(self):
-        super().setUp()
-        self.test_dir = tempfile.mkdtemp()
         __file__ = inspect.getfile(OpenMLSplitTest)
         self.directory = os.path.dirname(__file__)
-        # This is for dataset
-        original_arff_filepath = (
+        source_arff = (
             Path(self.directory).parent
             / "files"
             / "org"
@@ -35,17 +30,19 @@ class OpenMLSplitTest(TestBase):
             / "1882"
             / "datasplits.arff"
         )
-        self.arff_filepath = Path(self.test_dir) / "datasplits.arff"
-        shutil.copy(original_arff_filepath, self.arff_filepath)
+        # Use a unique temp directory for each test to avoid race conditions
+        # when running tests in parallel (see issue #1641)
+        self._temp_dir = tempfile.TemporaryDirectory()
+        self.arff_filepath = Path(self._temp_dir.name) / "datasplits.arff"
+        shutil.copy(source_arff, self.arff_filepath)
         self.pd_filename = self.arff_filepath.with_suffix(".pkl.py3")
 
     def tearDown(self):
-        shutil.rmtree(self.test_dir)
-        super().tearDown()
+        self._temp_dir.cleanup()
 
     def test_eq(self):
         split = OpenMLSplit._from_arff_file(self.arff_filepath)
-        assert split == split  # noqa: PLR0124
+        assert split == split
 
         split2 = OpenMLSplit._from_arff_file(self.arff_filepath)
         split2.name = "a"
@@ -87,7 +84,17 @@ class OpenMLSplitTest(TestBase):
         train_split, test_split = split.get(fold=5, repeat=2)
         assert train_split.shape[0] == 808
         assert test_split.shape[0] == 90
-        with pytest.raises(ValueError, match="Repeat 10 not known"):
-            split.get(10, 2)
-        with pytest.raises(ValueError, match="Fold 10 not known"):
-            split.get(2, 10)
+        self.assertRaisesRegex(
+            ValueError,
+            "Repeat 10 not known",
+            split.get,
+            10,
+            2,
+        )
+        self.assertRaisesRegex(
+            ValueError,
+            "Fold 10 not known",
+            split.get,
+            2,
+            10,
+        )
