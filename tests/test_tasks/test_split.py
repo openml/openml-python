@@ -5,6 +5,7 @@ import contextlib
 import inspect
 import os
 import shutil
+import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -20,10 +21,11 @@ class OpenMLSplitTest(TestBase):
 
     def setUp(self):
         super().setUp()
+        self._temp_dir = tempfile.TemporaryDirectory()
         __file__ = inspect.getfile(OpenMLSplitTest)
         self.directory = os.path.dirname(__file__)
         # This is for dataset
-        self.arff_filepath = (
+        source_arff = (
             Path(self.directory).parent
             / "files"
             / "org"
@@ -33,6 +35,8 @@ class OpenMLSplitTest(TestBase):
             / "1882"
             / "datasplits.arff"
         )
+        self.arff_filepath = Path(self._temp_dir.name) / "datasplits.arff"
+        shutil.copy(source_arff, self.arff_filepath)
         self.pd_filename = self.arff_filepath.with_suffix(".pkl.py3")
 
     def tearDown(self):
@@ -40,6 +44,7 @@ class OpenMLSplitTest(TestBase):
 
     def test_eq(self):
         split = OpenMLSplit._from_arff_file(self.arff_filepath)
+        assert split == split  # noqa: PLR0124
 
         split2 = OpenMLSplit._from_arff_file(self.arff_filepath)
         split2.name = "a"
