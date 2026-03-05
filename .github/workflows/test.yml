@@ -93,7 +93,11 @@ jobs:
         pip install -e .[test] scikit-learn==${{ matrix.scikit-learn }}
 
         # scikit-learn 1.7+ requires pandas 3.x, earlier versions use pandas 2.x
-        if [[ "${{ matrix.scikit-learn }}" == "1.7."* ]]; then
+        version="${{ matrix.scikit-learn }}"
+        major=$(echo "$version" | cut -d. -f1)
+        minor=$(echo "$version" | cut -d. -f2)
+
+        if [[ "$major" -gt 1 ]] || { [[ "$major" -eq 1 ]] && [[ "$minor" -ge 7 ]]; }; then
           pip install "pandas==3.*"
         else
           pip install "pandas==2.*"
