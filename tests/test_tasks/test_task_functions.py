@@ -96,7 +96,9 @@ class TestTask(TestBase):
 
     @pytest.mark.test_server()
     def test_list_tasks_by_tag(self):
-        num_basic_tasks = 100  # number is flexible, check server if fails
+        # Server starts with 99 active tasks with the tag, and one 'in_preparation',
+        # so depending on the processing of the last dataset, there may be 99 or 100 matches.
+        num_basic_tasks = 99
         tasks = openml.tasks.list_tasks(tag="OpenML100")
         assert len(tasks) >= num_basic_tasks
         for task in tasks.to_dict(orient="index").values():
@@ -156,13 +158,13 @@ class TestTask(TestBase):
         task = openml.tasks.get_task(1, download_data=True)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "task.xml")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "1", "task.xml")
         )
         assert not os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "datasplits.arff")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "1", "datasplits.arff")
         )
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "datasets", "1", "dataset.arff")
+            os.path.join(openml.config.get_cache_directory(), "datasets", "1", "dataset_1.pq")
         )
 
     @pytest.mark.test_server()
@@ -170,21 +172,21 @@ class TestTask(TestBase):
         task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
         assert isinstance(task, OpenMLTask)
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "task.xml")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "2", "task.xml")
         )
         assert task.class_labels == ["1", "2", "3", "4", "5", "U"]
 
         assert not os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff")
         )
         # Since the download_data=False is propagated to get_dataset
         assert not os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "datasets", "2", "dataset.arff")
+            os.path.join(openml.config.get_cache_directory(), "datasets", "2", "dataset.arff")
         )
 
         task.download_split()
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "2", "datasplits.arff")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff")
         )
 
     @mock.patch("openml.tasks.functions.get_dataset")
@@ -228,7 +230,7 @@ class TestTask(TestBase):
         split = task.download_split()
         assert type(split) == OpenMLSplit
         assert os.path.exists(
-            os.path.join(self.workdir, "org", "openml", "test", "tasks", "1", "datasplits.arff")
+            os.path.join(openml.config.get_cache_directory(), "tasks", "1", "datasplits.arff")
         )
 
     def test_deletion_of_cache_dir(self):
@@ -244,7 +246,6 @@ class TestTask(TestBase):
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_task_not_owned(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_not_owned.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -257,14 +258,13 @@ def test_delete_task_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.tasks.delete_task(1)
 
-    task_url = "https://test.openml.org/api/v1/xml/task/1"
+    task_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/task/1"
     assert task_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_task_with_run(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_has_runs.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -277,14 +277,13 @@ def test_delete_task_with_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.tasks.delete_task(3496)
 
-    task_url = "https://test.openml.org/api/v1/xml/task/3496"
+    task_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/task/3496"
     assert task_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_success(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_successful.xml"
     mock_delete.return_value = create_request_response(
         status_code=200,
@@ -294,14 +293,13 @@ def test_delete_success(mock_delete, test_files_directory, test_api_key):
     success = openml.tasks.delete_task(361323)
     assert success
 
-    task_url = "https://test.openml.org/api/v1/xml/task/361323"
+    task_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/task/361323"
     assert task_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
 def test_delete_unknown_task(mock_delete, test_files_directory, test_api_key):
-    openml.config.start_using_configuration_for_example()
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_not_exist.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -314,6 +312,6 @@ def test_delete_unknown_task(mock_delete, test_files_directory, test_api_key):
     ):
         openml.tasks.delete_task(9_999_999)
 
-    task_url = "https://test.openml.org/api/v1/xml/task/9999999"
+    task_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/task/9999999"
     assert task_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
