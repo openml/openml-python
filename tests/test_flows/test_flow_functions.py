@@ -5,10 +5,6 @@ import copy
 import functools
 import unittest
 from collections import OrderedDict
-from multiprocessing.managers import Value
-
-from openml_sklearn import SklearnExtension
-from packaging.version import Version
 from unittest import mock
 from unittest.mock import patch
 
@@ -16,6 +12,8 @@ import pandas as pd
 import pytest
 import requests
 import sklearn
+from openml_sklearn import SklearnExtension
+from packaging.version import Version
 from sklearn import ensemble
 
 import openml
@@ -34,7 +32,7 @@ class TestFlowFunctions(TestBase):
         super().tearDown()
 
     def _check_flow(self, flow):
-        assert type(flow) == dict
+        assert type(flow) == dict  # noqa: E721
         assert len(flow) == 6
         assert isinstance(flow["id"], int)
         assert isinstance(flow["name"], str)
@@ -47,7 +45,7 @@ class TestFlowFunctions(TestBase):
         )
         assert ext_version_str_or_none
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_list_flows(self):
         self.use_production_server()
         # We can only perform a smoke test here because we test on dynamic
@@ -58,7 +56,7 @@ class TestFlowFunctions(TestBase):
         for flow in flows.to_dict(orient="index").values():
             self._check_flow(flow)
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_list_flows_output_format(self):
         self.use_production_server()
         # We can only perform a smoke test here because we test on dynamic
@@ -67,13 +65,13 @@ class TestFlowFunctions(TestBase):
         assert isinstance(flows, pd.DataFrame)
         assert len(flows) >= 1500
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_list_flows_empty(self):
         self.use_production_server()
         flows = openml.flows.list_flows(tag="NoOneEverUsesThisTag123")
         assert flows.empty
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_list_flows_by_tag(self):
         self.use_production_server()
         flows = openml.flows.list_flows(tag="weka")
@@ -81,7 +79,7 @@ class TestFlowFunctions(TestBase):
         for flow in flows.to_dict(orient="index").values():
             self._check_flow(flow)
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_list_flows_paginate(self):
         self.use_production_server()
         size = 10
@@ -121,7 +119,7 @@ class TestFlowFunctions(TestBase):
             new_flow = copy.deepcopy(flow)
             setattr(new_flow, attribute, new_value)
             assert getattr(flow, attribute) != getattr(new_flow, attribute)
-            self.assertRaises(
+            self.assertRaises(  # noqa: PT027
                 ValueError,
                 openml.flows.functions.assert_flows_equal,
                 flow,
@@ -152,14 +150,14 @@ class TestFlowFunctions(TestBase):
         openml.flows.functions.assert_flows_equal(flow, flow)
         new_flow = copy.deepcopy(flow)
         new_flow.parameters["abc"] = 3.0
-        self.assertRaises(ValueError, openml.flows.functions.assert_flows_equal, flow, new_flow)
+        self.assertRaises(ValueError, openml.flows.functions.assert_flows_equal, flow, new_flow)  # noqa: PT027
 
         # Now test for components (subflows)
         parent_flow = copy.deepcopy(flow)
         subflow = copy.deepcopy(flow)
         parent_flow.components["subflow"] = subflow
         openml.flows.functions.assert_flows_equal(parent_flow, parent_flow)
-        self.assertRaises(
+        self.assertRaises(  # noqa: PT027
             ValueError,
             openml.flows.functions.assert_flows_equal,
             parent_flow,
@@ -167,7 +165,7 @@ class TestFlowFunctions(TestBase):
         )
         new_flow = copy.deepcopy(parent_flow)
         new_flow.components["subflow"].name = "Subflow name"
-        self.assertRaises(
+        self.assertRaises(  # noqa: PT027
             ValueError,
             openml.flows.functions.assert_flows_equal,
             parent_flow,
@@ -198,22 +196,20 @@ class TestFlowFunctions(TestBase):
 
         new_flow = copy.deepcopy(flow)
         new_flow.parameters["a"] = 7
-        with pytest.raises(ValueError) as excinfo:
+        with pytest.raises(ValueError) as excinfo:  # noqa: PT011
             openml.flows.functions.assert_flows_equal(flow, new_flow)
-        assert str(paramaters) in str(excinfo.value) and str(new_flow.parameters) in str(
-            excinfo.value
-        )
+        assert str(paramaters) in str(excinfo.value)
+        assert str(new_flow.parameters) in str(excinfo.value)
 
         openml.flows.functions.assert_flows_equal(flow, new_flow, ignore_parameter_values=True)
 
         del new_flow.parameters["a"]
-        with pytest.raises(ValueError) as excinfo:
+        with pytest.raises(ValueError) as excinfo:  # noqa: PT011
             openml.flows.functions.assert_flows_equal(flow, new_flow)
-        assert str(paramaters) in str(excinfo.value) and str(new_flow.parameters) in str(
-            excinfo.value
-        )
+        assert str(paramaters) in str(excinfo.value)
+        assert str(new_flow.parameters) in str(excinfo.value)
 
-        self.assertRaisesRegex(
+        self.assertRaisesRegex(  # noqa: PT027
             ValueError,
             r"Flow Test: parameter set of flow differs from the parameters "
             r"stored on the server.",
@@ -249,14 +245,14 @@ class TestFlowFunctions(TestBase):
         assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=None)
         new_flow = copy.deepcopy(flow)
         new_flow.parameters["a"] = 7
-        self.assertRaises(
+        self.assertRaises(  # noqa: PT027
             ValueError,
             assert_flows_equal,
             flow,
             new_flow,
             ignore_parameter_values_on_older_children=flow_upload_date,
         )
-        self.assertRaises(
+        self.assertRaises(  # noqa: PT027
             ValueError,
             assert_flows_equal,
             flow,
@@ -265,7 +261,7 @@ class TestFlowFunctions(TestBase):
         )
 
         new_flow.upload_date = "2016-01-31T12-01-01"
-        self.assertRaises(
+        self.assertRaises(  # noqa: PT027
             ValueError,
             assert_flows_equal,
             flow,
@@ -274,13 +270,13 @@ class TestFlowFunctions(TestBase):
         )
         assert_flows_equal(flow, flow, ignore_parameter_values_on_older_children=None)
 
-    @pytest.mark.sklearn()
+    @pytest.mark.sklearn
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="OrdinalEncoder introduced in 0.20. "
         "No known models with list of lists parameters in older versions.",
     )
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_sklearn_to_flow_list_of_lists(self):
         from sklearn.preprocessing import OrdinalEncoder
@@ -301,7 +297,7 @@ class TestFlowFunctions(TestBase):
         assert server_flow.parameters["categories"] == "[[0, 1], [0, 1]]"
         assert server_flow.model.categories == flow.model.categories
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_get_flow1(self):
         # Regression test for issue #305
         # Basically, this checks that a flow without an external version can be loaded
@@ -309,8 +305,8 @@ class TestFlowFunctions(TestBase):
         flow = openml.flows.get_flow(1)
         assert flow.external_version is None
 
-    @pytest.mark.sklearn()
-    @pytest.mark.test_server()
+    @pytest.mark.sklearn
+    @pytest.mark.test_server
     def test_get_flow_reinstantiate_model(self):
         model = ensemble.RandomForestClassifier(n_estimators=33)
         extension = openml.extensions.get_extension_by_model(model)
@@ -322,28 +318,28 @@ class TestFlowFunctions(TestBase):
         downloaded_flow = openml.flows.get_flow(flow.flow_id, reinstantiate=True)
         assert isinstance(downloaded_flow.model, sklearn.ensemble.RandomForestClassifier)
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_get_flow_reinstantiate_model_no_extension(self):
         # Flow 10 is a WEKA flow
-        self.assertRaisesRegex(
+        self.assertRaisesRegex(  # noqa: PT027
             ValueError,
-            ".* flow: 10 \(weka.SMO\). ",
+            r".* flow: 10 \(weka.SMO\). ",
             openml.flows.get_flow,
             flow_id=10,
             reinstantiate=True,
         )
 
-    @pytest.mark.sklearn()
+    @pytest.mark.sklearn
     @unittest.skipIf(
         Version(sklearn.__version__) == Version("0.19.1"),
         reason="Requires scikit-learn!=0.19.1, because target flow is from that version.",
     )
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_get_flow_with_reinstantiate_strict_with_wrong_version_raises_exception(self):
         self.use_production_server()
         flow = 8175
         expected = "Trying to deserialize a model with dependency sklearn==0.19.1 not satisfied."
-        self.assertRaisesRegex(
+        self.assertRaisesRegex(  # noqa: PT027
             ValueError,
             expected,
             openml.flows.get_flow,
@@ -352,48 +348,48 @@ class TestFlowFunctions(TestBase):
             strict_version=True,
         )
 
-    @pytest.mark.sklearn()
+    @pytest.mark.sklearn
     @unittest.skipIf(
         Version(sklearn.__version__) >= Version("1.0.0"),
         reason="Requires scikit-learn < 1.0.0.",
         # Because scikit-learn dropped min_impurity_split hyperparameter in 1.0,
         # and the requested flow is from 1.0.0 exactly.
     )
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_get_flow_reinstantiate_flow_not_strict_post_1(self):
         self.use_production_server()
         flow = openml.flows.get_flow(flow_id=19190, reinstantiate=True, strict_version=False)
         assert flow.flow_id is None
         assert "sklearn==1.0.0" not in flow.dependencies
 
-    @pytest.mark.sklearn()
+    @pytest.mark.sklearn
     @unittest.skipIf(
         (Version(sklearn.__version__) < Version("0.23.2"))
         or (Version(sklearn.__version__) >= Version("1.0")),
         reason="Requires scikit-learn 0.23.2 or ~0.24.",
         # Because these still have min_impurity_split, but with new scikit-learn module structure."
     )
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_get_flow_reinstantiate_flow_not_strict_023_and_024(self):
         self.use_production_server()
         flow = openml.flows.get_flow(flow_id=18587, reinstantiate=True, strict_version=False)
         assert flow.flow_id is None
         assert "sklearn==0.23.1" not in flow.dependencies
 
-    @pytest.mark.sklearn()
+    @pytest.mark.sklearn
     @unittest.skipIf(
         Version(sklearn.__version__) > Version("0.23"),
         reason="Requires scikit-learn<=0.23, because the scikit-learn module structure changed.",
     )
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_get_flow_reinstantiate_flow_not_strict_pre_023(self):
         self.use_production_server()
         flow = openml.flows.get_flow(flow_id=8175, reinstantiate=True, strict_version=False)
         assert flow.flow_id is None
         assert "sklearn==0.19.1" not in flow.dependencies
 
-    @pytest.mark.sklearn()
-    @pytest.mark.test_server()
+    @pytest.mark.sklearn
+    @pytest.mark.test_server
     def test_get_flow_id(self):
         if self.long_version:
             list_all = openml.utils._list_all
@@ -428,7 +424,7 @@ class TestFlowFunctions(TestBase):
             pytest.skip(reason="Not sure why there should only be one version of this flow.")
             assert flow_ids_exact_version_True == flow_ids_exact_version_False
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_delete_flow(self):
         flow = openml.OpenMLFlow(
             name="sklearn.dummy.DummyClassifier",
@@ -461,7 +457,7 @@ def test_delete_flow_not_owned(mock_delete, test_files_directory, test_api_key):
 
     with pytest.raises(
         OpenMLNotAuthorizedError,
-        match="The flow can not be deleted because it was not uploaded by you.",
+        match=r"The flow can not be deleted because it was not uploaded by you.",
     ):
         openml.flows.delete_flow(40_000)
 

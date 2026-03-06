@@ -5,12 +5,15 @@ from __future__ import annotations
 import argparse
 import string
 import sys
-from collections.abc import Callable
 from pathlib import Path
+from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
 from openml import config
 from openml.__version__ import __version__
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def is_hex(string_: str) -> bool:

@@ -25,7 +25,7 @@ class TestRun(TestBase):
     # Splitting not helpful, these test's don't rely on the server and take
     # less than 1 seconds
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_tagging(self):
         runs = openml.runs.list_runs(size=1)
         assert not runs.empty, "Test server state is incorrect"
@@ -66,12 +66,12 @@ class TestRun(TestBase):
     def _test_run_obj_equals(self, run, run_prime):
         for dictionary in ["evaluations", "fold_evaluations", "sample_evaluations"]:
             if getattr(run, dictionary) is not None:
-                self.assertDictEqual(getattr(run, dictionary), getattr(run_prime, dictionary))
+                self.assertDictEqual(getattr(run, dictionary), getattr(run_prime, dictionary))  # noqa: PT009
             else:
                 # should be none or empty
                 other = getattr(run_prime, dictionary)
                 if other is not None:
-                    self.assertDictEqual(other, {})
+                    self.assertDictEqual(other, {})  # noqa: PT009
         assert run._to_xml() == run_prime._to_xml()
         self._test_prediction_data_equal(run, run_prime)
 
@@ -105,7 +105,7 @@ class TestRun(TestBase):
             )
             bool_part = [line[4] for line in run_trace_content]
             bool_part_prime = [line[4] for line in run_prime_trace_content]
-            for bp, bpp in zip(bool_part, bool_part_prime):
+            for bp, bpp in zip(bool_part, bool_part_prime, strict=False):
                 assert bp in ["true", "false"]
                 assert bpp in ["true", "false"]
             string_part = np.array(run_trace_content)[:, 5:]
@@ -118,8 +118,8 @@ class TestRun(TestBase):
         else:
             assert run_prime_trace_content is None
 
-    @pytest.mark.sklearn()
-    @pytest.mark.test_server()
+    @pytest.mark.sklearn
+    @pytest.mark.test_server
     def test_to_from_filesystem_vanilla(self):
         model = Pipeline(
             [
@@ -135,7 +135,7 @@ class TestRun(TestBase):
             upload_flow=True,
         )
 
-        cache_path = os.path.join(
+        cache_path = os.path.join(  # noqa: PTH118
             self.workdir,
             "runs",
             str(random.getrandbits(128)),
@@ -153,9 +153,9 @@ class TestRun(TestBase):
             f"collected from {__file__.split('/')[-1]}: {run_prime.run_id}",
         )
 
-    @pytest.mark.sklearn()
-    @pytest.mark.flaky()
-    @pytest.mark.test_server()
+    @pytest.mark.sklearn
+    @pytest.mark.flaky
+    @pytest.mark.test_server
     def test_to_from_filesystem_search(self):
         model = Pipeline(
             [
@@ -178,7 +178,7 @@ class TestRun(TestBase):
             add_local_measures=False,
         )
 
-        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
+        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))  # noqa: PTH118
         run.to_filesystem(cache_path)
 
         run_prime = openml.runs.OpenMLRun.from_filesystem(cache_path)
@@ -189,8 +189,8 @@ class TestRun(TestBase):
             f"collected from {__file__.split('/')[-1]}: {run_prime.run_id}",
         )
 
-    @pytest.mark.sklearn()
-    @pytest.mark.test_server()
+    @pytest.mark.sklearn
+    @pytest.mark.test_server
     def test_to_from_filesystem_no_model(self):
         model = Pipeline(
             [("imputer", SimpleImputer(strategy="mean")), ("classifier", DummyClassifier())],
@@ -198,12 +198,12 @@ class TestRun(TestBase):
         task = openml.tasks.get_task(119)  # diabetes; crossvalidation
         run = openml.runs.run_model_on_task(model=model, task=task, add_local_measures=False)
 
-        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
+        cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))  # noqa: PTH118
         run.to_filesystem(cache_path, store_model=False)
         # obtain run from filesystem
         openml.runs.OpenMLRun.from_filesystem(cache_path, expect_model=False)
         # assert default behaviour is throwing an error
-        with self.assertRaises(ValueError, msg="Could not find model.pkl"):
+        with self.assertRaises(ValueError, msg="Could not find model.pkl"):  # noqa: PT027
             openml.runs.OpenMLRun.from_filesystem(cache_path)
 
     @staticmethod
@@ -266,7 +266,7 @@ class TestRun(TestBase):
         for fold_id in range(n_folds):
             # Get data for fold
             _, test_indices = task.get_train_test_split_indices(repeat=0, fold=fold_id, sample=0)
-            train_mask = np.full(len(X), True)
+            train_mask = np.full(len(X), True)  # noqa: FBT003
             train_mask[test_indices] = False
 
             # Get train / test
@@ -295,8 +295,8 @@ class TestRun(TestBase):
             assert_method(y_pred, saved_y_pred)
             assert_method(y_test, saved_y_test)
 
-    @pytest.mark.sklearn()
-    @pytest.mark.test_server()
+    @pytest.mark.sklearn
+    @pytest.mark.test_server
     def test_publish_with_local_loaded_flow(self):
         """
         Publish a run tied to a local flow after it has first been saved to
@@ -323,7 +323,7 @@ class TestRun(TestBase):
             # Make sure that the prediction data stored in the run is correct.
             self.assert_run_prediction_data(task, run, clone(model))
 
-            cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
+            cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))  # noqa: PTH118
             run.to_filesystem(cache_path)
             # obtain run from filesystem
             loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
@@ -339,8 +339,8 @@ class TestRun(TestBase):
             assert openml.flows.flow_exists(flow.name, flow.external_version)
             openml.runs.get_run(loaded_run.run_id)
 
-    @pytest.mark.sklearn()
-    @pytest.mark.test_server()
+    @pytest.mark.sklearn
+    @pytest.mark.test_server
     def test_offline_and_online_run_identical(self):
         extension = SklearnExtension()
 
@@ -361,7 +361,7 @@ class TestRun(TestBase):
             assert not openml.flows.flow_exists(flow.name, flow.external_version)
 
             # Load from filesystem
-            cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))
+            cache_path = os.path.join(self.workdir, "runs", str(random.getrandbits(128)))  # noqa: PTH118
             run.to_filesystem(cache_path)
             loaded_run = openml.runs.OpenMLRun.from_filesystem(cache_path)
 

@@ -1,8 +1,8 @@
 # OpenML Python Container
 
 This docker container has the latest version of openml-python downloaded and pre-installed.
-It can also be used by developers to run unit tests or build the docs in 
-a fresh and/or isolated unix environment. 
+It can also be used by developers to run unit tests or build the docs in
+a fresh and/or isolated unix environment.
 This document contains information about:
 
  1. [Usage](#usage): how to use the image and its main modes.
@@ -42,7 +42,7 @@ docker run -v PATH/TO/FILE:/openml/MY_SCRIPT.py openml/openml-python MY_SCRIPT.p
 ### Running unit tests
 
 You can run the unit tests by passing `test` as the first argument.
-It also requires a local or remote repository to be specified, which is explained 
+It also requires a local or remote repository to be specified, which is explained
 [below]((#using-local-or-remote-code). For this example, we specify to test the
 `develop` branch:
 
@@ -52,8 +52,8 @@ docker run openml/openml-python test develop
 
 ### Building documentation
 
-You can build the documentation by passing `doc` as the first argument, 
-you should [mount]((https://docs.docker.com/storage/bind-mounts/#start-a-container-with-a-bind-mount)) 
+You can build the documentation by passing `doc` as the first argument,
+you should [mount]((https://docs.docker.com/storage/bind-mounts/#start-a-container-with-a-bind-mount))
 an output directory in which the docs will be stored. You also need to provide a remote
 or local repository as explained in [the section below]((#using-local-or-remote-code).
 In this example, we build documentation for the `develop` branch.
@@ -67,7 +67,7 @@ on Linux:
 ```text
     docker run --mount type=bind,source="./output",destination="/output" openml/openml-python doc develop
 ```
-    
+
 see [the section below]((#using-local-or-remote-code) for running against local changes
 or a remote branch.
 
@@ -106,26 +106,26 @@ The branch may be specified by name directly if it exists on the original reposi
 
 Where `BRANCH` is the name of the branch for which to generate the documentation.
 It is also possible to build the documentation from the branch on a fork,
-in this case the `BRANCH` should be specified as `GITHUB_NAME#BRANCH` (e.g. 
+in this case the `BRANCH` should be specified as `GITHUB_NAME#BRANCH` (e.g.
 `PGijsbers#my_feature_branch`) and the name of the forked repository should be `openml-python`.
 
 ## For developers
-This section contains some notes about the structure of the image, 
+This section contains some notes about the structure of the image,
 intended for those who want to work on it.
 
 ### Added Directories
 The `openml/openml-python` image is built on a vanilla `python:3` image.
 Additionally, it contains the following files are directories:
 
- - `/openml`: contains the openml-python repository in the state with which the image 
-   was built by default. If working with a `BRANCH`, this repository will be set to 
+ - `/openml`: contains the openml-python repository in the state with which the image
+   was built by default. If working with a `BRANCH`, this repository will be set to
    the `HEAD` of `BRANCH`.
  - `/openml/venv/`: contains the used virtual environment for `doc` and `test`. It has
-   `openml-python` dependencies pre-installed.  When invoked with `doc` or `test`, the 
+   `openml-python` dependencies pre-installed.  When invoked with `doc` or `test`, the
    dependencies will be updated based on the `setup.py` of the `BRANCH` or mounted `/code`.
  - `/scripts/startup.sh`: the entrypoint of the image. Takes care of the automated features (e.g. `doc` and `test`).
 
 ## Building the image
 To build the image yourself, execute `docker build -f Dockerfile .` from the `docker`
-directory of the `openml-python` repository. It will use the `startup.sh` as is, so any 
+directory of the `openml-python` repository. It will use the `startup.sh` as is, so any
 local changes will be present in the image.

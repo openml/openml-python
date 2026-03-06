@@ -31,7 +31,7 @@ extension interface to allows others to contribute back. Building a
 suitable extension for therefore requires an understanding of the
 current OpenML-Python support.
 
-[This tutorial](../examples/Basics/simple_flows_and_runs_tutorial) shows how the scikit-learn 
+[This tutorial](../examples/Basics/simple_flows_and_runs_tutorial) shows how the scikit-learn
 extension works with OpenML-Python.
 
 #### API
@@ -52,7 +52,7 @@ must be called to allow OpenML-Python to interface the new extension.
 
 The following methods should get implemented. Although the documentation
 in the extension interface should always be leading, here
-we list some additional information and best practices. 
+we list some additional information and best practices.
 Note that most methods are relatively simple
 and can be implemented in several lines of code.
 
@@ -135,7 +135,7 @@ and can be implemented in several lines of code.
 ### Hosting the library
 
 Each extension created should be a stand-alone repository, compatible
-with the [OpenML-Python repository](https://github.com/openml/openml-python). 
+with the [OpenML-Python repository](https://github.com/openml/openml-python).
 The extension repository should work off-the-shelf with *OpenML-Python* installed.
 
 Create a public Github repo with the following directory structure:

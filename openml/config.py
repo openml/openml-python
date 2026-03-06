@@ -10,13 +10,15 @@ import os
 import platform
 import shutil
 import warnings
-from collections.abc import Iterator
 from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 from typing_extensions import TypedDict
 from urllib.parse import urlparse
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 logger = logging.getLogger(__name__)
 openml_logger = logging.getLogger("openml")

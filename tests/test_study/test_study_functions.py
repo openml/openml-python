@@ -1,8 +1,9 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import pytest
 import unittest
+
+import pytest
 
 import openml
 import openml.study
@@ -12,7 +13,7 @@ from openml.testing import TestBase
 class TestStudyFunctions(TestBase):
     _multiprocess_can_split_ = True
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_get_study_old(self):
         self.use_production_server()
@@ -24,7 +25,7 @@ class TestStudyFunctions(TestBase):
         assert len(study.setups) == 30
         assert study.runs is None
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_get_study_new(self):
         self.use_production_server()
 
@@ -35,7 +36,7 @@ class TestStudyFunctions(TestBase):
         assert len(study.setups) == 1253
         assert len(study.runs) == 1693
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_get_openml100(self):
         self.use_production_server()
 
@@ -45,7 +46,7 @@ class TestStudyFunctions(TestBase):
         assert isinstance(study_2, openml.study.OpenMLBenchmarkSuite)
         assert study.study_id == study_2.study_id
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_get_study_error(self):
         self.use_production_server()
 
@@ -54,7 +55,7 @@ class TestStudyFunctions(TestBase):
         ):
             openml.study.get_study(99)
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_get_suite(self):
         self.use_production_server()
 
@@ -65,7 +66,7 @@ class TestStudyFunctions(TestBase):
         assert study.runs is None
         assert study.setups is None
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_get_suite_error(self):
         self.use_production_server()
 
@@ -74,7 +75,7 @@ class TestStudyFunctions(TestBase):
         ):
             openml.study.get_suite(123)
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_publish_benchmark_suite(self):
         fixture_alias = None
         fixture_name = "unit tested benchmark suite"
@@ -105,18 +106,18 @@ class TestStudyFunctions(TestBase):
         assert study_downloaded.runs is None
         assert len(study_downloaded.data) > 0
         assert len(study_downloaded.data) <= len(fixture_task_ids)
-        self.assertSetEqual(set(study_downloaded.tasks), set(fixture_task_ids))
+        self.assertSetEqual(set(study_downloaded.tasks), set(fixture_task_ids))  # noqa: PT009
 
         # attach more tasks
         tasks_additional = [4, 5, 6]
         openml.study.attach_to_study(study.id, tasks_additional)
         study_downloaded = openml.study.get_suite(study.id)
         # verify again
-        self.assertSetEqual(set(study_downloaded.tasks), set(fixture_task_ids + tasks_additional))
+        self.assertSetEqual(set(study_downloaded.tasks), set(fixture_task_ids + tasks_additional))  # noqa: PT009
         # test detach function
         openml.study.detach_from_study(study.id, fixture_task_ids)
         study_downloaded = openml.study.get_suite(study.id)
-        self.assertSetEqual(set(study_downloaded.tasks), set(tasks_additional))
+        self.assertSetEqual(set(study_downloaded.tasks), set(tasks_additional))  # noqa: PT009
 
         # test status update function
         openml.study.update_suite_status(study.id, "deactivated")
@@ -143,16 +144,16 @@ class TestStudyFunctions(TestBase):
         assert study_downloaded.main_entity_type == "run"
         assert study_downloaded.runs is None
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_publish_empty_study_explicit(self):
         self._test_publish_empty_study_is_allowed(explicit=True)
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_publish_empty_study_implicit(self):
         self._test_publish_empty_study_is_allowed(explicit=False)
 
-    @pytest.mark.flaky()
-    @pytest.mark.test_server()
+    @pytest.mark.flaky
+    @pytest.mark.test_server
     def test_publish_study(self):
         # get some random runs to attach
         run_list = openml.evaluations.list_evaluations("predictive_accuracy", size=10)
@@ -182,23 +183,23 @@ class TestStudyFunctions(TestBase):
         assert study_downloaded.description == fixt_descr
         assert study_downloaded.main_entity_type == "run"
 
-        self.assertSetEqual(set(study_downloaded.runs), set(run_list.keys()))
-        self.assertSetEqual(set(study_downloaded.setups), set(fixt_setup_ids))
-        self.assertSetEqual(set(study_downloaded.flows), set(fixt_flow_ids))
-        self.assertSetEqual(set(study_downloaded.tasks), set(fixt_task_ids))
+        self.assertSetEqual(set(study_downloaded.runs), set(run_list.keys()))  # noqa: PT009
+        self.assertSetEqual(set(study_downloaded.setups), set(fixt_setup_ids))  # noqa: PT009
+        self.assertSetEqual(set(study_downloaded.flows), set(fixt_flow_ids))  # noqa: PT009
+        self.assertSetEqual(set(study_downloaded.tasks), set(fixt_task_ids))  # noqa: PT009
 
         # test whether the list run function also handles study data fine
-        run_ids = openml.runs.list_runs(study=study.id) # returns DF
-        self.assertSetEqual(set(run_ids["run_id"]), set(study_downloaded.runs))
+        run_ids = openml.runs.list_runs(study=study.id)  # returns DF
+        self.assertSetEqual(set(run_ids["run_id"]), set(study_downloaded.runs))  # noqa: PT009
 
         # test whether the list evaluation function also handles study data fine
-        run_ids = openml.evaluations.list_evaluations( # returns list of objects
+        run_ids = openml.evaluations.list_evaluations(  # returns list of objects
             "predictive_accuracy",
             size=None,
             study=study.id,
-            output_format="object", # making the default explicit
+            output_format="object",  # making the default explicit
         )
-        self.assertSetEqual(set(run_ids), set(study_downloaded.runs))
+        self.assertSetEqual(set(run_ids), set(study_downloaded.runs))  # noqa: PT009
 
         # attach more runs, since we fetch 11 here, at least one is non-overlapping
         run_list_additional = openml.runs.list_runs(size=11, offset=10)
@@ -207,12 +208,12 @@ class TestStudyFunctions(TestBase):
         study_downloaded = openml.study.get_study(study.id)
         # verify again
         all_run_ids = run_list_additional | set(run_list.keys())
-        self.assertSetEqual(set(study_downloaded.runs), all_run_ids)
+        self.assertSetEqual(set(study_downloaded.runs), all_run_ids)  # noqa: PT009
 
         # test detach function
         openml.study.detach_from_study(study.id, list(run_list.keys()))
         study_downloaded = openml.study.get_study(study.id)
-        self.assertSetEqual(set(study_downloaded.runs), run_list_additional)
+        self.assertSetEqual(set(study_downloaded.runs), run_list_additional)  # noqa: PT009
 
         # test status update function
         openml.study.update_study_status(study.id, "deactivated")
@@ -222,7 +223,7 @@ class TestStudyFunctions(TestBase):
         res = openml.study.delete_study(study.id)
         assert res
 
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_study_attach_illegal(self):
         run_list = openml.runs.list_runs(size=10)
         assert len(run_list) == 10
@@ -243,19 +244,19 @@ class TestStudyFunctions(TestBase):
 
         with pytest.raises(
             openml.exceptions.OpenMLServerException,
-            match="Problem attaching entities.",
+            match=r"Problem attaching entities.",
         ):
             # run id does not exists
             openml.study.attach_to_study(study.id, [0])
 
         with pytest.raises(
             openml.exceptions.OpenMLServerException,
-            match="Problem attaching entities.",
+            match=r"Problem attaching entities.",
         ):
             # some runs already attached
             openml.study.attach_to_study(study.id, list(run_list_more["run_id"]))
         study_downloaded = openml.study.get_study(study.id)
-        self.assertListEqual(study_original.runs, study_downloaded.runs)
+        self.assertListEqual(study_original.runs, study_downloaded.runs)  # noqa: PT009
 
     @unittest.skip("It is unclear when we can expect the test to pass or fail.")
     def test_study_list(self):

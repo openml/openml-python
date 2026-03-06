@@ -4,7 +4,6 @@ from __future__ import annotations
 import pickle
 import time
 from collections import OrderedDict
-from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -31,6 +30,8 @@ from openml.tasks import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
     from openml.runs.trace import OpenMLRunTrace
 
 
@@ -591,7 +592,7 @@ class OpenMLRun(OpenMLBase):
             values_correct[rep][fold][samp].append(correct)
 
         scores = []
-        for rep in values_predict:  # noqa: PLC0206
+        for rep in values_predict:  # noqa: PLC0206, RUF100
             for fold in values_predict[rep]:
                 last_sample = len(values_predict[rep][fold]) - 1
                 y_pred = values_predict[rep][fold][last_sample]

@@ -1,29 +1,29 @@
 from __future__ import annotations
 
 import unittest.mock
+from collections.abc import Iterable, Iterator
 from pathlib import Path
-from typing import NamedTuple, Iterable, Iterator
+from typing import NamedTuple
 from unittest import mock
 
 import minio
 import pytest
 
 import openml
-from openml.config import ConfigurationForExamples
 import openml.testing
-from openml._api_calls import _download_minio_bucket, API_TOKEN_HELP_LINK
+from openml._api_calls import API_TOKEN_HELP_LINK, _download_minio_bucket
 
 
 class TestConfig(openml.testing.TestBase):
-    @pytest.mark.test_server()
+    @pytest.mark.test_server
     def test_too_long_uri(self):
         with pytest.raises(openml.exceptions.OpenMLServerError, match="URI too long!"):
             openml.datasets.list_datasets(data_id=list(range(10000)))
 
     @unittest.mock.patch("time.sleep")
     @unittest.mock.patch("requests.Session")
-    @pytest.mark.test_server()
-    def test_retry_on_database_error(self, Session_class_mock, _):
+    @pytest.mark.test_server
+    def test_retry_on_database_error(self, Session_class_mock, _):  # noqa: PT019
         response_mock = unittest.mock.Mock()
         response_mock.text = (
             "<oml:error>\n"
@@ -50,10 +50,10 @@ class FakeMinio:
     def __init__(self, objects: Iterable[FakeObject] | None = None):
         self._objects = objects or []
 
-    def list_objects(self, *args, **kwargs) -> Iterator[FakeObject]:
+    def list_objects(self, *args, **kwargs) -> Iterator[FakeObject]:  # noqa: ARG002
         yield from self._objects
 
-    def fget_object(self, object_name: str, file_path: str, *args, **kwargs) -> None:
+    def fget_object(self, object_name: str, file_path: str, *args, **kwargs) -> None:  # noqa: ARG002
         if object_name in [obj.object_name for obj in self._objects]:
             Path(file_path).write_text("foo")
             return
@@ -91,7 +91,7 @@ def test_download_minio_failure(mock_minio, tmp_path: Path) -> None:
         ],
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         _download_minio_bucket(source=some_url, destination=tmp_path)
 
     mock_minio.return_value = FakeMinio(
@@ -100,29 +100,29 @@ def test_download_minio_failure(mock_minio, tmp_path: Path) -> None:
         ],
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         _download_minio_bucket(source=some_url, destination=tmp_path)
 
 
 @pytest.mark.parametrize(
-    "endpoint, method",
+    ("endpoint", "method"),
     [
         # https://github.com/openml/OpenML/blob/develop/openml_OS/views/pages/api_new/v1/xml/pre.php
         ("flow/exists", "post"),  # 102
         ("dataset", "post"),  # 137
         ("dataset/42", "delete"),  # 350
-        # ("flow/owned", "post"),  # 310 - Couldn't find what would trigger this
+        # ("flow/owned", "post"),  # 310 - Couldn't find what would trigger this  # noqa: ERA001
         ("flow/42", "delete"),  # 320
         ("run/42", "delete"),  # 400
         ("task/42", "delete"),  # 460
     ],
 )
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_authentication_endpoints_requiring_api_key_show_relevant_help_link(
     endpoint: str,
     method: str,
 ) -> None:
     # We need to temporarily disable the API key to test the error message
-    with openml.config.overwrite_config_context({"apikey": None}):
-        with pytest.raises(openml.exceptions.OpenMLAuthenticationError, match=API_TOKEN_HELP_LINK):
+    with openml.config.overwrite_config_context({"apikey": None}):  # noqa: SIM117
+        with pytest.raises(openml.exceptions.OpenMLNotAuthorizedError, match=API_TOKEN_HELP_LINK):
             openml._api_calls._perform_api_call(call=endpoint, request_method=method, data=None)

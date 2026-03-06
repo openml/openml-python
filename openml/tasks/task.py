@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import warnings
 from abc import ABC
-from collections.abc import Sequence
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -18,6 +17,9 @@ from openml.utils import _create_cache_directory_for_id
 from .split import OpenMLSplit
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from pathlib import Path
+
     import numpy as np
     import pandas as pd
 

@@ -1,14 +1,15 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-from contextlib import contextmanager
 import os
+import platform
 import tempfile
 import unittest.mock
+from collections.abc import Iterator
+from contextlib import contextmanager
 from copy import copy
-from typing import Any, Iterator
 from pathlib import Path
-import platform
+from typing import Any
 
 import pytest
 
@@ -45,7 +46,7 @@ class TestConfig(openml.testing.TestBase):
     )
     def test_non_writable_home(self, log_handler_mock, warnings_mock):
         with tempfile.TemporaryDirectory(dir=self.workdir) as td:
-            os.chmod(td, 0o444)
+            os.chmod(td, 0o444)  # noqa: PTH101
             _dd = copy(openml.config._defaults)
             _dd["cachedir"] = Path(td) / "something-else"
             openml.config._setup(_dd)
@@ -86,7 +87,7 @@ class TestConfig(openml.testing.TestBase):
         _config["show_progress"] = False
         assert isinstance(config, dict)
         assert len(config) == 7
-        self.assertDictEqual(config, _config)
+        self.assertDictEqual(config, _config)  # noqa: PT009
 
     def test_setup_with_config(self):
         """Checks if the OpenML configuration can be updated using _setup()."""
@@ -102,11 +103,11 @@ class TestConfig(openml.testing.TestBase):
         openml.config._setup(_config)
         updated_config = openml.config.get_config_as_dict()
         openml.config._setup(orig_config)  # important to not affect other unit tests
-        self.assertDictEqual(_config, updated_config)
+        self.assertDictEqual(_config, updated_config)  # noqa: PT009
 
 
 class TestConfigurationForExamples(openml.testing.TestBase):
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_switch_to_example_configuration(self):
         """Verifies the test configuration is loaded properly."""
         # Below is the default test key which would be used anyway, but just for clarity:
@@ -118,7 +119,7 @@ class TestConfigurationForExamples(openml.testing.TestBase):
         assert openml.config.apikey == TestBase.user_key
         assert openml.config.server == self.test_server
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_switch_from_example_configuration(self):
         """Verifies the previous configuration is loaded after stopping."""
         # Below is the default test key which would be used anyway, but just for clarity:
@@ -137,13 +138,13 @@ class TestConfigurationForExamples(openml.testing.TestBase):
         # Tests do not reset the state of this class. Thus, we ensure it is in
         # the original state before the test.
         openml.config.ConfigurationForExamples._start_last_called = False
-        self.assertRaisesRegex(
+        self.assertRaisesRegex(  # noqa: PT027
             RuntimeError,
             error_regex,
             openml.config.stop_using_configuration_for_example,
         )
 
-    @pytest.mark.production_server()
+    @pytest.mark.production_server
     def test_example_configuration_start_twice(self):
         """Checks that the original config can be returned to if `start..` is called twice."""
         openml.config.apikey = TestBase.user_key
@@ -171,7 +172,7 @@ def test_configuration_file_not_overwritten_on_load():
             new_file_content = config_file.read()
 
     assert config_file_content == new_file_content
-    assert "abcd" == read_config["apikey"]
+    assert read_config["apikey"] == "abcd"
 
 
 def test_configuration_loads_booleans(tmp_path):

@@ -3,15 +3,17 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
-from collections.abc import Hashable, Sequence
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import xmltodict
 
 from openml.base import OpenMLBase
 from openml.extensions import Extension, get_extension_by_flow
 from openml.utils import extract_xml_tags
+
+if TYPE_CHECKING:
+    from collections.abc import Hashable, Sequence
 
 
 class OpenMLFlow(OpenMLBase):

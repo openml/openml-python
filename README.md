@@ -93,7 +93,7 @@ Bibtex entry:
 
 We welcome contributions from both new and experienced developers!
 
-If you would like to contribute to OpenML-Python, please read our  
+If you would like to contribute to OpenML-Python, please read our
 [Contribution Guidelines](https://github.com/openml/openml-python/blob/main/CONTRIBUTING.md).
 
 If you are new to open-source development, a great way to get started is by
