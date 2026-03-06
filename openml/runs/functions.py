@@ -104,6 +104,15 @@ def run_model_on_task(  # noqa: PLR0913
         Result of the run.
     flow : OpenMLFlow (optional, only if `return_flow` is True).
         Flow generated from the model.
+
+    Examples
+    --------
+    >>> import openml
+    >>> import openml_sklearn  # doctest: +SKIP
+    >>> from sklearn.tree import DecisionTreeClassifier  # doctest: +SKIP
+    >>> clf = DecisionTreeClassifier()  # doctest: +SKIP
+    >>> task = openml.tasks.get_task(6)  # doctest: +SKIP
+    >>> run = openml.runs.run_model_on_task(clf, task)  # doctest: +SKIP
     """
     if avoid_duplicate_runs is None:
         avoid_duplicate_runs = openml.config.avoid_duplicate_runs
@@ -559,9 +568,14 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
     )  # job_rvals contain the output of all the runs with one-to-one correspondence with `jobs`
 
     for n_fit, rep_no, fold_no, sample_no in jobs:
-        pred_y, proba_y, test_indices, test_y, inner_trace, user_defined_measures_fold = job_rvals[
-            n_fit - 1
-        ]
+        (
+            pred_y,
+            proba_y,
+            test_indices,
+            test_y,
+            inner_trace,
+            user_defined_measures_fold,
+        ) = job_rvals[n_fit - 1]
 
         if inner_trace is not None:
             traces.append(inner_trace)
@@ -846,7 +860,10 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
     return _create_run_from_xml(run_xml)
 
 
-def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT002
+def _create_run_from_xml(  # noqa: PLR0915, PLR0912, C901
+    xml: str,
+    from_server: bool = True,  # noqa: FBT002
+) -> OpenMLRun:
     """Create a run object from xml returned from server.
 
     Parameters
