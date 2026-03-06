@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import contextlib
 import inspect
 import os
 import shutil
@@ -39,10 +40,8 @@ class OpenMLSplitTest(TestBase):
 
     def tearDown(self):
         # Clean up the entire temp directory
-        try:
+        with contextlib.suppress(OSError, FileNotFoundError):
             self._temp_dir.cleanup()
-        except (OSError, FileNotFoundError):
-            pass
 
     def test_eq(self):
         split = OpenMLSplit._from_arff_file(self.arff_filepath)
