@@ -18,6 +18,8 @@ In particular, this module implements a python interface for the
 # License: BSD 3-Clause
 from __future__ import annotations
 
+__version__ = "0.16.0"
+
 from . import (
     _api_calls,
     config,
@@ -32,7 +34,6 @@ from . import (
     tasks,
     utils,
 )
-from .__version__ import __version__
 from .datasets import OpenMLDataFeature, OpenMLDataset
 from .evaluations import OpenMLEvaluation
 from .flows import OpenMLFlow
