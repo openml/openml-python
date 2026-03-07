@@ -15,38 +15,6 @@ class OpenMLEvaluation:
     """
     Contains all meta-information about a run / evaluation combination,
     according to the evaluation/list function
-
-    Parameters
-    ----------
-    run_id : int
-        Refers to the run.
-    task_id : int
-        Refers to the task.
-    setup_id : int
-        Refers to the setup.
-    flow_id : int
-        Refers to the flow.
-    flow_name : str
-        Name of the referred flow.
-    data_id : int
-        Refers to the dataset.
-    data_name : str
-        The name of the dataset.
-    function : str
-        The evaluation metric of this item (e.g., accuracy).
-    upload_time : str
-        The time of evaluation.
-    uploader: int
-        Uploader ID (user ID)
-    upload_name : str
-        Name of the uploader of this evaluation
-    value : float
-        The value (score) of this evaluation.
-    values : List[float]
-        The values (scores) per repeat and fold (if requested)
-    array_data : str
-        list of information per class.
-        (e.g., in case of precision, auroc, recall)
     """
 
     run_id: int
@@ -60,8 +28,8 @@ class OpenMLEvaluation:
     upload_time: str
     uploader: int
     uploader_name: str
-    value: float | None
-    values: list[float] | None
+    value: float | None = None
+    values: list[float] | None = None
     array_data: str | None = None
 
     def _to_dict(self) -> dict:
@@ -102,9 +70,12 @@ class OpenMLEvaluation:
             "Metric Used",
             "Result",
         ]
+
         _fields = [(key, fields[key]) for key in order if key in fields]
 
         longest_field_name_length = max(len(name) for name, _ in _fields)
         field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
+
         body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
+
         return header + body
