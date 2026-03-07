@@ -18,6 +18,7 @@ import pandas as pd
 import pytest
 import requests
 import requests_mock
+from requests_mock import ANY
 import scipy.sparse
 from oslo_concurrency import lockutils
 
@@ -157,7 +158,6 @@ class TestOpenMLDataset(TestBase):
             openml.datasets.check_datasets_active,
             [79],
         )
-        openml.config.server = self.test_server
 
     @pytest.mark.test_server()
     def test_illegal_character_tag(self):
@@ -185,7 +185,6 @@ class TestOpenMLDataset(TestBase):
         self.use_production_server()
         # /d/1 was deactivated
         assert openml.datasets.functions._name_to_id("anneal") == 2
-        openml.config.server = self.test_server
 
     @pytest.mark.production_server()
     def test__name_to_id_with_multiple_active(self):
@@ -348,7 +347,7 @@ class TestOpenMLDataset(TestBase):
     def test__getarff_path_dataset_arff(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         description = _get_dataset_description(self.workdir, 2)
-        arff_path = _get_dataset_arff(description, cache_directory=self.workdir)
+        arff_path = _get_dataset_arff(description)
         assert isinstance(arff_path, Path)
         assert arff_path.exists()
 
@@ -418,7 +417,7 @@ class TestOpenMLDataset(TestBase):
             "oml:parquet_url": "http://data.openml.org/dataset30/dataset_30.pq",
             "oml:id": "30",
         }
-        path = _get_dataset_parquet(description, cache_directory=None)
+        path = _get_dataset_parquet(description)
         assert isinstance(path, Path), "_get_dataset_parquet returns a path"
         assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
@@ -427,7 +426,7 @@ class TestOpenMLDataset(TestBase):
             "oml:parquet_url": "http://data.openml.org/dataset20/does_not_exist.pq",
             "oml:id": "20",
         }
-        path = _get_dataset_parquet(description, cache_directory=self.workdir)
+        path = _get_dataset_parquet(description)
         assert path is None, "_get_dataset_parquet returns None if no file is found"
 
     def test__getarff_md5_issue(self):
@@ -441,8 +440,8 @@ class TestOpenMLDataset(TestBase):
 
         self.assertRaisesRegex(
             OpenMLHashException,
-            "Checksum of downloaded file is unequal to the expected checksum abc when downloading "
-            "https://www.openml.org/data/download/61. Raised when downloading dataset 5.",
+            "Checksum of downloaded file is unequal to the expected checksum abc "
+            "when downloading https://www.openml.org/data/download/61.",
             _get_dataset_arff,
             description,
         )
@@ -451,17 +450,15 @@ class TestOpenMLDataset(TestBase):
 
     @pytest.mark.test_server()
     def test__get_dataset_features(self):
-        features_file = _get_dataset_features_file(self.workdir, 2)
+        features_file = _get_dataset_features_file(2)
         assert isinstance(features_file, Path)
-        features_xml_path = self.workdir / "features.xml"
-        assert features_xml_path.exists()
+        assert features_file.exists()
 
     @pytest.mark.test_server()
     def test__get_dataset_qualities(self):
-        qualities = _get_dataset_qualities_file(self.workdir, 2)
+        qualities = _get_dataset_qualities_file(2)
         assert isinstance(qualities, Path)
-        qualities_xml_path = self.workdir / "qualities.xml"
-        assert qualities_xml_path.exists()
+        assert qualities.exists()
 
     @pytest.mark.test_server()
     def test_get_dataset_force_refresh_cache(self):
@@ -1552,7 +1549,6 @@ class TestOpenMLDataset(TestBase):
         datasets_b = openml.datasets.list_datasets(size=np.inf)
 
         # Reverting to test server
-        openml.config.server = self.test_server
         assert len(datasets_a) == len(datasets_b)
 
 
@@ -1726,8 +1722,8 @@ def test_valid_attribute_validations(default_target_attribute, row_id_attribute,
         assert openml.datasets.delete_dataset(_dataset_id)
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_key):
+@mock.patch.object(requests.Session, "request")
+def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_owned.xml"
     )
@@ -1742,13 +1738,14 @@ def test_delete_dataset_not_owned(mock_delete, test_files_directory, test_api_ke
     ):
         openml.datasets.delete_dataset(40_000)
 
-    dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/40000"
-    assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    dataset_url = test_server_v1 + "data/40000"
+    assert dataset_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key):
+@mock.patch.object(requests.Session, "request")
+def test_delete_dataset_with_run(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_has_tasks.xml"
     )
@@ -1763,13 +1760,14 @@ def test_delete_dataset_with_run(mock_delete, test_files_directory, test_api_key
     ):
         openml.datasets.delete_dataset(40_000)
 
-    dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/40000"
-    assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    dataset_url = test_server_v1 + "data/40000"
+    assert dataset_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key):
+@mock.patch.object(requests.Session, "request")
+def test_delete_dataset_success(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_successful.xml"
     )
@@ -1781,13 +1779,14 @@ def test_delete_dataset_success(mock_delete, test_files_directory, test_api_key)
     success = openml.datasets.delete_dataset(40000)
     assert success
 
-    dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/40000"
-    assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    dataset_url = test_server_v1 + "data/40000"
+    assert dataset_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key):
+@mock.patch.object(requests.Session, "request")
+def test_delete_unknown_dataset(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = (
         test_files_directory / "mock_responses" / "datasets" / "data_delete_not_exist.xml"
     )
@@ -1802,9 +1801,11 @@ def test_delete_unknown_dataset(mock_delete, test_files_directory, test_api_key)
     ):
         openml.datasets.delete_dataset(9_999_999)
 
-    dataset_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/9999999"
-    assert dataset_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    dataset_url = test_server_v1 + "data/9999999"
+    assert dataset_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    
 
 
 def _assert_datasets_have_id_and_valid_status(datasets: pd.DataFrame):
@@ -1980,7 +1981,7 @@ def test__get_dataset_parquet_not_cached():
         "oml:parquet_url": "http://data.openml.org/dataset20/dataset_20.pq",
         "oml:id": "20",
     }
-    path = _get_dataset_parquet(description, cache_directory=Path(openml.config.get_cache_directory()))
+    path = _get_dataset_parquet(description)
     assert isinstance(path, Path), "_get_dataset_parquet returns a path"
     assert path.is_file(), "_get_dataset_parquet returns path to real file"
 
@@ -1996,14 +1997,14 @@ def test_read_features_from_xml_with_whitespace() -> None:
 
 
 @pytest.mark.test_server()
-def test_get_dataset_parquet(requests_mock, test_files_directory):
+def test_get_dataset_parquet(requests_mock, test_files_directory, test_server_v1):
     # Parquet functionality is disabled on the test server
     # There is no parquet-copy of the test server yet.
     content_file = (
             test_files_directory / "mock_responses" / "datasets" / "data_description_61.xml"
     )
     # While the mocked example is from production, unit tests by default connect to the test server.
-    requests_mock.get(f"{openml.config.TEST_SERVER_URL}/api/v1/xml/data/61", text=content_file.read_text())
+    requests_mock.get(test_server_v1 + "data/61", text=content_file.read_text())
     dataset = openml.datasets.get_dataset(61, download_data=True)
     assert dataset._parquet_url is not None
     assert dataset.parquet_file is not None

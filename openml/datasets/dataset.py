@@ -15,10 +15,9 @@ import arff
 import numpy as np
 import pandas as pd
 import scipy.sparse
-import xmltodict
 
+import openml
 from openml.base import OpenMLBase
-from openml.config import OPENML_SKIP_PARQUET_ENV_VAR
 
 from .data_feature import OpenMLDataFeature
 
@@ -375,7 +374,9 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         # import required here to avoid circular import.
         from .functions import _get_dataset_arff, _get_dataset_parquet
 
-        skip_parquet = os.environ.get(OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+        skip_parquet = (
+            os.environ.get(openml.config.OPENML_SKIP_PARQUET_ENV_VAR, "false").casefold() == "true"
+        )
         if self._parquet_url is not None and not skip_parquet:
             parquet_file = _get_dataset_parquet(self)
             self.parquet_file = None if parquet_file is None else str(parquet_file)
@@ -807,7 +808,6 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         """Load the features metadata from the server and store it in the dataset object."""
         # Delayed Import to avoid circular imports or having to import all of dataset.functions to
         # import OpenMLDataset.
-        from openml.datasets.functions import _get_dataset_features_file
 
         if self.dataset_id is None:
             raise ValueError(
@@ -815,13 +815,11 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
                 "metadata.",
             )
 
-        features_file = _get_dataset_features_file(None, self.dataset_id)
-        self._features = _read_features(features_file)
+        self._features = openml._backend.dataset.get_features(self.dataset_id)
 
     def _load_qualities(self) -> None:
         """Load qualities information from the server and store it in the dataset object."""
         # same reason as above for _load_features
-        from openml.datasets.functions import _get_dataset_qualities_file
 
         if self.dataset_id is None:
             raise ValueError(
@@ -829,12 +827,12 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
                 "metadata.",
             )
 
-        qualities_file = _get_dataset_qualities_file(None, self.dataset_id)
+        qualities = openml._backend.dataset.get_qualities(self.dataset_id)
 
-        if qualities_file is None:
+        if qualities is None:
             self._no_qualities_found = True
         else:
-            self._qualities = _read_qualities(qualities_file)
+            self._qualities = qualities
 
     def retrieve_class_labels(self, target_name: str = "class") -> None | list[str]:
         """Reads the datasets arff to determine the class-labels.
@@ -952,6 +950,48 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         """Parse the id from the xml_response and assign it to self."""
         self.dataset_id = int(xml_response["oml:upload_data_set"]["oml:id"])
 
+    def publish(self) -> OpenMLDataset:
+        """Publish this flow to OpenML server.
+
+        Returns
+        -------
+        self : OpenMLFlow
+        """
+        file_elements = self._get_file_elements()
+        if "description" not in file_elements:
+            file_elements["description"] = self._to_xml()
+        dataset_id = openml._backend.dataset.publish(path="data", files=file_elements)
+        self.dataset_id = dataset_id
+        return self
+
+    def push_tag(self, tag: str) -> None:
+        """Annotates this dataset with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the dataset.
+        """
+        if self.dataset_id is None:
+            raise ValueError(
+                "Dataset does not have an ID. Please publish the dataset before tagging."
+            )
+        openml._backend.dataset.tag(self.dataset_id, tag)
+
+    def remove_tag(self, tag: str) -> None:
+        """Removes a tag from this dataset on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to remove from the dataset.
+        """
+        if self.dataset_id is None:
+            raise ValueError(
+                "Dataset does not have an ID. Please publish the dataset before untagging."
+            )
+        openml._backend.dataset.untag(self.dataset_id, tag)
+
     def _to_dict(self) -> dict[str, dict]:
         """Creates a dictionary representation of self."""
         props = [
@@ -994,46 +1034,18 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         }
 
 
-def _read_features(features_file: Path) -> dict[int, OpenMLDataFeature]:
+def _read_features(features_file: str | Path) -> dict[int, OpenMLDataFeature]:
+    features_file = Path(features_file)
     features_pickle_file = Path(_get_features_pickle_file(str(features_file)))
     try:
         with features_pickle_file.open("rb") as fh_binary:
             return pickle.load(fh_binary)  # type: ignore  # noqa: S301
 
-    except:  # noqa: E722
-        with Path(features_file).open("r", encoding="utf8") as fh:
-            features_xml_string = fh.read()
-
-        features = _parse_features_xml(features_xml_string)
-
+    except FileNotFoundError:
+        features = openml._backend.dataset.parse_features_file(features_file, features_pickle_file)
         with features_pickle_file.open("wb") as fh_binary:
             pickle.dump(features, fh_binary)
-
         return features
-
-
-def _parse_features_xml(features_xml_string: str) -> dict[int, OpenMLDataFeature]:
-    xml_dict = xmltodict.parse(
-        features_xml_string, force_list=("oml:feature", "oml:nominal_value"), strip_whitespace=False
-    )
-    features_xml = xml_dict["oml:data_features"]
-
-    features: dict[int, OpenMLDataFeature] = {}
-    for idx, xmlfeature in enumerate(features_xml["oml:feature"]):
-        nr_missing = xmlfeature.get("oml:number_of_missing_values", 0)
-        feature = OpenMLDataFeature(
-            int(xmlfeature["oml:index"]),
-            xmlfeature["oml:name"],
-            xmlfeature["oml:data_type"],
-            xmlfeature.get("oml:nominal_value"),
-            int(nr_missing),
-            xmlfeature.get("oml:ontology"),
-        )
-        if idx != feature.index:
-            raise ValueError("Data features not provided in right order")
-        features[feature.index] = feature
-
-    return features
 
 
 # TODO(eddiebergman): Should this really exist?
@@ -1055,29 +1067,9 @@ def _read_qualities(qualities_file: str | Path) -> dict[str, float]:
         with qualities_pickle_file.open("rb") as fh_binary:
             return pickle.load(fh_binary)  # type: ignore  # noqa: S301
     except:  # noqa: E722
-        with qualities_file.open(encoding="utf8") as fh:
-            qualities_xml = fh.read()
-
-        qualities = _parse_qualities_xml(qualities_xml)
+        qualities = openml._backend.dataset.parse_qualities_file(
+            qualities_file, qualities_pickle_file
+        )
         with qualities_pickle_file.open("wb") as fh_binary:
             pickle.dump(qualities, fh_binary)
-
         return qualities
-
-
-def _check_qualities(qualities: list[dict[str, str]]) -> dict[str, float]:
-    qualities_ = {}
-    for xmlquality in qualities:
-        name = xmlquality["oml:name"]
-        if xmlquality.get("oml:value", None) is None or xmlquality["oml:value"] == "null":
-            value = float("NaN")
-        else:
-            value = float(xmlquality["oml:value"])
-        qualities_[name] = value
-    return qualities_
-
-
-def _parse_qualities_xml(qualities_xml: str) -> dict[str, float]:
-    xml_as_dict = xmltodict.parse(qualities_xml, force_list=("oml:quality",))
-    qualities = xml_as_dict["oml:data_qualities"]["oml:quality"]
-    return _check_qualities(qualities)
