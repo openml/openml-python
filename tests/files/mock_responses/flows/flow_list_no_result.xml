@@ -1,0 +1,5 @@
+<oml:error xmlns:oml="http://openml.org/openml">
+  <oml:code>372</oml:code>
+  <oml:message>No results</oml:message>
+  <oml:additional_information>No flows matched the given criteria.</oml:additional_information>
+</oml:error>
