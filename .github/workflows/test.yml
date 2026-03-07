@@ -34,15 +34,27 @@ jobs:
         sklearn-only: ["true"]
 
         exclude:
-          # incompatible version combinations
+          # (python, sklearn) combinations for which there is no PyPI release
+          # scikit-learn 1.3
           - python-version: "3.13"
             scikit-learn: "1.3.*"
+          - python-version: "3.14"
+            scikit-learn: "1.3.*"
+          # scikit-learn 1.4
           - python-version: "3.13"
             scikit-learn: "1.4.*"
           - python-version: "3.14"
-            scikit-learn: "1.3.*"
-          - python-version: "3.14"
             scikit-learn: "1.4.*"
+          # scikit-learn 1.5
+          - python-version: "3.14"
+            scikit-learn: "1.5.*"
+          # scikit-learn 1.6
+          - python-version: "3.14"
+            scikit-learn: "1.6.*"
+          # scikit-learn 1.7 is installed with pandas 3
+          - python-version: "3.10"
+            scikit-learn: "1.7.*"
+
 
         include:
           # Full test run on ubuntu, 3.14
@@ -64,14 +76,6 @@ jobs:
             sklearn-only: "false"
             code-cov: true
 
-          # Pandas 2 run
-          - os: ubuntu-latest
-            python-version: "3.12"
-            scikit-learn: "1.5.*"
-            sklearn-only: "false"
-            pandas-version: "2.*"
-            code-cov: false
-
     steps:
     - uses: actions/checkout@v6
       with:
@@ -82,15 +86,21 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install test dependencies, scikit-learn, and optional pandas
+    - name: Install test dependencies, scikit-learn, and pandas
       shell: bash
       run: |
         python -m pip install --upgrade pip
         pip install -e .[test] scikit-learn==${{ matrix.scikit-learn }}
-        
-        if [ "${{ matrix.pandas-version }}" != "" ]; then
-          echo "Installing specific pandas version: ${{ matrix.pandas-version }}"
-          pip install "pandas==${{ matrix.pandas-version }}"
+
+        # scikit-learn 1.7+ requires pandas 3.x, earlier versions use pandas 2.x
+        version="${{ matrix.scikit-learn }}"
+        major=$(echo "$version" | cut -d. -f1)
+        minor=$(echo "$version" | cut -d. -f2)
+
+        if [[ "$major" -gt 1 ]] || { [[ "$major" -eq 1 ]] && [[ "$minor" -ge 7 ]]; }; then
+          pip install "pandas==3.*"
+        else
+          pip install "pandas==2.*"
         fi
 
     - name: Store repository status
@@ -101,6 +111,27 @@ jobs:
         echo "BEFORE=$git_status" >> $GITHUB_ENV
         echo "Repository status before tests: $git_status"
 
+    - name: Clone Services
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        git clone --depth 1 https://github.com/openml/services.git
+
+    - name: Start Docker Services
+      if: matrix.os == 'ubuntu-latest'
+      working-directory: ./services
+      run: |
+        chmod -R a+rw ./data
+        chmod -R a+rw ./logs
+        docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
+
+        echo "Waiting for PHP API to boot..."
+        timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} openml-php-rest-api)" == "healthy" ]; do sleep 5; done'
+
+        echo "Final Verification: Gateway Connectivity..."
+        curl -sSfL http://localhost:8000/api/v1/xml/data/1 | head -n 15
+
+        docker container ls
+
     - name: Show installed dependencies
       run: python -m pip list
 
@@ -108,15 +139,16 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       env:
         OPENML_TEST_SERVER_ADMIN_KEY: ${{ secrets.OPENML_TEST_SERVER_ADMIN_KEY }}
+        OPENML_USE_LOCAL_SERVICES: "true"
       run: |
         if [ "${{ matrix.code-cov }}" = "true" ]; then
           codecov="--cov=openml --long --cov-report=xml"
         fi
 
         if [ "${{ matrix.sklearn-only }}" = "true" ]; then
-          marks="sklearn and not production_server and not test_server"
+          marks="sklearn and not production_server"
         else
-          marks="not production_server and not test_server"
+          marks="not production_server"
         fi
 
         pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
@@ -125,15 +157,16 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       env:
         OPENML_TEST_SERVER_ADMIN_KEY: ${{ secrets.OPENML_TEST_SERVER_ADMIN_KEY }}
+        OPENML_USE_LOCAL_SERVICES: "true"
       run: |
         if [ "${{ matrix.code-cov }}" = "true" ]; then
           codecov="--cov=openml --long --cov-report=xml"
         fi
 
         if [ "${{ matrix.sklearn-only }}" = "true" ]; then
-          marks="sklearn and production_server and not test_server"
+          marks="sklearn and production_server"
         else
-          marks="production_server and not test_server"
+          marks="production_server"
         fi
 
         pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
@@ -144,6 +177,25 @@ jobs:
         OPENML_TEST_SERVER_ADMIN_KEY: ${{ secrets.OPENML_TEST_SERVER_ADMIN_KEY }}
       run: |  # we need a separate step because of the bash-specific if-statement in the previous one.
         pytest -n 4 --durations=20 --dist load -sv --reruns 5 --reruns-delay 1 -m "not test_server"
+
+    - name: Upload coverage
+      if: matrix.code-cov && always()
+      uses: codecov/codecov-action@v4
+      with:
+        files: coverage.xml
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: true
+        verbose: true
+
+    - name: Dump server logs
+      if: matrix.os == 'ubuntu-latest' && always()
+      run: |
+        docker logs openml-php-rest-api -t
+
+    - name: Cleanup Docker setup
+      if: matrix.os == 'ubuntu-latest' && always()
+      run: |
+        sudo rm -rf services
 
     - name: Check for files left behind by test
       if: matrix.os != 'windows-latest' && always()
@@ -156,15 +208,6 @@ jobs:
             echo "Not all generated files have been deleted!"
             exit 1
         fi
-
-    - name: Upload coverage
-      if: matrix.code-cov && always()
-      uses: codecov/codecov-action@v4
-      with:
-        files: coverage.xml
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: true
-        verbose: true
 
   dummy_windows_py_sk024:
     name: (windows-latest, Py, sk0.24.*, sk-only:false)
