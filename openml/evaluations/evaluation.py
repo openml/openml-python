@@ -76,8 +76,6 @@ class OpenMLEvaluation:
         longest_field_name_length = max(len(name) for name, _ in _fields)
         field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
 
-        body = "\n".join(
-            field_line_format.format(name, value) for name, value in _fields
-        )
+        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
 
         return header + body
