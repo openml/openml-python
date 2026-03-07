@@ -1,4 +1,4 @@
-"""Command Line Interface for `openml` to configure its settings."""
+"""Command Line Interface for `openml` to configure its settings and browse resources."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from collections.abc import Callable
 from pathlib import Path
 from urllib.parse import urlparse
 
+import openml
 from openml import config
 from openml.__version__ import __version__
 
@@ -300,6 +301,118 @@ def configure_field(  # noqa: PLR0913
     verbose_set(field, value)
 
 
+def list_flows_cli(args: argparse.Namespace) -> None:
+    """List OpenML flows with optional filtering."""
+    df = openml.flows.list_flows(
+        offset=args.offset,
+        size=args.size,
+        tag=args.tag,
+        uploader=args.uploader,
+    )
+    if df.empty:
+        print("No flows found matching the given criteria.")
+    else:
+        print(df.to_string())
+
+
+def info_flow_cli(args: argparse.Namespace) -> None:
+    """Display detailed information about a specific OpenML flow."""
+    flow = openml.flows.get_flow(args.flow_id)
+    print(flow)
+
+
+def handle_flows(args: argparse.Namespace) -> None:
+    """Dispatch flows subcommands."""
+    actions = {
+        "list": list_flows_cli,
+        "info": info_flow_cli,
+    }
+    action = getattr(args, "flows_action", None)
+    if action is None:
+        # Print help when no subcommand is given
+        args._parser_flows.print_help()
+    else:
+        actions[action](args)
+
+
+def list_datasets_cli(args: argparse.Namespace) -> None:
+    """List OpenML datasets with optional filtering."""
+    df = openml.datasets.list_datasets(
+        offset=args.offset,
+        size=args.size,
+        tag=args.tag,
+        status=args.status,
+        data_name=args.data_name,
+    )
+    if df.empty:
+        print("No datasets found matching the given criteria.")
+    else:
+        print(df.to_string())
+
+
+def info_dataset_cli(args: argparse.Namespace) -> None:
+    """Display detailed information about a specific OpenML dataset."""
+    dataset = openml.datasets.get_dataset(
+        args.dataset_id,
+        download_data=False,
+        download_qualities=True,
+        download_features_meta_data=True,
+    )
+    print(dataset)
+
+
+def handle_datasets(args: argparse.Namespace) -> None:
+    """Dispatch datasets subcommands."""
+    actions = {
+        "list": list_datasets_cli,
+        "info": info_dataset_cli,
+    }
+    action = getattr(args, "datasets_action", None)
+    if action is None:
+        args._parser_datasets.print_help()
+    else:
+        actions[action](args)
+
+
+def list_tasks_cli(args: argparse.Namespace) -> None:
+    """List OpenML tasks with optional filtering."""
+    df = openml.tasks.list_tasks(
+        offset=args.offset,
+        size=args.size,
+        tag=args.tag,
+        task_type=args.task_type,
+    )
+    if df.empty:
+        print("No tasks found matching the given criteria.")
+    else:
+        print(df.to_string())
+
+
+def info_task_cli(args: argparse.Namespace) -> None:
+    """Display detailed information about a specific OpenML task."""
+    task = openml.tasks.get_task(
+        args.task_id,
+        download_splits=False,
+        download_data=False,
+        download_qualities=False,
+        download_features_meta_data=False,
+    )
+    print(task)
+
+
+def handle_tasks(args: argparse.Namespace) -> None:
+    """Dispatch tasks subcommands."""
+    actions = {
+        "list": list_tasks_cli,
+        "info": info_task_cli,
+    }
+    action = getattr(args, "tasks_action", None)
+    if action is None:
+        args._parser_tasks.print_help()
+    else:
+        actions[action](args)
+
+
 def configure(args: argparse.Namespace) -> None:
     """Calls the right submenu(s) to edit `args.field` in the configuration file."""
     set_functions = {
@@ -329,7 +442,12 @@ def configure(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    subroutines = {"configure": configure}
+    subroutines = {
+        "configure": configure,
+        "flows": handle_flows,
+        "datasets": handle_datasets,
+        "tasks": handle_tasks,
+    }
 
     parser = argparse.ArgumentParser()
     # Add a global --version flag to display installed version and exit
@@ -368,7 +486,157 @@ def main() -> None:
         help="The value to set the FIELD to.",
     )
 
+    # --- flows subcommand ---
+    parser_flows = subparsers.add_parser(
+        "flows",
+        description="Browse and search OpenML flows (models).",
+    )
+    flows_subparsers = parser_flows.add_subparsers(dest="flows_action")
+
+    parser_flows_list = flows_subparsers.add_parser(
+        "list",
+        description="List OpenML flows with optional filtering.",
+    )
+    parser_flows_list.add_argument(
+        "--size",
+        type=int,
+        default=10,
+        help="Maximum number of flows to return (default: 10).",
+    )
+    parser_flows_list.add_argument(
+        "--offset",
+        type=int,
+        default=None,
+        help="Number of flows to skip, for pagination.",
+    )
+    parser_flows_list.add_argument(
+        "--tag",
+        type=str,
+        default=None,
+        help="Only list flows with this tag.",
+    )
+    parser_flows_list.add_argument(
+        "--uploader",
+        type=str,
+        default=None,
+        help="Only list flows uploaded by this user.",
+    )
+
+    parser_flows_info = flows_subparsers.add_parser(
+        "info",
+        description="Display detailed information about a specific flow.",
+    )
+    parser_flows_info.add_argument(
+        "flow_id",
+        type=int,
+        help="The ID of the flow to display.",
+    )
+
+    # --- datasets subcommand ---
+    parser_datasets = subparsers.add_parser(
+        "datasets",
+        description="Browse and search OpenML datasets.",
+    )
+    datasets_subparsers = parser_datasets.add_subparsers(dest="datasets_action")
+
+    parser_datasets_list = datasets_subparsers.add_parser(
+        "list",
+        description="List OpenML datasets with optional filtering.",
+    )
+    parser_datasets_list.add_argument(
+        "--size",
+        type=int,
+        default=10,
+        help="Maximum number of datasets to return (default: 10).",
+    )
+    parser_datasets_list.add_argument(
+        "--offset",
+        type=int,
+        default=None,
+        help="Number of datasets to skip, for pagination.",
+    )
+    parser_datasets_list.add_argument(
+        "--tag",
+        type=str,
+        default=None,
+        help="Only list datasets with this tag.",
+    )
+    parser_datasets_list.add_argument(
+        "--status",
+        type=str,
+        default=None,
+        choices=["active", "in_preparation", "deactivated"],
+        help="Filter by dataset status (default: active).",
+    )
+    parser_datasets_list.add_argument(
+        "--data-name",
+        type=str,
+        default=None,
+        help="Filter by dataset name.",
+    )
+
+    parser_datasets_info = datasets_subparsers.add_parser(
+        "info",
+        description="Display detailed information about a specific dataset.",
+    )
+    parser_datasets_info.add_argument(
+        "dataset_id",
+        type=int,
+        help="The ID of the dataset to display.",
+    )
+
+    # --- tasks subcommand ---
+    parser_tasks = subparsers.add_parser(
+        "tasks",
+        description="Browse and search OpenML tasks.",
+    )
+    tasks_subparsers = parser_tasks.add_subparsers(dest="tasks_action")
+
+    parser_tasks_list = tasks_subparsers.add_parser(
+        "list",
+        description="List OpenML tasks with optional filtering.",
+    )
+    parser_tasks_list.add_argument(
+        "--size",
+        type=int,
+        default=10,
+        help="Maximum number of tasks to return (default: 10).",
+    )
+    parser_tasks_list.add_argument(
+        "--offset",
+        type=int,
+        default=None,
+        help="Number of tasks to skip, for pagination.",
+    )
+    parser_tasks_list.add_argument(
+        "--tag",
+        type=str,
+        default=None,
+        help="Only list tasks with this tag.",
+    )
+    parser_tasks_list.add_argument(
+        "--task-type",
+        type=int,
+        default=None,
+        dest="task_type",
+        help="Filter by task type ID (e.g. 1 for Supervised Classification).",
+    )
+
+    parser_tasks_info = tasks_subparsers.add_parser(
+        "info",
+        description="Display detailed information about a specific task.",
+    )
+    parser_tasks_info.add_argument(
+        "task_id",
+        type=int,
+        help="The ID of the task to display.",
+    )
+
     args = parser.parse_args()
+    # Attach subparsers so handlers can print help when no action is given
+    args._parser_flows = parser_flows
+    args._parser_datasets = parser_datasets
+    args._parser_tasks = parser_tasks
     subroutines.get(args.subroutine, lambda _: parser.print_help())(args)
 
 
