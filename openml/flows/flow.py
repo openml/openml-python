@@ -9,6 +9,7 @@ from typing import Any, cast
 
 import xmltodict
 
+import openml
 from openml.base import OpenMLBase
 from openml.extensions import Extension, get_extension_by_flow
 from openml.utils import extract_xml_tags
@@ -438,9 +439,14 @@ class OpenMLFlow(OpenMLBase):
                 raise openml.exceptions.PyOpenMLError(
                     "Flow does not exist on the server, but 'flow.flow_id' is not None.",
                 )
-            super().publish()
-            assert self.flow_id is not None  # for mypy
-            flow_id = self.flow_id
+
+            file_elements = self._get_file_elements()
+            if "description" not in file_elements:
+                file_elements["description"] = self._to_xml()
+
+            # Use openml._backend.flow.publish which internally calls ResourceV1.publish
+            flow_id = openml._backend.flow.publish(path="flow", files=file_elements)
+            self.flow_id = flow_id
         elif raise_error_if_exists:
             error_message = f"This OpenMLFlow already exists with id: {flow_id}."
             raise openml.exceptions.PyOpenMLError(error_message)
@@ -467,6 +473,30 @@ class OpenMLFlow(OpenMLBase):
                 f"the flow if necessary! Error is:\n'{message}'",
             ) from e
         return self
+
+    def push_tag(self, tag: str) -> None:
+        """Annotates this flow with a tag on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to attach to the flow.
+        """
+        if self.flow_id is None:
+            raise ValueError("Flow does not have an ID. Please publish the flow before tagging.")
+        openml._backend.flow.tag(self.flow_id, tag)
+
+    def remove_tag(self, tag: str) -> None:
+        """Removes a tag from this flow on the server.
+
+        Parameters
+        ----------
+        tag : str
+            Tag to remove from the flow.
+        """
+        if self.flow_id is None:
+            raise ValueError("Flow does not have an ID. Please publish the flow before untagging.")
+        openml._backend.flow.untag(self.flow_id, tag)
 
     def get_structure(self, key_item: str) -> dict[str, list[str]]:
         """
