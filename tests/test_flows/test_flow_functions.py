@@ -324,14 +324,39 @@ class TestFlowFunctions(TestBase):
 
     @pytest.mark.test_server()
     def test_get_flow_reinstantiate_model_no_extension(self):
-        # Flow 10 is a WEKA flow
-        self.assertRaisesRegex(
-            ValueError,
-            ".* flow: 10 \(weka.SMO\). ",
-            openml.flows.get_flow,
-            flow_id=10,
-            reinstantiate=True,
-        )
+        # Flow 10 is a WEKA flow without a registered extension
+        # Should not raise an error, but log a warning and return flow without model
+        with self.assertLogs("openml.flows.functions", level="WARNING") as cm:
+            flow = openml.flows.get_flow(flow_id=10, reinstantiate=True)
+
+        # Verify that a warning was logged
+        assert any("Cannot reinstantiate flow" in log for log in cm.output)
+        assert any("no extension registered" in log for log in cm.output)
+
+        # Verify that the flow is returned but without a model
+        assert flow is not None
+        assert flow.flow_id == 10
+        assert flow.model is None
+
+    @pytest.mark.test_server()
+    def test_get_flow_reinstantiate_openml_native_flow(self):
+        """Test for issue #1626: get_flow() with reinstantiate=True for OpenML-native flows.
+
+        OpenML-native flows (e.g., weka.ZeroR on test server) don't have
+        registered extensions. When reinstantiate=True is passed, the function should
+        log a warning and return the flow without raising an error.
+        """
+        with self.assertLogs("openml.flows.functions", level="WARNING") as cm:
+            flow = openml.flows.get_flow(flow_id=1, reinstantiate=True)
+
+        # Verify that a warning was logged
+        assert any("Cannot reinstantiate flow 1" in log for log in cm.output)
+        assert any("no extension registered" in log for log in cm.output)
+
+        # Verify that the flow is returned but without a model
+        assert flow is not None
+        assert flow.flow_id == 1
+        assert flow.model is None
 
     @pytest.mark.sklearn()
     @unittest.skipIf(
