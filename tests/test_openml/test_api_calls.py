@@ -7,6 +7,7 @@ from unittest import mock
 
 import minio
 import pytest
+import requests
 
 import openml
 from openml.config import ConfigurationForExamples
@@ -126,3 +127,61 @@ def test_authentication_endpoints_requiring_api_key_show_relevant_help_link(
     with openml.config.overwrite_config_context({"apikey": None}):
         with pytest.raises(openml.exceptions.OpenMLAuthenticationError, match=API_TOKEN_HELP_LINK):
             openml._api_calls._perform_api_call(call=endpoint, request_method=method, data=None)
+
+
+def _make_ok_response() -> unittest.mock.Mock:
+    """Return a minimal mock that passes __check_response without errors."""
+    response = unittest.mock.Mock()
+    response.status_code = 200
+    response.headers = {"Content-Encoding": "gzip"}
+    return response
+
+
+@pytest.mark.parametrize("request_method", ["get", "post", "delete"])
+@unittest.mock.patch("time.sleep")
+@unittest.mock.patch("requests.Session")
+def test_timeout_is_forwarded_to_session(Session_class_mock, _sleep, request_method):
+    """timeout=(connect_timeout, read_timeout) must be passed to every session verb."""
+    session_mock = Session_class_mock.return_value.__enter__.return_value
+    verb_mock = getattr(session_mock, request_method)
+    verb_mock.return_value = _make_ok_response()
+
+    with openml.config.overwrite_config_context(
+        {"connect_timeout": 5.0, "read_timeout": 42.0, "connection_n_retries": 1}
+    ):
+        openml._api_calls._send_request(request_method, "http://example.com", {})
+
+    verb_mock.assert_called_once()
+    _call_kwargs = verb_mock.call_args[1]
+    assert _call_kwargs["timeout"] == (5.0, 42.0)
+
+
+@unittest.mock.patch("time.sleep")
+@unittest.mock.patch("requests.Session")
+def test_requests_timeout_is_retried_and_recovers(Session_class_mock, _sleep):
+    """requests.Timeout on the first attempt must trigger a retry that succeeds."""
+    session_mock = Session_class_mock.return_value.__enter__.return_value
+    ok_response = _make_ok_response()
+    session_mock.get.side_effect = [requests.exceptions.Timeout(), ok_response]
+
+    with openml.config.overwrite_config_context({"connection_n_retries": 2}):
+        result = openml._api_calls._send_request("get", "http://example.com", {})
+
+    assert result is ok_response
+    assert session_mock.get.call_count == 2
+    _sleep.assert_called_once()  # exactly one inter-retry sleep
+
+
+@unittest.mock.patch("time.sleep")
+@unittest.mock.patch("requests.Session")
+def test_requests_timeout_raised_after_all_retries_exhausted(Session_class_mock, _sleep):
+    """requests.Timeout must propagate once every retry attempt is consumed."""
+    session_mock = Session_class_mock.return_value.__enter__.return_value
+    session_mock.get.side_effect = requests.exceptions.Timeout()
+
+    with openml.config.overwrite_config_context({"connection_n_retries": 3}):
+        with pytest.raises(requests.exceptions.Timeout):
+            openml._api_calls._send_request("get", "http://example.com", {})
+
+    assert session_mock.get.call_count == 3
+    assert _sleep.call_count == 2  # sleep between retries, not after the last failure

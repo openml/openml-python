@@ -370,16 +370,19 @@ def _send_request(  # noqa: C901, PLR0912
     # Error to raise in case of retrying too often. Will be set to the last observed exception.
     retry_raise_e: Exception | None = None
 
+    timeout = (config.connect_timeout, config.read_timeout)
     with requests.Session() as session:
         # Start at one to have a non-zero multiplier for the sleep
         for retry_counter in range(1, n_retries + 1):
             try:
                 if request_method == "get":
-                    response = session.get(url, params=data, headers=_HEADERS)
+                    response = session.get(url, params=data, headers=_HEADERS, timeout=timeout)
                 elif request_method == "delete":
-                    response = session.delete(url, params=data, headers=_HEADERS)
+                    response = session.delete(url, params=data, headers=_HEADERS, timeout=timeout)
                 elif request_method == "post":
-                    response = session.post(url, data=data, files=files, headers=_HEADERS)
+                    response = session.post(
+                        url, data=data, files=files, headers=_HEADERS, timeout=timeout
+                    )
                 else:
                     raise NotImplementedError()
 
@@ -424,6 +427,7 @@ def _send_request(  # noqa: C901, PLR0912
                     ) from e
                 retry_raise_e = e
             except (
+                requests.exceptions.Timeout,
                 requests.exceptions.ChunkedEncodingError,
                 requests.exceptions.ConnectionError,
                 requests.exceptions.SSLError,

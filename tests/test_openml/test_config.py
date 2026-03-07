@@ -84,8 +84,10 @@ class TestConfig(openml.testing.TestBase):
         _config["connection_n_retries"] = 20
         _config["retry_policy"] = "robot"
         _config["show_progress"] = False
+        _config["connect_timeout"] = openml.config.connect_timeout
+        _config["read_timeout"] = openml.config.read_timeout
         assert isinstance(config, dict)
-        assert len(config) == 7
+        assert len(config) == 9
         self.assertDictEqual(config, _config)
 
     def test_setup_with_config(self):
@@ -98,6 +100,8 @@ class TestConfig(openml.testing.TestBase):
         _config["retry_policy"] = "human"
         _config["connection_n_retries"] = 100
         _config["show_progress"] = False
+        _config["connect_timeout"] = 5.0
+        _config["read_timeout"] = 120.0
         orig_config = openml.config.get_config_as_dict()
         openml.config._setup(_config)
         updated_config = openml.config.get_config_as_dict()
