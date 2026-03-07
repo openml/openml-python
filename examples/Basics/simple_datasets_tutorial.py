@@ -29,7 +29,7 @@ print(
     f"This is dataset '{dataset.name}', the target feature is '{dataset.default_target_attribute}'"
 )
 print(f"URL: {dataset.url}")
-print(dataset.description[:500])
+print(dataset.description[:500] if dataset.description else "")
 
 # %% [markdown]
 # ## Load a dataset
@@ -51,7 +51,7 @@ X, y, categorical_indicator, attribute_names = dataset.get_data(
 # %%
 import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
+import seaborn as sns # type: ignore
 
 iris_plot = sns.pairplot(pd.concat([X, y], axis=1), hue="class")
 plt.show()
