@@ -189,3 +189,20 @@ class TestSetupFunctions(TestBase):
         openml.config.set_root_cache_directory(self.static_cache_dir)
         with pytest.raises(openml.exceptions.OpenMLCacheException):
             openml.setups.functions._get_cached_setup(10)
+
+    @pytest.mark.test_server()
+    def test_tagging(self):
+        setups = openml.setups.list_setups(size=1)
+        setup_id = next(iter(setups.keys()))
+        setup = openml.setups.get_setup(setup_id)
+        unique_indicator = str(time.time()).replace(".", "")
+        tag = f"test_tag_TestSetup_{unique_indicator}"
+        tagged_setups = openml.setups.list_setups(tag=tag)
+        assert len(tagged_setups) == 0
+        setup.push_tag(tag)
+        tagged_setups = openml.setups.list_setups(tag=tag)
+        assert len(tagged_setups) == 1
+        assert setup_id in tagged_setups
+        setup.remove_tag(tag)
+        tagged_setups = openml.setups.list_setups(tag=tag)
+        assert len(tagged_setups) == 0
