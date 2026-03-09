@@ -9,12 +9,14 @@ from copy import copy
 from typing import Any, Iterator
 from pathlib import Path
 import platform
+from urllib.parse import urlparse
 
 import pytest
 
-import openml.config
+import openml
 import openml.testing
 from openml.testing import TestBase
+from openml.enums import APIVersion
 
 
 @contextmanager
@@ -37,7 +39,7 @@ def safe_environ_patcher(key: str, value: Any) -> Iterator[None]:
 
 class TestConfig(openml.testing.TestBase):
     @unittest.mock.patch("openml.config.openml_logger.warning")
-    @unittest.mock.patch("openml.config._create_log_handlers")
+    @unittest.mock.patch("openml._config.OpenMLConfigManager._create_log_handlers")
     @unittest.skipIf(os.name == "nt", "https://github.com/openml/openml-python/issues/1033")
     @unittest.skipIf(
         platform.uname().release.endswith(("-Microsoft", "microsoft-standard-WSL2")),
@@ -77,22 +79,24 @@ class TestConfig(openml.testing.TestBase):
         """Checks if the current configuration is returned accurately as a dict."""
         config = openml.config.get_config_as_dict()
         _config = {}
-        _config["apikey"] = TestBase.user_key
-        _config["server"] = f"{openml.config.TEST_SERVER_URL}/api/v1/xml"
+        _config["api_version"] = APIVersion.V1
+        _config["fallback_api_version"] = None
+        _config["servers"] = openml.config.get_servers("test")
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = False
         _config["connection_n_retries"] = 20
         _config["retry_policy"] = "robot"
         _config["show_progress"] = False
         assert isinstance(config, dict)
-        assert len(config) == 7
+        assert len(config) == 8
         self.assertDictEqual(config, _config)
 
     def test_setup_with_config(self):
         """Checks if the OpenML configuration can be updated using _setup()."""
         _config = {}
-        _config["apikey"] = TestBase.user_key
-        _config["server"] = "https://www.openml.org/api/v1/xml"
+        _config["api_version"] = APIVersion.V1
+        _config["fallback_api_version"] = None
+        _config["servers"] = openml.config.get_servers("test")
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = True
         _config["retry_policy"] = "human"
@@ -127,7 +131,6 @@ class TestConfigurationForExamples(openml.testing.TestBase):
 
         openml.config.start_using_configuration_for_example()
         openml.config.stop_using_configuration_for_example()
-
         assert openml.config.apikey == TestBase.user_key
         assert openml.config.server == self.production_server
 
@@ -136,7 +139,7 @@ class TestConfigurationForExamples(openml.testing.TestBase):
         error_regex = ".*stop_use_example_configuration.*start_use_example_configuration.*first"
         # Tests do not reset the state of this class. Thus, we ensure it is in
         # the original state before the test.
-        openml.config.ConfigurationForExamples._start_last_called = False
+        openml.config._examples._start_last_called = False
         self.assertRaisesRegex(
             RuntimeError,
             error_regex,
@@ -191,5 +194,6 @@ def test_openml_cache_dir_env_var(tmp_path: Path) -> None:
 
     with safe_environ_patcher("OPENML_CACHE_DIR", str(expected_path)):
         openml.config._setup()
+
         assert openml.config._root_cache_directory == expected_path
         assert openml.config.get_cache_directory() == str(expected_path / "org" / "openml" / "www")

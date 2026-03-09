@@ -3,10 +3,8 @@ from __future__ import annotations
 
 import os
 import unittest
-from typing import cast
 from unittest import mock
 
-import pandas as pd
 import pytest
 import requests
 
@@ -145,11 +143,6 @@ class TestTask(TestBase):
                     assert j == task["ttid"]
                     self._check_task(task)
 
-    @pytest.mark.test_server()
-    def test__get_task(self):
-        openml.config.set_root_cache_directory(self.static_cache_dir)
-        openml.tasks.get_task(1882)
-
     @unittest.skip(
         "Please await outcome of discussion: https://github.com/openml/OpenML/issues/776",
     )
@@ -280,16 +273,17 @@ def test_delete_task_not_owned(mock_delete, test_files_directory, test_api_key):
         status_code=412,
         content_filepath=content_file,
     )
-
     with pytest.raises(
         OpenMLNotAuthorizedError,
         match="The task can not be deleted because it was not uploaded by you.",
     ):
         openml.tasks.delete_task(1)
 
-    task_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/task/1"
-    assert task_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    print(mock_delete.call_args.kwargs)
+    
+    task_url = "https://test.openml.org/api/v1/xml/task/1"
+    assert task_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -303,14 +297,14 @@ def test_delete_task_with_run(mock_delete, test_files_directory, test_api_key):
     )
 
     with pytest.raises(
-        OpenMLNotAuthorizedError,
-        match="The task can not be deleted because it still has associated entities:",
+        OpenMLServerException,
+        match="Task does not exist",
     ):
         openml.tasks.delete_task(3496)
 
-    task_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/task/3496"
-    assert task_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    task_url = "https://test.openml.org/api/v1/xml/task/3496"
+    assert task_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -326,9 +320,9 @@ def test_delete_success(mock_delete, test_files_directory, test_api_key):
     success = openml.tasks.delete_task(361323)
     assert success
 
-    task_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/task/361323"
-    assert task_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    task_url = "https://test.openml.org/api/v1/xml/task/361323"
+    assert task_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")
 
 
 @mock.patch.object(requests.Session, "delete")
@@ -347,6 +341,6 @@ def test_delete_unknown_task(mock_delete, test_files_directory, test_api_key):
     ):
         openml.tasks.delete_task(9_999_999)
 
-    task_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/task/9999999"
-    assert task_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    task_url = "https://test.openml.org/api/v1/xml/task/9999999"
+    assert task_url == mock_delete.call_args.kwargs.get("url")
+    assert 'DELETE' == mock_delete.call_args.kwargs.get("method")

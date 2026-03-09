@@ -9,7 +9,6 @@ import minio
 import pytest
 
 import openml
-from openml.config import ConfigurationForExamples
 import openml.testing
 from openml._api_calls import _download_minio_bucket, API_TOKEN_HELP_LINK
 
