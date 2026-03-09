@@ -163,7 +163,7 @@ class TestSetupFunctions(TestBase):
 
         setups = openml.setups.list_setups(flow=flow_id)
 
-        assert len(setups) > 0  # TODO: please adjust 0
+        assert len(setups) >= 2
         for setup_id in setups:
             assert setups[setup_id].flow_id == flow_id
 
