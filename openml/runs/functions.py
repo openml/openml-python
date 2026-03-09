@@ -6,8 +6,7 @@ import time
 import warnings
 from collections import OrderedDict
 from functools import partial
-from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pandas as pd
@@ -18,9 +17,7 @@ from joblib.parallel import Parallel, delayed
 import openml
 import openml._api_calls
 import openml.utils
-from openml import config
 from openml.exceptions import (
-    OpenMLCacheException,
     OpenMLRunsExistError,
     OpenMLServerException,
     PyOpenMLError,
@@ -45,12 +42,11 @@ from .trace import OpenMLRunTrace
 
 # Avoid import cycles: https://mypy.readthedocs.io/en/latest/common_issues.html#import-cycles
 if TYPE_CHECKING:
-    from openml.config import _Config
+    from openml._config import _Config
     from openml.extensions.extension_interface import Extension
 
 # get_dict is in run.py to avoid circular imports
 
-RUNS_CACHE_DIR_NAME = "runs"
 ERROR_CODE = 512
 
 
@@ -107,7 +103,7 @@ def run_model_on_task(  # noqa: PLR0913
     """
     if avoid_duplicate_runs is None:
         avoid_duplicate_runs = openml.config.avoid_duplicate_runs
-    if avoid_duplicate_runs and not config.apikey:
+    if avoid_duplicate_runs and not openml.config.apikey:
         warnings.warn(
             "avoid_duplicate_runs is set to True, but no API key is set. "
             "Please set your API key in the OpenML configuration file, see"
@@ -336,7 +332,7 @@ def run_flow_on_task(  # noqa: C901, PLR0912, PLR0915, PLR0913
         message = f"Executed Task {task.task_id} with Flow id:{run.flow_id}"
     else:
         message = f"Executed Task {task.task_id} on local Flow with name {flow.name}."
-    config.logger.info(message)
+    openml.config.logger.info(message)
 
     return run
 
@@ -530,7 +526,7 @@ def _run_task_get_arffcontent(  # noqa: PLR0915, PLR0912, C901
 
     # The forked child process may not copy the configuration state of OpenML from the parent.
     # Current configuration setup needs to be copied and passed to the child processes.
-    _config = config.get_config_as_dict()
+    _config = openml.config.get_config_as_dict()
     # Execute runs in parallel
     # assuming the same number of tasks as workers (n_jobs), the total compute time for this
     # statement will be similar to the slowest run
@@ -738,7 +734,7 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
     """
     # Sets up the OpenML instantiated in the child process to match that of the parent's
     # if configuration=None, loads the default
-    config._setup(configuration)
+    openml.config._setup(configuration)
 
     train_indices, test_indices = task.get_train_test_split_indices(
         repeat=rep_no,
@@ -768,7 +764,7 @@ def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
             f"task_class={task.__class__.__name__}"
         )
 
-    config.logger.info(
+    openml.config.logger.info(
         f"Going to run model {model!s} on "
         f"dataset {openml.datasets.get_dataset(task.dataset_id).name} "
         f"for repeat {rep_no} fold {fold_no} sample {sample_no}"
@@ -820,30 +816,22 @@ def get_run(run_id: int, ignore_cache: bool = False) -> OpenMLRun:  # noqa: FBT0
         Whether to ignore the cache. If ``true`` this will download and overwrite the run xml
         even if the requested run is already cached.
 
-    ignore_cache
+    ignore_cache : bool
+        Whether to ignore the cache. If ``true`` this will download and overwrite the run xml
+        even if the requested run is already cached.
 
     Returns
     -------
     run : OpenMLRun
         Run corresponding to ID, fetched from the server.
     """
-    run_dir = Path(openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id))
-    run_file = run_dir / "description.xml"
-
-    run_dir.mkdir(parents=True, exist_ok=True)
-
-    try:
-        if not ignore_cache:
-            return _get_cached_run(run_id)
-
-        raise OpenMLCacheException(message="dummy")
-
-    except OpenMLCacheException:
-        run_xml = openml._api_calls._perform_api_call(f"run/{run_id}", "get")
-        with run_file.open("w", encoding="utf8") as fh:
-            fh.write(run_xml)
-
-    return _create_run_from_xml(run_xml)
+    return cast(
+        "OpenMLRun",
+        openml._backend.run.get(
+            run_id,
+            reset_cache=ignore_cache,
+        ),
+    )
 
 
 def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # noqa: PLR0915, PLR0912, C901, FBT002
@@ -918,7 +906,15 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
     run_details = obtain_field(run, "oml:run_details", from_server=False)
 
     if "oml:input_data" in run:
-        dataset_id = int(run["oml:input_data"]["oml:dataset"]["oml:did"])
+        input_data = run["oml:input_data"]
+        if isinstance(input_data, list):
+            input_data = input_data[0]
+
+        dataset_data = input_data["oml:dataset"]
+        if isinstance(dataset_data, list):
+            dataset_data = dataset_data[0]
+
+        dataset_id = int(dataset_data["oml:did"])
     elif not from_server:
         dataset_id = None
     else:
@@ -1033,17 +1029,6 @@ def _create_run_from_xml(xml: str, from_server: bool = True) -> OpenMLRun:  # no
     )
 
 
-def _get_cached_run(run_id: int) -> OpenMLRun:
-    """Load a run from the cache."""
-    run_cache_dir = openml.utils._create_cache_directory_for_id(RUNS_CACHE_DIR_NAME, run_id)
-    run_file = run_cache_dir / "description.xml"
-    try:
-        with run_file.open(encoding="utf8") as fh:
-            return _create_run_from_xml(xml=fh.read())
-    except OSError as e:
-        raise OpenMLCacheException(f"Run file for run id {run_id} not cached") from e
-
-
 def list_runs(  # noqa: PLR0913
     offset: int | None = None,
     size: int | None = None,
@@ -1104,8 +1089,8 @@ def list_runs(  # noqa: PLR0913
         raise TypeError("uploader must be of type list.")
 
     listing_call = partial(
-        _list_runs,
-        id=id,
+        openml._backend.run.list,
+        ids=id,
         task=task,
         setup=setup,
         flow=flow,
@@ -1326,4 +1311,4 @@ def delete_run(run_id: int) -> bool:
     bool
         True if the deletion was successful. False otherwise.
     """
-    return openml.utils._delete_entity("run", run_id)
+    return cast("bool", openml._backend.run.delete(run_id))
