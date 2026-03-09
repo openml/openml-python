@@ -113,10 +113,12 @@ jobs:
 
     - name: Clone Services
       if: matrix.os == 'ubuntu-latest'
+      id: clone-services
       run: |
         git clone --depth 1 https://github.com/openml/services.git
 
     - name: Start Docker Services
+      id: start-services
       if: matrix.os == 'ubuntu-latest'
       working-directory: ./services
       run: |
@@ -188,12 +190,12 @@ jobs:
         verbose: true
 
     - name: Dump server logs
-      if: matrix.os == 'ubuntu-latest' && always()
+      if: always() && steps.start-services.outcome == 'success'
       run: |
         docker logs openml-php-rest-api -t
 
     - name: Cleanup Docker setup
-      if: matrix.os == 'ubuntu-latest' && always()
+      if: always() && steps.clone-services.outcome == 'success'
       run: |
         sudo rm -rf services
 
