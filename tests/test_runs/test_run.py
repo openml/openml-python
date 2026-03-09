@@ -145,6 +145,10 @@ class TestRun(TestBase):
         else:
             assert run_prime_trace_content is None
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @mock.patch("openml.runs.run_model_on_task")
     @mock.patch("openml.tasks.get_task")
@@ -191,6 +195,10 @@ class TestRun(TestBase):
         run.to_filesystem(cache_path)
         run.to_filesystem.assert_called_once_with(cache_path)
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @mock.patch("openml.runs.run_model_on_task")
     @mock.patch("openml.tasks.get_task")
@@ -233,6 +241,10 @@ class TestRun(TestBase):
         mock_get_task.assert_called_once_with(119)
         mock_run_model.assert_called_once()
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @mock.patch("openml.runs.run_model_on_task")
     @mock.patch("openml.tasks.get_task")
@@ -304,6 +316,10 @@ class TestRun(TestBase):
 
         return [model_clf, model_reg]
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @mock.patch("openml.runs.get_run")
     @mock.patch("openml.flows.flow_exists")
@@ -357,6 +373,10 @@ class TestRun(TestBase):
             mock_flow_exists.side_effect = None
             mock_flow_exists.reset_mock()
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @mock.patch("openml.runs.get_run")
     @mock.patch("openml.flows.flow_exists")
