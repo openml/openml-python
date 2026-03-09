@@ -1,7 +1,7 @@
 import pytest
 from requests import Session, Response
 from unittest.mock import patch
-from openml._api import FallbackProxy, ResourceAPI, ResourceV1API, ResourceV2API, TaskAPI
+from openml._api import FallbackProxy, ResourceAPI, ResourceV1API, ResourceV2API
 from openml.enums import ResourceType
 from openml.exceptions import OpenMLNotSupportedError
 import openml
@@ -11,11 +11,11 @@ class DummyTaskAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.TASK
 
 
-class DummyTaskV1API(ResourceV1API, TaskAPI):
+class DummyTaskV1API(ResourceV1API, DummyTaskAPI):
     pass
 
 
-class DummyTaskV2API(ResourceV2API, TaskAPI):
+class DummyTaskV2API(ResourceV2API, DummyTaskAPI):
     pass
 
 
@@ -34,7 +34,7 @@ def dummy_task_fallback(dummy_task_v1, dummy_task_v2) -> DummyTaskV1API:
     return FallbackProxy(dummy_task_v2, dummy_task_v1)
 
 
-def test_v1_publish(dummy_task_v1, use_api_v1):
+def test_v1_publish(dummy_task_v1, test_server_v1, test_apikey_v1):
     resource = dummy_task_v1
     resource_name = resource.resource_type.value
     resource_files = {"description": "Resource Description File"}
@@ -58,15 +58,15 @@ def test_v1_publish(dummy_task_v1, use_api_v1):
 
         mock_request.assert_called_once_with(
             method="POST",
-            url=openml.config.server + resource_name,
+            url=test_server_v1 + resource_name,
             params={},
-            data={"api_key": openml.config.apikey},
+            data={"api_key": test_apikey_v1},
             headers=openml.config._HEADERS,
             files=resource_files,
         )
 
 
-def test_v1_delete(dummy_task_v1, use_api_v1):
+def test_v1_delete(dummy_task_v1, test_server_v1, test_apikey_v1):
     resource = dummy_task_v1
     resource_name = resource.resource_type.value
     resource_id = 123
@@ -85,19 +85,19 @@ def test_v1_delete(dummy_task_v1, use_api_v1):
         mock_request.assert_called_once_with(
             method="DELETE",
             url=(
-                openml.config.server
+                test_server_v1
                 + resource_name
                 + "/"
                 + str(resource_id)
             ),
-            params={"api_key": openml.config.apikey},
+            params={"api_key": test_apikey_v1},
             data={},
             headers=openml.config._HEADERS,
             files=None,
         )
 
 
-def test_v1_tag(dummy_task_v1, use_api_v1):
+def test_v1_tag(dummy_task_v1, test_server_v1, test_apikey_v1):
     resource = dummy_task_v1
     resource_id = 123
     resource_tag = "TAG"
@@ -119,13 +119,13 @@ def test_v1_tag(dummy_task_v1, use_api_v1):
         mock_request.assert_called_once_with(
             method="POST",
             url=(
-                openml.config.server
+                test_server_v1
                 + resource.resource_type
                 + "/tag"
             ),
             params={},
             data={
-                "api_key": openml.config.apikey,
+                "api_key": test_apikey_v1,
                 "task_id": resource_id,
                 "tag": resource_tag,
             },
@@ -134,7 +134,7 @@ def test_v1_tag(dummy_task_v1, use_api_v1):
         )
 
 
-def test_v1_untag(dummy_task_v1, use_api_v1):
+def test_v1_untag(dummy_task_v1, test_server_v1, test_apikey_v1):
     resource = dummy_task_v1
     resource_id = 123
     resource_tag = "TAG"
@@ -155,13 +155,13 @@ def test_v1_untag(dummy_task_v1, use_api_v1):
         mock_request.assert_called_once_with(
             method="POST",
             url=(
-                openml.config.server
+                test_server_v1
                 + resource.resource_type
                 + "/untag"
             ),
             params={},
             data={
-                "api_key": openml.config.apikey,
+                "api_key": test_apikey_v1,
                 "task_id": resource_id,
                 "tag": resource_tag,
             },
@@ -170,22 +170,22 @@ def test_v1_untag(dummy_task_v1, use_api_v1):
         )
 
 
-def test_v2_publish(dummy_task_v2, use_api_v2):
+def test_v2_publish(dummy_task_v2):
     with pytest.raises(OpenMLNotSupportedError):
         dummy_task_v2.publish(path=None, files=None)
 
 
-def test_v2_delete(dummy_task_v2, use_api_v2):
+def test_v2_delete(dummy_task_v2):
     with pytest.raises(OpenMLNotSupportedError):
         dummy_task_v2.delete(resource_id=None)
 
 
-def test_v2_tag(dummy_task_v2, use_api_v2):
+def test_v2_tag(dummy_task_v2):
     with pytest.raises(OpenMLNotSupportedError):
         dummy_task_v2.tag(resource_id=None, tag=None)
 
 
-def test_v2_untag(dummy_task_v2, use_api_v2):
+def test_v2_untag(dummy_task_v2):
     with pytest.raises(OpenMLNotSupportedError):
         dummy_task_v2.untag(resource_id=None, tag=None)
 
