@@ -44,13 +44,13 @@ def min_number_evaluations_on_test_server() -> int:
 
 
 def _mocked_perform_api_call(call, request_method):
-    url = openml.config.server + "/" + call
+    url = openml.config.server  + call
     return openml._api_calls._download_text_file(url)
 
 
 @pytest.mark.test_server()
 def test_list_all():
-    openml.utils._list_all(listing_call=openml.tasks.functions._list_tasks)
+    openml.utils._list_all(listing_call=openml.tasks.functions.list_tasks)
 
 
 @pytest.mark.test_server()
@@ -65,7 +65,7 @@ def test_list_all_with_multiple_batches(min_number_tasks_on_test_server):
     # batches and at the same time do as few batches (roundtrips) as possible.
     batch_size = min_number_tasks_on_test_server - 1
     batches = openml.utils._list_all(
-        listing_call=openml.tasks.functions._list_tasks,
+        listing_call=openml.tasks.functions.list_tasks,
         batch_size=batch_size,
     )
     assert len(batches) >= 2
