@@ -11,7 +11,6 @@ import requests
 import openml
 from openml import OpenMLSplit, OpenMLTask
 from openml.exceptions import (
-    OpenMLCacheException,
     OpenMLNotAuthorizedError,
     OpenMLServerException,
 )
@@ -27,29 +26,6 @@ class TestTask(TestBase):
 
     def tearDown(self):
         super().tearDown()
-
-    @pytest.mark.test_server()
-    def test__get_cached_tasks(self):
-        openml.config.set_root_cache_directory(self.static_cache_dir)
-        tasks = openml.tasks.functions._get_cached_tasks()
-        assert isinstance(tasks, dict)
-        assert len(tasks) == 3
-        assert isinstance(next(iter(tasks.values())), OpenMLTask)
-
-    @pytest.mark.test_server()
-    def test__get_cached_task(self):
-        openml.config.set_root_cache_directory(self.static_cache_dir)
-        task = openml.tasks.functions._get_cached_task(1)
-        assert isinstance(task, OpenMLTask)
-
-    def test__get_cached_task_not_cached(self):
-        openml.config.set_root_cache_directory(self.static_cache_dir)
-        self.assertRaisesRegex(
-            OpenMLCacheException,
-            "Task file for tid 2 not cached",
-            openml.tasks.functions._get_cached_task,
-            2,
-        )
 
     @pytest.mark.test_server()
     def test__get_estimation_procedure_list(self):
@@ -153,24 +129,6 @@ class TestTask(TestBase):
         # https://github.com/openml/openml-python/issues/378
         openml.tasks.get_task(34536)
 
-    @pytest.mark.test_server()
-    def test_get_task(self):
-        task = openml.tasks.get_task(1, download_data=True)  # anneal; crossvalidation
-        assert isinstance(task, OpenMLTask)
-        assert os.path.exists(
-            os.path.join(openml.config.get_cache_directory(), "tasks", "1", "task.xml")
-        )
-        assert not os.path.exists(
-            os.path.join(
-                openml.config.get_cache_directory(), "tasks", "1", "datasplits.arff"
-            )
-        )
-        assert os.path.exists(
-            os.path.join(
-                openml.config.get_cache_directory(), "datasets", "1", "dataset_1.pq"
-            )
-        )
-
     @pytest.mark.skipif(
         os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
         reason="Pending resolution of #1657",
@@ -222,12 +180,6 @@ class TestTask(TestBase):
         # Now the file should no longer exist
         assert not os.path.exists(os.path.join(os.getcwd(), "tasks", "1", "tasks.xml"))
 
-    @pytest.mark.test_server()
-    def test_get_task_with_cache(self):
-        openml.config.set_root_cache_directory(self.static_cache_dir)
-        task = openml.tasks.get_task(1)
-        assert isinstance(task, OpenMLTask)
-
     @pytest.mark.production_server()
     def test_get_task_different_types(self):
         self.use_production_server()
@@ -264,10 +216,10 @@ class TestTask(TestBase):
         assert not os.path.exists(tid_cache_dir)
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_task_not_owned(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
+@mock.patch.object(requests.Session, "request")
+def test_delete_task_not_owned(mock_request, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_not_owned.xml"
-    mock_delete.return_value = create_request_response(
+    mock_request.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
     )
@@ -278,14 +230,14 @@ def test_delete_task_not_owned(mock_delete, test_files_directory, test_server_v1
         openml.tasks.delete_task(1)
 
     task_url = test_server_v1 + "task/1"
-    assert task_url == mock_delete.call_args.args[0]
-    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert task_url == mock_request.call_args.kwargs.get("url")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_task_with_run(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
+@mock.patch.object(requests.Session, "request")
+def test_delete_task_with_run(mock_request, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_has_runs.xml"
-    mock_delete.return_value = create_request_response(
+    mock_request.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
     )
@@ -297,14 +249,14 @@ def test_delete_task_with_run(mock_delete, test_files_directory, test_server_v1,
         openml.tasks.delete_task(3496)
 
     task_url = test_server_v1 + "task/3496"
-    assert task_url == mock_delete.call_args.args[0]
-    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert task_url == mock_request.call_args.kwargs.get("url")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_success(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
+@mock.patch.object(requests.Session, "request")
+def test_delete_success(mock_request, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_successful.xml"
-    mock_delete.return_value = create_request_response(
+    mock_request.return_value = create_request_response(
         status_code=200,
         content_filepath=content_file,
     )
@@ -313,14 +265,14 @@ def test_delete_success(mock_delete, test_files_directory, test_server_v1, test_
     assert success
 
     task_url = test_server_v1 + "task/361323"
-    assert task_url == mock_delete.call_args.args[0]
-    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert task_url == mock_request.call_args.kwargs.get("url")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
 
 
-@mock.patch.object(requests.Session, "delete")
-def test_delete_unknown_task(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
+@mock.patch.object(requests.Session, "request")
+def test_delete_unknown_task(mock_request, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_not_exist.xml"
-    mock_delete.return_value = create_request_response(
+    mock_request.return_value = create_request_response(
         status_code=412,
         content_filepath=content_file,
     )
@@ -332,5 +284,5 @@ def test_delete_unknown_task(mock_delete, test_files_directory, test_server_v1, 
         openml.tasks.delete_task(9_999_999)
 
     task_url = test_server_v1 + "task/9999999"
-    assert task_url == mock_delete.call_args.args[0]
-    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert task_url == mock_request.call_args.kwargs.get("url")
+    assert test_apikey_v1 == mock_request.call_args.kwargs.get("params", {}).get("api_key")
