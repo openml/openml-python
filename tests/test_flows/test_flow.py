@@ -4,6 +4,7 @@ from __future__ import annotations
 import collections
 import copy
 import hashlib
+import os
 import re
 import time
 from packaging.version import Version

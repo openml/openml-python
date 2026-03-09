@@ -6,7 +6,7 @@ import functools
 import unittest
 from collections import OrderedDict
 from multiprocessing.managers import Value
-
+import os
 from openml_sklearn import SklearnExtension
 from packaging.version import Version
 from unittest import mock

@@ -6,6 +6,7 @@ from typing import NamedTuple, Iterable, Iterator
 from unittest import mock
 
 import minio
+import os
 import pytest
 
 import openml
