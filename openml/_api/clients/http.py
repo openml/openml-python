@@ -211,7 +211,7 @@ class HTTPClient:
     def server(self) -> str:
         server = openml.config.servers[self.api_version]["server"]
         if server is None:
-            servers_repr = {k.value: v for k, v in openml.config.servers}
+            servers_repr = {k.value: v for k, v in openml.config.servers.items()}
             raise ValueError(
                 f'server found to be None for api_version="{self.api_version}" in {servers_repr}'
             )
@@ -310,12 +310,8 @@ class HTTPClient:
 
         if message and additional_information:
             full_message = f"{message} - {additional_information}"
-        elif message:
-            full_message = message
-        elif additional_information:
-            full_message = additional_information
         else:
-            full_message = ""
+            full_message = message or additional_information or ""
 
         return code, full_message
 
@@ -766,7 +762,7 @@ class HTTPClient:
     def download(
         self,
         url: str,
-        handler: Callable[[Response, Path, str], Path] | None = None,
+        handler: Callable[[Response, Path, str], None] | None = None,
         encoding: str = "utf-8",
         file_name: str = "response.txt",
         md5_checksum: str | None = None,
@@ -806,29 +802,10 @@ class HTTPClient:
             return file_path
 
         response = self.get(url, md5_checksum=md5_checksum)
-        if handler is not None:
-            return handler(response, file_path, encoding)
 
-        return self._text_handler(response, file_path, encoding)
+        def write_to_file(response: Response, path: Path, encoding: str) -> None:
+            path.write_text(response.text, encoding)
 
-    def _text_handler(self, response: Response, path: Path, encoding: str) -> Path:
-        """
-        Write response text content to a file.
-
-        Parameters
-        ----------
-        response : requests.Response
-            HTTP response containing text data.
-        path : pathlib.Path
-            Destination file path.
-        encoding : str
-            Text encoding for writing the file.
-
-        Returns
-        -------
-        pathlib.Path
-            Path to the written file.
-        """
-        with path.open("w", encoding=encoding) as f:
-            f.write(response.text)
-        return path
+        handler = handler or write_to_file
+        handler(response, file_path, encoding)
+        return file_path

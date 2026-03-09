@@ -7,6 +7,7 @@ import openml
 from .builder import APIBackendBuilder
 
 if TYPE_CHECKING:
+    from openml._api.clients import HTTPClient, MinIOClient
     from openml._api.resources import (
         DatasetAPI,
         EstimationProcedureAPI,
@@ -67,7 +68,7 @@ class APIBackend:
         key = f"{api_version}_{fallback_api_version}"
 
         if key not in self._backends:
-            _backend = APIBackendBuilder.build(
+            _backend = APIBackendBuilder(
                 api_version=api_version,
                 fallback_api_version=fallback_api_version,
             )
@@ -110,6 +111,18 @@ class APIBackend:
     @property
     def setup(self) -> SetupAPI:
         return cast("SetupAPI", self._backend.setup)
+
+    @property
+    def http_client(self) -> HTTPClient:
+        return cast("HTTPClient", self._backend.http_client)
+
+    @property
+    def fallback_http_client(self) -> HTTPClient | None:
+        return cast("HTTPClient | None", self._backend.fallback_http_client)
+
+    @property
+    def minio_client(self) -> MinIOClient:
+        return cast("MinIOClient", self._backend.minio_client)
 
     @classmethod
     def get_instance(cls) -> APIBackend:
