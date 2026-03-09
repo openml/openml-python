@@ -58,11 +58,18 @@ def list_qualities() -> list[str]:
     """Return list of data qualities available.
 
     The function performs an API call to retrieve the entire list of
-    data qualities that are computed on the datasets uploaded.
+    data qualities that are computed on the datasets uploaded to OpenML.
 
     Returns
     -------
     list
+        A list of quality names.
+
+    Examples
+    --------
+    >>> import openml
+    >>> qualities = openml.datasets.list_qualities()
+    >>> print(qualities[:5])
     """
     api_call = "data/qualities/list"
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
@@ -126,6 +133,14 @@ def list_datasets(
         - status
         If qualities are calculated for the dataset, some of
         these are also included as columns.
+
+    Examples
+    --------
+    >>> import openml
+    >>> datasets = openml.datasets.list_datasets(size=5)
+    >>> print(datasets.head())
+
+
     """
     listing_call = partial(
         _list_datasets,
@@ -364,6 +379,12 @@ def get_datasets(
     -------
     datasets : list of datasets
         A list of dataset objects.
+            Examples
+    --------
+    >>> import openml
+    >>> datasets = openml.datasets.get_datasets([31, 32])
+    >>> for dataset in datasets:
+    ...     print(dataset.name)
     """
     datasets = []
     for dataset_id in dataset_ids:
@@ -1059,6 +1080,14 @@ def _topic_delete_dataset(data_id: int, topic: str) -> int:
     Returns
     -------
     Dataset id
+
+    Examples
+    --------
+    >>> import openml
+    >>> dataset_id = 61
+    >>> topic = "biology"
+    >>> result = openml.datasets.functions._topic_delete_dataset(dataset_id, topic)
+    >>> print(result)
     """
     if not isinstance(data_id, int):
         raise TypeError(f"`data_id` must be of type `int`, not {type(data_id)}.")
@@ -1458,5 +1487,11 @@ def delete_dataset(dataset_id: int) -> bool:
     -------
     bool
         True if the deletion was successful. False otherwise.
+
+    Examples
+    --------
+    >>> import openml
+    >>> success = openml.datasets.delete_dataset(123456)
+    >>> print(success)
     """
     return openml.utils._delete_entity("data", dataset_id)
