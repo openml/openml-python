@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib
 import time
 import unittest.mock
-
+import os
 import pandas as pd
 import pytest
 import sklearn.base
@@ -34,6 +34,10 @@ class TestSetupFunctions(TestBase):
         self.extension = SklearnExtension()
         super().setUp()
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_nonexisting_setup_exists(self):
@@ -82,6 +86,10 @@ class TestSetupFunctions(TestBase):
         setup_id = openml.setups.setup_exists(flow)
         assert setup_id == run.setup_id
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_existing_setup_exists_1(self):
@@ -98,12 +106,20 @@ class TestSetupFunctions(TestBase):
             nb = sklearn.naive_bayes.GaussianNB()
             self._existing_setup_exists(nb)
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_exisiting_setup_exists_2(self):
         # Check a flow with one hyperparameter
         self._existing_setup_exists(sklearn.naive_bayes.GaussianNB())
 
+    @pytest.mark.skipif(
+        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
+        reason="Pending resolution of #1657",
+    )
     @pytest.mark.sklearn()
     @pytest.mark.test_server()
     def test_existing_setup_exists_3(self):
@@ -143,7 +159,7 @@ class TestSetupFunctions(TestBase):
 
         setups = openml.setups.list_setups(flow=flow_id)
 
-        assert len(setups) > 0  # TODO: please adjust 0
+        assert len(setups) >= 2
         for setup_id in setups:
             assert setups[setup_id].flow_id == flow_id
 
