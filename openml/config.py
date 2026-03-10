@@ -26,9 +26,10 @@ file_handler: logging.handlers.RotatingFileHandler | None = None
 OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
 OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
 OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR = "OPENML_TEST_SERVER_ADMIN_KEY"
+OPENML_TEST_SERVER_URL_ENV_VAR = "OPENML_TEST_SERVER_URL"
 _TEST_SERVER_NORMAL_USER_KEY = "normaluser"
 
-TEST_SERVER_URL = "https://test.openml.org"
+TEST_SERVER_URL = os.environ.get(OPENML_TEST_SERVER_URL_ENV_VAR, "https://test.openml.org")
 
 
 class _Config(TypedDict):
