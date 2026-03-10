@@ -286,12 +286,19 @@ def with_server(request):
 
 @pytest.fixture(autouse=True)
 def with_test_cache(test_files_directory, request):
+    # Skip this fixture for TestBase subclasses - they manage their own cache directory
+    # in setUp()/tearDown(). Having both mechanisms fight over the global config
+    # causes race conditions.
+    if request.instance is not None and isinstance(request.instance, TestBase):
+        yield
+        return
+
     if not test_files_directory.exists():
         raise ValueError(
             f"Cannot find test cache dir, expected it to be {test_files_directory!s}!",
         )
     _root_cache_directory = openml.config._root_cache_directory
-    tmp_cache = test_files_directory / request.node.name
+    tmp_cache = test_files_directory / request.node.nodeid.replace("/", ".").replace("::", ".")
     openml.config.set_root_cache_directory(tmp_cache)
     yield
     openml.config.set_root_cache_directory(_root_cache_directory)
