@@ -9,8 +9,7 @@ from collections.abc import Callable
 from pathlib import Path
 from urllib.parse import urlparse
 
-from openml import config
-from openml.__version__ import __version__
+from openml import __version__, config
 
 
 def is_hex(string_: str) -> bool:
