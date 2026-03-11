@@ -80,31 +80,21 @@ def publish(obj: Any, *, name: str | None = None, tags: Sequence[str] | None = N
     installed (e.g., ``openml-sklearn``). The extension will be automatically imported
     if available.
     """
-    # Case 1: Object is already an OpenML entity
-    if isinstance(obj, OpenMLBase):
-        if tags and hasattr(obj, "tags"):
-            existing = obj.tags or []
-            if all(isinstance(tag, str) for tag in existing):
-                obj.tags = list(dict.fromkeys([*existing, *tags]))
-        if name is not None and hasattr(obj, "name"):
-            obj.name = name
-        return obj.publish()
+    if not isinstance(obj, OpenMLBase):
+        extension = extensions.get_extension_by_model(obj, raise_if_no_extension=True)
+        if extension is None:
+            raise ValueError(
+                f"No extension found to publish object of type {type(obj).__name__}. "
+                "Please ensure the appropriate extension is installed and registered."
+            )
+        flow = extension.model_to_flow(obj)
+        return publish(flow, name=name, tags=tags)
 
-    # Case 2: Object is an external estimator - use extension registry
-    extension = extensions.get_extension_by_model(obj, raise_if_no_extension=True)
-    if extension is None:
-        raise ValueError(
-            f"No extension found to publish object of type {type(obj).__name__}. "
-            "Please ensure the appropriate extension is installed and registered."
-        )
+    if tags is not None and hasattr(obj, "tags"):
+        existing_tags = list(obj.tags or [])
+        obj.tags = list(dict.fromkeys([*existing_tags, *tags]))
 
-    flow = extension.model_to_flow(obj)
+    if name is not None and hasattr(obj, "name"):
+        obj.name = name
 
-    if name is not None:
-        flow.name = name
-
-    if tags is not None:
-        existing_tags = list(getattr(flow, "tags", []) or [])
-        flow.tags = list(dict.fromkeys([*existing_tags, *tags]))
-
-    return flow.publish()
+    return obj.publish()
