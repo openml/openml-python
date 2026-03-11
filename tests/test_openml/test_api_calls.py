@@ -7,6 +7,7 @@ from unittest import mock
 
 import minio
 import pytest
+import os
 
 import openml
 from openml.config import ConfigurationForExamples
