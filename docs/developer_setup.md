@@ -208,3 +208,43 @@ $env:OPENML_TEST_SERVER_ADMIN_KEY = "admin-key"
 ```bash
 export OPENML_TEST_SERVER_ADMIN_KEY="admin-key"
 ```
+
+### Running Tests with Local Services
+
+You can run the test suite against local Docker services instead of the remote test server. This is useful for:
+- Testing changes to the OpenML backend services
+- Developing new features that require server interaction
+- Running tests without internet connectivity
+
+#### Prerequisites
+
+1. Follow the [API v1 Setup](#1-api-v1-setup-php-backend) to start the local services
+2. Ensure the services are running on `http://localhost:8080`
+
+#### Running Tests
+
+Set the `OPENML_USE_LOCAL_SERVICES` environment variable to enable testing against local services:
+
+#### Windows (PowerShell):
+
+```shell
+$env:OPENML_USE_LOCAL_SERVICES = "1"
+pytest -m "not production_server"
+```
+
+#### Linux/macOS:
+
+```bash
+export OPENML_USE_LOCAL_SERVICES=1
+pytest -m "not production_server"
+```
+
+The test suite will now connect to `http://localhost:8080/api/v1/xml` instead of the remote test server.
+
+#### Note
+
+Some tests that require specific data or features available on the remote test server may fail when running locally. These tests are marked with the `test_server` marker and can be excluded using:
+
+```bash
+pytest -m "not test_server and not production_server"
+```

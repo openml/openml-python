@@ -279,7 +279,10 @@ def with_server(request):
         openml.config.apikey = None
         yield
         return
-    openml.config.server = f"{openml.config.TEST_SERVER_URL}/api/v1/xml"
+    if openml.config.use_local_services():
+        openml.config.server = f"{openml.config.LOCAL_SERVER_URL}/api/v1/xml"
+    else:
+        openml.config.server = f"{openml.config.TEST_SERVER_URL}/api/v1/xml"
     openml.config.apikey = TestBase.user_key
     yield
 
@@ -304,11 +307,12 @@ def with_test_cache(test_files_directory, request):
     openml.config.set_root_cache_directory(_root_cache_directory)
     if tmp_cache.exists():
         shutil.rmtree(tmp_cache)
-        
+
 
 @pytest.fixture
 def static_cache_dir():
-    return Path(__file__).parent / "files" 
+    return Path(__file__).parent / "files"
+
 
 @pytest.fixture
 def workdir(tmp_path):
