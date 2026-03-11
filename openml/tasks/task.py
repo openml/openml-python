@@ -9,9 +9,9 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any, ClassVar
 from typing_extensions import TypedDict
 
-import openml
 import arff
 
+import openml
 import openml._api_calls
 from openml import datasets
 from openml.base import OpenMLBase
