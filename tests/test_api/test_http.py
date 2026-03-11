@@ -2,6 +2,7 @@ from requests import Response, Request, Session
 from unittest.mock import patch
 import pytest
 import os
+import hashlib
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 from openml.enums import APIVersion
@@ -102,20 +103,23 @@ def test_get_with_cache_creates_cache(http_client, cache, sample_url_v1, sample_
 
 
 @pytest.mark.test_server()
-def test_get_uses_cached_response(http_client, cache, sample_url_v1, sample_path):
-    key = cache.get_key(sample_url_v1, {})
-    meta_path = cache._key_to_path(key) / "meta.json"
+def test_get_uses_cached_response(http_client, cache, sample_url_v1, sample_path, monkeypatch):
+    response = Response()
+    response.status_code = 200
+    response._content = b"cached-response"
+    response.headers = {}
 
-    r1 = http_client.get(sample_path, enable_cache=True)
-    mtime1 = meta_path.stat().st_mtime
+    key = cache.get_key(url=sample_url_v1, params={})
+    cache.save(key=key, response=response)
 
-    r2 = http_client.get(sample_path, enable_cache=True)
-    mtime2 = meta_path.stat().st_mtime
+    def fail_request(*args, **kwargs):
+        raise AssertionError("HTTP request should not be called")
+    monkeypatch.setattr(Session, "request", fail_request)
 
-    assert mtime1 == mtime2
-    assert r2.status_code == 200
-    assert r1.content == r2.content
+    cached_response = http_client.get(sample_path, enable_cache=True)
 
+    assert cached_response.status_code == response.status_code
+    assert cached_response.content == response.content
 
 @pytest.mark.test_server()
 def test_get_refresh_cache(http_client, cache, sample_url_v1, sample_path):
@@ -134,11 +138,15 @@ def test_get_refresh_cache(http_client, cache, sample_url_v1, sample_path):
 
 
 @pytest.mark.test_server()
-def test_get_with_api_key(http_client, sample_path):
-    response = http_client.get(sample_path, use_api_key=True)
+def test_get_with_api_key(http_client, sample_path, test_apikey_v1):
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
 
-    assert response.status_code == 200
-    assert b"<oml:task" in response.content
+        http_client.get(sample_path, use_api_key=True)
+
+        _, kwargs = mock_request.call_args
+        assert kwargs.get("params", {}).get("api_key") == test_apikey_v1
 
 
 @pytest.mark.test_server()
@@ -149,27 +157,40 @@ def test_get_without_api_key_raises(http_client):
 
 @pytest.mark.test_server()
 def test_download_creates_file(http_client, sample_download_url_v1):
-    path = http_client.download(
-        url=sample_download_url_v1,
-        file_name="downloaded.bin",
-    )
+    dummy_content = b"this is dummy content"
+    md5_checksum = hashlib.md5(dummy_content).hexdigest()
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = dummy_content
+
+        path = http_client.download(
+            url=sample_download_url_v1,
+            file_name="downloaded.arff",
+            md5_checksum=md5_checksum,
+        )
 
     assert path.exists()
     assert path.is_file()
-    assert path.read_text(encoding="utf-8")
+    assert path.read_bytes() == dummy_content
 
 
 @pytest.mark.test_server()
-def test_download_is_cached_on_disk(http_client, sample_download_url_v1):
+def test_download_is_cached_on_disk(http_client, sample_download_url_v1, monkeypatch):
     path1 = http_client.download(
         url=sample_download_url_v1,
-        file_name="cached.bin",
+        file_name="cached.arff",
     )
     mtime1 = path1.stat().st_mtime
 
+    def fail_request(*args, **kwargs):
+        raise AssertionError("HTTP request should not be called")
+    monkeypatch.setattr(Session, "request", fail_request)
+
     path2 = http_client.download(
         url=sample_download_url_v1,
-        file_name="cached.bin",
+        file_name="cached.arff",
     )
     mtime2 = path2.stat().st_mtime
 
@@ -185,7 +206,7 @@ def test_download_respects_custom_handler(http_client, sample_download_url_v1):
 
     path = http_client.download(
         url=sample_download_url_v1,
-        file_name="handler.bin",
+        file_name="handler.arff",
         handler=handler,
     )
 
