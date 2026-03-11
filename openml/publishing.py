@@ -82,14 +82,10 @@ def publish(obj: Any, *, name: str | None = None, tags: Sequence[str] | None = N
     """
     # Case 1: Object is already an OpenML entity
     if isinstance(obj, OpenMLBase):
-        if tags is not None and hasattr(obj, "tags"):
-            existing = list(getattr(obj, "tags", []) or [])
+        if tags and hasattr(obj, "tags"):
+            existing = obj.tags or []
             if all(isinstance(tag, str) for tag in existing):
-                merged = list(existing)
-                for tag in tags:
-                    if tag not in merged:
-                        merged.append(tag)
-                obj.tags = merged
+                obj.tags = list(dict.fromkeys([*existing, *tags]))
         if name is not None and hasattr(obj, "name"):
             obj.name = name
         return obj.publish()
