@@ -26,9 +26,11 @@ file_handler: logging.handlers.RotatingFileHandler | None = None
 OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
 OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
 OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR = "OPENML_TEST_SERVER_ADMIN_KEY"
+OPENML_USE_LOCAL_SERVICES_ENV_VAR = "OPENML_USE_LOCAL_SERVICES"
 _TEST_SERVER_NORMAL_USER_KEY = "normaluser"
 
 TEST_SERVER_URL = "https://test.openml.org"
+LOCAL_SERVER_URL = "http://localhost:8080"
 
 
 class _Config(TypedDict):
@@ -188,6 +190,18 @@ avoid_duplicate_runs = _defaults["avoid_duplicate_runs"]
 
 retry_policy: Literal["human", "robot"] = _defaults["retry_policy"]
 connection_n_retries: int = _defaults["connection_n_retries"]
+
+
+def use_local_services() -> bool:
+    """Check if local services should be used instead of remote test server.
+
+    Returns True if the OPENML_USE_LOCAL_SERVICES environment variable is set.
+
+    Returns
+    -------
+    bool
+    """
+    return os.environ.get(OPENML_USE_LOCAL_SERVICES_ENV_VAR, "").lower() in ("1", "true", "yes")
 
 
 def set_retry_policy(value: Literal["human", "robot"], n_retries: int | None = None) -> None:
