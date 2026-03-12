@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib
 import time
 import unittest.mock
-
+import os
 import pandas as pd
 import pytest
 import sklearn.base

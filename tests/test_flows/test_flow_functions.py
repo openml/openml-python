@@ -12,6 +12,7 @@ from packaging.version import Version
 from unittest import mock
 from unittest.mock import patch
 
+import os
 import pandas as pd
 import pytest
 import requests
