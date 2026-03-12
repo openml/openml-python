@@ -51,7 +51,7 @@ _TEST_SERVERS: dict[APIVersion, dict[str, str | None]] = {
 
 _TEST_SERVERS_LOCAL: dict[APIVersion, dict[str, str | None]] = {
     APIVersion.V1: {
-        "server": "http://localhost:8080/api/v1/xml/",
+        "server": "http://localhost:8000/api/v1/xml/",
         "apikey": "normaluser",
     },
     APIVersion.V2: {
