@@ -15,8 +15,6 @@ from typing import ClassVar
 import requests
 
 import openml
-from openml._api import API_REGISTRY, HTTPCache, HTTPClient, MinIOClient, ResourceAPI
-from openml.enums import APIVersion, ResourceType
 from openml.exceptions import OpenMLServerException
 from openml.tasks import TaskType
 
@@ -54,11 +52,6 @@ class TestBase(unittest.TestCase):
     # creating logger for tracking files uploaded to test server
     logger = logging.getLogger("unit_tests_published_entities")
     logger.setLevel(logging.DEBUG)
-
-    # migration-specific attributes
-    cache: HTTPCache
-    http_clients: dict[APIVersion, HTTPClient]
-    minio_client: MinIOClient
 
     def setUp(self, n_levels: int = 1, tmpdir_suffix: str = "") -> None:
         """Setup variables and temporary directories.
@@ -110,13 +103,6 @@ class TestBase(unittest.TestCase):
         self.retry_policy = openml.config.retry_policy
         self.connection_n_retries = openml.config.connection_n_retries
         openml.config.set_retry_policy("robot", n_retries=20)
-
-        self.cache = HTTPCache()
-        self.http_clients = {
-            APIVersion.V1: HTTPClient(api_version=APIVersion.V1),
-            APIVersion.V2: HTTPClient(api_version=APIVersion.V2),
-        }
-        self.minio_client = MinIOClient()
 
     def use_production_server(self) -> None:
         """
@@ -283,11 +269,6 @@ class TestBase(unittest.TestCase):
                         assert isinstance(evaluation, float)
                         assert evaluation >= min_val
                         assert evaluation <= max_val
-
-    def _create_resource(self, api_version: APIVersion, resource_type: ResourceType) -> ResourceAPI:
-        http_client = self.http_clients[api_version]
-        resource_cls = API_REGISTRY[api_version][resource_type]
-        return resource_cls(http=http_client, minio=self.minio_client)
 
 
 def check_task_existence(
