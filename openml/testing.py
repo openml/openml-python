@@ -124,7 +124,7 @@ class TestBase(unittest.TestCase):
 
         Please use this sparingly - it is better to use the test server.
         """
-        openml.config.set_servers("production")
+        openml.config.use_production_servers()
 
     def tearDown(self) -> None:
         """Tear down the test"""
