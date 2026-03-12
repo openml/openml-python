@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../../images/openml_icon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -1248,6 +1248,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    _config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../base/" class="md-nav__link">
         
   
@@ -1284,34 +1312,6 @@
     
   
     cli
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../config/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    config
   
 
     
@@ -2829,11 +2829,11 @@
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>openml/utils/_openml.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-461">461</a></span>
-<span class="normal"><a href="#__codelineno-0-462">462</a></span>
-<span class="normal"><a href="#__codelineno-0-463">463</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-461" name="__codelineno-0-461"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_object_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="p">:</span> <span class="n">tqdm</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-460" name="__codelineno-0-460"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_object_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="p">:</span> <span class="n">tqdm</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -2912,7 +2912,8 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/utils/_openml.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-465">465</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-464">464</a></span>
+<span class="normal"><a href="#__codelineno-0-465">465</a></span>
 <span class="normal"><a href="#__codelineno-0-466">466</a></span>
 <span class="normal"><a href="#__codelineno-0-467">467</a></span>
 <span class="normal"><a href="#__codelineno-0-468">468</a></span>
@@ -2923,20 +2924,19 @@
 <span class="normal"><a href="#__codelineno-0-473">473</a></span>
 <span class="normal"><a href="#__codelineno-0-474">474</a></span>
 <span class="normal"><a href="#__codelineno-0-475">475</a></span>
-<span class="normal"><a href="#__codelineno-0-476">476</a></span>
-<span class="normal"><a href="#__codelineno-0-477">477</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">total_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializes the progress bar.</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">    object_name: str</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">      Not used.</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">    total_length: int</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">      File size of the object in bytes.</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_object_name</span> <span class="o">=</span> <span class="n">object_name</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">total_length</span><span class="p">,</span> <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-476">476</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="k">def</span><span class="w"> </span><span class="nf">set_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">total_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializes the progress bar.</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">    object_name: str</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="sd">      Not used.</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">    total_length: int</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">      File size of the object in bytes.</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_object_name</span> <span class="o">=</span> <span class="n">object_name</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">total_length</span><span class="p">,</span> <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2989,7 +2989,8 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/utils/_openml.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-479">479</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-478">478</a></span>
+<span class="normal"><a href="#__codelineno-0-479">479</a></span>
 <span class="normal"><a href="#__codelineno-0-480">480</a></span>
 <span class="normal"><a href="#__codelineno-0-481">481</a></span>
 <span class="normal"><a href="#__codelineno-0-482">482</a></span>
@@ -3000,20 +3001,19 @@
 <span class="normal"><a href="#__codelineno-0-487">487</a></span>
 <span class="normal"><a href="#__codelineno-0-488">488</a></span>
 <span class="normal"><a href="#__codelineno-0-489">489</a></span>
-<span class="normal"><a href="#__codelineno-0-490">490</a></span>
-<span class="normal"><a href="#__codelineno-0-491">491</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Updates the progress bar.</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">    length: int</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">      Number of bytes downloaded since last `update` call.</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="p">:</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Call `set_meta` before calling `update`.&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="o">.</span><span class="n">total</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="o">.</span><span class="n">n</span><span class="p">:</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-490">490</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Updates the progress bar.</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">    length: int</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">      Number of bytes downloaded since last `update` call.</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="p">:</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Call `set_meta` before calling `update`.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="o">.</span><span class="n">total</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="o">.</span><span class="n">n</span><span class="p">:</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3192,7 +3192,8 @@ should be extracted.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/utils/_openml.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-58">58</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-57">57</a></span>
+<span class="normal"><a href="#__codelineno-0-58">58</a></span>
 <span class="normal"><a href="#__codelineno-0-59">59</a></span>
 <span class="normal"><a href="#__codelineno-0-60">60</a></span>
 <span class="normal"><a href="#__codelineno-0-61">61</a></span>
@@ -3227,44 +3228,43 @@ should be extracted.</p>
 <span class="normal"><a href="#__codelineno-0-90">90</a></span>
 <span class="normal"><a href="#__codelineno-0-91">91</a></span>
 <span class="normal"><a href="#__codelineno-0-92">92</a></span>
-<span class="normal"><a href="#__codelineno-0-93">93</a></span>
-<span class="normal"><a href="#__codelineno-0-94">94</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="k">def</span><span class="w"> </span><span class="nf">extract_xml_tags</span><span class="p">(</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a>    <span class="n">xml_tag_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a>    <span class="n">node</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a>    <span class="n">allow_none</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper to extract xml tags from xmltodict.</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    xml_tag_name : str</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">        Name of the xml tag to extract from the node.</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    node : Mapping[str, Any]</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">        Node object returned by ``xmltodict`` from which ``xml_tag_name``</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">        should be extracted.</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    allow_none : bool</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">        If ``False``, the tag needs to exist in the node. Will raise a</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">        ``ValueError`` if it does not.</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    object</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="k">if</span> <span class="n">xml_tag_name</span> <span class="ow">in</span> <span class="n">node</span> <span class="ow">and</span> <span class="n">node</span><span class="p">[</span><span class="n">xml_tag_name</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="n">xml_tag_name</span><span class="p">],</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a>            <span class="k">return</span> <span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="n">xml_tag_name</span><span class="p">]]</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="n">xml_tag_name</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a>            <span class="k">return</span> <span class="n">node</span><span class="p">[</span><span class="n">xml_tag_name</span><span class="p">]</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Received not string and non list as tag item&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a>    <span class="k">if</span> <span class="n">allow_none</span><span class="p">:</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a>        <span class="k">return</span> <span class="kc">None</span>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find tag &#39;</span><span class="si">{</span><span class="n">xml_tag_name</span><span class="si">}</span><span class="s2">&#39; in node &#39;</span><span class="si">{</span><span class="n">node</span><span class="si">!s}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-93">93</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="k">def</span><span class="w"> </span><span class="nf">extract_xml_tags</span><span class="p">(</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a>    <span class="n">xml_tag_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a>    <span class="n">node</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a>    <span class="n">allow_none</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper to extract xml tags from xmltodict.</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    xml_tag_name : str</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">        Name of the xml tag to extract from the node.</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    node : Mapping[str, Any]</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">        Node object returned by ``xmltodict`` from which ``xml_tag_name``</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">        should be extracted.</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">    allow_none : bool</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">        If ``False``, the tag needs to exist in the node. Will raise a</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">        ``ValueError`` if it does not.</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    object</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a>    <span class="k">if</span> <span class="n">xml_tag_name</span> <span class="ow">in</span> <span class="n">node</span> <span class="ow">and</span> <span class="n">node</span><span class="p">[</span><span class="n">xml_tag_name</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="n">xml_tag_name</span><span class="p">],</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a>            <span class="k">return</span> <span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="n">xml_tag_name</span><span class="p">]]</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="n">xml_tag_name</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a>            <span class="k">return</span> <span class="n">node</span><span class="p">[</span><span class="n">xml_tag_name</span><span class="p">]</span>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Received not string and non list as tag item&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a>    <span class="k">if</span> <span class="n">allow_none</span><span class="p">:</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find tag &#39;</span><span class="si">{</span><span class="n">xml_tag_name</span><span class="si">}</span><span class="s2">&#39; in node &#39;</span><span class="si">{</span><span class="n">node</span><span class="si">!s}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3317,7 +3317,8 @@ should be extracted.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/utils/_openml.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-438">438</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-437">437</a></span>
+<span class="normal"><a href="#__codelineno-0-438">438</a></span>
 <span class="normal"><a href="#__codelineno-0-439">439</a></span>
 <span class="normal"><a href="#__codelineno-0-440">440</a></span>
 <span class="normal"><a href="#__codelineno-0-441">441</a></span>
@@ -3325,17 +3326,16 @@ should be extracted.</p>
 <span class="normal"><a href="#__codelineno-0-443">443</a></span>
 <span class="normal"><a href="#__codelineno-0-444">444</a></span>
 <span class="normal"><a href="#__codelineno-0-445">445</a></span>
-<span class="normal"><a href="#__codelineno-0-446">446</a></span>
-<span class="normal"><a href="#__codelineno-0-447">447</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_cache_size</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the size of OpenML cache directory</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">    cache_size: int</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        Total size of cache in bytes</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get_cache_directory</span><span class="p">())</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">())</span>
+<span class="normal"><a href="#__codelineno-0-446">446</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_cache_size</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the size of OpenML cache directory</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">    cache_size: int</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        Total size of cache in bytes</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_cache_directory</span><span class="p">())</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

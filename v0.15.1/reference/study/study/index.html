@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../../images/openml_icon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -1248,6 +1248,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    _config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../base/" class="md-nav__link">
         
   
@@ -1284,34 +1312,6 @@
     
   
     cli
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../config/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    config
   
 
     
@@ -3446,21 +3446,21 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-145">145</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-144">144</a></span>
+<span class="normal"><a href="#__codelineno-0-145">145</a></span>
 <span class="normal"><a href="#__codelineno-0-146">146</a></span>
 <span class="normal"><a href="#__codelineno-0-147">147</a></span>
 <span class="normal"><a href="#__codelineno-0-148">148</a></span>
 <span class="normal"><a href="#__codelineno-0-149">149</a></span>
 <span class="normal"><a href="#__codelineno-0-150">150</a></span>
-<span class="normal"><a href="#__codelineno-0-151">151</a></span>
-<span class="normal"><a href="#__codelineno-0-152">152</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="k">def</span><span class="w"> </span><span class="nf">open_in_browser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Opens the OpenML web page corresponding to this object in your default browser.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">openml_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a>            <span class="s2">&quot;Cannot open element on OpenML.org when attribute `openml_url` is `None`&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a>        <span class="p">)</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a>    <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">openml_url</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-151">151</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="k">def</span><span class="w"> </span><span class="nf">open_in_browser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Opens the OpenML web page corresponding to this object in your default browser.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">openml_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a>            <span class="s2">&quot;Cannot open element on OpenML.org when attribute `openml_url` is `None`&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a>        <span class="p">)</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a>    <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">openml_url</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3485,7 +3485,8 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-127">127</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-126">126</a></span>
+<span class="normal"><a href="#__codelineno-0-127">127</a></span>
 <span class="normal"><a href="#__codelineno-0-128">128</a></span>
 <span class="normal"><a href="#__codelineno-0-129">129</a></span>
 <span class="normal"><a href="#__codelineno-0-130">130</a></span>
@@ -3500,24 +3501,23 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 <span class="normal"><a href="#__codelineno-0-139">139</a></span>
 <span class="normal"><a href="#__codelineno-0-140">140</a></span>
 <span class="normal"><a href="#__codelineno-0-141">141</a></span>
-<span class="normal"><a href="#__codelineno-0-142">142</a></span>
-<span class="normal"><a href="#__codelineno-0-143">143</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="k">def</span><span class="w"> </span><span class="nf">publish</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLBase</span><span class="p">:</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Publish the object on the OpenML server.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="n">file_elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_elements</span><span class="p">()</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>    <span class="k">if</span> <span class="s2">&quot;description&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_elements</span><span class="p">:</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a>        <span class="n">file_elements</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_xml</span><span class="p">()</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="n">call</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_get_rest_api_type_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">/&quot;</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a>    <span class="n">response_text</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>        <span class="n">call</span><span class="p">,</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="s2">&quot;post&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a>        <span class="n">file_elements</span><span class="o">=</span><span class="n">file_elements</span><span class="p">,</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>    <span class="p">)</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a>    <span class="n">xml_response</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response_text</span><span class="p">)</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_parse_publish_response</span><span class="p">(</span><span class="n">xml_response</span><span class="p">)</span>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a>    <span class="k">return</span> <span class="bp">self</span>
+<span class="normal"><a href="#__codelineno-0-142">142</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="k">def</span><span class="w"> </span><span class="nf">publish</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLBase</span><span class="p">:</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Publish the object on the OpenML server.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a>    <span class="n">file_elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_elements</span><span class="p">()</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="k">if</span> <span class="s2">&quot;description&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_elements</span><span class="p">:</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>        <span class="n">file_elements</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_xml</span><span class="p">()</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="n">call</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_get_rest_api_type_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">/&quot;</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="n">response_text</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>        <span class="n">call</span><span class="p">,</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>        <span class="s2">&quot;post&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="n">file_elements</span><span class="o">=</span><span class="n">file_elements</span><span class="p">,</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="p">)</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a>    <span class="n">xml_response</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response_text</span><span class="p">)</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_parse_publish_response</span><span class="p">(</span><span class="n">xml_response</span><span class="p">)</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a>    <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3628,15 +3628,15 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-36">36</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-35">35</a></span>
+<span class="normal"><a href="#__codelineno-0-36">36</a></span>
 <span class="normal"><a href="#__codelineno-0-37">37</a></span>
 <span class="normal"><a href="#__codelineno-0-38">38</a></span>
-<span class="normal"><a href="#__codelineno-0-39">39</a></span>
-<span class="normal"><a href="#__codelineno-0-40">40</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="k">def</span><span class="w"> </span><span class="nf">url_for_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">id_</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the OpenML URL for the object of the class entity with the given id.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="c1"># Sample url for a flow: openml.org/f/123</span>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_server_base_url</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">_entity_letter</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">id_</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="normal"><a href="#__codelineno-0-39">39</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="k">def</span><span class="w"> </span><span class="nf">url_for_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">id_</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the OpenML URL for the object of the class entity with the given id.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="c1"># Sample url for a flow: openml.org/f/123</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_server_base_url</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">_entity_letter</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">id_</span><span class="si">}</span><span class="s2">&quot;</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4015,21 +4015,21 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-145">145</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-144">144</a></span>
+<span class="normal"><a href="#__codelineno-0-145">145</a></span>
 <span class="normal"><a href="#__codelineno-0-146">146</a></span>
 <span class="normal"><a href="#__codelineno-0-147">147</a></span>
 <span class="normal"><a href="#__codelineno-0-148">148</a></span>
 <span class="normal"><a href="#__codelineno-0-149">149</a></span>
 <span class="normal"><a href="#__codelineno-0-150">150</a></span>
-<span class="normal"><a href="#__codelineno-0-151">151</a></span>
-<span class="normal"><a href="#__codelineno-0-152">152</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="k">def</span><span class="w"> </span><span class="nf">open_in_browser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Opens the OpenML web page corresponding to this object in your default browser.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">openml_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a>            <span class="s2">&quot;Cannot open element on OpenML.org when attribute `openml_url` is `None`&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a>        <span class="p">)</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a>    <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">openml_url</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-151">151</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="k">def</span><span class="w"> </span><span class="nf">open_in_browser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Opens the OpenML web page corresponding to this object in your default browser.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">openml_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a>            <span class="s2">&quot;Cannot open element on OpenML.org when attribute `openml_url` is `None`&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a>        <span class="p">)</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a>    <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">openml_url</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4054,7 +4054,8 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-127">127</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-126">126</a></span>
+<span class="normal"><a href="#__codelineno-0-127">127</a></span>
 <span class="normal"><a href="#__codelineno-0-128">128</a></span>
 <span class="normal"><a href="#__codelineno-0-129">129</a></span>
 <span class="normal"><a href="#__codelineno-0-130">130</a></span>
@@ -4069,24 +4070,23 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 <span class="normal"><a href="#__codelineno-0-139">139</a></span>
 <span class="normal"><a href="#__codelineno-0-140">140</a></span>
 <span class="normal"><a href="#__codelineno-0-141">141</a></span>
-<span class="normal"><a href="#__codelineno-0-142">142</a></span>
-<span class="normal"><a href="#__codelineno-0-143">143</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="k">def</span><span class="w"> </span><span class="nf">publish</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLBase</span><span class="p">:</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Publish the object on the OpenML server.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="n">file_elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_elements</span><span class="p">()</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>    <span class="k">if</span> <span class="s2">&quot;description&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_elements</span><span class="p">:</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a>        <span class="n">file_elements</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_xml</span><span class="p">()</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="n">call</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_get_rest_api_type_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">/&quot;</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a>    <span class="n">response_text</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>        <span class="n">call</span><span class="p">,</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="s2">&quot;post&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a>        <span class="n">file_elements</span><span class="o">=</span><span class="n">file_elements</span><span class="p">,</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>    <span class="p">)</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a>    <span class="n">xml_response</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response_text</span><span class="p">)</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_parse_publish_response</span><span class="p">(</span><span class="n">xml_response</span><span class="p">)</span>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a>    <span class="k">return</span> <span class="bp">self</span>
+<span class="normal"><a href="#__codelineno-0-142">142</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="k">def</span><span class="w"> </span><span class="nf">publish</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLBase</span><span class="p">:</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Publish the object on the OpenML server.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a>    <span class="n">file_elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_elements</span><span class="p">()</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="k">if</span> <span class="s2">&quot;description&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_elements</span><span class="p">:</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>        <span class="n">file_elements</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_xml</span><span class="p">()</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="n">call</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_get_rest_api_type_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">/&quot;</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="n">response_text</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>        <span class="n">call</span><span class="p">,</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>        <span class="s2">&quot;post&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="n">file_elements</span><span class="o">=</span><span class="n">file_elements</span><span class="p">,</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="p">)</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a>    <span class="n">xml_response</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response_text</span><span class="p">)</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_parse_publish_response</span><span class="p">(</span><span class="n">xml_response</span><span class="p">)</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a>    <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4197,15 +4197,15 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-36">36</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-35">35</a></span>
+<span class="normal"><a href="#__codelineno-0-36">36</a></span>
 <span class="normal"><a href="#__codelineno-0-37">37</a></span>
 <span class="normal"><a href="#__codelineno-0-38">38</a></span>
-<span class="normal"><a href="#__codelineno-0-39">39</a></span>
-<span class="normal"><a href="#__codelineno-0-40">40</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="k">def</span><span class="w"> </span><span class="nf">url_for_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">id_</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the OpenML URL for the object of the class entity with the given id.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="c1"># Sample url for a flow: openml.org/f/123</span>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_server_base_url</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">_entity_letter</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">id_</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="normal"><a href="#__codelineno-0-39">39</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="k">def</span><span class="w"> </span><span class="nf">url_for_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">id_</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the OpenML URL for the object of the class entity with the given id.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="c1"># Sample url for a flow: openml.org/f/123</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_server_base_url</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">_entity_letter</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">id_</span><span class="si">}</span><span class="s2">&quot;</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4640,21 +4640,21 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-145">145</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-144">144</a></span>
+<span class="normal"><a href="#__codelineno-0-145">145</a></span>
 <span class="normal"><a href="#__codelineno-0-146">146</a></span>
 <span class="normal"><a href="#__codelineno-0-147">147</a></span>
 <span class="normal"><a href="#__codelineno-0-148">148</a></span>
 <span class="normal"><a href="#__codelineno-0-149">149</a></span>
 <span class="normal"><a href="#__codelineno-0-150">150</a></span>
-<span class="normal"><a href="#__codelineno-0-151">151</a></span>
-<span class="normal"><a href="#__codelineno-0-152">152</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="k">def</span><span class="w"> </span><span class="nf">open_in_browser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Opens the OpenML web page corresponding to this object in your default browser.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">openml_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a>            <span class="s2">&quot;Cannot open element on OpenML.org when attribute `openml_url` is `None`&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a>        <span class="p">)</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a>    <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">openml_url</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-151">151</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="k">def</span><span class="w"> </span><span class="nf">open_in_browser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Opens the OpenML web page corresponding to this object in your default browser.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">openml_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a>            <span class="s2">&quot;Cannot open element on OpenML.org when attribute `openml_url` is `None`&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a>        <span class="p">)</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a>    <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">openml_url</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4679,7 +4679,8 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-127">127</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-126">126</a></span>
+<span class="normal"><a href="#__codelineno-0-127">127</a></span>
 <span class="normal"><a href="#__codelineno-0-128">128</a></span>
 <span class="normal"><a href="#__codelineno-0-129">129</a></span>
 <span class="normal"><a href="#__codelineno-0-130">130</a></span>
@@ -4694,24 +4695,23 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 <span class="normal"><a href="#__codelineno-0-139">139</a></span>
 <span class="normal"><a href="#__codelineno-0-140">140</a></span>
 <span class="normal"><a href="#__codelineno-0-141">141</a></span>
-<span class="normal"><a href="#__codelineno-0-142">142</a></span>
-<span class="normal"><a href="#__codelineno-0-143">143</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="k">def</span><span class="w"> </span><span class="nf">publish</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLBase</span><span class="p">:</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Publish the object on the OpenML server.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="n">file_elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_elements</span><span class="p">()</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>    <span class="k">if</span> <span class="s2">&quot;description&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_elements</span><span class="p">:</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a>        <span class="n">file_elements</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_xml</span><span class="p">()</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="n">call</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_get_rest_api_type_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">/&quot;</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a>    <span class="n">response_text</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>        <span class="n">call</span><span class="p">,</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="s2">&quot;post&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a>        <span class="n">file_elements</span><span class="o">=</span><span class="n">file_elements</span><span class="p">,</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>    <span class="p">)</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a>    <span class="n">xml_response</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response_text</span><span class="p">)</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_parse_publish_response</span><span class="p">(</span><span class="n">xml_response</span><span class="p">)</span>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a>    <span class="k">return</span> <span class="bp">self</span>
+<span class="normal"><a href="#__codelineno-0-142">142</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="k">def</span><span class="w"> </span><span class="nf">publish</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenMLBase</span><span class="p">:</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Publish the object on the OpenML server.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a>    <span class="n">file_elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_elements</span><span class="p">()</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="k">if</span> <span class="s2">&quot;description&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">file_elements</span><span class="p">:</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>        <span class="n">file_elements</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_xml</span><span class="p">()</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="n">call</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_get_rest_api_type_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">/&quot;</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="n">response_text</span> <span class="o">=</span> <span class="n">openml</span><span class="o">.</span><span class="n">_api_calls</span><span class="o">.</span><span class="n">_perform_api_call</span><span class="p">(</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>        <span class="n">call</span><span class="p">,</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>        <span class="s2">&quot;post&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="n">file_elements</span><span class="o">=</span><span class="n">file_elements</span><span class="p">,</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="p">)</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a>    <span class="n">xml_response</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response_text</span><span class="p">)</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_parse_publish_response</span><span class="p">(</span><span class="n">xml_response</span><span class="p">)</span>
+<a id="__codelineno-0-142" name="__codelineno-0-142"></a>    <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4822,15 +4822,15 @@ Each tag is a dict of (tag) name, window_start and write_access.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/base.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-36">36</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-35">35</a></span>
+<span class="normal"><a href="#__codelineno-0-36">36</a></span>
 <span class="normal"><a href="#__codelineno-0-37">37</a></span>
 <span class="normal"><a href="#__codelineno-0-38">38</a></span>
-<span class="normal"><a href="#__codelineno-0-39">39</a></span>
-<span class="normal"><a href="#__codelineno-0-40">40</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="k">def</span><span class="w"> </span><span class="nf">url_for_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">id_</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the OpenML URL for the object of the class entity with the given id.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="c1"># Sample url for a flow: openml.org/f/123</span>
-<a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_server_base_url</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">_entity_letter</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">id_</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="normal"><a href="#__codelineno-0-39">39</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="k">def</span><span class="w"> </span><span class="nf">url_for_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">id_</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the OpenML URL for the object of the class entity with the given id.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="c1"># Sample url for a flow: openml.org/f/123</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">openml</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_server_base_url</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">_entity_letter</span><span class="p">()</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">id_</span><span class="si">}</span><span class="s2">&quot;</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

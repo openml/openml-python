@@ -12,14 +12,14 @@
         <link rel="prev" href="../__version__/">
       
       
-        <link rel="next" href="../base/">
+        <link rel="next" href="../_config/">
       
       
         
       
       
       <link rel="icon" href="../../images/openml_icon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -1319,6 +1319,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    _config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../base/" class="md-nav__link">
         
   
@@ -1355,34 +1383,6 @@
     
   
     cli
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../config/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    config
   
 
     
@@ -2810,9 +2810,7 @@ environment, please set the enviornment varialbe <code>no_proxy="*"</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>openml/_api_calls.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-52">52</a></span>
-<span class="normal"><a href="#__codelineno-0-53">53</a></span>
-<span class="normal"><a href="#__codelineno-0-54">54</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-54">54</a></span>
 <span class="normal"><a href="#__codelineno-0-55">55</a></span>
 <span class="normal"><a href="#__codelineno-0-56">56</a></span>
 <span class="normal"><a href="#__codelineno-0-57">57</a></span>
@@ -2827,24 +2825,26 @@ environment, please set the enviornment varialbe <code>no_proxy="*"</code>.</p>
 <span class="normal"><a href="#__codelineno-0-66">66</a></span>
 <span class="normal"><a href="#__codelineno-0-67">67</a></span>
 <span class="normal"><a href="#__codelineno-0-68">68</a></span>
-<span class="normal"><a href="#__codelineno-0-69">69</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_env_proxies</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Attempt to find a suitable proxy for this url.</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    Relies on ``requests`` internals to remain consistent. To disable this from the</span>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    environment, please set the enviornment varialbe ``no_proxy=&quot;*&quot;``.</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">    url : str</span>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">        The url endpoint</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Optional[str]</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        The proxy url if found, else None</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a>    <span class="n">resolved_proxies</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_environ_proxies</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a>    <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">select_proxy</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">resolved_proxies</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+<span class="normal"><a href="#__codelineno-0-69">69</a></span>
+<span class="normal"><a href="#__codelineno-0-70">70</a></span>
+<span class="normal"><a href="#__codelineno-0-71">71</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_env_proxies</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Attempt to find a suitable proxy for this url.</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    Relies on ``requests`` internals to remain consistent. To disable this from the</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    environment, please set the enviornment varialbe ``no_proxy=&quot;*&quot;``.</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    url : str</span>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">        The url endpoint</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    Optional[str]</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">        The proxy url if found, else None</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a>    <span class="n">resolved_proxies</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_environ_proxies</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a>    <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">select_proxy</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">resolved_proxies</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2904,13 +2904,13 @@ environment, please set the enviornment varialbe <code>no_proxy="*"</code>.</p>
         
         
           
-          <a href="../base/" class="md-footer__link md-footer__link--next" aria-label="Next: base">
+          <a href="../_config/" class="md-footer__link md-footer__link--next" aria-label="Next: _config">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                base
+                _config
               </div>
             </div>
             <div class="md-footer__button md-icon">
