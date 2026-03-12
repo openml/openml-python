@@ -7,7 +7,6 @@ import logging
 import os
 import pathlib
 import shutil
-import tempfile
 import time
 import unittest
 from pathlib import Path
@@ -87,10 +86,7 @@ class TestBase(unittest.TestCase):
                 f"Cannot find test cache dir, expected it to be {static_cache_dir}!",
             )
 
-        self._temp_dir = tempfile.TemporaryDirectory()
-        self.static_cache_dir = Path(self._temp_dir.name)
-        shutil.copytree(static_cache_dir, self.static_cache_dir, dirs_exist_ok=True)
-
+        self.static_cache_dir = static_cache_dir
         self.cwd = Path.cwd()
         workdir = Path(__file__).parent.absolute()
         tmp_dir_name = self.id() + tmpdir_suffix
@@ -125,7 +121,6 @@ class TestBase(unittest.TestCase):
             if os.name != "nt":
                 # one of the files may still be used by another process
                 raise e
-        self._temp_dir.cleanup()
 
         openml.config.connection_n_retries = self.connection_n_retries
         openml.config.retry_policy = self.retry_policy
