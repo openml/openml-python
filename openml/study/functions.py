@@ -9,7 +9,6 @@ import pandas as pd
 import xmltodict
 
 import openml._api_calls
-import openml.config
 import openml.utils
 from openml.study.study import OpenMLBenchmarkSuite, OpenMLStudy
 

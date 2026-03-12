@@ -10,7 +10,6 @@ import pytest
 import os
 
 import openml
-from openml.config import ConfigurationForExamples
 import openml.testing
 from openml._api_calls import _download_minio_bucket, API_TOKEN_HELP_LINK
 
@@ -21,10 +20,6 @@ class TestConfig(openml.testing.TestBase):
         with pytest.raises(openml.exceptions.OpenMLServerError, match="URI too long!"):
             openml.datasets.list_datasets(data_id=list(range(10000)))
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
     @unittest.mock.patch("time.sleep")
     @unittest.mock.patch("requests.Session")
     @pytest.mark.test_server()
