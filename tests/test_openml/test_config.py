@@ -9,12 +9,14 @@ from copy import copy
 from typing import Any, Iterator
 from pathlib import Path
 import platform
+from urllib.parse import urlparse
 
 import pytest
 
 import openml
 import openml.testing
 from openml.testing import TestBase
+from openml.enums import APIVersion
 
 
 @contextmanager
@@ -77,22 +79,24 @@ class TestConfig(openml.testing.TestBase):
         """Checks if the current configuration is returned accurately as a dict."""
         config = openml.config.get_config_as_dict()
         _config = {}
-        _config["apikey"] = TestBase.user_key
-        _config["server"] = f"{openml.config.TEST_SERVER_URL}/api/v1/xml"
+        _config["api_version"] = APIVersion.V1
+        _config["fallback_api_version"] = None
+        _config["servers"] = openml.config.get_test_servers()
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = False
         _config["connection_n_retries"] = 20
         _config["retry_policy"] = "robot"
         _config["show_progress"] = False
         assert isinstance(config, dict)
-        assert len(config) == 7
+        assert len(config) == 8
         self.assertDictEqual(config, _config)
 
     def test_setup_with_config(self):
         """Checks if the OpenML configuration can be updated using _setup()."""
         _config = {}
-        _config["apikey"] = TestBase.user_key
-        _config["server"] = "https://www.openml.org/api/v1/xml"
+        _config["api_version"] = APIVersion.V1
+        _config["fallback_api_version"] = None
+        _config["servers"] = openml.config.get_test_servers()
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = True
         _config["retry_policy"] = "human"
@@ -109,26 +113,22 @@ class TestConfigurationForExamples(openml.testing.TestBase):
     @pytest.mark.production_server()
     def test_switch_to_example_configuration(self):
         """Verifies the test configuration is loaded properly."""
-        # Below is the default test key which would be used anyway, but just for clarity:
-        openml.config.apikey = "any-api-key"
-        openml.config.server = self.production_server
+        openml.config.use_production_servers()
 
         openml.config.start_using_configuration_for_example()
 
-        assert openml.config.apikey == TestBase.user_key
-        assert openml.config.server == self.test_server
+        assert openml.config.servers == openml.config.get_test_servers()
 
     @pytest.mark.production_server()
     def test_switch_from_example_configuration(self):
         """Verifies the previous configuration is loaded after stopping."""
         # Below is the default test key which would be used anyway, but just for clarity:
-        openml.config.apikey = TestBase.user_key
-        openml.config.server = self.production_server
+        openml.config.use_production_servers()
 
         openml.config.start_using_configuration_for_example()
         openml.config.stop_using_configuration_for_example()
-        assert openml.config.apikey == TestBase.user_key
-        assert openml.config.server == self.production_server
+
+        assert openml.config.servers == openml.config.get_production_servers()
 
     def test_example_configuration_stop_before_start(self):
         """Verifies an error is raised if `stop_...` is called before `start_...`."""
@@ -145,15 +145,13 @@ class TestConfigurationForExamples(openml.testing.TestBase):
     @pytest.mark.production_server()
     def test_example_configuration_start_twice(self):
         """Checks that the original config can be returned to if `start..` is called twice."""
-        openml.config.apikey = TestBase.user_key
-        openml.config.server = self.production_server
+        openml.config.use_production_servers()
 
         openml.config.start_using_configuration_for_example()
         openml.config.start_using_configuration_for_example()
         openml.config.stop_using_configuration_for_example()
 
-        assert openml.config.apikey == TestBase.user_key
-        assert openml.config.server == self.production_server
+        assert openml.config.servers == openml.config.get_production_servers()
 
 
 def test_configuration_file_not_overwritten_on_load():
@@ -190,5 +188,71 @@ def test_openml_cache_dir_env_var(tmp_path: Path) -> None:
 
     with safe_environ_patcher("OPENML_CACHE_DIR", str(expected_path)):
         openml.config._setup()
+
         assert openml.config._root_cache_directory == expected_path
         assert openml.config.get_cache_directory() == str(expected_path / "org" / "openml" / "www")
+
+
+@pytest.mark.parametrize("mode", ["production", "test"])
+@pytest.mark.parametrize("api_version", [APIVersion.V1, APIVersion.V2])
+def test_get_servers(mode, api_version):
+    orig_servers = openml.config._get_servers(mode)
+
+    openml.config._set_servers(mode)
+    openml.config.set_api_version(api_version)
+    openml.config.server = "temp-server1"
+    openml.config.apikey = "temp-apikey1"
+    openml.config._get_servers(mode)["server"] = 'temp-server2'
+    openml.config._get_servers(mode)["apikey"] = 'temp-server2'
+
+    assert openml.config._get_servers(mode) == orig_servers
+
+
+@pytest.mark.parametrize("mode", ["production", "test"])
+@pytest.mark.parametrize("api_version", [APIVersion.V1, APIVersion.V2])
+def test_set_servers(mode, api_version):
+    openml.config._set_servers(mode)
+    openml.config.set_api_version(api_version)
+
+    assert openml.config.servers == openml.config._get_servers(mode)
+    assert openml.config.api_version == api_version
+
+    openml.config.server = "temp-server"
+    openml.config.apikey = "temp-apikey"
+
+    assert openml.config.server == openml.config.servers[api_version]["server"]
+    assert openml.config.apikey == openml.config.servers[api_version]["apikey"]
+
+    for version, servers in openml.config.servers.items():
+        if version == api_version:
+            assert servers != openml.config._get_servers(mode)[version]
+        else:
+            assert servers == openml.config._get_servers(mode)[version]
+
+
+def test_get_production_servers():
+    assert openml.config.get_production_servers() == openml.config._get_servers("production")
+
+
+def test_get_test_servers():
+    assert openml.config.get_test_servers() == openml.config._get_servers("test")
+
+
+def test_use_production_servers():
+    openml.config.use_production_servers()
+    servers_1 = openml.config.servers
+
+    openml.config._set_servers("production")
+    servers_2 = openml.config.servers
+
+    assert servers_1 == servers_2
+
+
+def test_use_test_servers():
+    openml.config.use_test_servers()
+    servers_1 = openml.config.servers
+
+    openml.config._set_servers("test")
+    servers_2 = openml.config.servers
+
+    assert servers_1 == servers_2
