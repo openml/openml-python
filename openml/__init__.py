@@ -28,6 +28,7 @@ from . import (
     exceptions,
     extensions,
     flows,
+    publishing,
     runs,
     setups,
     study,
@@ -38,6 +39,7 @@ from .__version__ import __version__
 from .datasets import OpenMLDataFeature, OpenMLDataset
 from .evaluations import OpenMLEvaluation
 from .flows import OpenMLFlow
+from .publishing import publish
 from .runs import OpenMLRun
 from .setups import OpenMLParameter, OpenMLSetup
 from .study import OpenMLBenchmarkSuite, OpenMLStudy
@@ -122,6 +124,8 @@ __all__ = [
     "exceptions",
     "extensions",
     "flows",
+    "publish",
+    "publishing",
     "runs",
     "setups",
     "study",
