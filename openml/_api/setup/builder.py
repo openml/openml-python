@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
 from openml._api.clients import HTTPClient, MinIOClient
-from openml._api.resources import API_REGISTRY, FallbackProxy
+from openml._api.resources import (
+    API_REGISTRY,
+    FallbackProxy,
+)
 from openml.enums import ResourceType
 
 if TYPE_CHECKING:
@@ -14,17 +16,26 @@ if TYPE_CHECKING:
 
 class APIBackendBuilder:
     """
-    Builder class for constructing API backend instances.
+    Builder for constructing API backend instances with all resource-specific APIs.
 
     This class organizes resource-specific API objects (datasets, tasks,
     flows, evaluations, runs, setups, studies, etc.) and provides a
-    centralized access point for both primary and optional fallback APIs.
+    centralized access point for both the primary API version and an
+    optional fallback API version.
+
+    The constructor automatically initializes:
+
+    - HTTPClient for the primary API version
+    - Optional HTTPClient for a fallback API version
+    - MinIOClient for file storage operations
+    - Resource-specific API instances, optionally wrapped with fallback proxies
 
     Parameters
     ----------
-    resource_apis : Mapping[ResourceType, ResourceAPI | FallbackProxy]
-        Mapping of resource types to their corresponding API instances
-        or fallback proxies.
+    api_version : APIVersion
+        The primary API version to use for all resource APIs and HTTP communication.
+    fallback_api_version : APIVersion | None, default=None
+        Optional fallback API version to wrap resource APIs with a FallbackProxy.
 
     Attributes
     ----------
@@ -47,37 +58,31 @@ class APIBackendBuilder:
     setup : ResourceAPI | FallbackProxy
         API interface for setup resources.
     http_client : HTTPClient
-        Client for HTTP Communication.
+        Client for HTTP communication using the primary API version.
     fallback_http_client : HTTPClient | None
-        Fallback Client for HTTP Communication.
+        Client for HTTP communication using the fallback API version, if provided.
     minio_client : MinIOClient
-        Client for MinIO Communication.
+        Client for file storage operations (MinIO/S3).
     """
 
-    def __init__(
-        self,
-        clients: Mapping[str, HTTPClient | MinIOClient | None],
-        resource_apis: Mapping[ResourceType, ResourceAPI | FallbackProxy],
-    ):
-        self.dataset = resource_apis[ResourceType.DATASET]
-        self.task = resource_apis[ResourceType.TASK]
-        self.evaluation_measure = resource_apis[ResourceType.EVALUATION_MEASURE]
-        self.estimation_procedure = resource_apis[ResourceType.ESTIMATION_PROCEDURE]
-        self.evaluation = resource_apis[ResourceType.EVALUATION]
-        self.flow = resource_apis[ResourceType.FLOW]
-        self.study = resource_apis[ResourceType.STUDY]
-        self.run = resource_apis[ResourceType.RUN]
-        self.setup = resource_apis[ResourceType.SETUP]
-        self.http_client = clients["http_client"]
-        self.fallback_http_client = clients["fallback_http_client"]
-        self.minio_client = clients["minio_client"]
+    dataset: ResourceAPI | FallbackProxy
+    task: ResourceAPI | FallbackProxy
+    evaluation_measure: ResourceAPI | FallbackProxy
+    estimation_procedure: ResourceAPI | FallbackProxy
+    evaluation: ResourceAPI | FallbackProxy
+    flow: ResourceAPI | FallbackProxy
+    study: ResourceAPI | FallbackProxy
+    run: ResourceAPI | FallbackProxy
+    setup: ResourceAPI | FallbackProxy
+    http_client: HTTPClient
+    fallback_http_client: HTTPClient | None
+    minio_client: MinIOClient
 
-    @classmethod
-    def build(
-        cls,
-        api_version: APIVersion,
-        fallback_api_version: APIVersion | None,
-    ) -> APIBackendBuilder:
+    def __init__(self, api_version: APIVersion, fallback_api_version: APIVersion | None = None):
+        # initialize clients and resource APIs in-place
+        self._build(api_version, fallback_api_version)
+
+    def _build(self, api_version: APIVersion, fallback_api_version: APIVersion | None) -> None:
         """
         Construct an APIBackendBuilder instance from a configuration.
 
@@ -98,31 +103,36 @@ class APIBackendBuilder:
         """
         minio_client = MinIOClient()
         primary_http_client = HTTPClient(api_version=api_version)
-        clients: dict[str, HTTPClient | MinIOClient | None] = {
-            "http_client": primary_http_client,
-            "fallback_http_client": None,
-            "minio_client": minio_client,
-        }
 
-        resource_apis: dict[ResourceType, ResourceAPI] = {}
+        self.http_client = primary_http_client
+        self.minio_client = minio_client
+        self.fallback_http_client = None
+
+        resource_apis: dict[ResourceType, ResourceAPI | FallbackProxy] = {}
         for resource_type, resource_api_cls in API_REGISTRY[api_version].items():
             resource_apis[resource_type] = resource_api_cls(primary_http_client, minio_client)
 
-        if fallback_api_version is None:
-            return cls(clients, resource_apis)
+        if fallback_api_version is not None:
+            fallback_http_client = HTTPClient(api_version=fallback_api_version)
+            self.fallback_http_client = fallback_http_client
 
-        fallback_http_client = HTTPClient(api_version=fallback_api_version)
-        clients["fallback_http_client"] = fallback_http_client
+            fallback_resource_apis: dict[ResourceType, ResourceAPI | FallbackProxy] = {}
+            for resource_type, resource_api_cls in API_REGISTRY[fallback_api_version].items():
+                fallback_resource_apis[resource_type] = resource_api_cls(
+                    fallback_http_client, minio_client
+                )
 
-        fallback_resource_apis: dict[ResourceType, ResourceAPI] = {}
-        for resource_type, resource_api_cls in API_REGISTRY[fallback_api_version].items():
-            fallback_resource_apis[resource_type] = resource_api_cls(
-                fallback_http_client, minio_client
-            )
+            resource_apis = {
+                name: FallbackProxy(resource_apis[name], fallback_resource_apis[name])
+                for name in resource_apis
+            }
 
-        merged: dict[ResourceType, FallbackProxy] = {
-            name: FallbackProxy(resource_apis[name], fallback_resource_apis[name])
-            for name in resource_apis
-        }
-
-        return cls(clients, merged)
+        self.dataset = resource_apis[ResourceType.DATASET]
+        self.task = resource_apis[ResourceType.TASK]
+        self.evaluation_measure = resource_apis[ResourceType.EVALUATION_MEASURE]
+        self.estimation_procedure = resource_apis[ResourceType.ESTIMATION_PROCEDURE]
+        self.evaluation = resource_apis[ResourceType.EVALUATION]
+        self.flow = resource_apis[ResourceType.FLOW]
+        self.study = resource_apis[ResourceType.STUDY]
+        self.run = resource_apis[ResourceType.RUN]
+        self.setup = resource_apis[ResourceType.SETUP]
