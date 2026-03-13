@@ -1,0 +1,6 @@
+<oml:users xmlns:oml="http://openml.org/openml">
+  <oml:user>
+    <oml:id>1</oml:id>
+    <oml:username>MockUser</oml:username>
+  </oml:user>
+</oml:users>
