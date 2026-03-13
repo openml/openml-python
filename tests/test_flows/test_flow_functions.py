@@ -49,17 +49,6 @@ class TestFlowFunctions(TestBase):
         assert ext_version_str_or_none
 
     @pytest.mark.production_server()
-    def test_list_flows(self):
-        self.use_production_server()
-        # We can only perform a smoke test here because we test on dynamic
-        # data from the internet...
-        flows = openml.flows.list_flows()
-        # 3000 as the number of flows on openml.org
-        assert len(flows) >= 1500
-        for flow in flows.to_dict(orient="index").values():
-            self._check_flow(flow)
-
-    @pytest.mark.production_server()
     def test_list_flows_output_format(self):
         self.use_production_server()
         # We can only perform a smoke test here because we test on dynamic
@@ -543,3 +532,32 @@ def test_delete_unknown_flow(mock_delete, test_files_directory, test_api_key):
     flow_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/flow/9999999"
     assert flow_url == mock_delete.call_args.args[0]
     assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+
+
+@mock.patch.object(requests.Session, "get")
+def test_list_flows(mock_get, test_files_directory, test_api_key):
+    content_file = test_files_directory / "mock_responses" / "flows" / "flow_list.xml"
+    mock_get.return_value = create_request_response(
+        status_code=200,
+        content_filepath=content_file,
+    )
+
+    flows = openml.flows.list_flows()
+
+    
+    assert isinstance(flows, pd.DataFrame)
+    assert len(flows) == 2
+
+    # Check each row has the expected typed columns
+    for flow in flows.to_dict(orient="index").values():
+        assert isinstance(flow["id"], int)
+        assert isinstance(flow["name"], str)
+        assert isinstance(flow["full_name"], str)
+        assert isinstance(flow["version"], str)
+        ext_v = flow["external_version"]
+        assert isinstance(ext_v, str) or ext_v is None or pd.isna(ext_v)
+
+    # Verify the mock was called and URL contains the list endpoint
+    assert mock_get.called
+    call_url = mock_get.call_args.args[0]
+    assert "flow/list" in call_url

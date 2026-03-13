@@ -1,0 +1,18 @@
+<oml:flows xmlns:oml="http://openml.org/openml">
+  <oml:flow>
+    <oml:id>100</oml:id>
+    <oml:full_name>sklearn.ensemble.RandomForestClassifier(1)</oml:full_name>
+    <oml:name>sklearn.ensemble.RandomForestClassifier</oml:name>
+    <oml:version>1</oml:version>
+    <oml:external_version>sklearn==1.0.0</oml:external_version>
+    <oml:uploader>1</oml:uploader>
+  </oml:flow>
+  <oml:flow>
+    <oml:id>101</oml:id>
+    <oml:full_name>weka.J48(2)</oml:full_name>
+    <oml:name>weka.J48</oml:name>
+    <oml:version>2</oml:version>
+    <oml:external_version>Weka_3.9.0</oml:external_version>
+    <oml:uploader>2</oml:uploader>
+  </oml:flow>
+</oml:flows>
