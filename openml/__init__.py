@@ -24,6 +24,7 @@ from . import (
     _api_calls,
     _config as _config_module,
     datasets,
+    dispatchers,
     evaluations,
     exceptions,
     extensions,
@@ -36,6 +37,7 @@ from . import (
 )
 from .__version__ import __version__
 from .datasets import OpenMLDataFeature, OpenMLDataset
+from .dispatchers import get, list_all
 from .evaluations import OpenMLEvaluation
 from .flows import OpenMLFlow
 from .runs import OpenMLRun
@@ -118,10 +120,13 @@ __all__ = [
     "_api_calls",
     "config",
     "datasets",
+    "dispatchers",
     "evaluations",
     "exceptions",
     "extensions",
     "flows",
+    "get",
+    "list_all",
     "runs",
     "setups",
     "study",
