@@ -5,6 +5,7 @@ import collections
 import copy
 import hashlib
 import re
+import os
 import time
 from packaging.version import Version
 from unittest import mock
@@ -31,7 +32,6 @@ import openml.exceptions
 import openml.utils
 import requests
 from openml.testing import SimpleImputer, TestBase, create_request_response
-
 
 
 class TestFlow(TestBase):
