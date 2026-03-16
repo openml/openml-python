@@ -8,24 +8,9 @@ import pytest
 import pandas as pd
 
 import openml
-from openml._api.clients.http import HTTPClient
-from openml.enums import APIVersion
 from openml.testing import TestBase
 from openml.exceptions import OpenMLNotSupportedError
 from openml._api import DatasetV1API, DatasetV2API
-
-ADMIN_KEY = os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR, "")
-
-@pytest.fixture
-def admin_dataset_v1(minio_client):
-    if not ADMIN_KEY:
-        pytest.skip("Admin API key not set")
-    original_key = openml.config.servers[APIVersion.V1]["apikey"]
-    openml.config.servers[APIVersion.V1]["apikey"] = ADMIN_KEY
-    admin_http = HTTPClient(api_version=APIVersion.V1)
-    dataset = DatasetV1API(http=admin_http, minio=minio_client)
-    yield dataset
-    openml.config.servers[APIVersion.V1]["apikey"] = original_key
 
 @pytest.fixture
 def dataset_v1(http_client_v1, minio_client) -> DatasetV1API:
@@ -65,11 +50,23 @@ def test_v1_list(dataset_v1):
     assert output["status"].nunique() == 1
     assert output["status"].unique()[0] == "active"
 
+def test_v1_download_arff(dataset_v1):
+    from openml.datasets.functions import _get_dataset_arff
+    output = dataset_v1.get(2)
+    file = _get_dataset_arff(output)
+    assert file.exists()
+
+def test_v1_download_parquet(dataset_v1):
+    from openml.datasets.functions import _get_dataset_parquet
+    output = dataset_v1.get(2)
+    file = _get_dataset_parquet(output)
+    assert file.exists()
+
 def test_v1_download_arff_from_get(dataset_v1):
     output = dataset_v1.get(2, download_data=True)
-
-    assert output.data_file is not None
-    assert Path(output.data_file).exists()
+    data = output.data_file is not None and Path(output.data_file).exists()
+    parquet = output.parquet_file is not None and Path(output.parquet_file).exists()
+    assert data or parquet
 
 def test_v1_download_qualities_from_get(dataset_v1):
     output = dataset_v1.get(2, download_qualities=True)
@@ -91,9 +88,14 @@ def test_v1_get_qualities(dataset_v1):
     output = dataset_v1.get_qualities(2)
 
     assert isinstance(output, dict)
-    assert len(output.keys()) == 19
+    assert len(output.keys()) == 107
 
-def test_v1_status_update(admin_dataset_v1):
+@pytest.mark.skipif(
+    not os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR),
+    reason="Test requires admin key. Set OPENML_TEST_SERVER_ADMIN_KEY environment variable.",
+)
+def test_v1_status_update(dataset_v1):
+    openml.config.apikey = TestBase.admin_key
     new_dataset = OpenMLDataset(
         f"TEST-{str(time.time())}-UploadTestWithURL",
         "test",
@@ -102,16 +104,14 @@ def test_v1_status_update(admin_dataset_v1):
         url="https://www.openml.org/data/download/61/dataset_61_iris.arff",
     )
     new_dataset.publish()
-    # admin key for test server (only admins can activate datasets.
-    # all users can deactivate their own datasets)
-    _status_update_check(admin_dataset_v1, new_dataset.dataset_id, "deactivated")
-    _status_update_check(admin_dataset_v1, new_dataset.dataset_id, "active")
-    TestBase._mark_entity_for_removal("data", new_dataset.dataset_id)
+    _status_update_check(dataset_v1, new_dataset.dataset_id, "deactivated")
+    _status_update_check(dataset_v1, new_dataset.dataset_id, "active")
+    dataset_v1.delete(new_dataset.dataset_id)
 
 def test_v1_edit(dataset_v1):
     did = 2
     result = dataset_v1.fork(did)
-    _wait_for_dataset_being_processed(dataset_v1, result)
+    _wait_for_dataset_being_processed(dataset_v1, result,'in_preparation')
 
     edited_did = dataset_v1.edit(result, description="Forked dataset", default_target_attribute="shape")
     assert result == edited_did
@@ -132,16 +132,16 @@ def test_v1_fork(dataset_v1):
     did = 2
     result = dataset_v1.fork(did)
     assert did != result
-    _wait_for_dataset_being_processed(dataset_v1, result)
+    _wait_for_dataset_being_processed(dataset_v1, result,'in_preparation')
 
-    listing = dataset_v1.list(limit=2, offset=0, data_id=[did, result])
+    listing = dataset_v1.list(limit=2, offset=0, data_id=[did, result], status="all")
+
     assert listing.iloc[0]["name"] == listing.iloc[1]["name"]
-
     dataset_v1.delete(result)
 
 def test_v1_list_qualities(dataset_v1):
     output = dataset_v1.list_qualities()
-    assert len(output) == 19
+    assert len(output) == 107
     assert isinstance(output[0], str)
 
 def test_v1_feature_add_remove_ontology(dataset_v1):
@@ -154,20 +154,22 @@ def test_v1_feature_add_remove_ontology(dataset_v1):
     output = dataset_v1.feature_remove_ontology(did, fid, ontology)
     assert output
 
-def test_v1_add_delete_topic(admin_dataset_v1):
+@pytest.mark.skipif(
+    not os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR),
+    reason="Test requires admin key. Set OPENML_TEST_SERVER_ADMIN_KEY environment variable.",
+)
+def test_v1_add_delete_topic(dataset_v1):
+    openml.config.apikey = TestBase.admin_key
     topic = f"test_topic_{str(time.time())}"
-    # only admin can add or delete topics
-    admin_dataset_v1.add_topic(31, topic)
-    admin_dataset_v1.delete_topic(31, topic)
+    dataset_v1.add_topic(31, topic)
+    dataset_v1.delete_topic(31, topic)
 
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_v2_get(dataset_v2):
     dataset_id = 2
     output = dataset_v2.get(dataset_id)
     assert output.dataset_id == dataset_id
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_v2_list(dataset_v2):
     output = dataset_v2.list(limit=2, offset=0, status="active")
     assert not output.empty
@@ -175,73 +177,76 @@ def test_v2_list(dataset_v2):
     assert output["status"].nunique() == 1
     assert output["status"].unique()[0] == "active"
 
-@pytest.mark.skip(reason='V2 server not set')
+def test_v2_download_arff(dataset_v2):
+    from openml.datasets.functions import _get_dataset_arff
+    output = dataset_v2.get(2)
+    file = _get_dataset_arff(output)
+    assert file.exists()
+
+def test_v2_download_parquet(dataset_v2):
+    from openml.datasets.functions import _get_dataset_parquet
+    output = dataset_v2.get(2)
+    file = _get_dataset_parquet(output)
+    assert file.exists()
+
 def test_v2_download_arff_from_get(dataset_v2):
     output = dataset_v2.get(2, download_data=True)
+    data = output.data_file is not None and Path(output.data_file).exists()
+    parquet = output.parquet_file is not None and Path(output.parquet_file).exists()
+    assert data or parquet
 
-    assert output.data_file is not None
-    assert Path(output.data_file).exists()
-
-@pytest.mark.skip(reason='V2 server not set')
 def test_v2_download_qualities_from_get(dataset_v2):
     output = dataset_v2.get(2, download_qualities=True)
 
     assert output._qualities is not None
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_v2_download_features_from_get(dataset_v2):
     output = dataset_v2.get(2, download_features_meta_data=True)
 
     assert output._features is not None
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_v2_get_features(dataset_v2):
     output = dataset_v2.get_features(2)
 
     assert isinstance(output, dict)
     assert len(output.keys()) == 37
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_v2_edit(dataset_v2):
     with pytest.raises(OpenMLNotSupportedError):
         dataset_v2.edit(2, description='Test')
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_v2_fork(dataset_v2):
     with pytest.raises(OpenMLNotSupportedError):
         dataset_v2.fork(2)
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_v2_feature_add_remove_ontology(dataset_v2):
     with pytest.raises(OpenMLNotSupportedError):
         dataset_v2.feature_add_ontology(2, 0, "https://www.openml.org/unittest/" + str(time.time()))
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_v2_add_delete_topic(dataset_v2):
     with pytest.raises(OpenMLNotSupportedError):
         dataset_v2.add_topic(2, 'test_topic_' + str(time.time()))
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_v2_get_qualities(dataset_v2):
-    # can be removed from here once v2 qualities are same as v1
     output = dataset_v2.get_qualities(2)
     assert isinstance(output, dict)
     assert len(output.keys()) == 107
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_v2_list_qualities(dataset_v2):
-    # can be removed from here once v2 qualities are same as v1
     output = dataset_v2.list_qualities()
     assert len(output) == 107
     assert isinstance(output[0], str)
 
-@pytest.mark.skip(reason='V2 server not set')
+pytest.mark.skipif(
+    not os.environ.get(openml.config.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR),
+    reason="Test requires admin key. Set OPENML_TEST_SERVER_ADMIN_KEY environment variable.",
+)
 def test_v2_status_update(dataset_v2):
+    openml.config.apikey = TestBase.admin_key
     # publish and fork is not supported in v2
     _status_update_check(dataset_v2, 2, "deactivated")
     _status_update_check(dataset_v2, 2, "active")
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_get_matches(dataset_v1, dataset_v2):
     output_v1 = dataset_v1.get(2)
     output_v2 = dataset_v2.get(2)
@@ -251,7 +256,6 @@ def test_get_matches(dataset_v1, dataset_v2):
     assert output_v1.data_file is None
     assert output_v1.data_file == output_v2.data_file
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_get_features_matches(dataset_v1, dataset_v2):
     output_v1 = dataset_v1.get_features(3)
     output_v2 = dataset_v2.get_features(3)
@@ -260,7 +264,6 @@ def test_get_features_matches(dataset_v1, dataset_v2):
     # would not be same if v1 has ontology
     assert output_v1 == output_v2
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_list_matches(dataset_v1, dataset_v2):
     output_v1 = dataset_v1.list(limit=2, offset=1)
     output_v2 = dataset_v2.list(limit=2, offset=1)
@@ -271,19 +274,15 @@ def test_list_matches(dataset_v1, dataset_v2):
         check_like=True
         )
     
-@pytest.mark.skip(reason='V2 server not set')
 def test_get_qualities_matches(dataset_v1, dataset_v2):
-    #TODO Qualities in local python server and test server differ
     output_v1 = dataset_v1.get_qualities(2)
     output_v2 = dataset_v2.get_qualities(2)
     assert  output_v1['AutoCorrelation'] == output_v2['AutoCorrelation']
+    assert len(output_v1) == len(output_v2)
 
-@pytest.mark.skip(reason='V2 server not set')
 def test_list_qualities_matches(dataset_v1, dataset_v2):
-    #TODO Qualities in local python server and test server differ
     output_v1 = dataset_v1.list_qualities()
     output_v2 = dataset_v2.list_qualities()
 
-    assert "AutoCorrelation" in output_v1
-    assert "AutoCorrelation" in output_v2
+    assert output_v1 == output_v2
 

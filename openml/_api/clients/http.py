@@ -762,7 +762,7 @@ class HTTPClient:
     def download(
         self,
         url: str,
-        handler: Callable[[Response, Path, str], None] | None = None,
+        handler: Callable[[Response, Path, str], Path | None] | None = None,
         encoding: str = "utf-8",
         file_name: str = "response.txt",
         md5_checksum: str | None = None,
