@@ -7,7 +7,6 @@ import unittest.mock
 
 import pandas as pd
 import pytest
-import sklearn.base
 import sklearn.naive_bayes
 import sklearn.tree
 from openml_sklearn import SklearnExtension

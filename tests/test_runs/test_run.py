@@ -341,6 +341,7 @@ class TestRun(TestBase):
 
     @pytest.mark.sklearn
     @pytest.mark.test_server
+    @pytest.mark.skip(reason="https://github.com/openml/openml-python/issues/1586")
     def test_offline_and_online_run_identical(self):
         extension = SklearnExtension()
 

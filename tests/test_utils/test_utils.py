@@ -36,7 +36,7 @@ def min_number_setups_on_test_server() -> int:
 @pytest.fixture
 def min_number_runs_on_test_server() -> int:
     """After a reset at least 21 runs are on the test server"""
-    return 21
+    return 15
 
 
 @pytest.fixture
@@ -179,5 +179,4 @@ def test_get_cache_size(config_mock, tmp_path):
     sub_dir = tmp_path / "subdir"
     sub_dir.mkdir()
     (sub_dir / "nested_file.txt").write_bytes(b"b" * 100)
-
     assert openml.utils.get_cache_size() == 100

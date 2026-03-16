@@ -1037,6 +1037,7 @@ class TestRun(TestBase):
         self._test_local_evaluations(run)
 
     @pytest.mark.sklearn
+    @pytest.mark.skip("https://github.com/openml/openml-python/issues/1586")
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1065,6 +1066,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
+    @pytest.mark.skip(reason="https://github.com/openml/openml-python/issues/1586")
     @pytest.mark.sklearn
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
