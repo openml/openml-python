@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Any, ClassVar, Literal, cast
 from urllib.parse import urlparse
 
-from openml.enums import APIVersion
+from openml.enums import APIVersion, ServerMode
 
 from .__version__ import __version__
 
@@ -60,19 +60,17 @@ _TEST_SERVERS_LOCAL: dict[APIVersion, dict[str, str | None]] = {
     },
 }
 
-_SERVERS_REGISTRY: dict[str, dict[APIVersion, dict[str, str | None]]] = {
-    "production": _PROD_SERVERS,
-    "test": _TEST_SERVERS_LOCAL
-    if os.getenv("OPENML_USE_LOCAL_SERVICES") == "true"
-    else _TEST_SERVERS,
+_SERVERS_REGISTRY: dict[ServerMode, dict[APIVersion, dict[str, str | None]]] = {
+    ServerMode.PRODUCTION: _PROD_SERVERS,
+    ServerMode.TEST: (
+        _TEST_SERVERS_LOCAL if os.getenv("OPENML_USE_LOCAL_SERVICES") == "true" else _TEST_SERVERS
+    ),
 }
 
 
-def _get_servers(mode: str) -> dict[APIVersion, dict[str, str | None]]:
-    if mode not in _SERVERS_REGISTRY:
-        raise ValueError(
-            f'invalid mode="{mode}" allowed modes: {", ".join(list(_SERVERS_REGISTRY.keys()))}'
-        )
+def _get_servers(mode: ServerMode) -> dict[APIVersion, dict[str, str | None]]:
+    if mode not in ServerMode:
+        raise ValueError(f'invalid mode="{mode}" allowed modes: {", ".join(list(ServerMode))}')
     return deepcopy(_SERVERS_REGISTRY[mode])
 
 
@@ -112,7 +110,7 @@ class OpenMLConfig:
     """Dataclass storing the OpenML configuration."""
 
     servers: dict[APIVersion, dict[str, str | None]] = field(
-        default_factory=lambda: _get_servers("production")
+        default_factory=lambda: _get_servers(ServerMode.PRODUCTION)
     )
     api_version: APIVersion = APIVersion.V1
     fallback_api_version: APIVersion | None = None
@@ -266,24 +264,24 @@ class OpenMLConfigManager:
         domain, _ = self._config.server.split("/api", maxsplit=1)
         return domain.replace("api", "www")
 
-    def _get_servers(self, mode: str) -> dict[APIVersion, dict[str, str | None]]:
+    def _get_servers(self, mode: ServerMode) -> dict[APIVersion, dict[str, str | None]]:
         return _get_servers(mode)
 
-    def _set_servers(self, mode: str) -> None:
+    def _set_servers(self, mode: ServerMode) -> None:
         servers = self._get_servers(mode)
         self._config = replace(self._config, servers=servers)
 
     def get_production_servers(self) -> dict[APIVersion, dict[str, str | None]]:
-        return self._get_servers(mode="production")
+        return self._get_servers(mode=ServerMode.PRODUCTION)
 
     def get_test_servers(self) -> dict[APIVersion, dict[str, str | None]]:
-        return self._get_servers(mode="test")
+        return self._get_servers(mode=ServerMode.TEST)
 
     def use_production_servers(self) -> None:
-        self._set_servers(mode="production")
+        self._set_servers(mode=ServerMode.PRODUCTION)
 
     def use_test_servers(self) -> None:
-        self._set_servers(mode="test")
+        self._set_servers(mode=ServerMode.TEST)
 
     def set_api_version(
         self,
