@@ -3,6 +3,13 @@ from __future__ import annotations
 from enum import Enum
 
 
+class ServerMode(str, Enum):
+    """Supported modes in server."""
+
+    PRODUCTION = "production"
+    TEST = "test"
+
+
 class APIVersion(str, Enum):
     """Supported OpenML API versions."""
 

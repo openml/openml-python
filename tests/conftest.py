@@ -99,7 +99,7 @@ def delete_remote_files(tracker, flow_names) -> None:
     :param tracker: Dict
     :return: None
     """
-    openml.config.set_servers("test")
+    openml.config.use_test_servers()
 
     # reordering to delete sub flows at the end of flows
     # sub-flows have shorter names, hence, sorting by descending order of flow name length
@@ -252,22 +252,22 @@ def test_files_directory() -> Path:
 
 @pytest.fixture(scope="session")
 def test_server_v1() -> str:
-    return openml.config.get_servers("test")[APIVersion.V1]["server"]
+    return openml.config.get_test_servers()[APIVersion.V1]["server"]
 
 
 @pytest.fixture(scope="session")
 def test_apikey_v1() -> str:
-    return openml.config.get_servers("test")[APIVersion.V1]["apikey"]
+    return openml.config.get_test_servers()[APIVersion.V1]["apikey"]
 
 
 @pytest.fixture(scope="session")
 def test_server_v2() -> str:
-    return openml.config.get_servers("test")[APIVersion.V2]["server"]
+    return openml.config.get_test_servers()[APIVersion.V2]["server"]
 
 
 @pytest.fixture(scope="session")
 def test_apikey_v2() -> str:
-    return openml.config.get_servers("test")[APIVersion.V2]["apikey"]
+    return openml.config.get_test_servers()[APIVersion.V2]["apikey"]
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -288,13 +288,14 @@ def as_robot() -> Iterator[None]:
 
 @pytest.fixture(autouse=True)
 def with_server(request):
-    if os.getenv("OPENML_USE_LOCAL_SERVICES") == "true":
-        openml.config.TEST_SERVER_URL = "http://localhost:8000"
+    openml.config.set_api_version(APIVersion.V1)
+
     if "production_server" in request.keywords:
-        openml.config.set_servers("production")
+        openml.config.use_production_servers()
         yield
         return
-    openml.config.set_servers("test")
+
+    openml.config.use_test_servers()
     yield
 
 
@@ -330,3 +331,18 @@ def workdir(tmp_path):
     os.chdir(tmp_path)
     yield tmp_path
     os.chdir(original_cwd)
+
+
+@pytest.fixture
+def http_client_v1() -> HTTPClient:
+    return HTTPClient(api_version=APIVersion.V1)
+
+
+@pytest.fixture
+def http_client_v2() -> HTTPClient:
+    return HTTPClient(api_version=APIVersion.V2)
+
+
+@pytest.fixture
+def minio_client() -> MinIOClient:
+    return MinIOClient()

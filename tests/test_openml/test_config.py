@@ -16,7 +16,7 @@ import pytest
 import openml
 import openml.testing
 from openml.testing import TestBase
-from openml.enums import APIVersion
+from openml.enums import APIVersion, ServerMode
 
 
 @contextmanager
@@ -81,7 +81,7 @@ class TestConfig(openml.testing.TestBase):
         _config = {}
         _config["api_version"] = APIVersion.V1
         _config["fallback_api_version"] = None
-        _config["servers"] = openml.config.get_servers("test")
+        _config["servers"] = openml.config.get_test_servers()
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = False
         _config["connection_n_retries"] = 20
@@ -96,7 +96,7 @@ class TestConfig(openml.testing.TestBase):
         _config = {}
         _config["api_version"] = APIVersion.V1
         _config["fallback_api_version"] = None
-        _config["servers"] = openml.config.get_servers("test")
+        _config["servers"] = openml.config.get_test_servers()
         _config["cachedir"] = self.workdir
         _config["avoid_duplicate_runs"] = True
         _config["retry_policy"] = "human"
@@ -113,22 +113,22 @@ class TestConfigurationForExamples(openml.testing.TestBase):
     @pytest.mark.production_server()
     def test_switch_to_example_configuration(self):
         """Verifies the test configuration is loaded properly."""
-        openml.config.set_servers("production")
+        openml.config.use_production_servers()
 
         openml.config.start_using_configuration_for_example()
 
-        openml.config.servers = openml.config.get_servers("test")
+        assert openml.config.servers == openml.config.get_test_servers()
 
     @pytest.mark.production_server()
     def test_switch_from_example_configuration(self):
         """Verifies the previous configuration is loaded after stopping."""
         # Below is the default test key which would be used anyway, but just for clarity:
-        openml.config.set_servers("production")
+        openml.config.use_production_servers()
 
         openml.config.start_using_configuration_for_example()
         openml.config.stop_using_configuration_for_example()
-        assert openml.config.apikey == TestBase.user_key
-        assert openml.config.server == self.production_server
+
+        assert openml.config.servers == openml.config.get_production_servers()
 
     def test_example_configuration_stop_before_start(self):
         """Verifies an error is raised if `stop_...` is called before `start_...`."""
@@ -145,13 +145,13 @@ class TestConfigurationForExamples(openml.testing.TestBase):
     @pytest.mark.production_server()
     def test_example_configuration_start_twice(self):
         """Checks that the original config can be returned to if `start..` is called twice."""
-        openml.config.set_servers("production")
+        openml.config.use_production_servers()
 
         openml.config.start_using_configuration_for_example()
         openml.config.start_using_configuration_for_example()
         openml.config.stop_using_configuration_for_example()
 
-        assert openml.config.servers == openml.config.get_servers("production")
+        assert openml.config.servers == openml.config.get_production_servers()
 
 
 def test_configuration_file_not_overwritten_on_load():
@@ -193,28 +193,28 @@ def test_openml_cache_dir_env_var(tmp_path: Path) -> None:
         assert openml.config.get_cache_directory() == str(expected_path / "org" / "openml" / "www")
 
 
-@pytest.mark.parametrize("mode", ["production", "test", "local"])
+@pytest.mark.parametrize("mode", list(ServerMode))
 @pytest.mark.parametrize("api_version", [APIVersion.V1, APIVersion.V2])
 def test_get_servers(mode, api_version):
-    orig_servers = openml.config.get_servers(mode)
+    orig_servers = openml.config._get_servers(mode)
 
-    openml.config.set_servers(mode)
+    openml.config._set_servers(mode)
     openml.config.set_api_version(api_version)
     openml.config.server = "temp-server1"
     openml.config.apikey = "temp-apikey1"
-    openml.config.get_servers(mode)["server"] = 'temp-server2'
-    openml.config.get_servers(mode)["apikey"] = 'temp-server2'
+    openml.config._get_servers(mode)["server"] = 'temp-server2'
+    openml.config._get_servers(mode)["apikey"] = 'temp-server2'
 
-    assert openml.config.get_servers(mode) == orig_servers
+    assert openml.config._get_servers(mode) == orig_servers
 
 
-@pytest.mark.parametrize("mode", ["production", "test", "local"])
+@pytest.mark.parametrize("mode", list(ServerMode))
 @pytest.mark.parametrize("api_version", [APIVersion.V1, APIVersion.V2])
 def test_set_servers(mode, api_version):
-    openml.config.set_servers(mode)
+    openml.config._set_servers(mode)
     openml.config.set_api_version(api_version)
 
-    assert openml.config.servers == openml.config.get_servers(mode)
+    assert openml.config.servers == openml.config._get_servers(mode)
     assert openml.config.api_version == api_version
 
     openml.config.server = "temp-server"
@@ -225,6 +225,34 @@ def test_set_servers(mode, api_version):
 
     for version, servers in openml.config.servers.items():
         if version == api_version:
-            assert servers != openml.config.get_servers(mode)[version]
+            assert servers != openml.config._get_servers(mode)[version]
         else:
-            assert servers == openml.config.get_servers(mode)[version]
+            assert servers == openml.config._get_servers(mode)[version]
+
+
+def test_get_production_servers():
+    assert openml.config.get_production_servers() == openml.config._get_servers("production")
+
+
+def test_get_test_servers():
+    assert openml.config.get_test_servers() == openml.config._get_servers("test")
+
+
+def test_use_production_servers():
+    openml.config.use_production_servers()
+    servers_1 = openml.config.servers
+
+    openml.config._set_servers("production")
+    servers_2 = openml.config.servers
+
+    assert servers_1 == servers_2
+
+
+def test_use_test_servers():
+    openml.config.use_test_servers()
+    servers_1 = openml.config.servers
+
+    openml.config._set_servers("test")
+    servers_2 = openml.config.servers
+
+    assert servers_1 == servers_2
