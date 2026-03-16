@@ -8,6 +8,7 @@ from unittest import mock
 import minio
 import os
 import pytest
+import os
 
 import openml
 import openml.testing

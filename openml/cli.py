@@ -112,7 +112,7 @@ def configure_server(value: str) -> None:
 
     def replace_shorthand(server: str) -> str:
         if server == "test":
-            return cast("str", openml.config.get_servers("test")[APIVersion.V1]["server"])
+            return f"{openml.config.TEST_SERVER_URL}/api/v1/xml"
         if server == "production_server":
             return cast("str", openml.config.get_servers("production")[APIVersion.V1]["server"])
         return server

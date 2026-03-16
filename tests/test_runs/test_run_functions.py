@@ -1133,6 +1133,7 @@ class TestRun(TestBase):
         reason="Pending resolution of #1657",
     )
     @pytest.mark.sklearn()
+    @pytest.mark.skip("https://github.com/openml/openml-python/issues/1586")
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",
@@ -1161,10 +1162,7 @@ class TestRun(TestBase):
 
         self._test_local_evaluations(run)
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
+    @pytest.mark.skip(reason="https://github.com/openml/openml-python/issues/1586")
     @pytest.mark.sklearn()
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
@@ -1944,10 +1942,7 @@ class TestRun(TestBase):
         res = format_prediction(regression, *ignored_input)
         self.assertListEqual(res, [0] * 5)
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
+
     @unittest.skipIf(
         Version(sklearn.__version__) < Version("0.20"),
         reason="SimpleImputer doesn't handle mixed type DataFrame as input",

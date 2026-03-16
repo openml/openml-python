@@ -1,15 +1,17 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import logging
 import warnings
 from abc import ABC
 from collections.abc import Sequence
 from enum import Enum
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 from typing_extensions import TypedDict
 
-import openml
+import arff
+
+import openml._api_calls
 from openml import datasets
 from openml.base import OpenMLBase
 from openml.utils import _create_cache_directory_for_id
@@ -19,6 +21,9 @@ from .split import OpenMLSplit
 if TYPE_CHECKING:
     import numpy as np
     import pandas as pd
+
+
+logger = logging.getLogger(__name__)
 
 
 # TODO(eddiebergman): Should use `auto()` but might be too late if these numbers are used
@@ -177,15 +182,6 @@ class OpenMLTask(OpenMLBase):
 
         return self.split.get(repeat=repeat, fold=fold, sample=sample)
 
-    def _download_split(self, cache_file: Path) -> None:
-        # TODO(eddiebergman): Not sure about this try to read and error approach
-        try:
-            with cache_file.open(encoding="utf8"):
-                pass
-        except OSError:
-            split_url = self.estimation_procedure["data_splits_url"]
-            openml._backend.task.download(url=str(split_url), file_name="datasplits.arff")
-
     def download_split(self) -> OpenMLSplit:
         """Download the OpenML split for a given task."""
         # TODO(eddiebergman): Can this every be `None`?
@@ -195,9 +191,23 @@ class OpenMLTask(OpenMLBase):
 
         try:
             split = OpenMLSplit._from_arff_file(cached_split_file)
-        except OSError:
+            logger.debug("Loaded file from cache: %s", str(cached_split_file))
+        except (OSError, arff.BadDataFormat):
+            logger.info("Failed to load file from cache: %s", str(cached_split_file))
+            if cached_split_file.exists():
+                logger.debug("Cleaning up old file")
+                cached_split_file.unlink()
             # Next, download and cache the associated split file
-            self._download_split(cached_split_file)
+            split_url = self.estimation_procedure["data_splits_url"]
+            openml._api_calls._download_text_file(
+                source=str(split_url),
+                output_path=str(cached_split_file),
+            )
+            if cached_split_file.exists():
+                logger.info("New file created of size %d", cached_split_file.stat().st_size)
+            else:
+                logger.info("Failed to create new file")
+
             split = OpenMLSplit._from_arff_file(cached_split_file)
 
         return split

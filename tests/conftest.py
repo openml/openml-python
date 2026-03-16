@@ -288,7 +288,8 @@ def as_robot() -> Iterator[None]:
 
 @pytest.fixture(autouse=True)
 def with_server(request):
-    openml.config.set_api_version(APIVersion.V1)
+    if os.getenv("OPENML_USE_LOCAL_SERVICES") == "true":
+        openml.config.TEST_SERVER_URL = "http://localhost:8000"
     if "production_server" in request.keywords:
         openml.config.set_servers("production")
         yield
@@ -299,12 +300,19 @@ def with_server(request):
 
 @pytest.fixture(autouse=True)
 def with_test_cache(test_files_directory, request):
+    # Skip this fixture for TestBase subclasses - they manage their own cache directory
+    # in setUp()/tearDown(). Having both mechanisms fight over the global config
+    # causes race conditions.
+    if request.instance is not None and isinstance(request.instance, TestBase):
+        yield
+        return
+
     if not test_files_directory.exists():
         raise ValueError(
             f"Cannot find test cache dir, expected it to be {test_files_directory!s}!",
         )
     _root_cache_directory = openml.config._root_cache_directory
-    tmp_cache = test_files_directory / request.node.name
+    tmp_cache = test_files_directory / request.node.nodeid.replace("/", ".").replace("::", ".")
     openml.config.set_root_cache_directory(tmp_cache)
     yield
     openml.config.set_root_cache_directory(_root_cache_directory)
@@ -322,18 +330,3 @@ def workdir(tmp_path):
     os.chdir(tmp_path)
     yield tmp_path
     os.chdir(original_cwd)
-
-
-@pytest.fixture
-def http_client_v1() -> HTTPClient:
-    return HTTPClient(api_version=APIVersion.V1)
-
-
-@pytest.fixture
-def http_client_v2() -> HTTPClient:
-    return HTTPClient(api_version=APIVersion.V2)
-
-
-@pytest.fixture
-def minio_client() -> MinIOClient:
-    return MinIOClient()
