@@ -21,8 +21,6 @@ from urllib.parse import urlparse
 
 from openml.enums import APIVersion
 
-from .__version__ import __version__
-
 logger = logging.getLogger(__name__)
 openml_logger = logging.getLogger("openml")
 
@@ -130,6 +128,7 @@ class OpenMLConfig:
     @apikey.setter
     def apikey(self, value: str | None) -> None:
         self.servers[self.api_version]["apikey"] = value
+
     def __setattr__(self, name: str, value: Any) -> None:
         if name == "apikey" and not isinstance(value, (type(None), str)):
             raise TypeError("apikey must be a string or None")
