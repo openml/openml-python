@@ -803,7 +803,8 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
             available_columns = list(data.columns)
             msg = (
                 f"Target column '{target_name}' was removed because it is listed as a "
-                f"row_id or ignore attribute. Available columns after filtering: {available_columns}"
+                f"row_id or ignore attribute. "
+                f"Available columns after filtering: {available_columns}"
                 if target_name in to_exclude
                 else f"Target column '{target_name}' does not exist in this dataset. "
                 f"Available columns: {available_columns}"
