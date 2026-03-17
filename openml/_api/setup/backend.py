@@ -68,7 +68,7 @@ class APIBackend:
         key = f"{api_version}_{fallback_api_version}"
 
         if key not in self._backends:
-            _backend = APIBackendBuilder.build(
+            _backend = APIBackendBuilder(
                 api_version=api_version,
                 fallback_api_version=fallback_api_version,
             )
