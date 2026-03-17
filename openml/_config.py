@@ -101,6 +101,8 @@ class OpenMLConfig:
     )
     api_version: APIVersion = APIVersion.V1
     fallback_api_version: APIVersion | None = None
+    apikey: str | None = ""
+    server: str = "https://www.openml.org/api/v1/xml"
     cachedir: Path = field(default_factory=_resolve_default_cache_dir)
     avoid_duplicate_runs: bool = False
     retry_policy: Literal["human", "robot"] = "human"
@@ -128,6 +130,11 @@ class OpenMLConfig:
     @apikey.setter
     def apikey(self, value: str | None) -> None:
         self.servers[self.api_version]["apikey"] = value
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name == "apikey" and not isinstance(value, (type(None), str)):
+            raise TypeError("apikey must be a string or None")
+
+        super().__setattr__(name, value)
 
 
 class OpenMLConfigManager:
@@ -139,8 +146,9 @@ class OpenMLConfigManager:
 
         self.OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
         self.OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
+        self._TEST_SERVER_NORMAL_USER_KEY = "normaluser"
         self.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR = "OPENML_TEST_SERVER_ADMIN_KEY"
-        self._HEADERS: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
+        self.TEST_SERVER_URL = "https://test.openml.org"
 
         self._config: OpenMLConfig = OpenMLConfig()
         # for legacy test `test_non_writable_home`
@@ -176,6 +184,7 @@ class OpenMLConfigManager:
             "OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR",
             "_HEADERS",
             "_defaults",
+            "_TEST_SERVER_NORMAL_USER_KEY",
         }:
             return object.__setattr__(self, name, value)
 
@@ -417,6 +426,8 @@ class OpenMLConfigManager:
             servers=config["servers"],
             api_version=config["api_version"],
             fallback_api_version=config["fallback_api_version"],
+            apikey=config["apikey"],
+            server=config["server"],
             show_progress=config["show_progress"],
             avoid_duplicate_runs=config["avoid_duplicate_runs"],
             retry_policy=config["retry_policy"],
@@ -495,12 +506,14 @@ class OpenMLConfigManager:
 class ConfigurationForExamples:
     """Allows easy switching to and from a test configuration, used for examples."""
 
-    _last_used_servers = None
+    _last_used_server = None
+    _last_used_key = None
     _start_last_called = False
 
     def __init__(self, manager: OpenMLConfigManager):
         self._manager = manager
-        self._test_servers = manager.get_servers("test")
+        self._test_apikey = manager._TEST_SERVER_NORMAL_USER_KEY
+        self._test_server = f"{manager.TEST_SERVER_URL}/api/v1/xml"
 
     def start_using_configuration_for_example(self) -> None:
         """Sets the configuration to connect to the test server with valid apikey.
@@ -508,22 +521,27 @@ class ConfigurationForExamples:
         To configuration as was before this call is stored, and can be recovered
         by using the `stop_use_example_configuration` method.
         """
-        if self._start_last_called and self._manager._config.servers == self._test_servers:
+        if (
+            self._start_last_called
+            and self._manager._config.server == self._test_server
+            and self._manager._config.apikey == self._test_apikey
+        ):
             # Method is called more than once in a row without modifying the server or apikey.
             # We don't want to save the current test configuration as a last used configuration.
             return
 
-        self._last_used_servers = self._manager._config.servers
+        self._last_used_server = self._manager._config.server
+        self._last_used_key = self._manager._config.apikey
         type(self)._start_last_called = True
 
         # Test server key for examples
         self._manager._config = replace(
             self._manager._config,
-            servers=self._test_servers,
+            server=self._test_server,
+            apikey=self._test_apikey,
         )
-        test_server = self._test_servers[self._manager._config.api_version]["server"]
         warnings.warn(
-            f"Switching to the test server {test_server} to not upload results to "
+            f"Switching to the test server {self._test_server} to not upload results to "
             "the live server. Using the test server may result in reduced performance of the "
             "API!",
             stacklevel=2,
@@ -541,7 +559,8 @@ class ConfigurationForExamples:
 
         self._manager._config = replace(
             self._manager._config,
-            servers=cast("dict[APIVersion, dict[str, str | None]]", self._last_used_servers),
+            server=cast("str", self._last_used_server),
+            apikey=cast("str", self._last_used_key),
         )
         type(self)._start_last_called = False
 
