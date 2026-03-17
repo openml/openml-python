@@ -2,6 +2,7 @@ from requests import Response, Request, Session
 from unittest.mock import patch
 import pytest
 import os
+import hashlib
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 from openml.enums import APIVersion
@@ -26,28 +27,28 @@ def sample_path() -> str:
 
 
 @pytest.fixture
-def sample_url(sample_path) -> str:
-    return urljoin(openml.config.server, sample_path)
+def sample_url_v1(sample_path, test_server_v1) -> str:
+    return urljoin(test_server_v1, sample_path)
 
 
 @pytest.fixture
-def sample_download_url() -> str:
-    server = openml.config.server.split("api/")[0]
+def sample_download_url_v1(test_server_v1) -> str:
+    server = test_server_v1.split("api/")[0]
     endpoint = "data/v1/download/1/anneal.arff"
     url = server + endpoint
     return url
 
 
-def test_cache(cache, sample_url):
+def test_cache(cache, sample_url_v1):
     params = {"param1": "value1", "param2": "value2"}
 
-    parsed_url = urlparse(sample_url)
+    parsed_url = urlparse(sample_url_v1)
     netloc_parts = parsed_url.netloc.split(".")[::-1]
     path_parts = parsed_url.path.strip("/").split("/")
     params_key = "&".join([f"{k}={v}" for k, v in params.items()])
 
 
-    key = cache.get_key(sample_url, params)
+    key = cache.get_key(sample_url_v1, params)
 
     expected_key = os.path.join(
         *netloc_parts,
@@ -58,10 +59,10 @@ def test_cache(cache, sample_url):
     assert key == expected_key
 
     # mock response
-    req = Request("GET", sample_url).prepare()
+    req = Request("GET", sample_url_v1).prepare()
     response = Response()
     response.status_code = 200
-    response.url = sample_url
+    response.url = sample_url_v1
     response.reason = "OK"
     response._content = b"<xml>test</xml>"
     response.headers = {"Content-Type": "text/xml"}
@@ -73,12 +74,12 @@ def test_cache(cache, sample_url):
     cached = cache.load(key)
 
     assert cached.status_code == 200
-    assert cached.url == sample_url
+    assert cached.url == sample_url_v1
     assert cached.content == b"<xml>test</xml>"
     assert cached.headers["Content-Type"] == "text/xml"
 
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_get(http_client):
     response = http_client.get("task/1")
 
@@ -86,14 +87,14 @@ def test_get(http_client):
     assert b"<oml:task" in response.content
 
 
-@pytest.mark.uses_test_server()
-def test_get_with_cache_creates_cache(http_client, cache, sample_url, sample_path):
+@pytest.mark.test_server()
+def test_get_with_cache_creates_cache(http_client, cache, sample_url_v1, sample_path):
     response = http_client.get(sample_path, enable_cache=True)
 
     assert response.status_code == 200
     assert cache.path.exists()
 
-    cache_key = cache.get_key(sample_url, {})
+    cache_key = cache.get_key(sample_url_v1, {})
     cache_path = cache._key_to_path(cache_key)
 
     assert (cache_path / "meta.json").exists()
@@ -101,25 +102,28 @@ def test_get_with_cache_creates_cache(http_client, cache, sample_url, sample_pat
     assert (cache_path / "body.bin").exists()
 
 
-@pytest.mark.uses_test_server()
-def test_get_uses_cached_response(http_client, cache, sample_url, sample_path):
-    key = cache.get_key(sample_url, {})
-    meta_path = cache._key_to_path(key) / "meta.json"
+@pytest.mark.test_server()
+def test_get_uses_cached_response(http_client, cache, sample_url_v1, sample_path, monkeypatch):
+    response = Response()
+    response.status_code = 200
+    response._content = b"cached-response"
+    response.headers = {}
 
-    r1 = http_client.get(sample_path, enable_cache=True)
-    mtime1 = meta_path.stat().st_mtime
+    key = cache.get_key(url=sample_url_v1, params={})
+    cache.save(key=key, response=response)
 
-    r2 = http_client.get(sample_path, enable_cache=True)
-    mtime2 = meta_path.stat().st_mtime
+    def fail_request(*args, **kwargs):
+        raise AssertionError("HTTP request should not be called")
+    monkeypatch.setattr(Session, "request", fail_request)
 
-    assert mtime1 == mtime2
-    assert r2.status_code == 200
-    assert r1.content == r2.content
+    cached_response = http_client.get(sample_path, enable_cache=True)
 
+    assert cached_response.status_code == response.status_code
+    assert cached_response.content == response.content
 
-@pytest.mark.uses_test_server()
-def test_get_refresh_cache(http_client, cache, sample_url, sample_path):
-    key = cache.get_key(sample_url, {})
+@pytest.mark.test_server()
+def test_get_refresh_cache(http_client, cache, sample_url_v1, sample_path):
+    key = cache.get_key(sample_url_v1, {})
     meta_path = cache._key_to_path(key) / "meta.json"
 
     r1 = http_client.get(sample_path, enable_cache=True)
@@ -133,43 +137,60 @@ def test_get_refresh_cache(http_client, cache, sample_url, sample_path):
     assert r1.content == r2.content
 
 
-@pytest.mark.uses_test_server()
-def test_get_with_api_key(http_client, sample_path):
-    response = http_client.get(sample_path, use_api_key=True)
+@pytest.mark.test_server()
+def test_get_with_api_key(http_client, sample_path, test_apikey_v1):
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
 
-    assert response.status_code == 200
-    assert b"<oml:task" in response.content
+        http_client.get(sample_path, use_api_key=True)
+
+        _, kwargs = mock_request.call_args
+        assert kwargs.get("params", {}).get("api_key") == test_apikey_v1
 
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_get_without_api_key_raises(http_client):
     with openml.config.overwrite_config_context({"apikey": None}), pytest.raises(OpenMLAuthenticationError):
         http_client.get("task/1", use_api_key=True)
 
 
-@pytest.mark.uses_test_server()
-def test_download_creates_file(http_client, sample_download_url):
-    path = http_client.download(
-        url=sample_download_url,
-        file_name="downloaded.bin",
-    )
+@pytest.mark.test_server()
+def test_download_creates_file(http_client, sample_download_url_v1):
+    dummy_content = b"this is dummy content"
+    md5_checksum = hashlib.md5(dummy_content).hexdigest()
+
+    with patch.object(Session, "request") as mock_request:
+        mock_request.return_value = Response()
+        mock_request.return_value.status_code = 200
+        mock_request.return_value._content = dummy_content
+
+        path = http_client.download(
+            url=sample_download_url_v1,
+            file_name="downloaded.arff",
+            md5_checksum=md5_checksum,
+        )
 
     assert path.exists()
     assert path.is_file()
-    assert path.read_text(encoding="utf-8")
+    assert path.read_bytes() == dummy_content
 
 
-@pytest.mark.uses_test_server()
-def test_download_is_cached_on_disk(http_client, sample_download_url):
+@pytest.mark.test_server()
+def test_download_is_cached_on_disk(http_client, sample_download_url_v1, monkeypatch):
     path1 = http_client.download(
-        url=sample_download_url,
-        file_name="cached.bin",
+        url=sample_download_url_v1,
+        file_name="cached.arff",
     )
     mtime1 = path1.stat().st_mtime
 
+    def fail_request(*args, **kwargs):
+        raise AssertionError("HTTP request should not be called")
+    monkeypatch.setattr(Session, "request", fail_request)
+
     path2 = http_client.download(
-        url=sample_download_url,
-        file_name="cached.bin",
+        url=sample_download_url_v1,
+        file_name="cached.arff",
     )
     mtime2 = path2.stat().st_mtime
 
@@ -177,15 +198,15 @@ def test_download_is_cached_on_disk(http_client, sample_download_url):
     assert mtime1 == mtime2
 
 
-@pytest.mark.uses_test_server()
-def test_download_respects_custom_handler(http_client, sample_download_url):
+@pytest.mark.test_server()
+def test_download_respects_custom_handler(http_client, sample_download_url_v1):
     def handler(response, path: Path, encoding: str):
         path.write_text("HANDLED", encoding=encoding)
         return path
 
     path = http_client.download(
-        url=sample_download_url,
-        file_name="handler.bin",
+        url=sample_download_url_v1,
+        file_name="handler.arff",
         handler=handler,
     )
 
@@ -193,7 +214,7 @@ def test_download_respects_custom_handler(http_client, sample_download_url):
     assert path.read_text() == "HANDLED"
 
 
-def test_post(http_client):
+def test_post(http_client, test_server_v1, test_apikey_v1):
     resource_name = "resource"
     resource_files = {"description": "Resource Description File"}
 
@@ -205,15 +226,15 @@ def test_post(http_client):
 
         mock_request.assert_called_once_with(
             method="POST",
-            url=urljoin(openml.config.server, resource_name),
+            url=urljoin(test_server_v1, resource_name),
             params={},
-            data={"api_key": openml.config.apikey},
+            data={"api_key": test_apikey_v1},
             headers=openml.config._HEADERS,
             files=resource_files,
         )
 
 
-def test_delete(http_client):
+def test_delete(http_client, test_server_v1, test_apikey_v1):
     resource_name = "resource"
     resource_id = 123
 
@@ -226,12 +247,12 @@ def test_delete(http_client):
         mock_request.assert_called_once_with(
             method="DELETE",
             url=(
-                openml.config.server
+                test_server_v1
                 + resource_name
                 + "/"
                 + str(resource_id)
             ),
-            params={"api_key": openml.config.apikey},
+            params={"api_key": test_apikey_v1},
             data={},
             headers=openml.config._HEADERS,
             files=None,
