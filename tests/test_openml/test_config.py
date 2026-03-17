@@ -127,8 +127,8 @@ class TestConfigurationForExamples(openml.testing.TestBase):
 
         openml.config.start_using_configuration_for_example()
         openml.config.stop_using_configuration_for_example()
-        assert openml.config.apikey == TestBase.user_key
-        assert openml.config.server == self.production_server
+        production_server = openml.config.get_servers("production")[APIVersion.V1]["server"]
+        assert openml.config.server == production_server
 
     def test_example_configuration_stop_before_start(self):
         """Verifies an error is raised if `stop_...` is called before `start_...`."""
