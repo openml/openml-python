@@ -600,8 +600,7 @@ def create_dataset(  # noqa: C901, PLR0912, PLR0915
     # Edit: Found it could also be like ["True", "False"]
     attributes: list[tuple[str, str | list[str]]] | dict[str, str | list[str]] | Literal["auto"],
     data: pd.DataFrame | np.ndarray | scipy.sparse.coo_matrix,
-    # TODO(eddiebergman): Function requires `default_target_attribute` exist but API allows None
-    default_target_attribute: str,
+    default_target_attribute: str | None,
     ignore_attribute: str | list[str] | None,
     citation: str,
     row_id_attribute: str | None = None,
@@ -645,7 +644,8 @@ def create_dataset(  # noqa: C901, PLR0912, PLR0915
         passing ``attributes='auto'``.
         The target feature is indicated as meta-data of the dataset.
     default_target_attribute : str
-        The default target attribute, if it exists.
+        The default target attribute, if it exists. Use ``None`` for unsupervised datasets
+        (e.g. clustering, anomaly detection) where no natural target column exists.
         Can have multiple values, comma separated.
     ignore_attribute : str | list
         Attributes that should be excluded in modelling,
