@@ -56,7 +56,7 @@ _TEST_SERVERS_LOCAL: dict[APIVersion, dict[str, str | None]] = {
     },
     APIVersion.V2: {
         "server": "http://localhost:8082/",
-        "apikey": "AD000000000000000000000000000000",
+        "apikey": "normaluser",
     },
 }
 
