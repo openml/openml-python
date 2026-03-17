@@ -99,8 +99,6 @@ class OpenMLConfig:
     )
     api_version: APIVersion = APIVersion.V1
     fallback_api_version: APIVersion | None = None
-    apikey: str | None = ""
-    server: str = "https://www.openml.org/api/v1/xml"
     cachedir: Path = field(default_factory=_resolve_default_cache_dir)
     avoid_duplicate_runs: bool = False
     retry_policy: Literal["human", "robot"] = "human"
@@ -425,8 +423,6 @@ class OpenMLConfigManager:
             servers=config["servers"],
             api_version=config["api_version"],
             fallback_api_version=config["fallback_api_version"],
-            apikey=config["apikey"],
-            server=config["server"],
             show_progress=config["show_progress"],
             avoid_duplicate_runs=config["avoid_duplicate_runs"],
             retry_policy=config["retry_policy"],
@@ -534,11 +530,9 @@ class ConfigurationForExamples:
         type(self)._start_last_called = True
 
         # Test server key for examples
-        self._manager._config = replace(
-            self._manager._config,
-            server=self._test_server,
-            apikey=self._test_apikey,
-        )
+        self._manager._config = replace(self._manager._config)
+        self._manager._config.server = self._test_server
+        self._manager._config.apikey = self._test_apikey
         warnings.warn(
             f"Switching to the test server {self._test_server} to not upload results to "
             "the live server. Using the test server may result in reduced performance of the "
@@ -556,12 +550,9 @@ class ConfigurationForExamples:
                 "`start_use_example_configuration` must be called first.",
             )
 
-        self._manager._config = replace(
-            self._manager._config,
-            server=cast("str", self._last_used_server),
-            apikey=cast("str", self._last_used_key),
-        )
-        type(self)._start_last_called = False
+        self._manager._config = replace(self._manager._config)
+        self._manager._config.server = cast("str", self._last_used_server)
+        self._manager._config.apikey = cast("str", self._last_used_key)
 
 
 __config = OpenMLConfigManager()
