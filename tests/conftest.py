@@ -99,8 +99,7 @@ def delete_remote_files(tracker, flow_names) -> None:
     :param tracker: Dict
     :return: None
     """
-    openml.config.server = TestBase.test_server
-    openml.config.apikey = TestBase.user_key
+    openml.config.use_test_servers()
 
     # reordering to delete sub flows at the end of flows
     # sub-flows have shorter names, hence, sorting by descending order of flow name length
@@ -252,8 +251,23 @@ def test_files_directory() -> Path:
 
 
 @pytest.fixture(scope="session")
-def test_api_key() -> str:
-    return TestBase.user_key
+def test_server_v1() -> str:
+    return openml.config.get_test_servers()[APIVersion.V1]["server"]
+
+
+@pytest.fixture(scope="session")
+def test_apikey_v1() -> str:
+    return openml.config.get_test_servers()[APIVersion.V1]["apikey"]
+
+
+@pytest.fixture(scope="session")
+def test_server_v2() -> str:
+    return openml.config.get_test_servers()[APIVersion.V2]["server"]
+
+
+@pytest.fixture(scope="session")
+def test_apikey_v2() -> str:
+    return openml.config.get_test_servers()[APIVersion.V2]["apikey"]
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -274,24 +288,32 @@ def as_robot() -> Iterator[None]:
 
 @pytest.fixture(autouse=True)
 def with_server(request):
+    openml.config.set_api_version(APIVersion.V1)
+
     if "production_server" in request.keywords:
-        openml.config.server = "https://www.openml.org/api/v1/xml/"
-        openml.config.apikey = None
+        openml.config.use_production_servers()
         yield
         return
-    openml.config.server = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/"
-    openml.config.apikey = TestBase.user_key
+
+    openml.config.use_test_servers()
     yield
 
 
 @pytest.fixture(autouse=True)
 def with_test_cache(test_files_directory, request):
+    # Skip this fixture for TestBase subclasses - they manage their own cache directory
+    # in setUp()/tearDown(). Having both mechanisms fight over the global config
+    # causes race conditions.
+    if request.instance is not None and isinstance(request.instance, TestBase):
+        yield
+        return
+
     if not test_files_directory.exists():
         raise ValueError(
             f"Cannot find test cache dir, expected it to be {test_files_directory!s}!",
         )
     _root_cache_directory = openml.config._root_cache_directory
-    tmp_cache = test_files_directory / request.node.name
+    tmp_cache = test_files_directory / request.node.nodeid.replace("/", ".").replace("::", ".")
     openml.config.set_root_cache_directory(tmp_cache)
     yield
     openml.config.set_root_cache_directory(_root_cache_directory)
@@ -309,16 +331,6 @@ def workdir(tmp_path):
     os.chdir(tmp_path)
     yield tmp_path
     os.chdir(original_cwd)
-
-
-@pytest.fixture
-def use_api_v1() -> None:
-    openml.config.set_api_version(api_version=APIVersion.V1)
-
-
-@pytest.fixture
-def use_api_v2() -> None:
-    openml.config.set_api_version(api_version=APIVersion.V2)
 
 
 @pytest.fixture
