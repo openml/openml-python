@@ -19,11 +19,13 @@ from pathlib import Path
 from typing import Any, ClassVar, Literal, cast
 from urllib.parse import urlparse
 
+from openml.__version__ import __version__
 from openml.enums import APIVersion
 
 logger = logging.getLogger(__name__)
 openml_logger = logging.getLogger("openml")
 
+_HEADERS = {"user-agent": f"openml-python/{__version__}"}
 
 _SERVERS_REGISTRY: dict[str, dict[APIVersion, dict[str, str | None]]] = {
     "production": {
@@ -154,6 +156,7 @@ class OpenMLConfigManager:
 
         self.logger = logger
         self.openml_logger = openml_logger
+        self._HEADERS = _HEADERS
 
         self._examples = ConfigurationForExamples(self)
 
