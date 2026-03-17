@@ -802,15 +802,17 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         if target_name not in data.columns:
             available_columns = list(data.columns)
             if target_name in to_exclude:
-                raise ValueError(
+                msg = (
                     f"Target column '{target_name}' was removed because it is listed as a row_id "
                     "or ignore attribute. Available columns after filtering: "
                     f"{available_columns}"
                 )
-            raise ValueError(
-                f"Target column '{target_name}' does not exist in this dataset. Available "
-                f"columns: {available_columns}"
-            )
+            else:
+                msg = (
+                    f"Target column '{target_name}' does not exist in this dataset. Available "
+                    f"columns: {available_columns}"
+                )
+            raise ValueError(msg)
         x = data.drop(columns=[target_name])
         y = data[target_name].squeeze()
 
