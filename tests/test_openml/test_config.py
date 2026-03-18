@@ -16,7 +16,7 @@ import pytest
 import openml
 import openml.testing
 from openml.testing import TestBase
-from openml.enums import APIVersion
+from openml.enums import APIVersion, ServerMode
 
 
 @contextmanager
@@ -193,7 +193,7 @@ def test_openml_cache_dir_env_var(tmp_path: Path) -> None:
         assert openml.config.get_cache_directory() == str(expected_path / "org" / "openml" / "www")
 
 
-@pytest.mark.parametrize("mode", ["production", "test"])
+@pytest.mark.parametrize("mode", list(ServerMode))
 @pytest.mark.parametrize("api_version", [APIVersion.V1, APIVersion.V2])
 def test_get_servers(mode, api_version):
     orig_servers = openml.config._get_servers(mode)
@@ -208,7 +208,7 @@ def test_get_servers(mode, api_version):
     assert openml.config._get_servers(mode) == orig_servers
 
 
-@pytest.mark.parametrize("mode", ["production", "test"])
+@pytest.mark.parametrize("mode", list(ServerMode))
 @pytest.mark.parametrize("api_version", [APIVersion.V1, APIVersion.V2])
 def test_set_servers(mode, api_version):
     openml.config._set_servers(mode)
