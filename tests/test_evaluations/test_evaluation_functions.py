@@ -267,7 +267,7 @@ class TestEvaluationFunctions(TestBase):
 
     @pytest.mark.test_server()
     def test_list_estimation_procedures_return_type(self):
-        procedures = openml.evaluations.list_estimation_procedures()
+        procedures = openml.evaluations.list_estimation_procedures(include_ids=True)
         assert isinstance(procedures, dict)
         assert len(procedures) > 0
         assert all(isinstance(k, int) for k in procedures.keys())
@@ -275,15 +275,28 @@ class TestEvaluationFunctions(TestBase):
 
     @pytest.mark.test_server()
     def test_list_estimation_procedures_top_level_accessible(self):
-        procedures = openml.list_estimation_procedures()
+        procedures = openml.list_estimation_procedures(include_ids=True)
         assert isinstance(procedures, dict)
         assert len(procedures) > 0
         assert all(isinstance(k, int) for k in procedures.keys())
         assert all(isinstance(v, str) for v in procedures.values())
 
     @pytest.mark.test_server()
-    def test_list_estimation_procedures_valid_id_for_task_creation(self):
-        procedures = openml.evaluations.list_estimation_procedures()
+    def test_list_estimation_procedures_ids_are_positive_ints(self):
+        procedures = openml.evaluations.list_estimation_procedures(include_ids=True)
         first_id = list(procedures.keys())[0]
         assert isinstance(first_id, int)
         assert first_id > 0
+
+    @pytest.mark.test_server()
+    def test_list_estimation_procedures_default_returns_list(self):
+        import warnings
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            procedures = openml.evaluations.list_estimation_procedures()
+            assert isinstance(procedures, list)
+            assert len(procedures) > 0
+            assert all(isinstance(s, str) for s in procedures)
+            # confirm deprecation warning was raised
+            assert any(issubclass(warning.category, DeprecationWarning) for warning in w)
