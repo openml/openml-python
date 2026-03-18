@@ -264,3 +264,26 @@ class TestEvaluationFunctions(TestBase):
         task_id = [6]
         size = 121
         self._check_list_evaluation_setups(tasks=task_id, size=size)
+
+    @pytest.mark.test_server()
+    def test_list_estimation_procedures_return_type(self):
+        procedures = openml.evaluations.list_estimation_procedures()
+        assert isinstance(procedures, dict)
+        assert len(procedures) > 0
+        assert all(isinstance(k, int) for k in procedures.keys())
+        assert all(isinstance(v, str) for v in procedures.values())
+
+    @pytest.mark.test_server()
+    def test_list_estimation_procedures_top_level_accessible(self):
+        procedures = openml.list_estimation_procedures()
+        assert isinstance(procedures, dict)
+        assert len(procedures) > 0
+        assert all(isinstance(k, int) for k in procedures.keys())
+        assert all(isinstance(v, str) for v in procedures.values())
+
+    @pytest.mark.test_server()
+    def test_list_estimation_procedures_valid_id_for_task_creation(self):
+        procedures = openml.evaluations.list_estimation_procedures()
+        first_id = list(procedures.keys())[0]
+        assert isinstance(first_id, int)
+        assert first_id > 0
