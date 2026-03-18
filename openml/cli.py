@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import pickle
 import string
 import sys
 from collections.abc import Callable
@@ -353,17 +352,22 @@ def upload_dataset(args: argparse.Namespace) -> None:
 
 def upload_flow(args: argparse.Namespace) -> None:
     """Upload a flow from a serialized model file to OpenML."""
-    from openml_sklearn import SklearnExtension
+    import pickle
 
     file_path = Path(args.file_path)
     if not file_path.is_file():
         print(f"Error: File '{file_path}' not found.")
         sys.exit(1)
 
+    print(
+        "WARNING: Loading pickle files executes arbitrary code. "
+        "Only use this with files you trust.",
+    )
     with file_path.open("rb") as fh:
         model = pickle.load(fh)  # noqa: S301
 
-    extension = SklearnExtension()
+    extension = openml.extensions.get_extension_by_model(model, raise_if_no_extension=True)
+    assert extension is not None  # guaranteed by raise_if_no_extension=True
     flow = extension.model_to_flow(model)
 
     if args.name:
@@ -508,7 +512,7 @@ def main() -> None:
     _dataset_args: list[tuple[str, str, bool]] = [
         ("--name", "Name of the dataset.", True),
         ("--description", "Description of the dataset.", True),
-        ("--default_target_attribute", "The default target attribute.", True),
+        ("--default_target_attribute", "The default target attribute.", False),
         ("--creator", "The person who created the dataset.", False),
         ("--contributor", "People who contributed to the dataset.", False),
         ("--collection_date", "The date the data was originally collected.", False),
@@ -534,12 +538,13 @@ def main() -> None:
     # upload flow
     parser_upload_flow = upload_subparsers.add_parser(
         "flow",
-        description="Upload a flow from a serialized model file (.pkl).",
+        description="Upload a flow from a serialized model file (.pkl). "
+        "WARNING: pickle files can execute arbitrary code. Only use trusted files.",
     )
     parser_upload_flow.add_argument(
         "file_path",
         type=str,
-        help="Path to the serialized model file (.pkl).",
+        help="Path to the serialized model file (.pkl). WARNING: only use trusted pickle files.",
     )
     parser_upload_flow.add_argument("--name", type=str, default=None, help="Custom flow name.")
     parser_upload_flow.add_argument(
