@@ -463,7 +463,7 @@ def run_exists(task_id: int, setup_id: int) -> set[int]:
         return set()
 
 
-def _run_task_get_arffcontent(  # noqa: PLR0913
+def _run_task_get_arffcontent(
     *,
     model: Any,
     task: OpenMLTask,
@@ -505,6 +505,7 @@ def _run_task_get_arffcontent(  # noqa: PLR0913
     """
     try:
         from tqdm import tqdm
+
         has_tqdm = True
     except ImportError:
         has_tqdm = False
@@ -523,11 +524,13 @@ def _run_task_get_arffcontent(  # noqa: PLR0913
     num_reps, num_folds, num_samples = task.get_split_dimensions()
 
     # Build jobs list
-    jobs = list(itertools.product(
-        range(num_reps),
-        range(num_folds),
-        range(num_samples),
-    ))
+    jobs = list(
+        itertools.product(
+            range(num_reps),
+            range(num_folds),
+            range(num_samples),
+        )
+    )
     total_jobs = len(jobs)
 
     _config = openml.config.get_config_as_dict()
@@ -556,7 +559,7 @@ def _run_task_get_arffcontent(  # noqa: PLR0913
         )
 
     # Aggregate results as each fold completes (streaming)
-    for (rep_no, fold_no, sample_no), result in zip(jobs, job_generator):
+    for (rep_no, fold_no, sample_no), result in zip(jobs, job_generator, strict=False):
         pred_y, proba_y, test_indices, test_y, inner_trace, user_defined_measures_fold = result
 
         if inner_trace is not None:
@@ -576,8 +579,8 @@ def _run_task_get_arffcontent(  # noqa: PLR0913
                 )
             )
             if add_local_measures:
-                user_defined_measures_fold["predictive_accuracy"] = (
-                    sklearn.metrics.accuracy_score(test_y, pred_y)
+                user_defined_measures_fold["predictive_accuracy"] = sklearn.metrics.accuracy_score(
+                    test_y, pred_y
                 )
 
         elif isinstance(task, OpenMLRegressionTask):
@@ -792,12 +795,13 @@ def _update_evaluation_measures(
         if fold_no not in user_defined_measures_per_sample[measure][rep_no]:
             user_defined_measures_per_sample[measure][rep_no][fold_no] = OrderedDict()
 
-        user_defined_measures_per_fold[measure][rep_no][fold_no] = (
-            user_defined_measures_fold[measure]
-        )
+        user_defined_measures_per_fold[measure][rep_no][fold_no] = user_defined_measures_fold[
+            measure
+        ]
         user_defined_measures_per_sample[measure][rep_no][fold_no][sample_no] = (
             user_defined_measures_fold[measure]
         )
+
 
 def _run_task_get_arffcontent_parallel_helper(  # noqa: PLR0913
     extension: Extension,
