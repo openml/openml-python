@@ -1022,14 +1022,20 @@ def _parse_features_xml(features_xml_string: str) -> dict[int, OpenMLDataFeature
 
     features: dict[int, OpenMLDataFeature] = {}
     for idx, xmlfeature in enumerate(features_xml["oml:feature"]):
-        nr_missing = xmlfeature.get("oml:number_of_missing_values", 0)
+        nr_missing = xmlfeature.get("oml:number_of_missing_values", "0")
+
+        # FIX: Convert ontology string to list for consistency
+        ontologies = xmlfeature.get("oml:ontology")
+        if isinstance(ontologies, str):
+            ontologies = [ontologies]
+
         feature = OpenMLDataFeature(
             int(xmlfeature["oml:index"]),
             xmlfeature["oml:name"],
             xmlfeature["oml:data_type"],
             xmlfeature.get("oml:nominal_value"),
             int(nr_missing),
-            xmlfeature.get("oml:ontology"),
+            ontologies,  # Now it's always list or None
         )
         if idx != feature.index:
             raise ValueError("Data features not provided in right order")
