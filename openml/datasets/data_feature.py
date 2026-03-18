@@ -41,7 +41,7 @@ class OpenMLDataFeature:  # noqa: PLW1641
 
     LEGAL_DATA_TYPES: ClassVar[Sequence[str]] = ["nominal", "numeric", "string", "date"]
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913, C901, PLR0912
         self,
         index: int,
         name: str,
@@ -72,8 +72,8 @@ class OpenMLDataFeature:  # noqa: PLW1641
         # Validate data_type
         if not isinstance(data_type, str):
             raise TypeError(
-                f"Parameter 'data_type' must be str, but got {type(data_type).__name__}. "
-                f"Value: {data_type!r}"
+                f"Parameter 'data_type' must be str, but got "
+                f"{type(data_type).__name__}. Value: {data_type!r}"
             )
         if data_type not in self.LEGAL_DATA_TYPES:
             raise ValueError(
@@ -85,37 +85,39 @@ class OpenMLDataFeature:  # noqa: PLW1641
         if data_type == "nominal":
             if nominal_values is None:
                 raise TypeError(
-                    "Parameter 'nominal_values' is required for nominal data types, but got None. "
-                    "Please provide a list of nominal values."
+                    "Parameter 'nominal_values' is required for nominal data types, "
+                    "but got None. Please provide a list of nominal values."
                 )
             if not isinstance(nominal_values, list):
                 raise TypeError(
-                    f"Parameter 'nominal_values' must be list, but got {type(nominal_values).__name__}. "
-                    f"Value: {nominal_values!r}"
+                    f"Parameter 'nominal_values' must be list, but got "
+                    f"{type(nominal_values).__name__}. Value: {nominal_values!r}"
                 )
             if not nominal_values:
                 raise ValueError(
-                    "Parameter 'nominal_values' cannot be empty for nominal data types. "
-                    "Please provide at least one nominal value."
+                    "Parameter 'nominal_values' cannot be empty for nominal data "
+                    "types. Please provide at least one nominal value."
                 )
             # Validate that all elements are strings
             non_string_values = [v for v in nominal_values if not isinstance(v, str)]
             if non_string_values:
                 raise TypeError(
-                    f"All elements in 'nominal_values' must be str, but found non-string values: "
-                    f"{non_string_values}. Expected all strings in list."
+                    f"All elements in 'nominal_values' must be str, but found "
+                    f"non-string values: {non_string_values}."
                 )
         elif nominal_values is not None:
             raise TypeError(
-                f"Parameter 'nominal_values' must be None for non-nominal data types (got {data_type!r}), "
-                f"but got {type(nominal_values).__name__}. Value: {nominal_values!r}"
+                f"Parameter 'nominal_values' must be None for non-nominal data "
+                f"types (got {data_type!r}), but got {type(nominal_values).__name__}. "
+                f"Value: {nominal_values!r}"
             )
 
         # Validate number_missing_values
         if not isinstance(number_missing_values, int):
             raise TypeError(
                 f"Parameter 'number_missing_values' must be int, but got "
-                f"{type(number_missing_values).__name__}. Value: {number_missing_values!r}"
+                f"{type(number_missing_values).__name__}. "
+                f"Value: {number_missing_values!r}"
             )
         if number_missing_values < 0:
             raise ValueError(
@@ -123,13 +125,12 @@ class OpenMLDataFeature:  # noqa: PLW1641
                 f"{number_missing_values}. Cannot have negative missing values."
             )
 
-        # Validate ontologies (keep simple - just check if list or None)
-        if ontologies is not None:
-            if not isinstance(ontologies, list):
-                raise TypeError(
-                    f"Parameter 'ontologies' must be list or None, but got {type(ontologies).__name__}. "
-                    f"Value: {ontologies!r}"
-                )
+        # Validate ontologies
+        if ontologies is not None and not isinstance(ontologies, list):
+            raise TypeError(
+                f"Parameter 'ontologies' must be list or None, but got "
+                f"{type(ontologies).__name__}. Value: {ontologies!r}"
+            )
 
         # All validations passed, assign attributes
         self.index = index
