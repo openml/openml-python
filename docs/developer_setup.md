@@ -193,6 +193,83 @@ Exclude production tests (local only):
 pytest -m "not production_server"
 ```
 
+### Running Tests Against Local Services
+
+The CI pipeline runs tests against a local OpenML server using Docker, instead of the remote
+test server. You can replicate this setup locally to avoid depending on the remote server.
+
+#### Prerequisites
+
+* **Docker**: Docker Desktop (ensure the daemon is running).
+* **Git**: To clone the services repository.
+
+#### 1. Clone the Services Repository
+
+```bash
+git clone --depth 1 https://github.com/openml/services.git
+cd services
+```
+
+#### 2. Configure File Permissions
+
+The containerized services need write access to the data and log directories:
+
+```bash
+chmod -R a+rw ./data
+chmod -R a+rw ./logs
+```
+
+#### 3. Start the Docker Services
+
+Launch the required service profiles (REST API, MinIO, and Evaluation Engine):
+
+```bash
+docker compose --profile rest-api --profile minio --profile evaluation-engine up -d
+```
+
+Wait for the PHP API to become healthy:
+
+```bash
+# Wait up to 60 seconds for the API to boot
+timeout 60s bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} openml-php-rest-api)" == "healthy" ]; do sleep 5; done'
+```
+
+Verify the services are running:
+
+```bash
+curl -sSfL http://localhost:8000/api/v1/xml/data/1 | head -n 15
+```
+
+#### 4. Run Tests Against Local Services
+
+Set the `OPENML_USE_LOCAL_SERVICES` environment variable and run pytest:
+
+=== "Linux/macOS"
+
+    ```bash
+    export OPENML_USE_LOCAL_SERVICES="true"
+    pytest -n 4 --durations=20 --dist load -sv -m "not production_server"
+    ```
+
+=== "Windows (PowerShell)"
+
+    ```shell
+    $env:OPENML_USE_LOCAL_SERVICES = "true"
+    pytest -n 4 --durations=20 --dist load -sv -m "not production_server"
+    ```
+
+When this environment variable is set, the test framework automatically redirects API calls
+to `http://localhost:8000` instead of the remote test server.
+
+#### 5. Cleanup
+
+After you're done testing, stop and remove the Docker containers:
+
+```bash
+cd services
+docker compose --profile rest-api --profile minio --profile evaluation-engine down
+```
+
 ### Admin Privilege Tests
 
 Certain tests require administrative privileges on the test server. These are skipped automatically unless an admin API key is provided via environment variables.
@@ -208,3 +285,4 @@ $env:OPENML_TEST_SERVER_ADMIN_KEY = "admin-key"
 ```bash
 export OPENML_TEST_SERVER_ADMIN_KEY="admin-key"
 ```
+
