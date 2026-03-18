@@ -237,7 +237,7 @@ def test_v2_list_qualities(dataset_v2):
     assert len(output) == 107
     assert isinstance(output[0], str)
 
-pytest.skip(reason="Needs valid v2 admin key required")
+@pytest.mark.skip(reason="Needs valid v2 admin key required")
 def test_v2_status_update(dataset_v2):
     openml.config.apikey = TestBase.admin_key
     # publish and fork is not supported in v2
