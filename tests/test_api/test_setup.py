@@ -33,7 +33,7 @@ def setup_v2(http_client_v2, minio_client) -> SetupV2API:
     return SetupV2API(http=http_client_v2, minio=minio_client)
 
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_v1_list(setup_v1):
     setups = setup_v1.list(limit=10, offset=0)
     
@@ -41,7 +41,7 @@ def test_v1_list(setup_v1):
     assert len(setups) > 0
     assert all(isinstance(s, OpenMLSetup) for s in setups)
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_v1_get(setup_v1):
     setup_id = 1
     setup = setup_v1.get(setup_id)
@@ -50,7 +50,7 @@ def test_v1_get(setup_v1):
     assert setup.setup_id == setup_id
 
 @pytest.mark.sklearn()
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_v1_exists_nonexisting_setup(setup_v1):
     """Test exists() returns False when setup doesn't exist"""
     # first publish a non-existing flow
@@ -70,7 +70,7 @@ def test_v1_exists_nonexisting_setup(setup_v1):
     assert not setup_id
 
 @pytest.mark.sklearn()
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_v1_exists_existing_setup(setup_v1):
     """Test exists() returns setup_id when setup exists"""
     flow =SklearnExtension().model_to_flow(
@@ -95,18 +95,18 @@ def test_v1_exists_existing_setup(setup_v1):
     setup_id = setup_v1.exists(flow, openml_param_settings)
     assert setup_id == run.setup_id
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_v2_list(setup_v2):
     with pytest.raises(OpenMLNotSupportedError):
         setup_v2.list(limit=10, offset=0)
 
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_v2_get(setup_v2):
     with pytest.raises(OpenMLNotSupportedError):
         setup_v2.get(1)
 
 @pytest.mark.sklearn()
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_v2_exists_nonexisting_setup(setup_v2):
     # first publish a non-existing flow
     sentinel = get_sentinel()
@@ -126,7 +126,7 @@ def test_v2_exists_nonexisting_setup(setup_v2):
 
     
 @pytest.mark.sklearn()
-@pytest.mark.uses_test_server()
+@pytest.mark.test_server()
 def test_v2_exists_existing_setup(setup_v2):
     flow =SklearnExtension().model_to_flow(
         sklearn.naive_bayes.GaussianNB()
