@@ -171,7 +171,7 @@ jobs:
           marks="production_server"
         fi
 
-        pytest -n 4 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
+        pytest -n 1 --durations=20 --dist load -sv $codecov -o log_cli=true -m "$marks"
 
     - name: Run tests on Windows
       if: matrix.os == 'windows-latest'
