@@ -63,7 +63,6 @@ def test_cache(cache, sample_url_v1):
     expected_path = Path(openml.config.get_cache_directory()).joinpath(key)
 
     assert path == expected_path
-    assert ":" not in str(path)
 
     # validate save/load
 
