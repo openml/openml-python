@@ -8,10 +8,12 @@ import sys
 from collections.abc import Callable
 from dataclasses import fields
 from pathlib import Path
+from typing import cast
 from urllib.parse import urlparse
 
 import openml
 from openml.__version__ import __version__
+from openml.enums import APIVersion
 
 
 def is_hex(string_: str) -> bool:
@@ -110,9 +112,9 @@ def configure_server(value: str) -> None:
 
     def replace_shorthand(server: str) -> str:
         if server == "test":
-            return f"{openml.config.TEST_SERVER_URL}/api/v1/xml"
+            return cast("str", openml.config.get_test_servers()[APIVersion.V1]["server"])
         if server == "production_server":
-            return "https://www.openml.org/api/v1/xml"
+            return cast("str", openml.config.get_production_servers()[APIVersion.V1]["server"])
         return server
 
     configure_field(
