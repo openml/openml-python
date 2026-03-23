@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import csv
 import pickle
 import time
 from collections import OrderedDict
@@ -183,8 +184,55 @@ class OpenMLRun(OpenMLBase):
                 if idx >= 0
             ]
             if relation_indexes:
-                return cast("dict[str, Any]", arff.loads(normalized[min(relation_indexes) :]))
+                arff_candidate = normalized[min(relation_indexes) :]
+                try:
+                    return cast("dict[str, Any]", arff.loads(arff_candidate))
+                except arff.ArffException:
+                    sanitized = OpenMLRun._sanitize_arff_text(arff_candidate)
+                    return cast("dict[str, Any]", arff.loads(sanitized))
             raise
+
+    @staticmethod
+    def _sanitize_arff_text(arff_text: str) -> str:
+        lines = arff_text.splitlines()
+
+        in_data = False
+        attribute_count = 0
+        cleaned_lines: list[str] = []
+
+        for line in lines:
+            stripped = line.strip()
+            lowered = stripped.lower()
+
+            if not in_data:
+                if lowered.startswith("@attribute"):
+                    attribute_count += 1
+                if lowered.startswith("@data"):
+                    in_data = True
+                cleaned_lines.append(line)
+                continue
+
+            if stripped == "" or stripped.startswith("%"):
+                cleaned_lines.append(line)
+                continue
+
+            if stripped.startswith("{"):
+                cleaned_lines.append(line)
+                continue
+
+            parsed_fields = next(
+                csv.reader(
+                    [line],
+                    delimiter=",",
+                    quotechar="'",
+                    skipinitialspace=True,
+                )
+            )
+
+            if len(parsed_fields) == attribute_count:
+                cleaned_lines.append(line)
+
+        return "\n".join(cleaned_lines) + "\n"
 
     @property
     def id(self) -> int | None:
