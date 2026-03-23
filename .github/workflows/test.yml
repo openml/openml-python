@@ -177,7 +177,6 @@ jobs:
       if: matrix.os == 'windows-latest'
       env:
         OPENML_TEST_SERVER_ADMIN_KEY: ${{ secrets.OPENML_TEST_SERVER_ADMIN_KEY }}
-        OPENML_USE_LOCAL_SERVICES: "true"
       run: |  # we need a separate step because of the bash-specific if-statement in the previous one.
         pytest -n 4 --durations=20 --dist load -sv --reruns 5 --reruns-delay 1 -m "not test_server"
 
