@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
+    cast,
 )
 
 import arff
@@ -154,11 +155,14 @@ class OpenMLRun(OpenMLBase):
     def predictions(self) -> pd.DataFrame:
         """Return a DataFrame with predictions for this run"""
         if self._predictions is None:
+            arff_dict: dict[str, Any]
             if self.data_content:
                 arff_dict = self._generate_arff_dict()
             elif self.predictions_url:
                 arff_text = openml._api_calls._download_text_file(self.predictions_url)
-                arff_dict = arff.loads(arff_text)
+                if arff_text is None:
+                    raise RuntimeError("Could not download predictions ARFF content.")
+                arff_dict = self._load_predictions_arff(arff_text)
             else:
                 raise RuntimeError("Run has no predictions.")
             self._predictions = pd.DataFrame(
@@ -166,6 +170,21 @@ class OpenMLRun(OpenMLBase):
                 columns=[name for name, _ in arff_dict["attributes"]],
             )
         return self._predictions
+
+    @staticmethod
+    def _load_predictions_arff(arff_text: str) -> dict[str, Any]:
+        try:
+            return cast("dict[str, Any]", arff.loads(arff_text))
+        except arff.ArffException:
+            normalized = arff_text.lstrip("\ufeff \t\r\n")
+            relation_indexes = [
+                idx
+                for idx in [normalized.find("@relation"), normalized.find("@RELATION")]
+                if idx >= 0
+            ]
+            if relation_indexes:
+                return cast("dict[str, Any]", arff.loads(normalized[min(relation_indexes) :]))
+            raise
 
     @property
     def id(self) -> int | None:
@@ -494,6 +513,7 @@ class OpenMLRun(OpenMLBase):
             metric results
         """
         kwargs = kwargs if kwargs else {}
+        predictions_arff: dict[str, Any]
         if self.data_content is not None and self.task_id is not None:
             predictions_arff = self._generate_arff_dict()
         elif (self.output_files is not None) and ("predictions" in self.output_files):
@@ -502,7 +522,9 @@ class OpenMLRun(OpenMLBase):
                 "predictions.arff",
             )
             response = openml._api_calls._download_text_file(predictions_file_url)
-            predictions_arff = arff.loads(response)
+            if response is None:
+                raise ValueError("Could not download predictions ARFF content.")
+            predictions_arff = self._load_predictions_arff(response)
             # TODO: make this a stream reader
         else:
             raise ValueError(
