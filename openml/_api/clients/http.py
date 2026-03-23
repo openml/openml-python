@@ -50,8 +50,8 @@ class HTTPCache:
         """
         Generate a filesystem-safe cache key for a request.
 
-        The key is constructed from the reversed domain components, URL path
-        segments, and URL-encoded query parameters (excluding ``api_key``).
+        The key is constructed from URL path segments and
+        URL-encoded query parameters (excluding ``api_key``).
 
         Parameters
         ----------
@@ -66,13 +66,12 @@ class HTTPCache:
             A relative path string representing the cache key.
         """
         parsed_url = urlparse(url)
-        netloc_parts = parsed_url.netloc.split(".")[::-1]
         path_parts = parsed_url.path.strip("/").split("/")
 
         filtered_params = {k: v for k, v in params.items() if k != "api_key"}
         params_part = [urlencode(filtered_params)] if filtered_params else []
 
-        return str(Path(*netloc_parts, *path_parts, *params_part))
+        return str(Path(*path_parts, *params_part))
 
     def _key_to_path(self, key: str) -> Path:
         """
