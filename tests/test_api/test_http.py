@@ -42,21 +42,30 @@ def sample_download_url_v1(test_server_v1) -> str:
 def test_cache(cache, sample_url_v1):
     params = {"param1": "value1", "param2": "value2"}
 
+    # validate key
+
     parsed_url = urlparse(sample_url_v1)
-    netloc_parts = parsed_url.netloc.split(".")[::-1]
     path_parts = parsed_url.path.strip("/").split("/")
     params_key = "&".join([f"{k}={v}" for k, v in params.items()])
-
 
     key = cache.get_key(sample_url_v1, params)
 
     expected_key = os.path.join(
-        *netloc_parts,
         *path_parts,
         params_key,
     )
 
     assert key == expected_key
+
+    # validate path
+
+    path = cache._key_to_path(key)
+    expected_path = Path(openml.config.get_cache_directory()).joinpath(key)
+
+    assert path == expected_path
+    assert ":" not in str(path)
+
+    # validate save/load
 
     # mock response
     req = Request("GET", sample_url_v1).prepare()
