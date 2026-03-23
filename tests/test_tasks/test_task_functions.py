@@ -233,8 +233,8 @@ def test_delete_task_with_run(mock_request, test_files_directory, test_server_v1
     )
 
     with pytest.raises(
-        OpenMLServerException,
-        match="Task does not exist",
+        OpenMLNotAuthorizedError,
+        match="The task can not be deleted because it still has associated entities:",
     ):
         openml.tasks.delete_task(3496)
 

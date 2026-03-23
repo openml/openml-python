@@ -65,7 +65,7 @@ def test_list_all_with_multiple_batches(min_number_tasks_on_test_server):
     # batches and at the same time do as few batches (roundtrips) as possible.
     batch_size = min_number_tasks_on_test_server - 1
     batches = openml.utils._list_all(
-        listing_call=openml.tasks.functions.list_tasks,
+        listing_call=openml._backend.task.list,
         batch_size=batch_size,
     )
     assert len(batches) >= 2
