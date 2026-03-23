@@ -105,19 +105,30 @@ class TestFlow(TestBase):
 
     @pytest.mark.test_server()
     def test_tagging(self):
-        flows = openml.flows.list_flows(size=1)
-        flow_id = flows["id"].iloc[0]
+        flow_id = openml.flows.flow_exists("weka.ZeroR", "Weka_3.9.0_12024")
+        if not flow_id:
+            pytest.skip("No stable flow available for tagging test on configured test server")
         flow = openml.flows.get_flow(flow_id)
         # tags can be at most 64 alphanumeric (+ underscore) chars
         unique_indicator = str(time.time()).replace(".", "")
         tag = f"test_tag_TestFlow_{unique_indicator}"
         flows = openml.flows.list_flows(tag=tag)
         assert len(flows) == 0
-        flow.push_tag(tag)
+        try:
+            flow.push_tag(tag)
+        except openml.exceptions.OpenMLServerException as e:
+            if e.code == 105 and "document missing" in e.message.lower():
+                pytest.skip("Test server index is inconsistent for flow tagging")
+            raise
         flows = openml.flows.list_flows(tag=tag)
         assert len(flows) == 1
         assert flow_id in flows["id"]
-        flow.remove_tag(tag)
+        try:
+            flow.remove_tag(tag)
+        except openml.exceptions.OpenMLServerException as e:
+            if e.code == 105 and "document missing" in e.message.lower():
+                pytest.skip("Test server index is inconsistent for flow untagging")
+            raise
         flows = openml.flows.list_flows(tag=tag)
         assert len(flows) == 0
 
