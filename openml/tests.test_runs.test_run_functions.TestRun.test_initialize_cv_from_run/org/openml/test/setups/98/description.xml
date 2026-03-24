@@ -1,0 +1,467 @@
+<oml:setup_parameters xmlns:oml="http://openml.org/openml">
+  <oml:setup_id>98</oml:setup_id>
+  <oml:flow_id>486</oml:flow_id>
+	<oml:parameter>
+		<oml:id>2072</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_bootstrap</oml:full_name>
+		<oml:name>bootstrap</oml:name>
+		<oml:parameter_name>bootstrap</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>bool</oml:data_type>
+		<oml:default_value>true</oml:default_value>
+		<oml:value>true</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2073</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_ccp_alpha</oml:full_name>
+		<oml:name>ccp_alpha</oml:name>
+		<oml:parameter_name>ccp_alpha</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>non</oml:data_type>
+		<oml:default_value>0.0</oml:default_value>
+		<oml:value>0.0</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2074</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_class_weight</oml:full_name>
+		<oml:name>class_weight</oml:name>
+		<oml:parameter_name>class_weight</oml:parameter_name> <!-- legacy -->
+		<oml:data_type></oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>null</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2075</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_criterion</oml:full_name>
+		<oml:name>criterion</oml:name>
+		<oml:parameter_name>criterion</oml:parameter_name> <!-- legacy -->
+		<oml:data_type></oml:data_type>
+		<oml:default_value>&quot;gini&quot;</oml:default_value>
+		<oml:value>&quot;gini&quot;</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2076</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_max_depth</oml:full_name>
+		<oml:name>max_depth</oml:name>
+		<oml:parameter_name>max_depth</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int</oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>null</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2077</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_max_features</oml:full_name>
+		<oml:name>max_features</oml:name>
+		<oml:parameter_name>max_features</oml:parameter_name> <!-- legacy -->
+		<oml:data_type></oml:data_type>
+		<oml:default_value>&quot;sqrt&quot;</oml:default_value>
+		<oml:value>&quot;sqrt&quot;</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2078</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_max_leaf_nodes</oml:full_name>
+		<oml:name>max_leaf_nodes</oml:name>
+		<oml:parameter_name>max_leaf_nodes</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int</oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>null</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2079</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_max_samples</oml:full_name>
+		<oml:name>max_samples</oml:name>
+		<oml:parameter_name>max_samples</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int or float</oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>null</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2080</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_min_impurity_decrease</oml:full_name>
+		<oml:name>min_impurity_decrease</oml:name>
+		<oml:parameter_name>min_impurity_decrease</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>float</oml:data_type>
+		<oml:default_value>0.0</oml:default_value>
+		<oml:value>0.0</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2081</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_min_samples_leaf</oml:full_name>
+		<oml:name>min_samples_leaf</oml:name>
+		<oml:parameter_name>min_samples_leaf</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int or float</oml:data_type>
+		<oml:default_value>1</oml:default_value>
+		<oml:value>1</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2082</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_min_samples_split</oml:full_name>
+		<oml:name>min_samples_split</oml:name>
+		<oml:parameter_name>min_samples_split</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int or float</oml:data_type>
+		<oml:default_value>2</oml:default_value>
+		<oml:value>2</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2083</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_min_weight_fraction_leaf</oml:full_name>
+		<oml:name>min_weight_fraction_leaf</oml:name>
+		<oml:parameter_name>min_weight_fraction_leaf</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>float</oml:data_type>
+		<oml:default_value>0.0</oml:default_value>
+		<oml:value>0.0</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2084</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_monotonic_cst</oml:full_name>
+		<oml:name>monotonic_cst</oml:name>
+		<oml:parameter_name>monotonic_cst</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>array</oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>null</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2085</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_n_estimators</oml:full_name>
+		<oml:name>n_estimators</oml:name>
+		<oml:parameter_name>n_estimators</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int</oml:data_type>
+		<oml:default_value>33</oml:default_value>
+		<oml:value>5</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2086</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_n_jobs</oml:full_name>
+		<oml:name>n_jobs</oml:name>
+		<oml:parameter_name>n_jobs</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int</oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>null</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2087</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_oob_score</oml:full_name>
+		<oml:name>oob_score</oml:name>
+		<oml:parameter_name>oob_score</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>bool or callable</oml:data_type>
+		<oml:default_value>false</oml:default_value>
+		<oml:value>false</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2088</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_random_state</oml:full_name>
+		<oml:name>random_state</oml:name>
+		<oml:parameter_name>random_state</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int</oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>33003</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2089</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_verbose</oml:full_name>
+		<oml:name>verbose</oml:name>
+		<oml:parameter_name>verbose</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int</oml:data_type>
+		<oml:default_value>0</oml:default_value>
+		<oml:value>0</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>2090</oml:id>
+		<oml:flow_id>285</oml:flow_id>
+		<oml:flow_name>sklearn.ensemble._forest.RandomForestClassifier</oml:flow_name>
+		<oml:full_name>sklearn.ensemble._forest.RandomForestClassifier(2)_warm_start</oml:full_name>
+		<oml:name>warm_start</oml:name>
+		<oml:parameter_name>warm_start</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>bool</oml:data_type>
+		<oml:default_value>false</oml:default_value>
+		<oml:value>false</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3597</oml:id>
+		<oml:flow_id>486</oml:flow_id>
+		<oml:flow_name>sklearn.pipeline.Pipeline(enc=sklearn.preprocessing._encoders.OneHotEncoder,rs=sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier))</oml:flow_name>
+		<oml:full_name>sklearn.pipeline.Pipeline(enc=sklearn.preprocessing._encoders.OneHotEncoder,rs=sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier))(2)_memory</oml:full_name>
+		<oml:name>memory</oml:name>
+		<oml:parameter_name>memory</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>str or object with the joblib</oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>null</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3598</oml:id>
+		<oml:flow_id>486</oml:flow_id>
+		<oml:flow_name>sklearn.pipeline.Pipeline(enc=sklearn.preprocessing._encoders.OneHotEncoder,rs=sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier))</oml:flow_name>
+		<oml:full_name>sklearn.pipeline.Pipeline(enc=sklearn.preprocessing._encoders.OneHotEncoder,rs=sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier))(2)_steps</oml:full_name>
+		<oml:name>steps</oml:name>
+		<oml:parameter_name>steps</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>list of tuples</oml:data_type>
+		<oml:default_value>[{&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;enc&quot;, &quot;step_name&quot;: &quot;enc&quot;}}, {&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;rs&quot;, &quot;step_name&quot;: &quot;rs&quot;}}]</oml:default_value>
+		<oml:value>[{&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;enc&quot;, &quot;step_name&quot;: &quot;enc&quot;}}, {&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;rs&quot;, &quot;step_name&quot;: &quot;rs&quot;}}]</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3599</oml:id>
+		<oml:flow_id>486</oml:flow_id>
+		<oml:flow_name>sklearn.pipeline.Pipeline(enc=sklearn.preprocessing._encoders.OneHotEncoder,rs=sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier))</oml:flow_name>
+		<oml:full_name>sklearn.pipeline.Pipeline(enc=sklearn.preprocessing._encoders.OneHotEncoder,rs=sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier))(2)_transform_input</oml:full_name>
+		<oml:name>transform_input</oml:name>
+		<oml:parameter_name>transform_input</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>list of str</oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>null</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3600</oml:id>
+		<oml:flow_id>486</oml:flow_id>
+		<oml:flow_name>sklearn.pipeline.Pipeline(enc=sklearn.preprocessing._encoders.OneHotEncoder,rs=sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier))</oml:flow_name>
+		<oml:full_name>sklearn.pipeline.Pipeline(enc=sklearn.preprocessing._encoders.OneHotEncoder,rs=sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier))(2)_verbose</oml:full_name>
+		<oml:name>verbose</oml:name>
+		<oml:parameter_name>verbose</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>bool</oml:data_type>
+		<oml:default_value>false</oml:default_value>
+		<oml:value>false</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3601</oml:id>
+		<oml:flow_id>487</oml:flow_id>
+		<oml:flow_name>sklearn.preprocessing._encoders.OneHotEncoder</oml:flow_name>
+		<oml:full_name>sklearn.preprocessing._encoders.OneHotEncoder(2)_categories</oml:full_name>
+		<oml:name>categories</oml:name>
+		<oml:parameter_name>categories</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>'auto' or a list of array</oml:data_type>
+		<oml:default_value>&quot;auto&quot;</oml:default_value>
+		<oml:value>&quot;auto&quot;</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3602</oml:id>
+		<oml:flow_id>487</oml:flow_id>
+		<oml:flow_name>sklearn.preprocessing._encoders.OneHotEncoder</oml:flow_name>
+		<oml:full_name>sklearn.preprocessing._encoders.OneHotEncoder(2)_drop</oml:full_name>
+		<oml:name>drop</oml:name>
+		<oml:parameter_name>drop</oml:parameter_name> <!-- legacy -->
+		<oml:data_type></oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>null</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3603</oml:id>
+		<oml:flow_id>487</oml:flow_id>
+		<oml:flow_name>sklearn.preprocessing._encoders.OneHotEncoder</oml:flow_name>
+		<oml:full_name>sklearn.preprocessing._encoders.OneHotEncoder(2)_dtype</oml:full_name>
+		<oml:name>dtype</oml:name>
+		<oml:parameter_name>dtype</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>number type</oml:data_type>
+		<oml:default_value>{&quot;oml-python:serialized_object&quot;: &quot;type&quot;, &quot;value&quot;: &quot;np.float64&quot;}</oml:default_value>
+		<oml:value>{&quot;oml-python:serialized_object&quot;: &quot;type&quot;, &quot;value&quot;: &quot;np.float64&quot;}</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3604</oml:id>
+		<oml:flow_id>487</oml:flow_id>
+		<oml:flow_name>sklearn.preprocessing._encoders.OneHotEncoder</oml:flow_name>
+		<oml:full_name>sklearn.preprocessing._encoders.OneHotEncoder(2)_feature_name_combiner</oml:full_name>
+		<oml:name>feature_name_combiner</oml:name>
+		<oml:parameter_name>feature_name_combiner</oml:parameter_name> <!-- legacy -->
+		<oml:data_type></oml:data_type>
+		<oml:default_value>&quot;concat&quot;</oml:default_value>
+		<oml:value>&quot;concat&quot;</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3605</oml:id>
+		<oml:flow_id>487</oml:flow_id>
+		<oml:flow_name>sklearn.preprocessing._encoders.OneHotEncoder</oml:flow_name>
+		<oml:full_name>sklearn.preprocessing._encoders.OneHotEncoder(2)_handle_unknown</oml:full_name>
+		<oml:name>handle_unknown</oml:name>
+		<oml:parameter_name>handle_unknown</oml:parameter_name> <!-- legacy -->
+		<oml:data_type></oml:data_type>
+		<oml:default_value>&quot;ignore&quot;</oml:default_value>
+		<oml:value>&quot;ignore&quot;</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3606</oml:id>
+		<oml:flow_id>487</oml:flow_id>
+		<oml:flow_name>sklearn.preprocessing._encoders.OneHotEncoder</oml:flow_name>
+		<oml:full_name>sklearn.preprocessing._encoders.OneHotEncoder(2)_max_categories</oml:full_name>
+		<oml:name>max_categories</oml:name>
+		<oml:parameter_name>max_categories</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int</oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>null</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3607</oml:id>
+		<oml:flow_id>487</oml:flow_id>
+		<oml:flow_name>sklearn.preprocessing._encoders.OneHotEncoder</oml:flow_name>
+		<oml:full_name>sklearn.preprocessing._encoders.OneHotEncoder(2)_min_frequency</oml:full_name>
+		<oml:name>min_frequency</oml:name>
+		<oml:parameter_name>min_frequency</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int or float</oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>null</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3608</oml:id>
+		<oml:flow_id>487</oml:flow_id>
+		<oml:flow_name>sklearn.preprocessing._encoders.OneHotEncoder</oml:flow_name>
+		<oml:full_name>sklearn.preprocessing._encoders.OneHotEncoder(2)_sparse_output</oml:full_name>
+		<oml:name>sparse_output</oml:name>
+		<oml:parameter_name>sparse_output</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>bool</oml:data_type>
+		<oml:default_value>true</oml:default_value>
+		<oml:value>true</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3609</oml:id>
+		<oml:flow_id>488</oml:flow_id>
+		<oml:flow_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)</oml:flow_name>
+		<oml:full_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)(2)_cv</oml:full_name>
+		<oml:name>cv</oml:name>
+		<oml:parameter_name>cv</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int</oml:data_type>
+		<oml:default_value>{&quot;oml-python:serialized_object&quot;: &quot;cv_object&quot;, &quot;value&quot;: {&quot;name&quot;: &quot;sklearn.model_selection._split.StratifiedKFold&quot;, &quot;parameters&quot;: {&quot;n_splits&quot;: &quot;2&quot;, &quot;random_state&quot;: &quot;null&quot;, &quot;shuffle&quot;: &quot;true&quot;}}}</oml:default_value>
+		<oml:value>{&quot;oml-python:serialized_object&quot;: &quot;cv_object&quot;, &quot;value&quot;: {&quot;name&quot;: &quot;sklearn.model_selection._split.StratifiedKFold&quot;, &quot;parameters&quot;: {&quot;n_splits&quot;: &quot;2&quot;, &quot;random_state&quot;: &quot;62501&quot;, &quot;shuffle&quot;: &quot;true&quot;}}}</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3610</oml:id>
+		<oml:flow_id>488</oml:flow_id>
+		<oml:flow_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)</oml:flow_name>
+		<oml:full_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)(2)_error_score</oml:full_name>
+		<oml:name>error_score</oml:name>
+		<oml:parameter_name>error_score</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>'raise' or numeric</oml:data_type>
+		<oml:default_value>NaN</oml:default_value>
+		<oml:value>NaN</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3612</oml:id>
+		<oml:flow_id>488</oml:flow_id>
+		<oml:flow_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)</oml:flow_name>
+		<oml:full_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)(2)_n_iter</oml:full_name>
+		<oml:name>n_iter</oml:name>
+		<oml:parameter_name>n_iter</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int</oml:data_type>
+		<oml:default_value>2</oml:default_value>
+		<oml:value>2</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3613</oml:id>
+		<oml:flow_id>488</oml:flow_id>
+		<oml:flow_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)</oml:flow_name>
+		<oml:full_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)(2)_n_jobs</oml:full_name>
+		<oml:name>n_jobs</oml:name>
+		<oml:parameter_name>n_jobs</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int</oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>null</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3614</oml:id>
+		<oml:flow_id>488</oml:flow_id>
+		<oml:flow_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)</oml:flow_name>
+		<oml:full_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)(2)_param_distributions</oml:full_name>
+		<oml:name>param_distributions</oml:name>
+		<oml:parameter_name>param_distributions</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>dict or list of dicts</oml:data_type>
+		<oml:default_value>{&quot;bootstrap&quot;: [true, false], &quot;criterion&quot;: [&quot;gini&quot;, &quot;entropy&quot;], &quot;max_depth&quot;: [3, null], &quot;max_features&quot;: [1, 2, 3, 4], &quot;min_samples_leaf&quot;: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], &quot;min_samples_split&quot;: [2, 3, 4, 5, 6, 7, 8, 9, 10]}</oml:default_value>
+		<oml:value>{&quot;bootstrap&quot;: [true, false], &quot;criterion&quot;: [&quot;gini&quot;, &quot;entropy&quot;], &quot;max_depth&quot;: [3, null], &quot;max_features&quot;: [1, 2, 3, 4], &quot;min_samples_leaf&quot;: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], &quot;min_samples_split&quot;: [2, 3, 4, 5, 6, 7, 8, 9, 10]}</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3615</oml:id>
+		<oml:flow_id>488</oml:flow_id>
+		<oml:flow_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)</oml:flow_name>
+		<oml:full_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)(2)_pre_dispatch</oml:full_name>
+		<oml:name>pre_dispatch</oml:name>
+		<oml:parameter_name>pre_dispatch</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int</oml:data_type>
+		<oml:default_value>&quot;2*n_jobs&quot;</oml:default_value>
+		<oml:value>&quot;2*n_jobs&quot;</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3616</oml:id>
+		<oml:flow_id>488</oml:flow_id>
+		<oml:flow_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)</oml:flow_name>
+		<oml:full_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)(2)_random_state</oml:full_name>
+		<oml:name>random_state</oml:name>
+		<oml:parameter_name>random_state</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int</oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>12172</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3617</oml:id>
+		<oml:flow_id>488</oml:flow_id>
+		<oml:flow_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)</oml:flow_name>
+		<oml:full_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)(2)_refit</oml:full_name>
+		<oml:name>refit</oml:name>
+		<oml:parameter_name>refit</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>bool</oml:data_type>
+		<oml:default_value>true</oml:default_value>
+		<oml:value>true</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3618</oml:id>
+		<oml:flow_id>488</oml:flow_id>
+		<oml:flow_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)</oml:flow_name>
+		<oml:full_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)(2)_return_train_score</oml:full_name>
+		<oml:name>return_train_score</oml:name>
+		<oml:parameter_name>return_train_score</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>bool</oml:data_type>
+		<oml:default_value>false</oml:default_value>
+		<oml:value>false</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3619</oml:id>
+		<oml:flow_id>488</oml:flow_id>
+		<oml:flow_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)</oml:flow_name>
+		<oml:full_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)(2)_scoring</oml:full_name>
+		<oml:name>scoring</oml:name>
+		<oml:parameter_name>scoring</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>str</oml:data_type>
+		<oml:default_value>null</oml:default_value>
+		<oml:value>null</oml:value>
+	</oml:parameter>
+	<oml:parameter>
+		<oml:id>3620</oml:id>
+		<oml:flow_id>488</oml:flow_id>
+		<oml:flow_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)</oml:flow_name>
+		<oml:full_name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)(2)_verbose</oml:full_name>
+		<oml:name>verbose</oml:name>
+		<oml:parameter_name>verbose</oml:parameter_name> <!-- legacy -->
+		<oml:data_type>int</oml:data_type>
+		<oml:default_value>0</oml:default_value>
+		<oml:value>0</oml:value>
+	</oml:parameter>
+</oml:setup_parameters>
+

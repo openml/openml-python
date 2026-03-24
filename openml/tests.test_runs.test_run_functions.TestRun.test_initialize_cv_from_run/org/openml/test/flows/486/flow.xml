@@ -1,0 +1,755 @@
+
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>486</oml:id>
+<oml:uploader>3229</oml:uploader>
+<oml:name>sklearn.pipeline.Pipeline(enc=sklearn.preprocessing._encoders.OneHotEncoder,rs=sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier))</oml:name>
+<oml:custom_name>sklearn.Pipeline(OneHotEncoder,RandomizedSearchCV(RandomForestClassifier))</oml:custom_name>
+<oml:class_name>sklearn.pipeline.Pipeline</oml:class_name>
+<oml:version>2</oml:version>
+<oml:external_version>openml==0.16.0,sklearn==1.8.0</oml:external_version>
+<oml:description>A sequence of data transformers with an optional final predictor.
+
+`Pipeline` allows you to sequentially apply a list of transformers to
+preprocess the data and, if desired, conclude the sequence with a final
+:term:`predictor` for predictive modeling.
+
+Intermediate steps of the pipeline must be transformers, that is, they
+must implement `fit` and `transform` methods.
+The final :term:`estimator` only needs to implement `fit`.
+The transformers in the pipeline can be cached using ``memory`` argument.
+
+The purpose of the pipeline is to assemble several steps that can be
+cross-validated together while setting different parameters. For this, it
+enables setting parameters of the various steps using their names and the
+parameter name separated by a `'__'`, as in the example below. A step's
+estimator may be replaced entirely by setting the parameter with its name
+to another estimator, or a transformer removed by setting it to
+`'passthrough'` or `None`.
+
+For an example use case of `Pipeline` combined with
+:class:`~s...</oml:description>
+<oml:upload_date>2026-01-30T08:44:35</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==1.8.0
+numpy&gt;=1.24.1
+scipy&gt;=1.10.0
+joblib&gt;=1.3.0
+threadpoolctl&gt;=3.2.0</oml:dependencies>
+<oml:parameter>
+	<oml:name>memory</oml:name>
+	<oml:data_type>str or object with the joblib</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Used to cache the fitted transformers of the pipeline. The last step
+    will never be cached, even if it is a transformer. By default, no
+    caching is performed. If a string is given, it is the path to the
+    caching directory. Enabling caching triggers a clone of the transformers
+    before fitting. Therefore, the transformer instance given to the
+    pipeline cannot be inspected directly. Use the attribute ``named_steps``
+    or ``steps`` to inspect estimators within the pipeline. Caching the
+    transformers is advantageous when fitting is time consuming. See
+    :ref:`sphx_glr_auto_examples_neighbors_plot_caching_nearest_neighbors.py`
+    for an example on how to enable caching</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>steps</oml:name>
+	<oml:data_type>list of tuples</oml:data_type>
+	<oml:default_value>[{&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;enc&quot;, &quot;step_name&quot;: &quot;enc&quot;}}, {&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;rs&quot;, &quot;step_name&quot;: &quot;rs&quot;}}]</oml:default_value>
+	<oml:description>List of (name of step, estimator) tuples that are to be chained in
+    sequential order. To be compatible with the scikit-learn API, all steps
+    must define `fit`. All non-last steps must also define `transform`. See
+    :ref:`Combining Estimators &lt;combining_estimators&gt;` for more details</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>transform_input</oml:name>
+	<oml:data_type>list of str</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>The names of the :term:`metadata` parameters that should be transformed by the
+    pipeline before passing it to the step consuming it
+
+    This enables transforming some input arguments to ``fit`` (other than ``X``)
+    to be transformed by the steps of the pipeline up to the step which requires
+    them. Requirement is defined via :ref:`metadata routing &lt;metadata_routing&gt;`
+    For instance, this can be used to pass a validation set through the pipeline
+
+    You can only set this if metadata routing is enabled, which you
+    can enable using ``sklearn.set_config(enable_metadata_routing=True)``
+
+    .. versionadded:: 1.6</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>verbose</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description>If True, the time elapsed while fitting each step will be printed as it
+    is completed.</oml:description>
+</oml:parameter>
+<oml:component>
+  <oml:identifier>enc</oml:identifier>
+	
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>487</oml:id>
+<oml:uploader>3229</oml:uploader>
+<oml:name>sklearn.preprocessing._encoders.OneHotEncoder</oml:name>
+<oml:custom_name>sklearn.OneHotEncoder</oml:custom_name>
+<oml:class_name>sklearn.preprocessing._encoders.OneHotEncoder</oml:class_name>
+<oml:version>2</oml:version>
+<oml:external_version>openml==0.16.0,sklearn==1.8.0</oml:external_version>
+<oml:description>Encode categorical features as a one-hot numeric array.
+
+The input to this transformer should be an array-like of integers or
+strings, denoting the values taken on by categorical (discrete) features.
+The features are encoded using a one-hot (aka 'one-of-K' or 'dummy')
+encoding scheme. This creates a binary column for each category and
+returns a sparse matrix or dense array (depending on the ``sparse_output``
+parameter).
+
+By default, the encoder derives the categories based on the unique values
+in each feature. Alternatively, you can also specify the `categories`
+manually.
+
+This encoding is needed for feeding categorical data to many scikit-learn
+estimators, notably linear models and SVMs with the standard kernels.
+
+Note: a one-hot encoding of y labels should use a LabelBinarizer
+instead.</oml:description>
+<oml:upload_date>2026-01-30T08:44:35</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==1.8.0
+numpy&gt;=1.24.1
+scipy&gt;=1.10.0
+joblib&gt;=1.3.0
+threadpoolctl&gt;=3.2.0</oml:dependencies>
+<oml:parameter>
+	<oml:name>categories</oml:name>
+	<oml:data_type>'auto' or a list of array</oml:data_type>
+	<oml:default_value>&quot;auto&quot;</oml:default_value>
+	<oml:description>Categories (unique values) per feature:
+
+    - 'auto' : Determine categories automatically from the training data
+    - list : ``categories[i]`` holds the categories expected in the ith
+      column. The passed categories should not mix strings and numeric
+      values within a single feature, and should be sorted in case of
+      numeric values
+
+    The used categories can be found in the ``categories_`` attribute
+
+    .. versionadded:: 0.20
+
+drop : {'first', 'if_binary'} or an array-like of shape (n_features,),             default=None
+    Specifies a methodology to use to drop one of the categories per
+    feature. This is useful in situations where perfectly collinear
+    features cause problems, such as when feeding the resulting data
+    into an unregularized linear regression model
+
+    However, dropping one category breaks the symmetry of the original
+    representation and can therefore induce a bias in downstream models,
+    for instance for penalized linear classification or regression models</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>drop</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>dtype</oml:name>
+	<oml:data_type>number type</oml:data_type>
+	<oml:default_value>{&quot;oml-python:serialized_object&quot;: &quot;type&quot;, &quot;value&quot;: &quot;np.float64&quot;}</oml:default_value>
+	<oml:description>Desired dtype of output
+
+handle_unknown : {'error', 'ignore', 'infrequent_if_exist', 'warn'},                      default='error'
+    Specifies the way unknown categories are handled during :meth:`transform`
+
+    - 'error' : Raise an error if an unknown category is present during transform
+    - 'ignore' : When an unknown category is encountered during
+      transform, the resulting one-hot encoded columns for this feature
+      will be all zeros. In the inverse transform, an unknown category
+      will be denoted as None
+    - 'infrequent_if_exist' : When an unknown category is encountered
+      during transform, the resulting one-hot encoded columns for this
+      feature will map to the infrequent category if it exists. The
+      infrequent category will be mapped to the last position in the
+      encoding. During inverse transform, an unknown category will be
+      mapped to the category denoted `'infrequent'` if it exists. If the
+      `'infrequent'` category does not exist, then :meth:`transform` an...</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>feature_name_combiner</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;concat&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>handle_unknown</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;ignore&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>max_categories</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Specifies an upper limit to the number of output features for each input
+    feature when considering infrequent categories. If there are infrequent
+    categories, `max_categories` includes the category representing the
+    infrequent categories along with the frequent categories. If `None`,
+    there is no limit to the number of output features
+
+    .. versionadded:: 1.1
+        Read more in the :ref:`User Guide &lt;encoder_infrequent_categories&gt;`
+
+feature_name_combiner : &quot;concat&quot; or callable, default=&quot;concat&quot;
+    Callable with signature `def callable(input_feature, category)` that returns a
+    string. This is used to create feature names to be returned by
+    :meth:`get_feature_names_out`
+
+    `&quot;concat&quot;` concatenates encoded feature name and category with
+    `feature + &quot;_&quot; + str(category)`.E.g. feature X with values 1, 6, 7 create
+    feature names `X_1, X_6, X_7`
+
+    .. versionadded:: 1.3</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_frequency</oml:name>
+	<oml:data_type>int or float</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Specifies the minimum frequency below which a category will be
+    considered infrequent
+
+    - If `int`, categories with a smaller cardinality will be considered
+      infrequent
+
+    - If `float`, categories with a smaller cardinality than
+      `min_frequency * n_samples`  will be considered infrequent
+
+    .. versionadded:: 1.1
+        Read more in the :ref:`User Guide &lt;encoder_infrequent_categories&gt;`</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>sparse_output</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>true</oml:default_value>
+	<oml:description>When ``True``, it returns a :class:`scipy.sparse.csr_matrix`,
+    i.e. a sparse matrix in &quot;Compressed Sparse Row&quot; (CSR) format
+
+    .. versionadded:: 1.2
+       `sparse` was renamed to `sparse_output`</oml:description>
+</oml:parameter>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_1.8.0</oml:tag>
+</oml:flow>
+</oml:component>
+<oml:component>
+  <oml:identifier>rs</oml:identifier>
+	
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>488</oml:id>
+<oml:uploader>3229</oml:uploader>
+<oml:name>sklearn.model_selection._search.RandomizedSearchCV(estimator=sklearn.ensemble._forest.RandomForestClassifier)</oml:name>
+<oml:custom_name>sklearn.RandomizedSearchCV(RandomForestClassifier)</oml:custom_name>
+<oml:class_name>sklearn.model_selection._search.RandomizedSearchCV</oml:class_name>
+<oml:version>2</oml:version>
+<oml:external_version>openml==0.16.0,sklearn==1.8.0</oml:external_version>
+<oml:description>Randomized search on hyper parameters.
+
+RandomizedSearchCV implements a &quot;fit&quot; and a &quot;score&quot; method.
+It also implements &quot;score_samples&quot;, &quot;predict&quot;, &quot;predict_proba&quot;,
+&quot;decision_function&quot;, &quot;transform&quot; and &quot;inverse_transform&quot; if they are
+implemented in the estimator used.
+
+The parameters of the estimator used to apply these methods are optimized
+by cross-validated search over parameter settings.
+
+In contrast to GridSearchCV, not all parameter values are tried out, but
+rather a fixed number of parameter settings is sampled from the specified
+distributions. The number of parameter settings that are tried is
+given by n_iter.
+
+If all parameters are presented as a list,
+sampling without replacement is performed. If at least one parameter
+is given as a distribution, sampling with replacement is used.
+It is highly recommended to use continuous distributions for continuous
+parameters.</oml:description>
+<oml:upload_date>2026-01-30T08:44:35</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==1.8.0
+numpy&gt;=1.24.1
+scipy&gt;=1.10.0
+joblib&gt;=1.3.0
+threadpoolctl&gt;=3.2.0</oml:dependencies>
+<oml:parameter>
+	<oml:name>cv</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>{&quot;oml-python:serialized_object&quot;: &quot;cv_object&quot;, &quot;value&quot;: {&quot;name&quot;: &quot;sklearn.model_selection._split.StratifiedKFold&quot;, &quot;parameters&quot;: {&quot;n_splits&quot;: &quot;2&quot;, &quot;random_state&quot;: &quot;null&quot;, &quot;shuffle&quot;: &quot;true&quot;}}}</oml:default_value>
+	<oml:description>Determines the cross-validation splitting strategy
+    Possible inputs for cv are:
+
+    - None, to use the default 5-fold cross validation,
+    - integer, to specify the number of folds in a `(Stratified)KFold`,
+    - :term:`CV splitter`,
+    - An iterable yielding (train, test) splits as arrays of indices
+
+    For integer/None inputs, if the estimator is a classifier and ``y`` is
+    either binary or multiclass, :class:`StratifiedKFold` is used. In all
+    other cases, :class:`KFold` is used. These splitters are instantiated
+    with `shuffle=False` so the splits will be the same across calls
+
+    Refer :ref:`User Guide &lt;cross_validation&gt;` for the various
+    cross-validation strategies that can be used here
+
+    .. versionchanged:: 0.22
+        ``cv`` default value if None changed from 3-fold to 5-fold</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>error_score</oml:name>
+	<oml:data_type>'raise' or numeric</oml:data_type>
+	<oml:default_value>NaN</oml:default_value>
+	<oml:description>Value to assign to the score if an error occurs in estimator fitting
+    If set to 'raise', the error is raised. If a numeric value is given,
+    FitFailedWarning is raised. This parameter does not affect the refit
+    step, which will always raise the error</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>estimator</oml:name>
+	<oml:data_type>estimator object</oml:data_type>
+	<oml:default_value>{&quot;oml-python:serialized_object&quot;: &quot;component_reference&quot;, &quot;value&quot;: {&quot;key&quot;: &quot;estimator&quot;, &quot;step_name&quot;: null}}</oml:default_value>
+	<oml:description>An object of that type is instantiated for each grid point
+    This is assumed to implement the scikit-learn estimator interface
+    Either estimator needs to provide a ``score`` function,
+    or ``scoring`` must be passed</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>n_iter</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>2</oml:default_value>
+	<oml:description>Number of parameter settings that are sampled. n_iter trades
+    off runtime vs quality of the solution</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>n_jobs</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Number of jobs to run in parallel
+    ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context
+    ``-1`` means using all processors. See :term:`Glossary &lt;n_jobs&gt;`
+    for more details
+
+    .. versionchanged:: v0.20
+       `n_jobs` default changed from 1 to None</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>param_distributions</oml:name>
+	<oml:data_type>dict or list of dicts</oml:data_type>
+	<oml:default_value>{&quot;bootstrap&quot;: [true, false], &quot;criterion&quot;: [&quot;gini&quot;, &quot;entropy&quot;], &quot;max_depth&quot;: [3, null], &quot;max_features&quot;: [1, 2, 3, 4], &quot;min_samples_leaf&quot;: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], &quot;min_samples_split&quot;: [2, 3, 4, 5, 6, 7, 8, 9, 10]}</oml:default_value>
+	<oml:description>Dictionary with parameters names (`str`) as keys and distributions
+    or lists of parameters to try. Distributions must provide a ``rvs``
+    method for sampling (such as those from scipy.stats.distributions)
+    If a list is given, it is sampled uniformly
+    If a list of dicts is given, first a dict is sampled uniformly, and
+    then a parameter is sampled using that dict as above</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>pre_dispatch</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>&quot;2*n_jobs&quot;</oml:default_value>
+	<oml:description>Controls the number of jobs that get dispatched during parallel
+    execution. Reducing this number can be useful to avoid an
+    explosion of memory consumption when more jobs get dispatched
+    than CPUs can process. This parameter can be:
+
+    - None, in which case all the jobs are immediately created and spawned. Use
+      this for lightweight and fast-running jobs, to avoid delays due to on-demand
+      spawning of the jobs
+    - An int, giving the exact number of total jobs that are spawned
+    - A str, giving an expression as a function of n_jobs, as in '2*n_jobs'</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>random_state</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Pseudo random number generator state used for random uniform sampling
+    from lists of possible values instead of scipy.stats distributions
+    Pass an int for reproducible output across multiple
+    function calls
+    See :term:`Glossary &lt;random_state&gt;`</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>refit</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>true</oml:default_value>
+	<oml:description>Refit an estimator using the best found parameters on the whole
+    dataset
+
+    For multiple metric evaluation, this needs to be a `str` denoting the
+    scorer that would be used to find the best parameters for refitting
+    the estimator at the end
+
+    Where there are considerations other than maximum score in
+    choosing a best estimator, ``refit`` can be set to a function which
+    returns the selected ``best_index_`` given the ``cv_results_``. In that
+    case, the ``best_estimator_`` and ``best_params_`` will be set
+    according to the returned ``best_index_`` while the ``best_score_``
+    attribute will not be available
+
+    The refitted estimator is made available at the ``best_estimator_``
+    attribute and permits using ``predict`` directly on this
+    ``RandomizedSearchCV`` instance
+
+    Also for multiple metric evaluation, the attributes ``best_index_``,
+    ``best_score_`` and ``best_params_`` will only be available if
+    ``refit`` is set and all of them will be determined w.r.t this spec...</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>return_train_score</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description>If ``False``, the ``cv_results_`` attribute will not include training
+    scores
+    Computing training scores is used to get insights on how different
+    parameter settings impact the overfitting/underfitting trade-off
+    However computing the scores on the training set can be computationally
+    expensive and is not strictly required to select the parameters that
+    yield the best generalization performance
+
+    .. versionadded:: 0.19
+
+    .. versionchanged:: 0.21
+        Default value was changed from ``True`` to ``False``</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>scoring</oml:name>
+	<oml:data_type>str</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Strategy to evaluate the performance of the cross-validated model on
+    the test set
+
+    If `scoring` represents a single score, one can use:
+
+    - a single string (see :ref:`scoring_string_names`);
+    - a callable (see :ref:`scoring_callable`) that returns a single value;
+    - `None`, the `estimator`'s
+      :ref:`default evaluation criterion &lt;scoring_api_overview&gt;` is used
+
+    If `scoring` represents multiple scores, one can use:
+
+    - a list or tuple of unique strings;
+    - a callable returning a dictionary where the keys are the metric
+      names and the values are the metric scores;
+    - a dictionary with metric names as keys and callables as values
+
+    See :ref:`multimetric_grid_search` for an example
+
+    If None, the estimator's score method is used</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>verbose</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>0</oml:default_value>
+	<oml:description>Controls the verbosity: the higher, the more messages</oml:description>
+</oml:parameter>
+<oml:component>
+  <oml:identifier>estimator</oml:identifier>
+	
+<oml:flow xmlns:oml="http://openml.org/openml">
+  <oml:id>285</oml:id>
+<oml:uploader>3229</oml:uploader>
+<oml:name>sklearn.ensemble._forest.RandomForestClassifier</oml:name>
+<oml:custom_name>sklearn.RandomForestClassifier</oml:custom_name>
+<oml:class_name>sklearn.ensemble._forest.RandomForestClassifier</oml:class_name>
+<oml:version>2</oml:version>
+<oml:external_version>openml==0.16.0,sklearn==1.8.0</oml:external_version>
+<oml:description>A random forest classifier.
+
+A random forest is a meta estimator that fits a number of decision tree
+classifiers on various sub-samples of the dataset and uses averaging to
+improve the predictive accuracy and control over-fitting.
+Trees in the forest use the best split strategy, i.e. equivalent to passing
+`splitter=&quot;best&quot;` to the underlying :class:`~sklearn.tree.DecisionTreeClassifier`.
+The sub-sample size is controlled with the `max_samples` parameter if
+`bootstrap=True` (default), otherwise the whole dataset is used to build
+each tree.
+
+For a comparison between tree-based ensemble models see the example
+:ref:`sphx_glr_auto_examples_ensemble_plot_forest_hist_grad_boosting_comparison.py`.
+
+This estimator has native support for missing values (NaNs). During training,
+the tree grower learns at each split point whether samples with missing values
+should go to the left or right child, based on the potential gain. When predicting,
+samples with missing values are assigned to the left or right child consequently....</oml:description>
+<oml:upload_date>2026-01-20T18:39:00</oml:upload_date>
+<oml:language>English</oml:language>
+<oml:dependencies>sklearn==1.8.0
+numpy&gt;=1.24.1
+scipy&gt;=1.10.0
+joblib&gt;=1.3.0
+threadpoolctl&gt;=3.2.0</oml:dependencies>
+<oml:parameter>
+	<oml:name>bootstrap</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>true</oml:default_value>
+	<oml:description>Whether bootstrap samples are used when building trees. If False, the
+    whole dataset is used to build each tree</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>ccp_alpha</oml:name>
+	<oml:data_type>non</oml:data_type>
+	<oml:default_value>0.0</oml:default_value>
+	<oml:description>Complexity parameter used for Minimal Cost-Complexity Pruning. The
+    subtree with the largest cost complexity that is smaller than
+    ``ccp_alpha`` will be chosen. By default, no pruning is performed. See
+    :ref:`minimal_cost_complexity_pruning` for details. See
+    :ref:`sphx_glr_auto_examples_tree_plot_cost_complexity_pruning.py`
+    for an example of such pruning
+
+    .. versionadded:: 0.22</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>class_weight</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>criterion</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;gini&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>max_depth</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>The maximum depth of the tree. If None, then nodes are expanded until
+    all leaves are pure or until all leaves contain less than
+    min_samples_split samples</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>max_features</oml:name>
+	<oml:data_type></oml:data_type>
+	<oml:default_value>&quot;sqrt&quot;</oml:default_value>
+	<oml:description></oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>max_leaf_nodes</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Grow trees with ``max_leaf_nodes`` in best-first fashion
+    Best nodes are defined as relative reduction in impurity
+    If None then unlimited number of leaf nodes</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>max_samples</oml:name>
+	<oml:data_type>int or float</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>If bootstrap is True, the number of samples to draw from X
+    to train each base estimator
+
+    - If None (default), then draw `X.shape[0]` samples
+    - If int, then draw `max_samples` samples
+    - If float, then draw `max(round(n_samples * max_samples), 1)` samples. Thus,
+      `max_samples` should be in the interval `(0.0, 1.0]`
+
+    .. versionadded:: 0.22</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_impurity_decrease</oml:name>
+	<oml:data_type>float</oml:data_type>
+	<oml:default_value>0.0</oml:default_value>
+	<oml:description>A node will be split if this split induces a decrease of the impurity
+    greater than or equal to this value
+
+    The weighted impurity decrease equation is the following::
+
+        N_t / N * (impurity - N_t_R / N_t * right_impurity
+                            - N_t_L / N_t * left_impurity)
+
+    where ``N`` is the total number of samples, ``N_t`` is the number of
+    samples at the current node, ``N_t_L`` is the number of samples in the
+    left child, and ``N_t_R`` is the number of samples in the right child
+
+    ``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,
+    if ``sample_weight`` is passed
+
+    .. versionadded:: 0.19</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_samples_leaf</oml:name>
+	<oml:data_type>int or float</oml:data_type>
+	<oml:default_value>1</oml:default_value>
+	<oml:description>The minimum number of samples required to be at a leaf node
+    A split point at any depth will only be considered if it leaves at
+    least ``min_samples_leaf`` training samples in each of the left and
+    right branches.  This may have the effect of smoothing the model,
+    especially in regression
+
+    - If int, then consider `min_samples_leaf` as the minimum number
+    - If float, then `min_samples_leaf` is a fraction and
+      `ceil(min_samples_leaf * n_samples)` are the minimum
+      number of samples for each node
+
+    .. versionchanged:: 0.18
+       Added float values for fractions</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_samples_split</oml:name>
+	<oml:data_type>int or float</oml:data_type>
+	<oml:default_value>2</oml:default_value>
+	<oml:description>The minimum number of samples required to split an internal node:
+
+    - If int, then consider `min_samples_split` as the minimum number
+    - If float, then `min_samples_split` is a fraction and
+      `ceil(min_samples_split * n_samples)` are the minimum
+      number of samples for each split
+
+    .. versionchanged:: 0.18
+       Added float values for fractions</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>min_weight_fraction_leaf</oml:name>
+	<oml:data_type>float</oml:data_type>
+	<oml:default_value>0.0</oml:default_value>
+	<oml:description>The minimum weighted fraction of the sum total of weights (of all
+    the input samples) required to be at a leaf node. Samples have
+    equal weight when sample_weight is not provided
+
+max_features : {&quot;sqrt&quot;, &quot;log2&quot;, None}, int or float, default=&quot;sqrt&quot;
+    The number of features to consider when looking for the best split:
+
+    - If int, then consider `max_features` features at each split
+    - If float, then `max_features` is a fraction and
+      `max(1, int(max_features * n_features_in_))` features are considered at each
+      split
+    - If &quot;sqrt&quot;, then `max_features=sqrt(n_features)`
+    - If &quot;log2&quot;, then `max_features=log2(n_features)`
+    - If None, then `max_features=n_features`
+
+    .. versionchanged:: 1.1
+        The default of `max_features` changed from `&quot;auto&quot;` to `&quot;sqrt&quot;`
+
+    Note: the search for a split does not stop until at least one
+    valid partition of the node samples is found, even if it requires to
+    effectively inspect more than ``max_features`` features</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>monotonic_cst</oml:name>
+	<oml:data_type>array</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Indicates the monotonicity constraint to enforce on each feature
+      - 1: monotonic increase
+      - 0: no constraint
+      - -1: monotonic decrease
+
+    If monotonic_cst is None, no constraints are applied
+
+    Monotonicity constraints are not supported for:
+      - multiclass classifications (i.e. when `n_classes &gt; 2`),
+      - multioutput classifications (i.e. when `n_outputs_ &gt; 1`),
+      - classifications trained on data with missing values
+
+    The constraints hold over the probability of the positive class
+
+    Read more in the :ref:`User Guide &lt;monotonic_cst_gbdt&gt;`
+
+    .. versionadded:: 1.4</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>n_estimators</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>33</oml:default_value>
+	<oml:description>The number of trees in the forest
+
+    .. versionchanged:: 0.22
+       The default value of ``n_estimators`` changed from 10 to 100
+       in 0.22
+
+criterion : {&quot;gini&quot;, &quot;entropy&quot;, &quot;log_loss&quot;}, default=&quot;gini&quot;
+    The function to measure the quality of a split. Supported criteria are
+    &quot;gini&quot; for the Gini impurity and &quot;log_loss&quot; and &quot;entropy&quot; both for the
+    Shannon information gain, see :ref:`tree_mathematical_formulation`
+    Note: This parameter is tree-specific</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>n_jobs</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>The number of jobs to run in parallel. :meth:`fit`, :meth:`predict`,
+    :meth:`decision_path` and :meth:`apply` are all parallelized over the
+    trees. ``None`` means 1 unless in a :obj:`joblib.parallel_backend`
+    context. ``-1`` means using all processors. See :term:`Glossary
+    &lt;n_jobs&gt;` for more details</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>oob_score</oml:name>
+	<oml:data_type>bool or callable</oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description>Whether to use out-of-bag samples to estimate the generalization score
+    By default, :func:`~sklearn.metrics.accuracy_score` is used
+    Provide a callable with signature `metric(y_true, y_pred)` to use a
+    custom metric. Only available if `bootstrap=True`
+
+    For an illustration of out-of-bag (OOB) error estimation, see the example
+    :ref:`sphx_glr_auto_examples_ensemble_plot_ensemble_oob.py`</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>random_state</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>null</oml:default_value>
+	<oml:description>Controls both the randomness of the bootstrapping of the samples used
+    when building trees (if ``bootstrap=True``) and the sampling of the
+    features to consider when looking for the best split at each node
+    (if ``max_features &lt; n_features``)
+    See :term:`Glossary &lt;random_state&gt;` for details</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>verbose</oml:name>
+	<oml:data_type>int</oml:data_type>
+	<oml:default_value>0</oml:default_value>
+	<oml:description>Controls the verbosity when fitting and predicting</oml:description>
+</oml:parameter>
+<oml:parameter>
+	<oml:name>warm_start</oml:name>
+	<oml:data_type>bool</oml:data_type>
+	<oml:default_value>false</oml:default_value>
+	<oml:description>When set to ``True``, reuse the solution of the previous call to fit
+    and add more estimators to the ensemble, otherwise, just fit a whole
+    new forest. See :term:`Glossary &lt;warm_start&gt;` and
+    :ref:`tree_ensemble_warm_start` for details
+
+class_weight : {&quot;balanced&quot;, &quot;balanced_subsample&quot;}, dict or list of dicts,             default=None
+    Weights associated with classes in the form ``{class_label: weight}``
+    If not given, all classes are supposed to have weight one. For
+    multi-output problems, a list of dicts can be provided in the same
+    order as the columns of y
+
+    Note that for multioutput (including multilabel) weights should be
+    defined for each class of every column in its own dict. For example,
+    for four-class multilabel classification weights should be
+    [{0: 1, 1: 1}, {0: 1, 1: 5}, {0: 1, 1: 1}, {0: 1, 1: 1}] instead of
+    [{1:1}, {2:5}, {3:1}, {4:1}]
+
+    The &quot;balanced&quot; mode uses the values of y to automatically adjust
+    weights inversely proportional to class frequenc...</oml:description>
+</oml:parameter>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_1.8.0</oml:tag>
+</oml:flow>
+</oml:component>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_1.8.0</oml:tag>
+</oml:flow>
+</oml:component>
+<oml:tag>openml-python</oml:tag>
+<oml:tag>python</oml:tag>
+<oml:tag>scikit-learn</oml:tag>
+<oml:tag>sklearn</oml:tag>
+<oml:tag>sklearn_1.8.0</oml:tag>
+</oml:flow>
