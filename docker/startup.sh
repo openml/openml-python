@@ -67,7 +67,7 @@ cd $code_dir
 pip install -e .[test,examples,docs,examples_unix]
 
 if [ "$1" == "test" ]; then
-  pytest -n 4 --durations=20 --timeout=600 --timeout-method=thread --dist load -sv
+  pytest --durations=20 --timeout=600 --timeout-method=thread --dist load -sv
 fi
 
 if [ "$1" == "doc" ]; then
