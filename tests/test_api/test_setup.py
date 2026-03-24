@@ -41,6 +41,7 @@ def test_v1_list(setup_v1):
     assert len(setups) > 0
     assert all(isinstance(s, OpenMLSetup) for s in setups)
 
+
 @pytest.mark.test_server()
 def test_v1_get(setup_v1):
     setup_id = 1
@@ -48,6 +49,7 @@ def test_v1_get(setup_v1):
     
     assert isinstance(setup, OpenMLSetup)
     assert setup.setup_id == setup_id
+
 
 @pytest.mark.sklearn()
 @pytest.mark.test_server()
@@ -68,6 +70,7 @@ def test_v1_exists_nonexisting_setup(setup_v1):
     # and hasn't been ran
     setup_id = setup_v1.exists(flow, openml_param_settings)
     assert not setup_id
+
 
 @pytest.mark.sklearn()
 @pytest.mark.test_server()
@@ -95,56 +98,17 @@ def test_v1_exists_existing_setup(setup_v1):
     setup_id = setup_v1.exists(flow, openml_param_settings)
     assert setup_id == run.setup_id
 
-@pytest.mark.test_server()
+
 def test_v2_list(setup_v2):
     with pytest.raises(OpenMLNotSupportedError):
         setup_v2.list(limit=10, offset=0)
 
-@pytest.mark.test_server()
+
 def test_v2_get(setup_v2):
     with pytest.raises(OpenMLNotSupportedError):
         setup_v2.get(1)
 
-@pytest.mark.sklearn()
-@pytest.mark.test_server()
-def test_v2_exists_nonexisting_setup(setup_v2):
-    # first publish a non-existing flow
-    sentinel = get_sentinel()
-    # because of the sentinel, we can not use flows that contain subflows
-    dectree = sklearn.tree.DecisionTreeClassifier()
-    flow = SklearnExtension().model_to_flow(dectree)
-    flow.name = f"{sentinel}{flow.name}"
-    flow.publish()
-    TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-    TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
-    openml_param_settings = flow.extension.obtain_parameter_values(flow)
-    # although the flow exists (created as of previous statement),
-    # we can be sure there are no setups (yet) as it was just created
-    # and hasn't been ran
-    with pytest.raises(OpenMLNotSupportedError):
-        setup_v2.exists(flow, openml_param_settings)
 
-    
-@pytest.mark.sklearn()
-@pytest.mark.test_server()
-def test_v2_exists_existing_setup(setup_v2):
-    flow =SklearnExtension().model_to_flow(
-        sklearn.naive_bayes.GaussianNB()
-    )
-    flow.name = f"{get_sentinel()}{flow.name}"
-    flow.publish()
-    TestBase._mark_entity_for_removal("flow", flow.flow_id, flow.name)
-    TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {flow.flow_id}")
-    openml_param_settings = flow.extension.obtain_parameter_values(flow)
-    # now run the flow on an easy task:
-    task = openml.tasks.get_task(115)
-    run = openml.runs.run_flow_on_task(flow, task)
-    # spoof flow id, otherwise the sentinel is ignored
-    run.flow_id = flow.flow_id
-    run.publish()
-    TestBase._mark_entity_for_removal("run", run.run_id)
-    TestBase.logger.info(f"collected from {__file__.split('/')[-1]}: {run.run_id}")
-    # download the run, as it contains the right setup id
-    run = openml.runs.get_run(run.run_id)
+def test_v2_exists(setup_v2):
     with pytest.raises(OpenMLNotSupportedError):
-        setup_v2.exists(flow, openml_param_settings)
+        setup_v2.exists(flow=None, param_settings=None)
