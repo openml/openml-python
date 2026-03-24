@@ -120,8 +120,7 @@ def test_list_all_for_evaluations(min_number_evaluations_on_test_server):
 def test_list_all_few_results_available(_perform_api_call):
     datasets = openml.datasets.list_datasets(size=1000, data_name="iris", data_version=1)
     assert len(datasets) == 1, "only one iris dataset version 1 should be present"
-    #TODO: _perform_api_call not used anymore
-    # assert _perform_api_call.call_count == 1, "expect just one call to get one dataset"
+    assert _perform_api_call.call_count == 1, "expect just one call to get one dataset"
 
 
 @unittest.skipIf(os.name == "nt", "https://github.com/openml/openml-python/issues/1033")

@@ -1879,21 +1879,31 @@ def test_list_datasets_combined_filters(all_datasets: pd.DataFrame):
     assert 1 <= len(combined_filter_datasets) < len(all_datasets)
     _assert_datasets_have_id_and_valid_status(combined_filter_datasets)
 
-#TODO: test update cache path tests
 
-def _dataset_qualities_is_downloaded(dataset: OpenMLDataset):
-    return dataset._qualities is not None
-
-def _dataset_features_is_downloaded(dataset: OpenMLDataset):
-    return dataset._features is not None
+def _dataset_file_is_downloaded(did: int, file: str):
+    cache_directory = Path(openml.config.get_cache_directory()) / "datasets" / str(did)
+    return (cache_directory / file).exists()
 
 
-def _dataset_data_file_is_downloaded(dataset: OpenMLDataset):
-    return dataset.data_file is not None or dataset.parquet_file is not None
+def _dataset_description_is_downloaded(did: int):
+    return _dataset_file_is_downloaded(did, "description.xml")
+
+
+def _dataset_qualities_is_downloaded(did: int):
+    return _dataset_file_is_downloaded(did, "qualities.xml")
+
+
+def _dataset_features_is_downloaded(did: int):
+    return _dataset_file_is_downloaded(did, "features.xml")
+
+
+def _dataset_data_file_is_downloaded(did: int):
+    cache_directory = Path(openml.config.get_cache_directory()) / "datasets" / str(did)
+    return any(f.suffix in (".pq", ".arff") for f in cache_directory.iterdir())
 
 
 def _assert_datasets_retrieved_successfully(
-    datasets: list[OpenMLDataset],
+    dids: Iterable[int],
     with_qualities: bool = False,
     with_features: bool = False,
     with_data: bool = False,
@@ -1906,15 +1916,16 @@ def _assert_datasets_retrieved_successfully(
         - features
         - absence of data arff if metadata_only, else it must be present too.
     """
-    for dataset in datasets:
+    for did in dids:
+        assert _dataset_description_is_downloaded(did)
 
-        has_qualities = _dataset_qualities_is_downloaded(dataset)
+        has_qualities = _dataset_qualities_is_downloaded(did)
         assert has_qualities if with_qualities else not has_qualities
 
-        has_features = _dataset_features_is_downloaded(dataset)
+        has_features = _dataset_features_is_downloaded(did)
         assert has_features if with_features else not has_features
 
-        has_data = _dataset_data_file_is_downloaded(dataset)
+        has_data = _dataset_data_file_is_downloaded(did)
         assert has_data if with_data else not has_data
 
 
