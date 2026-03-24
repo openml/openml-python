@@ -18,8 +18,8 @@ def evaluation_measure_v2(http_client_v2, minio_client) -> EvaluationMeasureV2AP
 @pytest.mark.test_server()
 def test_v1_list(evaluation_measure_v1):
     measures = evaluation_measure_v1.list()   
-    assert isinstance(measures, list) is True
-    assert all(isinstance(s, str) for s in measures) is True
+    assert isinstance(measures, list)
+    assert all(isinstance(s, str) for s in measures)
 
 
 @pytest.mark.test_server()
