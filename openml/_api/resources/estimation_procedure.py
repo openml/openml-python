@@ -49,7 +49,7 @@ class EstimationProcedureV1API(ResourceV1API, EstimationProcedureAPI):
             for prod in api_results["oml:estimationprocedures"]["oml:estimationprocedure"]
         ]
 
-    def _get_details(self) -> builtins.list[dict[str, Any]]:
+    def list_detailed(self) -> builtins.list[dict[str, Any]]:
         """Return a list of all estimation procedures which are on OpenML.
 
         Returns
@@ -128,5 +128,5 @@ class EstimationProcedureV2API(ResourceV2API, EstimationProcedureAPI):
 
         return [prod["name"] for prod in list_of_prod_dicts]
 
-    def _get_details(self) -> builtins.list[dict[str, Any]]:
+    def list_detailed(self) -> builtins.list[dict[str, Any]]:
         self._not_supported(method="get_details")
