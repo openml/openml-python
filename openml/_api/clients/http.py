@@ -66,8 +66,8 @@ class HTTPCache:
         """
         Generate a filesystem-safe cache key for a request.
 
-        The key is constructed from the reversed domain components, URL path
-        segments, and URL-encoded query parameters (excluding ``api_key``).
+        The key is constructed from URL path segments and
+        URL-encoded query parameters (excluding ``api_key``).
 
         Parameters
         ----------
@@ -82,13 +82,12 @@ class HTTPCache:
             A relative path string representing the cache key.
         """
         parsed_url = urlparse(url)
-        netloc_parts = parsed_url.netloc.split(".")[::-1]
         path_parts = parsed_url.path.strip("/").split("/")
 
         filtered_params = {k: v for k, v in params.items() if k != "api_key"}
         params_part = [urlencode(filtered_params)] if filtered_params else []
 
-        return str(Path(*netloc_parts, *path_parts, *params_part))
+        return str(Path(*path_parts, *params_part))
 
     def _key_to_path(self, key: str) -> Path:
         """
@@ -360,12 +359,8 @@ class HTTPClient:
 
         if message and additional_information:
             full_message = f"{message} - {additional_information}"
-        elif message:
-            full_message = message
-        elif additional_information:
-            full_message = additional_information
         else:
-            full_message = ""
+            full_message = message or additional_information or ""
 
         return code, full_message
 
@@ -819,7 +814,7 @@ class HTTPClient:
     def download(
         self,
         url: str,
-        handler: Callable[[Response, Path, str], Path] | None = None,
+        handler: Callable[[Response, Path, str], None] | None = None,
         encoding: str = "utf-8",
         file_name: str = "response.txt",
         md5_checksum: str | None = None,
@@ -859,29 +854,10 @@ class HTTPClient:
             return file_path
 
         response = self.get(url, md5_checksum=md5_checksum)
-        if handler is not None:
-            return handler(response, file_path, encoding)
 
-        return self._text_handler(response, file_path, encoding)
+        def write_to_file(response: Response, path: Path, encoding: str) -> None:
+            path.write_text(response.text, encoding)
 
-    def _text_handler(self, response: Response, path: Path, encoding: str) -> Path:
-        """
-        Write response text content to a file.
-
-        Parameters
-        ----------
-        response : requests.Response
-            HTTP response containing text data.
-        path : pathlib.Path
-            Destination file path.
-        encoding : str
-            Text encoding for writing the file.
-
-        Returns
-        -------
-        pathlib.Path
-            Path to the written file.
-        """
-        with path.open("w", encoding=encoding) as f:
-            f.write(response.text)
-        return path
+        handler = handler or write_to_file
+        handler(response, file_path, encoding)
+        return file_path

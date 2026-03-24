@@ -8,7 +8,6 @@ from collections.abc import Iterable, Sequence
 
 import xmltodict
 
-import openml
 import openml._api_calls
 
 from .utils import _get_rest_api_type_alias, _tag_openml_base

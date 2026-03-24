@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 import pandas as pd
 import xmltodict
 
-import openml
 import openml._api_calls
 import openml.utils
 from openml.study.study import OpenMLBenchmarkSuite, OpenMLStudy

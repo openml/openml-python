@@ -55,11 +55,6 @@ class TestBase(unittest.TestCase):
     logger = logging.getLogger("unit_tests_published_entities")
     logger.setLevel(logging.DEBUG)
 
-    # migration-specific attributes
-    cache: HTTPCache
-    http_clients: dict[APIVersion, HTTPClient]
-    minio_client: MinIOClient
-
     def setUp(self, n_levels: int = 1, tmpdir_suffix: str = "") -> None:
         """Setup variables and temporary directories.
 
@@ -111,20 +106,13 @@ class TestBase(unittest.TestCase):
         self.connection_n_retries = openml.config.connection_n_retries
         openml.config.set_retry_policy("robot", n_retries=20)
 
-        self.cache = HTTPCache()
-        self.http_clients = {
-            APIVersion.V1: HTTPClient(api_version=APIVersion.V1),
-            APIVersion.V2: HTTPClient(api_version=APIVersion.V2),
-        }
-        self.minio_client = MinIOClient()
-
     def use_production_server(self) -> None:
         """
         Use the production server for the OpenML API calls.
 
         Please use this sparingly - it is better to use the test server.
         """
-        openml.config.set_servers("production")
+        openml.config.use_production_servers()
 
     def tearDown(self) -> None:
         """Tear down the test"""
