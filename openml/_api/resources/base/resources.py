@@ -10,8 +10,8 @@ from .base import ResourceAPI
 if TYPE_CHECKING:
     import pandas as pd
 
-    from openml.flows.flow import OpenMLFlow
     from openml.evaluations import OpenMLEvaluation
+    from openml.flows.flow import OpenMLFlow
 
 
 class DatasetAPI(ResourceAPI):
