@@ -308,7 +308,8 @@ def list_estimation_procedures() -> list[str]:
     -------
     list
     """
-    return openml._backend.estimation_procedure.list()
+    result = openml._backend.estimation_procedure.list_detailed()
+    return [i.name for i in result]
 
 
 def list_evaluations_setups(
