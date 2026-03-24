@@ -10,6 +10,7 @@ from openml.enums import ResourceType
 from .base import ResourceAPI
 
 if TYPE_CHECKING:
+    from openml.evaluations import OpenMLEvaluation
     from openml.flows.flow import OpenMLFlow
     from openml.setups.setup import OpenMLSetup
 
@@ -42,6 +43,23 @@ class EvaluationAPI(ResourceAPI):
     """Abstract API interface for evaluation resources."""
 
     resource_type: ResourceType = ResourceType.EVALUATION
+
+    @abstractmethod
+    def list(  # noqa: PLR0913
+        self,
+        limit: int,
+        offset: int,
+        *,
+        function: str,
+        tasks: list | None = None,
+        setups: list | None = None,
+        flows: list | None = None,
+        runs: list | None = None,
+        uploaders: list | None = None,
+        study: int | None = None,
+        sort_order: str | None = None,
+        **kwargs: Any,
+    ) -> list[OpenMLEvaluation]: ...
 
 
 class FlowAPI(ResourceAPI):
