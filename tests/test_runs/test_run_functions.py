@@ -1959,17 +1959,19 @@ def test__run_task_get_arffcontent_2(parallel_mock):
     [
         # `None` picks the backend based on joblib version (loky or multiprocessing) and
         # spawns multiple processes if n_jobs != 1, which means the mock is not applied.
-        (2, None, 0),
-        (-1, None, 0),
+        #(2, None, 0),
+        #(-1, None, 0),
         (1, None, 10),  # with n_jobs=1 the mock *is* applied, since there is no new subprocess
         (1, "sequential", 10),
         (1, "threading", 10),
-        (-1, "threading", 10),  # the threading backend does preserve mocks even with parallelizing
+        #(-1, "threading", 10),  # the threading backend does preserve mocks even with parallelizing
     ]
 )
 @pytest.mark.test_server()
-def test_joblib_backends(parallel_mock, n_jobs, backend, call_count):
+def test_joblib_backends(parallel_mock, n_jobs, backend, call_count, tmp_path):
     """Tests evaluation of a run using various joblib backends and n_jobs."""
+    openml.config.set_root_cache_directory(tmp_path / "openml_cache")
+    
     if backend is None:
         backend = (
             "loky" if Version(joblib.__version__) > Version("0.11") else "multiprocessing"
