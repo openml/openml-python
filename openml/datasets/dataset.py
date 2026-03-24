@@ -606,6 +606,9 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
         if data_file.suffix == ".arff":
             data, categorical, attribute_names = self._parse_data_from_arff(data_file)
         elif data_file.suffix == ".pq":
+            # TODO testing joblib failures
+            if self.parquet_file is not None and not Path(self.parquet_file).exists():
+                self._download_data()
             attribute_names, categorical, data = self._parse_data_from_pq(data_file)
         else:
             raise ValueError(f"Unknown file type for file '{data_file}'.")

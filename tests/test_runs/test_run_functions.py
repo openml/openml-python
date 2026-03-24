@@ -1970,7 +1970,6 @@ def test__run_task_get_arffcontent_2(parallel_mock):
 @pytest.mark.test_server()
 def test_joblib_backends(parallel_mock, n_jobs, backend, call_count, tmp_path):
     """Tests evaluation of a run using various joblib backends and n_jobs."""
-    openml.config.set_root_cache_directory(tmp_path / "openml_cache")
 
     if backend is None:
         backend = (
