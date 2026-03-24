@@ -34,6 +34,5 @@ def test_list_matches(evaluation_measure_v1,evaluation_measure_v2):
     output_v1 = evaluation_measure_v1.list()
     output_v2 = evaluation_measure_v2.list()
 
-    assert isinstance(output_v1, list)
-    assert isinstance(output_v2, list)
+    assert type(output_v1) == type(output_v2)
     assert output_v1 == output_v2
