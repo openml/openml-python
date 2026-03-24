@@ -36,9 +36,6 @@ class EstimationProcedureAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.ESTIMATION_PROCEDURE
 
     @abstractmethod
-    def list(self) -> list[str]: ...
-
-    @abstractmethod
     def list_detailed(self) -> builtins.list[OpenMLEstimationProcedure]: ...
 
 
