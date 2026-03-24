@@ -1,7 +1,6 @@
 # License: BSD 3-Clause
 from __future__ import annotations
-from openml.tasks.functions import _get_estimation_procedure_list
-import re
+
 import contextlib
 import hashlib
 import logging
@@ -508,12 +507,13 @@ def __parse_server_exception(
             additional_information,
         )
     else:
-     full_message = f"{message} - {additional_information}"
+        full_message = f"{message} - {additional_information}"
 
     # Improve estimation_procedure error message
     if additional_information and "acceptable inputs" in additional_information:
         try:
             import re
+
             from openml.tasks.functions import _get_estimation_procedure_list
 
             # Extract IDs
