@@ -1881,24 +1881,28 @@ def test_list_datasets_combined_filters(all_datasets: pd.DataFrame):
 
 
 def _dataset_file_is_downloaded(did: int, file: str):
-    cache_directory = Path(openml.config.get_cache_directory()) / "datasets" / str(did)
+    cache_directory = Path(openml.config.get_cache_directory()) / "api/v1/xml/data" / str(did)     
     return (cache_directory / file).exists()
 
 
 def _dataset_description_is_downloaded(did: int):
-    return _dataset_file_is_downloaded(did, "description.xml")
+    return _dataset_file_is_downloaded(did, "body.bin")
 
 
 def _dataset_qualities_is_downloaded(did: int):
-    return _dataset_file_is_downloaded(did, "qualities.xml")
+    cache_directory = Path(openml.config.get_cache_directory()) / "downloads/data/qualities"
+    return (cache_directory / str(did) / "qualities.xml").exists()
 
 
 def _dataset_features_is_downloaded(did: int):
-    return _dataset_file_is_downloaded(did, "features.xml")
+    cache_directory = Path(openml.config.get_cache_directory()) / "downloads/data/features"
+    return (cache_directory / str(did) / "features.xml").exists()
 
 
 def _dataset_data_file_is_downloaded(did: int):
-    cache_directory = Path(openml.config.get_cache_directory()) / "datasets" / str(did)
+    cache_directory = Path(openml.config.get_cache_directory()) / "minio/datasets/0000/0001"
+    if not cache_directory.exists():
+        return False
     return any(f.suffix in (".pq", ".arff") for f in cache_directory.iterdir())
 
 
@@ -1950,6 +1954,7 @@ def test_get_dataset_lazy_behavior(
         download_data=with_data,
         download_qualities=with_qualities,
         download_features_meta_data=with_features,
+        force_refresh_cache=True,
     )
     assert type(dataset) == OpenMLDataset
     assert dataset.name == "anneal"
