@@ -133,20 +133,16 @@ class SetupV1API(ResourceV1API, SetupAPI):
 
         xml_parameters = result_dict["oml:setup_parameters"]["oml:parameter"]
         if isinstance(xml_parameters, dict):
-            parameters = {
-                int(xml_parameters["oml:id"]): self._create_setup_parameter_from_xml(
-                    xml_parameters
-                ),
-            }
-        elif isinstance(xml_parameters, builtins.list):
-            parameters = {
-                int(xml_parameter["oml:id"]): self._create_setup_parameter_from_xml(xml_parameter)
-                for xml_parameter in xml_parameters
-            }
-        else:
+            xml_parameters = [xml_parameters]
+        if not isinstance(xml_parameters, list):
             raise ValueError(
                 f"Expected None, list or dict, received something else: {type(xml_parameters)!s}",
             )
+            
+        parameters = {
+            int(xml_parameter["oml:id"]): self._create_setup_parameter_from_xml(xml_parameter)
+            for xml_parameter in xml_parameters
+        }
         return OpenMLSetup(setup_id, flow_id, parameters)
 
     def _create_setup_parameter_from_xml(self, result_dict: dict[str, str]) -> OpenMLParameter:
