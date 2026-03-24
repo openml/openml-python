@@ -1,0 +1,1 @@
+{"status_code": 200, "url": "https://www.openml.org/api/v1/xml/setup/1", "reason": "OK", "encoding": "utf-8", "created_at": 1774327095.6277223, "request": {"method": "GET", "url": "https://www.openml.org/api/v1/xml/setup/1", "headers": {"user-agent": "openml-python/0.16.0", "Accept-Encoding": "gzip, deflate", "Accept": "*/*", "Connection": "keep-alive"}, "body": null}}
