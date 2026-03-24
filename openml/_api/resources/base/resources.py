@@ -10,9 +10,9 @@ from .base import ResourceAPI
 if TYPE_CHECKING:
     import pandas as pd
 
+    from openml.evaluations import OpenMLEvaluation
     from openml.runs.run import OpenMLRun
     from openml.tasks.task import TaskType
-    from openml.evaluations import OpenMLEvaluation
 
 
 class DatasetAPI(ResourceAPI):
