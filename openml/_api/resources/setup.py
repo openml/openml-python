@@ -267,9 +267,6 @@ class SetupV2API(ResourceV2API, SetupAPI):
     ) -> builtins.list[OpenMLSetup]:
         self._not_supported(method="list")
 
-    def _create_setup(self, result_dict: dict) -> OpenMLSetup:  # noqa: ARG002
-        self._not_supported(method="create_setup")
-
     def get(self, setup_id: int) -> OpenMLSetup:  # noqa: ARG002
         self._not_supported(method="get")
 

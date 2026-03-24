@@ -79,9 +79,6 @@ class SetupAPI(ResourceAPI):
     ) -> list[OpenMLSetup]: ...
 
     @abstractmethod
-    def _create_setup(self, result_dict: dict) -> OpenMLSetup: ...
-
-    @abstractmethod
     def get(self, setup_id: int) -> OpenMLSetup: ...
 
     @abstractmethod

@@ -150,8 +150,3 @@ def initialize_model(setup_id: int, *, strict_version: bool = True) -> Any:
             subflow.parameters[hyperparameter.parameter_name] = hyperparameter.value
 
     return flow.extension.flow_to_model(flow, strict_version=strict_version)
-
-
-def _create_setup(result_dict: dict) -> OpenMLSetup:
-    """Turns an API xml result into a OpenMLSetup object (or dict)"""
-    return openml._backend.setup._create_setup(result_dict)
