@@ -2,8 +2,7 @@
 from __future__ import annotations  
   
 import pytest  
-import hashlib
-import time
+import uuid
 import sklearn.tree
 import sklearn.naive_bayes
 import openml
@@ -19,10 +18,8 @@ def get_sentinel():
     # Create a unique prefix for the flow. Necessary because the flow is
     # identified by its name and external version online. Having a unique
     #  name allows us to publish the same flow in each test run
-    md5 = hashlib.md5()
-    md5.update(str(time.time()).encode("utf-8"))
-    sentinel = md5.hexdigest()[:10]
-    return f"TEST{sentinel}"  
+    sentinel = uuid.uuid4().hex[:10]
+    return f"TEST{sentinel}"
 
 @pytest.fixture
 def setup_v1(http_client_v1, minio_client) -> SetupV1API:
