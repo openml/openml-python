@@ -224,7 +224,7 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
     res_paths.append(_c_root_dir / "setups" / "1" / "description.xml")
 
     for _id in ["1", "3", "1882"]:
-        tmp_p = _c_root_dir / "tasks" / _id
+        tmp_p = _c_root_dir / "api/v1/xml/task" / _id
         res_paths.extend(
             [
                 tmp_p / "datasplits.arff",
