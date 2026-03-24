@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import builtins
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
@@ -36,7 +35,7 @@ class EstimationProcedureAPI(ResourceAPI):
     resource_type: ResourceType = ResourceType.ESTIMATION_PROCEDURE
 
     @abstractmethod
-    def list(self) -> builtins.list[OpenMLEstimationProcedure]: ...
+    def list(self) -> list[OpenMLEstimationProcedure]: ...
 
 
 class EvaluationAPI(ResourceAPI):

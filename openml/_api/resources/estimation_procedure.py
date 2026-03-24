@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import builtins
 import warnings
 
 import xmltodict
@@ -17,7 +16,7 @@ class EstimationProcedureV1API(ResourceV1API, EstimationProcedureAPI):
     Fetches estimation procedures from the v1 XML API endpoint.
     """
 
-    def list(self) -> builtins.list[OpenMLEstimationProcedure]:
+    def list(self) -> list[OpenMLEstimationProcedure]:
         """Return a list of all estimation procedures which are on OpenML.
 
         Returns
@@ -52,7 +51,7 @@ class EstimationProcedureV1API(ResourceV1API, EstimationProcedureAPI):
                 ),
             )
 
-        procs: builtins.list[OpenMLEstimationProcedure] = []
+        procs: list[OpenMLEstimationProcedure] = []
         for proc_ in procs_dict["oml:estimationprocedures"]["oml:estimationprocedure"]:
             task_type_int = int(proc_["oml:ttid"])
             try:
@@ -81,5 +80,5 @@ class EstimationProcedureV2API(ResourceV2API, EstimationProcedureAPI):
     Fetches estimation procedures from the v2 JSON API endpoint.
     """
 
-    def list(self) -> builtins.list[OpenMLEstimationProcedure]:
+    def list(self) -> list[OpenMLEstimationProcedure]:
         self._not_supported(method="get_details")
