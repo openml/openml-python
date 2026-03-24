@@ -183,4 +183,8 @@ class TestSetupFunctions(TestBase):
     @pytest.mark.test_server()
     def test_get_cached_setup(self):
         openml.config.set_root_cache_directory(self.static_cache_dir)
-        openml.setups.get_setup(1)
+
+        with unittest.mock.patch("requests.sessions.Session.request") as mock_request:
+            setup = openml.setups.get_setup(1)
+            mock_request.assert_not_called()
+            assert setup is not None
