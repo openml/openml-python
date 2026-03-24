@@ -138,7 +138,7 @@ class SetupV1API(ResourceV1API, SetupAPI):
             raise ValueError(
                 f"Expected None, list or dict, received something else: {type(xml_parameters)!s}",
             )
-            
+
         parameters = {
             int(xml_parameter["oml:id"]): self._create_setup_parameter_from_xml(xml_parameter)
             for xml_parameter in xml_parameters
