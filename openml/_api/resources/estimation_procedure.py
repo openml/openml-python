@@ -17,7 +17,7 @@ class EstimationProcedureV1API(ResourceV1API, EstimationProcedureAPI):
     Fetches estimation procedures from the v1 XML API endpoint.
     """
 
-    def list_detailed(self) -> builtins.list[OpenMLEstimationProcedure]:
+    def list(self) -> builtins.list[OpenMLEstimationProcedure]:
         """Return a list of all estimation procedures which are on OpenML.
 
         Returns
@@ -81,5 +81,5 @@ class EstimationProcedureV2API(ResourceV2API, EstimationProcedureAPI):
     Fetches estimation procedures from the v2 JSON API endpoint.
     """
 
-    def list_detailed(self) -> builtins.list[OpenMLEstimationProcedure]:
+    def list(self) -> builtins.list[OpenMLEstimationProcedure]:
         self._not_supported(method="get_details")

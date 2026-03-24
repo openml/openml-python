@@ -26,8 +26,8 @@ def test_v1_list(estimation_procedure_v1):
 
 
 @pytest.mark.test_server()
-def test_v1_list_detailed(estimation_procedure_v1):
-    details = estimation_procedure_v1.list_detailed()
+def test_v1_list(estimation_procedure_v1):
+    details = estimation_procedure_v1.list()
     
     assert isinstance(details, list)
     assert len(details) > 0
@@ -48,9 +48,9 @@ def test_v2_list(estimation_procedure_v2):
 
     
 @pytest.mark.test_server()
-def test_v2_list_detailed(estimation_procedure_v2):
+def test_v2_list(estimation_procedure_v2):
     with pytest.raises(OpenMLNotSupportedError):
-        estimation_procedure_v2.list_detailed()
+        estimation_procedure_v2.list()
         
 
 @pytest.mark.test_server()
