@@ -167,16 +167,42 @@ def list_evaluation_measures() -> list[str]:
     return qualities["oml:evaluation_measures"]["oml:measures"][0]["oml:measure"]
 
 
-def list_estimation_procedures() -> list[str]:
-    """Return list of evaluation procedures available.
+@overload
+def list_estimation_procedures(include_ids: Literal[True]) -> dict[int, str]: ...
+
+
+@overload
+def list_estimation_procedures(include_ids: Literal[False] = ...) -> list[str]: ...
+
+
+def list_estimation_procedures(include_ids: bool = False) -> dict[int, str] | list[str]:  # noqa: FBT002
+    """Return dictionary or list of estimation procedures available.
 
     The function performs an API call to retrieve the entire list of
-    evaluation procedures' names that are available.
+    estimation procedures' ids and names that are available.
+
+    Parameters
+    ----------
+    include_ids : bool, optional (default=False)
+        If True, return a dictionary mapping estimation procedure id to name.
+        If False, return a list of estimation procedure names.
 
     Returns
     -------
-    list
+    list of estimation procedure names (default), or dict mapping
+    estimation procedure id to name if include_ids=True
     """
+    if not include_ids:
+        import warnings
+
+        warnings.warn(
+            "Returning a list from list_estimation_procedures is deprecated "
+            "and will be removed in a future release. "
+            "Use include_ids=True to get a dict of {id: name} instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
     api_call = "estimationprocedure/list"
     xml_string = openml._api_calls._perform_api_call(api_call, "get")
     api_results = xmltodict.parse(xml_string)
@@ -191,6 +217,11 @@ def list_estimation_procedures() -> list[str]:
     if not isinstance(api_results["oml:estimationprocedures"]["oml:estimationprocedure"], list):
         raise TypeError('Error in return XML, does not contain "oml:estimationprocedure" as a list')
 
+    if include_ids:
+        return {
+            int(prod["oml:id"]): prod["oml:name"]
+            for prod in api_results["oml:estimationprocedures"]["oml:estimationprocedure"]
+        }
     return [
         prod["oml:name"]
         for prod in api_results["oml:estimationprocedures"]["oml:estimationprocedure"]

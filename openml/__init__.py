@@ -37,7 +37,7 @@ from . import (
 from .__version__ import __version__
 from ._api import _backend
 from .datasets import OpenMLDataFeature, OpenMLDataset
-from .evaluations import OpenMLEvaluation
+from .evaluations import OpenMLEvaluation, list_estimation_procedures
 from .flows import OpenMLFlow
 from .runs import OpenMLRun
 from .setups import OpenMLParameter, OpenMLSetup
@@ -124,6 +124,7 @@ __all__ = [
     "exceptions",
     "extensions",
     "flows",
+    "list_estimation_procedures",
     "runs",
     "setups",
     "study",
