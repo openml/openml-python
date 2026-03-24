@@ -228,7 +228,7 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
         res_paths.extend(
             [
                 tmp_p / "datasplits.arff",
-                tmp_p / "task.xml",
+                tmp_p / "body.bin",
             ]
         )
 
