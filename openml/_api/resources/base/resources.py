@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import builtins
 from abc import abstractmethod
-from typing import Any
+from typing import TYPE_CHECKING
 
 from openml.enums import ResourceType
 
 from .base import ResourceAPI
+
+if TYPE_CHECKING:
+    from openml.estimation_procedures.estimation_procedure import OpenMLEstimationProcedure
 
 
 class DatasetAPI(ResourceAPI):
@@ -36,7 +39,7 @@ class EstimationProcedureAPI(ResourceAPI):
     def list(self) -> list[str]: ...
 
     @abstractmethod
-    def list_detailed(self) -> builtins.list[dict[str, Any]]: ...
+    def list_detailed(self) -> builtins.list[OpenMLEstimationProcedure]: ...
 
 
 class EvaluationAPI(ResourceAPI):

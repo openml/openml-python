@@ -80,8 +80,8 @@ def _get_estimation_procedure_list() -> list[dict[str, Any]]:
         a dictionary containing the following information: id, task type id,
         name, type, repeats, folds, stratified.
     """
-    result: list[dict[str, Any]] = openml._backend.estimation_procedure.list_detailed()
-    return result
+    result = openml._backend.estimation_procedure.list_detailed()
+    return [i._to_dict() for i in result]
 
 
 def list_tasks(  # noqa: PLR0913

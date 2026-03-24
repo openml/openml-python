@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import builtins
 import warnings
-from typing import Any
 
 import xmltodict
 
+from openml.estimation_procedures.estimation_procedure import OpenMLEstimationProcedure
 from openml.tasks.task import TaskType
 
 from .base import EstimationProcedureAPI, ResourceV1API, ResourceV2API
@@ -49,7 +49,7 @@ class EstimationProcedureV1API(ResourceV1API, EstimationProcedureAPI):
             for prod in api_results["oml:estimationprocedures"]["oml:estimationprocedure"]
         ]
 
-    def list_detailed(self) -> builtins.list[dict[str, Any]]:
+    def list_detailed(self) -> builtins.list[OpenMLEstimationProcedure]:
         """Return a list of all estimation procedures which are on OpenML.
 
         Returns
@@ -64,6 +64,7 @@ class EstimationProcedureV1API(ResourceV1API, EstimationProcedureAPI):
         xml_content = response.text
 
         procs_dict = xmltodict.parse(xml_content)
+
         # Minimalistic check if the XML is useful
         if "oml:estimationprocedures" not in procs_dict:
             raise ValueError("Error in return XML, does not contain tag oml:estimationprocedures.")
@@ -83,18 +84,18 @@ class EstimationProcedureV1API(ResourceV1API, EstimationProcedureAPI):
                 ),
             )
 
-        procs: builtins.list[dict[str, Any]] = []
+        procs: builtins.list[OpenMLEstimationProcedure] = []
         for proc_ in procs_dict["oml:estimationprocedures"]["oml:estimationprocedure"]:
             task_type_int = int(proc_["oml:ttid"])
             try:
                 task_type_id = TaskType(task_type_int)
                 procs.append(
-                    {
-                        "id": int(proc_["oml:id"]),
-                        "task_type_id": task_type_id,
-                        "name": proc_["oml:name"],
-                        "type": proc_["oml:type"],
-                    },
+                    OpenMLEstimationProcedure(
+                        id=int(proc_["oml:id"]),
+                        task_type_id=task_type_id,
+                        name=proc_["oml:name"],
+                        type=proc_["oml:type"],
+                    )
                 )
             except ValueError as e:
                 warnings.warn(
@@ -128,5 +129,5 @@ class EstimationProcedureV2API(ResourceV2API, EstimationProcedureAPI):
 
         return [prod["name"] for prod in list_of_prod_dicts]
 
-    def list_detailed(self) -> builtins.list[dict[str, Any]]:
+    def list_detailed(self) -> builtins.list[OpenMLEstimationProcedure]:
         self._not_supported(method="get_details")
