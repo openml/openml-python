@@ -104,10 +104,11 @@ def test_get_with_cache_creates_cache(http_client, cache, sample_url_v1, sample_
 
     cache_key = cache.get_key(sample_url_v1, {})
     cache_path = cache._key_to_path(cache_key)
+    body_filename = cache._get_body_filename_from_path(cache_path)
 
     assert (cache_path / "meta.json").exists()
     assert (cache_path / "headers.json").exists()
-    assert (cache_path / "body.bin").exists()
+    assert (cache_path / body_filename).exists()
 
 
 @pytest.mark.test_server()
