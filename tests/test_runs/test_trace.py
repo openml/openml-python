@@ -17,7 +17,7 @@ class TestTrace(TestBase):
                         repeat=i,
                         fold=j,
                         iteration=5,
-                        setup_string="parameter_%d%d%d" % (i, j, k),
+                        setup_string=f"parameter_{i}{j}{k}",
                         evaluation=1.0 * i + 0.1 * j + 0.01 * k,
                         selected=(i == j and i == k and i == 2),
                         parameters=None,
@@ -34,13 +34,13 @@ class TestTrace(TestBase):
 
     def test_initialization(self):
         """Check all different ways to fail the initialization"""
-        with pytest.raises(ValueError, match="Trace content not available."):
+        with pytest.raises(ValueError, match=r"Trace content not available."):
             OpenMLRunTrace.generate(attributes="foo", content=None)
-        with pytest.raises(ValueError, match="Trace attributes not available."):
+        with pytest.raises(ValueError, match=r"Trace attributes not available."):
             OpenMLRunTrace.generate(attributes=None, content="foo")
-        with pytest.raises(ValueError, match="Trace content is empty."):
+        with pytest.raises(ValueError, match=r"Trace content is empty."):
             OpenMLRunTrace.generate(attributes="foo", content=[])
-        with pytest.raises(ValueError, match="Trace_attributes and trace_content not compatible:"):
+        with pytest.raises(ValueError, match=r"Trace_attributes and trace_content not compatible:"):
             OpenMLRunTrace.generate(attributes=["abc"], content=[[1, 2]])
 
     def test_duplicate_name(self):
@@ -57,7 +57,7 @@ class TestTrace(TestBase):
         trace_content = [[0, 0, 0, 0.5, "true", 1], [0, 0, 0, 0.9, "false", 2]]
         with pytest.raises(
             ValueError,
-            match="Either `setup_string` or `parameters` needs to be passed as argument.",
+            match=r"Either `setup_string` or `parameters` needs to be passed as argument.",
         ):
             OpenMLRunTrace.generate(trace_attributes, trace_content)
 

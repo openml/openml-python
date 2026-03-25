@@ -78,7 +78,7 @@ class TestBase(unittest.TestCase):
         for _ in range(n_levels):
             static_cache_dir = static_cache_dir.parent.absolute()
 
-        content = os.listdir(static_cache_dir)  # noqa: PTH208
+        content = os.listdir(static_cache_dir)  # noqa: PTH208, RUF100
         if "files" in content:
             static_cache_dir = static_cache_dir / "files"
         else:

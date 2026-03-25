@@ -1,7 +1,7 @@
 # Advanced User Guide
 
 This document highlights some of the more advanced features of
-`openml-python`. 
+`openml-python`.
 
 ## Configuration
 
@@ -34,7 +34,7 @@ following keys are defined:
                 trying to reconnect for a longer time, quickly increasing
                 the time between retries.
 
-- connection_n_retries: number of times to retry a request if they fail. 
+- connection_n_retries: number of times to retry a request if they fail.
 Default depends on retry_policy (5 for `human`, 50 for `robot`)
 - verbosity: the level of output:
       -   0: normal output
@@ -43,7 +43,7 @@ Default depends on retry_policy (5 for `human`, 50 for `robot`)
 
 This file is easily configurable by the `openml` command line interface.
 To see where the file is stored, and what its values are, use openml
-configure none. 
+configure none.
 
 ## Docker
 
@@ -73,4 +73,3 @@ list of **tasks**.
 
 A further explanation is given in the [OpenML user
 guide](https://docs.openml.org/concepts/).
-

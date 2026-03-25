@@ -41,7 +41,7 @@ def _ensure_dataframe(
     raise TypeError(f"Data type {type(data)} not supported.")
 
 
-class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
+class OpenMLDataset(OpenMLBase):  # noqa: PLW1641, RUF100
     """Dataset object.
 
     Allows fetching and uploading datasets to OpenML.

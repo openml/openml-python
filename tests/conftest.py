@@ -18,7 +18,7 @@ disable file deletions, without editing any of the test case files.
 Possible Future: class TestBase from openml/testing.py can be included
     under this file and there would not be any requirements to import
     testing.py in each of the unit test modules.
-"""
+"""  # noqa: D404
 
 # License: BSD 3-Clause
 from __future__ import annotations
@@ -27,20 +27,18 @@ import multiprocessing
 
 multiprocessing.set_start_method("spawn", force=True)
 
-from collections.abc import Iterator
-import logging
-import os
-import shutil
-from pathlib import Path
-import pytest
-import openml_sklearn
-from openml._api import HTTPClient, MinIOClient
-from openml.enums import APIVersion
+import logging  # noqa: E402
+import os  # noqa: E402
+import shutil  # noqa: E402
+from collections.abc import Iterator  # noqa: E402
+from pathlib import Path  # noqa: E402
 
-import openml
-from openml.testing import TestBase
+import pytest  # noqa: E402
 
-import inspect
+import openml  # noqa: E402
+from openml._api import HTTPClient, MinIOClient  # noqa: E402
+from openml.enums import APIVersion  # noqa: E402
+from openml.testing import TestBase  # noqa: E402
 
 # creating logger for unit test file deletion status
 logger = logging.getLogger("unit_tests")
@@ -59,8 +57,7 @@ def worker_id() -> str:
     vars_ = list(os.environ.keys())
     if "PYTEST_XDIST_WORKER" in vars_ or "PYTEST_XDIST_WORKER_COUNT" in vars_:
         return os.environ["PYTEST_XDIST_WORKER"]
-    else:
-        return "master"
+    return "master"
 
 
 def read_file_list() -> list[Path]:
@@ -81,7 +78,7 @@ def compare_delete_files(old_list: list[Path], new_list: list[Path]) -> None:
     """
     file_list = list(set(new_list) - set(old_list))
     for file in file_list:
-        os.remove(file)
+        os.remove(file)  # noqa: PTH107
         logger.info(f"Deleted from local: {file}")
 
 
@@ -104,7 +101,7 @@ def delete_remote_files(tracker, flow_names) -> None:
     # reordering to delete sub flows at the end of flows
     # sub-flows have shorter names, hence, sorting by descending order of flow name length
     if "flow" in tracker:
-        to_sort = list(zip(tracker["flow"], flow_names))
+        to_sort = list(zip(tracker["flow"], flow_names, strict=False))
         flow_deletion_order = [
             entity_id for entity_id, _ in sorted(to_sort, key=lambda x: len(x[1]), reverse=True)
         ]
@@ -119,7 +116,7 @@ def delete_remote_files(tracker, flow_names) -> None:
             try:
                 openml.utils._delete_entity(entity_type, entity)
                 logger.info(f"Deleted ({entity_type}, {entity})")
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 logger.warning(f"Cannot delete ({entity_type},{entity}): {e}")
 
 
@@ -139,7 +136,7 @@ def pytest_sessionstart() -> None:
     :return: None
     """
     # file_list is global to maintain the directory snapshot during tear down
-    global file_list
+    global file_list  # noqa: PLW0603
     worker = worker_id()
     if worker == "master":
         file_list = read_file_list()
@@ -162,7 +159,7 @@ def pytest_sessionfinish() -> None:
     :return: None
     """
     # allows access to the file_list read in the set up phase
-    global file_list
+    global file_list  # noqa: PLW0602
     worker = worker_id()
     logger.info(f"Finishing worker {worker}")
 
@@ -270,7 +267,7 @@ def test_apikey_v2() -> str:
     return openml.config.get_test_servers()[APIVersion.V2]["apikey"]
 
 
-@pytest.fixture(autouse=True, scope="function")
+@pytest.fixture(autouse=True)
 def verify_cache_state(test_files_directory) -> Iterator[None]:
     assert_static_test_cache_correct(test_files_directory)
     yield
@@ -319,11 +316,12 @@ def with_test_cache(test_files_directory, request):
     openml.config.set_root_cache_directory(_root_cache_directory)
     if tmp_cache.exists():
         shutil.rmtree(tmp_cache)
-        
+
 
 @pytest.fixture
 def static_cache_dir():
-    return Path(__file__).parent / "files" 
+    return Path(__file__).parent / "files"
+
 
 @pytest.fixture
 def workdir(tmp_path):

@@ -8,12 +8,15 @@ import sys
 from collections.abc import Callable
 from dataclasses import fields
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 from urllib.parse import urlparse
 
 import openml
 from openml.__version__ import __version__
 from openml.enums import APIVersion
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def is_hex(string_: str) -> bool:

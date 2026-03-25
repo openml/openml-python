@@ -2,11 +2,10 @@
 from __future__ import annotations
 
 from collections import OrderedDict
-from collections.abc import Iterable
 from functools import partial
 from itertools import chain
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
 import xmltodict
@@ -17,6 +16,9 @@ import openml.utils
 from openml.flows import OpenMLFlow, flow_exists
 
 from .setup import OpenMLParameter, OpenMLSetup
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 def setup_exists(flow: OpenMLFlow) -> int:

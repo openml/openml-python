@@ -5,6 +5,7 @@ import unittest
 
 import openml
 
+
 class TestEvaluationsExample(unittest.TestCase):
     def test_example_python_paper(self):
         # Example script which will appear in the upcoming OpenML-Python paper
@@ -17,6 +18,8 @@ class TestEvaluationsExample(unittest.TestCase):
         ):
             import matplotlib.pyplot as plt
             import numpy as np
+
+            import openml
 
             df = openml.evaluations.list_evaluations_setups(
                 "predictive_accuracy",
