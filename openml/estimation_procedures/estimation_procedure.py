@@ -40,21 +40,11 @@ class OpenMLEstimationProcedure:
 
         fields = {
             "ID": self.id,
-            "Task Type": self.task_type_id,
             "Name": self.name,
             "Type": self.type,
+            "Task Type": self.task_type_id,
         }
-
-        order = [
-            "ID",
-            "Name",
-            "Type",
-            "Task Type",
-        ]
-
-        _fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, _ in _fields)
+        longest_field_name_length = max(len(name) for name in fields)
         field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
+        body = "\n".join(field_line_format.format(name, value) for name, value in fields.items())
         return header + body
