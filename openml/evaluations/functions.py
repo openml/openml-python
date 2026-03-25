@@ -9,7 +9,6 @@ from typing_extensions import overload
 
 import numpy as np
 import pandas as pd
-import xmltodict
 
 import openml
 import openml._api_calls
