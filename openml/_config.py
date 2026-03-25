@@ -11,6 +11,7 @@ import platform
 import shutil
 import warnings
 from contextlib import contextmanager
+from copy import deepcopy
 from dataclasses import dataclass, field, fields, replace
 from io import StringIO
 from pathlib import Path
@@ -19,9 +20,59 @@ from urllib.parse import urlparse
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+from openml.enums import APIVersion, ServerMode
+
+from .__version__ import __version__
 
 logger = logging.getLogger(__name__)
 openml_logger = logging.getLogger("openml")
+
+
+_PROD_SERVERS: dict[APIVersion, dict[str, str | None]] = {
+    APIVersion.V1: {
+        "server": "https://www.openml.org/api/v1/xml/",
+        "apikey": None,
+    },
+    APIVersion.V2: {
+        "server": None,
+        "apikey": None,
+    },
+}
+
+_TEST_SERVERS: dict[APIVersion, dict[str, str | None]] = {
+    APIVersion.V1: {
+        "server": "https://test.openml.org/api/v1/xml/",
+        "apikey": "normaluser",
+    },
+    APIVersion.V2: {
+        "server": None,
+        "apikey": None,
+    },
+}
+
+_TEST_SERVERS_LOCAL: dict[APIVersion, dict[str, str | None]] = {
+    APIVersion.V1: {
+        "server": "http://localhost:8000/api/v1/xml/",
+        "apikey": "normaluser",
+    },
+    APIVersion.V2: {
+        "server": "http://localhost:8082/",
+        "apikey": "normaluser",
+    },
+}
+
+_SERVERS_REGISTRY: dict[ServerMode, dict[APIVersion, dict[str, str | None]]] = {
+    ServerMode.PRODUCTION: _PROD_SERVERS,
+    ServerMode.TEST: (
+        _TEST_SERVERS_LOCAL if os.getenv("OPENML_USE_LOCAL_SERVICES") == "true" else _TEST_SERVERS
+    ),
+}
+
+
+def _get_servers(mode: ServerMode) -> dict[APIVersion, dict[str, str | None]]:
+    if mode not in ServerMode:
+        raise ValueError(f'invalid mode="{mode}" allowed modes: {", ".join(list(ServerMode))}')
+    return deepcopy(_SERVERS_REGISTRY[mode])
 
 
 def _resolve_default_cache_dir() -> Path:
@@ -59,19 +110,38 @@ def _resolve_default_cache_dir() -> Path:
 class OpenMLConfig:
     """Dataclass storing the OpenML configuration."""
 
-    apikey: str | None = ""
-    server: str = "https://www.openml.org/api/v1/xml"
+    servers: dict[APIVersion, dict[str, str | None]] = field(
+        default_factory=lambda: _get_servers(ServerMode.PRODUCTION)
+    )
+    api_version: APIVersion = APIVersion.V1
+    fallback_api_version: APIVersion | None = None
     cachedir: Path = field(default_factory=_resolve_default_cache_dir)
     avoid_duplicate_runs: bool = False
     retry_policy: Literal["human", "robot"] = "human"
     connection_n_retries: int = 5
     show_progress: bool = False
 
-    def __setattr__(self, name: str, value: Any) -> None:
-        if name == "apikey" and not isinstance(value, (type(None), str)):
-            raise TypeError("apikey must be a string or None")
+    @property
+    def server(self) -> str:
+        server = self.servers[self.api_version]["server"]
+        if server is None:
+            servers_repr = {k.value: v for k, v in self.servers.items()}
+            raise ValueError(
+                f'server found to be None for api_version="{self.api_version}" in {servers_repr}'
+            )
+        return server
 
-        super().__setattr__(name, value)
+    @server.setter
+    def server(self, value: str | None) -> None:
+        self.servers[self.api_version]["server"] = value
+
+    @property
+    def apikey(self) -> str | None:
+        return self.servers[self.api_version]["apikey"]
+
+    @apikey.setter
+    def apikey(self, value: str | None) -> None:
+        self.servers[self.api_version]["apikey"] = value
 
 
 class OpenMLConfigManager:
@@ -83,9 +153,8 @@ class OpenMLConfigManager:
 
         self.OPENML_CACHE_DIR_ENV_VAR = "OPENML_CACHE_DIR"
         self.OPENML_SKIP_PARQUET_ENV_VAR = "OPENML_SKIP_PARQUET"
-        self._TEST_SERVER_NORMAL_USER_KEY = "normaluser"
         self.OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR = "OPENML_TEST_SERVER_ADMIN_KEY"
-        self.TEST_SERVER_URL = "https://test.openml.org"
+        self._HEADERS: dict[str, str] = {"user-agent": f"openml-python/{__version__}"}
 
         self._config: OpenMLConfig = OpenMLConfig()
         # for legacy test `test_non_writable_home`
@@ -118,7 +187,7 @@ class OpenMLConfigManager:
             "_examples",
             "OPENML_CACHE_DIR_ENV_VAR",
             "OPENML_SKIP_PARQUET_ENV_VAR",
-            "_TEST_SERVER_NORMAL_USER_KEY",
+            "_HEADERS",
         }:
             return object.__setattr__(self, name, value)
 
@@ -127,6 +196,10 @@ class OpenMLConfigManager:
             if name == "cachedir":
                 object.__setattr__(self, "_root_cache_directory", Path(value))
             object.__setattr__(self, "_config", replace(self._config, **{name: value}))
+            return None
+
+        if name in ["server", "apikey"]:
+            setattr(self._config, name, value)
             return None
 
         object.__setattr__(self, name, value)
@@ -191,6 +264,48 @@ class OpenMLConfigManager:
         """Get the base URL of the OpenML server (i.e., without /api)."""
         domain, _ = self._config.server.split("/api", maxsplit=1)
         return domain.replace("api", "www")
+
+    def _get_servers(self, mode: ServerMode) -> dict[APIVersion, dict[str, str | None]]:
+        return _get_servers(mode)
+
+    def _set_servers(self, mode: ServerMode) -> None:
+        servers = self._get_servers(mode)
+        self._config = replace(self._config, servers=servers)
+
+    def get_production_servers(self) -> dict[APIVersion, dict[str, str | None]]:
+        return self._get_servers(mode=ServerMode.PRODUCTION)
+
+    def get_test_servers(self) -> dict[APIVersion, dict[str, str | None]]:
+        return self._get_servers(mode=ServerMode.TEST)
+
+    def use_production_servers(self) -> None:
+        self._set_servers(mode=ServerMode.PRODUCTION)
+
+    def use_test_servers(self) -> None:
+        self._set_servers(mode=ServerMode.TEST)
+
+    def set_api_version(
+        self,
+        api_version: APIVersion,
+        fallback_api_version: APIVersion | None = None,
+    ) -> None:
+        if api_version not in APIVersion:
+            raise ValueError(
+                f'invalid api_version="{api_version}" '
+                f"allowed versions: {', '.join(list(APIVersion))}"
+            )
+
+        if fallback_api_version is not None and fallback_api_version not in APIVersion:
+            raise ValueError(
+                f'invalid fallback_api_version="{fallback_api_version}" '
+                f"allowed versions: {', '.join(list(APIVersion))}"
+            )
+
+        self._config = replace(
+            self._config,
+            api_version=api_version,
+            fallback_api_version=fallback_api_version,
+        )
 
     def set_retry_policy(
         self, value: Literal["human", "robot"], n_retries: int | None = None
@@ -319,13 +434,18 @@ class OpenMLConfigManager:
 
         self._config = replace(
             self._config,
-            apikey=config["apikey"],
-            server=config["server"],
+            servers=config["servers"],
+            api_version=config["api_version"],
+            fallback_api_version=config["fallback_api_version"],
             show_progress=config["show_progress"],
             avoid_duplicate_runs=config["avoid_duplicate_runs"],
             retry_policy=config["retry_policy"],
             connection_n_retries=int(config["connection_n_retries"]),
         )
+        if "server" in config:
+            self._config.server = config["server"]
+        if "apikey" in config:
+            self._config.apikey = config["apikey"]
 
         user_defined_cache_dir = os.environ.get(self.OPENML_CACHE_DIR_ENV_VAR)
         if user_defined_cache_dir is not None:
@@ -395,14 +515,12 @@ class OpenMLConfigManager:
 class ConfigurationForExamples:
     """Allows easy switching to and from a test configuration, used for examples."""
 
-    _last_used_server = None
-    _last_used_key = None
+    _last_used_servers = None
     _start_last_called = False
 
     def __init__(self, manager: OpenMLConfigManager):
         self._manager = manager
-        self._test_apikey = manager._TEST_SERVER_NORMAL_USER_KEY
-        self._test_server = f"{manager.TEST_SERVER_URL}/api/v1/xml"
+        self._test_servers = manager.get_test_servers()
 
     def start_using_configuration_for_example(self) -> None:
         """Sets the configuration to connect to the test server with valid apikey.
@@ -410,27 +528,22 @@ class ConfigurationForExamples:
         To configuration as was before this call is stored, and can be recovered
         by using the `stop_use_example_configuration` method.
         """
-        if (
-            self._start_last_called
-            and self._manager._config.server == self._test_server
-            and self._manager._config.apikey == self._test_apikey
-        ):
+        if self._start_last_called and self._manager._config.servers == self._test_servers:
             # Method is called more than once in a row without modifying the server or apikey.
             # We don't want to save the current test configuration as a last used configuration.
             return
 
-        self._last_used_server = self._manager._config.server
-        self._last_used_key = self._manager._config.apikey
+        self._last_used_servers = self._manager._config.servers
         type(self)._start_last_called = True
 
         # Test server key for examples
         self._manager._config = replace(
             self._manager._config,
-            server=self._test_server,
-            apikey=self._test_apikey,
+            servers=self._test_servers,
         )
+        test_server = self._test_servers[self._manager._config.api_version]["server"]
         warnings.warn(
-            f"Switching to the test server {self._test_server} to not upload results to "
+            f"Switching to the test server {test_server} to not upload results to "
             "the live server. Using the test server may result in reduced performance of the "
             "API!",
             stacklevel=2,
@@ -448,8 +561,7 @@ class ConfigurationForExamples:
 
         self._manager._config = replace(
             self._manager._config,
-            server=cast("str", self._last_used_server),
-            apikey=cast("str", self._last_used_key),
+            servers=cast("dict[APIVersion, dict[str, str | None]]", self._last_used_servers),
         )
         type(self)._start_last_called = False
 

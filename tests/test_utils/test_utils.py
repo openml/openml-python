@@ -46,7 +46,7 @@ def min_number_evaluations_on_test_server() -> int:
 
 
 def _mocked_perform_api_call(call, request_method):  # noqa: ARG001
-    url = openml.config.server + "/" + call
+    url = openml.config.server + call
     return openml._api_calls._download_text_file(url)
 
 
