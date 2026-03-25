@@ -32,6 +32,9 @@ class EvaluationMeasureAPI(ResourceAPI):
 
     resource_type: ResourceType = ResourceType.EVALUATION_MEASURE
 
+    @abstractmethod
+    def list(self) -> list[str]: ...
+
 
 class EstimationProcedureAPI(ResourceAPI):
     """Abstract API interface for estimation procedure resources."""
