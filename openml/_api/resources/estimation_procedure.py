@@ -81,4 +81,4 @@ class EstimationProcedureV2API(ResourceV2API, EstimationProcedureAPI):
     """
 
     def list(self) -> list[OpenMLEstimationProcedure]:
-        self._not_supported(method="get_details")
+        self._not_supported(method="list")
