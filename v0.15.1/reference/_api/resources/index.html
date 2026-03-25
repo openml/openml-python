@@ -7795,7 +7795,8 @@ depends on the resource type.</p>
 
 
 
-        <p>Version 1 API implementation for evaluation measure resources.</p>
+        <p>V1 API implementation for evaluation measures.</p>
+<p>Fetches evaluation measures from the v1 XML API endpoint.</p>
 
 
 
@@ -8030,6 +8031,99 @@ depends on the resource type.</p>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a>    <span class="k">except</span> <span class="n">OpenMLServerException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_delete_exception</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a>        <span class="k">raise</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="openml._api.resources.EvaluationMeasureV1API.list" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">list</span>
+
+
+<a href="#openml._api.resources.EvaluationMeasureV1API.list" class="headerlink" title="Permanent link">#</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">list</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            list (openml._api.resources.evaluation_measure.EvaluationMeasureV1API.list)" href="evaluation_measure/#openml._api.resources.evaluation_measure.EvaluationMeasureV1API.list">list</a></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>List all evaluation measures available on OpenML.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><a class="autorefs autorefs-internal" title="            list (openml._api.resources.evaluation_measure.EvaluationMeasureV1API.list)" href="evaluation_measure/#openml._api.resources.evaluation_measure.EvaluationMeasureV1API.list">list</a>[<span title="str">str</span>]</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>A list of evaluation measure names.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>openml/_api/resources/evaluation_measure.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-14">14</a></span>
+<span class="normal"><a href="#__codelineno-0-15">15</a></span>
+<span class="normal"><a href="#__codelineno-0-16">16</a></span>
+<span class="normal"><a href="#__codelineno-0-17">17</a></span>
+<span class="normal"><a href="#__codelineno-0-18">18</a></span>
+<span class="normal"><a href="#__codelineno-0-19">19</a></span>
+<span class="normal"><a href="#__codelineno-0-20">20</a></span>
+<span class="normal"><a href="#__codelineno-0-21">21</a></span>
+<span class="normal"><a href="#__codelineno-0-22">22</a></span>
+<span class="normal"><a href="#__codelineno-0-23">23</a></span>
+<span class="normal"><a href="#__codelineno-0-24">24</a></span>
+<span class="normal"><a href="#__codelineno-0-25">25</a></span>
+<span class="normal"><a href="#__codelineno-0-26">26</a></span>
+<span class="normal"><a href="#__codelineno-0-27">27</a></span>
+<span class="normal"><a href="#__codelineno-0-28">28</a></span>
+<span class="normal"><a href="#__codelineno-0-29">29</a></span>
+<span class="normal"><a href="#__codelineno-0-30">30</a></span>
+<span class="normal"><a href="#__codelineno-0-31">31</a></span>
+<span class="normal"><a href="#__codelineno-0-32">32</a></span>
+<span class="normal"><a href="#__codelineno-0-33">33</a></span>
+<span class="normal"><a href="#__codelineno-0-34">34</a></span>
+<span class="normal"><a href="#__codelineno-0-35">35</a></span>
+<span class="normal"><a href="#__codelineno-0-36">36</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;List all evaluation measures available on OpenML.</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16"></a>
+<a id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="sd">    list[str]</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="sd">        A list of evaluation measure names.</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22"></a>    <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;evaluationmeasure/list&quot;</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23"></a>    <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_http</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24"></a>    <span class="n">xml_content</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25"></a>
+<a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="n">qualities</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_content</span><span class="p">,</span> <span class="n">force_list</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;oml:measures&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27"></a>    <span class="c1"># Minimalistic check if the XML is useful</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="k">if</span> <span class="s2">&quot;oml:evaluation_measures&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qualities</span><span class="p">:</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Error in return XML, does not contain &quot;oml:evaluation_measures&quot;&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30"></a>
+<a id="__codelineno-0-31" name="__codelineno-0-31"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32"></a>        <span class="n">qualities</span><span class="p">[</span><span class="s2">&quot;oml:evaluation_measures&quot;</span><span class="p">][</span><span class="s2">&quot;oml:measures&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;oml:measure&quot;</span><span class="p">],</span> <span class="nb">list</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33"></a>    <span class="p">):</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Error in return XML, does not contain &quot;oml:measure&quot; as a list&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a>    <span class="k">return</span> <span class="n">qualities</span><span class="p">[</span><span class="s2">&quot;oml:evaluation_measures&quot;</span><span class="p">][</span><span class="s2">&quot;oml:measures&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;oml:measure&quot;</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -8639,7 +8733,8 @@ depends on the resource type.</p>
 
 
 
-        <p>Version 2 API implementation for evaluation measure resources.</p>
+        <p>V2 API implementation for evaluation measures.</p>
+<p>Fetches evaluation measures from the v2 JSON API endpoint.</p>
 
 
 
@@ -8671,6 +8766,85 @@ depends on the resource type.</p>
 
 
 
+<div class="doc doc-object doc-function">
+
+
+<h4 id="openml._api.resources.EvaluationMeasureV2API.list" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">list</span>
+
+
+<a href="#openml._api.resources.EvaluationMeasureV2API.list" class="headerlink" title="Permanent link">#</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">list</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            list (openml._api.resources.evaluation_measure.EvaluationMeasureV2API.list)" href="evaluation_measure/#openml._api.resources.evaluation_measure.EvaluationMeasureV2API.list">list</a></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>List all evaluation measures available on OpenML.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><a class="autorefs autorefs-internal" title="            list (openml._api.resources.evaluation_measure.EvaluationMeasureV2API.list)" href="evaluation_measure/#openml._api.resources.evaluation_measure.EvaluationMeasureV2API.list">list</a>[<span title="str">str</span>]</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>A list of evaluation measure names.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>openml/_api/resources/evaluation_measure.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-45">45</a></span>
+<span class="normal"><a href="#__codelineno-0-46">46</a></span>
+<span class="normal"><a href="#__codelineno-0-47">47</a></span>
+<span class="normal"><a href="#__codelineno-0-48">48</a></span>
+<span class="normal"><a href="#__codelineno-0-49">49</a></span>
+<span class="normal"><a href="#__codelineno-0-50">50</a></span>
+<span class="normal"><a href="#__codelineno-0-51">51</a></span>
+<span class="normal"><a href="#__codelineno-0-52">52</a></span>
+<span class="normal"><a href="#__codelineno-0-53">53</a></span>
+<span class="normal"><a href="#__codelineno-0-54">54</a></span>
+<span class="normal"><a href="#__codelineno-0-55">55</a></span>
+<span class="normal"><a href="#__codelineno-0-56">56</a></span>
+<span class="normal"><a href="#__codelineno-0-57">57</a></span>
+<span class="normal"><a href="#__codelineno-0-58">58</a></span>
+<span class="normal"><a href="#__codelineno-0-59">59</a></span>
+<span class="normal"><a href="#__codelineno-0-60">60</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;List all evaluation measures available on OpenML.</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    list[str]</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">        A list of evaluation measure names.</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;evaluationmeasure/list&quot;</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_http</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected list, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a>    <span class="k">return</span> <span class="n">data</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
 
 
   </div>
@@ -8697,7 +8871,8 @@ depends on the resource type.</p>
 
 
 
-        <p>Version 1 API implementation for evaluation resources.</p>
+        <p>V1 API implementation for evaluations.
+Fetches evaluations from the v1 XML API endpoint.</p>
 
 
 
@@ -8932,6 +9107,480 @@ depends on the resource type.</p>
 <a id="__codelineno-0-111" name="__codelineno-0-111"></a>    <span class="k">except</span> <span class="n">OpenMLServerException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 <a id="__codelineno-0-112" name="__codelineno-0-112"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_delete_exception</span><span class="p">(</span><span class="n">endpoint_name</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 <a id="__codelineno-0-113" name="__codelineno-0-113"></a>        <span class="k">raise</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="openml._api.resources.EvaluationV1API.list" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">list</span>
+
+
+<a href="#openml._api.resources.EvaluationV1API.list" class="headerlink" title="Permanent link">#</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">list</span><span class="p">(</span><span class="n">limit</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">function</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n">tasks</span><span class="p">:</span> <span class="n"><span title="builtins.list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">setups</span><span class="p">:</span> <span class="n"><span title="builtins.list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">flows</span><span class="p">:</span> <span class="n"><span title="builtins.list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">runs</span><span class="p">:</span> <span class="n"><span title="builtins.list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">uploaders</span><span class="p">:</span> <span class="n"><span title="builtins.list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">study</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort_order</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="builtins.list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            OpenMLEvaluation
+
+
+  
+      dataclass
+   (openml.evaluations.OpenMLEvaluation)" href="../../evaluations/#openml.evaluations.OpenMLEvaluation">OpenMLEvaluation</a></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Retrieve evaluations from the OpenML v1 XML API.</p>
+<p>This method builds an evaluation query URL based on the provided
+filters, sends a request to the OpenML v1 endpoint, parses the XML
+response into a dictionary, and enriches the result with uploader
+usernames.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>The</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ones</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>limit</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the number of evaluations to return</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>offset</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the number of evaluations to skip, starting from the first</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>function</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the evaluation function. e.g., predictive_accuracy</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>tasks</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of task IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="            list (openml._api.resources.evaluation.EvaluationV1API.list)" href="evaluation/#openml._api.resources.evaluation.EvaluationV1API.list">list</a>[<span title="int">int</span>, <span title="str">str</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>setups</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of setup IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="builtins.list">list</span> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>flows</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of flow IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="            list (openml._api.resources.evaluation.EvaluationV1API.list)" href="evaluation/#openml._api.resources.evaluation.EvaluationV1API.list">list</a>[<span title="int">int</span>, <span title="str">str</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>runs</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of run IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="builtins.list">list</span> | None</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>uploaders</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>the list of uploader IDs</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="            list (openml._api.resources.evaluation.EvaluationV1API.list)" href="evaluation/#openml._api.resources.evaluation.EvaluationV1API.list">list</a>[<span title="int">int</span>, <span title="str">str</span>]</code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>study</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>kwargs</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Legal filter operators: tag, per_fold</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Any">Any</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sort_order</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>order of sorting evaluations, ascending ("asc") or descending ("desc")</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code>list of OpenMLEvaluation objects</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>This method performs two API calls:
+1. Fetches evaluation data from the specified endpoint
+2. Fetches user information for all uploaders in the evaluation data</p>
+<p>The user information is used to map uploader IDs to usernames.</p>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>openml/_api/resources/evaluation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-19"> 19</a></span>
+<span class="normal"><a href="#__codelineno-0-20"> 20</a></span>
+<span class="normal"><a href="#__codelineno-0-21"> 21</a></span>
+<span class="normal"><a href="#__codelineno-0-22"> 22</a></span>
+<span class="normal"><a href="#__codelineno-0-23"> 23</a></span>
+<span class="normal"><a href="#__codelineno-0-24"> 24</a></span>
+<span class="normal"><a href="#__codelineno-0-25"> 25</a></span>
+<span class="normal"><a href="#__codelineno-0-26"> 26</a></span>
+<span class="normal"><a href="#__codelineno-0-27"> 27</a></span>
+<span class="normal"><a href="#__codelineno-0-28"> 28</a></span>
+<span class="normal"><a href="#__codelineno-0-29"> 29</a></span>
+<span class="normal"><a href="#__codelineno-0-30"> 30</a></span>
+<span class="normal"><a href="#__codelineno-0-31"> 31</a></span>
+<span class="normal"><a href="#__codelineno-0-32"> 32</a></span>
+<span class="normal"><a href="#__codelineno-0-33"> 33</a></span>
+<span class="normal"><a href="#__codelineno-0-34"> 34</a></span>
+<span class="normal"><a href="#__codelineno-0-35"> 35</a></span>
+<span class="normal"><a href="#__codelineno-0-36"> 36</a></span>
+<span class="normal"><a href="#__codelineno-0-37"> 37</a></span>
+<span class="normal"><a href="#__codelineno-0-38"> 38</a></span>
+<span class="normal"><a href="#__codelineno-0-39"> 39</a></span>
+<span class="normal"><a href="#__codelineno-0-40"> 40</a></span>
+<span class="normal"><a href="#__codelineno-0-41"> 41</a></span>
+<span class="normal"><a href="#__codelineno-0-42"> 42</a></span>
+<span class="normal"><a href="#__codelineno-0-43"> 43</a></span>
+<span class="normal"><a href="#__codelineno-0-44"> 44</a></span>
+<span class="normal"><a href="#__codelineno-0-45"> 45</a></span>
+<span class="normal"><a href="#__codelineno-0-46"> 46</a></span>
+<span class="normal"><a href="#__codelineno-0-47"> 47</a></span>
+<span class="normal"><a href="#__codelineno-0-48"> 48</a></span>
+<span class="normal"><a href="#__codelineno-0-49"> 49</a></span>
+<span class="normal"><a href="#__codelineno-0-50"> 50</a></span>
+<span class="normal"><a href="#__codelineno-0-51"> 51</a></span>
+<span class="normal"><a href="#__codelineno-0-52"> 52</a></span>
+<span class="normal"><a href="#__codelineno-0-53"> 53</a></span>
+<span class="normal"><a href="#__codelineno-0-54"> 54</a></span>
+<span class="normal"><a href="#__codelineno-0-55"> 55</a></span>
+<span class="normal"><a href="#__codelineno-0-56"> 56</a></span>
+<span class="normal"><a href="#__codelineno-0-57"> 57</a></span>
+<span class="normal"><a href="#__codelineno-0-58"> 58</a></span>
+<span class="normal"><a href="#__codelineno-0-59"> 59</a></span>
+<span class="normal"><a href="#__codelineno-0-60"> 60</a></span>
+<span class="normal"><a href="#__codelineno-0-61"> 61</a></span>
+<span class="normal"><a href="#__codelineno-0-62"> 62</a></span>
+<span class="normal"><a href="#__codelineno-0-63"> 63</a></span>
+<span class="normal"><a href="#__codelineno-0-64"> 64</a></span>
+<span class="normal"><a href="#__codelineno-0-65"> 65</a></span>
+<span class="normal"><a href="#__codelineno-0-66"> 66</a></span>
+<span class="normal"><a href="#__codelineno-0-67"> 67</a></span>
+<span class="normal"><a href="#__codelineno-0-68"> 68</a></span>
+<span class="normal"><a href="#__codelineno-0-69"> 69</a></span>
+<span class="normal"><a href="#__codelineno-0-70"> 70</a></span>
+<span class="normal"><a href="#__codelineno-0-71"> 71</a></span>
+<span class="normal"><a href="#__codelineno-0-72"> 72</a></span>
+<span class="normal"><a href="#__codelineno-0-73"> 73</a></span>
+<span class="normal"><a href="#__codelineno-0-74"> 74</a></span>
+<span class="normal"><a href="#__codelineno-0-75"> 75</a></span>
+<span class="normal"><a href="#__codelineno-0-76"> 76</a></span>
+<span class="normal"><a href="#__codelineno-0-77"> 77</a></span>
+<span class="normal"><a href="#__codelineno-0-78"> 78</a></span>
+<span class="normal"><a href="#__codelineno-0-79"> 79</a></span>
+<span class="normal"><a href="#__codelineno-0-80"> 80</a></span>
+<span class="normal"><a href="#__codelineno-0-81"> 81</a></span>
+<span class="normal"><a href="#__codelineno-0-82"> 82</a></span>
+<span class="normal"><a href="#__codelineno-0-83"> 83</a></span>
+<span class="normal"><a href="#__codelineno-0-84"> 84</a></span>
+<span class="normal"><a href="#__codelineno-0-85"> 85</a></span>
+<span class="normal"><a href="#__codelineno-0-86"> 86</a></span>
+<span class="normal"><a href="#__codelineno-0-87"> 87</a></span>
+<span class="normal"><a href="#__codelineno-0-88"> 88</a></span>
+<span class="normal"><a href="#__codelineno-0-89"> 89</a></span>
+<span class="normal"><a href="#__codelineno-0-90"> 90</a></span>
+<span class="normal"><a href="#__codelineno-0-91"> 91</a></span>
+<span class="normal"><a href="#__codelineno-0-92"> 92</a></span>
+<span class="normal"><a href="#__codelineno-0-93"> 93</a></span>
+<span class="normal"><a href="#__codelineno-0-94"> 94</a></span>
+<span class="normal"><a href="#__codelineno-0-95"> 95</a></span>
+<span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
+<span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
+<span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
+<span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
+<span class="normal"><a href="#__codelineno-0-100">100</a></span>
+<span class="normal"><a href="#__codelineno-0-101">101</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22"></a>    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24"></a>    <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25"></a>    <span class="n">tasks</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="n">setups</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27"></a>    <span class="n">flows</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="n">runs</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29"></a>    <span class="n">uploaders</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30"></a>    <span class="n">study</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31"></a>    <span class="n">sort_order</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">builtins</span><span class="o">.</span><span class="n">list</span><span class="p">[</span><span class="n">OpenMLEvaluation</span><span class="p">]:</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve evaluations from the OpenML v1 XML API.</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">    This method builds an evaluation query URL based on the provided</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">    filters, sends a request to the OpenML v1 endpoint, parses the XML</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="sd">    response into a dictionary, and enriches the result with uploader</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a><span class="sd">    usernames.</span>
+<a id="__codelineno-0-40" name="__codelineno-0-40"></a>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">    The arguments that are lists are separated from the single value</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="sd">    ones which are put into the kwargs.</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">    limit : int</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">        the number of evaluations to return</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="sd">    offset : int</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">        the number of evaluations to skip, starting from the first</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    function : str</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">        the evaluation function. e.g., predictive_accuracy</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    tasks : list[int,str], optional</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">        the list of task IDs</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    setups: list[int,str], optional</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">        the list of setup IDs</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    flows : list[int,str], optional</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">        the list of flow IDs</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    runs :list[int,str], optional</span>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">        the list of run IDs</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    uploaders : list[int,str], optional</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">        the list of uploader IDs</span>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    study : int, optional</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    kwargs: dict, optional</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">        Legal filter operators: tag, per_fold</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    sort_order : str, optional</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">        order of sorting evaluations, ascending (&quot;asc&quot;) or descending (&quot;desc&quot;)</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">    list of OpenMLEvaluation objects</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">    Notes</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    -----</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    This method performs two API calls:</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    1. Fetches evaluation data from the specified endpoint</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">    2. Fetches user information for all uploaders in the evaluation data</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    The user information is used to map uploader IDs to usernames.</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="n">api_call</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_url</span><span class="p">(</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a>        <span class="n">limit</span><span class="p">,</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a>        <span class="n">offset</span><span class="p">,</span>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a>        <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a>        <span class="n">tasks</span><span class="o">=</span><span class="n">tasks</span><span class="p">,</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a>        <span class="n">setups</span><span class="o">=</span><span class="n">setups</span><span class="p">,</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a>        <span class="n">flows</span><span class="o">=</span><span class="n">flows</span><span class="p">,</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a>        <span class="n">runs</span><span class="o">=</span><span class="n">runs</span><span class="p">,</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a>        <span class="n">uploaders</span><span class="o">=</span><span class="n">uploaders</span><span class="p">,</span>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a>        <span class="n">study</span><span class="o">=</span><span class="n">study</span><span class="p">,</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a>        <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a>    <span class="p">)</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a>    <span class="n">eval_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_http</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">api_call</span><span class="p">)</span>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a>    <span class="n">xml_content</span> <span class="o">=</span> <span class="n">eval_response</span><span class="o">.</span><span class="n">text</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_list_xml</span><span class="p">(</span><span class="n">xml_content</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -9541,7 +10190,8 @@ depends on the resource type.</p>
 
 
 
-        <p>Version 2 API implementation for evaluation resources.</p>
+        <p>V2 API implementation for evaluations.
+Fetches evaluations from the v2 json API endpoint.</p>
 
 
 
@@ -9572,6 +10222,85 @@ depends on the resource type.</p>
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="openml._api.resources.EvaluationV2API.list" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">list</span>
+
+
+<a href="#openml._api.resources.EvaluationV2API.list" class="headerlink" title="Permanent link">#</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">list</span><span class="p">(</span><span class="n">limit</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">function</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n">tasks</span><span class="p">:</span> <span class="n"><span title="builtins.list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">setups</span><span class="p">:</span> <span class="n"><span title="builtins.list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">flows</span><span class="p">:</span> <span class="n"><span title="builtins.list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">runs</span><span class="p">:</span> <span class="n"><span title="builtins.list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">uploaders</span><span class="p">:</span> <span class="n"><span title="builtins.list">list</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">study</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sort_order</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="builtins.list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            OpenMLEvaluation
+
+
+  
+      dataclass
+   (openml.evaluations.OpenMLEvaluation)" href="../../evaluations/#openml.evaluations.OpenMLEvaluation">OpenMLEvaluation</a></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Retrieve evaluation results from the OpenML v2 JSON API.</p>
+
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>This method is not yet implemented.</p>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>openml/_api/resources/evaluation.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-257">257</a></span>
+<span class="normal"><a href="#__codelineno-0-258">258</a></span>
+<span class="normal"><a href="#__codelineno-0-259">259</a></span>
+<span class="normal"><a href="#__codelineno-0-260">260</a></span>
+<span class="normal"><a href="#__codelineno-0-261">261</a></span>
+<span class="normal"><a href="#__codelineno-0-262">262</a></span>
+<span class="normal"><a href="#__codelineno-0-263">263</a></span>
+<span class="normal"><a href="#__codelineno-0-264">264</a></span>
+<span class="normal"><a href="#__codelineno-0-265">265</a></span>
+<span class="normal"><a href="#__codelineno-0-266">266</a></span>
+<span class="normal"><a href="#__codelineno-0-267">267</a></span>
+<span class="normal"><a href="#__codelineno-0-268">268</a></span>
+<span class="normal"><a href="#__codelineno-0-269">269</a></span>
+<span class="normal"><a href="#__codelineno-0-270">270</a></span>
+<span class="normal"><a href="#__codelineno-0-271">271</a></span>
+<span class="normal"><a href="#__codelineno-0-272">272</a></span>
+<span class="normal"><a href="#__codelineno-0-273">273</a></span>
+<span class="normal"><a href="#__codelineno-0-274">274</a></span>
+<span class="normal"><a href="#__codelineno-0-275">275</a></span>
+<span class="normal"><a href="#__codelineno-0-276">276</a></span>
+<span class="normal"><a href="#__codelineno-0-277">277</a></span>
+<span class="normal"><a href="#__codelineno-0-278">278</a></span>
+<span class="normal"><a href="#__codelineno-0-279">279</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="c1"># noqa: ARG002</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="c1"># noqa: ARG002</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># noqa: ARG002</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="n">tasks</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># noqa: ARG002</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="n">setups</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># noqa: ARG002</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="n">flows</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># noqa: ARG002</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="n">runs</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># noqa: ARG002</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="n">uploaders</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># noqa: ARG002</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="n">study</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># noqa: ARG002</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>    <span class="n">sort_order</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># noqa: ARG002</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>  <span class="c1"># noqa: ARG002</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">builtins</span><span class="o">.</span><span class="n">list</span><span class="p">[</span><span class="n">OpenMLEvaluation</span><span class="p">]:</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a><span class="sd">    Retrieve evaluation results from the OpenML v2 JSON API.</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="sd">    Notes</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="sd">    -----</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">    This method is not yet implemented.</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_not_supported</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;list&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 
 
