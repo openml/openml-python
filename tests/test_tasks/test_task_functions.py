@@ -245,7 +245,7 @@ class TestTask(TestBase):
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_task_not_owned(mock_delete, test_files_directory, test_api_key):
+def test_delete_task_not_owned(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_not_owned.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -258,13 +258,13 @@ def test_delete_task_not_owned(mock_delete, test_files_directory, test_api_key):
     ):
         openml.tasks.delete_task(1)
 
-    task_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/task/1"
+    task_url = test_server_v1 + "task/1"
     assert task_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_task_with_run(mock_delete, test_files_directory, test_api_key):
+def test_delete_task_with_run(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_has_runs.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -277,13 +277,13 @@ def test_delete_task_with_run(mock_delete, test_files_directory, test_api_key):
     ):
         openml.tasks.delete_task(3496)
 
-    task_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/task/3496"
+    task_url = test_server_v1 + "task/3496"
     assert task_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_success(mock_delete, test_files_directory, test_api_key):
+def test_delete_success(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_successful.xml"
     mock_delete.return_value = create_request_response(
         status_code=200,
@@ -293,13 +293,13 @@ def test_delete_success(mock_delete, test_files_directory, test_api_key):
     success = openml.tasks.delete_task(361323)
     assert success
 
-    task_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/task/361323"
+    task_url = test_server_v1 + "task/361323"
     assert task_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
 
 
 @mock.patch.object(requests.Session, "delete")
-def test_delete_unknown_task(mock_delete, test_files_directory, test_api_key):
+def test_delete_unknown_task(mock_delete, test_files_directory, test_server_v1, test_apikey_v1):
     content_file = test_files_directory / "mock_responses" / "tasks" / "task_delete_not_exist.xml"
     mock_delete.return_value = create_request_response(
         status_code=412,
@@ -312,6 +312,6 @@ def test_delete_unknown_task(mock_delete, test_files_directory, test_api_key):
     ):
         openml.tasks.delete_task(9_999_999)
 
-    task_url = f"{openml.config.TEST_SERVER_URL}/api/v1/xml/task/9999999"
+    task_url = test_server_v1 + "task/9999999"
     assert task_url == mock_delete.call_args.args[0]
-    assert test_api_key == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
+    assert test_apikey_v1 == mock_delete.call_args.kwargs.get("params", {}).get("api_key")
