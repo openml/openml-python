@@ -10,7 +10,7 @@ import xmltodict
 
 import openml._api_calls
 
-from .utils import _get_rest_api_type_alias, _tag_openml_base
+from .utils import _get_rest_api_type_alias
 
 
 class OpenMLBase(ABC):
@@ -149,23 +149,3 @@ class OpenMLBase(ABC):
             )
 
         webbrowser.open(self.openml_url)
-
-    def push_tag(self, tag: str) -> None:
-        """Annotates this entity with a tag on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the flow.
-        """
-        _tag_openml_base(self, tag)
-
-    def remove_tag(self, tag: str) -> None:
-        """Removes a tag from this entity on the server.
-
-        Parameters
-        ----------
-        tag : str
-            Tag to attach to the flow.
-        """
-        _tag_openml_base(self, tag, untag=True)
