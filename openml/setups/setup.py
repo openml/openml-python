@@ -1,14 +1,15 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from typing import Any
 
 import openml.flows
+from openml.base import OpenMLBase
 
 
-@dataclass
-class OpenMLSetup:
+class OpenMLSetup(OpenMLBase):
     """Setup object (a.k.a. Configuration).
 
     Parameters
@@ -21,19 +22,42 @@ class OpenMLSetup:
         The setting of the parameters
     """
 
-    setup_id: int
-    flow_id: int
-    parameters: dict[int, Any] | None
-
-    def __post_init__(self) -> None:
-        if not isinstance(self.setup_id, int):
+    def __init__(
+        self,
+        setup_id: int,
+        flow_id: int,
+        parameters: dict[int, Any] | None,
+    ) -> None:
+        if not isinstance(setup_id, int):
             raise ValueError("setup id should be int")
 
-        if not isinstance(self.flow_id, int):
+        if not isinstance(flow_id, int):
             raise ValueError("flow id should be int")
 
-        if self.parameters is not None and not isinstance(self.parameters, dict):
+        if parameters is not None and not isinstance(parameters, dict):
             raise ValueError("parameters should be dict")
+
+        self.setup_id = setup_id
+        self.flow_id = flow_id
+        self.parameters = parameters
+
+    @property
+    def id(self) -> int | None:
+        """The ID of the setup."""
+        return self.setup_id
+
+    def _get_repr_body_fields(self) -> Sequence[tuple[str, str | int | list[str] | None]]:
+        """Collect all information to display in the __repr__ body."""
+        fields = {
+            "Setup ID": self.setup_id,
+            "Flow ID": self.flow_id,
+            "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
+            "# of Parameters": (
+                len(self.parameters) if self.parameters is not None else float("nan")
+            ),
+        }
+        order = ["Setup ID", "Flow ID", "Flow URL", "# of Parameters"]
+        return [(key, fields[key]) for key in order if key in fields]
 
     def _to_dict(self) -> dict[str, Any]:
         return {
@@ -44,27 +68,9 @@ class OpenMLSetup:
             else None,
         }
 
-    def __repr__(self) -> str:
-        header = "OpenML Setup"
-        header = f"{header}\n{'=' * len(header)}\n"
-
-        fields = {
-            "Setup ID": self.setup_id,
-            "Flow ID": self.flow_id,
-            "Flow URL": openml.flows.OpenMLFlow.url_for_id(self.flow_id),
-            "# of Parameters": (
-                len(self.parameters) if self.parameters is not None else float("nan")
-            ),
-        }
-
-        # determines the order in which the information will be printed
-        order = ["Setup ID", "Flow ID", "Flow URL", "# of Parameters"]
-        _fields = [(key, fields[key]) for key in order if key in fields]
-
-        longest_field_name_length = max(len(name) for name, _ in _fields)
-        field_line_format = f"{{:.<{longest_field_name_length}}}: {{}}"
-        body = "\n".join(field_line_format.format(name, value) for name, value in _fields)
-        return header + body
+    def _parse_publish_response(self, xml_response: dict[str, str]) -> None:
+        msg = "Setups cannot be published directly."
+        raise NotImplementedError(msg)
 
 
 @dataclass

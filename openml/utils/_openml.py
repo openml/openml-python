@@ -98,6 +98,7 @@ def _get_rest_api_type_alias(oml_object: OpenMLBase) -> str:
     rest_api_mapping: list[tuple[type | tuple, str]] = [
         (openml.datasets.OpenMLDataset, "data"),
         (openml.flows.OpenMLFlow, "flow"),
+        (openml.setups.OpenMLSetup, "setup"),
         (openml.tasks.OpenMLTask, "task"),
         (openml.runs.OpenMLRun, "run"),
         ((openml.study.OpenMLStudy, openml.study.OpenMLBenchmarkSuite), "study"),
