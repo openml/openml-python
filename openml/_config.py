@@ -26,7 +26,6 @@ from .__version__ import __version__
 logger = logging.getLogger(__name__)
 openml_logger = logging.getLogger("openml")
 
-_HEADERS = {"user-agent": f"openml-python/{__version__}"}
 
 _PROD_SERVERS: dict[APIVersion, dict[str, str | None]] = {
     APIVersion.V1: {
@@ -143,12 +142,6 @@ class OpenMLConfig:
     def apikey(self, value: str | None) -> None:
         self.servers[self.api_version]["apikey"] = value
 
-    def __setattr__(self, name: str, value: Any) -> None:
-        if name == "apikey" and not isinstance(value, (type(None), str)):
-            raise TypeError("apikey must be a string or None")
-
-        super().__setattr__(name, value)
-
 
 class OpenMLConfigManager:
     """The OpenMLConfigManager manages the configuration of the openml-python package."""
@@ -169,7 +162,6 @@ class OpenMLConfigManager:
 
         self.logger = logger
         self.openml_logger = openml_logger
-        self._HEADERS = _HEADERS
 
         self._examples = ConfigurationForExamples(self)
 
@@ -194,16 +186,14 @@ class OpenMLConfigManager:
             "_examples",
             "OPENML_CACHE_DIR_ENV_VAR",
             "OPENML_SKIP_PARQUET_ENV_VAR",
-            "OPENML_TEST_SERVER_ADMIN_KEY_ENV_VAR",
             "_HEADERS",
-            "_defaults",
-            "_TEST_SERVER_NORMAL_USER_KEY",
         }:
             return object.__setattr__(self, name, value)
 
-        # write into dataclass, not manager (prevents shadowing)
-        if name == "cachedir":
-            object.__setattr__(self, "_root_cache_directory", Path(value))
+        if name in self._FIELDS:
+            # write into dataclass, not manager (prevents shadowing)
+            if name == "cachedir":
+                object.__setattr__(self, "_root_cache_directory", Path(value))
             object.__setattr__(self, "_config", replace(self._config, **{name: value}))
             return None
 
@@ -524,8 +514,7 @@ class OpenMLConfigManager:
 class ConfigurationForExamples:
     """Allows easy switching to and from a test configuration, used for examples."""
 
-    _last_used_server = None
-    _last_used_key = None
+    _last_used_servers = None
     _start_last_called = False
 
     def __init__(self, manager: OpenMLConfigManager):

@@ -4,56 +4,14 @@ from typing import TYPE_CHECKING
 
 from openml._api.clients import HTTPClient, MinIOClient
 from openml._api.resources import (
-    DatasetV1API,
-    DatasetV2API,
-    EstimationProcedureV1API,
-    EstimationProcedureV2API,
-    EvaluationMeasureV1API,
-    EvaluationMeasureV2API,
-    EvaluationV1API,
-    EvaluationV2API,
+    API_REGISTRY,
     FallbackProxy,
-    FlowV1API,
-    FlowV2API,
-    RunV1API,
-    RunV2API,
-    SetupV1API,
-    SetupV2API,
-    StudyV1API,
-    StudyV2API,
-    TaskV1API,
-    TaskV2API,
 )
-from openml.enums import APIVersion, ResourceType
+from openml.enums import ResourceType
 
 if TYPE_CHECKING:
     from openml._api.resources import ResourceAPI
-
-# Registry mapping API versions and resource types to their implementations
-API_REGISTRY: dict[APIVersion, dict[ResourceType, type[ResourceAPI]]] = {
-    APIVersion.V1: {
-        ResourceType.DATASET: DatasetV1API,
-        ResourceType.TASK: TaskV1API,
-        ResourceType.EVALUATION_MEASURE: EvaluationMeasureV1API,
-        ResourceType.ESTIMATION_PROCEDURE: EstimationProcedureV1API,
-        ResourceType.EVALUATION: EvaluationV1API,
-        ResourceType.FLOW: FlowV1API,
-        ResourceType.STUDY: StudyV1API,
-        ResourceType.RUN: RunV1API,
-        ResourceType.SETUP: SetupV1API,
-    },
-    APIVersion.V2: {
-        ResourceType.DATASET: DatasetV2API,
-        ResourceType.TASK: TaskV2API,
-        ResourceType.EVALUATION_MEASURE: EvaluationMeasureV2API,
-        ResourceType.ESTIMATION_PROCEDURE: EstimationProcedureV2API,
-        ResourceType.EVALUATION: EvaluationV2API,
-        ResourceType.FLOW: FlowV2API,
-        ResourceType.STUDY: StudyV2API,
-        ResourceType.RUN: RunV2API,
-        ResourceType.SETUP: SetupV2API,
-    },
-}
+    from openml.enums import APIVersion
 
 
 class APIBackendBuilder:
@@ -132,32 +90,11 @@ class APIBackendBuilder:
         API instances for the primary API version, and optionally wraps them
         with fallback proxies if a fallback API version is configured.
 
-        primary_api_config = config.api_configs[config.api_version]
-        primary_http_client = HTTPClient(
-            server=primary_api_config.server,
-            base_url=primary_api_config.base_url,
-            api_key=primary_api_config.api_key,
-            retries=config.connection.retries,
-            retry_policy=config.connection.retry_policy,
-            cache=http_cache,
-            timeout=10,
-        )
-
-        resource_apis: dict[ResourceType, ResourceAPI] = {}
-        for resource_type, resource_api_cls in API_REGISTRY[config.api_version].items():
-            if resource_type == ResourceType.DATASET:
-                resource_apis[resource_type] = resource_api_cls(
-                    primary_http_client, minio_client
-                )  # type: ignore[call-arg]
-            else:
-                resource_apis[resource_type] = resource_api_cls(primary_http_client)
-
         Parameters
         ----------
-        api_version : APIVersion
-            Primary API version to use for resource access.
-        fallback_api_version : APIVersion | None
-            Optional fallback API version for compatibility.
+        config : Config
+            Configuration object containing API versions, endpoints, cache
+            settings, and connection parameters.
 
         Returns
         -------
@@ -173,25 +110,18 @@ class APIBackendBuilder:
 
         resource_apis: dict[ResourceType, ResourceAPI | FallbackProxy] = {}
         for resource_type, resource_api_cls in API_REGISTRY[api_version].items():
-            if resource_type == ResourceType.DATASET:
-                resource_apis[resource_type] = resource_api_cls(  # type: ignore[call-arg]
-                    primary_http_client, minio_client
-                )
-            else:
-                resource_apis[resource_type] = resource_api_cls(primary_http_client)
+            resource_apis[resource_type] = resource_api_cls(primary_http_client, minio_client)
 
         if fallback_api_version is not None:
             fallback_http_client = HTTPClient(api_version=fallback_api_version)
             self.fallback_http_client = fallback_http_client
 
-            fallback_resource_apis: dict[ResourceType, ResourceAPI] = {}
+            fallback_resource_apis: dict[ResourceType, ResourceAPI | FallbackProxy] = {}
             for resource_type, resource_api_cls in API_REGISTRY[fallback_api_version].items():
-                if resource_type == ResourceType.DATASET:
-                    fallback_resource_apis[resource_type] = resource_api_cls(  # type: ignore[call-arg]
-                        fallback_http_client, minio_client
-                    )
-                else:
-                    fallback_resource_apis[resource_type] = resource_api_cls(fallback_http_client)
+                fallback_resource_apis[resource_type] = resource_api_cls(
+                    fallback_http_client, minio_client
+                )
+
             resource_apis = {
                 name: FallbackProxy(resource_apis[name], fallback_resource_apis[name])
                 for name in resource_apis

@@ -10,12 +10,13 @@ import xml
 from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Any, cast
-from urllib.parse import urlencode, urlparse
+from urllib.parse import urlencode, urljoin, urlparse
 
 import requests
 import xmltodict
 from requests import Response
 
+import openml
 from openml.enums import APIVersion, RetryPolicy
 from openml.exceptions import (
     OpenMLAuthenticationError,
@@ -35,32 +36,15 @@ class HTTPCache:
     three files: metadata (``meta.json``), headers (``headers.json``), and the raw
     body (``body.bin``).
 
-    Parameters
-    ----------
-    path : pathlib.Path or None, optional
-        Base directory for storing cached responses. If None, uses the default
-        cache directory from openml.config.
-    ttl : int or None, optional
-        Time-to-live for cached entries in seconds. Currently unused but provided
-        for future cache expiration support.
-
     Notes
     -----
     The cache key is derived from the URL (domain and path components) and query
     parameters, excluding the ``api_key`` parameter.
     """
 
-    def __init__(self, path: Path | None = None, ttl: int | None = None) -> None:
-        self._path = path
-        self.ttl = ttl
-
     @property
     def path(self) -> Path:
-        if self._path is not None:
-            return self._path
-        from openml import _config as _config_module
-
-        return Path(_config_module.get_cache_directory())
+        return Path(openml.config.get_cache_directory())
 
     def get_key(self, url: str, params: dict[str, Any]) -> str:
         """
@@ -105,6 +89,26 @@ class HTTPCache:
         """
         return self.path.joinpath(key)
 
+    def _get_body_filename_from_response(self, response: Response) -> str:
+        content_type = response.headers.get("Content-Type", "").lower()
+
+        if "application/json" in content_type:
+            return "body.json"
+
+        if "text/xml" in content_type:
+            return "body.xml"
+
+        return "body.txt"
+
+    def _get_body_filename_from_path(self, path: Path) -> str:
+        if (path / "body.json").exists():
+            return "body.json"
+
+        if (path / "body.xml").exists():
+            return "body.xml"
+
+        return "body.txt"
+
     def load(self, key: str) -> Response:
         """
         Load a cached HTTP response from disk.
@@ -128,31 +132,26 @@ class HTTPCache:
         """
         path = self._key_to_path(key)
 
-        if not path.exists():
-            raise FileNotFoundError(f"Cache entry not found: {path}")
-
         meta_path = path / "meta.json"
+        meta_raw = meta_path.read_bytes() if meta_path.exists() else "{}"
+        meta = json.loads(meta_raw)
+
         headers_path = path / "headers.json"
-        body_path = path / "body.bin"
+        headers_raw = headers_path.read_bytes() if headers_path.exists() else "{}"
+        headers = json.loads(headers_raw)
 
-        if not (meta_path.exists() and headers_path.exists() and body_path.exists()):
-            raise FileNotFoundError(f"Incomplete cache at {path}")
-
-        with meta_path.open("r", encoding="utf-8") as f:
-            meta = json.load(f)
-
-        with headers_path.open("r", encoding="utf-8") as f:
-            headers = json.load(f)
-
+        body_path = path / self._get_body_filename_from_path(path)
+        if not body_path.exists():
+            raise FileNotFoundError(f"Incomplete cache at {body_path}")
         body = body_path.read_bytes()
 
         response = Response()
-        response.status_code = meta["status_code"]
-        response.url = meta["url"]
-        response.reason = meta["reason"]
         response.headers = headers
         response._content = body
-        response.encoding = meta["encoding"]
+        response.status_code = meta.get("status_code")
+        response.url = meta.get("url")
+        response.reason = meta.get("reason")
+        response.encoding = meta.get("encoding")
 
         return response
 
@@ -176,7 +175,9 @@ class HTTPCache:
         path = self._key_to_path(key)
         path.mkdir(parents=True, exist_ok=True)
 
-        (path / "body.bin").write_bytes(response.content)
+        body_filename = self._get_body_filename_from_response(response)
+        with (path / body_filename).open("wb") as f:
+            f.write(response.content)
 
         with (path / "headers.json").open("w", encoding="utf-8") as f:
             json.dump(dict(response.headers), f)
@@ -213,70 +214,36 @@ class HTTPClient:
         Backend API Version.
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         *,
         api_version: APIVersion,
-        server: str | None = None,
-        base_url: str | None = None,
-        api_key: str | None = None,
-        timeout: int | None = None,
-        retries: int | None = None,
-        retry_policy: RetryPolicy | None = None,
-        cache: HTTPCache | None = None,
     ) -> None:
         self.api_version = api_version
 
-        # Get config defaults - use lazy import to avoid circular dependency
-        api_config: dict[str, Any] = {}
-        if server is None or base_url is None or api_key is None:
-            from openml import _config as _config_module
-
-            api_config = _config_module.servers.get(api_version, {})
-
-        # Store provided values or read from config
-        self._server = server if server is not None else api_config.get("server", "")
-        self._base_url = base_url if base_url is not None else api_config.get("base_url", "")
-        self._api_key = api_key if api_key is not None else api_config.get("apikey")
-        self._timeout = timeout if timeout is not None else 10
-
-        if retries is None or retry_policy is None:
-            from openml import _config as _config_module
-
-            self._retries = retries if retries is not None else _config_module.connection_n_retries
-            retry_policy_str = (
-                retry_policy.value if retry_policy is not None else _config_module.retry_policy
-            )
-        else:
-            self._retries = retries
-            retry_policy_str = retry_policy.value
-
-        self._retry_policy = RetryPolicy.HUMAN if retry_policy_str == "human" else RetryPolicy.ROBOT
-        self.cache = cache if cache is not None else HTTPCache()
+        self.cache = HTTPCache()
 
     @property
     def server(self) -> str:
-        return self._server
-
-    @property
-    def base_url(self) -> str:
-        return self._base_url
-
-    @property
-    def timeout(self) -> int:
-        return self._timeout
+        server = openml.config.servers[self.api_version]["server"]
+        if server is None:
+            servers_repr = {k.value: v for k, v in openml.config.servers.items()}
+            raise ValueError(
+                f'server found to be None for api_version="{self.api_version}" in {servers_repr}'
+            )
+        return cast("str", server)
 
     @property
     def api_key(self) -> str | None:
-        return self._api_key
+        return cast("str | None", openml.config.servers[self.api_version]["apikey"])
 
     @property
     def retries(self) -> int:
-        return self._retries
+        return cast("int", openml.config.connection_n_retries)
 
     @property
     def retry_policy(self) -> RetryPolicy:
-        return self._retry_policy
+        return RetryPolicy.HUMAN if openml.config.retry_policy == "human" else RetryPolicy.ROBOT
 
     @property
     def retry_func(self) -> Callable:
@@ -608,7 +575,7 @@ class HTTPClient:
         OpenMLHashException
             If checksum verification fails.
         """
-        url = f"{self.server.rstrip('/')}/{path.lstrip('/')}"
+        url = urljoin(self.server, path)
         retries = max(1, self.retries)
 
         params = request_kwargs.pop("params", {}).copy()
@@ -631,12 +598,9 @@ class HTTPClient:
             params = {}
 
         # prepare headers
-        from openml import _config as _config_module
-
         headers = request_kwargs.pop("headers", {}).copy()
-        headers.update(_config_module._HEADERS)
+        headers.update(openml.config._HEADERS)
 
-        request_kwargs.pop("timeout", self.timeout)
         files = request_kwargs.pop("files", None)
 
         if enable_cache and not refresh_cache:

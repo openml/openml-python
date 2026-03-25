@@ -205,7 +205,7 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
     _c_root_dir = root_dir / "org" / "openml" / "test"
     res_paths = [root_dir, _c_root_dir]
 
-    for _d in ["datasets", "tasks", "runs", "setups"]:
+    for _d in ["datasets", "tasks", "runs"]:
         res_paths.append(_c_root_dir / _d)
 
     for _id in ["-1", "2"]:
@@ -221,7 +221,6 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
 
     res_paths.append(_c_root_dir / "datasets" / "30" / "dataset_30.pq")
     res_paths.append(_c_root_dir / "runs" / "1" / "description.xml")
-    res_paths.append(_c_root_dir / "setups" / "1" / "description.xml")
 
     for _id in ["1", "3", "1882"]:
         tmp_p = _c_root_dir / "tasks" / _id
@@ -231,6 +230,12 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
                 tmp_p / "task.xml",
             ]
         )
+
+    res_paths.extend([
+        _c_root_dir / "api" / "v1" / "xml" / "setup",
+        _c_root_dir / "api" / "v1" / "xml" / "setup" / "1",
+        _c_root_dir / "api" / "v1" / "xml" / "setup" / "1" / "body.xml",
+    ])
 
     return res_paths
 
@@ -289,8 +294,6 @@ def as_robot() -> Iterator[None]:
 @pytest.fixture(autouse=True)
 def with_server(request):
     openml.config.set_api_version(APIVersion.V1)
-    if os.getenv("OPENML_USE_LOCAL_SERVICES") == "true":
-        openml.config.TEST_SERVER_URL = "http://localhost:8000"
 
     if "production_server" in request.keywords:
         openml.config.use_production_servers()

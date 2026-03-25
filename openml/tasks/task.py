@@ -11,7 +11,6 @@ from typing_extensions import TypedDict
 
 import arff
 
-import openml
 import openml._api_calls
 from openml import datasets
 from openml.base import OpenMLBase

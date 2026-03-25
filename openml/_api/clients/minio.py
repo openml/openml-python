@@ -14,12 +14,6 @@ class MinIOClient:
     default HTTP headers. It is intended to be extended with actual request
     or storage logic elsewhere.
 
-    Parameters
-    ----------
-    path : pathlib.Path or None, optional
-        Configured base path for storage operations. If None, uses the default
-        cache directory from openml.config.
-
     Attributes
     ----------
     path : pathlib.Path or None
@@ -29,11 +23,6 @@ class MinIOClient:
         OpenML Python client version.
     """
 
-    def __init__(self, path: Path | None = None) -> None:
-        self._path = path
-
     @property
     def path(self) -> Path:
-        if self._path is not None:
-            return self._path
         return Path(openml.config.get_cache_directory())

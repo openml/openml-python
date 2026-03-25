@@ -9,35 +9,16 @@ from .builder import APIBackendBuilder
 if TYPE_CHECKING:
     from openml._api.clients import HTTPClient, MinIOClient
     from openml._api.resources import (
-        DatasetV1API,
-        DatasetV2API,
-        EstimationProcedureV1API,
-        EstimationProcedureV2API,
-        EvaluationMeasureV1API,
-        EvaluationMeasureV2API,
-        EvaluationV1API,
-        EvaluationV2API,
-        FlowV1API,
-        FlowV2API,
-        RunV1API,
-        RunV2API,
-        SetupV1API,
-        SetupV2API,
-        StudyV1API,
-        StudyV2API,
-        TaskV1API,
-        TaskV2API,
+        DatasetAPI,
+        EstimationProcedureAPI,
+        EvaluationAPI,
+        EvaluationMeasureAPI,
+        FlowAPI,
+        RunAPI,
+        SetupAPI,
+        StudyAPI,
+        TaskAPI,
     )
-
-    DatasetAPI = DatasetV1API | DatasetV2API
-    TaskAPI = TaskV1API | TaskV2API
-    EvaluationMeasureAPI = EvaluationMeasureV1API | EvaluationMeasureV2API
-    EstimationProcedureAPI = EstimationProcedureV1API | EstimationProcedureV2API
-    EvaluationAPI = EvaluationV1API | EvaluationV2API
-    FlowAPI = FlowV1API | FlowV2API
-    StudyAPI = StudyV1API | StudyV2API
-    RunAPI = RunV1API | RunV2API
-    SetupAPI = SetupV1API | SetupV2API
 
 
 class APIBackend:

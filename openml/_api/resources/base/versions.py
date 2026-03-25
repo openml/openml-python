@@ -5,11 +5,12 @@ from typing import Any, cast
 
 import xmltodict
 
-from openml._api.resources.base import ResourceAPI
 from openml.enums import APIVersion, ResourceType
 from openml.exceptions import (
     OpenMLServerException,
 )
+
+from .base import ResourceAPI
 
 _LEGAL_RESOURCES_DELETE = [
     ResourceType.DATASET,
@@ -26,7 +27,6 @@ _LEGAL_RESOURCES_TAG = [
     ResourceType.FLOW,
     ResourceType.SETUP,
     ResourceType.RUN,
-    ResourceType.STUDY,
 ]
 
 

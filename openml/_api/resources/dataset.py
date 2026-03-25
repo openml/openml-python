@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from openml._api.resources.base import DatasetAPI, ResourceV1API, ResourceV2API
+from .base import DatasetAPI, ResourceV1API, ResourceV2API
 
 
 class DatasetV1API(ResourceV1API, DatasetAPI):

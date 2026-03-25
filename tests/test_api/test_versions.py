@@ -1,9 +1,8 @@
 import pytest
-from openml.testing import TestAPIBase
-from openml.enums import APIVersion, ResourceType
 from requests import Session, Response
 from unittest.mock import patch
 from openml._api import FallbackProxy, ResourceAPI, ResourceV1API, ResourceV2API
+from openml.enums import ResourceType
 from openml.exceptions import OpenMLNotSupportedError
 import openml
 
@@ -26,12 +25,12 @@ def dummy_task_v1(http_client_v1, minio_client) -> DummyTaskV1API:
 
 
 @pytest.fixture
-def dummy_task_v2(http_client_v2, minio_client) -> DummyTaskV2API:
+def dummy_task_v2(http_client_v2, minio_client) -> DummyTaskV1API:
     return DummyTaskV2API(http=http_client_v2, minio=minio_client)
 
 
 @pytest.fixture
-def dummy_task_fallback(dummy_task_v1, dummy_task_v2) -> FallbackProxy:
+def dummy_task_fallback(dummy_task_v1, dummy_task_v2) -> DummyTaskV1API:
     return FallbackProxy(dummy_task_v2, dummy_task_v1)
 
 
