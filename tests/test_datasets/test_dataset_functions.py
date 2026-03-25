@@ -522,10 +522,11 @@ class TestOpenMLDataset(TestBase):
     @mock.patch("openml.datasets.functions._get_dataset_description")
     @pytest.mark.test_server()
     def test_deletion_of_cache_dir_faulty_download(self, patch):
-        patch.side_effect = Exception("Boom!")
-        self.assertRaisesRegex(Exception, "Boom!", openml.datasets.get_dataset, dataset_id=1)
-        datasets_cache_dir = os.path.join(openml.config.get_cache_directory(), "datasets")
-        assert len(os.listdir(datasets_cache_dir)) == 0
+        with mock.patch.object(openml._backend.dataset._http, "get") as patch_get:
+            patch_get.side_effect = Exception("Boom!")
+            self.assertRaisesRegex(Exception, "Boom!", openml.datasets.get_dataset, dataset_id=1)
+            datasets_cache_dir = os.path.join(openml.config.get_cache_directory(), "datasets") #TODO cache path invalid
+            assert len(os.listdir(datasets_cache_dir)) == 0
 
     @pytest.mark.test_server()
     def test_publish_dataset(self):

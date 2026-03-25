@@ -871,7 +871,6 @@ def _topic_delete_dataset(data_id: int, topic: str) -> int:
     return openml._backend.dataset.delete_topic(data_id, topic)
 
 
-# TODO used by tests only
 def _get_dataset_description(did_cache_dir: Path, dataset_id: int) -> dict[str, Any]:
     """Get the dataset description as xml dictionary.
 
