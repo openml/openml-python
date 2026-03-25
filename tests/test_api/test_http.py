@@ -1,14 +1,17 @@
-from requests import Response, Request, Session
-from unittest.mock import patch
-import pytest
-import os
+from __future__ import annotations
+
 import hashlib
+import os
 from pathlib import Path
+from unittest.mock import patch
 from urllib.parse import urljoin, urlparse
-from openml.enums import APIVersion
-from openml.exceptions import OpenMLAuthenticationError
-from openml._api import HTTPClient, HTTPCache
+
+import pytest
+from requests import Request, Response, Session
+
 import openml
+from openml._api import HTTPCache, HTTPClient
+from openml.exceptions import OpenMLAuthenticationError
 
 
 @pytest.fixture
@@ -35,8 +38,7 @@ def sample_url_v1(sample_path, test_server_v1) -> str:
 def sample_download_url_v1(test_server_v1) -> str:
     server = test_server_v1.split("api/")[0]
     endpoint = "data/v1/download/1/anneal.arff"
-    url = server + endpoint
-    return url
+    return server + endpoint
 
 
 def test_cache(cache, sample_url_v1):
@@ -87,7 +89,7 @@ def test_cache(cache, sample_url_v1):
     assert cached.headers["Content-Type"] == "text/xml"
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_get(http_client):
     response = http_client.get("task/1")
 
@@ -95,7 +97,7 @@ def test_get(http_client):
     assert b"<oml:task" in response.content
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_get_with_cache_creates_cache(http_client, cache, sample_url_v1, sample_path):
     response = http_client.get(sample_path, enable_cache=True)
 
@@ -110,7 +112,7 @@ def test_get_with_cache_creates_cache(http_client, cache, sample_url_v1, sample_
     assert (cache_path / "body.bin").exists()
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_get_uses_cached_response(http_client, cache, sample_url_v1, sample_path, monkeypatch):
     response = Response()
     response.status_code = 200
@@ -122,6 +124,7 @@ def test_get_uses_cached_response(http_client, cache, sample_url_v1, sample_path
 
     def fail_request(*args, **kwargs):
         raise AssertionError("HTTP request should not be called")
+
     monkeypatch.setattr(Session, "request", fail_request)
 
     cached_response = http_client.get(sample_path, enable_cache=True)
@@ -129,7 +132,8 @@ def test_get_uses_cached_response(http_client, cache, sample_url_v1, sample_path
     assert cached_response.status_code == response.status_code
     assert cached_response.content == response.content
 
-@pytest.mark.test_server()
+
+@pytest.mark.test_server
 def test_get_refresh_cache(http_client, cache, sample_url_v1, sample_path):
     key = cache.get_key(sample_url_v1, {})
     meta_path = cache._key_to_path(key) / "meta.json"
@@ -145,7 +149,7 @@ def test_get_refresh_cache(http_client, cache, sample_url_v1, sample_path):
     assert r1.content == r2.content
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_get_with_api_key(http_client, sample_path, test_apikey_v1):
     with patch.object(Session, "request") as mock_request:
         mock_request.return_value = Response()
@@ -157,13 +161,16 @@ def test_get_with_api_key(http_client, sample_path, test_apikey_v1):
         assert kwargs.get("params", {}).get("api_key") == test_apikey_v1
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_get_without_api_key_raises(http_client):
-    with openml.config.overwrite_config_context({"apikey": None}), pytest.raises(OpenMLAuthenticationError):
+    with (
+        openml.config.overwrite_config_context({"apikey": None}),
+        pytest.raises(OpenMLAuthenticationError),
+    ):
         http_client.get("task/1", use_api_key=True)
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_download_creates_file(http_client, sample_download_url_v1):
     dummy_content = b"this is dummy content"
     md5_checksum = hashlib.md5(dummy_content).hexdigest()
@@ -184,7 +191,7 @@ def test_download_creates_file(http_client, sample_download_url_v1):
     assert path.read_bytes() == dummy_content
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_download_is_cached_on_disk(http_client, sample_download_url_v1, monkeypatch):
     path1 = http_client.download(
         url=sample_download_url_v1,
@@ -194,6 +201,7 @@ def test_download_is_cached_on_disk(http_client, sample_download_url_v1, monkeyp
 
     def fail_request(*args, **kwargs):
         raise AssertionError("HTTP request should not be called")
+
     monkeypatch.setattr(Session, "request", fail_request)
 
     path2 = http_client.download(
@@ -206,7 +214,7 @@ def test_download_is_cached_on_disk(http_client, sample_download_url_v1, monkeyp
     assert mtime1 == mtime2
 
 
-@pytest.mark.test_server()
+@pytest.mark.test_server
 def test_download_respects_custom_handler(http_client, sample_download_url_v1):
     def handler(response, path: Path, encoding: str):
         path.write_text("HANDLED", encoding=encoding)
@@ -254,12 +262,7 @@ def test_delete(http_client, test_server_v1, test_apikey_v1):
 
         mock_request.assert_called_once_with(
             method="DELETE",
-            url=(
-                test_server_v1
-                + resource_name
-                + "/"
-                + str(resource_id)
-            ),
+            url=(test_server_v1 + resource_name + "/" + str(resource_id)),
             params={"api_key": test_apikey_v1},
             data={},
             headers=openml.config._HEADERS,
