@@ -1437,7 +1437,7 @@ class TestOpenMLDataset(TestBase):
         n_tries = 10
         # we need to wait for the edit to be reflected on the server
         for i in range(n_tries):
-            edited_dataset = openml.datasets.get_dataset(did)
+            edited_dataset = openml.datasets.get_dataset(did,force_refresh_cache=True)
             try:
                 assert edited_dataset.default_target_attribute == "shape", edited_dataset
                 assert edited_dataset.ignore_attribute == ["oil"], edited_dataset
