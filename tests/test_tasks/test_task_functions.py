@@ -164,7 +164,7 @@ class TestTask(TestBase):
             os.path.join(openml.config.get_cache_directory(), "tasks", "1", "datasplits.arff")
         )
         assert os.path.exists(
-            os.path.join(openml.config.get_cache_directory(), "minio", "datasets","0000","0001", "dataset_1.pq")
+            os.path.join(openml.config.get_cache_directory(), "minio","minio", "datasets","0000","0001", "dataset_1.pq")
         )
 
     @pytest.mark.test_server()

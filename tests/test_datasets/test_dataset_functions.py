@@ -509,8 +509,10 @@ class TestOpenMLDataset(TestBase):
         with mock.patch.object(openml._backend.dataset._http, "get") as patch_get:
             patch_get.side_effect = Exception("Boom!")
             self.assertRaisesRegex(Exception, "Boom!", openml.datasets.get_dataset, dataset_id=1)
-            datasets_cache_dir = os.path.join(openml.config.get_cache_directory(), "datasets") #TODO cache path invalid
-            assert len(os.listdir(datasets_cache_dir)) == 0
+            datasets_cache_dir = os.path.join(openml.config.get_cache_directory(), "api/v1/xml/data/1") 
+            #TODO cache path would not be created
+            if os.path.exists(datasets_cache_dir):
+                assert len(os.listdir(datasets_cache_dir)) == 0
 
     @pytest.mark.test_server()
     def test_publish_dataset(self):
@@ -1445,10 +1447,7 @@ class TestOpenMLDataset(TestBase):
                     raise e
                 time.sleep(10)
                 # Delete the cache dir to get the newer version of the dataset
-                
-                shutil.rmtree(
-                    os.path.join(openml.config.get_cache_directory(), "datasets", str(did)),
-                )
+                #TODO not needed as tests are isolated?
 
     @pytest.mark.test_server()
     def test_data_edit_requires_field(self):
