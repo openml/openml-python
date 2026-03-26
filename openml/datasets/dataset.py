@@ -976,8 +976,9 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
             Tag to attach to the dataset.
         """
         if self.dataset_id is None:
-            raise ValueError(
-                "Dataset does not have an ID. Please publish the dataset before tagging."
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Cannot tag an dataset that has not been published yet."
+                "Please publish the object first before being able to tag it."
             )
         openml._backend.dataset.tag(self.dataset_id, tag)
 
@@ -990,8 +991,9 @@ class OpenMLDataset(OpenMLBase):  # noqa: PLW1641
             Tag to remove from the dataset.
         """
         if self.dataset_id is None:
-            raise ValueError(
-                "Dataset does not have an ID. Please publish the dataset before untagging."
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Cannot tag an dataset that has not been published yet."
+                "Please publish the object first before being able to tag it."
             )
         openml._backend.dataset.untag(self.dataset_id, tag)
 
