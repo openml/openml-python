@@ -20,14 +20,6 @@ def task_v2(http_client_v2, minio_client) -> TaskV2API:
     return TaskV2API(http=http_client_v2, minio=minio_client)
 
 
-def _get_first_tid(task_api: TaskV1API, task_type: TaskType) -> int:
-    """Helper to find an existing task ID for a given type using the V1 resource."""
-    tasks = task_api.list(limit=1, offset=0, task_type=task_type)
-    if tasks.empty:
-        pytest.skip(f"No tasks of type {task_type} found on test server.")
-    return int(tasks.iloc[0]["tid"])
-
-
 @pytest.mark.uses_test_server()
 def test_v1_list_tasks(task_v1):
     """Verify V1 list endpoint returns a populated DataFrame."""
@@ -40,10 +32,9 @@ def test_v1_list_tasks(task_v1):
 @pytest.mark.uses_test_server()
 def test_v1_get(task_v1):
     """Verify V1 get endpoint returns a task."""
-    task_id = _get_first_tid(task_v1, TaskType.SUPERVISED_CLASSIFICATION)
-    task = task_v1.get(task_id)
+    task = task_v1.get(1)
     assert task is not None
-    assert task.task_id == task_id
+    assert task.task_id == 1
 
 
 @pytest.mark.uses_test_server()
@@ -56,10 +47,9 @@ def test_v2_list_tasks(task_v2):
 @pytest.mark.uses_test_server()
 def test_v2_get(task_v2):
     """Verify V2 get endpoint returns a task."""
-    task_id = _get_first_tid(task_v2, TaskType.SUPERVISED_CLASSIFICATION)
-    task = task_v2.get(task_id)
+    task = task_v2.get(1)
     assert task is not None
-    assert task.task_id == task_id
+    assert task.task_id == 1
 
 
 def test_v1_publish(task_v1):

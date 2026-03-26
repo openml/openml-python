@@ -27,6 +27,13 @@ class TestTask(TestBase):
     def tearDown(self):
         super().tearDown()
 
+    @pytest.mark.test_server()
+    def test__get_estimation_procedure_list(self):
+        estimation_procedures = openml.tasks.functions._get_estimation_procedure_list()
+        assert isinstance(estimation_procedures, list)
+        assert isinstance(estimation_procedures[0], dict)
+        assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
+
     @pytest.mark.production_server()
     @pytest.mark.xfail(reason="failures_issue_1544", strict=False)
     def test_list_clustering_task(self):
