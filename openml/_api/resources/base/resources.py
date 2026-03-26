@@ -12,7 +12,8 @@ from .base import ResourceAPI
 if TYPE_CHECKING:
     import pandas as pd
 
-    from openml import OpenMLEvaluation
+    from openml.estimation_procedures import OpenMLEstimationProcedure
+    from openml.evaluations import OpenMLEvaluation
     from openml.flows.flow import OpenMLFlow
     from openml.setups.setup import OpenMLSetup
     from openml.tasks.task import OpenMLTask, TaskType
@@ -86,6 +87,9 @@ class EstimationProcedureAPI(ResourceAPI):
     """Abstract API interface for estimation procedure resources."""
 
     resource_type: ResourceType = ResourceType.ESTIMATION_PROCEDURE
+
+    @abstractmethod
+    def list(self) -> list[OpenMLEstimationProcedure]: ...
 
 
 class EvaluationAPI(ResourceAPI):
