@@ -20,11 +20,6 @@ def task_v2(http_client_v2, minio_client) -> TaskV2API:
     return TaskV2API(http=http_client_v2, minio=minio_client)
 
 
-@pytest.fixture
-def task_fallback(task_v1, task_v2) -> FallbackProxy:
-    return FallbackProxy(task_v2, task_v1)
-
-
 def _get_first_tid(task_api: TaskV1API, task_type: TaskType) -> int:
     """Helper to find an existing task ID for a given type using the V1 resource."""
     tasks = task_api.list(limit=1, offset=0, task_type=task_type)
@@ -43,10 +38,29 @@ def test_v1_list_tasks(task_v1):
 
 
 @pytest.mark.uses_test_server()
+def test_v1_get(task_v1):
+    """Verify V1 get endpoint returns a task."""
+    task_id = _get_first_tid(task_v1, TaskType.SUPERVISED_CLASSIFICATION)
+    task = task_v1.get(task_id)
+    assert task is not None
+    assert task.task_id == task_id
+
+
+@pytest.mark.uses_test_server()
 def test_v2_list_tasks(task_v2):
     """Verify V2 list endpoint raises NotSupported."""
     with pytest.raises(OpenMLNotSupportedError):
         task_v2.list(limit=5, offset=0)
+
+
+@pytest.mark.uses_test_server()
+def test_v2_get(task_v2):
+    """Verify V2 get endpoint returns a task."""
+    task_id = _get_first_tid(task_v2, TaskType.SUPERVISED_CLASSIFICATION)
+    task = task_v2.get(task_id)
+    assert task is not None
+    assert task.task_id == task_id
+
 
 def test_v1_publish(task_v1):
     resource_name = task_v1.resource_type.value
@@ -96,12 +110,7 @@ def test_v1_delete(task_v1):
 
         mock_request.assert_called_once_with(
             method="DELETE",
-            url=(
-                openml.config.server
-                + resource_name
-                + "/"
-                + str(resource_id)
-            ),
+            url=(openml.config.server + resource_name + "/" + str(resource_id)),
             params={"api_key": openml.config.apikey},
             data={},
             headers=openml.config._HEADERS,
@@ -129,11 +138,7 @@ def test_v1_tag(task_v1):
 
         mock_request.assert_called_once_with(
             method="POST",
-            url=(
-                openml.config.server
-                + task_v1.resource_type.value
-                + "/tag"
-            ),
+            url=(openml.config.server + task_v1.resource_type.value + "/tag"),
             params={},
             data={
                 "api_key": openml.config.apikey,
@@ -164,11 +169,7 @@ def test_v1_untag(task_v1):
 
         mock_request.assert_called_once_with(
             method="POST",
-            url=(
-                openml.config.server
-                + task_v1.resource_type.value
-                + "/untag"
-            ),
+            url=(openml.config.server + task_v1.resource_type.value + "/untag"),
             params={},
             data={
                 "api_key": openml.config.apikey,

@@ -6,6 +6,7 @@ from time import time
 import openml
 from openml.testing import TestBase
 import pytest
+import unittest.mock
 
 
 # Common methods between tasks
@@ -33,9 +34,7 @@ class OpenMLTaskMethodsTest(TestBase):
         assert len(tasks) == 0
 
     @pytest.mark.test_server()
-    def test_get_train_and_test_split_indices(self):
-        import unittest.mock
-        
+    def test_get_train_and_test_split_indices(self):        
         openml.config.set_root_cache_directory(self.static_cache_dir)
         
         with unittest.mock.patch("requests.sessions.Session.request") as mock_request:

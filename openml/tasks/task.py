@@ -264,7 +264,9 @@ class OpenMLTask(OpenMLBase):
             Tag to attach to the task.
         """
         if self.task_id is None:
-            raise ValueError("Task does not have an ID. Please publish the task before tagging.")
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Please publish the task first before being able to tag it."
+            )
         openml._backend.task.tag(self.task_id, tag)
 
     def remove_tag(self, tag: str) -> None:
@@ -276,8 +278,8 @@ class OpenMLTask(OpenMLBase):
             Tag to remove from the task.
         """
         if self.task_id is None:
-            raise ValueError(
-                "Dataset does not have an ID. Please publish the dataset before untagging."
+            raise openml.exceptions.ObjectNotPublishedError(
+                "Please publish the task first before being able to untag it."
             )
         openml._backend.task.untag(self.task_id, tag)
 
