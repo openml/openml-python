@@ -27,6 +27,7 @@ def _wait_for_dataset_being_processed(dataset, did, status='active', n_tries=10,
             time.sleep(wait_time)
             result = dataset.list(limit=1, offset=0, data_id=[did], status="all")
             result = result.to_dict(orient="index")
+            TestBase.logger.warning(f"Dataset {did} status: {result[did]['status']}")
             if result[did]["status"] == status:
                 return
         except Exception:
@@ -144,7 +145,7 @@ def test_v1_fork(dataset_v1):
     did = 2
     result = dataset_v1.fork(did)
     assert did != result
-    _wait_for_dataset_being_processed(dataset_v1, result,'in_preparation')
+    _wait_for_dataset_being_processed(dataset_v1, result, 'in_preparation', n_tries=30)
 
     listing = dataset_v1.list(limit=2, offset=0, data_id=[did, result], status="all")
 
