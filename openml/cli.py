@@ -303,6 +303,124 @@ def configure_field(  # noqa: PLR0913
     verbose_set(field, value)
 
 
+def upload_dataset(args: argparse.Namespace) -> None:
+    """Upload a dataset from a CSV or ARFF file to OpenML."""
+    import pandas as pd
+
+    file_path = Path(args.file_path)
+    if not file_path.is_file():
+        print(f"Error: File '{file_path}' not found.")
+        sys.exit(1)
+
+    suffix = file_path.suffix.lower()
+    if suffix == ".csv":
+        data = pd.read_csv(file_path)
+    elif suffix == ".arff":
+        import arff
+
+        with file_path.open() as fh:
+            arff_data = arff.load(fh)
+        data = pd.DataFrame(
+            arff_data["data"],
+            columns=[attr[0] for attr in arff_data["attributes"]],
+        )
+    else:
+        print(f"Error: Unsupported file format '{suffix}'. Supported formats: .csv, .arff")
+        sys.exit(1)
+
+    dataset = openml.datasets.create_dataset(
+        name=args.name,
+        description=args.description,
+        creator=args.creator,
+        contributor=args.contributor,
+        collection_date=args.collection_date,
+        language=args.language,
+        licence=args.licence,
+        attributes="auto",
+        data=data,
+        default_target_attribute=args.default_target_attribute,
+        ignore_attribute=args.ignore_attribute,
+        citation=args.citation or "",
+        row_id_attribute=args.row_id_attribute,
+        original_data_url=args.original_data_url,
+        paper_url=args.paper_url,
+        version_label=args.version_label,
+        update_comment=args.update_comment,
+    )
+    dataset.publish()
+    print(f"Dataset successfully uploaded. ID: {dataset.id}")
+    print(f"URL: {dataset.openml_url}")
+
+
+def upload_flow(args: argparse.Namespace) -> None:
+    """Upload a flow from a serialized model file to OpenML."""
+    import pickle
+
+    file_path = Path(args.file_path)
+    if not file_path.is_file():
+        print(f"Error: File '{file_path}' not found.")
+        sys.exit(1)
+
+    print(
+        "WARNING: Loading pickle files executes arbitrary code. "
+        "Only use this with files you trust.",
+    )
+    with file_path.open("rb") as fh:
+        model = pickle.load(fh)  # noqa: S301
+
+    extension = openml.extensions.get_extension_by_model(model, raise_if_no_extension=True)
+    assert extension is not None  # guaranteed by raise_if_no_extension=True
+    flow = extension.model_to_flow(model)
+
+    if args.name:
+        flow.custom_name = args.name
+    if args.description:
+        flow.description = args.description
+
+    flow.publish()
+    print(f"Flow successfully uploaded. ID: {flow.flow_id}")
+    print(f"URL: {flow.openml_url}")
+
+
+def upload_run(args: argparse.Namespace) -> None:
+    """Upload a run from a directory containing run files to OpenML."""
+    directory = Path(args.file_path)
+    if not directory.is_dir():
+        print(f"Error: Directory '{directory}' not found.")
+        sys.exit(1)
+
+    expect_model = not args.no_model
+    run = openml.runs.OpenMLRun.from_filesystem(directory, expect_model=expect_model)
+    run.publish()
+    print(f"Run successfully uploaded. ID: {run.run_id}")
+    print(f"URL: {run.openml_url}")
+
+
+def upload(args: argparse.Namespace) -> None:
+    """Dispatch upload subcommands."""
+    if not openml.config.apikey:
+        print(
+            "Error: No API key configured. Set your API key with:\n"
+            "  openml configure apikey\n"
+            "For more information, see: "
+            "https://openml.github.io/openml-python/latest/examples/Basics/"
+            "introduction_tutorial/#authentication",
+        )
+        sys.exit(1)
+
+    upload_functions: dict[str, Callable[[argparse.Namespace], None]] = {
+        "dataset": upload_dataset,
+        "flow": upload_flow,
+        "run": upload_run,
+    }
+
+    if args.upload_resource not in upload_functions:
+        print("Please specify a resource to upload: dataset, flow, or run.")
+        sys.exit(1)
+
+    upload_functions[args.upload_resource](args)
+
+
 def configure(args: argparse.Namespace) -> None:
     """Calls the right submenu(s) to edit `args.field` in the configuration file."""
     set_functions = {
@@ -332,7 +450,10 @@ def configure(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    subroutines = {"configure": configure}
+    subroutines: dict[str, Callable[[argparse.Namespace], None]] = {
+        "configure": configure,
+        "upload": upload,
+    }
 
     parser = argparse.ArgumentParser()
     # Add a global --version flag to display installed version and exit
@@ -371,6 +492,85 @@ def main() -> None:
         default=None,
         nargs="?",
         help="The value to set the FIELD to.",
+    )
+
+    # --- upload subcommand ---
+    parser_upload = subparsers.add_parser(
+        "upload",
+        description="Upload resources (datasets, flows, or runs) to OpenML.",
+    )
+    upload_subparsers = parser_upload.add_subparsers(dest="upload_resource")
+
+    # upload dataset
+    parser_upload_dataset = upload_subparsers.add_parser(
+        "dataset",
+        description="Upload a dataset from a CSV or ARFF file.",
+    )
+    parser_upload_dataset.add_argument(
+        "file_path",
+        type=str,
+        help="Path to the dataset file (.csv or .arff).",
+    )
+    _dataset_args: list[tuple[str, str, bool]] = [
+        ("--name", "Name of the dataset.", True),
+        ("--description", "Description of the dataset.", True),
+        ("--default_target_attribute", "The default target attribute.", False),
+        ("--creator", "The person who created the dataset.", False),
+        ("--contributor", "People who contributed to the dataset.", False),
+        ("--collection_date", "The date the data was originally collected.", False),
+        ("--language", "Language in which the data is represented.", False),
+        ("--licence", "License of the data.", False),
+        ("--ignore_attribute", "Attributes to exclude in modelling (comma separated).", False),
+        ("--citation", "Reference(s) that should be cited.", False),
+        ("--row_id_attribute", "The attribute that represents the row-id column.", False),
+        ("--original_data_url", "URL to the original dataset (for derived data).", False),
+        ("--paper_url", "Link to a paper describing the dataset.", False),
+        ("--version_label", "Version label (e.g. date, hash).", False),
+        ("--update_comment", "An explanation for when the dataset is uploaded.", False),
+    ]
+    for flag, help_text, required in _dataset_args:
+        parser_upload_dataset.add_argument(
+            flag,
+            type=str,
+            required=required,
+            default=None,
+            help=help_text,
+        )
+
+    # upload flow
+    parser_upload_flow = upload_subparsers.add_parser(
+        "flow",
+        description="Upload a flow from a serialized model file (.pkl). "
+        "WARNING: pickle files can execute arbitrary code. Only use trusted files.",
+    )
+    parser_upload_flow.add_argument(
+        "file_path",
+        type=str,
+        help="Path to the serialized model file (.pkl). WARNING: only use trusted pickle files.",
+    )
+    parser_upload_flow.add_argument("--name", type=str, default=None, help="Custom flow name.")
+    parser_upload_flow.add_argument(
+        "--description",
+        type=str,
+        default=None,
+        help="Description of the flow.",
+    )
+
+    # upload run
+    parser_upload_run = upload_subparsers.add_parser(
+        "run",
+        description="Upload a run from a directory containing run files.",
+    )
+    parser_upload_run.add_argument(
+        "file_path",
+        type=str,
+        help="Path to directory with run files (description.xml, predictions.arff, etc.).",
+    )
+    parser_upload_run.add_argument(
+        "--no_model",
+        action="store_true",
+        default=False,
+        help="If set, do not require model.pkl in the run directory.",
     )
 
     args = parser.parse_args()
