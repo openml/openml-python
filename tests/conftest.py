@@ -237,6 +237,14 @@ def _expected_static_cache_state(root_dir: Path) -> list[Path]:
         _c_root_dir / "api" / "v1" / "xml" / "setup" / "1" / "body.xml",
     ])
 
+    res_paths.extend([
+        _c_root_dir / "api" / "v1" / "xml" / "datasets",
+        _c_root_dir / "api" / "v1" / "xml" / "datasets" / "-1",
+        _c_root_dir / "api" / "v1" / "xml" / "datasets" / "-1" / "body.xml",
+        _c_root_dir / "api" / "v1" / "xml" / "datasets" / "2",
+        _c_root_dir / "api" / "v1" / "xml" / "datasets" / "2" / "body.xml",
+    ])
+
     return res_paths
 
 

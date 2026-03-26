@@ -462,7 +462,7 @@ class TestOpenMLDataset(TestBase):
 
     @pytest.mark.test_server()
     def test_get_dataset_force_refresh_cache(self):
-        did_cache_dir = os.path.join(openml.config.get_cache_directory(),"api","v1","xml","data","2","body.bin")
+        did_cache_dir = os.path.join(openml.config.get_cache_directory(),"api","v1","xml","data","2","body.xml")
 
         openml.datasets.get_dataset(2)
         change_time = os.stat(did_cache_dir).st_mtime
@@ -483,7 +483,7 @@ class TestOpenMLDataset(TestBase):
 
     @pytest.mark.test_server()
     def test_get_dataset_force_refresh_cache_clean_start(self):
-        did_cache_dir = os.path.join(openml.config.get_cache_directory(),"api","v1","xml","data","2","body.bin")
+        did_cache_dir = os.path.join(openml.config.get_cache_directory(),"api","v1","xml","data","2","body.xml")
 
         # Test clean start
         openml.datasets.get_dataset(2, force_refresh_cache=True)
@@ -1873,7 +1873,7 @@ def _dataset_file_is_downloaded(did: int, file: str):
 
 
 def _dataset_description_is_downloaded(did: int):
-    return _dataset_file_is_downloaded(did, "body.bin")
+    return _dataset_file_is_downloaded(did, "body.xml")
 
 
 def _dataset_qualities_is_downloaded(did: int):
