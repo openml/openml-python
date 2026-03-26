@@ -12,15 +12,15 @@ import openml
 
 
 @pytest.fixture
-def study_v1(http_client_v1) -> StudyV1API:
+def study_v1(http_client_v1, minio_client) -> StudyV1API:
     """Fixture for V1 Study API instance."""
-    return StudyV1API(http=http_client_v1)
+    return StudyV1API(http=http_client_v1, minio=minio_client)
 
 
 @pytest.fixture
-def study_v2(http_client_v2) -> StudyV2API:
+def study_v2(http_client_v2, minio_client) -> StudyV2API:
     """Fixture for V2 Study API instance."""
-    return StudyV2API(http=http_client_v2)
+    return StudyV2API(http=http_client_v2, minio=minio_client)
 
 def test_v1_list_basic(study_v1, test_server_v1, test_apikey_v1):
     """Test V1 list basic functionality with limit and offset."""
