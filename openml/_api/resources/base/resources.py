@@ -43,6 +43,11 @@ class TaskAPI(ResourceAPI):
         """
         ...
 
+    @abstractmethod
+    def supports_download_splits(self) -> bool:
+        """Return whether the task API implementation supports split downloads."""
+        ...
+
     # Task listing (V1 only)
     @abstractmethod
     def list(

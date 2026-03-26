@@ -14,7 +14,7 @@ from openml.exceptions import (
     OpenMLNotAuthorizedError,
     OpenMLServerException,
 )
-from openml.tasks import TaskType
+from openml.tasks import TaskType, task
 from openml.testing import TestBase, create_request_response
 
 
@@ -29,7 +29,7 @@ class TestTask(TestBase):
 
     @pytest.mark.test_server()
     def test__get_estimation_procedure_list(self):
-        estimation_procedures = openml.tasks.functions._get_estimation_procedure_list()
+        estimation_procedures = openml._api.resources.task._get_estimation_procedure_list()
         assert isinstance(estimation_procedures, list)
         assert isinstance(estimation_procedures[0], dict)
         assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
@@ -116,6 +116,13 @@ class TestTask(TestBase):
                     assert j == task["ttid"]
                     self._check_task(task)
 
+    @pytest.mark.test_server()
+    def test__get_task(self):
+        openml.config.set_root_cache_directory(self.static_cache_dir)
+        with unittest.mock.patch("requests.sessions.Session.request") as mock_request:
+            openml.tasks.get_task(1882)
+            mock_request.assert_not_called()
+
     @unittest.skip(
         "Please await outcome of discussion: https://github.com/openml/OpenML/issues/776",
     )
@@ -126,13 +133,18 @@ class TestTask(TestBase):
         # https://github.com/openml/openml-python/issues/378
         openml.tasks.get_task(34536)
 
-    @pytest.mark.skipif(
-        os.getenv("OPENML_USE_LOCAL_SERVICES") == "true",
-        reason="Pending resolution of #1657",
-    )
+    @pytest.mark.test_server()
+    def test_get_task(self):
+        with unittest.mock.patch("requests.sessions.Session.request") as mock_request:
+            openml.tasks.get_task(1)
+            mock_request.assert_not_called()
+
     @pytest.mark.test_server()
     def test_get_task_lazy(self):
-        task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
+        with unittest.mock.patch("requests.sessions.Session.request") as mock_request:
+            task = openml.tasks.get_task(2, download_data=False)  # anneal; crossvalidation
+            mock_request.assert_not_called()
+
         assert isinstance(task, OpenMLTask)
         assert os.path.exists(
             os.path.join(openml.config.get_cache_directory(), "tasks", "2", "task.xml")
@@ -151,7 +163,10 @@ class TestTask(TestBase):
             )
         )
 
-        task.download_split()
+        with unittest.mock.patch("requests.sessions.Session.request") as mock_request:
+            task.download_split()
+            mock_request.assert_not_called()        
+            
         assert os.path.exists(
             os.path.join(
                 openml.config.get_cache_directory(), "tasks", "2", "datasplits.arff"
@@ -177,6 +192,15 @@ class TestTask(TestBase):
         # Now the file should no longer exist
         assert not os.path.exists(os.path.join(os.getcwd(), "tasks", "1", "tasks.xml"))
 
+    @pytest.mark.test_server()
+    def test_get_task_with_cache(self):
+        openml.config.set_root_cache_directory(self.static_cache_dir)
+        with unittest.mock.patch("requests.sessions.Session.request") as mock_request:
+            task = openml.tasks.get_task(1)
+            mock_request.assert_not_called()
+
+        assert isinstance(task, OpenMLTask)
+
     @pytest.mark.production_server()
     def test_get_task_different_types(self):
         self.use_production_server()
@@ -189,8 +213,10 @@ class TestTask(TestBase):
 
     @pytest.mark.test_server()
     def test_download_split(self):
-        task = openml.tasks.get_task(1)  # anneal; crossvalidation
-        split = task.download_split()
+        with unittest.mock.patch("requests.sessions.Session.request") as mock_request:
+            task = openml.tasks.get_task(1)  # anneal; crossvalidation
+            split = task.download_split()
+            mock_request.assert_not_called()
         assert type(split) == OpenMLSplit
         assert os.path.exists(
             os.path.join(

@@ -200,6 +200,9 @@ class TaskV1API(ResourceV1API, TaskAPI):
         response = self._http.get(f"task/{task_id}", enable_cache=True)
         return _create_task_from_xml(response.text)
 
+    def supports_download_splits(self) -> bool:
+        return True
+
     def list(
         self,
         limit: int,
@@ -401,3 +404,6 @@ class TaskV2API(ResourceV2API, TaskAPI):
         **kwargs: Any,  # noqa: ARG002
     ) -> pd.DataFrame:
         raise self._not_supported(method="list")
+
+    def supports_download_splits(self) -> bool:
+        return False

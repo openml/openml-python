@@ -134,7 +134,11 @@ def get_tasks(
     tasks = []
     for task_id in task_ids:
         tasks.append(
-            get_task(task_id, download_data=download_data, download_qualities=download_qualities)
+            get_task(
+                task_id,
+                download_data=download_data,
+                download_qualities=download_qualities,
+            )
         )
     return tasks
 
@@ -166,8 +170,6 @@ def get_task(
     -------
     task: OpenMLTask
     """
-    from openml._api.resources.task import TaskV1API, TaskV2API
-
     if not isinstance(task_id, int):
         raise TypeError(f"Task id should be integer, is {type(task_id)}")
 
@@ -180,17 +182,14 @@ def get_task(
     ):
         task.class_labels = dataset.retrieve_class_labels(task.target_name)
 
-    if (
-        download_splits
-        and isinstance(task, OpenMLSupervisedTask)
-        and isinstance(openml._backend.task, TaskV1API)
-    ):
-        task.download_split()
-    elif download_splits and isinstance(openml._backend.task, TaskV2API):
-        warnings.warn(
-            "`download_splits` is not yet supported in the v2 API and will be ignored.",
-            stacklevel=2,
-        )
+    if download_splits and isinstance(task, OpenMLSupervisedTask):
+        if openml._backend.task.supports_download_splits():
+            task.download_split()
+        else:
+            warnings.warn(
+                "`download_splits` is not yet supported in the v2 API and will be ignored.",
+                stacklevel=2,
+            )
 
     return task
 
