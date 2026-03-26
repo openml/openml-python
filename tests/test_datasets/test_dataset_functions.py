@@ -1891,8 +1891,8 @@ def _dataset_data_file_is_downloaded(did: int):
     if not cache_directory.exists():
         TestBase.logger.warning(f"Cache directory {cache_directory} does not exist. Data file is not downloaded.")
         TestBase.logger.warning(
-            f"Contents of cache directory: {list((Path(openml.config.get_cache_directory()) / 'minio').iterdir())}"
-        )        
+            f"Contents of cache directory: {list((Path(openml.config.get_cache_directory()) / 'minio' / 'minio').iterdir())}"
+        )
         return False
     return any(f.suffix in (".pq", ".arff") for f in cache_directory.iterdir())
 
