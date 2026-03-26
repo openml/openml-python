@@ -52,8 +52,8 @@ class StudyV1API(ResourceV1API, StudyAPI):
         xml_string = response.content.decode("utf-8")
         return self._parse_list_xml(xml_string)
 
+    @staticmethod
     def _build_url(  # noqa: PLR0913
-        self,
         limit: int | None = None,
         offset: int | None = None,
         status: str | None = None,
@@ -100,7 +100,8 @@ class StudyV1API(ResourceV1API, StudyAPI):
 
         return api_call
 
-    def _parse_list_xml(self, xml_string: str) -> pd.DataFrame:
+    @staticmethod
+    def _parse_list_xml(xml_string: str) -> pd.DataFrame:
         """Parse the XML response from study list API.
 
         Parameters

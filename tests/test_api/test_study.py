@@ -265,7 +265,7 @@ def test_v1_delete(study_v1, test_server_v1, test_apikey_v1):
 
         result = study_v1.delete(study_id)
 
-        assert result is True
+        assert result
 
         mock_request.assert_called_once_with(
             method="DELETE",
