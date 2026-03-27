@@ -111,19 +111,20 @@ class HTTPCache:
         return "body.txt"
 
     def _get_body_filename_from_path(self, path: Path) -> str:
-        if (path / "body.json").exists():
-            return "body.json"
+        candidates = []
+        for p in path.iterdir():
+            if p.name.startswith("body.") and len(p.suffixes) == 1:
+                candidates.append(p)
 
-        if (path / "body.xml").exists():
-            return "body.xml"
+        if not candidates:
+            raise FileNotFoundError(f"No body file found in path: {path}")
 
-        if (path / "body.arff").exists():
-            return "body.arff"
+        if len(candidates) > 1:
+            raise FileNotFoundError(
+                f"Multiple body files found in path: {path} ({[p.name for p in candidates]})"
+            )
 
-        if (path / "body.zip").exists():
-            return "body.zip"
-
-        return "body.txt"
+        return candidates[0].name
 
     def load(self, key: str) -> Response:
         """
@@ -148,6 +149,9 @@ class HTTPCache:
         """
         path = self._key_to_path(key)
 
+        if not path.exists():
+            raise FileNotFoundError(f"Cache path not found: {path}")
+
         meta_path = path / "meta.json"
         meta_raw = meta_path.read_bytes() if meta_path.exists() else "{}"
         meta = json.loads(meta_raw)
@@ -157,8 +161,6 @@ class HTTPCache:
         headers = json.loads(headers_raw)
 
         body_path = path / self._get_body_filename_from_path(path)
-        if not body_path.exists():
-            raise FileNotFoundError(f"Incomplete cache at {body_path}")
         body = body_path.read_bytes()
 
         response = Response()
