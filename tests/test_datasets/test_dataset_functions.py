@@ -108,6 +108,9 @@ class TestOpenMLDataset(TestBase):
         for did in datasets:
             self._check_dataset(datasets[did])
 
+    def _get_cache_filename(self, id):
+        return self.http_client.cache_path_from_url(f"data/{id}")
+
     @pytest.mark.test_server()
     def test_tag_untag_dataset(self):
         tag = "test_tag_%d" % random.randint(1, 1000000)
@@ -462,26 +465,26 @@ class TestOpenMLDataset(TestBase):
 
     @pytest.mark.test_server()
     def test_get_dataset_force_refresh_cache(self):
-        cache_dir = openml.config.get_cache_directory()
-
         openml.datasets.get_dataset(2)
-        change_time = os.stat(cache_dir).st_mtime
+        did_cache_file = self._get_cache_filename(2)
+        change_time = os.stat(did_cache_file).st_mtime
 
         # Test default
         openml.datasets.get_dataset(2)
-        assert change_time == os.stat(cache_dir).st_mtime
+        assert change_time == os.stat(did_cache_file).st_mtime
 
         # Test refresh
         openml.datasets.get_dataset(2, force_refresh_cache=True)
-        assert change_time != os.stat(cache_dir).st_mtime
+        assert change_time != os.stat(did_cache_file).st_mtime
 
     @pytest.mark.test_server()
     def test_get_dataset_force_refresh_cache_clean_start(self):
-        did_cache_dir = os.path.join(openml.config.get_cache_directory(),"api","v1","xml","data","2","body.xml")
+        with pytest.raises(FileNotFoundError):
+            self._get_cache_filename(2)
 
-        # Test clean start
         openml.datasets.get_dataset(2, force_refresh_cache=True)
-        assert os.path.exists(did_cache_dir)
+
+        assert self._get_cache_filename(2).exists()
 
     def test_deletion_of_cache_dir(self):
         # Simple removal
