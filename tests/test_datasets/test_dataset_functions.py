@@ -462,24 +462,18 @@ class TestOpenMLDataset(TestBase):
 
     @pytest.mark.test_server()
     def test_get_dataset_force_refresh_cache(self):
-        did_cache_dir = os.path.join(openml.config.get_cache_directory(),"api","v1","xml","data","2","body.xml")
+        cache_dir = openml.config.get_cache_directory()
 
         openml.datasets.get_dataset(2)
-        change_time = os.stat(did_cache_dir).st_mtime
+        change_time = os.stat(cache_dir).st_mtime
 
         # Test default
         openml.datasets.get_dataset(2)
-        assert change_time == os.stat(did_cache_dir).st_mtime
+        assert change_time == os.stat(cache_dir).st_mtime
 
         # Test refresh
         openml.datasets.get_dataset(2, force_refresh_cache=True)
-        assert change_time != os.stat(did_cache_dir).st_mtime
-
-        # Final clean up
-        # openml.utils._remove_cache_dir_for_id(
-        #     DATASETS_CACHE_DIR_NAME,
-        #     did_cache_dir,
-        # )
+        assert change_time != os.stat(cache_dir).st_mtime
 
     @pytest.mark.test_server()
     def test_get_dataset_force_refresh_cache_clean_start(self):
