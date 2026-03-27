@@ -99,10 +99,13 @@ class HTTPCache:
         if "text/xml" in content_type:
             return "body.xml"
 
+        if response.content.startswith(b"PK\x03\x04"):
+            return "body.zip"
+
         try:
             arff.loads(response.text)
             return "body.arff"
-        except arff.BadDataFormat:
+        except arff.ArffException:
             pass
 
         return "body.txt"
@@ -116,6 +119,9 @@ class HTTPCache:
 
         if (path / "body.arff").exists():
             return "body.arff"
+
+        if (path / "body.zip").exists():
+            return "body.zip"
 
         return "body.txt"
 
