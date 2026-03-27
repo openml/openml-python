@@ -424,9 +424,13 @@ def test__read_features(mocker, workdir, static_cache_dir):
             "org",
             "openml",
             "test",
-            "datasets",
+            "api",
+            "v1",
+            "xml",
+            "data",
+            "features",
             "2",
-            "features.xml",
+            "body.xml",
         ),
     )
     assert isinstance(features, dict)
@@ -457,9 +461,13 @@ def test__read_qualities(static_cache_dir, workdir, mocker):
             "org",
             "openml",
             "test",
-            "datasets",
+            "api",
+            "v1",
+            "xml",
+            "data",
+            "qualities",
             "2",
-            "qualities.xml",
+            "body.xml",
         ),
     )
     assert isinstance(qualities, dict)

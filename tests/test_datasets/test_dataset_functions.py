@@ -501,7 +501,7 @@ class TestOpenMLDataset(TestBase):
 
     @pytest.mark.test_server()
     def test_publish_dataset(self):
-        arff_file_path = self.static_cache_dir / "org" / "openml" / "test" / "datasets" / "2" / "dataset.arff"
+        arff_file_path = self.static_cache_dir / "org" / "openml" / "test" / "data" / "download" / "1666876" / "phpFsFYVN" / "body.arff"
         dataset = OpenMLDataset(
             "anneal",
             "test",
@@ -1366,8 +1366,8 @@ class TestOpenMLDataset(TestBase):
         # Check if dataset is written to cache directory using feather
         cache_dir = openml.config.get_cache_directory()
         cache_dir_for_id = os.path.join(cache_dir, "datasets", "128")
-        feather_file = os.path.join(cache_dir,"downloads","data","v1","download","128","iris.arff", "dataset.feather")
-        pickle_file = os.path.join(cache_dir,"downloads","data","v1","download","128","iris.arff", "dataset.feather.attributes.pkl.py3")
+        feather_file = os.path.join(cache_dir,"data","v1","download","128","iris.arff", "body.feather")
+        pickle_file = os.path.join(cache_dir,"data","v1","download","128","iris.arff", "body.feather.attributes.pkl.py3")
         data = pd.read_feather(feather_file)
         assert os.path.isfile(feather_file), "Feather file is missing"
         assert os.path.isfile(pickle_file), "Attributes pickle file is missing"
@@ -1859,17 +1859,17 @@ def _dataset_description_is_downloaded(did: int):
 
 
 def _dataset_qualities_is_downloaded(did: int):
-    cache_directory = Path(openml.config.get_cache_directory()) / "downloads/data/qualities"
-    return (cache_directory / str(did) / "qualities.xml").exists()
+    cache_directory = Path(openml.config.get_cache_directory()) / "api/v1/xml/data/qualities/"
+    return (cache_directory / str(did) / "body.xml").exists()
 
 
 def _dataset_features_is_downloaded(did: int):
-    cache_directory = Path(openml.config.get_cache_directory()) / "downloads/data/features"
-    return (cache_directory / str(did) / "features.xml").exists()
+    cache_directory = Path(openml.config.get_cache_directory()) / "api/v1/xml/data/features/" 
+    return (cache_directory / str(did) / "body.xml").exists()
 
 
 def _dataset_data_file_is_downloaded(did: int):
-    cache_directory = Path(openml.config.get_cache_directory()) / "minio/minio/datasets/0000/0001"
+    cache_directory = Path(openml.config.get_cache_directory()) / "minio/datasets/0000/0001"
     if not cache_directory.exists():
         return False
     return any(f.suffix in (".pq", ".arff") for f in cache_directory.iterdir())
