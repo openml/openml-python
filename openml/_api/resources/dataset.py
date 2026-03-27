@@ -8,10 +8,12 @@ import os
 import pickle
 from collections import OrderedDict
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import Any, Literal
 
 import minio
+import pandas as pd
 import urllib3
+import xmltodict
 
 import openml
 from openml.datasets.data_feature import OpenMLDataFeature
@@ -23,13 +25,6 @@ from openml.exceptions import (
 )
 
 from .base import DatasetAPI, ResourceV1API, ResourceV2API
-
-if TYPE_CHECKING:
-    from requests import Response
-
-
-import pandas as pd
-import xmltodict
 
 logger = logging.getLogger(__name__)
 
@@ -662,30 +657,20 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
             }
         )
 
-    def _download_file(self, url_ext: str, file_path: str, encoding: str = "utf-8") -> Path:
+    def _download_file(self, url_ext: str) -> Path:
         """Helper method to pass respective handler to downloader.
 
         Parameters
         ----------
         url_ext : str
             URL extension to download from.
-        file_name : str
-            Name of the file to save as.
-        encoding : str, optional (default='utf-8')
-            Encoding of the file.
 
         Returns
         -------
         Path
         """
-
-        def __handler(response: Response, path: Path, encoding: str) -> Path:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            with path.open("w", encoding=encoding) as f:
-                f.write(response.text)
-            return path
-
-        return self._http.download(url_ext, __handler, encoding, file_path)
+        response = self._http.get(url_ext, enable_cache=True)
+        return self._http.cache_path_from_response(response)
 
     def download_features_file(self, dataset_id: int) -> Path:
         """Download features file.
@@ -700,7 +685,7 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         Path
         """
         path = f"data/features/{dataset_id}"
-        file = self._download_file(path, "features.xml")
+        file = self._download_file(path)
         self.parse_features_file(file)
         return file
 
@@ -717,7 +702,7 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
         Path
         """
         path = f"data/qualities/{dataset_id}"
-        file = self._download_file(path, "qualities.xml")
+        file = self._download_file(path)
         self.parse_qualities_file(file)
         return file
 
@@ -791,9 +776,8 @@ class DatasetV1API(ResourceV1API, DatasetAPI):
             raise TypeError("`description` should be either OpenMLDataset or Dict.")
 
         try:
-            output_file_path = self._http.download(
-                url, file_name="dataset.arff", md5_checksum=md5_checksum_fixture
-            )
+            response = self._http.get(url, enable_cache=True, md5_checksum=md5_checksum_fixture)
+            output_file_path = self._http.cache_path_from_response(response)
         except OpenMLHashException as e:
             additional_info = f" Raised when downloading dataset {did}."
             e.args = (e.args[0] + additional_info,)
@@ -1372,29 +1356,20 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
             }
         )
 
-    def _download_file(self, url_ext: str, file_name: str, encoding: str = "utf-8") -> Path:
+    def _download_file(self, url_ext: str) -> Path:
         """Helper method to pass respective handler to downloader.
 
         Parameters
         ----------
         url_ext : str
             URL extension to download from.
-        file_name : str
-            Name of the file to save as.
-        encoding : str, optional (default='utf-8')
-            Encoding of the file.
 
         Returns
         -------
         Path
         """
-
-        def __handler(response: Response, path: Path, encoding: str) -> Path:
-            with path.open("w", encoding=encoding) as f:
-                json.dump(response.json(), f, indent=4)
-            return path
-
-        return self._http.download(url_ext, __handler, encoding, file_name)
+        response = self._http.get(url_ext, enable_cache=True)
+        return self._http.cache_path_from_response(response)
 
     def download_features_file(self, dataset_id: int) -> Path:
         """Download features file.
@@ -1409,7 +1384,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         Path
         """
         path = f"datasets/features/{dataset_id}"
-        file = self._download_file(path, "features.json")
+        file = self._download_file(path)
         self.parse_features_file(file)
         return file
 
@@ -1426,7 +1401,7 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
         Path
         """
         path = f"datasets/qualities/{dataset_id}"
-        file = self._download_file(path, "qualities.json")
+        file = self._download_file(path)
         self.parse_qualities_file(file)
         return file
 
@@ -1496,7 +1471,8 @@ class DatasetV2API(ResourceV2API, DatasetAPI):
             raise TypeError("`description` should be either OpenMLDataset or Dict.")
 
         try:
-            output_file_path = self._http.download(url, file_name="dataset.arff")
+            response = self._http.get(url, enable_cache=True)
+            output_file_path = self._http.cache_path_from_response(response)
         except OpenMLHashException as e:
             additional_info = f" Raised when downloading dataset {did}."
             e.args = (e.args[0] + additional_info,)
