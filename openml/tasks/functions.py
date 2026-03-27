@@ -1,8 +1,6 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
-import os
-import re
 import warnings
 from functools import partial
 from typing import TYPE_CHECKING, Any
@@ -10,9 +8,7 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 
 import openml.utils
-from openml._api.resources.task import _create_task_from_xml
 from openml.datasets import get_dataset
-from openml.exceptions import OpenMLCacheException
 
 from .task import (
     OpenMLClassificationTask,
@@ -28,48 +24,6 @@ if TYPE_CHECKING:
         OpenMLTask,
     )
 TASKS_CACHE_DIR_NAME = "tasks"
-
-
-def _get_cached_tasks() -> dict[int, OpenMLTask]:
-    """Return a dict of all the tasks which are cached locally.
-
-    Returns
-    -------
-    tasks : OrderedDict
-        A dict of all the cached tasks. Each task is an instance of
-        OpenMLTask.
-    """
-    task_cache_dir = openml.utils._create_cache_directory(TASKS_CACHE_DIR_NAME)
-    directory_content = os.listdir(task_cache_dir)  # noqa: PTH208
-    directory_content.sort()
-
-    # Find all dataset ids for which we have downloaded the dataset
-    # description
-    tids = (int(did) for did in directory_content if re.match(r"[0-9]*", did))
-    return {tid: _get_cached_task(tid) for tid in tids}
-
-
-def _get_cached_task(tid: int) -> OpenMLTask:
-    """Return a cached task based on the given id.
-
-    Parameters
-    ----------
-    tid : int
-        Id of the task.
-
-    Returns
-    -------
-    OpenMLTask
-    """
-    tid_cache_dir = openml.utils._create_cache_directory_for_id(TASKS_CACHE_DIR_NAME, tid)
-
-    task_xml_path = tid_cache_dir / "task.xml"
-    try:
-        with task_xml_path.open(encoding="utf8") as fh:
-            return _create_task_from_xml(fh.read())
-    except OSError as e:
-        openml.utils._remove_cache_dir_for_id(TASKS_CACHE_DIR_NAME, tid_cache_dir)
-        raise OpenMLCacheException(f"Task file for tid {tid} not cached") from e
 
 
 def _get_estimation_procedure_list() -> list[dict[str, Any]]:

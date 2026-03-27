@@ -29,7 +29,7 @@ class TestTask(TestBase):
 
     @pytest.mark.test_server()
     def test__get_estimation_procedure_list(self):
-        estimation_procedures = openml._api.resources.task._get_estimation_procedure_list()
+        estimation_procedures = openml.tasks.functions._get_estimation_procedure_list()
         assert isinstance(estimation_procedures, list)
         assert isinstance(estimation_procedures[0], dict)
         assert estimation_procedures[0]["task_type_id"] == TaskType.SUPERVISED_CLASSIFICATION
