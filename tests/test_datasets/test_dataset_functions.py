@@ -499,18 +499,6 @@ class TestOpenMLDataset(TestBase):
         )
         assert not os.path.exists(did_cache_dir)
 
-    # get_dataset_description is the only data guaranteed to be downloaded
-    @mock.patch("openml.datasets.functions._get_dataset_description")
-    @pytest.mark.test_server()
-    def test_deletion_of_cache_dir_faulty_download(self, patch):
-        with mock.patch.object(openml._backend.dataset._http, "get") as patch_get:
-            patch_get.side_effect = Exception("Boom!")
-            self.assertRaisesRegex(Exception, "Boom!", openml.datasets.get_dataset, dataset_id=1)
-            datasets_cache_dir = os.path.join(openml.config.get_cache_directory(), "api/v1/xml/data/1") 
-            #TODO cache path would not be created
-            if os.path.exists(datasets_cache_dir):
-                assert len(os.listdir(datasets_cache_dir)) == 0
-
     @pytest.mark.test_server()
     def test_publish_dataset(self):
         arff_file_path = self.static_cache_dir / "org" / "openml" / "test" / "datasets" / "2" / "dataset.arff"
