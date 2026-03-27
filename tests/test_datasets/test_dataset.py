@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 import unittest.mock
+from pathlib import Path
 import shutil
 from time import time
 
@@ -236,7 +237,7 @@ class OpenMLDatasetTest(TestBase):
 
     def test_lazy_loading_metadata(self):
         # Initial Setup
-        cache_dir = openml.config.get_cache_directory()
+        did_cache_dir = Path(self.http_client.cache_path_from_url("data/2")).parent
 
         _compare_dataset = openml.datasets.get_dataset(
             2,
@@ -244,7 +245,7 @@ class OpenMLDatasetTest(TestBase):
             download_features_meta_data=True,
             download_qualities=True,
         )
-        change_time = os.stat(cache_dir).st_mtime
+        change_time = os.stat(did_cache_dir).st_mtime
 
         # Test with cache
         _dataset = openml.datasets.get_dataset(
@@ -253,12 +254,12 @@ class OpenMLDatasetTest(TestBase):
             download_features_meta_data=False,
             download_qualities=False,
         )
-        assert change_time == os.stat(cache_dir).st_mtime
+        assert change_time == os.stat(did_cache_dir).st_mtime
         assert _dataset.features == _compare_dataset.features
         assert _dataset.qualities == _compare_dataset.qualities
 
         # -- Test without cache
-        shutil.rmtree(cache_dir)
+        shutil.rmtree(did_cache_dir)
 
         _dataset = openml.datasets.get_dataset(
             2,
@@ -267,7 +268,8 @@ class OpenMLDatasetTest(TestBase):
             download_qualities=False,
         )
 
-        assert change_time != os.stat(cache_dir).st_mtime
+        assert "body.xml" in os.listdir(did_cache_dir)
+        assert change_time != os.stat(did_cache_dir).st_mtime
         assert _dataset.features == _compare_dataset.features
         assert _dataset.qualities == _compare_dataset.qualities
 
