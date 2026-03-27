@@ -4,6 +4,7 @@ import os
 import unittest.mock
 import pytest
 import openml
+import requests
 from openml.testing import _check_dataset
 
 
@@ -41,11 +42,6 @@ def min_number_runs_on_test_server() -> int:
 def min_number_evaluations_on_test_server() -> int:
     """After a reset at least 8 evaluations are on the test server"""
     return 8
-
-
-def _mocked_perform_api_call(call, request_method):
-    url = openml.config.server  + call
-    return openml._api_calls._download_text_file(url)
 
 
 @pytest.mark.test_server()
@@ -115,13 +111,12 @@ def test_list_all_for_evaluations(min_number_evaluations_on_test_server):
     assert min_number_evaluations_on_test_server == len(evaluations)
 
 
-@unittest.mock.patch("openml._api_calls._perform_api_call", side_effect=_mocked_perform_api_call)
+@unittest.mock.patch.object(requests.Session, "request", autospec=True, wraps=requests.Session.request)
 @pytest.mark.test_server()
-def test_list_all_few_results_available(_perform_api_call):
+def test_list_all_few_results_available(mocked_request):
     datasets = openml.datasets.list_datasets(size=1000, data_name="iris", data_version=1)
     assert len(datasets) == 1, "only one iris dataset version 1 should be present"
-    # TODO: _perform_api_call no more used 
-    #assert _perform_api_call.call_count == 1, "expect just one call to get one dataset"
+    assert mocked_request.call_count == 1, "expect just one call to get one dataset"
 
 
 @unittest.skipIf(os.name == "nt", "https://github.com/openml/openml-python/issues/1033")
