@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 import unittest.mock
+import shutil
 from time import time
 
 import numpy as np
@@ -232,6 +233,44 @@ class OpenMLDatasetTest(TestBase):
         xy, _, _, _ = self.iris.get_data()
         assert isinstance(xy, pd.DataFrame)
         assert xy.shape == (150, 5)
+
+    def test_lazy_loading_metadata(self):
+        # Initial Setup
+        # /home/geetu/work/gcos/openml-python/openml/tests.test_datasets.test_dataset.OpenMLDatasetTest.test_lazy_loading_metadata/org/openml/www/datasets/2
+        cache_dir = openml.config.get_cache_directory()
+
+        _compare_dataset = openml.datasets.get_dataset(
+            2,
+            download_data=False,
+            download_features_meta_data=True,
+            download_qualities=True,
+        )
+        change_time = os.stat(cache_dir).st_mtime
+
+        # Test with cache
+        _dataset = openml.datasets.get_dataset(
+            2,
+            download_data=False,
+            download_features_meta_data=False,
+            download_qualities=False,
+        )
+        assert change_time == os.stat(cache_dir).st_mtime
+        assert _dataset.features == _compare_dataset.features
+        assert _dataset.qualities == _compare_dataset.qualities
+
+        # -- Test without cache
+        shutil.rmtree(cache_dir)
+
+        _dataset = openml.datasets.get_dataset(
+            2,
+            download_data=False,
+            download_features_meta_data=False,
+            download_qualities=False,
+        )
+
+        assert change_time != os.stat(cache_dir).st_mtime
+        assert _dataset.features == _compare_dataset.features
+        assert _dataset.qualities == _compare_dataset.qualities
 
     def test_equality_comparison(self):
         self.assertEqual(self.iris, self.iris)
