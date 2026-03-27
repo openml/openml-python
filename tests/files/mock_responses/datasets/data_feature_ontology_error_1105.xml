@@ -1,0 +1,4 @@
+<oml:error xmlns:oml="http://openml.org/openml">
+  <oml:code>1105</oml:code>
+  <oml:message>Ontology URL too long (max 256 characters)</oml:message>
+</oml:error>
