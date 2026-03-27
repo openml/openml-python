@@ -1,6 +1,7 @@
 # License: BSD 3-Clause
 from __future__ import annotations
 
+import logging
 import os
 import re
 from collections import OrderedDict
@@ -83,9 +84,11 @@ def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = T
     flow_id : int
         The OpenML flow id.
     reinstantiate : bool, optional (default=False)
-        If True, convert the flow description into a concrete model instance
-        using the flow's extension (e.g., sklearn). If conversion fails and
-        ``strict_version`` is True, an exception will be raised.
+        If True, attempt to convert the flow description into a concrete model
+        instance using the flow's extension (e.g., sklearn). If no extension is
+        registered for the flow type (e.g., for OpenML-native evaluation functions
+        or flows from uninstalled extensions), a warning is logged and the flow
+        is returned without instantiating the model.
     strict_version : bool, optional (default=True)
         When ``reinstantiate`` is True, whether to enforce exact version
         requirements for the extension/model. If False, a new flow may
@@ -95,7 +98,7 @@ def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = T
     -------
     OpenMLFlow
         The flow object with metadata; ``model`` may be populated when
-        ``reinstantiate=True``.
+        ``reinstantiate=True`` and an extension is available.
 
     Raises
     ------
@@ -108,6 +111,8 @@ def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = T
     ------------
     - Writes to ``openml.config.cache_directory/flows/{flow_id}/flow.xml``
       when the flow is downloaded from the server.
+    - Logs a warning if ``reinstantiate=True`` but no extension is available
+      for the flow type.
 
     Preconditions
     -------------
@@ -124,17 +129,35 @@ def get_flow(flow_id: int, reinstantiate: bool = False, strict_version: bool = T
     --------
     >>> import openml
     >>> flow = openml.flows.get_flow(5)  # doctest: +SKIP
+    >>> # Reinstantiate a sklearn flow (requires openml-sklearn extension)
+    >>> flow_with_model = openml.flows.get_flow(5, reinstantiate=True)  # doctest: +SKIP
+    >>> # For flows without extensions, a warning is logged and flow.model remains None
+    >>> flow_no_model = openml.flows.get_flow(1, reinstantiate=True)  # doctest: +SKIP
     """
     flow_id = int(flow_id)
     flow = _get_flow_description(flow_id)
 
     if reinstantiate:
-        flow.model = flow.extension.flow_to_model(flow, strict_version=strict_version)
-        if not strict_version:
-            # check if we need to return a new flow b/c of version mismatch
-            new_flow = flow.extension.model_to_flow(flow.model)
-            if new_flow.dependencies != flow.dependencies:
-                return new_flow
+        # Try to get an extension that can handle this flow
+        extension = flow._extension
+        if extension is None:
+            extension = openml.extensions.get_extension_by_flow(flow, raise_if_no_extension=False)
+
+        if extension is not None:
+            flow.model = extension.flow_to_model(flow, strict_version=strict_version)
+            if not strict_version:
+                # check if we need to return a new flow b/c of version mismatch
+                new_flow = extension.model_to_flow(flow.model)
+                if new_flow.dependencies != flow.dependencies:
+                    return new_flow
+        else:
+            # No extension available for this flow type, log a warning
+            logger = logging.getLogger(__name__)
+            logger.warning(
+                f"Cannot reinstantiate flow {flow_id} ({flow.name}): "
+                f"no extension registered that can handle this flow type. "
+                f"Returning flow without model instance."
+            )
     return flow
 
 
