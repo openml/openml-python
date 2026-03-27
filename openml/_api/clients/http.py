@@ -842,4 +842,4 @@ class HTTPClient:
 
         key = self.cache.get_key(url, params={})
         path = self.cache._key_to_path(key)
-        return path / self.cache._get_body_filename_from_response(response)
+        return path / self.cache._get_body_filename_from_path(path)
