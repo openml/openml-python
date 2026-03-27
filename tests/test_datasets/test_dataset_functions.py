@@ -1869,15 +1869,8 @@ def _dataset_features_is_downloaded(did: int):
 
 
 def _dataset_data_file_is_downloaded(did: int):
+    #TODO to be updated after minio paths is fixed
     cache_directory = Path(openml.config.get_cache_directory()) / "minio/datasets/0000/0001"
-    directory = Path(directory)
-    if not directory.exists():
-        TestBase.logger.info(f"Directory does not exist: {directory}")
-        return
-    TestBase.logger.info(f"All files under {directory}:")
-    for path in directory.rglob("*"):
-        if path.is_file():
-            TestBase.logger.info(f" - {path}")
     if not cache_directory.exists():
         return False
     return any(f.suffix in (".pq", ".arff") for f in cache_directory.iterdir())
