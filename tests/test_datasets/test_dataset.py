@@ -236,7 +236,6 @@ class OpenMLDatasetTest(TestBase):
 
     def test_lazy_loading_metadata(self):
         # Initial Setup
-        # /home/geetu/work/gcos/openml-python/openml/tests.test_datasets.test_dataset.OpenMLDatasetTest.test_lazy_loading_metadata/org/openml/www/datasets/2
         cache_dir = openml.config.get_cache_directory()
 
         _compare_dataset = openml.datasets.get_dataset(
